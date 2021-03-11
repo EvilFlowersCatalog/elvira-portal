@@ -31,7 +31,7 @@ build_image:development:
   dependencies:
     - build:development
   script:
-    - docker login -u $CI_USER -p $CI_REGISTRY_TOKEN $CI_REGISTRY
+    - docker login -u $CI_DEPLOY_USER -p $CI_DEPLOY_PASSWORD $CI_REGISTRY
     - docker build -t registry.gitlab.com/fiit_coworking/e-library/e-library-client:dev .
     - docker push registry.gitlab.com/fiit_coworking/e-library/e-library-client:dev
 
@@ -61,6 +61,6 @@ build_image:prod:
   dependencies:
     - build:prod
   script:
-    - docker login -u $CI_USER -p $CI_REGISTRY_TOKEN $CI_REGISTRY
+    - docker login -u $CI_DEPLOY_USER -p $CI_DEPLOY_PASSWORD $CI_REGISTRY
     - docker build -t registry.gitlab.com/fiit_coworking/e-library/e-library-client:prod .
     - docker push registry.gitlab.com/fiit_coworking/e-library/e-library-client:prod
