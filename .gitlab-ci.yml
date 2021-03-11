@@ -13,7 +13,7 @@ build:development:
     - master
   script:
     - npm install --prod
-    - npm install -D typescript
+    - npm install -D typescript @angular/cli @angular/compiler
     - npm run build:dev
   artifacts:
     paths:
@@ -43,7 +43,7 @@ build:prod:
     - merge_requests
   script:
     - npm install --prod
-    - npm install -D typescript
+    - npm install -D typescript @angular/cli @angular/compiler
     - npm run build:prod
   artifacts:
     paths:
