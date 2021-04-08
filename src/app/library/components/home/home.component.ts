@@ -15,6 +15,10 @@ export class HomeComponent implements OnInit {
   ngOnInit(): void {
   }
 
+  goToAdmin() {
+    this.router.navigate(['/library/admin'])
+  }
+
   logout() {
     localStorage.removeItem('token');
     this.router.navigate(['/auth/login'])

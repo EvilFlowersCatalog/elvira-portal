@@ -82,6 +82,7 @@ import { MatTreeModule } from '@angular/material/tree';
         MatTreeModule,
         OverlayModule,
         PortalModule,
+        MatCardModule
     ],
 })
 export class MaterialModule {}
