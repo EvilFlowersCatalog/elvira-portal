@@ -12,7 +12,8 @@ export const LIBRARY_ROUTES: Routes = [
     {
         path: 'home',
         canActivate: [LibraryGuard],
-        component: HomeComponent
+        component: HomeComponent,
+        loadChildren: () => import('../../common/navbar/navbar.component').then(m => m.NavbarComponent),
     },
     {
       path: 'admin',

@@ -5,9 +5,10 @@ import { RouterModule } from '@angular/router';
 import { LIBRARY_ROUTES } from './routing/library.routes';
 import { MaterialModule } from '../material.module';
 import { AdminComponent } from './components/admin/admin.component';
+import { NavbarComponent } from '../common/navbar/navbar.component';
 
 @NgModule({
-  declarations: [HomeComponent, AdminComponent],
+  declarations: [HomeComponent, AdminComponent, NavbarComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(LIBRARY_ROUTES),
