@@ -18,6 +18,9 @@ export class NavbarComponent implements OnInit {
   goToAdmin() {
     this.router.navigate(['/library/admin'])
   }
+  goToHome() {
+    this.router.navigate(['/library/home'])
+  }
 
   logout() {
     localStorage.removeItem('token');
