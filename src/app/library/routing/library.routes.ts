@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { HomeComponent } from '../components/home/home.component';
+import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component'
 import { LibraryGuard } from './library.guard';
 
 export const LIBRARY_ROUTES: Routes = [
@@ -12,5 +13,10 @@ export const LIBRARY_ROUTES: Routes = [
         path: 'home',
         canActivate: [LibraryGuard],
         component: HomeComponent
+    },
+    {
+        path: 'pdf-viewer/:id',
+        canActivate: [LibraryGuard],
+        component: PdfViewerComponent
     }
-  ];
+];
