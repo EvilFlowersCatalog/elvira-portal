@@ -28,4 +28,18 @@ export class HomeComponent implements OnInit {
   openPdf(id) {
     this.router.navigateByUrl(`/library/pdf-viewer/${id}`)
   }
+
+  private getSelectedText() {
+    return (window as any).getSelection().toString();
+  }
+
+  public registerSelectionListener() {
+    document.addEventListener('selectionchange', (event: any) => {
+      const text = this.getSelectedText();
+
+      if (text) {
+        console.log(text);
+      }
+    });
+  }
 }
