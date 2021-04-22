@@ -26,4 +26,8 @@ export class AuthService {
   verifyToken(token: string): Observable<boolean> {
     return of(token === 'token' ? true : false)
   }
+
+  getToken(){
+    return localStorage.getItem('token')
+  }
 }

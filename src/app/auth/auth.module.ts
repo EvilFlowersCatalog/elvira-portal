@@ -6,12 +6,11 @@ import { RouterModule } from '@angular/router';
 import { AUTH_ROUTES } from './routing/auth.routing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../material.module';
-import { BrowserModule } from '@angular/platform-browser';
 
 @NgModule({
   declarations: [
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
   ],
   imports: [
     CommonModule,
@@ -19,6 +18,6 @@ import { BrowserModule } from '@angular/platform-browser';
     FormsModule,
     RouterModule.forChild(AUTH_ROUTES),
     MaterialModule
-  ]
+  ],
 })
 export class AuthModule { }

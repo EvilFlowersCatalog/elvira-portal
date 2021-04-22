@@ -13,6 +13,7 @@ import { NavbarComponent } from '../common/navbar/navbar.component';
     CommonModule,
     RouterModule.forChild(LIBRARY_ROUTES),
     MaterialModule
-  ]
+  ],
+  providers: [],
 })
 export class LibraryModule { }

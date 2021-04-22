@@ -2,11 +2,16 @@
   <mat-card  fxFlex="25" >
     <mat-toolbar fxLayoutAlign="center" >Please sign in</mat-toolbar>
     <form [formGroup] = "loginForm" (submit)="submit()" fxLayoutAlign="stretch" fxLayout="column">
-
-        <input formControlName="username" class="form-control" placeholder="Email address" required autofocus>
-        <input formControlName="password" type="password"  class="form-control" placeholder="Password" required>
-
-      <button mat-raised-button type="submit">Sign in</button>
-    </form>
+    <mat-form-field floatLabel="auto">
+      <mat-label>Username</mat-label>
+        <input matInput formControlName="username"  required>
+    </mat-form-field >
+    <mat-form-field >
+      <mat-label>password</mat-label>
+        <input matInput formControlName="password" type="password" required>
+    </mat-form-field>
+      <button mat-raised-button type="submit" >Sign in</button>
+  </form>
   </mat-card>
 </div>
+
