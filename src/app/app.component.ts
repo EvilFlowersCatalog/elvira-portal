@@ -13,18 +13,6 @@ export class AppComponent {
   constructor(private http: HttpClient){}
 
   ngOnInit(){
-    this.http.get('http://jsonplaceholder.typicode.com/users')
-    .subscribe(data =>{
-
-    });
-    this.http.get(baseUrl)
-    .subscribe(data =>{
-
-    })
-    // this.http.get('http://jsonplaceholder.typicode.com/posts/2')
-    // .subscribe(data =>{
-
-    // });
 
   }
 }

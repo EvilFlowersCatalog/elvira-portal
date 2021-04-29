@@ -8,15 +8,15 @@ import { LoginCredentials, LoginResponse } from '../types/auth.types';
 })
 export class AuthService {
 
-  apiUrl = 'http://localhost:8000/api';
+  apiUrl = 'http://localhost:8000';
 
   constructor(
     private readonly httpClient: HttpClient
   ) { }
 
   login(loginCredentials: LoginCredentials): Observable<LoginResponse> {
-    // return this.httpClient.post<LoginResponse>(`${this.apiUrl}/login`, loginCredentials);
-    return of({ userId: '72076', token: 'token' });
+    return this.httpClient.post<LoginResponse>('api/apigw/auth/login', loginCredentials);
+   // return of({ userId: '72076', token: 'token' });
   }
 
   register(registrationCredentials) {
@@ -24,7 +24,7 @@ export class AuthService {
   }
 
   verifyToken(token: string): Observable<boolean> {
-    return of(token === 'token' ? true : false)
+    return of(true)
   }
 
   getToken(){

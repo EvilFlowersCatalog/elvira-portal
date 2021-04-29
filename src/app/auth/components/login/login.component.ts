@@ -20,6 +20,7 @@ export class LoginComponent implements OnInit {
   constructor(
     private readonly router: Router,
     private readonly authService: AuthService,
+    private readonly http: HttpClient
   ) {
     this.loginForm = new FormGroup({
       username: new FormControl(''),
@@ -43,7 +44,7 @@ export class LoginComponent implements OnInit {
       )
       .subscribe((response: LoginResponse) => {
         console.log(response);
-        localStorage.setItem('token', response.token);
+        localStorage.setItem('token', response.accesToken);
         this.router.navigate(['/library'])
       });
   }
