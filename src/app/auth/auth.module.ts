@@ -5,18 +5,19 @@ import { RegisterComponent } from './components/register/register.component';
 import { RouterModule } from '@angular/router';
 import { AUTH_ROUTES } from './routing/auth.routing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
+import { MaterialModule } from '../material.module';
 
 @NgModule({
   declarations: [
     LoginComponent,
-    RegisterComponent
+    RegisterComponent,
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    RouterModule.forChild(AUTH_ROUTES)
-  ]
+    RouterModule.forChild(AUTH_ROUTES),
+    MaterialModule
+  ],
 })
 export class AuthModule { }

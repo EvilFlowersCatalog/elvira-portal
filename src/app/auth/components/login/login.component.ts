@@ -13,15 +13,20 @@ import { throwError } from 'rxjs';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  loginForm = new FormGroup({
-    username: new FormControl(''),
-    password: new FormControl('')
-  });
+  loginForm :FormGroup;
+  username: string;
+  password: string;
 
   constructor(
     private readonly router: Router,
     private readonly authService: AuthService,
-  ) { }
+    private readonly http: HttpClient
+  ) {
+    this.loginForm = new FormGroup({
+      username: new FormControl(''),
+      password: new FormControl(''),
+  });
+  }
 
   ngOnInit(): void {
 
@@ -39,7 +44,7 @@ export class LoginComponent implements OnInit {
       )
       .subscribe((response: LoginResponse) => {
         console.log(response);
-        localStorage.setItem('token', response.token);
+        localStorage.setItem('token', response.accesToken);
         this.router.navigate(['/library'])
       });
   }

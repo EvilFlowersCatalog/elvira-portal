@@ -3,12 +3,17 @@ import { CommonModule } from '@angular/common';
 import { HomeComponent } from './components/home/home.component';
 import { RouterModule } from '@angular/router';
 import { LIBRARY_ROUTES } from './routing/library.routes';
+import { MaterialModule } from '../material.module';
+import { AdminComponent } from './components/admin/admin.component';
+import { NavbarComponent } from '../common/navbar/navbar.component';
 
 @NgModule({
-  declarations: [HomeComponent],
+  declarations: [HomeComponent, AdminComponent, NavbarComponent],
   imports: [
     CommonModule,
-    RouterModule.forChild(LIBRARY_ROUTES)
-  ]
+    RouterModule.forChild(LIBRARY_ROUTES),
+    MaterialModule
+  ],
+  providers: [],
 })
 export class LibraryModule { }
