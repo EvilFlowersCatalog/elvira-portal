@@ -2,18 +2,21 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HomeComponent } from './components/home/home.component';
 import { RouterModule } from '@angular/router';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { LIBRARY_ROUTES } from './routing/library.routes';
-import { MaterialModule } from '../material.module';
 import { AdminComponent } from './components/admin/admin.component';
 import { NavbarComponent } from '../common/navbar/navbar.component';
+import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component';
+import { MaterialModule } from '../material.module';
 
 @NgModule({
-  declarations: [HomeComponent, AdminComponent, NavbarComponent],
-  imports: [
+  declarations: [HomeComponent, PdfViewerComponent],
+  imports:[
     CommonModule,
+    NgxExtendedPdfViewerModule,
     RouterModule.forChild(LIBRARY_ROUTES),
     MaterialModule
   ],
-  providers: [],
+  providers:[]
 })
 export class LibraryModule { }
