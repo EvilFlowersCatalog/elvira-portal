@@ -10,10 +10,10 @@ import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component
 import { MaterialModule } from '../material.module';
 
 @NgModule({
-  declarations: [HomeComponent, PdfViewerComponent],
+  declarations: [HomeComponent, PdfViewerComponent, AdminComponent, NavbarComponent],
   imports:[
     CommonModule,
-    NgxExtendedPdfViewerModule,
+
     RouterModule.forChild(LIBRARY_ROUTES),
     MaterialModule
   ],
