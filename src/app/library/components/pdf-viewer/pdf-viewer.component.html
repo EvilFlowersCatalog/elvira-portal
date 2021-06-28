@@ -1,7 +1,9 @@
 <ng-container>
-    <ngx-extended-pdf-viewer *ngIf="annotatedFile" [src]="annotatedFile" [textLayer]="true" [useBrowserLocale]="true"
-        [customToolbar]="additionalButtons" [showBorders]="true" [backgroundColor]="'gray'" [height]="'100%'"
-        theme="dark">
+    <button (click)="addFigure()">Rectangle</button>
+    <canvas id="canvas"></canvas>
+    <ngx-extended-pdf-viewer id="pdf-viewer" *ngIf="annotatedFile" [src]="annotatedFile" [textLayer]="true"
+        [useBrowserLocale]="true" [customToolbar]="additionalButtons" [showBorders]="true" [backgroundColor]="'gray'"
+        [height]="'100%'" theme="dark">
     </ngx-extended-pdf-viewer>
 </ng-container>
 
@@ -42,6 +44,6 @@
                 <button title="Enable Hand Tool" id="cursorHandTool"></button>
             </pdf-toggle-secondary-toolbar>
         </div>
-        <pdf-zoom-toolbar></pdf-zoom-toolbar>
+        <!-- <pdf-zoom-toolbar></pdf-zoom-toolbar> -->
     </div>
 </ng-template>
