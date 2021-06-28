@@ -43,9 +43,11 @@ export class LoginComponent implements OnInit {
         })
       )
       .subscribe((response: LoginResponse) => {
-        console.log(response);
+        //console.log(response);
         localStorage.setItem('token', response.accesToken);
+        localStorage.setItem('username', response.user.login);
         this.router.navigate(['/library'])
       });
   }
+
 }
