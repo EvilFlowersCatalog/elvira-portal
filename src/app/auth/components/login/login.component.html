@@ -1,17 +1,21 @@
-<div fxLayoutAlign="center center" fxFlexFill style="padding-top: 200px;">
-  <mat-card  fxFlex="25" >
-    <mat-toolbar fxLayoutAlign="center" >Please sign in</mat-toolbar>
-    <form [formGroup] = "loginForm" (submit)="submit()" fxLayoutAlign="stretch" fxLayout="column">
-    <mat-form-field floatLabel="auto">
-      <mat-label>Username</mat-label>
-        <input matInput formControlName="username"  required>
+<div fxLayoutAlign="center center" fxLayout="column"  fxFlexFill class="login-row">
+    <h1 fxLayoutAlign="start" fxLayout="row" >Prihlásenie</h1>
+    <form [formGroup] = "loginForm" (submit)="submit()" fxLayoutAlign="stretch" fxLayout="column" class="login-box">
+    <div >
+    <mat-form-field  appearance="fill" class="login-form-width" >
+      <mat-label>Login</mat-label>
+        <input matInput formControlName="username" style="padding: 0 .75em 0 .75em;" required>
     </mat-form-field >
-    <mat-form-field >
-      <mat-label>password</mat-label>
-        <input matInput formControlName="password" type="password" required>
+  </div>
+  <div >
+    <mat-form-field appearance="fill" class="login-form-width">
+      <mat-label>Heslo</mat-label>
+        <input matInput formControlName="password"  type="password" style="padding: 0 .75em 0 .75em;" required >
     </mat-form-field>
-      <button mat-raised-button type="submit" >Sign in</button>
+      <div>
+        <button mat-raised-button color="primary" type="submit" class="login-button" >Prihlásiť sa</button>
+      </div>
+    </div>
   </form>
-  </mat-card>
 </div>
 
