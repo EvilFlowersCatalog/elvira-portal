@@ -1,9 +1,7 @@
 <ng-container>
-    <button (click)="addFigure()">Rectangle</button>
-    <canvas id="canvas"></canvas>
-    <ngx-extended-pdf-viewer id="pdf-viewer" *ngIf="annotatedFile" [src]="annotatedFile" [textLayer]="true"
-        [useBrowserLocale]="true" [customToolbar]="additionalButtons" [showBorders]="true" [backgroundColor]="'gray'"
-        [height]="'100%'" theme="dark">
+    <ngx-extended-pdf-viewer *ngIf="book" [src]="book" [textLayer]="true" [useBrowserLocale]="true"
+        [customToolbar]="additionalButtons" [showBorders]="true" [backgroundColor]="'gray'" [height]="'100%'"
+        theme="dark">
     </ngx-extended-pdf-viewer>
 </ng-container>
 
@@ -18,22 +16,6 @@
         <div id="toolbarViewerRight">
             <pdf-hand-tool></pdf-hand-tool>
             <pdf-select-tool></pdf-select-tool>
-            <button type="button" class="toolbarButton new-tab hiddenMediumView" title="Undo annotation"
-                (click)="undoAnnotation()">
-                <mat-icon class="custom-button-icon">undo</mat-icon>
-            </button>
-            <button type="button" class="toolbarButton new-tab hiddenMediumView" title="Redo annotation"
-                (click)="redoAnnotation()">
-                <mat-icon class="custom-button-icon">redo</mat-icon>
-            </button>
-            <button type="button" class="toolbarButton new-tab hiddenMediumView" title="Create highlight annotation"
-                (click)="highlightAnnotation()">
-                <mat-icon class="custom-button-icon">border_color</mat-icon>
-            </button>
-            <button type="button" class="toolbarButton new-tab hiddenMediumView" title="Create comment annotation"
-                (click)="commentAnnotation()">
-                <mat-icon class="custom-button-icon">insert_comment</mat-icon>
-            </button>
             <pdf-rotate-page></pdf-rotate-page>
             <pdf-presentation-mode></pdf-presentation-mode>
             <pdf-print></pdf-print>
