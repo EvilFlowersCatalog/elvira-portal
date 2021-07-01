@@ -1,0 +1,53 @@
+@import '~@angular/material/theming';
+@include mat-core();
+
+// $my-app-primary: mat-palette($mat-blue-grey);
+// $my-app-accent:  mat-palette($mat-pink, 500, 900, A100);
+// $my-app-warn:    mat-palette($mat-deep-orange);
+// $my-app-theme: mat-light-theme($my-app-primary, $my-app-accent, $my-app-warn);
+// @include angular-material-theme($my-app-theme);
+
+// .alternate-theme {
+//   $alternate-primary: mat-palette($mat-light-blue);
+//   $alternate-accent:  mat-palette($mat-yellow, 400);
+//   $alternate-theme: mat-light-theme($alternate-primary, $alternate-accent);
+
+//   @include angular-material-theme($alternate-theme);
+// }
+
+.login-theme{
+$primary: (
+ Main:#333,
+ Light:#5c5c5c,
+ Dark: #0c0c0c,
+ contrast: (
+  Main: #fff,
+  Light: #fff,
+  Dark: #fff
+ ));
+$accent: (
+ Main: #00bcd4,
+ Light: #00bcd4,
+ Dark: #00bcd4,
+ contrast: (
+   Main: #fff,
+   Light: #fff,
+   Dark: #fff
+  ));
+$warn:(
+  Main:#666,
+  Light:#5c5c5c,
+  Dark: #0c0c0c,
+  contrast: (
+   Main: #fff,
+   Light: #fff,
+   Dark: #fff
+  ));
+
+$login-theme-primary: mat-palette($primary, Main, Light, Dark);
+$login-theme-accent: mat-palette($accent, Main, Light, Dark);
+$login-theme-warn: mat-palette($warn, A200, A400, A700);
+$login-theme: mat-light-theme($login-theme-primary, $login-theme-accent, $login-theme-warn);
+
+@include angular-material-theme($login-theme);
+}

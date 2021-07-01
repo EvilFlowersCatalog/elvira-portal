@@ -1,21 +1,33 @@
-<div fxLayoutAlign="center center" fxLayout="column"  fxFlexFill class="login-row">
-    <h1 fxLayoutAlign="start" fxLayout="row" >Prihlásenie</h1>
-    <form [formGroup] = "loginForm" (submit)="submit()" fxLayoutAlign="stretch" fxLayout="column" class="login-box">
-    <div >
-    <mat-form-field  appearance="fill" class="login-form-width" >
-      <mat-label>Login</mat-label>
-        <input matInput formControlName="username" style="padding: 0 .75em 0 .75em;" required>
-    </mat-form-field >
-  </div>
-  <div >
-    <mat-form-field appearance="fill" class="login-form-width">
-      <mat-label>Heslo</mat-label>
-        <input matInput formControlName="password"  type="password" style="padding: 0 .75em 0 .75em;" required >
-    </mat-form-field>
-      <div>
-        <button mat-raised-button color="primary" type="submit" class="login-button" >Prihlásiť sa</button>
+<div class="mdl-card mdl-card__blank-layout-card mdl-shadow--2dp">
+  <div class="mdl-card__supporting-text color--dark-gray">
+    <div class="mdl-grid">
+      <div class="mdl-cell mdl-cell--12-col mdl-cell--4-col-phone">
+        <span class="mdl-card__title-text text-color--smooth-gray">E-LIBRARY</span>
       </div>
+      <div class="mdl-cell mdl-cell--12-col mdl-cell--4-col-phone">
+        <span class="blank-layout-card-name text-color--white">Sign in</span>
+      </div>
+      <form class="login-form" [formGroup]="loginForm" (submit)="submit()" autocomplete="off" novalidate>
+        <div class="mdl-cell mdl-cell--12-col mdl-cell--4-col-phone">
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label full-size">
+            <b class="login-text-size">Login</b>
+            <i class="login-text-size"> (použite prihlasovacie údaje z AIS)</i>
+            <input formControlName="username" class="mdl-textfield__input" type="text" id="email">
+          </div>
+
+          <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label full-size" id="forPass">
+            <b class="login-text-size">Password</b>
+            <input formControlName="password"
+                   class="mdl-textfield__input" type="password" id="password">
+          </div>
+          <div class="mdl-layout-spacer"></div>
+          <button class="mdl-button mdl-js-button mdl-button--raised color--light-blue"
+                  type="submit">
+            SIGN IN
+          </button>
+        </div>
+      </form>
     </div>
-  </form>
+  </div>
 </div>
 

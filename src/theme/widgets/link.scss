@@ -1,0 +1,8 @@
+@import '../helpers';
+
+a {
+  @include typo-default;
+
+  color: $card-link-color;
+  text-decoration: none;
+}
