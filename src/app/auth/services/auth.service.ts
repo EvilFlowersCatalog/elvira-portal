@@ -16,18 +16,14 @@ export class AuthService {
 
   login(loginCredentials: LoginCredentials): Observable<LoginResponse> {
     return this.httpClient.post<LoginResponse>('api/apigw/auth/login', loginCredentials);
-   // return of({ userId: '72076', token: 'token' });
-  }
-
-  register(registrationCredentials) {
-
+    // return of({ userId: '72076', token: 'token' });
   }
 
   verifyToken(token: string): Observable<boolean> {
     return of(true)
   }
 
-  getToken(){
+  getToken() {
     return localStorage.getItem('token')
   }
 }

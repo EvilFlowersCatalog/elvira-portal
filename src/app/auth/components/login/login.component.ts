@@ -13,9 +13,10 @@ import { throwError } from 'rxjs';
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit {
-  loginForm :FormGroup;
+  loginForm: FormGroup;
   username: string;
   password: string;
+  hidePassword = true;
 
   constructor(
     private readonly router: Router,
@@ -25,7 +26,7 @@ export class LoginComponent implements OnInit {
     this.loginForm = new FormGroup({
       username: new FormControl(''),
       password: new FormControl(''),
-  });
+    });
   }
 
   ngOnInit(): void {
