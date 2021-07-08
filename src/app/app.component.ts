@@ -9,9 +9,9 @@ import { Component } from '@angular/core';
 export class AppComponent {
   title = 'elibrary-portal';
 
-  constructor(private http: HttpClient){}
+  constructor(private http: HttpClient) { }
 
-  ngOnInit(){
+  ngOnInit() {
 
   }
 }

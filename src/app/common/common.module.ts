@@ -5,10 +5,17 @@ import { NavbarComponent } from './navbar/navbar.component';
 import { MaterialModule } from '../material.module';
 
 @NgModule({
-  declarations: [NotfoundComponent, NavbarComponent],
+  declarations: [
+    NavbarComponent,
+    NotfoundComponent,
+  ],
   imports: [
     CommonModule,
-    MaterialModule
-  ]
+    MaterialModule,
+  ],
+  exports: [
+    NavbarComponent,
+    NotfoundComponent,
+  ],
 })
 export class CommonLibraryModule { }

@@ -2,10 +2,16 @@ span {
   padding-right: 1rem;
 }
 
-.navbar-items {
-  cursor: pointer;
+.navbar-spacer {
+  flex: 1 1 auto;
 }
 
-.navbar-items:hover {
-  color: grey;
+.nav-label {
+  font-size: large;
+  vertical-align: baseline;
+}
+
+.nav-label-text {
+  font-size: large;
+  font-variant: small-caps;
 }
