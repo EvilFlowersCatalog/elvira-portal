@@ -7,11 +7,12 @@ import { Component } from '@angular/core';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'elibrary-portal';
+  title: string = 'elibrary-portal';
+  isDarkTheme: boolean = true;
 
   constructor(private http: HttpClient) { }
 
   ngOnInit() {
-
+    this.isDarkTheme = localStorage.getItem('theme') === "Dark" ? true : false;
   }
 }
