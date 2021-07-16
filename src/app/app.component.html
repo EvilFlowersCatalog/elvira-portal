@@ -1,4 +1,4 @@
-<div class="mat-app-background" [ngClass]="isDarkTheme ? 'theme-alternate' : 'theme'">
-  <app-navbar></app-navbar>
+<div class="mat-app-background">
+  <app-navbar (themeChanged)="changeTheme()"></app-navbar>
   <router-outlet></router-outlet>
 </div>

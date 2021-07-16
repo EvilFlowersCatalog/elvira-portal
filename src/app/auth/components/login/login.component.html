@@ -2,11 +2,11 @@
   <mat-card tabindex="0" fxLayout="column" fxLayoutAlign="center stretch" class="login-card">
     <h1>Prihlásenie</h1>
     <form [formGroup]="loginForm" (submit)="submit()" fxLayoutAlign="stretch" fxLayout="column">
-      <mat-form-field>
+      <mat-form-field color="accent">
         <mat-label>Login</mat-label>
         <input matInput formControlName="username" style="padding: 0 .75em 0 .75em;" required>
       </mat-form-field>
-      <mat-form-field>
+      <mat-form-field color="accent">
         <mat-label>Heslo</mat-label>
         <input matInput formControlName="password" type="password" style="padding: 0 .75em 0 .75em;" required
           [type]="hidePassword ? 'password' : 'text'">

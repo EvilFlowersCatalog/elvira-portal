@@ -1,5 +1,7 @@
+import { DOCUMENT } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, Inject, Renderer2 } from '@angular/core';
+import { LocalStorageService } from './common/services/local-storage.service'
 
 @Component({
   selector: 'app-root',
@@ -8,11 +10,20 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title: string = 'elibrary-portal';
-  isDarkTheme: boolean = true;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    @Inject(DOCUMENT) private document: Document,
+    private renderer: Renderer2,
+    private localStorageService: LocalStorageService,
+  ) { }
 
   ngOnInit() {
-    this.isDarkTheme = localStorage.getItem('theme') === "Dark" ? true : false;
+    this.changeTheme()
+  }
+
+  changeTheme() {
+    const hostClass = this.localStorageService.getItem('theme') === 'dark' ? 'theme-dark' : 'theme-light'
+    this.renderer.setAttribute(this.document.body, 'class', hostClass)
   }
 }

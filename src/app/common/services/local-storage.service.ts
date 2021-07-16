@@ -1,21 +1,26 @@
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
+import { LOCAL_STORAGE_TOKEN } from '../common.module';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LocalStorageService {
 
-  constructor() { }
+  constructor(@Inject(LOCAL_STORAGE_TOKEN) private localStorage: Storage) { }
 
-  getItem(prop: string): string {
-    return localStorage.getItem(prop)
+  getItem(attribute: string): string {
+    return this.localStorage.getItem(attribute)
   }
 
-  setItem(prop: string, item: string) {
-    localStorage.setItem(prop, item)
+  setItem(attribute: string, value: string) {
+    this.localStorage.setItem(attribute, value)
   }
 
-  removeItem(prop: string) {
-    localStorage.removeItem(prop)
+  removeItem(attribute: string) {
+    this.localStorage.removeItem(attribute)
+  }
+
+  clear() {
+    this.localStorage.clear()
   }
 }
