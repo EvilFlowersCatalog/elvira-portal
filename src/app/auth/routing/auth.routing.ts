@@ -13,4 +13,14 @@ export const AUTH_ROUTES: Routes = [
         canActivate: [LoginGuard],
         component: LoginComponent,
     },
+    {
+      path: 'login/en',
+      canActivate: [LoginGuard],
+      component: LoginComponent,
+  },
+  {
+    path: 'login/sk',
+    canActivate: [LoginGuard],
+    component: LoginComponent,
+},
   ];

@@ -16,6 +16,18 @@
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
+      "i18n": {
+        "locales": {
+          "sk": {
+            "translation": "src/locale/messages.sk.xlf",
+            "baseHref": ""
+          },
+          "en": {
+            "translation": "src/locale/messages.sk.xlf",
+            "baseHref": ""
+          }
+        }
+      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
@@ -25,7 +37,9 @@
             "main": "src/main.ts",
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
+            "localize": true,
             "aot": true,
+            "i18nMissingTranslation": "error",
             "assets": [
               "src/favicon.ico",
               "src/assets",
@@ -68,6 +82,12 @@
                 }
               ]
             },
+            "en": {
+              "localize": ["en"]
+            },
+            "sk": {
+              "localize": ["sk"]
+            },
             "development": {
               "fileReplacements": [
                 {
@@ -104,6 +124,12 @@
           "configurations": {
             "production": {
               "browserTarget": "elibrary-portal:build:production"
+            },
+            "en":{
+              "browserTarget": "elibrary-portal:build:en"
+            },
+            "sk":{
+              "browserTarget": "elibrary-portal:build:sk"
             }
           }
         },
