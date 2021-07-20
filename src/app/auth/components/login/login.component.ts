@@ -6,6 +6,7 @@ import { AuthService } from '../../services/auth.service';
 import { catchError, take } from 'rxjs/operators';
 import { LoginResponse } from '../../types/auth.types';
 import { throwError } from 'rxjs';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
@@ -21,7 +22,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private readonly router: Router,
     private readonly authService: AuthService,
-    private readonly http: HttpClient
+    private readonly http: HttpClient,
+    private snackBar: MatSnackBar
   ) {
     this.loginForm = new FormGroup({
       username: new FormControl(''),
@@ -40,6 +42,9 @@ export class LoginComponent implements OnInit {
         take(1),
         catchError(err => {
           console.log(err);
+          this.snackBar.open('Invalid credentials!', 'close', {
+            duration: 5000,
+          });
           return throwError(err)
         })
       )
