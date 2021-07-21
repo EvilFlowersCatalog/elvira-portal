@@ -1,13 +1,13 @@
 <section fxLayout="column" fxLayoutAlign="center center" fxFlexFill class="login-container">
   <mat-card fxLayout="column" fxLayoutAlign="center stretch" class="login-card">
-    <h1 i18n="@@loginTitle">Prihlásenie</h1>
+    <h1>Prihlásenie</h1>
     <form [formGroup]="loginForm" (submit)="submit()" fxLayoutAlign="stretch" fxLayout="column">
       <mat-form-field>
-        <mat-label i18n="@@login">Loginn</mat-label>
+        <mat-label>Loginn</mat-label>
         <input matInput formControlName="username" style="padding: 0 .75em 0 .75em;" required>
       </mat-form-field>
       <mat-form-field>
-        <mat-label i18n="@@password">Heslo</mat-label>
+        <mat-label>Heslo</mat-label>
         <input matInput formControlName="password" type="password" style="padding: 0 .75em 0 .75em;" required
           [type]="hidePassword ? 'password' : 'text'">
         <mat-icon matSuffix (click)="hidePassword = !hidePassword" class="login-password-icon">{{
