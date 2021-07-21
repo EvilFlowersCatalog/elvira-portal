@@ -1,0 +1,8 @@
+{
+  "loginScreen": {
+    "form": "Prihlásenie",
+    "login": "Prihlasovacie meno",
+    "password": "Heslo",
+    "button": "Prihlásiť sa"
+  }
+}

@@ -10,6 +10,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TokenInterceptorService } from './auth/services/token-interceptor.service';
 import { ErrorInterceptor } from './auth/services/error-interceptor.service';
+import { TranslocoRootModule } from './transloco/transloco-root.module';
+
 
 
 @NgModule({
@@ -23,7 +25,8 @@ import { ErrorInterceptor } from './auth/services/error-interceptor.service';
     ReactiveFormsModule,
     HttpClientModule,
     MaterialModule,
-    BrowserAnimationsModule
+    BrowserAnimationsModule,
+    TranslocoRootModule
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,

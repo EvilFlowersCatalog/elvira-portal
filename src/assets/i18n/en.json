@@ -1,0 +1,8 @@
+{
+  "loginScreen": {
+    "form": "Login form",
+    "login": "Username",
+    "password": "Password",
+    "button": "Log in"
+  }
+}

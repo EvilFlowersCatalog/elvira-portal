@@ -7,6 +7,7 @@ import { catchError, take } from 'rxjs/operators';
 import { LoginResponse } from '../../types/auth.types';
 import { throwError } from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
+import { TranslocoService } from '@ngneat/transloco';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +24,8 @@ export class LoginComponent implements OnInit {
     private readonly router: Router,
     private readonly authService: AuthService,
     private readonly http: HttpClient,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private service: TranslocoService
   ) {
     this.loginForm = new FormGroup({
       username: new FormControl(''),
@@ -54,6 +56,10 @@ export class LoginComponent implements OnInit {
         localStorage.setItem('username', response.user.login);
         this.router.navigate(['/library'])
       });
+  }
+
+  change(lang: string) {
+    this.service.setActiveLang(lang);
   }
 
 }
