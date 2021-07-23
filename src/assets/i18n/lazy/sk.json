@@ -1,0 +1,20 @@
+{
+  "adminPage": {
+    "header": "Nahrajte dokument",
+    "title": "Názov",
+    "title-description": "Názov dokumentácie",
+    "author": "Autor",
+    "author-name": "Meno autora",
+    "author-surname": "Priezvisko autora",
+    "contributor": "prispievateľ",
+    "contributor-name": "Meno prispievateľa",
+    "contributor-surname": "Priezvisko prispievateľa",
+    "category": "Kategória",
+    "category-description": "Kategória vašej dokumentácie",
+    "category-hint": "Beletria, veda atď...",
+    "tags": "Tagy",
+    "cancel": "zrušiť",
+    "summary": "Zhrnutie",
+    "summary-hint": "Krátke zhrnutie dokumentácie"
+  }
+}

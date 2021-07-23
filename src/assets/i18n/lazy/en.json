@@ -1,0 +1,21 @@
+{
+  "adminPage": {
+    "header": "Upload your document",
+    "title": "title",
+    "title-description": "Title of the documentation",
+    "author": "Author",
+    "author-name": "Author's name",
+    "author-surname": "Author's surname",
+    "contributor": "Contributor",
+    "contributor-name": "Contributor's name",
+    "contributor-surname": "Contributor's surname",
+    "category": "Category",
+    "category-description": "Category of your documentation",
+    "category-hint": "Fiction, Science, etc...",
+    "tags": "Tags",
+    "cancel": "cancel",
+    "summary": "Summary",
+    "summary-hint": "Short summary about the documentation"
+  }
+}
+

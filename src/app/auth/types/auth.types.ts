@@ -4,7 +4,7 @@ export interface LoginCredentials {
 }
 
 export interface LoginResponse {
-    accesToken: string;
+    accessToken: string;
     user: {
       login: string;
     }

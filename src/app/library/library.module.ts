@@ -9,14 +9,16 @@ import { NavbarComponent } from '../common/navbar/navbar.component';
 import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component';
 import { MaterialModule } from '../material.module';
 import { TranslocoRootModule } from '../transloco/transloco-root.module';
+import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
 
 @NgModule({
   declarations: [HomeComponent, PdfViewerComponent, AdminComponent, NavbarComponent],
   imports:[
     CommonModule,
     RouterModule.forChild(LIBRARY_ROUTES),
-    MaterialModule
+    MaterialModule,
+    TranslocoRootModule
   ],
-  providers:[]
+  providers:[{ provide: TRANSLOCO_SCOPE, useValue: 'lazy' }]
 })
 export class LibraryModule { }

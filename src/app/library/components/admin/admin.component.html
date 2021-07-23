@@ -1,81 +1,75 @@
 <app-navbar></app-navbar>
-<div fxLayoutAlign="center center" >
-<mat-card fxLayout="column"  fxFlex="35" class="login-theme">
-  <mat-card-title >
-    Upload your document
-  </mat-card-title>
-  <mat-card-title>
-    Information
-  </mat-card-title>
-  <div fxLayout="row" fxLayoutAlign="space-between center">
-    <mat-form-field appearance="legacy" style="width: 45%;">
-      <mat-label>Title</mat-label>
-      <input matInput placeholder="Title" maxlength="50">
-      <mat-hint>Give your work a name</mat-hint>
-    </mat-form-field>
-    <mat-form-field appearance="legacy" style="width: 45%;">
-      <mat-label>Publication date</mat-label>
-      <input matInput placeholder="Name" maxlength="30">
-      <mat-hint>Give date</mat-hint>
-    </mat-form-field>
+<ng-container *transloco="let t;">
+  <div fxLayoutAlign="center center" class="admin-box">
+    <mat-card fxLayout="column"  fxFlex="35" class="login-theme">
+      <mat-card-title >
+        {{ t('lazy.adminPage.header') }}
+      </mat-card-title>
+    <hr>
+      <mat-card-title >{{ t('lazy.adminPage.title') }}</mat-card-title>
+        <div fxLayout="row" fxLayoutAlign="space-between center">
+          <mat-form-field appearance="legacy" style="width: 100%;">
+            <mat-label>{{ t('lazy.adminPage.title-description') }}</mat-label>
+              <input matInput  maxlength="50">
+          </mat-form-field>
+        </div>
+      <br>
+        <mat-card-title >{{ t('lazy.adminPage.author') }}</mat-card-title>
+          <div fxLayout="row" fxLayoutAlign="space-between center">
+            <mat-form-field appearance="legacy" style="width: 45%;">
+              <mat-label>{{ t('lazy.adminPage.author-name') }}</mat-label>
+                <input matInput  maxlength="50">
+            </mat-form-field>
+            <mat-form-field appearance="legacy" style="width: 45%;">
+              <mat-label>{{ t('lazy.adminPage.author-surname') }}</mat-label>
+                <input matInput  maxlength="30">
+            </mat-form-field>
+          </div>
+        <mat-card-title >{{ t('lazy.adminPage.contributor') }}</mat-card-title>
+      <div fxLayout="row" fxLayoutAlign="space-between center">
+        <mat-form-field appearance="legacy" style="width: 45%;">
+          <mat-label>{{ t('lazy.adminPage.contributor-name') }}</mat-label>
+            <input matInput  maxlength="50">
+        </mat-form-field>
+        <mat-form-field appearance="legacy" style="width: 45%;">
+          <mat-label>{{ t('lazy.adminPage.contributor-surname') }}</mat-label>
+            <input matInput  maxlength="30">
+        </mat-form-field>
+      </div>
+    <br>
+      <mat-card-title >{{ t('lazy.adminPage.category') }}</mat-card-title>
+        <mat-form-field appearance="outline">
+          <mat-label>{{ t('lazy.adminPage.category-description') }}</mat-label>
+            <input matInput placeholder="Placeholder">
+          <mat-hint>{{ t('lazy.adminPage.category-hint') }}</mat-hint>
+        </mat-form-field>
+      <br>
+        <mat-card-title>
+          {{ t('lazy.adminPage.tags') }}
+        </mat-card-title>
+      <mat-form-field appearance="fill">
+        <mat-label>{{ t('lazy.adminPage.tags') }}</mat-label>
+          <mat-chip-list #chipList aria-label="Add new tags">
+            <mat-chip *ngFor="let tag of tags" [selectable]="selectable"
+                    [removable]="removable" (removed)="remove(tag)">
+              {{tag.name}}
+              <mat-icon matChipRemove *ngIf="removable">{{ t('lazy.adminPage.cancel') }}</mat-icon>
+            </mat-chip>
+            <input placeholder="Add new tags"
+                  [matChipInputFor]="chipList"
+                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+                  [matChipInputAddOnBlur]="addOnBlur"
+                  (matChipInputTokenEnd)="add($event)">
+          </mat-chip-list>
+      </mat-form-field>
+      <mat-form-field appearance="standard">
+        <mat-label>{{ t('lazy.adminPage.summary') }}</mat-label>
+          <textarea matInput class="summary-textfield"></textarea>
+            <mat-hint>{{ t('lazy.adminPage.summary-hint') }}</mat-hint>
+      </mat-form-field>
+    <br>
+      <input type="file" (change)="fileChange($event)" placeholder="Upload file" accept=".pdf">
+    </mat-card>
   </div>
-  <div fxLayout="row" fxLayoutAlign="space-between center">
-    <mat-form-field appearance="legacy" style="width: 45%;">
-      <mat-label>First name</mat-label>
-      <input matInput placeholder="Title" maxlength="50">
-      <mat-hint>Give your name</mat-hint>
-    </mat-form-field>
-    <mat-form-field appearance="legacy" style="width: 45%;">
-      <mat-label>Second name</mat-label>
-      <input matInput placeholder="Name" maxlength="30">
-      <mat-hint>Give your name</mat-hint>
-    </mat-form-field>
-  </div>
-  <mat-form-field appearance="standard">
-    <mat-label>Description</mat-label>
-    <textarea matInput placeholder="Short description about the documentation"></textarea>
-  </mat-form-field>
-
-  <mat-card-title>
-    Tags
-  </mat-card-title>
-  <mat-form-field appearance="fill">
-    <mat-label>Tags</mat-label>
-    <mat-chip-list #chipList aria-label="Add new tags">
-      <mat-chip *ngFor="let tag of tags" [selectable]="selectable"
-               [removable]="removable" (removed)="remove(tag)">
-        {{tag.name}}
-        <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-      </mat-chip>
-      <input placeholder="Add new tags"
-             [matChipInputFor]="chipList"
-             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-             [matChipInputAddOnBlur]="addOnBlur"
-             (matChipInputTokenEnd)="add($event)">
-    </mat-chip-list>
-  </mat-form-field>
-
-  <mat-card-title>
-    Select an option
-  </mat-card-title>
-  <mat-radio-group aria-label="Select an option" fxLayoutAlign="space-evenly start">
-
-    <mat-radio-button value="1">Bachalar</mat-radio-button>
-    <mat-radio-button value="2">Engineer</mat-radio-button>
-  </mat-radio-group>
-  <mat-form-field appearance="outline">
-    <mat-label>Outline form field</mat-label>
-    <input matInput placeholder="Placeholder">
-    <mat-hint>Hint</mat-hint>
-  </mat-form-field>
-  <mat-form-field appearance="fill">
-    <mat-label>Select</mat-label>
-    <mat-select>
-      <mat-option value="one">First option</mat-option>
-      <mat-option value="two">Second option</mat-option>
-    </mat-select>
-  </mat-form-field>
-<input type="file" (change)="fileChange($event)" placeholder="Upload file" accept=".pdf,.doc,.docx">
-</mat-card>
-</div>
+</ng-container>
 

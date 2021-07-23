@@ -52,7 +52,7 @@ export class LoginComponent implements OnInit {
       )
       .subscribe((response: LoginResponse) => {
         //console.log(response);
-        localStorage.setItem('token', response.accesToken);
+        localStorage.setItem('token', response.accessToken);
         localStorage.setItem('username', response.user.login);
         this.router.navigate(['/library'])
       });
