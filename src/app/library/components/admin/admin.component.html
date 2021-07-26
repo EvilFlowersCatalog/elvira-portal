@@ -1,6 +1,8 @@
 <app-navbar></app-navbar>
 <ng-container *transloco="let t;">
+  <form [formGroup]="uploadForm" (submit)="formUploader()" >
   <div fxLayoutAlign="center center" class="admin-box">
+
     <mat-card fxLayout="column"  fxFlex="35" class="login-theme">
       <mat-card-title >
         {{ t('lazy.adminPage.header') }}
@@ -10,7 +12,7 @@
         <div fxLayout="row" fxLayoutAlign="space-between center">
           <mat-form-field appearance="legacy" style="width: 100%;">
             <mat-label>{{ t('lazy.adminPage.title-description') }}</mat-label>
-              <input matInput  maxlength="50">
+              <input matInput  maxlength="50" formControlName="title">
           </mat-form-field>
         </div>
       <br>
@@ -18,58 +20,49 @@
           <div fxLayout="row" fxLayoutAlign="space-between center">
             <mat-form-field appearance="legacy" style="width: 45%;">
               <mat-label>{{ t('lazy.adminPage.author-name') }}</mat-label>
-                <input matInput  maxlength="50">
+                <input matInput  maxlength="50" formControlName="authorName">
             </mat-form-field>
             <mat-form-field appearance="legacy" style="width: 45%;">
               <mat-label>{{ t('lazy.adminPage.author-surname') }}</mat-label>
-                <input matInput  maxlength="30">
+                <input matInput  maxlength="30" formControlName="authorSurname">
             </mat-form-field>
           </div>
-        <mat-card-title >{{ t('lazy.adminPage.contributor') }}</mat-card-title>
-      <div fxLayout="row" fxLayoutAlign="space-between center">
+        <mat-card-title >{{ t('lazy.adminPage.contributor') }}
+        <button (click)="addContributor()" type="button" mat-raised-button color="secondary">+</button>
+      </mat-card-title>
+      <div *ngFor="let contributor of contributors(counter); index as i" fxLayout="row" fxLayoutAlign="space-between center">
         <mat-form-field appearance="legacy" style="width: 45%;">
           <mat-label>{{ t('lazy.adminPage.contributor-name') }}</mat-label>
-            <input matInput  maxlength="50">
+            <input matInput  maxlength="50" formControlName="contributorsName[i]">
         </mat-form-field>
         <mat-form-field appearance="legacy" style="width: 45%;">
           <mat-label>{{ t('lazy.adminPage.contributor-surname') }}</mat-label>
-            <input matInput  maxlength="30">
+            <input matInput  maxlength="30" formControlName="contributorsSurname[i]">
         </mat-form-field>
+        <button (click)="removeContributor()" type="button">-</button>
       </div>
     <br>
       <mat-card-title >{{ t('lazy.adminPage.category') }}</mat-card-title>
         <mat-form-field appearance="outline">
           <mat-label>{{ t('lazy.adminPage.category-description') }}</mat-label>
-            <input matInput placeholder="Placeholder">
+            <input matInput placeholder="Placeholder" formControlName="category">
           <mat-hint>{{ t('lazy.adminPage.category-hint') }}</mat-hint>
         </mat-form-field>
       <br>
-        <mat-card-title>
-          {{ t('lazy.adminPage.tags') }}
-        </mat-card-title>
-      <mat-form-field appearance="fill">
-        <mat-label>{{ t('lazy.adminPage.tags') }}</mat-label>
-          <mat-chip-list #chipList aria-label="Add new tags">
-            <mat-chip *ngFor="let tag of tags" [selectable]="selectable"
-                    [removable]="removable" (removed)="remove(tag)">
-              {{tag.name}}
-              <mat-icon matChipRemove *ngIf="removable">{{ t('lazy.adminPage.cancel') }}</mat-icon>
-            </mat-chip>
-            <input placeholder="Add new tags"
-                  [matChipInputFor]="chipList"
-                  [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-                  [matChipInputAddOnBlur]="addOnBlur"
-                  (matChipInputTokenEnd)="add($event)">
-          </mat-chip-list>
-      </mat-form-field>
       <mat-form-field appearance="standard">
         <mat-label>{{ t('lazy.adminPage.summary') }}</mat-label>
-          <textarea matInput class="summary-textfield"></textarea>
+          <textarea matInput class="summary-textfield" formControlName="description"></textarea>
             <mat-hint>{{ t('lazy.adminPage.summary-hint') }}</mat-hint>
       </mat-form-field>
     <br>
       <input type="file" (change)="fileChange($event)" placeholder="Upload file" accept=".pdf">
+      <br>
+      <button mat-raised-button color="primary" type="submit">Upload</button>
+      <br>
+      <p>Form Status: {{ uploadForm.value }}</p>
     </mat-card>
+
   </div>
+</form>
 </ng-container>
 

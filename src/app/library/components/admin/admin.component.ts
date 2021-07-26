@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
+import { FormGroup, FormControl, FormArray } from '@angular/forms';
 
 export interface Tag {
   name: string;
@@ -17,14 +18,34 @@ export class AdminComponent implements OnInit {
   addOnBlur = true;
   readonly separatorKeysCodes = [ENTER, COMMA] as const;
   tags: Tag[] = [];
+  counter = 0;
+  uploadForm: FormGroup;
 
-  constructor() { }
+  contributors(i: number) {
+    return new Array(i);
+}
+
+  constructor() {
+    this.uploadForm = new FormGroup({
+      title: new FormControl(''),
+      authorName: new FormControl(''),
+      authorSurname: new FormControl(''),
+      contributorsName: new FormArray([]),
+      contributorsSurname: new FormArray([]),
+      category: new FormControl(''),
+      description: new FormControl(''),
+    });
+   }
 
   ngOnInit(): void {
   }
 
   fileChange(event) {
 
+}
+
+formUploader() {
+  console.log(this.uploadForm.value);
 }
 
   add(event: MatChipInputEvent): void {
@@ -45,4 +66,13 @@ export class AdminComponent implements OnInit {
     }
   }
 
+  addContributor() {
+    if(this.counter<5)
+      this.counter++;
+  }
+
+  removeContributor() {
+    if(this.counter>0)
+      this.counter--;
+  }
 }

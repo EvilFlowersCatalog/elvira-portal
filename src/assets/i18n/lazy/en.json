@@ -12,10 +12,7 @@
     "category": "Category",
     "category-description": "Category of your documentation",
     "category-hint": "Fiction, Science, etc...",
-    "tags": "Tags",
-    "cancel": "cancel",
     "summary": "Summary",
     "summary-hint": "Short summary about the documentation"
   }
 }
-
