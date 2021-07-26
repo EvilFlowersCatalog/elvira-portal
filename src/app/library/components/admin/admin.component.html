@@ -1,81 +1,63 @@
-<app-navbar></app-navbar>
-<div fxLayoutAlign="center center" >
-<mat-card fxLayout="column"  fxFlex="35" class="login-theme">
-  <mat-card-title >
-    Upload your document
-  </mat-card-title>
-  <mat-card-title>
-    Information
-  </mat-card-title>
-  <div fxLayout="row" fxLayoutAlign="space-between center">
-    <mat-form-field appearance="legacy" style="width: 45%;">
-      <mat-label>Title</mat-label>
-      <input matInput placeholder="Title" maxlength="50">
-      <mat-hint>Give your work a name</mat-hint>
-    </mat-form-field>
-    <mat-form-field appearance="legacy" style="width: 45%;">
-      <mat-label>Publication date</mat-label>
-      <input matInput placeholder="Name" maxlength="30">
-      <mat-hint>Give date</mat-hint>
-    </mat-form-field>
-  </div>
-  <div fxLayout="row" fxLayoutAlign="space-between center">
-    <mat-form-field appearance="legacy" style="width: 45%;">
-      <mat-label>First name</mat-label>
-      <input matInput placeholder="Title" maxlength="50">
-      <mat-hint>Give your name</mat-hint>
-    </mat-form-field>
-    <mat-form-field appearance="legacy" style="width: 45%;">
-      <mat-label>Second name</mat-label>
-      <input matInput placeholder="Name" maxlength="30">
-      <mat-hint>Give your name</mat-hint>
-    </mat-form-field>
-  </div>
-  <mat-form-field appearance="standard">
-    <mat-label>Description</mat-label>
-    <textarea matInput placeholder="Short description about the documentation"></textarea>
-  </mat-form-field>
+<div fxLayoutAlign="center center">
+  <mat-card fxLayout="column" fxFlex="35">
+    <mat-card-title> Upload your document </mat-card-title>
+    <mat-card-title> Information </mat-card-title>
+    <div fxLayout="row" fxLayoutAlign="space-between center">
+      <mat-form-field appearance="legacy" style="width: 45%">
+        <mat-label>Title</mat-label>
+        <input matInput placeholder="Title" maxlength="50" />
+        <mat-hint>Give your work a name</mat-hint>
+      </mat-form-field>
 
-  <mat-card-title>
-    Tags
-  </mat-card-title>
-  <mat-form-field appearance="fill">
-    <mat-label>Tags</mat-label>
-    <mat-chip-list #chipList aria-label="Add new tags">
-      <mat-chip *ngFor="let tag of tags" [selectable]="selectable"
-               [removable]="removable" (removed)="remove(tag)">
-        {{tag.name}}
-        <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
-      </mat-chip>
-      <input placeholder="Add new tags"
-             [matChipInputFor]="chipList"
-             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-             [matChipInputAddOnBlur]="addOnBlur"
-             (matChipInputTokenEnd)="add($event)">
-    </mat-chip-list>
-  </mat-form-field>
+      <mat-card-title> Tags </mat-card-title>
+      <mat-form-field appearance="fill">
+        <mat-label>Tags</mat-label>
+        <mat-chip-list #chipList aria-label="Add new tags">
+          <mat-chip
+            *ngFor="let tag of tags"
+            [selectable]="selectable"
+            [removable]="removable"
+            (removed)="remove(tag)"
+          >
+            {{ tag.name }}
+            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+          </mat-chip>
+          <input
+            placeholder="Add new tags"
+            [matChipInputFor]="chipList"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            [matChipInputAddOnBlur]="addOnBlur"
+            (matChipInputTokenEnd)="add($event)"
+          />
+        </mat-chip-list>
+      </mat-form-field>
 
-  <mat-card-title>
-    Select an option
-  </mat-card-title>
-  <mat-radio-group aria-label="Select an option" fxLayoutAlign="space-evenly start">
-
-    <mat-radio-button value="1">Bachalar</mat-radio-button>
-    <mat-radio-button value="2">Engineer</mat-radio-button>
-  </mat-radio-group>
-  <mat-form-field appearance="outline">
-    <mat-label>Outline form field</mat-label>
-    <input matInput placeholder="Placeholder">
-    <mat-hint>Hint</mat-hint>
-  </mat-form-field>
-  <mat-form-field appearance="fill">
-    <mat-label>Select</mat-label>
-    <mat-select>
-      <mat-option value="one">First option</mat-option>
-      <mat-option value="two">Second option</mat-option>
-    </mat-select>
-  </mat-form-field>
-<input type="file" (change)="fileChange($event)" placeholder="Upload file" accept=".pdf,.doc,.docx">
-</mat-card>
+      <mat-card-title> Select an option </mat-card-title>
+      <mat-radio-group
+        aria-label="Select an option"
+        fxLayoutAlign="space-evenly start"
+      >
+        <mat-radio-button value="1">Bachalar</mat-radio-button>
+        <mat-radio-button value="2">Engineer</mat-radio-button>
+      </mat-radio-group>
+      <mat-form-field appearance="outline">
+        <mat-label>Outline form field</mat-label>
+        <input matInput placeholder="Placeholder" />
+        <mat-hint>Hint</mat-hint>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Select</mat-label>
+        <mat-select>
+          <mat-option value="one">First option</mat-option>
+          <mat-option value="two">Second option</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <input
+        type="file"
+        (change)="fileChange($event)"
+        placeholder="Upload file"
+        accept=".pdf,.doc,.docx"
+      />
+    </div>
+  </mat-card>
 </div>
-

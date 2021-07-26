@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
-import { NotfoundComponent } from './notfound/notfound.component';
-import { NavbarComponent } from './navbar/navbar.component';
+import { InjectionToken, NgModule } from '@angular/core';
+import { NotfoundComponent } from './components/notfound/notfound.component';
+import { NavbarComponent } from './components/navbar/navbar.component';
 import { MaterialModule } from '../material.module';
 
+export const LOCAL_STORAGE_TOKEN = new InjectionToken('localStorage');
+
 @NgModule({
-  declarations: [NotfoundComponent, NavbarComponent],
-  imports: [
-    CommonModule,
-    MaterialModule
-  ]
+  declarations: [NavbarComponent, NotfoundComponent],
+  imports: [CommonModule, MaterialModule],
+  exports: [NavbarComponent, NotfoundComponent],
+  providers: [{ provide: LOCAL_STORAGE_TOKEN, useValue: localStorage }],
 })
-export class CommonLibraryModule { }
+export class CommonLibraryModule {}
