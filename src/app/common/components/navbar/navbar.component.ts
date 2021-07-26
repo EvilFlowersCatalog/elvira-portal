@@ -1,53 +1,54 @@
-import { Component, OnInit, EventEmitter, Output } from '@angular/core';
-import { Router } from "@angular/router";
-import { LocalStorageService } from '../../services/local-storage.service';
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { AppStateService } from '../../services/app-state/app-state.service';
+import { Observable } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { State } from '../../services/app-state/app-state.types';
+import { AuthService } from 'src/app/auth/services/auth.service';
+import { DisposableComponent } from '../disposable.component';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+  styleUrls: ['./navbar.component.scss'],
 })
-export class NavbarComponent implements OnInit {
-  @Output()
-  readonly themeChanged = new EventEmitter<string>();
-
-  isDarkTheme: boolean
-  isEnglish: boolean
-  isLoggedIn: boolean
-  username: string
+export class NavbarComponent extends DisposableComponent implements OnInit {
+  appState$: Observable<State>;
 
   constructor(
     private readonly router: Router,
-    private readonly localStorageService: LocalStorageService
-  ) { }
+    private readonly appStateService: AppStateService,
+    private readonly authService: AuthService
+  ) {
+    super();
+  }
 
   ngOnInit(): void {
-    this.isDarkTheme = this.localStorageService.getItem('theme') === 'dark' ? true : false;
-    this.isEnglish = this.localStorageService.getItem('language') === 'english' ? true : false;
-    this.isLoggedIn = this.localStorageService.getItem('token') === null ? false : true;
-    this.username = this.isLoggedIn ? this.localStorageService.getItem('username') : null;
+    this.appState$ = this.appStateService
+      .getState$()
+      .pipe(takeUntil(this.destroySignal$));
   }
 
   navigate(link: string) {
-    this.router.navigate([link])
+    this.router.navigate([link]);
   }
 
-  onThemeChange(theme: string) {
-    this.localStorageService.setItem('theme', theme)
-    this.isDarkTheme = !this.isDarkTheme
-    this.themeChanged.emit()
+  changeTheme(theme: string) {
+    this.appStateService.patchState({ theme: theme });
   }
 
-  setLanguageSelection() {
-    let switchToLanguage: string = this.isEnglish ? 'slovak' : 'english'
-
-    this.localStorageService.setItem('language', switchToLanguage)
-    window.location.reload()
+  changeLanguage(language: string) {
+    this.appStateService.patchState({ lang: language });
   }
 
   logout() {
-    this.localStorageService.removeItem('token');
-    this.localStorageService.removeItem('username');
-    this.router.navigate(['/auth/login'])
+    this.authService.logout(this.appStateService.getStateSnapshot().token);
+    this.appStateService.patchState({
+      token: null,
+      username: null,
+      isLoggedIn: false,
+      isAdmin: false,
+    });
+    this.router.navigate(['/auth/login']);
   }
 }

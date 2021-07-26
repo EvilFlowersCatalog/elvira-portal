@@ -1,18 +1,15 @@
-<button (click)="logout()">Logout</button>
 <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="2rem">
-    <ng-container *ngFor="let book of books$ | async">
-        <mat-card>
-            <mat-card-header>
-                <mat-card-title>{{book.title}}</mat-card-title>
-            </mat-card-header>
-            <img mat-card-image [src]="book.front" />
-            <mat-card-actions>
-                <button mat-icon-button (click)="openPdf(book.id)">
-                    <mat-icon>
-                        picture_as_pdf
-                    </mat-icon>
-                </button>
-            </mat-card-actions>
-        </mat-card>
-    </ng-container>
+  <ng-container *ngFor="let book of books$ | async">
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>{{ book.title }}</mat-card-title>
+      </mat-card-header>
+      <img mat-card-image [src]="book.front" />
+      <mat-card-actions>
+        <button mat-icon-button (click)="openPdf(book.id)">
+          <mat-icon> picture_as_pdf </mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </ng-container>
 </div>

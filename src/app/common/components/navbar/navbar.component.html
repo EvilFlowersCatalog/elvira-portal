@@ -1,56 +1,77 @@
-<mat-toolbar color="primary">
-  <div *ngIf="isLoggedIn">
-    <button mat-icon-button>
-      <mat-icon>menu</mat-icon>
+<ng-container *ngIf="appState$ | async as appState">
+  <mat-toolbar color="primary">
+    <div *ngIf="appState.isLoggedIn">
+      <button mat-icon-button>
+        <mat-icon>menu</mat-icon>
+      </button>
+    </div>
+    <button
+      mat-flat-button
+      (click)="navigate('/library/home')"
+      color="primary"
+      class="nav-label"
+    >
+      <mat-icon>menu_book</mat-icon>
+      <span class="nav-label-text"> eLibrary</span>
     </button>
-  </div>
-  <button mat-flat-button (click)="navigate('/library/home')" color="primary" class="nav-label">
-    <mat-icon>menu_book</mat-icon>
-    <span class="nav-label-text"> eLibrary</span>
-  </button>
-  <span class="navbar-spacer"></span>
-  <button mat-flat-button (click)="navigate('/library/admin')" color="primary">Admin</button>
-  <button mat-flat-button *ngIf="isLoggedIn" [matMenuTriggerFor]="profileMenu" color="primary">
-    <span>{{username}}</span>
-    <mat-icon>person_outline</mat-icon>
-  </button>
-  <button mat-icon-button [matMenuTriggerFor]="settingsMenu">
-    <mat-icon>settings</mat-icon>
-  </button>
-</mat-toolbar>
+    <span class="navbar-spacer"></span>
+    <button
+      mat-flat-button
+      *ngIf="appState.isAdmin"
+      (click)="navigate('/library/admin')"
+      color="primary"
+    >
+      Admin
+    </button>
+    <button
+      mat-flat-button
+      *ngIf="appState.isLoggedIn"
+      [matMenuTriggerFor]="profileMenu"
+      color="primary"
+    >
+      <span>{{ appState.username }}</span>
+      <mat-icon>person_outline</mat-icon>
+    </button>
+    <button mat-icon-button [matMenuTriggerFor]="settingsMenu">
+      <mat-icon>settings</mat-icon>
+    </button>
+  </mat-toolbar>
 
-<mat-menu #settingsMenu="matMenu">
-  <div *ngIf="isDarkTheme; else darkModeBtn">
-    <button mat-menu-item (click)="onThemeChange('light')">
-      <mat-icon>light_mode</mat-icon>
-      <span>Svetlý režim</span>
-    </button>
-  </div>
-  <ng-template #darkModeBtn>
-    <button mat-menu-item (click)="onThemeChange('dark')">
-      <mat-icon>dark_mode</mat-icon>
-      <span>Tmavý režim</span>
-    </button>
-  </ng-template>
-  <button mat-menu-item (click)="setLanguageSelection()">
-    <div *ngIf="isEnglish; else enVersionBtn">
-      <mat-icon>translate</mat-icon>
-      <span>Slovensky</span>
+  <mat-menu #settingsMenu="matMenu">
+    <div *ngIf="appState.theme === 'dark'; else darkModeBtn">
+      <button mat-menu-item (click)="changeTheme('light')">
+        <mat-icon>light_mode</mat-icon>
+        <span>Svetlý režim</span>
+      </button>
+    </div>
+    <ng-template #darkModeBtn>
+      <button mat-menu-item (click)="changeTheme('dark')">
+        <mat-icon>dark_mode</mat-icon>
+        <span>Tmavý režim</span>
+      </button>
+    </ng-template>
+    <div *ngIf="appState.lang === 'en'; else enVersionBtn">
+      <button mat-menu-item (click)="changeLanguage('sk')">
+        <mat-icon>translate</mat-icon>
+        <span>Slovensky</span>
+      </button>
     </div>
     <ng-template #enVersionBtn>
-      <mat-icon>language</mat-icon>
-      <span>English</span>
+      <button mat-menu-item (click)="changeLanguage('en')">
+        <mat-icon>language</mat-icon>
+        <span>English</span>
+      </button>
     </ng-template>
-  </button>
-</mat-menu>
+  </mat-menu>
 
-<mat-menu #profileMenu="matMenu">
-  <button mat-menu-item>
-    <mat-icon>account_circle</mat-icon>
-    <span>Profil</span>
-  </button>
-  <button mat-menu-item (click)="logout()">
-    <mat-icon>logout</mat-icon>
-    <span>Odhlásiť sa</span>
-  </button>
-</mat-menu>
+  <mat-menu #profileMenu="matMenu">
+    <button mat-menu-item>
+      <mat-icon>account_circle</mat-icon>
+      <span>Profil</span>
+    </button>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Odhlásiť sa</span>
+    </button>
+  </mat-menu>
+</ng-container>

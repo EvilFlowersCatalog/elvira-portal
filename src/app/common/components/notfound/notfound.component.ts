@@ -1,28 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from "@angular/router";
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-notfound',
   templateUrl: './notfound.component.html',
-  styleUrls: ['./notfound.component.scss']
+  styleUrls: ['./notfound.component.scss'],
 })
 export class NotfoundComponent implements OnInit {
+  constructor(private readonly router: Router) {}
 
-  loginCheck = false;
-  show = true;
-
-  constructor(
-    private readonly router: Router
-  ) { }
-
-  ngOnInit(): void {
-    if(localStorage.getItem('token')!=null) this.loginCheck=true;
-    console.log(this.loginCheck);
-  }
-
-  goToLogin() {
-    this.router.navigate(['/auth/login'])
-  }
-
-
+  ngOnInit(): void {}
 }

@@ -1,29 +1,33 @@
 import { DOCUMENT } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Component, Inject, Renderer2 } from '@angular/core';
-import { LocalStorageService } from './common/services/local-storage.service'
+import { takeUntil } from 'rxjs/operators';
+import { DisposableComponent } from './common/components/disposable.component';
+import { AppStateService } from './common/services/app-state/app-state.service';
+import { State } from './common/services/app-state/app-state.types';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
-  title: string = 'elibrary-portal';
-
+export class AppComponent extends DisposableComponent {
   constructor(
-    private http: HttpClient,
     @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2,
-    private localStorageService: LocalStorageService,
-  ) { }
-
-  ngOnInit() {
-    this.changeTheme()
+    private readonly appStateService: AppStateService
+  ) {
+    super();
   }
 
-  changeTheme() {
-    const hostClass = this.localStorageService.getItem('theme') === 'dark' ? 'theme-dark' : 'theme-light'
-    this.renderer.setAttribute(this.document.body, 'class', hostClass)
+  ngOnInit() {
+    this.appStateService
+      .getState$()
+      .pipe(takeUntil(this.destroySignal$))
+      .subscribe((data: State) => this.setTheme(data.theme));
+  }
+
+  setTheme(theme: string) {
+    const hostClass = theme === 'dark' ? 'theme-dark' : 'theme-light';
+    this.renderer.setAttribute(this.document.body, 'class', hostClass);
   }
 }

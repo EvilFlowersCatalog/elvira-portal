@@ -1,25 +1,32 @@
 import { Injectable } from '@angular/core';
-import { HttpInterceptor, HttpHandler, HttpRequest, HttpEvent } from '@angular/common/http'
-import { AuthService } from './auth.service'
+import {
+  HttpInterceptor,
+  HttpHandler,
+  HttpRequest,
+  HttpEvent,
+} from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from 'src/environments/environment';
+import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
 
 @Injectable()
-export class TokenInterceptorService implements HttpInterceptor{
+export class TokenInterceptorService implements HttpInterceptor {
+  constructor(private readonly appStateService: AppStateService) {}
 
-  constructor(
-    private auth: AuthService
-  ) { }
-
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    console.log("Token interceptor working");
-     const authToken = this.auth.getToken();
-     const isApiRequest = request.urlWithParams.startsWith(environment.baseUrl)
+  intercept(
+    request: HttpRequest<any>,
+    next: HttpHandler
+  ): Observable<HttpEvent<any>> {
+    const authToken = this.appStateService.getStateSnapshot().token;
+    const isApiRequest = request.urlWithParams.startsWith(environment.baseUrl);
 
     const options = {
-      headers: authToken && isApiRequest ? request.headers.set('Authorization', `Bearer ${authToken}`) : request.headers,
+      headers:
+        authToken && isApiRequest
+          ? request.headers.set('Authorization', `Bearer ${authToken}`)
+          : request.headers,
     };
     const clonedRequest = request.clone(options);
-     return next.handle(clonedRequest);
+    return next.handle(clonedRequest);
   }
 }

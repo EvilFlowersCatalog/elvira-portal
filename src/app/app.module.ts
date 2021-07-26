@@ -11,12 +11,10 @@ import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TokenInterceptorService } from './auth/services/token-interceptor.service';
 import { ErrorInterceptor } from './auth/services/error-interceptor.service';
 import { CommonLibraryModule } from './common/common.module';
-
+import { AppStateService } from './common/services/app-state/app-state.service';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -25,19 +23,22 @@ import { CommonLibraryModule } from './common/common.module';
     HttpClientModule,
     MaterialModule,
     BrowserAnimationsModule,
-    CommonLibraryModule
+    CommonLibraryModule,
   ],
-  providers: [{
-    provide: HTTP_INTERCEPTORS,
-    useClass: TokenInterceptorService,
-    multi: true
-  },
-  {
-    provide: HTTP_INTERCEPTORS,
-    useClass: ErrorInterceptor,
-    multi: true
-  }
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptorService,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
+      multi: true,
+    },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {
+  constructor(private readonly appStateService: AppStateService) {}
+}

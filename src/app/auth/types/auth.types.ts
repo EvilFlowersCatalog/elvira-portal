@@ -1,11 +1,11 @@
 export interface LoginCredentials {
-    username: string;
-    password: string;
+  username: string;
+  password: string;
 }
 
 export interface LoginResponse {
-    accesToken: string;
-    user: {
-      login: string;
-    }
+  accessToken: string;
+  user: {
+    login: string;
+  };
 }
