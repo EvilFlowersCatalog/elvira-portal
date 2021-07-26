@@ -16,16 +16,6 @@
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
-      "i18n": {
-        "locales": {
-          "sk": {
-            "translation": "src/locale/messages.sk.xlf"
-          },
-          "en": {
-            "translation": "src/locale/messages.en.xlf"
-          }
-        }
-      },
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
