@@ -13,11 +13,11 @@ import { ErrorInterceptor } from './auth/services/error-interceptor.service';
 import { TranslocoRootModule } from './transloco/transloco-root.module';
 
 
+import { CommonLibraryModule } from './common/common.module';
+import { AppStateService } from './common/services/app-state/app-state.service';
 
 @NgModule({
-  declarations: [
-    AppComponent,
-  ],
+  declarations: [AppComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -26,19 +26,23 @@ import { TranslocoRootModule } from './transloco/transloco-root.module';
     HttpClientModule,
     MaterialModule,
     BrowserAnimationsModule,
-    TranslocoRootModule
+    TranslocoRootModule,
+    CommonLibraryModule,
   ],
-  providers: [{
-    provide: HTTP_INTERCEPTORS,
-    useClass: TokenInterceptorService,
-    multi: true
-  },
-  {
-    provide: HTTP_INTERCEPTORS,
-    useClass: ErrorInterceptor,
-    multi: true
-  }
-],
-  bootstrap: [AppComponent]
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptorService,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: ErrorInterceptor,
+      multi: true,
+    },
+  ],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {
+  constructor(private readonly appStateService: AppStateService) {}
+}
