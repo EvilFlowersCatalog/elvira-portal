@@ -21,9 +21,9 @@ build:development:
 
 build_image:development:
   stage: build_image
-  image: docker:19.03.12
+  image: docker:dind
   services:
-    - docker:19.03.12-dind
+    - docker:dind
   tags:
     - docker
   only:
