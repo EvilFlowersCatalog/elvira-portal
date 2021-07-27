@@ -19,7 +19,7 @@ export class AppStateService {
       username: null,
       isAdmin: false,
       theme: 'light',
-      lang: 'en',
+      lang: 'sk',
     };
 
     let initState = JSON.parse(localStorage.getItem('state'));

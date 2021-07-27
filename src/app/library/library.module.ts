@@ -15,7 +15,7 @@ import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
     CommonModule,
     RouterModule.forChild(LIBRARY_ROUTES),
     MaterialModule,
-    TranslocoRootModule
+    TranslocoRootModule,
   ],
   providers:[{ provide: TRANSLOCO_SCOPE, useValue: 'lazy' }]
 })

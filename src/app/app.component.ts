@@ -4,6 +4,7 @@ import { takeUntil } from 'rxjs/operators';
 import { DisposableComponent } from './common/components/disposable.component';
 import { AppStateService } from './common/services/app-state/app-state.service';
 import { State } from './common/services/app-state/app-state.types';
+import { TranslocoService } from '@ngneat/transloco';
 
 @Component({
   selector: 'app-root',
@@ -14,7 +15,8 @@ export class AppComponent extends DisposableComponent {
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2,
-    private readonly appStateService: AppStateService
+    private readonly appStateService: AppStateService,
+    private readonly langService: TranslocoService
   ) {
     super();
   }
@@ -23,7 +25,7 @@ export class AppComponent extends DisposableComponent {
     this.appStateService
       .getState$()
       .pipe(takeUntil(this.destroySignal$))
-      .subscribe((data: State) => this.setTheme(data.theme));
+      .subscribe((data: State) => {this.setTheme(data.theme); this.langService.setActiveLang(data.lang);});
   }
 
   setTheme(theme: string) {

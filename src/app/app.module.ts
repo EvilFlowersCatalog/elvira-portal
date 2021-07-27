@@ -15,6 +15,8 @@ import { TranslocoRootModule } from './transloco/transloco-root.module';
 
 import { CommonLibraryModule } from './common/common.module';
 import { AppStateService } from './common/services/app-state/app-state.service';
+import { NotificationModule } from '@progress/kendo-angular-notification';
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -28,6 +30,7 @@ import { AppStateService } from './common/services/app-state/app-state.service';
     BrowserAnimationsModule,
     TranslocoRootModule,
     CommonLibraryModule,
+    NotificationModule,
   ],
   providers: [
     {

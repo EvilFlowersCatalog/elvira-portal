@@ -6,7 +6,6 @@ import { catchError, take } from 'rxjs/operators';
 import { LoginResponse } from '../../types/auth.types';
 import { throwError } from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
-import { TranslocoService } from '@ngneat/transloco';
 import { AppStateService } from '../../../common/services/app-state/app-state.service';
 
 @Component({
@@ -23,7 +22,6 @@ export class LoginComponent implements OnInit {
   constructor(
     private readonly router: Router,
     private readonly authService: AuthService,
-    private service: TranslocoService,
     private readonly appStateService: AppStateService,
     private readonly route: ActivatedRoute,
     private readonly snackBar: MatSnackBar
@@ -38,6 +36,7 @@ export class LoginComponent implements OnInit {
 
   submit(): void {
     const loginCredentials = this.loginForm.value;
+    console.log(loginCredentials);
     this.authService
       .login(loginCredentials)
       .pipe(

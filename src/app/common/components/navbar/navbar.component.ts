@@ -6,7 +6,6 @@ import { takeUntil } from 'rxjs/operators';
 import { State } from '../../services/app-state/app-state.types';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { DisposableComponent } from '../disposable.component';
-import { TranslocoService } from '@ngneat/transloco';
 
 @Component({
   selector: 'app-navbar',
@@ -20,7 +19,6 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
     private readonly router: Router,
     private readonly appStateService: AppStateService,
     private readonly authService: AuthService,
-    private readonly service: TranslocoService
   ) {
     super();
   }
@@ -40,7 +38,6 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   }
 
   changeLanguage(language: string) {
-    this.service.setActiveLang(language);
     this.appStateService.patchState({ lang: language });
   }
 
