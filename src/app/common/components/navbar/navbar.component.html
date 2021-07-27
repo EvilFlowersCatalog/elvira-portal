@@ -1,3 +1,4 @@
+<ng-container *transloco="let t; read: 'navbar';">
 <ng-container *ngIf="appState$ | async as appState">
   <mat-toolbar color="primary">
     <div *ngIf="appState.isLoggedIn">
@@ -41,25 +42,25 @@
     <div *ngIf="appState.theme === 'dark'; else darkModeBtn">
       <button mat-menu-item (click)="changeTheme('light')">
         <mat-icon>light_mode</mat-icon>
-        <span>Svetlý režim</span>
+        <span>{{ t('light') }}</span>
       </button>
     </div>
     <ng-template #darkModeBtn>
       <button mat-menu-item (click)="changeTheme('dark')">
         <mat-icon>dark_mode</mat-icon>
-        <span>Tmavý režim</span>
+        <span>{{ t('dark') }}</span>
       </button>
     </ng-template>
     <div *ngIf="appState.lang === 'en'; else enVersionBtn">
       <button mat-menu-item (click)="changeLanguage('sk')">
         <mat-icon>translate</mat-icon>
-        <span>Slovensky</span>
+        <span>{{ t('svk') }}</span>
       </button>
     </div>
     <ng-template #enVersionBtn>
       <button mat-menu-item (click)="changeLanguage('en')">
         <mat-icon>language</mat-icon>
-        <span>English</span>
+        <span>{{ t('eng') }}</span>
       </button>
     </ng-template>
   </mat-menu>
@@ -67,11 +68,12 @@
   <mat-menu #profileMenu="matMenu">
     <button mat-menu-item>
       <mat-icon>account_circle</mat-icon>
-      <span>Profil</span>
+      <span>{{ t('profile') }}</span>
     </button>
     <button mat-menu-item (click)="logout()">
       <mat-icon>logout</mat-icon>
-      <span>Odhlásiť sa</span>
+      <span>{{ t('log-out') }}</span>
     </button>
   </mat-menu>
+</ng-container>
 </ng-container>
