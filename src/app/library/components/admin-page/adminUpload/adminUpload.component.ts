@@ -13,10 +13,10 @@ export interface Tag {
 
 @Component({
   selector: 'app-admin',
-  templateUrl: './admin.component.html',
-  styleUrls: ['./admin.component.scss'],
+  templateUrl: './adminUpload.component.html',
+  styleUrls: ['./adminUpload.component.scss'],
 })
-export class AdminComponent implements OnInit {
+export class AdminUploadComponent implements OnInit {
   uploadForm: FormGroup;
   counter: number = 0;
   catalogForm = new FormControl();
