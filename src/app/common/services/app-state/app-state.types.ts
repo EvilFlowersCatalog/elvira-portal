@@ -5,4 +5,5 @@ export interface State {
   isAdmin: boolean;
   theme: string;
   lang: string;
+  sidebar: boolean;
 }

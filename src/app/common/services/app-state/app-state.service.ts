@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { LocalStorageService } from '../local-storage/local-storage.service';
 import { BehaviorSubject } from 'rxjs';
-import { share } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { State } from './app-state.types';
 
@@ -20,6 +19,7 @@ export class AppStateService {
       isAdmin: false,
       theme: 'light',
       lang: 'en',
+      sidebar: false,
     };
 
     let initState = JSON.parse(localStorage.getItem('state'));
