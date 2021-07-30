@@ -20,6 +20,7 @@ export class AppStateService {
       theme: 'light',
       lang: 'en',
       sidebar: false,
+      showSidebarToggle: false,
     };
 
     let initState = JSON.parse(localStorage.getItem('state'));

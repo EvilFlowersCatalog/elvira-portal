@@ -25,11 +25,16 @@ export class HomeComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.appStateService.patchState({ showSidebarToggle: true });
     this.sidebarState$ = this.appStateService.getState$().pipe(
       takeUntil(this.destroySignal$),
       map((data: State) => data.sidebar)
     );
     this.books$ = this.bookService.getBooks();
+  }
+
+  ngOnDestroy(): void {
+    this.appStateService.patchState({ showSidebarToggle: false });
   }
 
   openPdf(id) {

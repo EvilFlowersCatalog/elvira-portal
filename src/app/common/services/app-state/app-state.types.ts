@@ -6,4 +6,5 @@ export interface State {
   theme: string;
   lang: string;
   sidebar: boolean;
+  showSidebarToggle: boolean;
 }
