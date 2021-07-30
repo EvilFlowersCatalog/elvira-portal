@@ -1,5 +1,7 @@
 <mat-sidenav-container>
-  <mat-sidenav mode="side" [opened]="sidebarState$ | async">hello</mat-sidenav>
+  <mat-sidenav mode="side" [opened]="sidebarState$ | async">
+    <app-sidebar></app-sidebar>
+  </mat-sidenav>
   <mat-sidenav-content>
     <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="2rem">
       <ng-container *ngFor="let book of books$ | async">
