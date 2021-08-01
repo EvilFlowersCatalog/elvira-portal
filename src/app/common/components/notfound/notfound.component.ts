@@ -10,4 +10,8 @@ export class NotfoundComponent implements OnInit {
   constructor(private readonly router: Router) {}
 
   ngOnInit(): void {}
+
+  goBack() {
+    this.router.navigate(['/']);
+  }
 }
