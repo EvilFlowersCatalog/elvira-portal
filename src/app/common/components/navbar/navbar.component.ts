@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AppStateService } from '../../services/app-state/app-state.service';
 import { Observable } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, tap } from 'rxjs/operators';
 import { State } from '../../services/app-state/app-state.types';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { DisposableComponent } from '../disposable.component';
@@ -16,6 +16,7 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   appState$: Observable<State>;
 
   constructor(
+    private route: ActivatedRoute,
     private readonly router: Router,
     private readonly appStateService: AppStateService,
     private readonly authService: AuthService
@@ -27,6 +28,7 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
     this.appState$ = this.appStateService
       .getState$()
       .pipe(takeUntil(this.destroySignal$));
+    console.log(this.route);
   }
 
   navigate(link: string) {
@@ -39,6 +41,11 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
 
   changeLanguage(language: string) {
     this.appStateService.patchState({ lang: language });
+  }
+
+  onSidebarToggle() {
+    const currentSidebarState = this.appStateService.getStateSnapshot().sidebar;
+    this.appStateService.patchState({ sidebar: !currentSidebarState });
   }
 
   logout() {

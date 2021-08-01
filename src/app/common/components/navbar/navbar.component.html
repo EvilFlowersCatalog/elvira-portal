@@ -1,7 +1,7 @@
 <ng-container *ngIf="appState$ | async as appState">
   <mat-toolbar color="primary">
-    <div *ngIf="appState.isLoggedIn">
-      <button mat-icon-button>
+    <div *ngIf="appState.showSidebarToggle">
+      <button mat-icon-button (click)="onSidebarToggle()">
         <mat-icon>menu</mat-icon>
       </button>
     </div>
