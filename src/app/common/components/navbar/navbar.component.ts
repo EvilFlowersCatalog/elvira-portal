@@ -28,7 +28,6 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
     this.appState$ = this.appStateService
       .getState$()
       .pipe(takeUntil(this.destroySignal$));
-    console.log(this.route);
   }
 
   navigate(link: string) {

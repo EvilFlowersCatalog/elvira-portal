@@ -9,3 +9,15 @@
 .login-password-icon {
   cursor: pointer;
 }
+
+@media screen and (max-width: 1150px) {
+  .login-card {
+    width: 60%;
+  }
+}
+
+@media screen and (max-width: 750px) {
+  .login-card {
+    width: 90%;
+  }
+}
