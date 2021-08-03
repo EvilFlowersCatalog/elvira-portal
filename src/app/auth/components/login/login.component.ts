@@ -7,6 +7,7 @@ import { LoginResponse } from '../../types/auth.types';
 import { throwError } from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
 import { AppStateService } from '../../../common/services/app-state/app-state.service';
+import jwtDecode, { JwtPayload } from 'jwt-decode';
 
 @Component({
   selector: 'app-login',
@@ -50,11 +51,14 @@ export class LoginComponent implements OnInit {
         })
       )
       .subscribe((response: LoginResponse) => {
+        const isAdmin = jwtDecode<JwtPayload & { isAdmin: boolean }>(
+          response.accessToken
+        ).isAdmin;
         this.appStateService.patchState({
           token: response.accessToken,
           username: response.user.login,
           isLoggedIn: true,
-          // isAdmin: response.user.isAdmin,
+          isAdmin: isAdmin,
         });
         this.router.navigate(['../../library'], { relativeTo: this.route });
       });

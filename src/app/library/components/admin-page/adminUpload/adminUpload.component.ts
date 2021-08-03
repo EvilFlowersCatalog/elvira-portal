@@ -1,10 +1,10 @@
-import { Component, OnInit, ViewChild, Inject } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import {MatChipInputEvent} from '@angular/material/chips';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {Observable} from 'rxjs';
 import { FormGroup, FormControl, FormArray } from '@angular/forms';
 import {map, startWith} from 'rxjs/operators';
-
+import {MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 
 
 export interface Tag {
@@ -22,12 +22,15 @@ export class AdminUploadComponent implements OnInit {
   catalogForm = new FormControl();
   options: string[] = ['1. semester', '2. semester', '3. semester', '4. semester'];
   filteredOptions: Observable<string[]>;
+  filteredChips: Observable<string[]>;
+  chipsForm = new FormControl();
   visible: boolean = true;
   selectable: boolean = true;
   removable: boolean = true;
   addOnBlur: boolean = true;
   separatorKeysCodes = [ENTER, COMMA];
   @ViewChild('chipList') chipList;
+  @ViewChild('fruitInput') fruitInput: ElementRef<HTMLInputElement>;
   feeds = [
     { name: 'Mathematics' },
     { name: 'Programming' },
@@ -60,6 +63,11 @@ export class AdminUploadComponent implements OnInit {
       startWith(''),
       map(value => this._filter(value))
     );
+
+    this.filteredChips = this.chipsForm.valueChanges.pipe(
+      startWith(''),
+      map(value => this._filter(value))
+    );
   }
   //Matchip add
   add(event: MatChipInputEvent): void {
@@ -83,6 +91,11 @@ export class AdminUploadComponent implements OnInit {
     if (index >= 0) {
       this.feeds.splice(index, 1);
     }
+  }
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    this.feeds.push({name: event.option.viewValue});
+    this.fruitInput.nativeElement.value = '';
   }
   //Autocomplete
   private _filter(value: string): string[] {

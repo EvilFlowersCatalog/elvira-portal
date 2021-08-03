@@ -7,16 +7,21 @@ import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component
 import { MaterialModule } from '../material.module';
 import { TranslocoRootModule } from '../transloco/transloco-root.module';
 import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
-
+import { SidebarComponent } from './components/sidebar/sidebar.component';
 
 @NgModule({
-  declarations: [HomeComponent, PdfViewerComponent],
+  declarations: [
+    HomeComponent,
+    PdfViewerComponent,
+    SidebarComponent
+  ],
   imports: [
     CommonModule,
     RouterModule.forChild(LIBRARY_ROUTES),
     MaterialModule,
     TranslocoRootModule,
   ],
-  providers:[{ provide: TRANSLOCO_SCOPE, useValue: 'lazy' }]
+  providers:[{ provide: TRANSLOCO_SCOPE, useValue: 'lazy' }],
+  exports: [SidebarComponent],
 })
-export class LibraryModule { }
+export class LibraryModule {}

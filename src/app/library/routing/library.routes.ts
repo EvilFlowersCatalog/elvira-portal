@@ -16,6 +16,7 @@ export const LIBRARY_ROUTES: Routes = [
   },
   {
     path: 'admin',
+    canLoad: [],
     loadChildren: () =>
       import('../components/admin-page/admin-page.module').then((m) => m.AdminPageModule),
   },

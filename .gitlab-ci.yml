@@ -21,9 +21,9 @@ build:development:
 
 build_image:development:
   stage: build_image
-  image: docker:19.03.12
+  image: docker:19.03.1
   services:
-    - docker:19.03.12-dind
+    - docker:19.03.1-dind
   tags:
     - docker
   only:
@@ -32,7 +32,7 @@ build_image:development:
     - build:development
   script:
     - docker login -u $CI_DEPLOY_USER -p $CI_DEPLOY_PASSWORD $CI_REGISTRY
-    - docker build -t registry.gitlab.com/fiit_coworking/e-library/e-library-client:dev .
+    - DOCKER_BUILDKIT=1 docker build -t registry.gitlab.com/fiit_coworking/e-library/e-library-client:dev .
     - docker push registry.gitlab.com/fiit_coworking/e-library/e-library-client:dev
 
 build:prod:
@@ -53,7 +53,7 @@ build:prod:
 
 build_image:prod:
   stage: build_image
-  image: docker:dind
+  image: docker:19.03.1
   tags:
     - docker
   only:

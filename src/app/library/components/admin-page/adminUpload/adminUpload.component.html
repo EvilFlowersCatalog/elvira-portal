@@ -3,7 +3,6 @@
 >
   <form
     [formGroup]="uploadForm"
-    (submit)="formUploader()"
   >
     <div
       fxLayoutAlign="center center"
@@ -87,7 +86,7 @@
             <input
               matInput
               maxlength="50"
-              formControlName="contributorsName[i]"
+              [formControl]="contributorsName[i]"
             >
         </mat-form-field>
         <mat-form-field
@@ -150,7 +149,13 @@
                  [matChipInputAddOnBlur]="addOnBlur"
                  (matChipInputTokenEnd)="add($event)" />
         </mat-chip-list>
+        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
+          <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
+            {{option}}
+          </mat-option>
+        </mat-autocomplete>
         <mat-hint>Easy tags</mat-hint>
+
       </mat-form-field>
       <br>
       <mat-card-title >Summary</mat-card-title>
@@ -188,7 +193,8 @@
       <button
         mat-raised-button
         color="primary"
-        type="submit"
+        type="button"
+        (click)="formUploader()"
       >
        Upload
       </button>

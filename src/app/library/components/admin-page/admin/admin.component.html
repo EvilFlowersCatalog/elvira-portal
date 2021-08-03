@@ -1,24 +1,32 @@
 <ng-container
   *transloco="let t;"
 >
-<div fxLayoutAlign="end center">
-  <button
-    class="new-doc-button"
-    (click)="newDocument()"
-    mat-raised-button
-    color="primary"
-  >
-  New document
-  </button>
-</div>
 
-<mat-form-field
-  class="search-bar"
-
+<div fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="header-box"
 >
-  <mat-label>Filter</mat-label>
-  <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input>
-</mat-form-field>
+
+  <mat-form-field
+    class="search-bar"
+
+  >
+    <mat-label>Filter</mat-label>
+    <input matInput (keyup)="applyFilter($event)" placeholder="Ex. ium" #input>
+  </mat-form-field>
+
+  <div fxLayoutAlign="end center">
+
+    <button
+      class="new-doc-button"
+      (click)="newDocument()"
+      mat-raised-button
+      color="primary"
+    >
+    New document
+    </button>
+  </div>
+  </div>
 
 <table mat-table [dataSource]="dataSource" class="main-table">
 
@@ -58,12 +66,21 @@
       </td>
     </ng-container>
 
+
+
   <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
   <tr
       mat-row
       (click)="getRow(row)"
       *matRowDef="let row; columns: displayedColumns;"
   ></tr>
+
+
 </table>
+
+<mat-paginator
+      [pageSizeOptions]="[5, 10, 20]"
+>
+</mat-paginator>
 
 </ng-container>

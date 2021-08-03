@@ -1,16 +1,17 @@
 import { CommonModule } from '@angular/common';
-import { InjectionToken, NgModule } from '@angular/core';
+import { NgModule } from '@angular/core';
 import { NotfoundComponent } from './components/notfound/notfound.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { MaterialModule } from '../material.module';
 import { TranslocoRootModule } from '../transloco/transloco-root.module';
 import { DeleteDialogComponent } from './delete-dialog/delete-dialog.component';
+import { LOCAL_STORAGE_TOKEN } from './services/local-storage/local-storage.service';
+import { LibraryModule } from '../library/library.module';
 
-export const LOCAL_STORAGE_TOKEN = new InjectionToken('localStorage');
 
 @NgModule({
   declarations: [NavbarComponent, NotfoundComponent, DeleteDialogComponent],
-  imports: [CommonModule, MaterialModule, TranslocoRootModule],
+  imports: [CommonModule, MaterialModule, LibraryModule, TranslocoRootModule],
   exports: [NavbarComponent, NotfoundComponent],
   providers: [{ provide: LOCAL_STORAGE_TOKEN, useValue: localStorage }],
 })
