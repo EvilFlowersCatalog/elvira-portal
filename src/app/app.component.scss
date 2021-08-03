@@ -1,3 +1,20 @@
 .app-height {
-  min-height: 100vh !important
+  min-height: 100vh !important;
+}
+
+.app-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 3;
+}
+
+.app-content {
+  padding-top: 64px;
+}
+
+@media screen and (max-width: 599px) {
+  .app-content {
+    padding-top: 56px;
+  }
 }
