@@ -73,11 +73,15 @@
             <mat-icon>add</mat-icon>
           </button>
         </mat-card-title>
+
       <div
-        *ngFor="let contributor of contributors(counter); index as i"
+        *ngFor="let temp of contributors(counter); index as i"
         fxLayout="row"
         fxLayoutAlign="space-between center"
       >
+      <ng-container formArrayName="contributor">
+      <div  *ngFor="let _ of contributor.controls; index as x">
+        <ng-container [formGroupName]="x">
         <mat-form-field
           appearance="legacy"
           style="width: 45%;"
@@ -86,7 +90,7 @@
             <input
               matInput
               maxlength="50"
-              [formControl]="contributorsName[i]"
+              formControlName="name"
             >
         </mat-form-field>
         <mat-form-field
@@ -97,7 +101,7 @@
             <input
               matInput
               maxlength="30"
-              formControlName="contributorsSurname[i]"
+              formControlName="surname"
             >
         </mat-form-field>
         <button
@@ -107,7 +111,41 @@
         >
         <mat-icon>clear</mat-icon>
         </button>
+
+        <mat-form-field
+          appearance="legacy"
+          style="width: 45%;"
+        >
+          <mat-label>{{ t('lazy.adminPage.contributor-name') }}</mat-label>
+            <input
+              matInput
+              maxlength="50"
+              formControlName="name"
+            >
+        </mat-form-field>
+        <mat-form-field
+          appearance="legacy"
+          style="width: 45%;"
+        >
+          <mat-label>{{ t('lazy.adminPage.contributor-surname') }}</mat-label>
+            <input
+              matInput
+              maxlength="30"
+              formControlName="surname"
+            >
+        </mat-form-field>
+        <button
+          (click)="removeContributor()"
+          type="button"
+          mat-icon-button color="primary"
+        >
+        <mat-icon>clear</mat-icon>
+        </button>
+      </ng-container>
+        </div>
+      </ng-container>
       </div>
+
     <br>
       <mat-card-title >{{ t('lazy.adminPage.category') }}</mat-card-title>
         <mat-form-field appearance="outline">

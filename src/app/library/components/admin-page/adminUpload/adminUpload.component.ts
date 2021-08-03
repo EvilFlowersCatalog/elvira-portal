@@ -17,7 +17,6 @@ export interface Tag {
   styleUrls: ['./adminUpload.component.scss'],
 })
 export class AdminUploadComponent implements OnInit {
-  uploadForm: FormGroup;
   counter: number = 0;
   catalogForm = new FormControl();
   options: string[] = ['1. semester', '2. semester', '3. semester', '4. semester'];
@@ -46,17 +45,23 @@ export class AdminUploadComponent implements OnInit {
 
   constructor(
       //private readonly store: Store,
-  ) {
-    this.uploadForm = new FormGroup({
-      title: new FormControl(''),
-      authorName: new FormControl(''),
-      authorSurname: new FormControl(''),
-      contributorsName: new FormArray([]),
-      contributorsSurname: new FormArray([]),
-      category: new FormControl(''),
-      description: new FormControl(''),
-    });
-   }
+  ) {}
+
+  uploadForm = new FormGroup({
+    title: new FormControl(''),
+    authorName: new FormControl(''),
+    authorSurname: new FormControl(''),
+    contributor: new FormArray([
+      new FormGroup({
+        name: new FormControl(''),
+        surname: new FormControl('')
+      })
+    ]),
+    category: new FormControl(''),
+    description: new FormControl(''),
+  });
+   contributor = this.uploadForm.get('contributor') as FormArray;
+
 
   ngOnInit(): void {
     this.filteredOptions = this.catalogForm.valueChanges.pipe(
