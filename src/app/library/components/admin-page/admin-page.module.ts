@@ -7,6 +7,7 @@ import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
 import { ADMIN_ROUTES } from './routing/admin-page.routes';
 import { AdminComponent } from './admin/admin.component';
 import { AdminUploadComponent } from './adminUpload/adminUpload.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [AdminComponent, AdminUploadComponent],
@@ -14,6 +15,8 @@ import { AdminUploadComponent } from './adminUpload/adminUpload.component';
     CommonModule,
     RouterModule.forChild(ADMIN_ROUTES),
     MaterialModule,
+    FormsModule,
+    ReactiveFormsModule,
     TranslocoRootModule,
   ],
   providers:[{ provide: TRANSLOCO_SCOPE, useValue: 'lazy' }]
