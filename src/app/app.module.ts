@@ -1,6 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -8,8 +7,9 @@ import { HttpClientModule } from '@angular/common/http';
 import { MaterialModule } from './material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
-import { TokenInterceptorService } from './auth/services/token-interceptor.service';
-import { ErrorInterceptor } from './auth/services/error-interceptor.service';
+import { HttpErrorInterceptor } from './common/interceptors/http-error.interceptor';
+import { HttpRequestInterceptor } from './common/interceptors/http-request.interceptor';
+import { HttpResponseInterceptor } from './common/interceptors/http-response.interceptor';
 import { CommonLibraryModule } from './common/common.module';
 import { AppStateService } from './common/services/app-state/app-state.service';
 
@@ -28,12 +28,17 @@ import { AppStateService } from './common/services/app-state/app-state.service';
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: TokenInterceptorService,
+      useClass: HttpErrorInterceptor,
       multi: true,
     },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: ErrorInterceptor,
+      useClass: HttpRequestInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpResponseInterceptor,
       multi: true,
     },
   ],

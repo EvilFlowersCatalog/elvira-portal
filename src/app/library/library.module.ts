@@ -7,6 +7,7 @@ import { AdminComponent } from './components/admin/admin.component';
 import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component';
 import { MaterialModule } from '../material.module';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { EntryDetailComponent } from './components/entry-detail/entry-detail.component';
 
 @NgModule({
   declarations: [
@@ -14,6 +15,7 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
     PdfViewerComponent,
     AdminComponent,
     SidebarComponent,
+    EntryDetailComponent,
   ],
   imports: [
     CommonModule,

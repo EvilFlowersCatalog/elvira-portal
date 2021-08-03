@@ -30,16 +30,16 @@ export class HomeComponent extends DisposableComponent implements OnInit {
 
   ngOnInit(): void {
     this.appStateService.patchState({ showSidebarToggle: true });
+    window.onbeforeunload = () => this.ngOnDestroy();
     this.sidebarState$ = this.appStateService.getState$().pipe(
       takeUntil(this.destroySignal$),
       map((data: State) => data.sidebar)
     );
+
     this.books$ = this.bookService.getBooks();
-    this.entries$ = this.entriesService.listEntries().pipe(
-      map((data: ListEntriesResponse) => data),
-      tap(console.log)
-    );
-    window.onbeforeunload = () => this.ngOnDestroy();
+    this.entries$ = this.entriesService
+      .listEntries()
+      .pipe(map((data: ListEntriesResponse) => data));
   }
 
   ngOnDestroy(): void {
