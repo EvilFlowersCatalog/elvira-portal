@@ -13,6 +13,7 @@
 
 .login-container {
   min-height: 100vh !important;
+  margin-top: -64px;
 }
 
 .login-password-icon {
@@ -28,5 +29,12 @@
 @media screen and (max-width: 750px) {
   .login-card {
     width: 90%;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .login-container {
+    min-height: 100vh !important;
+    margin-top: -56px;
   }
 }

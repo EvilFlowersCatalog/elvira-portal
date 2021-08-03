@@ -239,12 +239,8 @@ $altTheme: mat-dark-theme($theme-primary, $theme-accent, $theme-warn);
 // Theme Init
 .theme-light {
   @include angular-material-theme($theme);
-  background-image: url("./assets/light_bg.png");
-  background-size: cover;
 }
 
 .theme-dark {
   @include angular-material-theme($altTheme);
-  background-image: url("./assets/dark_bg.png");
-  background-size: cover;
 }
