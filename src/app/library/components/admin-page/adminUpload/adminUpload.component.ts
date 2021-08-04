@@ -1,5 +1,6 @@
-import { Component, OnInit, ViewChild, Inject } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import {MatChipInputEvent} from '@angular/material/chips';
+import {MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {Observable} from 'rxjs';
 import { FormGroup, FormControl, FormArray } from '@angular/forms';
@@ -23,19 +24,18 @@ export class AdminUploadComponent implements OnInit {
   options: string[] = ['1. semester', '2. semester', '3. semester', '4. semester'];
   filteredOptions: Observable<string[]>;
   visible: boolean = true;
-  selectable: boolean = true;
-  removable: boolean = true;
-  addOnBlur: boolean = true;
-  separatorKeysCodes = [ENTER, COMMA];
-  @ViewChild('chipList') chipList;
-  feeds = [
-    { name: 'Mathematics' },
-    { name: 'Programming' },
-    { name: 'Artificial intelligence' },
-  ];
+  selectable = true;
+  removable = true;
+  separatorKeysCodes: number[] = [ENTER, COMMA];
+  fruitCtrl = new FormControl();
+  filteredFruits: Observable<string[]>;
+  fruits: string[] = ['Lemon'];
+  allFruits: string[] = ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
   file: File;
   isUploading = false;
 
+
+  @ViewChild('fruitInput') fruitInput: ElementRef<HTMLInputElement>;
 
   contributors(i: number) {
     return new Array(i);
@@ -56,40 +56,44 @@ export class AdminUploadComponent implements OnInit {
    }
 
   ngOnInit(): void {
-    this.filteredOptions = this.catalogForm.valueChanges.pipe(
-      startWith(''),
-      map(value => this._filter(value))
-    );
+    this.filteredFruits = this.fruitCtrl.valueChanges.pipe(
+      startWith(null),
+      map((fruit: string | null) => fruit ? this._filter(fruit) : this.allFruits.slice()));
   }
-  //Matchip add
   add(event: MatChipInputEvent): void {
-    let input = event.input;
-    let value = event.value;
+    const value = (event.value || '').trim();
 
-    // Add our feeds
-    if ((value || '').trim()) {
-      this.feeds.push({ name: value.trim() });
+    // Add our fruit
+    if (value) {
+      this.fruits.push(value);
     }
 
-    // Reset the input value
-    if (input) {
-      input.value = '';
-    }
+    // Clear the input value
+    event.chipInput!.clear();
+
+    this.fruitCtrl.setValue(null);
   }
-  //Matchip remove
-  remove(fruit: any): void {
-    let index = this.feeds.indexOf(fruit);
+
+  remove(fruit: string): void {
+    const index = this.fruits.indexOf(fruit);
 
     if (index >= 0) {
-      this.feeds.splice(index, 1);
+      this.fruits.splice(index, 1);
     }
   }
-  //Autocomplete
+
+  selected(event: MatAutocompleteSelectedEvent): void {
+    this.fruits.push(event.option.viewValue);
+    this.fruitInput.nativeElement.value = '';
+    this.fruitCtrl.setValue(null);
+  }
+
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.options.filter(option => option.toLowerCase().includes(filterValue));
+    return this.allFruits.filter(fruit => fruit.toLowerCase().includes(filterValue));
   }
+  //Autocomplete
   //pdf file uploader
   fileChange(event) {
 
