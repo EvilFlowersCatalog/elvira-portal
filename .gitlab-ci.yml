@@ -32,7 +32,7 @@ build_image:development:
     - build:development
   script:
     - docker login -u $CI_DEPLOY_USER -p $CI_DEPLOY_PASSWORD $CI_REGISTRY
-    - DOCKER_BUILDKIT=1 docker build -t registry.gitlab.com/fiit_coworking/e-library/e-library-client:dev .
+    - docker build -t registry.gitlab.com/fiit_coworking/e-library/e-library-client:dev .
     - docker push registry.gitlab.com/fiit_coworking/e-library/e-library-client:dev
 
 build:prod:
