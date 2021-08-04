@@ -15,6 +15,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     CommonModule,
     RouterModule.forChild(ADMIN_ROUTES),
     MaterialModule,
+    FormsModule,
+    ReactiveFormsModule,
     TranslocoRootModule,
     ReactiveFormsModule,
     FormsModule
