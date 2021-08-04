@@ -1,0 +1,17 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>{{ entry.title }}</mat-card-title>
+  </mat-card-header>
+  <!-- <img mat-card-image [src]="entry.image" /> -->
+  <mat-card-actions>
+    <button mat-icon-button (click)="openPdf(entry.id)">
+      <mat-icon> picture_as_pdf </mat-icon>
+    </button>
+    <button mat-icon-button (click)="downloadPdf(entry.id)">
+      <mat-icon> file_download </mat-icon>
+    </button>
+    <button mat-icon-button (click)="addToFavorites(entry.id)">
+      <mat-icon> favorite </mat-icon>
+    </button>
+  </mat-card-actions>
+</mat-card>

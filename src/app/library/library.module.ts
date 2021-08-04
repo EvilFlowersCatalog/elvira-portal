@@ -8,12 +8,14 @@ import { MaterialModule } from '../material.module';
 import { TranslocoRootModule } from '../transloco/transloco-root.module';
 import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { EntryDetailComponent } from './components/entry-detail/entry-detail.component';
 
 @NgModule({
   declarations: [
     HomeComponent,
     PdfViewerComponent,
-    SidebarComponent
+    SidebarComponent,
+    EntryDetailComponent,
   ],
   imports: [
     CommonModule,

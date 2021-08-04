@@ -26,7 +26,6 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.app.json",
             "localize": true,
-            "aot": true,
             "i18nMissingTranslation": "error",
             "assets": [
               "src/favicon.ico",
@@ -37,13 +36,14 @@
                 "output": "/assets/"
               }
             ],
-            "styles": [
-              {
-                "input": "node_modules/@progress/kendo-theme-default/dist/all.css"
-              },
-              "src/theme.scss"
-            ],
-            "scripts": []
+            "styles": ["src/theme.scss"],
+            "scripts": [],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
           },
           "configurations": {
             "production": {
@@ -80,11 +80,6 @@
                   "with": "src/environments/environment.dev.ts"
                 }
               ],
-              "optimization": false,
-              "sourceMap": true,
-              "namedChunks": true,
-              "vendorChunk": true,
-              "buildOptimizer": false,
               "budgets": [
                 {
                   "type": "initial",
@@ -98,7 +93,8 @@
                 }
               ]
             }
-          }
+          },
+          "defaultConfiguration": ""
         },
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",

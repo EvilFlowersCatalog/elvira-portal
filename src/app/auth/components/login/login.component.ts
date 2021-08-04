@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-import { catchError, take } from 'rxjs/operators';
+import { catchError, take, tap } from 'rxjs/operators';
 import { LoginResponse } from '../../types/auth.types';
 import { throwError } from 'rxjs';
 import {MatSnackBar} from '@angular/material/snack-bar';
@@ -41,6 +41,18 @@ export class LoginComponent implements OnInit {
     this.authService
       .login(loginCredentials)
       .pipe(
+        tap((response: LoginResponse) => {
+          const isAdmin = jwtDecode<JwtPayload & { isAdmin: boolean }>(
+            response.accessToken
+          ).isAdmin;
+          this.appStateService.patchState({
+            token: response.accessToken,
+            username: response.user.login,
+            isLoggedIn: true,
+            isAdmin: isAdmin,
+          });
+          this.router.navigate(['../../library'], { relativeTo: this.route });
+        }),
         take(1),
         catchError((err) => {
           console.log(err);
@@ -50,17 +62,6 @@ export class LoginComponent implements OnInit {
           return throwError(err);
         })
       )
-      .subscribe((response: LoginResponse) => {
-        const isAdmin = jwtDecode<JwtPayload & { isAdmin: boolean }>(
-          response.accessToken
-        ).isAdmin;
-        this.appStateService.patchState({
-          token: response.accessToken,
-          username: response.user.login,
-          isLoggedIn: true,
-          isAdmin: isAdmin,
-        });
-        this.router.navigate(['../../library'], { relativeTo: this.route });
-      });
+      .subscribe();
   }
 }

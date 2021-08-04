@@ -6,12 +6,6 @@ import {Observable} from 'rxjs';
 import { FormGroup, FormControl, FormArray } from '@angular/forms';
 import {map, startWith} from 'rxjs/operators';
 
-
-
-export interface Tag {
-  name: string;
-}
-
 @Component({
   selector: 'app-admin',
   templateUrl: './adminUpload.component.html',
@@ -20,20 +14,18 @@ export interface Tag {
 export class AdminUploadComponent implements OnInit {
   uploadForm: FormGroup;
   counter: number = 0;
-  catalogForm = new FormControl();
-  options: string[] = ['1. semester', '2. semester', '3. semester', '4. semester'];
-  filteredOptions: Observable<string[]>;
-  visible: boolean = true;
+  //Chips variables
   selectable = true;
   removable = true;
   separatorKeysCodes: number[] = [ENTER, COMMA];
-  fruitCtrl = new FormControl();
-  filteredFruits: Observable<string[]>;
-  fruits: string[] = ['Lemon'];
-  allFruits: string[] = ['Apple', 'Lemon', 'Lime', 'Orange', 'Strawberry'];
+  feedCtrl = new FormControl();
+  filteredFeeds: Observable<string[]>;
+  feeds: string[] = ['FIIT'];
+  allFeeds: string[] = ['Mathematics', 'Artificial intelligence', 'Programming', '1. Semester'];
+  //Image upload variables
   file: File;
   isUploading = false;
-
+  validSize: boolean = false;
 
   @ViewChild('fruitInput') fruitInput: ElementRef<HTMLInputElement>;
 
@@ -41,9 +33,7 @@ export class AdminUploadComponent implements OnInit {
     return new Array(i);
 }
 
-  constructor(
-      //private readonly store: Store,
-  ) {
+  constructor() {
     this.uploadForm = new FormGroup({
       title: new FormControl(''),
       authorName: new FormControl(''),
@@ -56,58 +46,63 @@ export class AdminUploadComponent implements OnInit {
    }
 
   ngOnInit(): void {
-    this.filteredFruits = this.fruitCtrl.valueChanges.pipe(
+    this.filteredFeeds = this.feedCtrl.valueChanges.pipe(
       startWith(null),
-      map((fruit: string | null) => fruit ? this._filter(fruit) : this.allFruits.slice()));
+      map((fruit: string | null) => fruit ? this._filter(fruit) : this.allFeeds.slice()));
   }
+
+  //Add feeds chips function
   add(event: MatChipInputEvent): void {
     const value = (event.value || '').trim();
 
-    // Add our fruit
+    // Add our feed
     if (value) {
-      this.fruits.push(value);
+      this.feeds.push(value);
     }
 
     // Clear the input value
     event.chipInput!.clear();
 
-    this.fruitCtrl.setValue(null);
+    this.feedCtrl.setValue(null);
   }
-
-  remove(fruit: string): void {
-    const index = this.fruits.indexOf(fruit);
+  //Remove feeds chips function
+  remove(feed: string): void {
+    const index = this.feeds.indexOf(feed);
 
     if (index >= 0) {
-      this.fruits.splice(index, 1);
+      this.feeds.splice(index, 1);
     }
   }
-
+  //Add selected chips from autocomplete
   selected(event: MatAutocompleteSelectedEvent): void {
-    this.fruits.push(event.option.viewValue);
+    this.feeds.push(event.option.viewValue);
     this.fruitInput.nativeElement.value = '';
-    this.fruitCtrl.setValue(null);
+    this.feedCtrl.setValue(null);
   }
 
   private _filter(value: string): string[] {
     const filterValue = value.toLowerCase();
 
-    return this.allFruits.filter(fruit => fruit.toLowerCase().includes(filterValue));
+    return this.allFeeds.filter(fruit => fruit.toLowerCase().includes(filterValue));
   }
-  //Autocomplete
+
   //pdf file uploader
   fileChange(event) {
 
   }
+
   //submit button -> POST
   formUploader() {
     const uploadCredentials = this.uploadForm.value;
     console.log(uploadCredentials);
   }
+
   //ngFor add contributor
   addContributor() {
     if(this.counter<5)
       this.counter++;
   }
+
 //ngFor remove contributor
   removeContributor() {
     if(this.counter>0)
@@ -143,28 +138,29 @@ formatFileSize(bytes: number, decimals = 0) {
     const dm = decimals <= 0 ? 0 : decimals || 2;
     const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
+    console.log(this.validSize);
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
-// TODO: CROP
-// imageChangedEvent: any = '';
-// croppedImage: any = '';
-// fileChangeEvent(event: any): void {
-//     this.imageChangedEvent = event;
-// }
-// imageCropped(event: ImageCroppedEvent) {
-//     console.log(event);
-//     this.croppedImage = event.base64;
-// }
-// imageLoaded() {
-//     // show cropper
-//     console.log('loaded')
-// }
-// cropperReady() {
-//     // cropper ready
-//     console.log('ready')
-// }
-// loadImageFailed() {
-//     // show message
-//     console.log('failed')
-// }
+
+checkImageSize(bytes: number, decimals = 0) {
+  const k = 1024;
+  const dm = decimals <= 0 ? 0 : decimals || 2;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  const info = (bytes / Math.pow(k, i)).toFixed(dm);
+  if(sizes[i] === 'Bytes' || sizes[i] === 'KB'){
+    this.validSize = true;
+    return true;
+  }
+  if(sizes[i] === 'MB' && (info === '4' || info === '3' || info === '2' || info === '1')){
+    this.validSize = true;
+    return true;
+  }
+  else this.validSize = false;
+  if(sizes[i] === 'GB' || sizes[i] === 'TB' || sizes[i] === 'PB' || sizes[i] === 'EB' || sizes[i] === 'ZB' || sizes[i] === 'YB')
+  //console.log(size);
+  //console.log(imageSize);
+  this.validSize = false;
+  return false;
+}
 }

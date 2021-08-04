@@ -14,7 +14,7 @@
         fxFlex="35"
         class="login-theme"
       >
-        <mat-card-title >{{ t('lazy.adminPage.header') }}</mat-card-title>
+        <mat-card-title>{{ t('lazy.adminPage.header') }}</mat-card-title>
       <hr>
       <mat-card-title >{{ t('lazy.adminPage.title') }}</mat-card-title>
         <div
@@ -80,14 +80,12 @@
         fxLayoutAlign="space-between center"
       >
         <mat-form-field
-          appearance="legacy"
           style="width: 45%;"
         >
           <mat-label>{{ t('lazy.adminPage.contributor-name') }}</mat-label>
             <input
               matInput
               maxlength="50"
-              formControlName="contributorsName[i]"
             >
         </mat-form-field>
         <mat-form-field
@@ -98,7 +96,6 @@
             <input
               matInput
               maxlength="30"
-              formControlName="contributorsSurname[i]"
             >
         </mat-form-field>
         <button
@@ -121,45 +118,30 @@
           <mat-hint>{{ t('lazy.adminPage.category-hint') }}</mat-hint>
         </mat-form-field>
       <br>
-      <mat-card-title >Catalog</mat-card-title>
-      <mat-form-field class="example-full-width" appearance="fill">
-        <mat-label>Catalog</mat-label>
-        <input type="text"
-               placeholder="Pick one"
-               aria-label="number"
-               matInput
-               [formControl]="catalogForm"
-               [matAutocomplete]="auto">
-        <mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
-          <mat-option *ngFor="let option of filteredOptions | async" [value]="option">
-            {{option}}
-          </mat-option>
-        </mat-autocomplete>
-      </mat-form-field>
       <mat-card-title>Feeds</mat-card-title>
       <mat-form-field class="example-chip-list" appearance="fill">
-        <mat-label>Favorite Fruits</mat-label>
-        <mat-chip-list #chipList aria-label="Fruit selection">
+        <mat-label>Favorite Feeds</mat-label>
+        <mat-chip-list #chipList aria-label="Feed selection">
           <mat-chip
-            *ngFor="let fruit of fruits"
+            *ngFor="let feed of feeds"
             [selectable]="selectable"
             [removable]="removable"
-            (removed)="remove(fruit)">
-            {{fruit}}
+            (removed)="remove(feed)">
+            {{feed}}
             <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
           </mat-chip>
           <input
-            placeholder="New fruit..."
+            placeholder="New feed..."
             #fruitInput
-            [formControl]="fruitCtrl"
+            [formControl]="feedCtrl"
             [matAutocomplete]="auto"
             [matChipInputFor]="chipList"
             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
             (matChipInputTokenEnd)="add($event)">
         </mat-chip-list>
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
-          <mat-option *ngFor="let fruit of filteredFruits | async" [value]="fruit">
-            {{fruit}}
+          <mat-option *ngFor="let feed of filteredFeeds | async" [value]="feed">
+            {{feed}}
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
@@ -177,13 +159,14 @@
       <br>
       <div mat-dialog-content class="dropzone" fxLayout="column" fxLayoutAlign="center center" dragAndDrop (fileDropped)="onFileDropped($event)">
         <ng-template [ngIf]="!file">
-            <input type="file" class="input-file" (change)="fileSelectedFromBrowse(($event.target?.files)[0])" />
+            <input type="file" class="input-file" accept=".png,.jpeg,.jpg,.eps,.tif,.tiff" (change)="fileSelectedFromBrowse(($event.target?.files)[0])" />
             <h3>Drag your image here or click here to browse</h3>
             <h4><i>(64x64 px resolution is recommended)</i></h4>
         </ng-template>
         <ng-template [ngIf]="file">
             <h3>{{ file?.name }}</h3>
-            <h4>{{ formatFileSize(file?.size) }}</h4>
+            <h4 *ngIf="checkImageSize(file?.size)">{{ formatFileSize(file?.size) }}</h4>
+            <h4 *ngIf="!validSize">The image is too big.</h4>
             <button mat-icon-button class="btn-remove-file" (click)="removeFile()">
                 <mat-icon>clear</mat-icon>
             </button>

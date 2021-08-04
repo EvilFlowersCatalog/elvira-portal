@@ -7,12 +7,13 @@ import { TranslocoRootModule } from '../transloco/transloco-root.module';
 import { DeleteDialogComponent } from './delete-dialog/delete-dialog.component';
 import { LOCAL_STORAGE_TOKEN } from './services/local-storage/local-storage.service';
 import { LibraryModule } from '../library/library.module';
+import { LoadingComponent } from './components/loading.component';
 
 
 @NgModule({
-  declarations: [NavbarComponent, NotfoundComponent, DeleteDialogComponent],
+  declarations: [NavbarComponent, NotfoundComponent, LoadingComponent, DeleteDialogComponent],
   imports: [CommonModule, MaterialModule, LibraryModule, TranslocoRootModule],
-  exports: [NavbarComponent, NotfoundComponent],
+  exports: [NavbarComponent, NotfoundComponent, LoadingComponent],
   providers: [{ provide: LOCAL_STORAGE_TOKEN, useValue: localStorage }],
 })
 export class CommonLibraryModule {}

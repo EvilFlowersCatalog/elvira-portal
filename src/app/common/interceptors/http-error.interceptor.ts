@@ -7,29 +7,30 @@ import {
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
-import { retry, catchError } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { LoadingService } from '../services/loading/loading.service';
 
 @Injectable()
-export class ErrorInterceptor implements HttpInterceptor {
-  constructor(private snackBar: MatSnackBar) {}
+export class HttpErrorInterceptor implements HttpInterceptor {
+  constructor(
+    private snackBar: MatSnackBar,
+    private readonly loadingService: LoadingService
+  ) {}
 
   intercept(
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
-      retry(1),
       catchError((error: HttpErrorResponse) => {
-        let errorMessage = '';
+        this.loadingService.hideLoading();
         if (error.status >= 500) {
-          //errorMessage = `Error: ${error.error.message}`;
           this.snackBar.open(`Error: ${error.error.message}`, 'close', {
             duration: 5000,
           });
         }
-        //window.alert(errorMessage);
-        return throwError(errorMessage);
+        return throwError(error);
       })
     );
   }
