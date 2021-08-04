@@ -1,19 +1,25 @@
-import { Component, OnInit } from '@angular/core';
-import { AppStateService } from '../../services/app-state/app-state.service';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Router } from '@angular/router';
+import { $ } from 'protractor';
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { State } from '../../services/app-state/app-state.types';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { DisposableComponent } from '../disposable.component';
-import { Router } from '@angular/router';
+import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
+import { State } from 'src/app/common/services/app-state/app-state.types';
+import { DisposableComponent } from '../../disposable.component';
 
 @Component({
-  selector: 'app-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss'],
+  selector: 'app-mobile-navbar',
+  templateUrl: './mobile-navbar.component.html',
+  styleUrls: ['./mobile-navbar.component.scss'],
 })
-export class NavbarComponent extends DisposableComponent implements OnInit {
+export class MobileNavbarComponent
+  extends DisposableComponent
+  implements OnInit
+{
   appState$: Observable<State>;
+  isNavbarOpened: boolean = false;
+  @ViewChild('#sidebar') sidebar;
 
   constructor(
     private readonly router: Router,
@@ -23,10 +29,22 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
     super();
   }
 
+  @HostListener('document:click', ['$event.target'])
+  onClick(targetElement) {
+    console.log(targetElement);
+    // if (!clickedInside) {
+    //   this.toggleNavbar();
+    // }
+  }
+
   ngOnInit(): void {
     this.appState$ = this.appStateService
       .getState$()
       .pipe(takeUntil(this.destroySignal$));
+  }
+
+  toggleNavbar() {
+    this.isNavbarOpened = !this.isNavbarOpened;
   }
 
   navigate(link: string) {
@@ -39,11 +57,6 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
 
   changeLanguage(language: string) {
     this.appStateService.patchState({ lang: language });
-  }
-
-  onSidebarToggle() {
-    const currentSidebarState = this.appStateService.getStateSnapshot().sidebar;
-    this.appStateService.patchState({ sidebar: !currentSidebarState });
   }
 
   logout() {
