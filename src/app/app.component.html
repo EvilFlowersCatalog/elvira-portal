@@ -1,6 +1,6 @@
 <div>
   <app-navbar class="app-header"></app-navbar>
-  <div class="app-background-dark">
+  <div [ngClass]="background">
     <div class="app-content">
       <router-outlet></router-outlet>
     </div>
