@@ -1,4 +1,8 @@
 <div>
-  <app-navbar></app-navbar>
-  <router-outlet></router-outlet>
+  <app-navbar class="app-header"></app-navbar>
+  <div [ngClass]="background">
+    <div class="app-content">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
 </div>

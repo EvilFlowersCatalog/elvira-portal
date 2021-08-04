@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, Inject, Renderer2 } from '@angular/core';
+import { Observable } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
 import { DisposableComponent } from './common/components/disposable.component';
 import { AppStateService } from './common/services/app-state/app-state.service';
@@ -12,6 +13,8 @@ import { LoadingService } from './common/services/loading/loading.service';
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent extends DisposableComponent {
+  background: string;
+
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2,
@@ -42,6 +45,8 @@ export class AppComponent extends DisposableComponent {
 
   setTheme(theme: string) {
     const hostClass = theme === 'dark' ? 'theme-dark' : 'theme-light';
+    this.background =
+      theme === 'dark' ? 'app-background-dark' : 'app-background-light';
     this.renderer.setAttribute(this.document.body, 'class', hostClass);
   }
 }

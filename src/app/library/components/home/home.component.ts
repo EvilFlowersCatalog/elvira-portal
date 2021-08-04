@@ -46,6 +46,10 @@ export class HomeComponent extends DisposableComponent implements OnInit {
     this.appStateService.patchState({ showSidebarToggle: false });
   }
 
+  hideSidebar() {
+    this.appStateService.patchState({ sidebar: false });
+  }
+
   openPdf(id) {
     this.router.navigateByUrl(`/library/pdf-viewer/${id}`);
   }

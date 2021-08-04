@@ -1,8 +1,38 @@
-<div class="sidebar-container">
-  <form>
-    <mat-form-field>
-      <mat-label>Search</mat-label>
-      <input matInput type="search" placeholder="Search" />
-    </mat-form-field>
+<div fxLayout="column" class="sidebar-container">
+  <form (submit)="search()">
+    <div fxLayout="row">
+      <mat-form-field color="accent">
+        <mat-label>Search</mat-label>
+        <input matInput type="search" placeholder="Search" />
+      </mat-form-field>
+      <button
+        mat-icon-button
+        type="submit"
+        color="accent"
+        class="sidebar-search-button"
+      >
+        <mat-icon>search</mat-icon>
+      </button>
+    </div>
   </form>
+  <hr />
+  <button mat-raised-button color="accent">
+    <mat-icon>filter_alt</mat-icon>Filtrovať
+  </button>
+  <h5 class="sidebar-filter-title">Autor:</h5>
+  <h5 class="sidebar-filter-title">Predmet:</h5>
+  <h5 class="sidebar-filter-title">Semester:</h5>
+  <h5 class="sidebar-filter-title">Autor:</h5>
+  <h5 class="sidebar-filter-title">Autor:</h5>
+  <h5 class="sidebar-filter-title">Autor:</h5>
+  <h5 class="sidebar-filter-title">Autor:</h5>
+  <h5 class="sidebar-filter-title">Autor:</h5>
+  <h5 class="sidebar-filter-title">Autor:</h5>
+  <h5 class="sidebar-filter-title">Autor:</h5>
+  <h5 class="sidebar-filter-title">Autor:</h5>
+  <h5 class="sidebar-filter-title">Autor:</h5>
+  <h5 class="sidebar-filter-title">Autor:</h5>
+  <h5 class="sidebar-filter-title">Autor:</h5>
+  <h5 class="sidebar-filter-title">Autor:</h5>
+  <h5 class="sidebar-filter-title">Autor:</h5>
 </div>

@@ -1,8 +1,8 @@
-<mat-sidenav-container>
+<mat-sidenav-container class="sidenav-container">
   <mat-sidenav mode="side" [opened]="sidebarState$ | async">
     <app-sidebar></app-sidebar>
   </mat-sidenav>
-  <mat-sidenav-content>
+  <mat-sidenav-content (click)="hideSidebar()">
     <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="2rem">
       <ng-container *ngFor="let book of books$ | async">
         <mat-card>
