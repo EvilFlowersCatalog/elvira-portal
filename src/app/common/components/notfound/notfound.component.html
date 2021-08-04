@@ -1,0 +1,32 @@
+<section
+  fxLayout="column"
+  fxLayoutAlign="center center"
+  fxFlexFill
+  class="notfound-container"
+>
+  <mat-card
+    tabindex="0"
+    fxLayout="column"
+    fxLayoutAlign="center stretch"
+    class="notfound-card"
+  >
+    <div fxLayout="column">
+      <div fxLayout="row">
+        <span class="notfound-title">404</span>
+      </div>
+      <div fxLayout="row">
+        <span class="notfound-text">Page not found</span>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="end">
+        <button
+          mat-button
+          color="accent"
+          class="notfound-button"
+          (click)="goBack()"
+        >
+          GO BACK
+        </button>
+      </div>
+    </div>
+  </mat-card>
+</section>

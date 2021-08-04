@@ -1,0 +1,16 @@
+{
+  "loginScreen": {
+    "form": "Prihlásenie",
+    "login": "Prihlasovacie meno",
+    "password": "Heslo",
+    "button": "Prihlásiť sa"
+  },
+  "navbar": {
+    "light": "Svetlý režim",
+    "dark": "Tmavý režim",
+    "svk": "Slovensky",
+    "eng": "Anglicky",
+    "profile": "Profil",
+    "log-out": "Odhlásiť sa"
+  }
+}

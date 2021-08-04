@@ -5,6 +5,8 @@ import { RouterModule } from '@angular/router';
 import { AUTH_ROUTES } from './routing/auth.routing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../material.module';
+import { TranslocoRootModule } from '../transloco/transloco-root.module';
+
 
 @NgModule({
   declarations: [
@@ -15,7 +17,8 @@ import { MaterialModule } from '../material.module';
     ReactiveFormsModule,
     FormsModule,
     RouterModule.forChild(AUTH_ROUTES),
-    MaterialModule
+    MaterialModule,
+    TranslocoRootModule
   ],
 })
 export class AuthModule { }

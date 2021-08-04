@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
-import { NotfoundComponent } from './common/notfound/notfound.component';
+import { NotfoundComponent } from './common/components/notfound/notfound.component';
 
 const routes: Routes = [
   {
@@ -10,22 +10,25 @@ const routes: Routes = [
   },
   {
     path: 'auth',
-    loadChildren: () => import('./auth/auth.module').then(m => m.AuthModule),
+    loadChildren: () => import('./auth/auth.module').then((m) => m.AuthModule),
   },
   {
     path: 'library',
-    loadChildren: () => import('./library/library.module').then(m => m.LibraryModule),
+    loadChildren: () =>
+      import('./library/library.module').then((m) => m.LibraryModule),
   },
   {
-    path: '404', component: NotfoundComponent
+    path: '404',
+    component: NotfoundComponent,
   },
   {
-    path: '**', redirectTo: '/404'
-  }
+    path: '**',
+    redirectTo: '/404',
+  },
 ];
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}
