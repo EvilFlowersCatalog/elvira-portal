@@ -9,17 +9,7 @@
     <span class="nav-label-text"> eLibrary</span>
   </button>
   <span class="navbar-spacer"></span>
-  <button mat-icon-button (click)="toggleNavbar()">
+  <button mat-icon-button (click)="toggleSidenav()">
     <mat-icon>menu</mat-icon>
   </button>
 </mat-toolbar>
-
-<mat-sidenav [opened]="isNavbarOpened" mode="over" style="min-height: 100vh">
-  <mat-toolbar>
-    <mat-toolbar-row>
-      <h2 (click)="navigate('/library/home')">eLibrary</h2>
-    </mat-toolbar-row>
-  </mat-toolbar>
-
-  <mat-divider></mat-divider>
-</mat-sidenav>

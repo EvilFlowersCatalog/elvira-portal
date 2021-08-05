@@ -18,8 +18,6 @@ export class MobileNavbarComponent
   implements OnInit
 {
   appState$: Observable<State>;
-  isNavbarOpened: boolean = false;
-  @ViewChild('#sidebar') sidebar;
 
   constructor(
     private readonly router: Router,
@@ -29,22 +27,19 @@ export class MobileNavbarComponent
     super();
   }
 
-  @HostListener('document:click', ['$event.target'])
-  onClick(targetElement) {
-    console.log(targetElement);
-    // if (!clickedInside) {
-    //   this.toggleNavbar();
-    // }
-  }
-
   ngOnInit(): void {
     this.appState$ = this.appStateService
       .getState$()
       .pipe(takeUntil(this.destroySignal$));
   }
 
-  toggleNavbar() {
-    this.isNavbarOpened = !this.isNavbarOpened;
+  ngOnDestroy() {
+    this.appStateService.patchState({ sidenav: false });
+  }
+
+  toggleSidenav() {
+    const currentSidenavState = this.appStateService.getStateSnapshot().sidenav;
+    this.appStateService.patchState({ sidenav: !currentSidenavState });
   }
 
   navigate(link: string) {

@@ -14,6 +14,7 @@ import { LoadingService } from './common/services/loading/loading.service';
 })
 export class AppComponent extends DisposableComponent {
   background: string;
+  sidenavState: boolean;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -28,7 +29,10 @@ export class AppComponent extends DisposableComponent {
     this.appStateService
       .getState$()
       .pipe(takeUntil(this.destroySignal$))
-      .subscribe((data: State) => this.setTheme(data.theme));
+      .subscribe((data: State) => {
+        this.sidenavState = data.sidenav;
+        this.setTheme(data.theme);
+      });
     this.loadingService.loadingStatus$
       .pipe(
         tap((status) => {
@@ -48,5 +52,9 @@ export class AppComponent extends DisposableComponent {
     this.background =
       theme === 'dark' ? 'app-background-dark' : 'app-background-light';
     this.renderer.setAttribute(this.document.body, 'class', hostClass);
+  }
+
+  hideSidenav() {
+    this.appStateService.patchState({ sidenav: false });
   }
 }
