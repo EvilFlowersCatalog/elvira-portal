@@ -1,20 +1,3 @@
-<<<<<<< HEAD
-<section fxLayout="column" fxLayoutAlign="center center" fxFlexFill class="login-container">
-  <mat-card fxLayout="column" fxLayoutAlign="center stretch" class="login-card">
-    <h1>Prihlásenie</h1>
-    <form [formGroup]="loginForm" (submit)="submit()" fxLayoutAlign="stretch" fxLayout="column">
-      <mat-form-field>
-        <mat-label>Loginn</mat-label>
-        <input matInput formControlName="username" style="padding: 0 .75em 0 .75em;" required>
-      </mat-form-field>
-      <mat-form-field>
-        <mat-label>Heslo</mat-label>
-        <input matInput formControlName="password" type="password" style="padding: 0 .75em 0 .75em;" required
-          [type]="hidePassword ? 'password' : 'text'">
-        <mat-icon matSuffix (click)="hidePassword = !hidePassword" class="login-password-icon">{{
-          hidePassword ? 'visibility_off' : 'visibility'
-          }}</mat-icon>
-=======
 <ng-container *transloco="let t;
   read: 'loginScreen';"
 >
@@ -64,7 +47,6 @@
           class="login-password-icon"
           >{{ hidePassword ? "visibility_off" : "visibility" }}</mat-icon
         >
->>>>>>> feature/theming
       </mat-form-field>
       <button mat-raised-button color="primary" type="submit">
         {{ t('button') }}
