@@ -18,7 +18,7 @@ export class AppStateService {
       username: null,
       isAdmin: false,
       theme: 'light',
-      lang: 'en',
+      lang: 'sk',
       sidebar: false,
       showSidebarToggle: false,
       sidenav: false,

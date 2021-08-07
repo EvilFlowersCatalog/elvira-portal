@@ -18,7 +18,7 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   constructor(
     private readonly router: Router,
     private readonly appStateService: AppStateService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
   ) {
     super();
   }

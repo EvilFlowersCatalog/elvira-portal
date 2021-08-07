@@ -1,3 +1,6 @@
+<ng-container *transloco="let t;
+  read: 'loginScreen';"
+>
 <section
   fxLayout="column"
   fxLayoutAlign="center center"
@@ -10,7 +13,7 @@
     fxLayoutAlign="center stretch"
     class="login-card"
   >
-    <h1>Prihlásenie</h1>
+    <h1>{{ t('form') }}</h1>
     <form
       [formGroup]="loginForm"
       (submit)="submit()"
@@ -18,7 +21,7 @@
       fxLayout="column"
     >
       <mat-form-field color="accent">
-        <mat-label>Login</mat-label>
+        <mat-label>{{ t('login') }}</mat-label>
         <input
           matInput
           formControlName="username"
@@ -28,7 +31,7 @@
         />
       </mat-form-field>
       <mat-form-field color="accent">
-        <mat-label>Heslo</mat-label>
+        <mat-label>{{ t('password') }}</mat-label>
         <input
           matInput
           formControlName="password"
@@ -46,8 +49,9 @@
         >
       </mat-form-field>
       <button mat-raised-button color="primary" type="submit">
-        Prihlásiť sa
+        {{ t('button') }}
       </button>
     </form>
   </mat-card>
 </section>
+</ng-container>

@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { NotfoundComponent } from './components/notfound/notfound.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { MaterialModule } from '../material.module';
+import { TranslocoRootModule } from '../transloco/transloco-root.module';
+import { DeleteDialogComponent } from './delete-dialog/delete-dialog.component';
 import { LOCAL_STORAGE_TOKEN } from './services/local-storage/local-storage.service';
 import { LibraryModule } from '../library/library.module';
 import { LoadingComponent } from './components/loading.component';
@@ -18,8 +20,9 @@ import { MobileSidenavComponent } from './components/mobile-sidenav/mobile-siden
     MobileNavbarComponent,
     HeaderComponent,
     MobileSidenavComponent,
+    DeleteDialogComponent,
   ],
-  imports: [CommonModule, MaterialModule, LibraryModule],
+  imports: [CommonModule, MaterialModule, LibraryModule, TranslocoRootModule],
   exports: [
     NotfoundComponent,
     LoadingComponent,

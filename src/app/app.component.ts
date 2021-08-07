@@ -5,6 +5,7 @@ import { takeUntil, tap } from 'rxjs/operators';
 import { DisposableComponent } from './common/components/disposable.component';
 import { AppStateService } from './common/services/app-state/app-state.service';
 import { State } from './common/services/app-state/app-state.types';
+import { TranslocoService } from '@ngneat/transloco';
 import { LoadingService } from './common/services/loading/loading.service';
 
 @Component({
@@ -20,6 +21,7 @@ export class AppComponent extends DisposableComponent {
     @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2,
     private readonly appStateService: AppStateService,
+    private readonly langService: TranslocoService,
     private readonly loadingService: LoadingService
   ) {
     super();
@@ -32,6 +34,7 @@ export class AppComponent extends DisposableComponent {
       .subscribe((data: State) => {
         this.sidenavState = data.sidenav;
         this.setTheme(data.theme);
+        this.langService.setActiveLang(data.lang);
       });
     this.loadingService.loadingStatus$
       .pipe(

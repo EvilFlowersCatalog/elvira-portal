@@ -5,7 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { catchError, take, tap } from 'rxjs/operators';
 import { LoginResponse } from '../../types/auth.types';
 import { throwError } from 'rxjs';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import {MatSnackBar} from '@angular/material/snack-bar';
 import { AppStateService } from '../../../common/services/app-state/app-state.service';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 
@@ -37,6 +37,7 @@ export class LoginComponent implements OnInit {
 
   submit(): void {
     const loginCredentials = this.loginForm.value;
+    console.log(loginCredentials);
     this.authService
       .login(loginCredentials)
       .pipe(

@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import { AdminComponent } from '../components/admin/admin.component';
 import { HomeComponent } from '../components/home/home.component';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { LibraryGuard } from './library.guard';
@@ -17,8 +16,9 @@ export const LIBRARY_ROUTES: Routes = [
   },
   {
     path: 'admin',
-    canActivate: [LibraryGuard],
-    component: AdminComponent,
+    canLoad: [],
+    loadChildren: () =>
+      import('../components/admin-page/admin-page.module').then((m) => m.AdminPageModule),
   },
   {
     path: 'pdf-viewer/:id',

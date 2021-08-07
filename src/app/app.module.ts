@@ -7,11 +7,13 @@ import { HttpClientModule } from '@angular/common/http';
 import { MaterialModule } from './material.module';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
+import { TranslocoRootModule } from './transloco/transloco-root.module';
 import { HttpErrorInterceptor } from './common/interceptors/http-error.interceptor';
 import { HttpRequestInterceptor } from './common/interceptors/http-request.interceptor';
 import { HttpResponseInterceptor } from './common/interceptors/http-response.interceptor';
 import { CommonLibraryModule } from './common/common.module';
 import { AppStateService } from './common/services/app-state/app-state.service';
+
 
 @NgModule({
   declarations: [AppComponent],
@@ -23,7 +25,8 @@ import { AppStateService } from './common/services/app-state/app-state.service';
     HttpClientModule,
     MaterialModule,
     BrowserAnimationsModule,
-    CommonLibraryModule,
+    TranslocoRootModule,
+    CommonLibraryModule
   ],
   providers: [
     {
