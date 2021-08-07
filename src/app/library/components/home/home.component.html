@@ -1,5 +1,5 @@
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav mode="side" [opened]="sidebarState$ | async">
+  <mat-sidenav mode="over" [opened]="sidebarState$ | async">
     <app-sidebar></app-sidebar>
   </mat-sidenav>
   <mat-sidenav-content (click)="hideSidebar()">

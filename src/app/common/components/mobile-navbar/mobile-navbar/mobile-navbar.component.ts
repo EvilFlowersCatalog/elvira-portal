@@ -13,25 +13,15 @@ import { DisposableComponent } from '../../disposable.component';
   templateUrl: './mobile-navbar.component.html',
   styleUrls: ['./mobile-navbar.component.scss'],
 })
-export class MobileNavbarComponent
-  extends DisposableComponent
-  implements OnInit
-{
+export class MobileNavbarComponent implements OnInit {
   appState$: Observable<State>;
 
   constructor(
     private readonly router: Router,
-    private readonly appStateService: AppStateService,
-    private readonly authService: AuthService
-  ) {
-    super();
-  }
+    private readonly appStateService: AppStateService
+  ) {}
 
-  ngOnInit(): void {
-    this.appState$ = this.appStateService
-      .getState$()
-      .pipe(takeUntil(this.destroySignal$));
-  }
+  ngOnInit(): void {}
 
   ngOnDestroy() {
     this.appStateService.patchState({ sidenav: false });
@@ -44,25 +34,5 @@ export class MobileNavbarComponent
 
   navigate(link: string) {
     this.router.navigate([link]);
-  }
-
-  changeTheme(theme: string) {
-    this.appStateService.patchState({ theme: theme });
-  }
-
-  changeLanguage(language: string) {
-    this.appStateService.patchState({ lang: language });
-  }
-
-  logout() {
-    this.authService.logout(this.appStateService.getStateSnapshot().token);
-    this.appStateService.patchState({
-      token: null,
-      username: null,
-      isLoggedIn: false,
-      isAdmin: false,
-    });
-
-    this.router.navigate(['/auth/login']);
   }
 }

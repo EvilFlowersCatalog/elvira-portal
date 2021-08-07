@@ -8,6 +8,7 @@ import { LibraryModule } from '../library/library.module';
 import { LoadingComponent } from './components/loading.component';
 import { MobileNavbarComponent } from './components/mobile-navbar/mobile-navbar/mobile-navbar.component';
 import { HeaderComponent } from './components/header/header/header.component';
+import { MobileSidenavComponent } from './components/mobile-sidenav/mobile-sidenav/mobile-sidenav.component';
 
 @NgModule({
   declarations: [
@@ -16,9 +17,15 @@ import { HeaderComponent } from './components/header/header/header.component';
     LoadingComponent,
     MobileNavbarComponent,
     HeaderComponent,
+    MobileSidenavComponent,
   ],
   imports: [CommonModule, MaterialModule, LibraryModule],
-  exports: [NotfoundComponent, LoadingComponent, HeaderComponent],
+  exports: [
+    NotfoundComponent,
+    LoadingComponent,
+    HeaderComponent,
+    MobileSidenavComponent,
+  ],
   providers: [{ provide: LOCAL_STORAGE_TOKEN, useValue: localStorage }],
 })
 export class CommonLibraryModule {}
