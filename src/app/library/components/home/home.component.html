@@ -3,10 +3,20 @@
     <app-sidebar></app-sidebar>
   </mat-sidenav>
   <mat-sidenav-content (click)="hideSidebar()">
-    <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="2rem">
-      <ng-container *ngFor="let entry of entries$ | async">
+    <div
+      class="entries-list-container"
+      fxLayout="row wrap"
+      fxLayoutGap="16px grid"
+    >
+      <div
+        fxFlex="20%"
+        fxFlex.xs="100%"
+        fxFlex.sm="33%"
+        fxFlex.md="25%"
+        *ngFor="let entry of entries$ | async"
+      >
         <app-entry-detail [entry]="entry"></app-entry-detail>
-      </ng-container>
+      </div>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

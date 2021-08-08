@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { map, takeUntil, tap } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
 import { State } from 'src/app/common/services/app-state/app-state.types';
@@ -18,7 +18,6 @@ export class HomeComponent extends DisposableComponent implements OnInit {
   entries$: Observable<EntriesItem[]>;
 
   constructor(
-    private readonly router: Router,
     private readonly appStateService: AppStateService,
     private readonly entriesService: EntriesService
   ) {

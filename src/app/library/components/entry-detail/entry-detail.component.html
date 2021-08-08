@@ -1,9 +1,15 @@
-<mat-card>
+<mat-card class="entry-detail-card">
   <mat-card-header>
     <mat-card-title>{{ entry.title }}</mat-card-title>
   </mat-card-header>
-  <img mat-card-image [src]="imageSrc" />
-  <mat-card-actions>
+  <mat-divider></mat-divider>
+  <mat-card-content>
+    <img mat-card-image [src]="imageSrc" class="entry-detail-image" />
+  </mat-card-content>
+  <mat-card-content>
+    <h5>{{ entry.author.name + " " + entry.author.surname }}</h5>
+  </mat-card-content>
+  <mat-card-actions fxLayout="row" fxLayoutAlign="space-around">
     <button mat-icon-button (click)="openPdf(entry.id)">
       <mat-icon> picture_as_pdf </mat-icon>
     </button>
