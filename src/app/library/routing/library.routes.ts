@@ -18,7 +18,7 @@ export const LIBRARY_ROUTES: Routes = [
     path: 'admin',
     canLoad: [],
     loadChildren: () =>
-      import('../components/admin-page/admin-page.module').then((m) => m.AdminPageModule),
+      import('../../admin/admin.module').then((m) => m.AdminModule),
   },
   {
     path: 'pdf-viewer/:id',

@@ -22,14 +22,14 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
     this.loadingService.showLoading();
-    const authToken = this.appStateService.getStateSnapshot().token;
-    const options = {
-      headers: authToken
-        ? request.headers.set('Authorization', `Bearer ${authToken}`)
-        : request.headers,
-    };
+    // const authToken = this.appStateService.getStateSnapshot().token;
+    // const options = {
+    //   headers: authToken
+    //     ? request.headers.set('Authorization', `Bearer ${authToken}`)
+    //     : request.headers,
+    // };
 
-    request = request.clone(options);
+    // request = request.clone(options);
     return next.handle(request);
   }
 }
