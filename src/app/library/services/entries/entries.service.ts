@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { ListEntriesResponse } from './entries.types';
+import { EntriesItem } from './entries.types';
 
 @Injectable({
   providedIn: 'root',
@@ -21,12 +21,14 @@ export class EntriesService {
     });
   }
 
-  listEntries(): Observable<ListEntriesResponse> {
+  listEntries(): Observable<EntriesItem[]> {
     let header = this.createAuthorizationHeader();
 
-    return this.httpClient.get<ListEntriesResponse>(
+    return this.httpClient.get<EntriesItem[]>(
       'api/apigw/evil-flowers-conn/entries/',
-      { headers: header }
+      {
+        headers: header,
+      }
     );
   }
 

@@ -4,18 +4,8 @@
   </mat-sidenav>
   <mat-sidenav-content (click)="hideSidebar()">
     <div fxLayout="column" fxLayoutAlign="start center" fxLayoutGap="2rem">
-      <ng-container *ngFor="let book of books$ | async">
-        <mat-card>
-          <mat-card-header>
-            <mat-card-title>{{ book.title }}</mat-card-title>
-          </mat-card-header>
-          <img mat-card-image [src]="book.front" />
-          <mat-card-actions>
-            <button mat-icon-button (click)="openPdf(book.id)">
-              <mat-icon> picture_as_pdf </mat-icon>
-            </button>
-          </mat-card-actions>
-        </mat-card>
+      <ng-container *ngFor="let entry of entries$ | async">
+        <app-entry-detail [entry]="entry"></app-entry-detail>
       </ng-container>
     </div>
   </mat-sidenav-content>
