@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AdminUploadComponent } from './adminUpload.component';
+import { AdminUploadComponent } from './admin-upload.component';
 
 describe('AdminComponent', () => {
   let component: AdminUploadComponent;

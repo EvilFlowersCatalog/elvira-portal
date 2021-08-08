@@ -1,0 +1,266 @@
+<ng-container
+  *transloco="let t;"
+>
+  <form
+    [formGroup]="uploadForm"
+    (ngSubmit)="formUploader()"
+  >
+    <div
+      fxLayoutAlign="center center"
+      class="admin-box"
+    >
+      <mat-card
+        fxLayout="column"
+        fxFlex="35"
+        class="login-theme"
+      >
+      <div *ngIf="isInEditMode; else elseHeader">
+        <mat-card-title>{{ t('lazy.adminPage.header-edit') }}</mat-card-title>
+      </div>
+      <ng-template #elseHeader>
+        <mat-card-title>{{ t('lazy.adminPage.header-new') }}</mat-card-title>
+      </ng-template>
+      <hr>
+      <mat-card-title >{{ t('lazy.adminPage.title') }}</mat-card-title>
+        <div
+          fxLayout="row"
+          fxLayoutAlign="space-between center"
+        >
+          <mat-form-field
+            appearance="legacy"
+            style="width: 100%;"
+          >
+            <mat-label>{{ t('lazy.adminPage.title-description') }}</mat-label>
+            <div *ngIf="isInEditMode; else elseTitle">
+              <input
+                matInput
+                maxlength="50"
+                formControlName="title"
+                [(ngModel)]="editData.response.title"
+              >
+            </div>
+            <ng-template #elseTitle>
+              <input
+                matInput
+                maxlength="50"
+                formControlName="title"
+              >
+            </ng-template>
+          </mat-form-field>
+        </div>
+      <br>
+        <div fxLayout="row" >
+          <mat-card-title >{{ t('lazy.adminPage.author') }}</mat-card-title>
+          <mat-icon>person</mat-icon>
+        </div>
+          <div
+            fxLayout="row"
+            fxLayoutAlign="space-between center"
+            formGroupName="author"
+          >
+            <mat-form-field
+              appearance="legacy"
+              style="width: 45%;"
+            >
+              <mat-label>{{ t('lazy.adminPage.author-name') }}</mat-label>
+              <div *ngIf="isInEditMode; else elseAuthorName">
+                <input
+                  matInput
+                  maxlength="50"
+                  formControlName="name"
+                  [(ngModel)]="editData.response.author.name"
+                >
+              </div>
+              <ng-template #elseAuthorName>
+                <input
+                  matInput
+                  maxlength="50"
+                  formControlName="name"
+                >
+              </ng-template>
+            </mat-form-field>
+            <mat-form-field
+              appearance="legacy"
+              style="width: 45%;"
+            >
+              <mat-label>{{ t('lazy.adminPage.author-surname') }}</mat-label>
+              <div *ngIf="isInEditMode; else elseAuthorSurname">
+                <input
+                  matInput
+                  maxlength="50"
+                  formControlName="surname"
+                  [(ngModel)]="editData.response.author.surname"
+                >
+              </div>
+              <ng-template #elseAuthorSurname>
+                <input
+                  matInput
+                  maxlength="50"
+                  formControlName="surname"
+                >
+              </ng-template>
+            </mat-form-field>
+          </div>
+          <div *ngIf="!isInEditMode">
+          <mat-card-title >{{ t('lazy.adminPage.contributor') }}
+            <button
+              (click)="addContributor()"
+              type="button"
+              mat-icon-button color="primary"
+            >
+              <mat-icon>add</mat-icon>
+            </button>
+          </mat-card-title>
+          <div formArrayName="contributors"
+          *ngFor="let item of uploadForm.get('contributors').controls; let i = index;"
+          fxLayout="row"
+          fxLayoutAlign="space-between center"
+
+          >
+          <div [formGroupName]="i"
+            style="width: 100%;"
+            fxLayoutAlign="space-between center">
+            <mat-form-field
+                  style="width: 41%;"
+          >
+            <mat-label>{{ t('lazy.adminPage.contributor-name') }}</mat-label>
+              <input
+                matInput
+                maxlength="50"
+                formControlName="name"
+              >
+          </mat-form-field>
+          <mat-form-field
+            appearance="legacy"
+            style="width: 41%;"
+          >
+            <mat-label>{{ t('lazy.adminPage.contributor-surname') }}</mat-label>
+              <input
+                matInput
+                maxlength="30"
+                formControlName="surname"
+              >
+          </mat-form-field>
+          <button
+            (click)="deleteContributor(i)"
+            type="button"
+            mat-icon-button color="primary"
+          >
+          <mat-icon>clear</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+    <br>
+      <br>
+      <mat-card-title>{{ t('lazy.adminPage.feeds') }}</mat-card-title>
+      <mat-form-field class="example-chip-list" appearance="fill">
+        <mat-label>{{ t('lazy.adminPage.feeds-label') }}</mat-label>
+        <mat-chip-list #chipList aria-label="Feed selection">
+          <mat-chip
+            *ngFor="let feed of feeds"
+            [selectable]="selectable"
+            [removable]="removable"
+            (removed)="remove(feed)">
+            {{feed}}
+            <mat-icon matChipRemove *ngIf="removable">cancel</mat-icon>
+          </mat-chip>
+          <input
+            placeholder="New feed..."
+            #fruitInput
+            [formControl]="feedCtrl"
+            [matAutocomplete]="auto"
+            [matChipInputFor]="chipList"
+            [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
+            (matChipInputTokenEnd)="add($event)">
+        </mat-chip-list>
+        <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
+          <mat-option *ngFor="let feed of filteredFeeds | async" [value]="feed">
+            {{feed}}
+          </mat-option>
+        </mat-autocomplete>
+      </mat-form-field>
+      <br>
+      <mat-card-title >{{ t('lazy.adminPage.summary') }}</mat-card-title>
+      <mat-form-field appearance="standard">
+        <mat-label>{{ t('lazy.adminPage.summary') }}</mat-label>
+        <div *ngIf="isInEditMode; else elseSummary">
+          <textarea
+            matInput
+            class="summary-textfield"
+            formControlName="summary"
+            [(ngModel)]="editData.response.summary"
+          ></textarea>
+        </div>
+        <ng-template #elseSummary>
+          <textarea
+            matInput
+            class="summary-textfield"
+            formControlName="summary"
+          ></textarea>
+        </ng-template>
+            <mat-hint>{{ t('lazy.adminPage.summary-hint') }}</mat-hint>
+      </mat-form-field>
+      <br>
+      <div *ngIf="!isInEditMode">
+      <mat-card-title >{{ t('lazy.adminPage.image') }}</mat-card-title>
+      <hr>
+      <div mat-dialog-content class="dropzone" fxLayout="column" fxLayoutAlign="center center" dragAndDrop (fileDropped)="onImageDropped($event)">
+        <ng-template [ngIf]="!imageFile">
+            <input type="file" class="input-file" accept=".png, .jpg" (change)="imageSelectedFromBrowse(($event.target?.files)[0])" />
+            <h3>{{ t('lazy.adminPage.image-dropper') }}</h3>
+            <h4><i>(MAX 5MB)</i></h4>
+        </ng-template>
+        <ng-template [ngIf]="imageFile">
+            <h3>{{ imageFile?.name }}</h3>
+            <h4 *ngIf="checkImageSize()">{{ formatFileSize(imageFile?.size) }}</h4>
+            <h4 *ngIf="!validSize">{{ t('lazy.adminPage.image-error') }}</h4>
+            <button mat-icon-button class="btn-remove-file" (click)="removeImage()">
+                <mat-icon>clear</mat-icon>
+            </button>
+        </ng-template>
+    </div>
+    <hr>
+  </div>
+    <br>
+    <div *ngIf="!isInEditMode">
+    <mat-card-title >{{ t('lazy.adminPage.document') }}</mat-card-title>
+    <hr>
+      <div mat-dialog-content class="dropzone" fxLayout="column" fxLayoutAlign="center center" dragAndDrop (fileDropped)="onPDFDropped($event)">
+        <ng-template [ngIf]="!pdfFile">
+            <input type="file" class="input-file" accept=".pdf" (change)="PDFSelectedFromBrowse(($event.target?.files)[0])" />
+            <h3>{{ t('lazy.adminPage.document-dropper') }}</h3>
+        </ng-template>
+        <ng-template [ngIf]="pdfFile">
+            <h3>{{ pdfFile?.name }}</h3>
+            <button mat-icon-button class="btn-remove-file" (click)="removePDF()">
+                <mat-icon>clear</mat-icon>
+            </button>
+        </ng-template>
+    </div>
+    <hr>
+  </div>
+      <br>
+      <div *ngIf="isInEditMode; else elseButton">
+      <button
+        style="width: 100%;"
+        mat-raised-button
+        color="primary"
+        type="submit"
+      >
+      {{ t('lazy.adminPage.edit') }}
+      </button>
+    </div>
+    <ng-template #elseButton>
+    <button
+        mat-raised-button
+        color="primary"
+        type="submit"
+      >
+      {{ t('lazy.adminPage.upload') }}
+      </button>
+    </ng-template>
+    </mat-card>
+  </div>
+  </form>
+</ng-container>

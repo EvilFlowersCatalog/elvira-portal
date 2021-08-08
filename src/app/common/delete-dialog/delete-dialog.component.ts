@@ -1,5 +1,7 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { AdminService } from 'src/app/admin/services/admin.service';
+import { DialogData } from 'src/app/admin/services/admin.types';
 
 @Component({
   selector: 'app-delete-dialog',
@@ -10,7 +12,8 @@ export class DeleteDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<DeleteDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: string
+    @Inject(MAT_DIALOG_DATA) public data: DialogData,
+    private readonly adminService: AdminService,
   ) { }
 
   ngOnInit(): void {
@@ -20,4 +23,10 @@ export class DeleteDialogComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  onYesClcik(): void {
+    //console.log(this.data.entryApikey);
+    this.adminService.deleteEntry(this.data.entryApikey).subscribe();
+    this.dialogRef.close();
+    location.reload();
+  }
 }
