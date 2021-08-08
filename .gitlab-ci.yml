@@ -26,6 +26,7 @@ build_image:development:
     entrypoint: [""]
   tags:
     - docker
+    - build_docker
   only:
     - dev
   dependencies:
