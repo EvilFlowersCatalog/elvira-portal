@@ -21,9 +21,9 @@ build:development:
 
 build_image:development:
   stage: build_image
-  image: docker:19.03.1
-  services:
-    - docker:19.03.1-dind
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
   tags:
     - docker
   only:
@@ -31,9 +31,9 @@ build_image:development:
   dependencies:
     - build:development
   script:
-    - docker login -u $CI_DEPLOY_USER -p $CI_DEPLOY_PASSWORD $CI_REGISTRY
-    - docker build -t registry.gitlab.com/fiit_coworking/e-library/e-library-client:dev .
-    - docker push registry.gitlab.com/fiit_coworking/e-library/e-library-client:dev
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:dev
 
 build:prod:
   stage: build
@@ -53,7 +53,9 @@ build:prod:
 
 build_image:prod:
   stage: build_image
-  image: docker:19.03.1
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
   tags:
     - docker
   only:
@@ -61,6 +63,6 @@ build_image:prod:
   dependencies:
     - build:prod
   script:
-    - docker login -u $CI_DEPLOY_USER -p $CI_DEPLOY_PASSWORD $CI_REGISTRY
-    - docker build -t registry.gitlab.com/fiit_coworking/e-library/e-library-client:prod .
-    - docker push registry.gitlab.com/fiit_coworking/e-library/e-library-client:prod
+    - mkdir -p /kaniko/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"}}}" > /kaniko/.docker/config.json
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:dev
