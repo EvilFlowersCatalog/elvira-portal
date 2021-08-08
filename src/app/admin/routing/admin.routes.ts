@@ -1,11 +1,11 @@
 import { Routes } from '@angular/router';
-import { AdminComponent } from '../admin/admin.component';
-import { AdminUploadComponent } from '../adminUpload/adminUpload.component';
+import { AdminOverviewComponent } from '../admin-overview/admin-overview.component';
+import { AdminUploadComponent } from '../admin-upload/admin-upload.component';
 
 export const ADMIN_ROUTES: Routes = [
   {
     path: '',
-    component: AdminComponent,
+    component: AdminOverviewComponent,
   },
   {
     path: 'upload',

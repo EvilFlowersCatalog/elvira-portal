@@ -1,6 +1,7 @@
 {
   "adminPage": {
-    "header": "Upload your document",
+    "header-new": "Upload your document",
+    "header-edit": "Edit your document",
     "title": "Title",
     "title-description": "Title of the documentation",
     "author": "Author",
@@ -9,10 +10,26 @@
     "contributor": "Contributor",
     "contributor-name": "Contributor's name",
     "contributor-surname": "Contributor's surname",
-    "category": "Category",
-    "category-description": "Category of your documentation",
-    "category-hint": "Fiction, Science, etc...",
+    "feeds": "Feeds",
+    "feeds-label": "Favourite Feeds",
+    "feeds-placeholder": "New feed...",
     "summary": "Summary",
-    "summary-hint": "Short summary about the documentation"
+    "summary-hint": "Short summary about the documentation",
+    "image": "Image",
+    "image-dropper": "Drag your image here or click here to browse",
+    "image-error": "The image is too big.",
+    "document": "PDF File",
+    "document-dropper": "Drag your PDF here or click here to browse",
+    "upload": "Upload",
+    "edit": "Edit"
+  },
+  "adminOverview": {
+    "search": "Search",
+    "document": "New document",
+    "title": "Title",
+    "name": "Name",
+    "surname": "Surname",
+    "edit": "Edit",
+    "delete": "Delete"
   }
 }

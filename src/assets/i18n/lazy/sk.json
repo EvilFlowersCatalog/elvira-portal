@@ -1,6 +1,7 @@
 {
   "adminPage": {
-    "header": "Nahrajte dokument",
+    "header-new": "Nahrajte dokument",
+    "header-edit": "Upravte dokument",
     "title": "Názov",
     "title-description": "Názov dokumentácie",
     "author": "Autor",
@@ -9,10 +10,26 @@
     "contributor": "Prispievateľ",
     "contributor-name": "Meno prispievateľa",
     "contributor-surname": "Priezvisko prispievateľa",
-    "category": "Kategória",
-    "category-description": "Kategória vašej dokumentácie",
-    "category-hint": "Beletria, veda atď...",
     "summary": "Zhrnutie",
-    "summary-hint": "Krátke zhrnutie dokumentácie"
+    "summary-hint": "Krátke zhrnutie dokumentácie",
+    "feeds": "Feedy",
+    "feeds-label": "Obľúbené  Feedy",
+    "feeds-placeholder": "Nový feed...",
+    "image": "Obrázok",
+    "image-dropper": "Presuňte obrázok sem alebo kliknite sem a prehľadávajte",
+    "image-error": "Obrázok je príliš veľký.",
+    "document": "Súbor PDF",
+    "document-dropper": "Presuňte svoj PDF sem alebo kliknite sem a prehľadávajte",
+    "upload": "Nahrať",
+    "edit": "Upraviť"
+  },
+  "adminOverview": {
+    "search": "Vyhľadávanie",
+    "document": "Nový dokument",
+    "title": "Názov",
+    "name": "Meno",
+    "surname": "Priezvisko",
+    "edit": "Upraviť",
+    "delete": "Vymazať"
   }
 }
