@@ -16,9 +16,10 @@ export class AdminService {
     createAuthorizationHeader() {
       return new HttpHeaders({
         authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
-        api_key: '1398a10c-f387-4970-bc90-65902c0b4fea',
+        api_key: '1398a10c-f387-4970-bc90-65902c0b4fea'
       });
     }
+
 
     getAllEntries(): Observable<GetEntries>{
       const headers = this.createAuthorizationHeader();

@@ -25,6 +25,7 @@
     "@angular/platform-browser-dynamic": "~12.1.4",
     "@angular/router": "~12.1.4",
     "@ngneat/transloco": "^2.22.0",
+    "form-data": "^2.3.3",
     "is-svg": "^4.3.1",
     "jwt-decode": "^3.1.2",
     "ngx-extended-pdf-viewer": "^9.0.3",

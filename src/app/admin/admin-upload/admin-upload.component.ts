@@ -163,11 +163,13 @@ export class AdminUploadComponent implements OnInit {
       this.adminService.updateEntry(this.entryId, this.getEditedData()).subscribe();
     }
     else {
-    let testData:FormData = new FormData();
+    let testData: FormData = new FormData();
     testData.append('file', this.imageFile, this.imageFile.name);
-    testData.append('body', JSON.stringify( await this.getFormData()));
-    console.log(await this.getFormData());
-    this.adminService.upload(testData).subscribe();
+    testData.append('body', JSON.stringify(await this.getFormData()));
+    // console.log(testData.get('body'));
+    // console.log(testData.get('file'));
+
+    this.adminService.upload(testData).subscribe(datas => console.log(datas));
     }
     this.router.navigate(['../'], { relativeTo: this.route });
   }
@@ -197,7 +199,7 @@ export class AdminUploadComponent implements OnInit {
           summary : this.uploadForm.get('summary').value,
           language_code : this.uploadForm.get('language_code').value,
           acquisitions : {
-            content : await this.getBase()
+            content: await this.getBase()
           },
           };
           //console.log(entriesData);
