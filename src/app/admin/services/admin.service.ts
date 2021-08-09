@@ -70,7 +70,7 @@ export class AdminService {
 
  getIsAdmin(mongoId: string){
     const headers = this.createTokenHeader();
-    return this.httpClient.get(
+    return this.httpClient.get<boolean>(
       `api/apigw/isAdmin/${mongoId}`,
       {headers: headers}
     );
