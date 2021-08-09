@@ -1,24 +1,27 @@
 import { Component, OnInit } from '@angular/core';
-import { AppStateService } from '../../services/app-state/app-state.service';
+import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { State } from '../../services/app-state/app-state.types';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { DisposableComponent } from '../disposable.component';
-import { Router } from '@angular/router';
+import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
+import { State } from 'src/app/common/services/app-state/app-state.types';
+import { DisposableComponent } from '../../disposable.component';
 
 @Component({
-  selector: 'app-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss'],
+  selector: 'app-mobile-sidenav',
+  templateUrl: './mobile-sidenav.component.html',
+  styleUrls: ['./mobile-sidenav.component.scss'],
 })
-export class NavbarComponent extends DisposableComponent implements OnInit {
+export class MobileSidenavComponent
+  extends DisposableComponent
+  implements OnInit
+{
   appState$: Observable<State>;
 
   constructor(
     private readonly router: Router,
     private readonly appStateService: AppStateService,
-    private readonly authService: AuthService,
+    private readonly authService: AuthService
   ) {
     super();
   }
@@ -39,11 +42,6 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
 
   changeLanguage(language: string) {
     this.appStateService.patchState({ lang: language });
-  }
-
-  onSidebarToggle() {
-    const currentSidebarState = this.appStateService.getStateSnapshot().sidebar;
-    this.appStateService.patchState({ sidebar: !currentSidebarState });
   }
 
   logout() {

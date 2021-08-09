@@ -1,9 +1,9 @@
 export interface ListEntriesResponse {
-  items: ListEntriesItem[];
+  items: EntriesItem[];
   metadata: ListEntriesMetadata;
 }
 
-export interface ListEntriesItem {
+export interface EntriesItem {
   id: string;
   creator_id: string;
   catalog_id: string;
@@ -24,6 +24,7 @@ export interface ListEntriesItem {
   title: string;
   created_at: string;
   updated_at: string;
+  img: string;
 }
 
 export interface ListEntriesMetadata {

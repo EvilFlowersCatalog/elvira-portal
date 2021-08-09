@@ -17,7 +17,7 @@ export class EntriesService {
   createAuthorizationHeader() {
     return new HttpHeaders({
       authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
-      api_key: '5629aa1b-9b16-4964-98a1-1f676ae7f34c',
+      api_key: '7afa8603-7357-4dc8-ada2-fadd148952a1',
     });
   }
 
@@ -26,7 +26,9 @@ export class EntriesService {
 
     return this.httpClient.get<ListEntriesResponse>(
       'api/apigw/evil-flowers-conn/entries/',
-      { headers: header }
+      {
+        headers: header,
+      }
     );
   }
 

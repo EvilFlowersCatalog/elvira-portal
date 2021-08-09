@@ -7,4 +7,5 @@ export interface State {
   lang: string;
   sidebar: boolean;
   showSidebarToggle: boolean;
+  sidenav: boolean;
 }

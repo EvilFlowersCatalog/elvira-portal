@@ -8,12 +8,27 @@ import { DeleteDialogComponent } from './delete-dialog/delete-dialog.component';
 import { LOCAL_STORAGE_TOKEN } from './services/local-storage/local-storage.service';
 import { LibraryModule } from '../library/library.module';
 import { LoadingComponent } from './components/loading.component';
-
+import { MobileNavbarComponent } from './components/mobile-navbar/mobile-navbar/mobile-navbar.component';
+import { HeaderComponent } from './components/header/header/header.component';
+import { MobileSidenavComponent } from './components/mobile-sidenav/mobile-sidenav/mobile-sidenav.component';
 
 @NgModule({
-  declarations: [NavbarComponent, NotfoundComponent, LoadingComponent, DeleteDialogComponent],
+  declarations: [
+    NavbarComponent,
+    NotfoundComponent,
+    LoadingComponent,
+    MobileNavbarComponent,
+    HeaderComponent,
+    MobileSidenavComponent,
+    DeleteDialogComponent,
+  ],
   imports: [CommonModule, MaterialModule, LibraryModule, TranslocoRootModule],
-  exports: [NavbarComponent, NotfoundComponent, LoadingComponent],
+  exports: [
+    NotfoundComponent,
+    LoadingComponent,
+    HeaderComponent,
+    MobileSidenavComponent,
+  ],
   providers: [{ provide: LOCAL_STORAGE_TOKEN, useValue: localStorage }],
 })
 export class CommonLibraryModule {}
