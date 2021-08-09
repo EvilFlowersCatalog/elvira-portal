@@ -1,7 +1,7 @@
-// export interface ListEntriesResponse {
-//   items: ListEntriesItem[];
-//   metadata: ListEntriesMetadata;
-// }
+export interface ListEntriesResponse {
+  items: EntriesItem[];
+  metadata: ListEntriesMetadata;
+}
 
 export interface EntriesItem {
   id: string;
@@ -27,9 +27,9 @@ export interface EntriesItem {
   img: string;
 }
 
-// export interface ListEntriesMetadata {
-//   page: number;
-//   limit: number;
-//   pages: number;
-//   total: number;
-// }
+export interface ListEntriesMetadata {
+  page: number;
+  limit: number;
+  pages: number;
+  total: number;
+}

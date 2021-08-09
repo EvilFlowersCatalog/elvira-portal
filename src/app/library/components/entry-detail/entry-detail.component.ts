@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { EntriesItem } from '../../services/entries/entries.types';
+import { DateTime } from 'luxon';
 
 @Component({
   selector: 'app-entry-detail',
@@ -9,6 +10,7 @@ import { EntriesItem } from '../../services/entries/entries.types';
 export class EntryDetailComponent implements OnInit {
   @Input() entry: EntriesItem;
   imageSrc: string;
+  year: string;
 
   constructor() {}
 
@@ -17,6 +19,7 @@ export class EntryDetailComponent implements OnInit {
       this.entry.img === 'none'
         ? 'default'
         : `data:image/png;base64,${this.entry.img}`;
+    this.year = DateTime.fromISO(this.entry.created_at).year;
   }
 
   openPdf(id: string) {

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { EntriesItem } from './entries.types';
+import { ListEntriesResponse } from './entries.types';
 
 @Injectable({
   providedIn: 'root',
@@ -17,14 +17,14 @@ export class EntriesService {
   createAuthorizationHeader() {
     return new HttpHeaders({
       authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
-      api_key: '5629aa1b-9b16-4964-98a1-1f676ae7f34c',
+      api_key: '7afa8603-7357-4dc8-ada2-fadd148952a1',
     });
   }
 
-  listEntries(): Observable<EntriesItem[]> {
+  listEntries(): Observable<ListEntriesResponse> {
     let header = this.createAuthorizationHeader();
 
-    return this.httpClient.get<EntriesItem[]>(
+    return this.httpClient.get<ListEntriesResponse>(
       'api/apigw/evil-flowers-conn/entries/',
       {
         headers: header,

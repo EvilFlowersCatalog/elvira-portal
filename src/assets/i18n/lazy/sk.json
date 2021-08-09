@@ -31,5 +31,10 @@
     "surname": "Priezvisko",
     "edit": "Upraviť",
     "delete": "Vymazať"
+  },
+  "entryDetail": {
+    "open-pdf-tooltip": "Otvoriť PDF",
+    "download-pdf-tooltip": "Stiahnuť PDF",
+    "favorite-pdf-tooltip": "Pridať do obľúbených"
   }
 }

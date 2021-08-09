@@ -6,7 +6,10 @@ import { DisposableComponent } from 'src/app/common/components/disposable.compon
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
 import { State } from 'src/app/common/services/app-state/app-state.types';
 import { EntriesService } from '../../services/entries/entries.service';
-import { EntriesItem } from '../../services/entries/entries.types';
+import {
+  EntriesItem,
+  ListEntriesResponse,
+} from '../../services/entries/entries.types';
 
 @Component({
   selector: 'app-home',
@@ -15,7 +18,8 @@ import { EntriesItem } from '../../services/entries/entries.types';
 })
 export class HomeComponent extends DisposableComponent implements OnInit {
   sidebarState$: Observable<boolean>;
-  entries$: Observable<EntriesItem[]>;
+  entriesResponse$: Observable<ListEntriesResponse>;
+  entries: EntriesItem[];
 
   constructor(
     private readonly appStateService: AppStateService,
@@ -32,7 +36,9 @@ export class HomeComponent extends DisposableComponent implements OnInit {
       map((data: State) => data.sidebar)
     );
 
-    this.entries$ = this.entriesService.listEntries();
+    this.entriesService
+      .listEntries()
+      .subscribe((data) => (this.entries = data.items));
   }
 
   ngOnDestroy(): void {

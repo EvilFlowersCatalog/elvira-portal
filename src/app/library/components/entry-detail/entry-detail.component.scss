@@ -2,6 +2,25 @@
   box-shadow: 0 0 0 0.2rem rgba(0, 188, 212, 0.5);
 }
 
+.entry-detail-image-container {
+  padding-top: 20px;
+  display: flex;
+  justify-content: center;
+}
+
 .entry-detail-image {
   padding: 20px;
+  width: 330px;
+  height: 440px;
+}
+
+.entry-detail-title {
+  font-size: 15px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  display: -moz-box;
+  -moz-line-clamp: 1;
+  -moz-box-orient: vertical;
 }

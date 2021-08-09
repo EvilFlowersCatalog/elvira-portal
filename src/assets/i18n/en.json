@@ -1,6 +1,6 @@
 {
   "loginScreen": {
-    "form": "Login form",
+    "form": "Login",
     "login": "Username",
     "password": "Password",
     "button": "Log in"
@@ -8,7 +8,7 @@
   "navbar": {
     "light": "Light mode",
     "dark": "Dark mode",
-    "svk": "Slovak",
+    "svk": "Slovensky",
     "eng": "English",
     "profile": "Profile",
     "log-out": "Log out"

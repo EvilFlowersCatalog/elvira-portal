@@ -13,7 +13,7 @@
         fxFlex.xs="100%"
         fxFlex.sm="33%"
         fxFlex.md="25%"
-        *ngFor="let entry of entries$ | async"
+        *ngFor="let entry of entries"
       >
         <app-entry-detail [entry]="entry"></app-entry-detail>
       </div>
