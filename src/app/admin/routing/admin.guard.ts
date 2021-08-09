@@ -1,53 +1,38 @@
 import { Injectable } from '@angular/core';
-import {
-  CanActivate,
-  Router,
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot,
-  UrlTree,
-} from '@angular/router';
-import { Observable } from 'rxjs';
-import { take, tap } from 'rxjs/operators';
+import { CanLoad, Route, Router } from '@angular/router';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { AuthService } from '../../auth/services/auth.service';
+import jwtDecode, { JwtPayload } from 'jwt-decode';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AdminGuard implements CanActivate {
+export class AdminGuard implements CanLoad {
   constructor(
-    protected readonly authService: AuthService,
     protected readonly router: Router,
-    private readonly appStateService: AppStateService
+    protected readonly appStateService: AppStateService,
+    private readonly httpClient: HttpClient
   ) {}
 
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ):
-    | boolean
-    | UrlTree
-    | Observable<boolean | UrlTree>
-    | Promise<boolean | UrlTree> {
-    return this.verifyAuthTokenValidity();
+  createTokenHeader() {
+    return new HttpHeaders({
+      authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
+    });
   }
 
-  private verifyAuthTokenValidity() {
+  canLoad(): boolean{
+    const headers = this.createTokenHeader();
     const token = this.appStateService.getStateSnapshot().token;
-
-    if (token === null) {
-      this.router.navigate(['/auth/login']);
-      return false;
-    }
-
-    return this.authService.verifyToken(token).pipe(
-      take(1),
-      tap((isValid: boolean) => {
-        if (!isValid) {
-          this.appStateService.patchState({ token: null });
-          this.router.navigate(['/auth/login']);
-        }
-      })
-    );
+    const mongoId = jwtDecode<JwtPayload & { mongoId: string }>(token).mongoId;
+    this.httpClient.get(
+      `api/apigw/isAdmin/${mongoId}`,
+      {headers: headers}
+    ).subscribe(isAdmin => {
+      if(isAdmin) return true;
+      else return false;
+    })
+    return false;
   }
+
+
 }
