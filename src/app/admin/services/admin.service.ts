@@ -20,6 +20,12 @@ export class AdminService {
       });
     }
 
+    createTokenHeader() {
+      return new HttpHeaders({
+        authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
+      });
+    }
+
 
     getAllEntries(): Observable<GetEntries>{
       const headers = this.createAuthorizationHeader();
@@ -60,5 +66,13 @@ export class AdminService {
     `api/apigw/evil-flowers-conn/admin/catalogs/95e2b439-4851-4080-b33e-0adc1fd90196/entries/${entryId}`,
     entriesData, {headers: headers}
   );
+ }
+
+ getIsAdmin(mongoId: string){
+    const headers = this.createTokenHeader();
+    return this.httpClient.get(
+      `api/apigw/isAdmin/${mongoId}`,
+      {headers: headers}
+    );
  }
 }

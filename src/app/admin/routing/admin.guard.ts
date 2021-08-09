@@ -1,8 +1,15 @@
 import { Injectable } from '@angular/core';
-import { CanLoad, Route, Router } from '@angular/router';
+import {
+  CanLoad,
+  Router,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+  UrlTree,
+} from '@angular/router';
+import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { AdminService } from '../services/admin.service';
 
 @Injectable({
   providedIn: 'root',
@@ -11,28 +18,17 @@ export class AdminGuard implements CanLoad {
   constructor(
     protected readonly router: Router,
     protected readonly appStateService: AppStateService,
-    private readonly httpClient: HttpClient
+    private readonly adminService: AdminService,
   ) {}
 
-  createTokenHeader() {
-    return new HttpHeaders({
-      authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
-    });
+ canLoad(): boolean{
+    return this.verifyAdmin();
   }
 
-  canLoad(): boolean{
-    const headers = this.createTokenHeader();
+  verifyAdmin():boolean {
     const token = this.appStateService.getStateSnapshot().token;
     const mongoId = jwtDecode<JwtPayload & { mongoId: string }>(token).mongoId;
-    this.httpClient.get(
-      `api/apigw/isAdmin/${mongoId}`,
-      {headers: headers}
-    ).subscribe(isAdmin => {
-      if(isAdmin) return true;
-      else return false;
-    })
-    return false;
+    if(this.adminService.getIsAdmin(mongoId).subscribe()) return true;
+    else return false;
   }
-
-
 }
