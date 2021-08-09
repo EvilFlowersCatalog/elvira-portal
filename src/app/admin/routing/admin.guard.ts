@@ -1,53 +1,41 @@
 import { Injectable } from '@angular/core';
 import {
-  CanActivate,
+  CanLoad,
   Router,
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot,
+  ActivatedRoute,
   UrlTree,
 } from '@angular/router';
-import { Observable } from 'rxjs';
-import { take, tap } from 'rxjs/operators';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { AuthService } from '../../auth/services/auth.service';
+import jwtDecode, { JwtPayload } from 'jwt-decode';
+import { AdminService } from '../services/admin.service';
+import { take, map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AdminGuard implements CanActivate {
+export class AdminGuard implements CanLoad {
   constructor(
-    protected readonly authService: AuthService,
     protected readonly router: Router,
-    private readonly appStateService: AppStateService
+    protected readonly appStateService: AppStateService,
+    private readonly adminService: AdminService,
+    private readonly route: ActivatedRoute
   ) {}
 
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ):
+ canLoad():
     | boolean
     | UrlTree
     | Observable<boolean | UrlTree>
-    | Promise<boolean | UrlTree> {
-    return this.verifyAuthTokenValidity();
+    | Promise<boolean | UrlTree>
+    {
+       return this.verifyAdmin();
   }
 
-  private verifyAuthTokenValidity() {
+  private verifyAdmin(): Observable<boolean> {
     const token = this.appStateService.getStateSnapshot().token;
-
-    if (token === null) {
-      this.router.navigate(['/auth/login']);
-      return false;
-    }
-
-    return this.authService.verifyToken(token).pipe(
-      take(1),
-      tap((isValid: boolean) => {
-        if (!isValid) {
-          this.appStateService.patchState({ token: null });
-          this.router.navigate(['/auth/login']);
-        }
-      })
+    const mongoId = jwtDecode<JwtPayload & { mongoId: string }>(token).mongoId;
+    return this.adminService.getIsAdmin(mongoId).pipe(
+      map(data => data)
     );
   }
 }
