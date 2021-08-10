@@ -27,8 +27,8 @@ export class AdminUploadComponent implements OnInit {
   separatorKeysCodes: number[] = [ENTER, COMMA];
   feedCtrl = new FormControl();
   filteredFeeds: Observable<string[]>;
-  feeds: string[] = ['FIIT'];
-  allFeeds: string[] = ['Mathematics', 'Artificial intelligence', 'Programming', '1. Semester'];
+  feeds: string[] = [];
+  allFeeds: string[] = [];
   //Image upload variables
   imageFile: File;
   pdfFile: File;
@@ -102,19 +102,32 @@ export class AdminUploadComponent implements OnInit {
         this.adminService.getOneEntry(this.entryId).subscribe(
           datas => {
             this.editData = datas;
-            console.log(datas);
+            //console.log(datas);
           }
         );
         this.isInEditMode = true;
       }
 
-    this.filteredFeeds = this.feedCtrl.valueChanges.pipe(
-      startWith(null),
-      map((fruit: string | null) => fruit ? this._filter(fruit) : this.allFeeds.slice()));
+      this.allFeeds = this.getFeeds();
+      console.log("loaded");
+
+      this.filteredFeeds = this.feedCtrl.valueChanges.pipe(
+        startWith(null),
+        map((fruit: string | null) => fruit ? this._filter(fruit) :this.allFeeds.slice()));
 
       //console.log(this.isInEditMode);
   }
 
+  getFeeds(): string[]{
+    let feedsList: string[] = [];
+    this.adminService.getAllFeeds().subscribe(
+      datas => {
+        datas.items.map(m => feedsList.push(m.title))
+      }
+    );
+    //console.log(feedsList);
+    return feedsList;
+  }
 
   //Add feeds chips function
   add(event: MatChipInputEvent): void {

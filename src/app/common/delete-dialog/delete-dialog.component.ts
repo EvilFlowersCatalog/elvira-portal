@@ -24,9 +24,7 @@ export class DeleteDialogComponent implements OnInit {
   }
 
   onYesClcik(): void {
-    //console.log(this.data.entryApikey);
     this.adminService.deleteEntry(this.data.entryApikey).subscribe();
     this.dialogRef.close();
-    location.reload();
   }
 }

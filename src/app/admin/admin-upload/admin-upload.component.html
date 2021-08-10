@@ -202,13 +202,12 @@
             <mat-hint>{{ t('lazy.adminPage.summary-hint') }}</mat-hint>
       </mat-form-field>
       <br>
-      <div *ngIf="!isInEditMode">
+      <div *ngIf="!isInEditMode" >
       <mat-card-title >{{ t('lazy.adminPage.image') }}</mat-card-title>
-      <hr>
-      <div mat-dialog-content class="dropzone" fxLayout="column" fxLayoutAlign="center center" dragAndDrop (fileDropped)="onImageDropped($event)">
-        <ng-template [ngIf]="!imageFile">
+      <div mat-dialog-content class="dropzone" fxLayout="column" fxLayoutAlign="center center" dragAndDrop (fileDropped)="onImageDropped($event)" >
+        <ng-template [ngIf]="!imageFile" >
             <input type="file" class="input-file" accept=".png, .jpg" (change)="imageSelectedFromBrowse(($event.target?.files)[0])" />
-            <h3>{{ t('lazy.adminPage.image-dropper') }}</h3>
+            <h3 style="text-align: center;">{{ t('lazy.adminPage.image-dropper') }}</h3>
             <h4><i>(MAX 5MB)</i></h4>
         </ng-template>
         <ng-template [ngIf]="imageFile">
@@ -220,16 +219,15 @@
             </button>
         </ng-template>
     </div>
-    <hr>
   </div>
+    <br>
     <br>
     <div *ngIf="!isInEditMode">
     <mat-card-title >{{ t('lazy.adminPage.document') }}</mat-card-title>
-    <hr>
       <div mat-dialog-content class="dropzone" fxLayout="column" fxLayoutAlign="center center" dragAndDrop (fileDropped)="onPDFDropped($event)">
         <ng-template [ngIf]="!pdfFile">
             <input type="file" class="input-file" accept=".pdf" (change)="PDFSelectedFromBrowse(($event.target?.files)[0])" />
-            <h3>{{ t('lazy.adminPage.document-dropper') }}</h3>
+            <h3 style="text-align: center;">{{ t('lazy.adminPage.document-dropper') }}</h3>
         </ng-template>
         <ng-template [ngIf]="pdfFile">
             <h3>{{ pdfFile?.name }}</h3>
@@ -238,7 +236,6 @@
             </button>
         </ng-template>
     </div>
-    <hr>
   </div>
       <br>
       <div *ngIf="isInEditMode; else elseButton">
