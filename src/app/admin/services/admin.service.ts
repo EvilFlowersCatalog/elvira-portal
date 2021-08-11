@@ -7,6 +7,7 @@ import {
   AllEntryItems,
   EditedData,
   GetEntries,
+  GetFeeds,
 } from './admin.types';
 
 @Injectable({
@@ -21,7 +22,7 @@ export class AdminService {
   createAuthorizationHeader() {
     return new HttpHeaders({
       authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
-      api_key: '5629aa1b-9b16-4964-98a1-1f676ae7f34c',
+      api_key: '1398a10c-f387-4970-bc90-65902c0b4fea',
     });
   }
 
@@ -29,6 +30,14 @@ export class AdminService {
     const headers = this.createAuthorizationHeader();
     return this.httpClient.get<GetEntries>(
       'api/apigw/evil-flowers-conn/entries',
+      { headers: headers }
+    );
+  }
+
+  getAllFeeds(): Observable<GetFeeds> {
+    const headers = this.createAuthorizationHeader();
+    return this.httpClient.get<GetFeeds>(
+      'api/apigw/evil-flowers-conn/feeds',
       { headers: headers }
     );
   }

@@ -4,15 +4,17 @@
 
 .admin-box {
   margin-top: 50px;
+  padding-bottom: 50px;
 }
 .dropzone {
   height: 170px;
   width: inherit;
   margin-left: 0;
   margin-right: 0;
-  border-radius: 5px;
+  border-radius: 1px;
   opacity: 0.5;
   position: relative;
+  border-style: dashed;
   h4 {
     margin-top: 0.5rem;
   }
@@ -42,3 +44,6 @@
   opacity: 1;
 }
 
+.drag-and-drop-box {
+  border-style: dashed;
+}

@@ -68,3 +68,28 @@ export interface EditedData {
   summary: string;
   language_code: string;
 }
+
+export interface GetFeeds {
+  items: AllFeedsItems[];
+  metadata: {
+    page: number;
+    limit: number;
+    pages: number;
+    total: number;
+  }
+}
+
+export interface AllFeedsItems {
+  id: string;
+  catalog_id: string;
+  parent_id: string;
+  creator_id: string;
+  title: string;
+  kind: string;
+  url_name: string;
+  url: string;
+  content: string;
+  per_page: number;
+  created_at: string;
+  updated_at: string;
+}

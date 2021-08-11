@@ -9,6 +9,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from '../services/admin.service';
 import { HttpClient } from '@angular/common/http';
 import { AllEntryItems, EditedData, EntriesData } from '../services/admin.types';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-admin',
@@ -27,8 +28,8 @@ export class AdminUploadComponent implements OnInit {
   separatorKeysCodes: number[] = [ENTER, COMMA];
   feedCtrl = new FormControl();
   filteredFeeds: Observable<string[]>;
-  feeds: string[] = ['FIIT'];
-  allFeeds: string[] = ['Mathematics', 'Artificial intelligence', 'Programming', '1. Semester'];
+  feeds: string[] = [];
+  allFeeds: string[] = [];
   //Image upload variables
   imageFile: File;
   pdfFile: File;
@@ -49,6 +50,7 @@ export class AdminUploadComponent implements OnInit {
     private readonly http: HttpClient,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
+    private _snackBar: MatSnackBar
     ) {
 
       this.imageForm = new FormGroup({
@@ -58,21 +60,21 @@ export class AdminUploadComponent implements OnInit {
     this.uploadForm = new FormGroup({
       title: new FormControl('', Validators.required),
       author: new FormGroup({
-        name: new FormControl('', Validators.required),
-        surname: new FormControl('', Validators.required)
+        name: new FormControl('',),
+        surname: new FormControl('',)
       }),
-      contributors: new FormArray([]),
-      summary: new FormControl('', Validators.required),
+      contributors: new FormArray([], [Validators.required]),
+      summary: new FormControl('',),
       language_code: new FormControl('sk')
     });
 
     this.editForm = new FormGroup({
-      title: new FormControl('', Validators.required),
+      title: new FormControl('',),
       author: new FormGroup({
-       name: new FormControl('', Validators.required),
-       surname: new FormControl('', Validators.required)
+       name: new FormControl('',),
+       surname: new FormControl('',)
      }),
-     summary: new FormControl('', Validators.required)
+     summary: new FormControl('',)
     });
    }
 
@@ -102,19 +104,32 @@ export class AdminUploadComponent implements OnInit {
         this.adminService.getOneEntry(this.entryId).subscribe(
           datas => {
             this.editData = datas;
-            console.log(datas);
+            //console.log(datas);
           }
         );
         this.isInEditMode = true;
       }
 
-    this.filteredFeeds = this.feedCtrl.valueChanges.pipe(
-      startWith(null),
-      map((fruit: string | null) => fruit ? this._filter(fruit) : this.allFeeds.slice()));
+      this.allFeeds = this.getFeeds();
+      console.log("loaded");
+
+      this.filteredFeeds = this.feedCtrl.valueChanges.pipe(
+        startWith(null),
+        map((fruit: string | null) => fruit ? this._filter(fruit) :this.allFeeds.slice()));
 
       //console.log(this.isInEditMode);
   }
 
+  getFeeds(): string[]{
+    let feedsList: string[] = [];
+    this.adminService.getAllFeeds().subscribe(
+      datas => {
+        datas.items.map(m => feedsList.push(m.title))
+      }
+    );
+    //console.log(feedsList);
+    return feedsList;
+  }
 
   //Add feeds chips function
   add(event: MatChipInputEvent): void {
@@ -161,6 +176,7 @@ export class AdminUploadComponent implements OnInit {
 
     if(this.isInEditMode){
       this.adminService.updateEntry(this.entryId, this.getEditedData()).subscribe();
+      this.router.navigate(['../'], { relativeTo: this.route });
     }
     else {
     let testData: FormData = new FormData();
@@ -168,10 +184,17 @@ export class AdminUploadComponent implements OnInit {
     testData.append('body', JSON.stringify(await this.getFormData()));
     // console.log(testData.get('body'));
     // console.log(testData.get('file'));
+      if(this.uploadForm.status === "VALID" && this.imageFile && this.pdfFile){
+        if(this.validSize){
+          this.adminService.upload(testData).subscribe(datas => console.log(datas));
+          this.router.navigate(['../'], { relativeTo: this.route });
+        }
+        else {
+            this._snackBar.open("Invalid image size!", "Close");
+        }
 
-    this.adminService.upload(testData).subscribe(datas => console.log(datas));
+      }
     }
-    this.router.navigate(['../'], { relativeTo: this.route });
   }
 
   getEditedData() {
@@ -265,7 +288,7 @@ export class AdminUploadComponent implements OnInit {
 
 checkImageSize() {
   //console.log(this.file.size);
-  if(this.imageFile.size<5*1024*1024) {
+  if(this.imageFile.size<1024*1024) {
     this.validSize = true;
     return true;
   }
