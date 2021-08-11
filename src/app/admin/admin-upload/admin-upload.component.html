@@ -44,6 +44,7 @@
                 matInput
                 maxlength="50"
                 formControlName="title"
+                required
               >
             </ng-template>
           </mat-form-field>
@@ -128,6 +129,7 @@
                 matInput
                 maxlength="50"
                 formControlName="name"
+                required
               >
           </mat-form-field>
           <mat-form-field
@@ -139,6 +141,7 @@
                 matInput
                 maxlength="30"
                 formControlName="surname"
+                required
               >
           </mat-form-field>
           <button
@@ -208,7 +211,7 @@
         <ng-template [ngIf]="!imageFile" >
             <input type="file" class="input-file" accept=".png, .jpg" (change)="imageSelectedFromBrowse(($event.target?.files)[0])" />
             <h3 style="text-align: center;">{{ t('lazy.adminPage.image-dropper') }}</h3>
-            <h4><i>(MAX 5MB)</i></h4>
+            <h4><i>(MAX 1MB)</i></h4>
         </ng-template>
         <ng-template [ngIf]="imageFile">
             <h3>{{ imageFile?.name }}</h3>
