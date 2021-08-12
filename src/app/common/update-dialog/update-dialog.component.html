@@ -1,0 +1,11 @@
+<h1 mat-dialog-title>Update({{data.oldFeed}}) feed to a new feed</h1>
+<div mat-dialog-content fxLayout="row" fxLayoutAlign="center center">
+  <mat-form-field appearance="fill">
+    <mat-label>New feed</mat-label>
+    <input matInput [(ngModel)]="data.newFeed">
+  </mat-form-field>
+</div>
+<div mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No Thanks</button>
+  <button mat-button (click)="onYesClcik()" cdkFocusInitial>Ok</button>
+</div>

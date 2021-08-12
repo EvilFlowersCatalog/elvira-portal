@@ -11,6 +11,8 @@ import { LoadingComponent } from './components/loading.component';
 import { MobileNavbarComponent } from './components/mobile-navbar/mobile-navbar/mobile-navbar.component';
 import { HeaderComponent } from './components/header/header/header.component';
 import { MobileSidenavComponent } from './components/mobile-sidenav/mobile-sidenav/mobile-sidenav.component';
+import { UpdateDialogComponent } from './update-dialog/update-dialog.component';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -21,8 +23,9 @@ import { MobileSidenavComponent } from './components/mobile-sidenav/mobile-siden
     HeaderComponent,
     MobileSidenavComponent,
     DeleteDialogComponent,
+    UpdateDialogComponent,
   ],
-  imports: [CommonModule, MaterialModule, LibraryModule, TranslocoRootModule],
+  imports: [CommonModule, MaterialModule, LibraryModule, TranslocoRootModule, FormsModule],
   exports: [
     NotfoundComponent,
     LoadingComponent,

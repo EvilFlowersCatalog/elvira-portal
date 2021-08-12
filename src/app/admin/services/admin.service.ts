@@ -5,9 +5,11 @@ import { AppStateService } from 'src/app/common/services/app-state/app-state.ser
 import {
   AdminResponse,
   AllEntryItems,
+  AllFeedsItems,
   EditedData,
   GetEntries,
   GetFeeds,
+  UpdateFeeds,
 } from './admin.types';
 
 @Injectable({
@@ -38,6 +40,23 @@ export class AdminService {
     const headers = this.createAuthorizationHeader();
     return this.httpClient.get<GetFeeds>(
       'api/apigw/evil-flowers-conn/feeds',
+      { headers: headers }
+    );
+  }
+
+  updateFeed(feedId: string, newFeed: UpdateFeeds) {
+    const headers = this.createAuthorizationHeader();
+    return this.httpClient.put(
+      `api/apigw/evil-flowers-conn/admin/feeds/${feedId}`,
+      newFeed,
+      { headers: headers }
+    );
+  }
+
+  deleteFeed(feedId: string) {
+    const headers = this.createAuthorizationHeader();
+    return this.httpClient.delete(
+      `api/apigw/evil-flowers-conn/admin/feeds/${feedId}`,
       { headers: headers }
     );
   }
