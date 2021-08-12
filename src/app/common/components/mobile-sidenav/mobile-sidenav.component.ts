@@ -5,7 +5,7 @@ import { takeUntil } from 'rxjs/operators';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
 import { State } from 'src/app/common/services/app-state/app-state.types';
-import { DisposableComponent } from '../../disposable.component';
+import { DisposableComponent } from '../disposable.component';
 
 @Component({
   selector: 'app-mobile-sidenav',
