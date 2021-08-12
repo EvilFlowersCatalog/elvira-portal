@@ -22,6 +22,9 @@ export class AdminUploadComponent implements OnInit {
   imageForm: FormGroup;
   contributors: FormArray;
   counter: number = 4;
+  checkTitle: string;
+  isTitleSame: boolean = false;
+  allTitles: string[] = [];
   //Chips variables
   selectable = true;
   removable = true;
@@ -78,7 +81,49 @@ export class AdminUploadComponent implements OnInit {
     });
    }
 
-
+   onBlurTitle(){
+     let editTitle = this.uploadForm.get('title').value;
+     if(this.isInEditMode){
+      this.adminService.checkTitle(this.checkTitle).subscribe(
+        data => {
+          if(data.metadata.total === 0 || this.isTitleSame) {
+            this.isTitleSame = false;
+         }
+          else {
+            data.items.map(
+              map => {
+                //console.log(map.title.toLowerCase());
+                if(editTitle.toLocaleLowerCase() === map.title.toLocaleLowerCase()){
+                  this.isTitleSame = true;
+                }
+                else if(!this.isTitleSame){
+                   this.isTitleSame = false;
+                }
+               }
+            )}
+           });
+     }
+     else {
+      this.adminService.checkTitle(this.checkTitle).subscribe(
+        data => {
+          if(data.metadata.total === 0 || this.isTitleSame) {
+            this.isTitleSame = false;
+         }
+          else {
+            data.items.map(
+              map => {
+                //console.log(map.title.toLowerCase());
+                if(map.title.toLocaleLowerCase() === this.checkTitle.toLocaleLowerCase()){
+                  this.isTitleSame = true;
+                }
+                else if(!this.isTitleSame){
+                   this.isTitleSame = false;
+                }
+               }
+            )}
+           });
+     }
+   }
 
    createItem(): FormGroup {
     return this.formBuilder.group({
@@ -105,9 +150,10 @@ export class AdminUploadComponent implements OnInit {
           datas => {
             this.editData = datas;
             //console.log(datas);
+            this.isInEditMode = true;
           }
         );
-        this.isInEditMode = true;
+
       }
 
       this.allFeeds = this.getFeeds();

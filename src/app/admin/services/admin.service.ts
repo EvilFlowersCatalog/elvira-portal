@@ -99,4 +99,12 @@ export class AdminService {
       `api/apigw/isAdmin/${mongoId}`,
     );
  }
+
+ checkTitle(title: string){
+  const headers = this.createAuthorizationHeader();
+  return this.httpClient.get<GetEntries>(
+    'api/apigw/evil-flowers-conn/entries',
+    { headers: headers, params: {title: title}}
+  );
+ }
 }
