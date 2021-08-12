@@ -24,7 +24,12 @@ export class DeleteDialogComponent implements OnInit {
   }
 
   onYesClcik(): void {
-    this.adminService.deleteEntry(this.data.entryApikey).subscribe();
+    if(this.data.source === "admin"){
+      this.adminService.deleteEntry(this.data.entryApikey).subscribe();
+    }
+    if(this.data.source === "feed"){
+      this.adminService.deleteFeed(this.data.entryApikey).subscribe();
+    }
     this.dialogRef.close();
   }
 }
