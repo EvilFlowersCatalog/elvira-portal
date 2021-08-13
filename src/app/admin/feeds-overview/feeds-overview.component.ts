@@ -4,6 +4,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { DeleteDialogComponent } from 'src/app/common/delete-dialog/delete-dialog.component';
+import { NewFeedDialogComponent } from 'src/app/common/new-feed-dialog/new-feed-dialog.component';
 import { UpdateDialogComponent } from 'src/app/common/update-dialog/update-dialog.component';
 import { AdminService } from '../services/admin.service';
 import { AllFeedsItems } from '../services/admin.types';
@@ -42,6 +43,15 @@ export class FeedsOverviewComponent implements AfterViewInit {
         this.dataSource.paginator = this.paginator;
       }
     );
+  }
+
+  createNewFeed(){
+    const dialogRef = this.dialog.open(NewFeedDialogComponent, {
+      width: '350px'
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
   }
 
   //Function, to get the current clicked row

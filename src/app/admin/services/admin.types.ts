@@ -102,3 +102,11 @@ export interface UpdateFeeds {
   content: string;
   kind: string;
 }
+
+export interface addNewFeed {
+  catalog_id: string;
+	title: string;
+	url_name: string;
+	content: string;
+	kind: string;
+}

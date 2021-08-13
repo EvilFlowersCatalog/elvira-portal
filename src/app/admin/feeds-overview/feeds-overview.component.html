@@ -14,6 +14,13 @@
     <mat-label>{{ t('lazy.adminOverview.search') }}</mat-label>
     <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Title, Name, Surname" #input>
   </mat-form-field>
+  <button
+      (click)="createNewFeed()"
+      mat-raised-button
+      color="primary"
+    >
+   Create New Feed!
+    </button>
   </div>
 
 <div fxLayout="column"

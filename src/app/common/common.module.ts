@@ -13,6 +13,7 @@ import { HeaderComponent } from './components/header/header/header.component';
 import { MobileSidenavComponent } from './components/mobile-sidenav/mobile-sidenav/mobile-sidenav.component';
 import { UpdateDialogComponent } from './update-dialog/update-dialog.component';
 import { FormsModule } from '@angular/forms';
+import { NewFeedDialogComponent } from './new-feed-dialog/new-feed-dialog.component';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { FormsModule } from '@angular/forms';
     MobileSidenavComponent,
     DeleteDialogComponent,
     UpdateDialogComponent,
+    NewFeedDialogComponent,
   ],
   imports: [CommonModule, MaterialModule, LibraryModule, TranslocoRootModule, FormsModule],
   exports: [

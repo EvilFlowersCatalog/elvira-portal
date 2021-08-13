@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
 import {
+  addNewFeed,
   AdminResponse,
   AllEntryItems,
   AllFeedsItems,
@@ -105,6 +106,16 @@ export class AdminService {
   return this.httpClient.get<GetEntries>(
     'api/apigw/evil-flowers-conn/entries',
     { headers: headers, params: {title: title}}
+  );
+ }
+
+
+ addNewFeed(feedData: addNewFeed){
+  const headers = this.createAuthorizationHeader();
+  return this.httpClient.post(
+    'api/apigw/evil-flowers-conn/admin/feeds',
+    feedData,
+    { headers: headers }
   );
  }
 }
