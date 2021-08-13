@@ -34,14 +34,15 @@ export class MobileSidenavComponent
 
   navigate(link: string) {
     this.router.navigate([link]);
+    this.appStateService.patchState({ sidebar: false });
   }
 
   changeTheme(theme: string) {
-    this.appStateService.patchState({ theme: theme });
+    this.appStateService.patchState({ theme: theme, sidenav: false });
   }
 
   changeLanguage(language: string) {
-    this.appStateService.patchState({ lang: language });
+    this.appStateService.patchState({ lang: language, sidenav: false });
   }
 
   logout() {
@@ -51,6 +52,7 @@ export class MobileSidenavComponent
       username: null,
       isLoggedIn: false,
       isAdmin: false,
+      sidenav: false,
     });
 
     this.router.navigate(['/auth/login']);
