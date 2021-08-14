@@ -1,20 +1,18 @@
 import { Component, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { DeleteDialogComponent } from 'src/app/common/delete-dialog/delete-dialog.component';
+import { DeleteDialogComponent } from 'src/app/common/components/delete-dialog/delete-dialog.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { AdminService } from '../services/admin.service';
 import { AllEntryItems } from '../services/admin.types';
 
-
 @Component({
   selector: 'app-admin',
   templateUrl: './admin-overview.component.html',
-  styleUrls: ['./admin-overview.component.scss']
+  styleUrls: ['./admin-overview.component.scss'],
 })
-
-export class AdminOverviewComponent implements AfterViewInit  {
+export class AdminOverviewComponent implements AfterViewInit {
   displayedColumns: string[] = ['title', 'name', 'surname', 'edit', 'delete'];
   currentRow: number = 0;
   resultsLength = 0;
@@ -29,24 +27,18 @@ export class AdminOverviewComponent implements AfterViewInit  {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     public dialog: MatDialog,
-    private readonly adminService: AdminService,
-  ) {
-
-
-  }
+    private readonly adminService: AdminService
+  ) {}
 
   //Pass info to pagination
   ngAfterViewInit() {
-    this.adminService.getAllEntries().subscribe(
-      datas => {
-        console.log(datas);
-        this.tableData = datas.items;
-        this.resultsLength = datas.metadata.total;
-        this.dataSource = new MatTableDataSource(this.tableData);
-        this.dataSource.paginator = this.paginator;
-      }
-    );
-
+    this.adminService.getAllEntries().subscribe((datas) => {
+      console.log(datas);
+      this.tableData = datas.items;
+      this.resultsLength = datas.metadata.total;
+      this.dataSource = new MatTableDataSource(this.tableData);
+      this.dataSource.paginator = this.paginator;
+    });
   }
 
   //Button, to navigate to the upload formular
@@ -59,30 +51,30 @@ export class AdminOverviewComponent implements AfterViewInit  {
   }
 
   //Function, to get the current clicked row
-  getRow(row: AllEntryItems){
-    if(this.isdelete){
+  getRow(row: AllEntryItems) {
+    if (this.isdelete) {
       const dialogRef = this.dialog.open(DeleteDialogComponent, {
         width: '350px',
-        data: {title: row.title, entryApikey: row.id, source: "admin"},
+        data: { title: row.title, entryApikey: row.id, source: 'admin' },
       });
 
-      dialogRef.afterClosed().subscribe(result => {
+      dialogRef.afterClosed().subscribe((result) => {
         console.log('The dialog was closed');
       });
     }
-    if(this.isedit){
+    if (this.isedit) {
       this.router.navigate([`./${row.id}`], { relativeTo: this.route });
     }
     //console.log(this.deleteEntryId);
   }
 
   //Function, to give choice, wether we want to delete the document or not
-  deleteDocument(){
+  deleteDocument() {
     this.isdelete = true;
     this.isedit = false;
   }
 
-  editDocument(){
+  editDocument() {
     this.isdelete = false;
     this.isedit = true;
   }
@@ -97,6 +89,3 @@ export class AdminOverviewComponent implements AfterViewInit  {
     }
   }
 }
-
-
-

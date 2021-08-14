@@ -3,17 +3,16 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
-import { DeleteDialogComponent } from 'src/app/common/delete-dialog/delete-dialog.component';
-import { UpdateDialogComponent } from 'src/app/common/update-dialog/update-dialog.component';
+import { DeleteDialogComponent } from 'src/app/common/components/delete-dialog/delete-dialog.component';
+import { UpdateDialogComponent } from 'src/app/common/components/update-dialog/update-dialog.component';
 import { AdminService } from '../services/admin.service';
 import { AllFeedsItems } from '../services/admin.types';
 
 @Component({
   selector: 'app-feeds-overview',
   templateUrl: './feeds-overview.component.html',
-  styleUrls: ['./feeds-overview.component.scss']
+  styleUrls: ['./feeds-overview.component.scss'],
 })
-
 export class FeedsOverviewComponent implements AfterViewInit {
   displayedColumns: string[] = ['feed', 'edit', 'delete'];
   tableData: AllFeedsItems[] = [];
@@ -29,40 +28,45 @@ export class FeedsOverviewComponent implements AfterViewInit {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     public dialog: MatDialog
-  ) { }
+  ) {}
 
   ngAfterViewInit() {
-
-    this.adminService.getAllFeeds().subscribe(
-      datas => {
-        console.log(datas);
-        this.tableData = datas.items;
-        this.resultsLength = datas.metadata.total;
-        this.dataSource = new MatTableDataSource(this.tableData);
-        this.dataSource.paginator = this.paginator;
-      }
-    );
+    this.adminService.getAllFeeds().subscribe((datas) => {
+      console.log(datas);
+      this.tableData = datas.items;
+      this.resultsLength = datas.metadata.total;
+      this.dataSource = new MatTableDataSource(this.tableData);
+      this.dataSource.paginator = this.paginator;
+    });
   }
 
   //Function, to get the current clicked row
-  getRow(row: AllFeedsItems){
-    if(this.isdelete){
+  getRow(row: AllFeedsItems) {
+    if (this.isdelete) {
       const dialogRef = this.dialog.open(DeleteDialogComponent, {
         width: '350px',
-        data: {title: row.title, entryApikey: row.id, source: "feed"},
+        data: { title: row.title, entryApikey: row.id, source: 'feed' },
       });
 
-      dialogRef.afterClosed().subscribe(result => {
+      dialogRef.afterClosed().subscribe((result) => {
         console.log('The dialog was closed');
       });
     }
-    if(this.isedit){
+    if (this.isedit) {
       const dialogRef = this.dialog.open(UpdateDialogComponent, {
         width: '350px',
-        data: {feedId: row.id, oldFeed: row.title, newFeed: "", catalogId: row.catalog_id, url: row.url_name, content: row.content, kind: row.kind},
+        data: {
+          feedId: row.id,
+          oldFeed: row.title,
+          newFeed: '',
+          catalogId: row.catalog_id,
+          url: row.url_name,
+          content: row.content,
+          kind: row.kind,
+        },
       });
 
-      dialogRef.afterClosed().subscribe(result => {
+      dialogRef.afterClosed().subscribe((result) => {
         console.log('The dialog was closed');
       });
     }
@@ -70,12 +74,12 @@ export class FeedsOverviewComponent implements AfterViewInit {
   }
 
   //Function, to give choice, wether we want to delete the document or not
-  deleteDocument(){
+  deleteDocument() {
     this.isdelete = true;
     this.isedit = false;
   }
 
-  editDocument(){
+  editDocument() {
     this.isdelete = false;
     this.isedit = true;
   }
@@ -89,5 +93,4 @@ export class FeedsOverviewComponent implements AfterViewInit {
       this.dataSource.paginator.firstPage();
     }
   }
-
 }

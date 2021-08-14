@@ -11,6 +11,8 @@
     "svk": "Slovensky",
     "eng": "English",
     "profile": "Profile",
-    "log-out": "Log out"
+    "log-out": "Log out",
+    "settings": "Settings",
+    "favorites": "Favorites"
   }
 }

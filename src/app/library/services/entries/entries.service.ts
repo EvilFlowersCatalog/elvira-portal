@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
 import { ListEntriesResponse } from './entries.types';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +18,7 @@ export class EntriesService {
   createAuthorizationHeader() {
     return new HttpHeaders({
       authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
-      api_key: '7afa8603-7357-4dc8-ada2-fadd148952a1',
+      api_key: environment.apiKey,
     });
   }
 
@@ -25,7 +26,7 @@ export class EntriesService {
     let header = this.createAuthorizationHeader();
 
     return this.httpClient.get<ListEntriesResponse>(
-      'api/apigw/evil-flowers-conn/entries/',
+      'api/apigw/evil-flowers-conn/entries',
       {
         headers: header,
       }

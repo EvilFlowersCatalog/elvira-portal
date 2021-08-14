@@ -1,0 +1,84 @@
+<ng-container *transloco="let t; read: 'navbar'">
+  <ng-container *ngIf="appState$ | async as appState">
+    <div class="mobile-sidenav-container">
+      <mat-accordion>
+        <mat-expansion-panel hideToggle *ngIf="appState.showSidebarToggle">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon class="mobile-sidenav-icon">filter_alt</mat-icon>
+              Filter
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-divider></mat-divider>
+          <ng-template matExpansionPanelContent>
+            <div fxLayout="column" fxLayoutAlign="start start">
+              <app-sidebar></app-sidebar>
+            </div>
+          </ng-template>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle *ngIf="appState.isLoggedIn">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon class="mobile-sidenav-icon">person_outline</mat-icon>
+              {{ appState.username }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-divider></mat-divider>
+          <ng-template matExpansionPanelContent>
+            <div fxLayout="column" fxLayoutAlign="start start">
+              <button mat-flat-button>
+                <mat-icon class="mobile-sidenav-icon">favorite</mat-icon>
+                <span>{{ t("favorites") }}</span>
+              </button>
+              <button mat-flat-button>
+                <mat-icon class="mobile-sidenav-icon">account_circle</mat-icon>
+                <span>{{ t("profile") }}</span>
+              </button>
+              <button mat-flat-button (click)="logout()">
+                <mat-icon class="mobile-sidenav-icon">logout</mat-icon>
+                <span>{{ t("log-out") }}</span>
+              </button>
+            </div>
+          </ng-template>
+        </mat-expansion-panel>
+        <mat-expansion-panel hideToggle>
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              <mat-icon class="mobile-sidenav-icon">settings</mat-icon>
+              {{ t("settings") }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <mat-divider></mat-divider>
+          <ng-template matExpansionPanelContent>
+            <div fxLayout="column" fxLayoutAlign="start start">
+              <div *ngIf="appState.theme === 'dark'; else darkModeBtn">
+                <button mat-flat-button (click)="changeTheme('light')">
+                  <mat-icon class="mobile-sidenav-icon">light_mode</mat-icon>
+                  <span>{{ t("light") }}</span>
+                </button>
+              </div>
+              <ng-template #darkModeBtn>
+                <button mat-flat-button (click)="changeTheme('dark')">
+                  <mat-icon class="mobile-sidenav-icon">dark_mode</mat-icon>
+                  <span>{{ t("dark") }}</span>
+                </button>
+              </ng-template>
+              <div *ngIf="appState.lang === 'en'; else enVersionBtn">
+                <button mat-flat-button (click)="changeLanguage('sk')">
+                  <mat-icon class="mobile-sidenav-icon">translate</mat-icon>
+                  <span>{{ t("svk") }}</span>
+                </button>
+              </div>
+              <ng-template #enVersionBtn>
+                <button mat-flat-button (click)="changeLanguage('en')">
+                  <mat-icon class="mobile-sidenav-icon">language</mat-icon>
+                  <span>{{ t("eng") }}</span>
+                </button>
+              </ng-template>
+            </div>
+          </ng-template>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+  </ng-container>
+</ng-container>

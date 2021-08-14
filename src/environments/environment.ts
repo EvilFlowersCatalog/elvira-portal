@@ -4,9 +4,10 @@
 
 export const environment = {
   production: false,
-  baseUrl: `http://localhost:300/api/`
+  baseUrl: `http://localhost:300/api/`,
+  apiKey: 'fd98a8a4-bd5b-464c-a326-2ba3d1487843',
+  catalogId: 'b3f81546-9cd6-4a5c-b687-c8e3edaedf92',
 };
-
 
 /*
  * For easier debugging in development mode, you can import the following file
