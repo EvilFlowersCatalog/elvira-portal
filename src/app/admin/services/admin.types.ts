@@ -57,6 +57,7 @@ export interface AllEntryItems {
 export interface DialogData {
   title: string;
   entryApikey: string;
+  source: string;
 }
 
 export interface EditedData {
@@ -92,4 +93,12 @@ export interface AllFeedsItems {
   per_page: number;
   created_at: string;
   updated_at: string;
+}
+
+export interface UpdateFeeds {
+  catalog_id: string;
+  title: string;
+  url_name: string;
+  content: string;
+  kind: string;
 }

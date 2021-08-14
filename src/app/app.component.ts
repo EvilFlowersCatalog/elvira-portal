@@ -56,8 +56,4 @@ export class AppComponent extends DisposableComponent {
       theme === 'dark' ? 'app-background-dark' : 'app-background-light';
     this.renderer.setAttribute(this.document.body, 'class', hostClass);
   }
-
-  hideSidenav() {
-    this.appStateService.patchState({ sidenav: false });
-  }
 }

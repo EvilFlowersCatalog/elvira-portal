@@ -7,9 +7,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AdminUploadComponent } from './admin-upload/admin-upload.component';
 import { AdminOverviewComponent } from './admin-overview/admin-overview.component';
 import { MaterialModule } from '../material.module';
+import { FeedsOverviewComponent } from './feeds-overview/feeds-overview.component';
 
 @NgModule({
-  declarations: [AdminOverviewComponent, AdminUploadComponent],
+  declarations: [AdminOverviewComponent, AdminUploadComponent, FeedsOverviewComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(ADMIN_ROUTES),

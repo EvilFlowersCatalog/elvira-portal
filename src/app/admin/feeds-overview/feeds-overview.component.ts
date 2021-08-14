@@ -1,38 +1,37 @@
-import { Component, ViewChild, AfterViewInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, AfterViewInit, ViewChild } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { DeleteDialogComponent } from 'src/app/common/components/delete-dialog/delete-dialog.component';
-import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DeleteDialogComponent } from 'src/app/common/components/delete-dialog/delete-dialog.component';
+import { UpdateDialogComponent } from 'src/app/common/components/update-dialog/update-dialog.component';
 import { AdminService } from '../services/admin.service';
-import { AllEntryItems } from '../services/admin.types';
+import { AllFeedsItems } from '../services/admin.types';
 
 @Component({
-  selector: 'app-admin',
-  templateUrl: './admin-overview.component.html',
-  styleUrls: ['./admin-overview.component.scss'],
+  selector: 'app-feeds-overview',
+  templateUrl: './feeds-overview.component.html',
+  styleUrls: ['./feeds-overview.component.scss'],
 })
-export class AdminOverviewComponent implements AfterViewInit {
-  displayedColumns: string[] = ['title', 'name', 'surname', 'edit', 'delete'];
-  currentRow: number = 0;
+export class FeedsOverviewComponent implements AfterViewInit {
+  displayedColumns: string[] = ['feed', 'edit', 'delete'];
+  tableData: AllFeedsItems[] = [];
+  dataSource: MatTableDataSource<AllFeedsItems>;
   resultsLength = 0;
-  tableData: AllEntryItems[] = [];
-  dataSource: MatTableDataSource<AllEntryItems>;
   isdelete: boolean = false;
   isedit: boolean = false;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(
+    private readonly adminService: AdminService,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    public dialog: MatDialog,
-    private readonly adminService: AdminService
+    public dialog: MatDialog
   ) {}
 
-  //Pass info to pagination
   ngAfterViewInit() {
-    this.adminService.getAllEntries().subscribe((datas) => {
+    this.adminService.getAllFeeds().subscribe((datas) => {
       console.log(datas);
       this.tableData = datas.items;
       this.resultsLength = datas.metadata.total;
@@ -41,21 +40,12 @@ export class AdminOverviewComponent implements AfterViewInit {
     });
   }
 
-  //Button, to navigate to the upload formular
-  newDocument() {
-    this.router.navigate(['./upload'], { relativeTo: this.route });
-  }
-
-  feedsOverview() {
-    this.router.navigate(['./feeds'], { relativeTo: this.route });
-  }
-
   //Function, to get the current clicked row
-  getRow(row: AllEntryItems) {
+  getRow(row: AllFeedsItems) {
     if (this.isdelete) {
       const dialogRef = this.dialog.open(DeleteDialogComponent, {
         width: '350px',
-        data: { title: row.title, entryApikey: row.id, source: 'admin' },
+        data: { title: row.title, entryApikey: row.id, source: 'feed' },
       });
 
       dialogRef.afterClosed().subscribe((result) => {
@@ -63,7 +53,22 @@ export class AdminOverviewComponent implements AfterViewInit {
       });
     }
     if (this.isedit) {
-      this.router.navigate([`./${row.id}`], { relativeTo: this.route });
+      const dialogRef = this.dialog.open(UpdateDialogComponent, {
+        width: '350px',
+        data: {
+          feedId: row.id,
+          oldFeed: row.title,
+          newFeed: '',
+          catalogId: row.catalog_id,
+          url: row.url_name,
+          content: row.content,
+          kind: row.kind,
+        },
+      });
+
+      dialogRef.afterClosed().subscribe((result) => {
+        console.log('The dialog was closed');
+      });
     }
     //console.log(this.deleteEntryId);
   }

@@ -14,25 +14,6 @@
     <mat-label>{{ t('lazy.adminOverview.search') }}</mat-label>
     <input matInput (keyup)="applyFilter($event)" placeholder="Ex. Title, Name, Surname" #input>
   </mat-form-field>
-  <div>
-    <!-- New documnet button -->
-    <button
-      (click)="newDocument()"
-      mat-raised-button
-      color="primary"
-      style="margin-right: 30px;"
-    >
-    {{ t('lazy.adminOverview.document') }}
-    </button>
-
-    <button
-      (click)="feedsOverview()"
-      mat-raised-button
-      color="primary"
-    >
-   FEEDS
-    </button>
-  </div>
   </div>
 
 <div fxLayout="column"
@@ -44,21 +25,9 @@
       >
 
       <!-- Title Column -->
-  <ng-container matColumnDef="title">
+  <ng-container matColumnDef="feed">
     <th mat-header-cell *matHeaderCellDef> {{ t('lazy.adminOverview.title') }} </th>
     <td mat-cell *matCellDef="let element"> {{element.title}} </td>
-  </ng-container>
-
-  <!-- Atuhor name Column -->
-  <ng-container matColumnDef="name">
-    <th mat-header-cell *matHeaderCellDef> {{ t('lazy.adminOverview.name') }} </th>
-    <td mat-cell *matCellDef="let element"> {{element.author.name}} </td>
-  </ng-container>
-
-  <!-- Author surname Column -->
-  <ng-container matColumnDef="surname">
-    <th mat-header-cell *matHeaderCellDef> {{ t('lazy.adminOverview.surname') }} </th>
-    <td mat-cell *matCellDef="let element"> {{element.author.surname}} </td>
   </ng-container>
 
     <!-- Edit Column -->
@@ -101,3 +70,4 @@
   </mat-paginator>
 </div>
 </ng-container>
+
