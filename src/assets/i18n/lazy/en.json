@@ -33,7 +33,7 @@
     "delete": "Delete"
   },
   "entryDetail": {
-    "open-pdf-tooltip": "Open PDF",
+    "info-pdf-tooltip": "Show info",
     "download-pdf-tooltip": "Download PDF",
     "favorite-pdf-tooltip": "Add to favorite list"
   }
