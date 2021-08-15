@@ -1,6 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { EntriesItem } from '../../services/entries/entries.types';
 import { DateTime } from 'luxon';
+import { EntriesService } from '../../services/entries/entries.service';
 
 @Component({
   selector: 'app-entry-detail',
@@ -12,7 +13,7 @@ export class EntryDetailComponent implements OnInit {
   imageSrc: string;
   year: string;
 
-  constructor() {}
+  constructor(private readonly entriesService: EntriesService) {}
 
   ngOnInit(): void {
     this.imageSrc =
@@ -23,8 +24,15 @@ export class EntryDetailComponent implements OnInit {
   }
 
   openPdf(id: string) {
-    console.log('openPdf', id);
+    this.entriesService.entryDetail(id).subscribe((data) => {
+      console.log(data);
+    });
+
     // this.router.navigateByUrl(`/library/pdf-viewer/${id}`);
+  }
+
+  showInfo(id: string) {
+    console.log('showInfo', id);
   }
 
   downloadPdf(id: string) {

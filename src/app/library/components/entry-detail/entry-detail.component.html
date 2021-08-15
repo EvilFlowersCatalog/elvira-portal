@@ -23,10 +23,10 @@
     <mat-card-actions fxLayout="row" fxLayoutAlign="space-around">
       <button
         mat-icon-button
-        matTooltip="{{ t('lazy.entryDetail.open-pdf-tooltip') }}"
-        (click)="openPdf(entry.id)"
+        matTooltip="{{ t('lazy.entryDetail.info-pdf-tooltip') }}"
+        (click)="showInfo(entry.id)"
       >
-        <mat-icon> picture_as_pdf </mat-icon>
+        <mat-icon> info </mat-icon>
       </button>
       <button
         mat-icon-button

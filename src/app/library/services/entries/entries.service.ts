@@ -10,6 +10,7 @@ import { environment } from '../../../../environments/environment';
   providedIn: 'root',
 })
 export class EntriesService {
+  catalogId = environment.catalogId;
   constructor(
     private readonly httpClient: HttpClient,
     private readonly appStateService: AppStateService
@@ -33,7 +34,14 @@ export class EntriesService {
     );
   }
 
-  entryDetail() {
-    console.log('entry detail');
+  entryDetail(id: string) {
+    let header = this.createAuthorizationHeader();
+
+    return this.httpClient.get<ListEntriesResponse>(
+      `api/apigw/evil-flowers-conn/catalogs/${this.catalogId}/entries/${id}`,
+      {
+        headers: header,
+      }
+    );
   }
 }

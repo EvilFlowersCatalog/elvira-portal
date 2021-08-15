@@ -33,7 +33,7 @@
     "delete": "Vymazať"
   },
   "entryDetail": {
-    "open-pdf-tooltip": "Otvoriť PDF",
+    "info-pdf-tooltip": "Zobraziť informácie",
     "download-pdf-tooltip": "Stiahnuť PDF",
     "favorite-pdf-tooltip": "Pridať do obľúbených"
   }
