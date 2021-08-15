@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
   baseUrl: `http://localhost:300/api/`,
-  apiKey: 'fd98a8a4-bd5b-464c-a326-2ba3d1487843',
-  catalogId: '1a71e8d6-6861-4de9-bf00-9c8ed9410a11',
+  apiKey: '1ad541a8-2104-47ac-9d01-ba2af4324fa8',
+  catalogId: '6435a96c-b8c7-4d5a-ba24-e4c126469f1c',
 };
