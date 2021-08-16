@@ -34,7 +34,7 @@ export class EntriesService {
     );
   }
 
-  entryDetail(id: string) {
+  entryDetail(id: string): Observable<EntryDetail> {
     let header = this.createAuthorizationHeader();
 
     return this.httpClient.get<EntryDetail>(
