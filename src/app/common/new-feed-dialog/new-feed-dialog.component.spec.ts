@@ -1,20 +1,20 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FeedsOverviewComponent } from './feeds-overview.component';
+import { NewFeedDialogComponent } from './new-feed-dialog.component';
 
-describe('FeedsOverviewComponent', () => {
-  let component: FeedsOverviewComponent;
-  let fixture: ComponentFixture<FeedsOverviewComponent>;
+describe('NewFeedDialogComponent', () => {
+  let component: NewFeedDialogComponent;
+  let fixture: ComponentFixture<NewFeedDialogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ FeedsOverviewComponent ]
+      declarations: [ NewFeedDialogComponent ]
     })
     .compileComponents();
   });
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(FeedsOverviewComponent);
+    fixture = TestBed.createComponent(NewFeedDialogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

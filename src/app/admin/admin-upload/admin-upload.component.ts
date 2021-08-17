@@ -10,6 +10,7 @@ import { AdminService } from '../services/admin.service';
 import { HttpClient } from '@angular/common/http';
 import { AllEntryItems, EditedData, EntriesData } from '../services/admin.types';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TitleValidators } from '../validators/title.validator';
 
 @Component({
   selector: 'app-admin',
@@ -53,7 +54,8 @@ export class AdminUploadComponent implements OnInit {
     private readonly http: HttpClient,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    private _snackBar: MatSnackBar
+    private _snackBar: MatSnackBar,
+    private readonly titleValidator: TitleValidators
     ) {
 
       this.imageForm = new FormGroup({
@@ -61,7 +63,15 @@ export class AdminUploadComponent implements OnInit {
       });
 
     this.uploadForm = new FormGroup({
-      title: new FormControl('', Validators.required),
+      title: new FormControl('', {
+        validators: [
+          Validators.required
+        ],
+        asyncValidators: [
+          titleValidator.userValidator()
+        ],
+        updateOn: 'blur'
+      }),
       author: new FormGroup({
         name: new FormControl('',),
         surname: new FormControl('',)
@@ -81,49 +91,55 @@ export class AdminUploadComponent implements OnInit {
     });
    }
 
-   onBlurTitle(){
-     let editTitle = this.uploadForm.get('title').value;
-     if(this.isInEditMode){
-      this.adminService.checkTitle(this.checkTitle).subscribe(
-        data => {
-          if(data.metadata.total === 0 || this.isTitleSame) {
-            this.isTitleSame = false;
-         }
-          else {
-            data.items.map(
-              map => {
-                //console.log(map.title.toLowerCase());
-                if(editTitle.toLocaleLowerCase() === map.title.toLocaleLowerCase()){
-                  this.isTitleSame = true;
-                }
-                else if(!this.isTitleSame){
-                   this.isTitleSame = false;
-                }
-               }
-            )}
-           });
-     }
-     else {
-      this.adminService.checkTitle(this.checkTitle).subscribe(
-        data => {
-          if(data.metadata.total === 0 || this.isTitleSame) {
-            this.isTitleSame = false;
-         }
-          else {
-            data.items.map(
-              map => {
-                //console.log(map.title.toLowerCase());
-                if(map.title.toLocaleLowerCase() === this.checkTitle.toLocaleLowerCase()){
-                  this.isTitleSame = true;
-                }
-                else if(!this.isTitleSame){
-                   this.isTitleSame = false;
-                }
-               }
-            )}
-           });
-     }
+   get formTitle() {
+     console.log(this.uploadForm.controls['title'].hasError('titleExists'));
+     return this.uploadForm.controls['title'];
    }
+
+
+  //  onBlurTitle(){
+  //    let editTitle = this.uploadForm.get('title').value;
+  //    if(this.isInEditMode){
+  //     this.adminService.checkTitle(this.checkTitle).subscribe(
+  //       data => {
+  //         if(data.metadata.total === 0 || this.isTitleSame) {
+  //           this.isTitleSame = false;
+  //        }
+  //         else {
+  //           data.items.map(
+  //             map => {
+  //               //console.log(map.title.toLowerCase());
+  //               if(editTitle.toLocaleLowerCase() === map.title.toLocaleLowerCase()){
+  //                 this.isTitleSame = true;
+  //               }
+  //               else if(!this.isTitleSame){
+  //                  this.isTitleSame = false;
+  //               }
+  //              }
+  //           )}
+  //          });
+  //    }
+  //    else {
+  //     this.adminService.checkTitle(this.checkTitle).subscribe(
+  //       data => {
+  //         if(data.metadata.total === 0 || this.isTitleSame) {
+  //           this.isTitleSame = false;
+  //        }
+  //         else {
+  //           data.items.map(
+  //             map => {
+  //               //console.log(map.title.toLowerCase());
+  //               if(map.title.toLocaleLowerCase() === this.checkTitle.toLocaleLowerCase()){
+  //                 this.isTitleSame = true;
+  //               }
+  //               else if(!this.isTitleSame){
+  //                  this.isTitleSame = false;
+  //               }
+  //              }
+  //           )}
+  //          });
+  //    }
+  //  }
 
    createItem(): FormGroup {
     return this.formBuilder.group({
