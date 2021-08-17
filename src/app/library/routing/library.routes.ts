@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { AdminGuard } from 'src/app/admin/routing/admin.guard';
 import { HomeComponent } from '../components/home/home.component';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
+import { FavoritesComponent } from '../components/favorites/favorites.component';
 import { LibraryGuard } from './library.guard';
 
 export const LIBRARY_ROUTES: Routes = [
@@ -25,5 +26,10 @@ export const LIBRARY_ROUTES: Routes = [
     path: 'pdf-viewer/:id',
     canActivate: [LibraryGuard],
     component: PdfViewerComponent,
+  },
+  {
+    path: 'favorites',
+    canActivate: [LibraryGuard],
+    component: FavoritesComponent,
   },
 ];

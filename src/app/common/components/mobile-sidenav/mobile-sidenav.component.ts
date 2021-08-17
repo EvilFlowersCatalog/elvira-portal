@@ -34,7 +34,7 @@ export class MobileSidenavComponent
 
   navigate(link: string) {
     this.router.navigate([link]);
-    this.appStateService.patchState({ sidebar: false });
+    this.appStateService.patchState({ sidenav: false });
   }
 
   changeTheme(theme: string) {
