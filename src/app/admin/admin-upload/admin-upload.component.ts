@@ -96,10 +96,6 @@ export class AdminUploadComponent implements OnInit {
      return this.uploadForm.controls['title'];
    }
 
-   isTitleTaken(): boolean {
-     console.log(this.uploadForm.controls['title'].hasError('titleExists'));
-    return this.uploadForm.get('title').hasError('titleExists');
-  }
 
   //  onBlurTitle(){
   //    let editTitle = this.uploadForm.get('title').value;

@@ -5,7 +5,10 @@ import { DeleteDialogComponent } from 'src/app/common/delete-dialog/delete-dialo
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { AdminService } from '../services/admin.service';
-import { AllEntryItems } from '../services/admin.types';
+import { AllEntryItems, AllFeedsItems } from '../services/admin.types';
+import { UpdateDialogComponent } from 'src/app/common/update-dialog/update-dialog.component';
+import { NewFeedDialogComponent } from 'src/app/common/new-feed-dialog/new-feed-dialog.component';
+import { FlexAlignStyleBuilder } from '@angular/flex-layout';
 
 
 @Component({
@@ -13,6 +16,7 @@ import { AllEntryItems } from '../services/admin.types';
   templateUrl: './admin-overview.component.html',
   styleUrls: ['./admin-overview.component.scss']
 })
+
 
 export class AdminOverviewComponent implements AfterViewInit  {
   displayedColumns: string[] = ['title', 'name', 'surname', 'edit', 'delete'];
@@ -22,6 +26,15 @@ export class AdminOverviewComponent implements AfterViewInit  {
   dataSource: MatTableDataSource<AllEntryItems>;
   isdelete: boolean = false;
   isedit: boolean = false;
+  tabIndex: number = 0;
+  isFeedLoaded: boolean = false;
+
+  displayedColumnsFeed: string[] = ['feed', 'edit', 'delete'];
+  tableDataFeed: AllFeedsItems[] = [];
+  dataSourceFeed: MatTableDataSource<AllFeedsItems>;
+  resultsLengthFeed = 0;
+  isdeleteFeed: boolean = false;
+  iseditFeed: boolean = false;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
 
@@ -31,6 +44,22 @@ export class AdminOverviewComponent implements AfterViewInit  {
     public dialog: MatDialog,
     private readonly adminService: AdminService,
   ) {
+    this.route.queryParams.subscribe(params => {
+      this.tabIndex = params['index'];
+      if(this.tabIndex == 1 && !this.isFeedLoaded){
+        this.isFeedLoaded = true;
+        this.adminService.getAllFeeds().subscribe(
+        datas => {
+          console.log(datas);
+          this.tableDataFeed = datas.items;
+          this.resultsLengthFeed = datas.metadata.total;
+          this.dataSourceFeed = new MatTableDataSource(this.tableDataFeed);
+          this.dataSourceFeed.paginator = this.paginator;
+        }
+      );
+      }
+
+  });
 
 
   }
@@ -94,6 +123,61 @@ export class AdminOverviewComponent implements AfterViewInit  {
 
     if (this.dataSource.paginator) {
       this.dataSource.paginator.firstPage();
+    }
+  }
+
+  createNewFeed(){
+    const dialogRef = this.dialog.open(NewFeedDialogComponent, {
+      width: '350px'
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      console.log('The dialog was closed');
+    });
+  }
+
+  //Function, to get the current clicked row
+  getRowFeed(row: AllFeedsItems){
+    if(this.isdeleteFeed){
+      const dialogRef = this.dialog.open(DeleteDialogComponent, {
+        width: '350px',
+        data: {title: row.title, entryApikey: row.id, source: "feed"},
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('The dialog was closed');
+      });
+    }
+    if(this.iseditFeed){
+      const dialogRef = this.dialog.open(UpdateDialogComponent, {
+        width: '350px',
+        data: {feedId: row.id, oldFeed: row.title, newFeed: "", catalogId: row.catalog_id, url: row.url_name, content: row.content, kind: row.kind},
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        console.log('The dialog was closed');
+      });
+    }
+    //console.log(this.deleteEntryId);
+  }
+
+  //Function, to give choice, wether we want to delete the document or not
+  deleteFeed(){
+    this.isdeleteFeed = true;
+    this.iseditFeed = false;
+  }
+
+  editFeed(){
+    this.isdeleteFeed = false;
+    this.iseditFeed = true;
+  }
+
+  //Function for searchbar
+  applyFilterFeed(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSourceFeed.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSourceFeed.paginator) {
+      this.dataSourceFeed.paginator.firstPage();
     }
   }
 }

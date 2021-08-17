@@ -7,10 +7,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AdminUploadComponent } from './admin-upload/admin-upload.component';
 import { AdminOverviewComponent } from './admin-overview/admin-overview.component';
 import { MaterialModule } from '../material.module';
-import { FeedsOverviewComponent } from './feeds-overview/feeds-overview.component';
+import { TabGroupDirective } from './services/tab-group.directive';
 
 @NgModule({
-  declarations: [AdminOverviewComponent, AdminUploadComponent, FeedsOverviewComponent],
+  declarations: [AdminOverviewComponent, AdminUploadComponent, TabGroupDirective],
   imports: [
     CommonModule,
     RouterModule.forChild(ADMIN_ROUTES),

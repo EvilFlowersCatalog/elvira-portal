@@ -30,13 +30,10 @@ export class TitleValidators {
         map(
           data => data.map(
             resp => {
-              //console.log("control: ",control.value);
-              //console.log(resp.title);
               if(resp.title.toLocaleLowerCase() === control.value.toLocaleLowerCase()){
                 console.log("found");
                 return { 'titleExists': true};
               }
-
               })
         )
         )
