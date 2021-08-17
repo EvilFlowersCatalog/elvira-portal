@@ -1,7 +1,30 @@
-<h1 mat-dialog-title>{{ this.data.response.title }}</h1>
-<div mat-dialog-content fxLayout="row" fxLayoutAlign="center center">
-  <p>kokot</p>
-</div>
-<div mat-dialog-actions>
-  <button mat-button (click)="closeDialog()">zavri picu</button>
-</div>
+<ng-container *ngIf="entryDetail$ | async as entryDetail">
+  <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center" color="accent">
+    {{ entryDetail.response.title }}
+  </h2>
+  <mat-dialog-content fxLayout="column" fxLayoutAlign="start start">
+    <p>
+      Author:
+      {{
+        entryDetail.response.author.name +
+          " " +
+          entryDetail.response.author.surname
+      }}
+    </p>
+    <p>
+      Summary:
+      {{ entryDetail.response.summary }}
+    </p>
+    <p>
+      Language:
+      {{ entryDetail.response.language.name }}
+    </p>
+    <p>
+      Created:
+      {{ entryDetail.response.created_at }}
+    </p>
+  </mat-dialog-content>
+  <mat-dialog-actions fxLayout="row" fxLayoutAlign="center center">
+    <button mat-button mat-dialog-close color="accent">zavri picu</button>
+  </mat-dialog-actions>
+</ng-container>

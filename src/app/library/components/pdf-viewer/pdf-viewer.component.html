@@ -6,10 +6,10 @@
     [useBrowserLocale]="true"
     [customToolbar]="additionalButtons"
     [showBorders]="true"
-    backgroundColor="{{ appState.theme == 'light' ? '#f8f8f8' : '#2e2e2e' }}"
-    language="{{ appState.lang == 'en' ? 'en-US' : 'sk-SK' }}"
+    [backgroundColor]="appState.theme == 'light' ? '#f8f8f8' : '#2e2e2e'"
+    [language]="appState.lang == 'en' ? 'en-US' : 'sk-SK'"
     [height]="'100%'"
-    theme="{{ appState.theme }}"
+    [theme]="appState.theme"
   >
   </ngx-extended-pdf-viewer>
 </ng-container>

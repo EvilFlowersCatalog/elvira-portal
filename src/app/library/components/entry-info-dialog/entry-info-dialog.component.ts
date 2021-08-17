@@ -1,5 +1,8 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { EntriesService } from '../../services/entries/entries.service';
 import { EntryDetail } from '../../services/entries/entries.types';
 
 @Component({
@@ -8,16 +11,17 @@ import { EntryDetail } from '../../services/entries/entries.types';
   styleUrls: ['./entry-info-dialog.component.scss'],
 })
 export class EntryInfoDialogComponent implements OnInit {
+  entryDetail$: Observable<EntryDetail>;
+
   constructor(
     public dialogRef: MatDialogRef<EntryInfoDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: EntryDetail
+    @Inject(MAT_DIALOG_DATA) public data: { id: string },
+    private readonly entriesService: EntriesService
   ) {}
 
   ngOnInit(): void {
-    console.log(this.data);
-  }
-
-  closeDialog(): void {
-    this.dialogRef.close();
+    this.entryDetail$ = this.entriesService
+      .entryDetail(this.data.id)
+      .pipe(tap(console.log));
   }
 }

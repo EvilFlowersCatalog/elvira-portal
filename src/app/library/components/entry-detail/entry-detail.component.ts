@@ -36,13 +36,9 @@ export class EntryDetailComponent implements OnInit {
   }
 
   showInfo(id: string) {
-    let entryDetail: EntryDetail;
-    this.entriesService
-      .entryDetail(id)
-      .subscribe((data: EntryDetail) => (entryDetail = data));
     this.dialog.open(EntryInfoDialogComponent, {
       width: '350px',
-      data: entryDetail,
+      data: { id },
     });
   }
 
