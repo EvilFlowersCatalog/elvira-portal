@@ -26,7 +26,7 @@
           <mat-divider></mat-divider>
           <ng-template matExpansionPanelContent>
             <div fxLayout="column" fxLayoutAlign="start start">
-              <button mat-flat-button>
+              <button mat-flat-button (click)="navigate('/library/favorites')">
                 <mat-icon class="mobile-sidenav-icon">favorite</mat-icon>
                 <span>{{ t("favorites") }}</span>
               </button>

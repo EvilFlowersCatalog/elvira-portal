@@ -11,6 +11,7 @@ import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { EntryDetailComponent } from './components/entry-detail/entry-detail.component';
 import { EntryInfoDialogComponent } from './components/entry-info-dialog/entry-info-dialog.component';
+import { FavoritesComponent } from './components/favorites/favorites.component';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { EntryInfoDialogComponent } from './components/entry-info-dialog/entry-i
     SidebarComponent,
     EntryDetailComponent,
     EntryInfoDialogComponent,
+    FavoritesComponent,
   ],
   imports: [
     CommonModule,
