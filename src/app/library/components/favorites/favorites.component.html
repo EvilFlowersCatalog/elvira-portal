@@ -1,0 +1,11 @@
+<div class="entries-list-container" fxLayout="row wrap" fxLayoutGap="16px grid">
+  <div
+    fxFlex="20%"
+    fxFlex.xs="100%"
+    fxFlex.sm="33%"
+    fxFlex.md="25%"
+    *ngFor="let entry of entries"
+  >
+    <app-entry-detail [entry]="entry"></app-entry-detail>
+  </div>
+</div>

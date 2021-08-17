@@ -12,11 +12,14 @@ import {
   GetFeeds,
   UpdateFeeds,
 } from './admin.types';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
+  catalog_id = environment.catalogId;
+
   constructor(
     private readonly httpClient: HttpClient,
     private readonly appStateService: AppStateService
@@ -25,7 +28,7 @@ export class AdminService {
   createAuthorizationHeader() {
     return new HttpHeaders({
       authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
-      api_key: '1398a10c-f387-4970-bc90-65902c0b4fea',
+      api_key: environment.apiKey,
     });
   }
 
@@ -39,10 +42,9 @@ export class AdminService {
 
   getAllFeeds(): Observable<GetFeeds> {
     const headers = this.createAuthorizationHeader();
-    return this.httpClient.get<GetFeeds>(
-      'api/apigw/evil-flowers-conn/feeds',
-      { headers: headers }
-    );
+    return this.httpClient.get<GetFeeds>('api/apigw/evil-flowers-conn/feeds', {
+      headers: headers,
+    });
   }
 
   updateFeed(feedId: string, newFeed: UpdateFeeds) {
@@ -65,7 +67,7 @@ export class AdminService {
   upload(entriesData: FormData) {
     const headers = this.createAuthorizationHeader();
     return this.httpClient.post(
-      'api/apigw/evil-flowers-conn/admin/catalogs/95e2b439-4851-4080-b33e-0adc1fd90196/entries',
+      `api/apigw/evil-flowers-conn/admin/catalogs/${this.catalog_id}/entries`,
       entriesData,
       { headers: headers }
     );
@@ -74,7 +76,7 @@ export class AdminService {
   deleteEntry(entryId: string) {
     const headers = this.createAuthorizationHeader();
     return this.httpClient.delete(
-      `api/apigw/evil-flowers-conn/admin/catalogs/95e2b439-4851-4080-b33e-0adc1fd90196/entries/${entryId}`,
+      `api/apigw/evil-flowers-conn/admin/catalogs/${this.catalog_id}/entries/${entryId}`,
       { headers: headers }
     );
   }
@@ -82,24 +84,23 @@ export class AdminService {
   getOneEntry(entryId: string) {
     const headers = this.createAuthorizationHeader();
     return this.httpClient.get<AllEntryItems>(
-      `api/apigw/evil-flowers-conn/catalogs/95e2b439-4851-4080-b33e-0adc1fd90196/entries/${entryId}`,
+      `api/apigw/evil-flowers-conn/catalogs/${this.catalog_id}/entries/${entryId}`,
       { headers: headers }
     );
   }
 
- updateEntry(entryId: string, entriesData: EditedData){
-  const headers = this.createAuthorizationHeader();
-  return this.httpClient.put(
-    `api/apigw/evil-flowers-conn/admin/catalogs/95e2b439-4851-4080-b33e-0adc1fd90196/entries/${entryId}`,
-    entriesData, {headers: headers}
-  );
- }
-
- getIsAdmin(mongoId: string){
-    return this.httpClient.get<boolean>(
-      `api/apigw/isAdmin/${mongoId}`,
+  updateEntry(entryId: string, entriesData: EditedData) {
+    const headers = this.createAuthorizationHeader();
+    return this.httpClient.put(
+      `api/apigw/evil-flowers-conn/admin/catalogs/${this.catalog_id}/entries/${entryId}`,
+      entriesData,
+      { headers: headers }
     );
- }
+  }
+
+  getIsAdmin(mongoId: string) {
+    return this.httpClient.get<boolean>(`api/apigw/isAdmin/${mongoId}`);
+  }
 
  checkTitle(title: string){
   const headers = this.createAuthorizationHeader();

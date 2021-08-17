@@ -1,6 +1,11 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { EntriesItem } from '../../services/entries/entries.types';
+import { EntriesItem, EntryDetail } from '../../services/entries/entries.types';
 import { DateTime } from 'luxon';
+import { MatDialog } from '@angular/material/dialog';
+import { EntriesService } from '../../services/entries/entries.service';
+import { Router } from '@angular/router';
+import { EntryInfoDialogComponent } from '../entry-info-dialog/entry-info-dialog.component';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-entry-detail',
@@ -12,7 +17,11 @@ export class EntryDetailComponent implements OnInit {
   imageSrc: string;
   year: string;
 
-  constructor() {}
+  constructor(
+    private readonly entriesService: EntriesService,
+    private readonly router: Router,
+    public dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.imageSrc =
@@ -23,8 +32,14 @@ export class EntryDetailComponent implements OnInit {
   }
 
   openPdf(id: string) {
-    console.log('openPdf', id);
-    // this.router.navigateByUrl(`/library/pdf-viewer/${id}`);
+    this.router.navigateByUrl(`/library/pdf-viewer/${id}`);
+  }
+
+  showInfo(id: string) {
+    this.dialog.open(EntryInfoDialogComponent, {
+      width: '350px',
+      data: { id },
+    });
   }
 
   downloadPdf(id: string) {

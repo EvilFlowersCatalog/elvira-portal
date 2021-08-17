@@ -4,14 +4,14 @@ import { NotfoundComponent } from './components/notfound/notfound.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { MaterialModule } from '../material.module';
 import { TranslocoRootModule } from '../transloco/transloco-root.module';
-import { DeleteDialogComponent } from './delete-dialog/delete-dialog.component';
+import { DeleteDialogComponent } from './components/delete-dialog/delete-dialog.component';
 import { LOCAL_STORAGE_TOKEN } from './services/local-storage/local-storage.service';
 import { LibraryModule } from '../library/library.module';
 import { LoadingComponent } from './components/loading.component';
-import { MobileNavbarComponent } from './components/mobile-navbar/mobile-navbar/mobile-navbar.component';
-import { HeaderComponent } from './components/header/header/header.component';
-import { MobileSidenavComponent } from './components/mobile-sidenav/mobile-sidenav/mobile-sidenav.component';
-import { UpdateDialogComponent } from './update-dialog/update-dialog.component';
+import { MobileNavbarComponent } from './components/mobile-navbar/mobile-navbar.component';
+import { HeaderComponent } from './components/header/header.component';
+import { MobileSidenavComponent } from './components/mobile-sidenav/mobile-sidenav.component';
+import { UpdateDialogComponent } from './components/update-dialog/update-dialog.component';
 import { FormsModule } from '@angular/forms';
 import { NewFeedDialogComponent } from './new-feed-dialog/new-feed-dialog.component';
 
@@ -27,7 +27,13 @@ import { NewFeedDialogComponent } from './new-feed-dialog/new-feed-dialog.compon
     UpdateDialogComponent,
     NewFeedDialogComponent,
   ],
-  imports: [CommonModule, MaterialModule, LibraryModule, TranslocoRootModule, FormsModule],
+  imports: [
+    CommonModule,
+    MaterialModule,
+    LibraryModule,
+    TranslocoRootModule,
+    FormsModule,
+  ],
   exports: [
     NotfoundComponent,
     LoadingComponent,

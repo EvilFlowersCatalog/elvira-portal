@@ -4,11 +4,14 @@ import { HomeComponent } from './components/home/home.component';
 import { RouterModule } from '@angular/router';
 import { LIBRARY_ROUTES } from './routing/library.routes';
 import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { MaterialModule } from '../material.module';
 import { TranslocoRootModule } from '../transloco/transloco-root.module';
 import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { EntryDetailComponent } from './components/entry-detail/entry-detail.component';
+import { EntryInfoDialogComponent } from './components/entry-info-dialog/entry-info-dialog.component';
+import { FavoritesComponent } from './components/favorites/favorites.component';
 
 @NgModule({
   declarations: [
@@ -16,14 +19,17 @@ import { EntryDetailComponent } from './components/entry-detail/entry-detail.com
     PdfViewerComponent,
     SidebarComponent,
     EntryDetailComponent,
+    EntryInfoDialogComponent,
+    FavoritesComponent,
   ],
   imports: [
     CommonModule,
     RouterModule.forChild(LIBRARY_ROUTES),
     MaterialModule,
     TranslocoRootModule,
+    NgxExtendedPdfViewerModule,
   ],
-  providers:[{ provide: TRANSLOCO_SCOPE, useValue: 'lazy' }],
+  providers: [{ provide: TRANSLOCO_SCOPE, useValue: 'lazy' }],
   exports: [SidebarComponent],
 })
 export class LibraryModule {}
