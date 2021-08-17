@@ -37,7 +37,6 @@
                 maxlength="50"
                 formControlName="title"
                 [(ngModel)]="editData.response.title"
-                (blur)="onBlurTitle()"
               >
             </div>
             <ng-template #elseTitle>
@@ -46,11 +45,10 @@
                 maxlength="50"
                 formControlName="title"
                 required
-                [(ngModel)]="checkTitle"
-                (blur)="onBlurTitle()"
               >
             </ng-template>
-            <mat-hint *ngIf="isTitleSame" style="color: red;">This title is taken</mat-hint>
+            <mat-error
+              *ngIf="formTitle.errors?.titleExists">Not available</mat-error>
           </mat-form-field>
         </div>
       <br>
