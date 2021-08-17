@@ -10,6 +10,7 @@ import { TranslocoRootModule } from '../transloco/transloco-root.module';
 import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { EntryDetailComponent } from './components/entry-detail/entry-detail.component';
+import { EntryInfoDialogComponent } from './components/entry-info-dialog/entry-info-dialog.component';
 
 @NgModule({
   declarations: [
@@ -17,6 +18,7 @@ import { EntryDetailComponent } from './components/entry-detail/entry-detail.com
     PdfViewerComponent,
     SidebarComponent,
     EntryDetailComponent,
+    EntryInfoDialogComponent,
   ],
   imports: [
     CommonModule,
