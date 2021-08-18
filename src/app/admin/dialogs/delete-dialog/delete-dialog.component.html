@@ -1,0 +1,9 @@
+<ng-container
+  *transloco="let t;"
+>
+<h1 mat-dialog-title>{{ t('lazy.adminDialog.delete', {title: data.title}) }}</h1>
+<div fxLayout="row" fxLayoutAlign="space-evenly center" >
+  <button mat-flat-button (click)="onNoClick()">{{ t('lazy.adminDialog.disagree-button')}}</button>
+  <button mat-flat-button (click)="onYesClcik()" color="warn">{{ t('lazy.adminDialog.agree-button')}}</button>
+</div>
+</ng-container>

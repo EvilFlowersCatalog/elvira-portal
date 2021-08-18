@@ -1,14 +1,13 @@
 import { Component, ViewChild, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatDialog } from '@angular/material/dialog';
-import { DeleteDialogComponent } from 'src/app/common/components/delete-dialog/delete-dialog.component';
+import { DeleteDialogComponent } from 'src/app/admin/dialogs/delete-dialog/delete-dialog.component';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { AdminService } from '../services/admin.service';
 import { AllEntryItems, AllFeedsItems } from '../services/admin.types';
-import { NewFeedDialogComponent } from 'src/app/common/new-feed-dialog/new-feed-dialog.component';
-import { FlexAlignStyleBuilder } from '@angular/flex-layout';
-import { UpdateDialogComponent } from 'src/app/common/components/update-dialog/update-dialog.component';
+import { NewFeedDialogComponent } from 'src/app/admin/dialogs/new-feed-dialog/new-feed-dialog.component';
+import { UpdateDialogComponent } from 'src/app/admin/dialogs/update-dialog/update-dialog.component';
 
 @Component({
   selector: 'app-admin',
@@ -36,6 +35,7 @@ export class AdminOverviewComponent implements AfterViewInit  {
   iseditFeed: boolean = false;
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator) Feedpaginator: MatPaginator;
 
   constructor(
     private readonly router: Router,
@@ -49,11 +49,11 @@ export class AdminOverviewComponent implements AfterViewInit  {
         this.isFeedLoaded = true;
         this.adminService.getAllFeeds().subscribe(
         datas => {
-          console.log(datas);
+          //console.log(datas);
           this.tableDataFeed = datas.items;
           this.resultsLengthFeed = datas.metadata.total;
           this.dataSourceFeed = new MatTableDataSource(this.tableDataFeed);
-          this.dataSourceFeed.paginator = this.paginator;
+          this.dataSourceFeed.paginator = this.Feedpaginator;
         }
       );
       }
@@ -66,7 +66,7 @@ export class AdminOverviewComponent implements AfterViewInit  {
   //Pass info to pagination
   ngAfterViewInit() {
     this.adminService.getAllEntries().subscribe((datas) => {
-      console.log(datas);
+      //console.log(datas);
       this.tableData = datas.items;
       this.resultsLength = datas.metadata.total;
       this.dataSource = new MatTableDataSource(this.tableData);

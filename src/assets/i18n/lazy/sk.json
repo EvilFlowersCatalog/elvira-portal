@@ -30,11 +30,22 @@
     "name": "Meno",
     "surname": "Priezvisko",
     "edit": "Upraviť",
-    "delete": "Vymazať"
+    "delete": "Vymazať",
+    "newFeed": "Vytvoriť nový feed!"
   },
   "entryDetail": {
     "info-pdf-tooltip": "Zobraziť informácie",
     "download-pdf-tooltip": "Stiahnuť PDF",
     "favorite-pdf-tooltip": "Pridať do obľúbených"
+  },
+  "adminDialog": {
+    "delete": "Ste si istí, že chcete odstrániť '{{title}}'?",
+    "agree-button": "Áno, som si istý!",
+    "disagree-button": "Nie, ďakujem!",
+    "update-feed": "Aktualizujte Feed ({{feed}}) na nový Feed",
+    "create-feed": "Vytvoriť nový feed!",
+    "new-feed": "Nový Feed",
+    "create": "Vytvoriť",
+    "cancel": "Zrušiť"
   }
 }

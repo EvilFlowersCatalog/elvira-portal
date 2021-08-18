@@ -5,11 +5,11 @@
 export const environment = {
   production: false,
   baseUrl: `http://localhost:300/api/`,
-  apiKey: '1ad541a8-2104-47ac-9d01-ba2af4324fa8',
+  apiKey: '1398a10c-f387-4970-bc90-65902c0b4fea',
   catalogId: '6435a96c-b8c7-4d5a-ba24-e4c126469f1c',
 };
 
-/*
+/*D
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
  *

@@ -30,11 +30,22 @@
     "name": "Name",
     "surname": "Surname",
     "edit": "Edit",
-    "delete": "Delete"
+    "delete": "Delete",
+    "newFeed": "Created new feed!"
   },
   "entryDetail": {
     "info-pdf-tooltip": "Show info",
     "download-pdf-tooltip": "Download PDF",
     "favorite-pdf-tooltip": "Add to favorite list"
+  },
+  "adminDialog": {
+    "delete": "Are you sure you want to delete '{{title}}'?",
+    "agree-button": "Yes, I am sure!",
+    "disagree-button": "No, thanks!",
+    "update-feed": "Update ({{feed}}) feed to a new feed",
+    "create-feed": "Create new Feed",
+    "new-feed": "New Feed",
+    "create": "Create",
+    "cancel": "Cancel"
   }
 }
