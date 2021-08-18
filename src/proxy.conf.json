@@ -7,5 +7,14 @@
     },
     "logLevel": "debug",
     "changeOrigin": true
+  },
+  "/conn": {
+    "target": "http://localhost:8003",
+    "secure": false,
+    "pathRewrite": {
+      "^/conn": ""
+    },
+    "logLevel": "debug",
+    "changeOrigin": true
   }
 }

@@ -70,7 +70,7 @@
         <mat-icon>favorite</mat-icon>
         <span>{{ t("favorites") }}</span>
       </button>
-      <button mat-menu-item>
+      <button mat-menu-item (click)="navigate('/library/account')">
         <mat-icon>account_circle</mat-icon>
         <span>{{ t("profile") }}</span>
       </button>

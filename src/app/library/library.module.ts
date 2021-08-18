@@ -12,6 +12,8 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { EntryDetailComponent } from './components/entry-detail/entry-detail.component';
 import { EntryInfoDialogComponent } from './components/entry-info-dialog/entry-info-dialog.component';
 import { FavoritesComponent } from './components/favorites/favorites.component';
+import { AccountSettingsComponent } from './components/account-settings/account-settings.component';
+import { GdriveAuthComponent } from './components/gdrive-auth.component';
 
 @NgModule({
   declarations: [
@@ -21,6 +23,8 @@ import { FavoritesComponent } from './components/favorites/favorites.component';
     EntryDetailComponent,
     EntryInfoDialogComponent,
     FavoritesComponent,
+    AccountSettingsComponent,
+    GdriveAuthComponent,
   ],
   imports: [
     CommonModule,
