@@ -24,17 +24,17 @@ export class TitleValidators {
       );
   }
 
-  userValidator(): AsyncValidatorFn {
+  titleValidator(): AsyncValidatorFn {
     return (control: AbstractControl) => {
+      if (!control.value) { return of(null); }
       return this.searchTitle(control.value).pipe(
         map(
-          data => data.map(
-            resp => {
-              if(resp.title.toLocaleLowerCase() === control.value.toLocaleLowerCase()){
-                console.log("found");
-                return { 'titleExists': true};
-              }
-              })
+          data => {
+            if (data.some(item => item.title.toLocaleLowerCase() === control.value.toLocaleLowerCase())){
+              return { 'titleExists': true};
+            }
+            else return null;
+            }
         )
         )
     };

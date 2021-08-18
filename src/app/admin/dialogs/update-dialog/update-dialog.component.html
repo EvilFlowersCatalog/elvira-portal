@@ -1,0 +1,15 @@
+<ng-container
+  *transloco="let t;"
+>
+<h1 mat-dialog-title>{{ t('lazy.adminDialog.update-feed', {feed: data.oldFeed}) }}</h1>
+<div mat-dialog-content fxLayout="row" fxLayoutAlign="center center">
+  <mat-form-field appearance="fill">
+    <mat-label>{{ t('lazy.adminDialog.new-feed')}}</mat-label>
+    <input matInput [(ngModel)]="data.newFeed">
+  </mat-form-field>
+</div>
+<div mat-dialog-actions fxLayout="row" fxLayoutAlign="space-evenly center">
+  <button mat-flat-button (click)="onNoClick()">{{ t('lazy.adminDialog.cancel')}}</button>
+  <button mat-flat-button (click)="onYesClcik()" color="primary" cdkFocusInitial>{{ t('lazy.adminDialog.agree-button')}}</button>
+</div>
+</ng-container>

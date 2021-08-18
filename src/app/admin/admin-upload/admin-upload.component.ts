@@ -68,7 +68,7 @@ export class AdminUploadComponent implements OnInit {
           Validators.required
         ],
         asyncValidators: [
-          titleValidator.userValidator()
+          titleValidator.titleValidator()
         ],
         updateOn: 'blur'
       }),
@@ -92,7 +92,6 @@ export class AdminUploadComponent implements OnInit {
    }
 
    get formTitle() {
-     console.log(this.uploadForm.controls['title'].hasError('titleExists'));
      return this.uploadForm.controls['title'];
    }
 
@@ -167,6 +166,7 @@ export class AdminUploadComponent implements OnInit {
             this.editData = datas;
             //console.log(datas);
             this.isInEditMode = true;
+            console.log(this.isInEditMode);
           }
         );
 
