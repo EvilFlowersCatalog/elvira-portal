@@ -36,7 +36,7 @@ export class LibraryGuard implements CanActivate {
     const token = this.appStateService.getStateSnapshot().token;
 
     if (token === null) {
-      this.router.navigate(['/auth/login']);
+      this.router.navigate(['/auth']);
       return false;
     }
 
@@ -45,7 +45,7 @@ export class LibraryGuard implements CanActivate {
       tap((isValid: boolean) => {
         if (!isValid) {
           this.appStateService.patchState({ token: null });
-          this.router.navigate(['/auth/login']);
+          this.router.navigate(['/auth']);
         }
       })
     );

@@ -30,6 +30,13 @@
       </button>
       <button
         mat-icon-button
+        matTooltip="{{ t('lazy.entryDetail.add-pdf-to-drive-tooltip') }}"
+        (click)="addPdfToDrive(entry.id)"
+      >
+        <mat-icon> add_to_drive </mat-icon>
+      </button>
+      <button
+        mat-icon-button
         matTooltip="{{ t('lazy.entryDetail.download-pdf-tooltip') }}"
         (click)="downloadPdf(entry.id)"
       >

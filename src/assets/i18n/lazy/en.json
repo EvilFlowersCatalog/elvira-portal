@@ -34,6 +34,7 @@
   },
   "entryDetail": {
     "info-pdf-tooltip": "Show info",
+    "add-pdf-to-drive-tooltip": "Upload PDF to Google Drive",
     "download-pdf-tooltip": "Download PDF",
     "favorite-pdf-tooltip": "Add to favorite list"
   }

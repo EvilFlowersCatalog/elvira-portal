@@ -6,11 +6,13 @@ import { AUTH_ROUTES } from './routing/auth.routing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../material.module';
 import { TranslocoRootModule } from '../transloco/transloco-root.module';
+import { LandingPageComponent } from './components/landing-page/landing-page.component';
 
 
 @NgModule({
   declarations: [
     LoginComponent,
+    LandingPageComponent,
   ],
   imports: [
     CommonModule,
