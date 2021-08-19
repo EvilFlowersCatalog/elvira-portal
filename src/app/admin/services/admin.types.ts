@@ -10,9 +10,12 @@ export interface EntriesData {
   contributors: EntriesContributors[];
   summary: string;
   language_code: string;
-  acquisitions: {
-    content: unknown;
-  }
+  acquisitions: AcquisitionsItems[];
+}
+
+export interface AcquisitionsItems {
+  relation: string;
+  content: unknown;
 }
 
 export interface EntriesContributors {

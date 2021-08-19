@@ -34,8 +34,8 @@ export class AdminOverviewComponent implements AfterViewInit  {
   isdeleteFeed: boolean = false;
   iseditFeed: boolean = false;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
-  @ViewChild(MatPaginator) Feedpaginator: MatPaginator;
+  @ViewChild('paginator') paginator: MatPaginator;
+  @ViewChild('Feedpaginator') Feedpaginator: MatPaginator;
 
   constructor(
     private readonly router: Router,

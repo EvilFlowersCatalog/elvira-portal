@@ -36,7 +36,7 @@
                 matInput
                 maxlength="50"
                 formControlName="title"
-                [(ngModel)]="editData.response.title"
+                [(ngModel)]="editData.title"
               >
             </div>
             <ng-template #elseTitle>
@@ -70,7 +70,7 @@
                   matInput
                   maxlength="50"
                   formControlName="name"
-                  [(ngModel)]="editData.response.author.name"
+                  [(ngModel)]="editData.author.name"
                 >
               </div>
               <ng-template #elseAuthorName>
@@ -91,7 +91,7 @@
                   matInput
                   maxlength="50"
                   formControlName="surname"
-                  [(ngModel)]="editData.response.author.surname"
+                  [(ngModel)]="editData.author.surname"
                 >
               </div>
               <ng-template #elseAuthorSurname>
@@ -176,7 +176,7 @@
             [matAutocomplete]="auto"
             [matChipInputFor]="chipList"
             [matChipInputSeparatorKeyCodes]="separatorKeysCodes"
-            (matChipInputTokenEnd)="add($event)">
+            >
         </mat-chip-list>
         <mat-autocomplete #auto="matAutocomplete" (optionSelected)="selected($event)">
           <mat-option *ngFor="let feed of filteredFeeds | async" [value]="feed">
@@ -193,7 +193,7 @@
             matInput
             class="summary-textfield"
             formControlName="summary"
-            [(ngModel)]="editData.response.summary"
+            [(ngModel)]="editData.summary"
           ></textarea>
         </div>
         <ng-template #elseSummary>
@@ -210,7 +210,7 @@
       <mat-card-title >{{ t('lazy.adminPage.image') }}</mat-card-title>
       <div mat-dialog-content class="dropzone" fxLayout="column" fxLayoutAlign="center center" dragAndDrop (fileDropped)="onImageDropped($event)" >
         <ng-template [ngIf]="!imageFile" >
-            <input type="file" class="input-file" accept=".png, .jpg" (change)="imageSelectedFromBrowse(($event.target?.files)[0])" />
+            <input type="file" class="input-file" accept=".png" (change)="imageSelectedFromBrowse(($event.target?.files)[0])" />
             <h3 style="text-align: center;">{{ t('lazy.adminPage.image-dropper') }}</h3>
             <h4><i>(MAX 1MB)</i></h4>
         </ng-template>

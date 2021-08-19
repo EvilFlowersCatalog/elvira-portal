@@ -86,6 +86,7 @@
   </table>
     <!-- Paginator -->
     <mat-paginator
+          #paginator
           [length]="resultsLength"
           [pageSizeOptions]="[5, 10, 20]"
           class="paginator-size"
@@ -162,6 +163,7 @@
 </table>
   <!-- Paginator -->
   <mat-paginator
+        #Feedpaginator
         [length]="resultsLengthFeed"
         [pageSizeOptions]="[5, 10, 20]"
         class="paginator-size"
