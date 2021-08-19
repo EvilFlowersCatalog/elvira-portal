@@ -158,6 +158,7 @@ export class AdminUploadComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.allFeeds = this.getFeeds();
     this.entryId = this.route.snapshot.paramMap.get('id');
       //console.log(this.entryId);
       if(this.entryId != null && !this.isInEditMode){
@@ -172,8 +173,8 @@ export class AdminUploadComponent implements OnInit {
 
       }
 
-      this.allFeeds = this.getFeeds();
-      console.log("loaded");
+
+      //console.log("loaded");
 
       this.filteredFeeds = this.feedCtrl.valueChanges.pipe(
         startWith(null),
@@ -217,7 +218,10 @@ export class AdminUploadComponent implements OnInit {
   }
   //Add selected chips from autocomplete
   selected(event: MatAutocompleteSelectedEvent): void {
-    this.feeds.push(event.option.viewValue);
+    if(!this.feeds.includes(event.option.viewValue)){
+      this.feeds.push(event.option.viewValue);
+
+    }
     this.fruitInput.nativeElement.value = '';
     this.feedCtrl.setValue(null);
   }
@@ -283,9 +287,9 @@ export class AdminUploadComponent implements OnInit {
           contributors: this.getContributors(),
           summary : this.uploadForm.get('summary').value,
           language_code : this.uploadForm.get('language_code').value,
-          acquisitions : {
-            content: await this.getBase()
-          },
+          acquisitions : [
+            {relation: "acquisition", content: await this.getBase()}
+          ],
           };
           //console.log(entriesData);
 
@@ -305,7 +309,6 @@ export class AdminUploadComponent implements OnInit {
       //console.log(base);
      return base;
      }
-
 
   getContributors(){
     let contributors = [];

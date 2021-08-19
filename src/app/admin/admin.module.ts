@@ -7,7 +7,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AdminUploadComponent } from './admin-upload/admin-upload.component';
 import { AdminOverviewComponent } from './admin-overview/admin-overview.component';
 import { MaterialModule } from '../material.module';
-import { TabGroupDirective } from './services/tab-group.directive';
+import { TabGroupDirective } from './directives/tab-group.directive';
 
 @NgModule({
   declarations: [AdminOverviewComponent, AdminUploadComponent, TabGroupDirective],
