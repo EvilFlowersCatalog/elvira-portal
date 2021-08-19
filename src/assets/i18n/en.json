@@ -5,6 +5,9 @@
     "password": "Password",
     "button": "Log in"
   },
+  "landingPage": {
+    "siteDescription": "Modern digital library system"
+  },
   "navbar": {
     "light": "Light mode",
     "dark": "Dark mode",
@@ -13,6 +16,7 @@
     "profile": "Profile",
     "log-out": "Log out",
     "settings": "Settings",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+    "login": "Login"
   }
 }

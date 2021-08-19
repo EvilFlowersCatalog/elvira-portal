@@ -2,6 +2,17 @@
   <ng-container *ngIf="appState$ | async as appState">
     <div class="mobile-sidenav-container">
       <mat-accordion>
+        <button
+          mat-flat-button
+          *ngIf="appState.isLoggedIn == false"
+          (click)="navigate('/auth/login')"
+          class="mobile-sidenav-button"
+        >
+          <div class="mobile-sidenav-button-content">
+            <mat-icon class="mobile-sidenav-icon">login</mat-icon>
+            {{ t("login") }}
+          </div>
+        </button>
         <mat-expansion-panel hideToggle *ngIf="appState.showSidebarToggle">
           <mat-expansion-panel-header>
             <mat-panel-title>

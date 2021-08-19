@@ -1,1 +1,11 @@
-<p>landing-page works!</p>
+<ng-container *transloco="let t; read: 'landingPage'">
+  <div fxLayout="column">
+    <div fxLayout="row">
+      <div fxLayout="column">
+        <h1>Elvíra</h1>
+        <p>{{ t("siteDescription") }}</p>
+      </div>
+    </div>
+    <div fxLayout="row"></div>
+  </div>
+</ng-container>

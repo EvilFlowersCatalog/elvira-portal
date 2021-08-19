@@ -5,6 +5,9 @@
     "password": "Heslo",
     "button": "Prihlásiť sa"
   },
+  "landingPage": {
+    "siteDescription": "Moderný digitálny knižničný systém"
+  },
   "navbar": {
     "light": "Svetlý režim",
     "dark": "Tmavý režim",
@@ -13,6 +16,7 @@
     "profile": "Profil",
     "log-out": "Odhlásiť sa",
     "settings": "Nastavenia",
-    "favorites": "Obľúbené"
+    "favorites": "Obľúbené",
+    "login": "Prihlásiť sa"
   }
 }
