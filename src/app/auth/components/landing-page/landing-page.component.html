@@ -1,9 +1,135 @@
 <ng-container *transloco="let t; read: 'landingPage'">
   <div fxLayout="column">
-    <div fxLayout="row">
-      <div fxLayout="column">
-        <h1>Elvíra</h1>
-        <p>{{ t("siteDescription") }}</p>
+    <div
+      fxLayout="row"
+      fxLayout.lt-md="column"
+      fxLayoutAlign="space-evenly"
+      class="landing-page-main-row"
+    >
+      <div
+        fxLayout="column"
+        fxLayoutAlign="center"
+        fxLayoutAlign.lt-md="center center"
+        fxFlex="40"
+        class="landing-page-title-column"
+      >
+        <h1 class="landing-page-title">Elvíra</h1>
+        <p class="landing-page-site-description">{{ t("siteDescription") }}</p>
+      </div>
+      <div
+        fxLayout="column"
+        fxLayoutAlign="center"
+        fxLayoutAlign.lt-md="center center"
+        fxFlex="40"
+        class="landing-page-text-column"
+      >
+        <div
+          fxLayout="column"
+          fxLayoutAlign="space-evenly"
+          fxLayoutGap="16px"
+          class="landing-page-text-container"
+        >
+          <div fxLayout="row" class="landing-page-text-yellow-row">
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center center"
+              fxFlex="10"
+              fxFlex.lt-md="20"
+            >
+              <mat-icon class="landing-page-text-icon">menu_book</mat-icon>
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center start"
+              fxFlex="90"
+              fxFlex.lt-md="80"
+            >
+              <p class="landing-page-text-p">
+                {{ t("booksDescription") }}
+              </p>
+            </div>
+          </div>
+          <div fxLayout="row" class="landing-page-text-purple-row">
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center start"
+              fxFlex="90"
+              fxFlex.lt-md="80"
+            >
+              <p class="landing-page-text-p">
+                {{ t("filtersDescription") }}
+              </p>
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center center"
+              fxFlex="10"
+              fxFlex.lt-md="20"
+            >
+              <mat-icon class="landing-page-text-icon">filter_alt</mat-icon>
+            </div>
+          </div>
+          <div fxLayout="row" class="landing-page-text-green-row">
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center center"
+              fxFlex="10"
+              fxFlex.lt-md="20"
+            >
+              <mat-icon class="landing-page-text-icon">picture_as_pdf</mat-icon>
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center start"
+              fxFlex="90"
+              fxFlex.lt-md="80"
+            >
+              <p class="landing-page-text-p">
+                {{ t("pdfDescription") }}
+              </p>
+            </div>
+          </div>
+          <div fxLayout="row" class="landing-page-text-red-row">
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center start"
+              fxFlex="90"
+              fxFlex.lt-md="80"
+            >
+              <p class="landing-page-text-p">
+                {{ t("favoritesDescription") }}
+              </p>
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center center"
+              fxFlex="10"
+              fxFlex.lt-md="20"
+            >
+              <mat-icon class="landing-page-text-icon">favorite</mat-icon>
+            </div>
+          </div>
+          <div fxLayout="row" class="landing-page-text-blue-row">
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center center"
+              fxFlex="10"
+              fxFlex.lt-md="20"
+            >
+              <mat-icon class="landing-page-text-icon">add_to_drive</mat-icon>
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center start"
+              fxFlex="90"
+              fxFlex.lt-md="80"
+            >
+              <p class="landing-page-text-p">
+                {{ t("driveDescription") }}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <div fxLayout="row"></div>

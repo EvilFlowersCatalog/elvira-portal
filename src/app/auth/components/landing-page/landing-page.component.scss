@@ -1,0 +1,116 @@
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-300%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  0% {
+    transform: translateX(300%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.landing-page-main-row {
+  min-height: 100vh;
+  margin-top: -64px;
+  min-width: 100%;
+}
+
+.landing-page-title-column {
+  margin-top: 64px;
+  animation: 1s ease-out 0s 1 slideInFromLeft;
+}
+
+.landing-page-title {
+  font-size: 100px;
+  letter-spacing: 10px;
+  font-weight: 700;
+  font-variant: small-caps;
+  transform: scale(1, 0.8);
+  opacity: 0.9;
+  text-shadow: 0 0 40px rgba(119, 119, 119, 0.7);
+}
+
+.landing-page-site-description {
+  font-style: italic;
+  font-size: 20px;
+  opacity: 0.7;
+  text-shadow: 0 0 40px rgba(119, 119, 119, 0.7);
+}
+
+.landing-page-text-column {
+  margin-top: 64px;
+  animation: 1s ease-out 0s 1 slideInFromRight;
+}
+
+.landing-page-text-container {
+  background-color: rgba(0, 188, 212, 0.8);
+  width: 100%;
+  height: 100%;
+  margin: 20px;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.landing-page-text-icon {
+  font-size: 40px;
+  margin-right: 15px;
+  margin-bottom: 15px;
+}
+
+.landing-page-text-p {
+  font-size: 18px;
+  font-weight: 500;
+  word-break: break-word;
+  margin: 0 !important;
+}
+
+.landing-page-text-green-row {
+  background-color: rgba(0, 212, 90, 0.7);
+  border-radius: 5px;
+  padding: 10px 20px;
+}
+
+.landing-page-text-red-row {
+  background-color: rgba(244, 67, 54, 0.7);
+  border-radius: 5px;
+  padding: 10px 20px;
+}
+
+.landing-page-text-purple-row {
+  background-color: rgba(119, 38, 211, 0.7);
+  border-radius: 5px;
+  padding: 10px 20px;
+}
+
+.landing-page-text-yellow-row {
+  background-color: rgba(255, 193, 7, 0.7);
+  border-radius: 5px;
+  padding: 10px 20px;
+}
+
+.landing-page-text-blue-row {
+  background-color: rgba(3, 169, 244, 0.7);
+  border-radius: 5px;
+  padding: 10px 20px;
+}
+
+@media screen and (max-width: 599px) {
+  .landing-page-main-row {
+    margin-top: -56px;
+  }
+
+  .landing-page-title-column {
+    margin-top: 56x;
+  }
+
+  .landing-page-text-column {
+    margin-top: 56x;
+  }
+}
