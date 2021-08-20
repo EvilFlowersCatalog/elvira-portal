@@ -10,6 +10,7 @@ import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { AdminService } from '../services/admin.service';
 import { take, map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
+import { DeviceDetectorService } from 'ngx-device-detector';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +20,7 @@ export class AdminGuard implements CanLoad {
     protected readonly router: Router,
     protected readonly appStateService: AppStateService,
     private readonly adminService: AdminService,
-    private readonly route: ActivatedRoute
+    private deviceService: DeviceDetectorService
   ) {}
 
  canLoad():
@@ -32,8 +33,13 @@ export class AdminGuard implements CanLoad {
   }
 
   private verifyAdmin(): Observable<boolean> {
+    const isMobile = this.deviceService.isMobile();
+    const isTablet = this.deviceService.isTablet();
     const token = this.appStateService.getStateSnapshot().token;
     const mongoId = jwtDecode<JwtPayload & { mongoId: string }>(token).mongoId;
+    if(isMobile || isTablet){
+      return of(false);
+    }
     return this.adminService.getIsAdmin(mongoId).pipe(
       map(data => data)
     );
