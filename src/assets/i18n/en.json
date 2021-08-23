@@ -7,11 +7,10 @@
   },
   "landingPage": {
     "siteDescription": "Modern digital library system",
-    "booksDescription": "V digitálnej knižnici nájdeš možstvo kníh, ktoré ti pomôžu pri štúdiu. Knihy si teraz môžeš prezerať online v PDF zobrazovači kdekoľvek budeš chcieť!",
-    "filtersDescription": "Knihy môžeš filtrovať podľa predmetov, semestrov, autora a taktiež môžeš prehľadávať zoznam kníh pomocou full textového vyhľadávania.",
-    "pdfDescription": "PDF zobrazovač ponúka viaceré užitočné funkcie - vyhľadávanie v texte s viacerými možnosťami, praktické prehľadávanie strán, rôzne typy zobrazenia a posúvania strán, tlač dokumentu, či jeho stiahnutie.",
-    "favoritesDescription": "Je pre teba zoznam kníh neprehľadný a musíš dlho hľadať knihy, ktoré potrebuješ? Vytvor si zoznam obľúbených kníh, ktoré práve čítaš alebo sa k ním chceš vrátiť.",
-    "driveDescription": "Systém ponúka možnosť prepojenia s Google diskom. Po úspešnej autorizácii si budeš môcť pridávať súbory na svoj disk a tak si ešte viac zjednodušiť prístup ku knihám. Na disku si ich môžeš rozdeliť do priečinkov prípadne s nimi ďalej pracovať."
+    "booksDescription": "In the digital library you will find a number of books to help you study. You can now view your books online in PDF viewer wherever you want!",
+    "filtersDescription": "You can filter books by subject, semester, author, and you can also search the book list using a full-text search.",
+    "favoritesDescription": "Is the book list cluttered for you, and do you have to look for the books you need for a long time? Make a list of your favorite books that you're reading or want to return to.",
+    "driveDescription": "The system offers the option of connecting to a Google drive. After successful authorization, you will be able to add files to your disk, making it even easier to access books. You can divide them into folders on the disk or work with them further."
   },
   "navbar": {
     "light": "Light mode",
