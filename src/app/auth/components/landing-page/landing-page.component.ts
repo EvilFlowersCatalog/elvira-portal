@@ -1,20 +1,21 @@
 import { Component, OnInit } from '@angular/core';
-import { FormGroup, FormControl } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AuthService } from '../../services/auth.service';
-import { catchError, take, tap } from 'rxjs/operators';
-import { LoginResponse } from '../../types/auth.types';
-import { throwError } from 'rxjs';
+import { FormControl, FormGroup } from '@angular/forms';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { AppStateService } from '../../../common/services/app-state/app-state.service';
+import { ActivatedRoute, Router } from '@angular/router';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
+import { throwError } from 'rxjs';
+import { catchError, take, tap } from 'rxjs/operators';
+import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
+import { AuthService } from '../../services/auth.service';
+import { LoginResponse } from '../../types/auth.types';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
+  selector: 'app-landing-page',
+  templateUrl: './landing-page.component.html',
+  styleUrls: ['./landing-page.component.scss'],
 })
-export class LoginComponent implements OnInit {
+export class LandingPageComponent implements OnInit {
+  showLoginForm = false;
   loginForm: FormGroup;
   username: string;
   password: string;
@@ -35,7 +36,7 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  submit(): void {
+  submit() {
     const loginCredentials = this.loginForm.value;
     this.authService
       .login(loginCredentials)
@@ -62,5 +63,13 @@ export class LoginComponent implements OnInit {
         })
       )
       .subscribe();
+  }
+
+  loginButtonHandler() {
+    if (this.showLoginForm) {
+      this.submit();
+    } else {
+      this.showLoginForm = true;
+    }
   }
 }

@@ -1,0 +1,174 @@
+<ng-container *transloco="let t">
+  <div fxLayout="column">
+    <div
+      fxLayout="row"
+      fxLayout.lt-md="column"
+      fxLayoutAlign="space-evenly"
+      class="landing-page-main-row"
+    >
+      <div
+        fxLayout="column"
+        fxLayoutAlign="center"
+        fxLayoutAlign.lt-md="center center"
+        fxFlex="30"
+        fxFlex.lt-md="80"
+        class="landing-page-title-column"
+      >
+        <div
+          fxLayout="column"
+          fxLayoutAlign="center"
+          class="landing-page-title-container"
+        >
+          <h1 class="landing-page-title">Elvíra</h1>
+          <p class="landing-page-site-description">
+            {{ t("landingPage.siteDescription") }}
+          </p>
+          <div *ngIf="showLoginForm" class="landing-page-login-container">
+            <form
+              [formGroup]="loginForm"
+              (keydown.enter)="submit()"
+              fxLayoutAlign="stretch"
+              fxLayout="column"
+            >
+              <mat-form-field color="accent">
+                <mat-label>{{ t("loginScreen.login") }}</mat-label>
+                <input
+                  matInput
+                  formControlName="username"
+                  style="padding: 0 0.75em 0 0.75em"
+                  required
+                  class="landing-page-login-input"
+                />
+              </mat-form-field>
+              <mat-form-field color="accent">
+                <mat-label>{{ t("loginScreen.password") }}</mat-label>
+                <input
+                  matInput
+                  formControlName="password"
+                  type="password"
+                  style="padding: 0 0.75em 0 0.75em"
+                  required
+                  [type]="hidePassword ? 'password' : 'text'"
+                  class="landing-page-login-input"
+                />
+                <mat-icon
+                  matSuffix
+                  (click)="hidePassword = !hidePassword"
+                  class="landing-page-login-password-icon"
+                  >{{
+                    hidePassword ? "visibility_off" : "visibility"
+                  }}</mat-icon
+                >
+              </mat-form-field>
+            </form>
+          </div>
+          <button
+            mat-stroked-button
+            color="accent"
+            class="landing-page-login-button"
+            type="submit"
+            (click)="loginButtonHandler()"
+          >
+            {{ t("loginScreen.button") }}
+          </button>
+        </div>
+      </div>
+      <div
+        fxLayout="column"
+        fxLayoutAlign="center"
+        fxLayoutAlign.lt-md="center center"
+        fxFlex="50"
+        class="landing-page-text-column"
+      >
+        <div
+          fxLayout="column"
+          fxLayoutAlign="space-evenly"
+          fxLayoutGap="16px"
+          class="landing-page-text-container"
+        >
+          <div fxLayout="row" class="landing-page-text-row-left">
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center center"
+              fxFlex="10"
+              fxFlex.lt-md="20"
+            >
+              <mat-icon class="landing-page-text-icon">menu_book</mat-icon>
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center start"
+              fxFlex="90"
+              fxFlex.lt-md="80"
+            >
+              <p class="landing-page-text-p">
+                {{ t("landingPage.booksDescription") }}
+              </p>
+            </div>
+          </div>
+          <div fxLayout="row" class="landing-page-text-row-right">
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center start"
+              fxFlex="90"
+              fxFlex.lt-md="80"
+            >
+              <p class="landing-page-text-p">
+                {{ t("landingPage.filtersDescription") }}
+              </p>
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center center"
+              fxFlex="10"
+              fxFlex.lt-md="20"
+            >
+              <mat-icon class="landing-page-text-icon">filter_alt</mat-icon>
+            </div>
+          </div>
+          <div fxLayout="row" class="landing-page-text-row-left">
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center center"
+              fxFlex="10"
+              fxFlex.lt-md="20"
+            >
+              <mat-icon class="landing-page-text-icon">favorite</mat-icon>
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center start"
+              fxFlex="90"
+              fxFlex.lt-md="80"
+            >
+              <p class="landing-page-text-p">
+                {{ t("landingPage.favoritesDescription") }}
+              </p>
+            </div>
+          </div>
+          <div fxLayout="row" class="landing-page-text-row-right">
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center start"
+              fxFlex="90"
+              fxFlex.lt-md="80"
+            >
+              <p class="landing-page-text-p">
+                {{ t("landingPage.driveDescription") }}
+              </p>
+            </div>
+            <div
+              fxLayout="column"
+              fxLayoutAlign="center center"
+              fxFlex="10"
+              fxFlex.lt-md="20"
+            >
+              <mat-icon class="landing-page-text-icon">add_to_drive</mat-icon>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div fxLayout="row"><p>powered by holy kokot</p></div>
+  </div>
+</ng-container>

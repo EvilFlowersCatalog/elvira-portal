@@ -5,6 +5,13 @@
     "password": "Password",
     "button": "Log in"
   },
+  "landingPage": {
+    "siteDescription": "Modern digital library system",
+    "booksDescription": "In the digital library you will find a number of books to help you study. You can now view your books online in PDF viewer wherever you want!",
+    "filtersDescription": "You can filter books by subject, semester, author, and you can also search the book list using a full-text search.",
+    "favoritesDescription": "Is the book list cluttered for you, and do you have to look for the books you need for a long time? Make a list of your favorite books that you're reading or want to return to.",
+    "driveDescription": "The system offers the option of connecting to a Google drive. After successful authorization, you will be able to add files to your disk, making it even easier to access books. You can divide them into folders on the disk or work with them further."
+  },
   "navbar": {
     "light": "Light mode",
     "dark": "Dark mode",
@@ -13,6 +20,7 @@
     "profile": "Profile",
     "log-out": "Log out",
     "settings": "Settings",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+    "login": "Login"
   }
 }

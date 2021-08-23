@@ -3,7 +3,9 @@ import { AdminGuard } from 'src/app/admin/routing/admin.guard';
 import { HomeComponent } from '../components/home/home.component';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { FavoritesComponent } from '../components/favorites/favorites.component';
+import { AccountSettingsComponent } from '../components/account-settings/account-settings.component';
 import { LibraryGuard } from './library.guard';
+import { GdriveAuthComponent } from '../components/gdrive-auth.component';
 
 export const LIBRARY_ROUTES: Routes = [
   {
@@ -31,5 +33,15 @@ export const LIBRARY_ROUTES: Routes = [
     path: 'favorites',
     canActivate: [LibraryGuard],
     component: FavoritesComponent,
+  },
+  {
+    path: 'account',
+    canActivate: [LibraryGuard],
+    component: AccountSettingsComponent,
+  },
+  {
+    path: 'account/gdrive_auth',
+    canActivate: [LibraryGuard],
+    component: GdriveAuthComponent,
   },
 ];

@@ -42,6 +42,10 @@ export class EntryDetailComponent implements OnInit {
     });
   }
 
+  addPdfToDrive(id: string) {
+    console.log('addPdfToDrive', id);
+  }
+
   downloadPdf(id: string) {
     console.log('downloadPdf', id);
   }

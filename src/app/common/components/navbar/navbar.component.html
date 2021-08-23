@@ -10,10 +10,8 @@
         mat-flat-button
         (click)="navigate('/library/home')"
         color="primary"
-        class="nav-label"
       >
-        <mat-icon>menu_book</mat-icon>
-        <span class="nav-label-text"> eLibrary</span>
+        <img src="../../../../assets/title_logo.png" class="navbar-logo" />
       </button>
       <span class="navbar-spacer"></span>
       <button
@@ -30,8 +28,8 @@
         [matMenuTriggerFor]="profileMenu"
         color="primary"
       >
-        <span>{{ appState.username }} </span>
-        <mat-icon>person_outline</mat-icon>
+        <mat-icon class="navbar-icon">person_outline</mat-icon>
+        {{ appState.username }}
       </button>
       <button mat-icon-button [matMenuTriggerFor]="settingsMenu">
         <mat-icon>settings</mat-icon>
@@ -70,7 +68,7 @@
         <mat-icon>favorite</mat-icon>
         <span>{{ t("favorites") }}</span>
       </button>
-      <button mat-menu-item>
+      <button mat-menu-item (click)="navigate('/library/account')">
         <mat-icon>account_circle</mat-icon>
         <span>{{ t("profile") }}</span>
       </button>

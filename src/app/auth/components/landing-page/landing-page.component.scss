@@ -1,0 +1,165 @@
+@keyframes slideInFromLeft {
+  0% {
+    transform: translateX(-300%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInFromRight {
+  0% {
+    transform: translateX(300%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
+.landing-page-main-row {
+  min-height: 100vh;
+  margin-top: -64px;
+  min-width: 100%;
+}
+
+.landing-page-title-column {
+  margin-top: 64px;
+  animation: 1s ease-out 0s 1 slideInFromLeft;
+}
+
+.landing-page-title-container {
+  height: 70%;
+  border-right: solid 2px;
+}
+
+.landing-page-title {
+  font-size: 100px;
+  letter-spacing: 10px;
+  font-weight: 700;
+  font-variant: small-caps;
+  transform: scale(1, 0.8);
+  text-shadow: 0 0 40px rgba(119, 119, 119, 0.7);
+}
+
+.landing-page-site-description {
+  margin-top: -20px;
+  font-style: italic;
+  font-size: 20px;
+  opacity: 0.7;
+  text-shadow: 0 0 40px rgba(119, 119, 119, 0.7);
+}
+
+.landing-page-login-container {
+  padding-top: 50px;
+  padding-right: 50px;
+}
+
+.landing-page-login-input {
+  max-width: -webkit-fill-available;
+  max-width: -moz-available;
+}
+
+.landing-page-login-password-icon {
+  cursor: pointer;
+}
+
+.landing-page-login-button {
+  font-size: 20px;
+  border-radius: 20px;
+  border-width: 4px;
+  border-color: #ffc107 !important;
+  width: 60%;
+  margin-top: 20px;
+}
+
+.landing-page-text-column {
+  margin-top: 64px;
+  animation: 1s ease-out 0s 1 slideInFromRight;
+}
+
+.landing-page-text-container {
+  width: 100%;
+  height: 100%;
+  margin: 50px 20px;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+.landing-page-text-icon {
+  font-size: 40px;
+  margin-right: 15px;
+  margin-bottom: 15px;
+  color: #ffc107;
+}
+
+.landing-page-text-p {
+  font-size: 18px;
+  font-weight: 500;
+  word-break: break-word;
+  margin: 0 !important;
+}
+
+.landing-page-text-row-left {
+  background-color: rgba(0, 188, 212, 0.8);
+  border-radius: 5px;
+  padding: 20px 30px;
+  margin-right: 60px;
+}
+
+.landing-page-text-row-right {
+  background-color: rgba(0, 188, 212, 0.8);
+  border-radius: 5px;
+  padding: 20px 30px;
+  margin-left: 60px;
+}
+
+@media screen and (max-width: 1250px) {
+  .landing-page-title {
+    font-size: 78px;
+  }
+}
+
+@media screen and (max-width: 959px) {
+  .landing-page-title-container {
+    padding-top: 50px;
+    border: none !important;
+  }
+
+  .landing-page-title {
+    text-align: center;
+  }
+
+  .landing-page-site-description {
+    text-align: center;
+  }
+
+  .landing-page-login-button {
+    align-self: center;
+  }
+
+  .landing-page-login-container {
+    padding-right: 0;
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .landing-page-main-row {
+    margin-top: -56px;
+  }
+
+  .landing-page-title-column {
+    margin-top: 56x;
+  }
+
+  .landing-page-text-column {
+    margin-top: 56x;
+  }
+
+  .landing-page-text-row-right {
+    margin: 0;
+  }
+
+  .landing-page-text-row-left {
+    margin: 0;
+  }
+}
