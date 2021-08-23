@@ -16,15 +16,6 @@
       <span class="navbar-spacer"></span>
       <button
         mat-flat-button
-        *ngIf="appState.isLoggedIn == false"
-        (click)="navigate('/auth/login')"
-        color="primary"
-      >
-        <mat-icon class="navbar-icon">login</mat-icon>
-        {{ t("login") }}
-      </button>
-      <button
-        mat-flat-button
         *ngIf="appState.isAdmin"
         (click)="navigate('/library/admin')"
         color="primary"
