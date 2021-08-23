@@ -1,4 +1,4 @@
-<ng-container *transloco="let t; read: 'landingPage'">
+<ng-container *transloco="let t">
   <div fxLayout="column">
     <div
       fxLayout="row"
@@ -20,14 +20,55 @@
         >
           <h1 class="landing-page-title">Elvíra</h1>
           <p class="landing-page-site-description">
-            {{ t("siteDescription") }}
+            {{ t("landingPage.siteDescription") }}
           </p>
+          <div *ngIf="showLoginForm" class="landing-page-login-container">
+            <form
+              [formGroup]="loginForm"
+              (keydown.enter)="submit()"
+              fxLayoutAlign="stretch"
+              fxLayout="column"
+            >
+              <mat-form-field color="accent">
+                <mat-label>{{ t("loginScreen.login") }}</mat-label>
+                <input
+                  matInput
+                  formControlName="username"
+                  style="padding: 0 0.75em 0 0.75em"
+                  required
+                  class="landing-page-login-input"
+                />
+              </mat-form-field>
+              <mat-form-field color="accent">
+                <mat-label>{{ t("loginScreen.password") }}</mat-label>
+                <input
+                  matInput
+                  formControlName="password"
+                  type="password"
+                  style="padding: 0 0.75em 0 0.75em"
+                  required
+                  [type]="hidePassword ? 'password' : 'text'"
+                  class="landing-page-login-input"
+                />
+                <mat-icon
+                  matSuffix
+                  (click)="hidePassword = !hidePassword"
+                  class="landing-page-login-password-icon"
+                  >{{
+                    hidePassword ? "visibility_off" : "visibility"
+                  }}</mat-icon
+                >
+              </mat-form-field>
+            </form>
+          </div>
           <button
             mat-stroked-button
             color="accent"
             class="landing-page-login-button"
+            type="submit"
+            (click)="loginButtonHandler()"
           >
-            Login
+            {{ t("loginScreen.button") }}
           </button>
         </div>
       </div>
@@ -60,7 +101,7 @@
               fxFlex.lt-md="80"
             >
               <p class="landing-page-text-p">
-                {{ t("booksDescription") }}
+                {{ t("landingPage.booksDescription") }}
               </p>
             </div>
           </div>
@@ -72,7 +113,7 @@
               fxFlex.lt-md="80"
             >
               <p class="landing-page-text-p">
-                {{ t("filtersDescription") }}
+                {{ t("landingPage.filtersDescription") }}
               </p>
             </div>
             <div
@@ -100,7 +141,7 @@
               fxFlex.lt-md="80"
             >
               <p class="landing-page-text-p">
-                {{ t("favoritesDescription") }}
+                {{ t("landingPage.favoritesDescription") }}
               </p>
             </div>
           </div>
@@ -112,7 +153,7 @@
               fxFlex.lt-md="80"
             >
               <p class="landing-page-text-p">
-                {{ t("driveDescription") }}
+                {{ t("landingPage.driveDescription") }}
               </p>
             </div>
             <div

@@ -49,6 +49,20 @@
   text-shadow: 0 0 40px rgba(119, 119, 119, 0.7);
 }
 
+.landing-page-login-container {
+  padding-top: 50px;
+  padding-right: 50px;
+}
+
+.landing-page-login-input {
+  max-width: -webkit-fill-available;
+  max-width: -moz-available;
+}
+
+.landing-page-login-password-icon {
+  cursor: pointer;
+}
+
 .landing-page-login-button {
   font-size: 20px;
   border-radius: 20px;
@@ -99,6 +113,31 @@
   margin-left: 60px;
 }
 
+@media screen and (max-width: 1250px) {
+  .landing-page-title {
+    font-size: 78px;
+  }
+}
+
+@media screen and (max-width: 959px) {
+  .landing-page-title-container {
+    padding-top: 50px;
+    border: none !important;
+  }
+
+  .landing-page-title {
+    text-align: center;
+  }
+
+  .landing-page-login-button {
+    align-self: center;
+  }
+
+  .landing-page-login-container {
+    padding-right: 0;
+  }
+}
+
 @media screen and (max-width: 599px) {
   .landing-page-main-row {
     margin-top: -56px;
@@ -110,5 +149,13 @@
 
   .landing-page-text-column {
     margin-top: 56x;
+  }
+
+  .landing-page-text-row-right {
+    margin: 0;
+  }
+
+  .landing-page-text-row-left {
+    margin: 0;
   }
 }
