@@ -22,6 +22,8 @@ export class AppStateService {
       sidebar: false,
       showSidebarToggle: false,
       sidenav: false,
+      feedId: null,
+      googleAuthed: false,
     };
 
     let initState = JSON.parse(localStorage.getItem('state'));

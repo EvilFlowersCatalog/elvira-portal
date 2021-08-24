@@ -18,7 +18,7 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   constructor(
     private readonly router: Router,
     private readonly appStateService: AppStateService,
-    private readonly authService: AuthService,
+    private readonly authService: AuthService
   ) {
     super();
   }
@@ -53,8 +53,10 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
       username: null,
       isLoggedIn: false,
       isAdmin: false,
+      googleAuthed: false,
+      feedId: null,
     });
 
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/auth/home']);
   }
 }

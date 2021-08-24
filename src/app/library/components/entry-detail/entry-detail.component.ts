@@ -6,6 +6,8 @@ import { EntriesService } from '../../services/entries/entries.service';
 import { Router } from '@angular/router';
 import { EntryInfoDialogComponent } from '../entry-info-dialog/entry-info-dialog.component';
 import { map } from 'rxjs/operators';
+import { GdriveService } from '../../services/gdrive/gdrive.service';
+import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
 
 @Component({
   selector: 'app-entry-detail',
@@ -20,6 +22,8 @@ export class EntryDetailComponent implements OnInit {
   constructor(
     private readonly entriesService: EntriesService,
     private readonly router: Router,
+    private readonly gdriveService: GdriveService,
+    private readonly appStateService: AppStateService,
     public dialog: MatDialog
   ) {}
 
@@ -42,8 +46,8 @@ export class EntryDetailComponent implements OnInit {
     });
   }
 
-  addPdfToDrive(id: string) {
-    console.log('addPdfToDrive', id);
+  addPdfToDrive(entryId: string, catalogId: string) {
+    this.gdriveService.uploadFileToDrive(entryId, catalogId).subscribe();
   }
 
   downloadPdf(id: string) {
@@ -51,6 +55,7 @@ export class EntryDetailComponent implements OnInit {
   }
 
   addToFavorites(id: string) {
-    console.log('addToFavorites', id);
+    const feedId = this.appStateService.getStateSnapshot().feedId;
+    console.log('addToFavorites entryId:', id, 'feedId:', feedId);
   }
 }

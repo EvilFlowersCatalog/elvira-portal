@@ -8,7 +8,6 @@ import {
 import { Observable } from 'rxjs';
 import { AppStateService } from '../services/app-state/app-state.service';
 import { LoadingService } from '../services/loading/loading.service';
-import { environment } from 'src/environments/environment';
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {

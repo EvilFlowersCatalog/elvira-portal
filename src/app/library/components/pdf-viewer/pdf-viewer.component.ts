@@ -31,8 +31,7 @@ export class PdfViewerComponent extends DisposableComponent implements OnInit {
     this.entriesService
       .entryDetail(bookId)
       .subscribe(
-        (data) =>
-          (this.base64 = data.response.acquisitions[0].content.slice(28))
+        (data) => (this.base64 = data.acquisitions[0].content.slice(28))
       );
     this.appState$ = this.appStateService
       .getState$()

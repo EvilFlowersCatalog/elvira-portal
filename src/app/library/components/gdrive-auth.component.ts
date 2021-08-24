@@ -18,8 +18,9 @@ export class GdriveAuthComponent implements OnInit {
   ngOnInit(): void {
     this.route.queryParams.subscribe((params) => {
       this.code = params['code'];
-      this.gdriveService.postAuthCode(this.code);
     });
-    window.close();
+    this.gdriveService
+      .postAuthCode(this.code)
+      .subscribe((res) => window.close());
   }
 }

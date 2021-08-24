@@ -45,11 +45,19 @@ export class LandingPageComponent implements OnInit {
           const isAdmin = jwtDecode<JwtPayload & { isAdmin: boolean }>(
             response.accessToken
           ).isAdmin;
+          const googleAuthed = jwtDecode<
+            JwtPayload & { googleAuthed: boolean }
+          >(response.accessToken).googleAuthed;
+          const feedId = jwtDecode<JwtPayload & { feedId: string }>(
+            response.accessToken
+          ).feedId;
           this.appStateService.patchState({
             token: response.accessToken,
             username: response.user.login,
             isLoggedIn: true,
             isAdmin: isAdmin,
+            feedId: feedId,
+            googleAuthed: googleAuthed,
           });
           this.router.navigate(['../../library'], { relativeTo: this.route });
         }),
