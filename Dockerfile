@@ -10,6 +10,6 @@ RUN npm run build --prod
 FROM nginx:alpine
 
 COPY ./docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
-COPY --from=build-step /app/dist/elibrary-portal /usr/share/nginx/html/elib
+COPY --from=build-step /dist/elibrary-portal /usr/share/nginx/html/elib
 
 EXPOSE 4200:80
