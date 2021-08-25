@@ -13,5 +13,5 @@ COPY ./docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 COPY --from=build-step /app/dist/elibrary-portal /usr/share/nginx/html/elib
 COPY ./app/docker/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 
-EXPOSE 80
+EXPOSE 4200:80
 
