@@ -1,27 +1,23 @@
 <ng-container *ngIf="entryDetail$ | async as entryDetail">
   <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center" color="accent">
-    {{ entryDetail.response.title }}
+    {{ entryDetail.title }}
   </h2>
   <mat-dialog-content fxLayout="column" fxLayoutAlign="start start">
     <p>
       Author:
-      {{
-        entryDetail.response.author.name +
-          " " +
-          entryDetail.response.author.surname
-      }}
+      {{ entryDetail.author.name + " " + entryDetail.author.surname }}
     </p>
     <p>
       Summary:
-      {{ entryDetail.response.summary }}
+      {{ entryDetail.summary }}
     </p>
     <p>
       Language:
-      {{ entryDetail.response.language.name }}
+      {{ entryDetail.language.name }}
     </p>
     <p>
       Created:
-      {{ entryDetail.response.created_at }}
+      {{ entryDetail.created_at }}
     </p>
   </mat-dialog-content>
   <mat-dialog-actions fxLayout="row" fxLayoutAlign="center center">

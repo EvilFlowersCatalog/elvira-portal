@@ -53,8 +53,10 @@ export class MobileSidenavComponent
       isLoggedIn: false,
       isAdmin: false,
       sidenav: false,
+      googleAuthed: false,
+      feedId: null,
     });
 
-    this.router.navigate(['/auth/login']);
+    this.router.navigate(['/auth/home']);
   }
 }

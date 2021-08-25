@@ -8,4 +8,6 @@ export interface State {
   sidebar: boolean;
   showSidebarToggle: boolean;
   sidenav: boolean;
+  googleAuthed: boolean;
+  feedId: string;
 }

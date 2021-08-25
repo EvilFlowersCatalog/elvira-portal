@@ -18,7 +18,7 @@ export class AuthService {
   }
 
   logout(token: string) {
-    this.httpClient.post('api/apigw/auth/logout', token);
+    return this.httpClient.post('api/apigw/auth/logout', token);
   }
 
   verifyToken(token: string): Observable<boolean> {

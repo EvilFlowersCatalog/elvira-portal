@@ -8,13 +8,13 @@ import {
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoadingService } from '../services/loading/loading.service';
+import { NotificationService } from '../services/notification/notification.service';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
   constructor(
-    private snackBar: MatSnackBar,
+    private readonly notificationService: NotificationService,
     private readonly loadingService: LoadingService
   ) {}
 
@@ -26,9 +26,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         this.loadingService.hideLoading();
         if (error.status >= 500) {
-          this.snackBar.open(`Error: ${error.error.message}`, 'close', {
-            duration: 5000,
-          });
+          this.notificationService.error(`Error: ${error.error.message}`);
         }
         return throwError(error);
       })

@@ -37,7 +37,9 @@
     "info-pdf-tooltip": "Zobraziť informácie",
     "add-pdf-to-drive-tooltip": "Pridať PDF na Google Disk",
     "download-pdf-tooltip": "Stiahnuť PDF",
-    "favorite-pdf-tooltip": "Pridať do obľúbených"
+    "favorite-pdf-tooltip": "Pridať do obľúbených",
+    "drive-success-message": "Úspešne nahrané na disk",
+    "drive-error-message": "Nahrávanie na disk zlyhalo"
   },
   "adminDialog": {
     "delete": "Ste si istí, že chcete odstrániť '{{title}}'?",
