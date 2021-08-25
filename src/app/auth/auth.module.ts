@@ -6,9 +6,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../material.module';
 import { TranslocoRootModule } from '../transloco/transloco-root.module';
 import { LandingPageComponent } from './components/landing-page/landing-page.component';
+import { LoginFormComponent } from './components/login-form/login-form.component';
 
 @NgModule({
-  declarations: [LandingPageComponent],
+  declarations: [LandingPageComponent, LoginFormComponent],
   imports: [
     CommonModule,
     ReactiveFormsModule,

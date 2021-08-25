@@ -24,43 +24,7 @@
             {{ t("landingPage.siteDescription") }}
           </p>
           <div *ngIf="showLoginForm" class="landing-page-login-container">
-            <form
-              [formGroup]="loginForm"
-              (keydown.enter)="submit()"
-              fxLayoutAlign="stretch"
-              fxLayout="column"
-            >
-              <mat-form-field color="accent">
-                <mat-label>{{ t("loginScreen.login") }}</mat-label>
-                <input
-                  matInput
-                  formControlName="username"
-                  style="padding: 0 0.75em 0 0.75em"
-                  required
-                  class="landing-page-login-input"
-                />
-              </mat-form-field>
-              <mat-form-field color="accent">
-                <mat-label>{{ t("loginScreen.password") }}</mat-label>
-                <input
-                  matInput
-                  formControlName="password"
-                  type="password"
-                  style="padding: 0 0.75em 0 0.75em"
-                  required
-                  [type]="hidePassword ? 'password' : 'text'"
-                  class="landing-page-login-input"
-                />
-                <mat-icon
-                  matSuffix
-                  (click)="hidePassword = !hidePassword"
-                  class="landing-page-login-password-icon"
-                  >{{
-                    hidePassword ? "visibility_off" : "visibility"
-                  }}</mat-icon
-                >
-              </mat-form-field>
-            </form>
+            <app-login-form></app-login-form>
           </div>
           <button
             mat-stroked-button
@@ -69,7 +33,7 @@
             type="submit"
             (click)="loginButtonHandler()"
           >
-            {{ t("loginScreen.button") }}
+            {{ t("landingPage.loginButton") }}
           </button>
         </div>
       </div>
@@ -169,6 +133,29 @@
         </div>
       </div>
     </div>
-    <div fxLayout="row"><p>powered by holy kokot</p></div>
+    <div fxLayout="row" fxLayoutAlign="center">
+      <h3 class="landing-page-powered-by">powered by:</h3>
+    </div>
+    <div
+      fxLayout="row"
+      fxLayout.lt-md="column"
+      fxLayoutAlign="space-evenly"
+      fxLayoutAlign.lt-md="center"
+    >
+      <div fxLayout="row" fxLayoutAlign="center">
+        <a href="https://www.fiit.stuba.sk/" target="_blank">
+          <img
+            src="../../../../assets/fiitLogo.png"
+            class="landing-page-image"
+          />
+        </a>
+      </div>
+      <div fxLayout="row" fxLayoutAlign="center">
+        <img
+          src="../../../../assets/workzoneLogo.png"
+          class="landing-page-image"
+        />
+      </div>
+    </div>
   </div>
 </ng-container>
