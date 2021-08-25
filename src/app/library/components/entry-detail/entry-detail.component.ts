@@ -5,9 +5,12 @@ import { MatDialog } from '@angular/material/dialog';
 import { EntriesService } from '../../services/entries/entries.service';
 import { Router } from '@angular/router';
 import { EntryInfoDialogComponent } from '../entry-info-dialog/entry-info-dialog.component';
-import { map } from 'rxjs/operators';
+import { catchError, take, tap } from 'rxjs/operators';
 import { GdriveService } from '../../services/gdrive/gdrive.service';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
+import { throwError } from 'rxjs';
+import { NotificationService } from 'src/app/common/services/notification/notification.service';
+import { TranslocoService } from '@ngneat/transloco';
 
 @Component({
   selector: 'app-entry-detail',
@@ -20,11 +23,12 @@ export class EntryDetailComponent implements OnInit {
   year: string;
 
   constructor(
-    private readonly entriesService: EntriesService,
     private readonly router: Router,
     private readonly gdriveService: GdriveService,
     private readonly appStateService: AppStateService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
+    private readonly notificationService: NotificationService,
+    private translocoService: TranslocoService
   ) {}
 
   ngOnInit(): void {
@@ -47,7 +51,26 @@ export class EntryDetailComponent implements OnInit {
   }
 
   addPdfToDrive(entryId: string, catalogId: string) {
-    this.gdriveService.uploadFileToDrive(entryId, catalogId).subscribe();
+    this.gdriveService
+      .uploadFileToDrive(entryId, catalogId)
+      .pipe(
+        tap(() => {
+          const message = this.translocoService.translate(
+            'lazy.entryDetail.drive-success-message'
+          );
+          this.notificationService.success(message);
+        }),
+        take(1),
+        catchError((err) => {
+          console.log(err);
+          const message = this.translocoService.translate(
+            'lazy.entryDetail.drive-error-message'
+          );
+          this.notificationService.error(message);
+          return throwError(err);
+        })
+      )
+      .subscribe();
   }
 
   downloadPdf(id: string) {

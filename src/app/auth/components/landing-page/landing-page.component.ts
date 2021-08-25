@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { throwError } from 'rxjs';
 import { catchError, take, tap } from 'rxjs/operators';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
+import { NotificationService } from 'src/app/common/services/notification/notification.service';
 import { AuthService } from '../../services/auth.service';
 import { LoginResponse } from '../../types/auth.types';
 
@@ -26,7 +26,7 @@ export class LandingPageComponent implements OnInit {
     private readonly authService: AuthService,
     private readonly appStateService: AppStateService,
     private readonly route: ActivatedRoute,
-    private readonly snackBar: MatSnackBar
+    private readonly notificationService: NotificationService
   ) {
     this.loginForm = new FormGroup({
       username: new FormControl(''),
@@ -51,6 +51,7 @@ export class LandingPageComponent implements OnInit {
           const feedId = jwtDecode<JwtPayload & { feedId: string }>(
             response.accessToken
           ).feedId;
+          console.log(response.accessToken);
           this.appStateService.patchState({
             token: response.accessToken,
             username: response.user.login,
@@ -64,9 +65,8 @@ export class LandingPageComponent implements OnInit {
         take(1),
         catchError((err) => {
           console.log(err);
-          this.snackBar.open('Invalid credentials!', 'close', {
-            duration: 5000,
-          });
+          const message = 'invalid credentials';
+          this.notificationService.error(message);
           return throwError(err);
         })
       )

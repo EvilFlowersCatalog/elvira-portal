@@ -14,6 +14,10 @@ import { MobileSidenavComponent } from './components/mobile-sidenav/mobile-siden
 import { UpdateDialogComponent } from '../admin/dialogs/update-dialog/update-dialog.component';
 import { FormsModule } from '@angular/forms';
 import { NewFeedDialogComponent } from '../admin/dialogs/new-feed-dialog/new-feed-dialog.component';
+import { ErrorNotificationComponent } from './components/notifications/error-notification.component';
+import { WarningNotificationComponent } from './components/notifications/warning-notification.component';
+import { InfoNotificationComponent } from './components/notifications/info-notification.component';
+import { SuccessNotificationComponent } from './components/notifications/success-notification.component';
 
 @NgModule({
   declarations: [
@@ -26,6 +30,10 @@ import { NewFeedDialogComponent } from '../admin/dialogs/new-feed-dialog/new-fee
     DeleteDialogComponent,
     UpdateDialogComponent,
     NewFeedDialogComponent,
+    SuccessNotificationComponent,
+    ErrorNotificationComponent,
+    InfoNotificationComponent,
+    WarningNotificationComponent,
   ],
   imports: [
     CommonModule,
