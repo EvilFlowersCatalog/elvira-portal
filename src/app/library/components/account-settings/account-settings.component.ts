@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
 import { GdriveService } from '../../services/gdrive/gdrive.service';
-import { catchError, map, takeUntil, tap } from 'rxjs/operators';
+import { catchError, takeUntil, tap } from 'rxjs/operators';
 import { UserService } from '../../services/user/user.service';
 import { UserResponse } from '../../library.types';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
@@ -24,7 +23,6 @@ export class AccountSettingsComponent
   appState$: Observable<State>;
 
   constructor(
-    private readonly route: ActivatedRoute,
     private readonly gdriveService: GdriveService,
     private readonly userService: UserService,
     private readonly appStateService: AppStateService,
@@ -45,9 +43,8 @@ export class AccountSettingsComponent
     this.gdriveService
       .getAuthUrl()
       .pipe(takeUntil(this.destroySignal$))
-      .subscribe(
-        (data: { response: { url: string } }) =>
-          (window.location.href = data.response.url)
+      .subscribe((data: { response: { url: string } }) =>
+        window.open(data.response.url)
       );
   }
 

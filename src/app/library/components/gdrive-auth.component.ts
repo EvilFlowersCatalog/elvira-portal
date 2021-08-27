@@ -56,9 +56,11 @@ export class GdriveAuthComponent extends DisposableComponent implements OnInit {
       )
       .subscribe();
 
-    async () => {
-      await delay(2000);
-      window.close();
-    };
+    this.waitAndClose();
+  }
+
+  async waitAndClose() {
+    await delay(2000);
+    window.close();
   }
 }
