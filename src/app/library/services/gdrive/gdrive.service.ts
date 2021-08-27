@@ -30,6 +30,10 @@ export class GdriveService {
     return this.httpClient.post(`api/apigw/oauth/callback`, { code: code });
   }
 
+  unlinkGoogle() {
+    return this.httpClient.delete('api/apigw/oauth/unlink');
+  }
+
   uploadFileToDrive(entryId: string, catalogId: string) {
     let header = this.createAuthorizationHeader();
 

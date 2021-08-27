@@ -1,7 +1,7 @@
 import { DOCUMENT } from '@angular/common';
 import { Component, Inject, Renderer2 } from '@angular/core';
-import { Observable } from 'rxjs';
-import { takeUntil, tap } from 'rxjs/operators';
+import { fromEvent, Observable } from 'rxjs';
+import { debounceTime, takeUntil, tap } from 'rxjs/operators';
 import { DisposableComponent } from './common/components/disposable.component';
 import { AppStateService } from './common/services/app-state/app-state.service';
 import { State } from './common/services/app-state/app-state.types';
@@ -16,6 +16,7 @@ import { LoadingService } from './common/services/loading/loading.service';
 export class AppComponent extends DisposableComponent {
   background: string;
   sidenavState: boolean;
+  windowStoreChange$: Observable<any>;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -48,6 +49,7 @@ export class AppComponent extends DisposableComponent {
         takeUntil(this.destroySignal$)
       )
       .subscribe();
+    this.initWindowStorageListener();
   }
 
   setTheme(theme: string) {
@@ -55,5 +57,18 @@ export class AppComponent extends DisposableComponent {
     this.background =
       theme === 'dark' ? 'app-background-dark' : 'app-background-light';
     this.renderer.setAttribute(this.document.body, 'class', hostClass);
+  }
+
+  initWindowStorageListener() {
+    this.windowStoreChange$ = fromEvent(window, 'storage').pipe(
+      takeUntil(this.destroySignal$),
+      debounceTime(500)
+    );
+    this.windowStoreChange$.subscribe((state: StorageEvent) => {
+      if (document.hasFocus()) {
+        return;
+      }
+      this.appStateService.setState(JSON.parse(state.newValue));
+    });
   }
 }

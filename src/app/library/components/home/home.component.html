@@ -1,8 +1,12 @@
 <mat-sidenav-container class="sidenav-container">
-  <mat-sidenav mode="over" [opened]="sidebarState$ | async">
+  <mat-sidenav
+    mode="over"
+    [opened]="sidebarState$ | async"
+    (closedStart)="hideSidebar()"
+  >
     <app-sidebar></app-sidebar>
   </mat-sidenav>
-  <mat-sidenav-content (click)="hideSidebar()">
+  <mat-sidenav-content>
     <div
       class="entries-list-container"
       fxLayout="row wrap"

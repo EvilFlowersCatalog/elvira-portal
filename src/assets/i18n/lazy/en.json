@@ -50,5 +50,18 @@
     "new-feed": "New Feed",
     "create": "Create",
     "cancel": "Cancel"
+  },
+  "accountSettings": {
+    "title": "Account settings",
+    "nick": "Nick",
+    "role": "Role",
+    "email": "University email",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "googleAuth": "Google authorization",
+    "unlinkSuccessMessage": "This application has been unlinked from your Google account",
+    "unlinkErrorMessage": "Unlink process failed, please try again",
+    "authSuccessMessage": "Authorization successful",
+    "authErrorMessage": "Authorization failed, please try again"
   }
 }

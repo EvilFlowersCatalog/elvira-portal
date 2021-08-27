@@ -52,7 +52,10 @@ export class LoginFormComponent implements OnInit {
           const feedId = jwtDecode<JwtPayload & { feedId: string }>(
             response.accessToken
           ).feedId;
-          console.log(response.accessToken);
+          const mongoId = jwtDecode<JwtPayload & { mongoId: string }>(
+            response.accessToken
+          ).mongoId;
+
           this.appStateService.patchState({
             token: response.accessToken,
             username: response.user.login,
@@ -60,7 +63,7 @@ export class LoginFormComponent implements OnInit {
             isAdmin: isAdmin,
             feedId: feedId,
             googleAuthed: googleAuthed,
-            sidebar: false,
+            userId: mongoId,
           });
           this.router.navigate(['../../library'], { relativeTo: this.route });
         }),

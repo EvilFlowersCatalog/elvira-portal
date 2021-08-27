@@ -3,7 +3,8 @@
     "form": "Login",
     "login": "Username",
     "password": "Password",
-    "invalidCredentials": "Invalid credentials"
+    "invalidCredentials": "Invalid credentials",
+    "loginButton": "Login"
   },
   "landingPage": {
     "siteDescription": "Modern digital library system",
