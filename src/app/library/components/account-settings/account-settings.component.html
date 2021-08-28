@@ -55,7 +55,7 @@
                 color="primary"
                 class="account-settings-toggle"
                 [checked]="appState.googleAuthed"
-                (toggleChange)="handleToggle()"
+                (change)="handleToggle($event)"
               ></mat-slide-toggle>
             </div>
           </div>

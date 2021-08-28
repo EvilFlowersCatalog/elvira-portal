@@ -72,10 +72,11 @@ export class AccountSettingsComponent
       .subscribe();
   }
 
-  handleToggle() {
+  handleToggle(e) {
     if (this.appStateService.getStateSnapshot().googleAuthed) {
       this.unlinkGoogle();
     } else {
+      e.source.checked = false;
       this.getUrl();
     }
   }
