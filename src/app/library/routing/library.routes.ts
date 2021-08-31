@@ -9,6 +9,12 @@ import { GdriveAuthComponent } from '../components/gdrive-auth.component';
 
 export const LIBRARY_ROUTES: Routes = [
   {
+    path: 'admin',
+    canLoad: [AdminGuard],
+    loadChildren: () =>
+      import('../../admin/admin.module').then((m) => m.AdminModule),
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full',
@@ -17,12 +23,6 @@ export const LIBRARY_ROUTES: Routes = [
     path: 'home',
     canActivate: [LibraryGuard],
     component: HomeComponent,
-  },
-  {
-    path: 'admin',
-    canLoad: [AdminGuard],
-    loadChildren: () =>
-      import('../../admin/admin.module').then((m) => m.AdminModule),
   },
   {
     path: 'pdf-viewer/:id',

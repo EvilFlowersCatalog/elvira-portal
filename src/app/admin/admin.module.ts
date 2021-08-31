@@ -8,6 +8,9 @@ import { AdminUploadComponent } from './admin-upload/admin-upload.component';
 import { AdminOverviewComponent } from './admin-overview/admin-overview.component';
 import { MaterialModule } from '../material.module';
 import { TabGroupDirective } from './directives/tab-group.directive';
+import { MatPaginatorIntl } from '@angular/material/paginator';
+import { CustomPaginationService } from './custom-pagination/custom-pagination.service';
+
 
 @NgModule({
   declarations: [AdminOverviewComponent, AdminUploadComponent, TabGroupDirective],
@@ -20,6 +23,9 @@ import { TabGroupDirective } from './directives/tab-group.directive';
     TranslocoModule,
     ReactiveFormsModule
   ],
-  providers:[{ provide: TRANSLOCO_SCOPE, useValue: 'lazy' }]
+  providers:[
+    { provide: TRANSLOCO_SCOPE, useValue: 'lazy' },
+    //{ provide: MatPaginatorIntl , useValue:  CustomPaginationService}
+  ]
 })
 export class AdminModule { }

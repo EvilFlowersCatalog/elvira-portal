@@ -18,6 +18,7 @@ import { DeviceDetectorService } from 'ngx-device-detector';
 export class AdminGuard implements CanLoad {
   constructor(
     protected readonly router: Router,
+    protected readonly route: ActivatedRoute,
     protected readonly appStateService: AppStateService,
     private readonly adminService: AdminService,
     private deviceService: DeviceDetectorService
@@ -29,7 +30,19 @@ export class AdminGuard implements CanLoad {
     | Observable<boolean | UrlTree>
     | Promise<boolean | UrlTree>
     {
-       return this.verifyAdmin();
+      this.verifyAdmin().subscribe(
+        m => {
+          if(m){
+            return of(true);
+          }
+          else {
+            this.router.navigate(['./'], { relativeTo: this.route });
+            return of(false);
+          }
+        }
+      )
+      console.log(this.verifyAdmin());
+      return this.verifyAdmin();
   }
 
   private verifyAdmin(): Observable<boolean> {
@@ -38,6 +51,7 @@ export class AdminGuard implements CanLoad {
     const token = this.appStateService.getStateSnapshot().token;
     const mongoId = jwtDecode<JwtPayload & { mongoId: string }>(token).mongoId;
     if(isMobile || isTablet){
+      this.router.navigate(['./'], { relativeTo: this.route });
       return of(false);
     }
     return this.adminService.getIsAdmin(mongoId).pipe(

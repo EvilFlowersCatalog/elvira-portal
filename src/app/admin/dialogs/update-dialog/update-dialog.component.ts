@@ -1,8 +1,12 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
+import { catchError, take, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AdminService } from 'src/app/admin/services/admin.service';
 import { AllFeedsItems, UpdateFeeds } from 'src/app/admin/services/admin.types';
+import { NotificationService } from 'src/app/common/services/notification/notification.service';
+import { TranslocoService } from '@ngneat/transloco';
 
 export interface DialogData {
   feedId: string;
@@ -23,7 +27,9 @@ export class UpdateDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<UpdateDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: DialogData,
-    private readonly adminService: AdminService
+    private readonly adminService: AdminService,
+    private readonly notificationService: NotificationService,
+    private translocoService: TranslocoService
   ) {}
 
   ngOnInit(): void {}
@@ -38,6 +44,10 @@ export class UpdateDialogComponent implements OnInit {
     this.adminService
       .updateFeed(this.data.feedId, this.getFeedsData())
       .subscribe();
+      const message = this.translocoService.translate(
+        'lazy.adminPage.success-message-upload'
+      );
+      this.notificationService.success(message);
     this.dialogRef.close();
   }
 
