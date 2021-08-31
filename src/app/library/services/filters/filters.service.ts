@@ -2,11 +2,12 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
+import { ListEntriesResponse } from '../entries/entries.types';
 
 @Injectable({
   providedIn: 'root',
 })
-export class GdriveService {
+export class FiltersService {
   constructor(
     private readonly httpClient: HttpClient,
     private readonly appStateService: AppStateService
@@ -18,28 +19,17 @@ export class GdriveService {
     });
   }
 
-  getAuthUrl(): Observable<any> {
-    return this.httpClient.get<any>(`api/apigw/oauth/link`);
+  getFeedsTree() {
+    // return this.httpClient.get()
   }
 
-  postAuthCode(code: string) {
-    return this.httpClient.post(`api/apigw/oauth/callback`, { code: code });
-  }
-
-  unlinkGoogle() {
-    return this.httpClient.delete('api/apigw/oauth/unlink');
-  }
-
-  uploadFileToDrive(entryId: string, catalogId: string) {
+  entriesSearch(keyword: string): Observable<ListEntriesResponse> {
     let header = this.createAuthorizationHeader();
-
-    return this.httpClient.post(
-      `api/apigw/gdrive/upload`,
-      {
-        entry_id: entryId,
-        catalog_id: catalogId,
-      },
-      { headers: header }
-    );
+    let params = new HttpParams().set('title', keyword);
+    console.log(params);
+    return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
+      params: params,
+      headers: header,
+    });
   }
 }

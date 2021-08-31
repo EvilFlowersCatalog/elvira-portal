@@ -1,9 +1,14 @@
 <div fxLayout="column" class="sidebar-container">
-  <form (submit)="search()">
+  <form [formGroup]="searchForm" (submit)="search()">
     <div fxLayout="row">
       <mat-form-field color="accent">
         <mat-label>Search</mat-label>
-        <input matInput type="search" placeholder="Search" />
+        <input
+          matInput
+          formControlName="searchInput"
+          type="text"
+          placeholder="Search"
+        />
       </mat-form-field>
       <button
         mat-icon-button

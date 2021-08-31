@@ -14,6 +14,7 @@ import { EntryInfoDialogComponent } from './components/entry-info-dialog/entry-i
 import { FavoritesComponent } from './components/favorites/favorites.component';
 import { AccountSettingsComponent } from './components/account-settings/account-settings.component';
 import { GdriveAuthComponent } from './components/gdrive-auth.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,8 @@ import { GdriveAuthComponent } from './components/gdrive-auth.component';
     MaterialModule,
     TranslocoRootModule,
     NgxExtendedPdfViewerModule,
+    ReactiveFormsModule,
+    FormsModule,
   ],
   providers: [{ provide: TRANSLOCO_SCOPE, useValue: 'lazy' }],
   exports: [SidebarComponent],
