@@ -47,7 +47,9 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   }
 
   logout() {
-    this.authService.logout(this.appStateService.getStateSnapshot().token);
+    this.authService
+      .logout(this.appStateService.getStateSnapshot().token)
+      .subscribe();
     this.appStateService.patchState({
       token: null,
       username: null,

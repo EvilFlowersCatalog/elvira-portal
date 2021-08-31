@@ -40,7 +40,7 @@ export const LIBRARY_ROUTES: Routes = [
     component: AccountSettingsComponent,
   },
   {
-    path: 'account/gdrive_auth',
+    path: 'account/gdrive-auth',
     canActivate: [LibraryGuard],
     component: GdriveAuthComponent,
   },

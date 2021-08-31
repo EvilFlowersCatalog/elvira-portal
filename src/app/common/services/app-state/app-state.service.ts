@@ -16,6 +16,7 @@ export class AppStateService {
       isLoggedIn: false,
       token: null,
       username: null,
+      userId: null,
       isAdmin: false,
       theme: 'light',
       lang: 'sk',

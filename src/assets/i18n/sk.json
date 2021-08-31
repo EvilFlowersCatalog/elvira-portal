@@ -3,7 +3,8 @@
     "form": "Prihlásenie",
     "login": "Prihlasovacie meno",
     "password": "Heslo",
-    "invalidCredentials": "Nesprávne prihlasovacie údaje"
+    "invalidCredentials": "Nesprávne prihlasovacie údaje",
+    "loginButton": "Prihlásiť sa"
   },
   "landingPage": {
     "siteDescription": "Moderný digitálny knižničný systém",

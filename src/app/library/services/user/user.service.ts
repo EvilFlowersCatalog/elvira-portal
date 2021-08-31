@@ -2,12 +2,14 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { EntryDetail, ListEntriesResponse } from './entries.types';
+import { environment } from 'src/environments/environment';
+import { UserResponse } from '../../library.types';
+import { EntryDetail } from '../entries/entries.types';
 
 @Injectable({
   providedIn: 'root',
 })
-export class EntriesService {
+export class UserService {
   constructor(
     private readonly httpClient: HttpClient,
     private readonly appStateService: AppStateService
@@ -16,21 +18,15 @@ export class EntriesService {
   createAuthorizationHeader() {
     return new HttpHeaders({
       authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
+      api_key: environment.apiKey,
     });
   }
 
-  listEntries(): Observable<ListEntriesResponse> {
-    let header = this.createAuthorizationHeader();
+  getUser(): Observable<UserResponse> {
+    let header: HttpHeaders = this.createAuthorizationHeader();
+    const userId: string = this.appStateService.getStateSnapshot().userId;
 
-    return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
-      headers: header,
-    });
-  }
-
-  entryDetail(id: string): Observable<EntryDetail> {
-    let header = this.createAuthorizationHeader();
-
-    return this.httpClient.get<EntryDetail>(`api/apigw/entries/${id}`, {
+    return this.httpClient.get<UserResponse>(`api/apigw/user/${userId}`, {
       headers: header,
     });
   }

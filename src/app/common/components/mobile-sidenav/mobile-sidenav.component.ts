@@ -46,7 +46,9 @@ export class MobileSidenavComponent
   }
 
   logout() {
-    this.authService.logout(this.appStateService.getStateSnapshot().token);
+    this.authService
+      .logout(this.appStateService.getStateSnapshot().token)
+      .subscribe();
     this.appStateService.patchState({
       token: null,
       username: null,

@@ -1,7 +1,7 @@
 <ng-container *transloco="let t">
   <form
     [formGroup]="loginForm"
-    (keydown.enter)="submit()"
+    (submit)="submit()"
     fxLayoutAlign="stretch"
     fxLayout="column"
   >
@@ -33,5 +33,16 @@
         >{{ hidePassword ? "visibility_off" : "visibility" }}</mat-icon
       >
     </mat-form-field>
+    <div fxLayout="row" fxLayoutAlign="center">
+      <button
+        mat-stroked-button
+        color="accent"
+        class="login-form-button"
+        type="submit"
+        (click)="submit()"
+      >
+        {{ t("loginForm.loginButton") }}
+      </button>
+    </div>
   </form>
 </ng-container>

@@ -45,7 +45,8 @@
     "download-pdf-tooltip": "Download PDF",
     "favorite-pdf-tooltip": "Add to favorite list",
     "drive-success-message": "Successfully uploaded to drive",
-    "drive-error-message": "Upload to drive failed"
+    "drive-error-message": "Upload to drive failed",
+    "drive-unauthorized-message": "Sign in to your Google account in Elvíra's account settings first"
   },
   "adminDialog": {
     "delete": "Are you sure you want to delete '{{title}}'?",
@@ -56,5 +57,18 @@
     "new-feed": "New Feed",
     "create": "Create",
     "cancel": "Cancel"
+  },
+  "accountSettings": {
+    "title": "Account settings",
+    "nick": "Nick",
+    "role": "Role",
+    "email": "University email",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "googleAuth": "Google authorization",
+    "unlinkSuccessMessage": "This application has been unlinked from your Google account",
+    "unlinkErrorMessage": "Unlink process failed, please try again",
+    "authSuccessMessage": "Authorization successful",
+    "authErrorMessage": "Authorization failed, please try again"
   }
 }

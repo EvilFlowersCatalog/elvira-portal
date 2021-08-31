@@ -45,7 +45,8 @@
     "download-pdf-tooltip": "Stiahnuť PDF",
     "favorite-pdf-tooltip": "Pridať do obľúbených",
     "drive-success-message": "Úspešne nahrané na disk",
-    "drive-error-message": "Nahrávanie na disk zlyhalo"
+    "drive-error-message": "Nahrávanie na disk zlyhalo",
+    "drive-unauthorized-message": "Prihláste sa najskôr do svojho účtu Google v nastaveniach účtu Elvíry"
   },
   "adminDialog": {
     "delete": "Ste si istí, že chcete odstrániť '{{title}}'?",
@@ -56,5 +57,18 @@
     "new-feed": "Nový Feed",
     "create": "Vytvoriť",
     "cancel": "Zrušiť"
+  },
+  "accountSettings": {
+    "title": "Nastavenia účtu",
+    "nick": "Nick",
+    "role": "Rola",
+    "email": "Univerzitný email",
+    "firstName": "Meno",
+    "lastName": "Priezvisko",
+    "googleAuth": "Google autorizácia",
+    "unlinkSuccessMessage": "Aplikácia bola odstránená z vášho Google účtu",
+    "unlinkErrorMessage": "Proces odstránenia aplikácie z vášho Google účtu zlyhal, prosím skúste to znova",
+    "authSuccessMessage": "Autorizácia prebehla úspešne",
+    "authErrorMessage": "Autorizácia zlyhala, prosím skúste to znova"
   }
 }

@@ -40,7 +40,7 @@ export class LibraryGuard implements CanActivate {
       return false;
     }
 
-    return this.authService.verifyToken(token).pipe(
+    return this.authService.verifyToken().pipe(
       take(1),
       tap((isValid: boolean) => {
         if (!isValid) {

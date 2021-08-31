@@ -51,26 +51,33 @@ export class EntryDetailComponent implements OnInit {
   }
 
   addPdfToDrive(entryId: string, catalogId: string) {
-    this.gdriveService
-      .uploadFileToDrive(entryId, catalogId)
-      .pipe(
-        tap(() => {
-          const message = this.translocoService.translate(
-            'lazy.entryDetail.drive-success-message'
-          );
-          this.notificationService.success(message);
-        }),
-        take(1),
-        catchError((err) => {
-          console.log(err);
-          const message = this.translocoService.translate(
-            'lazy.entryDetail.drive-error-message'
-          );
-          this.notificationService.error(message);
-          return throwError(err);
-        })
-      )
-      .subscribe();
+    if (this.appStateService.getStateSnapshot().googleAuthed) {
+      this.gdriveService
+        .uploadFileToDrive(entryId, catalogId)
+        .pipe(
+          tap(() => {
+            const message = this.translocoService.translate(
+              'lazy.entryDetail.drive-success-message'
+            );
+            this.notificationService.success(message);
+          }),
+          take(1),
+          catchError((err) => {
+            console.log(err);
+            const message = this.translocoService.translate(
+              'lazy.entryDetail.drive-error-message'
+            );
+            this.notificationService.error(message);
+            return throwError(err);
+          })
+        )
+        .subscribe();
+    } else {
+      const message = this.translocoService.translate(
+        'lazy.entryDetail.drive-unauthorized-message'
+      );
+      this.notificationService.info(message);
+    }
   }
 
   downloadPdf(id: string) {

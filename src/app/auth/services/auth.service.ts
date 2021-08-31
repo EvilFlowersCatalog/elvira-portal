@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError, map, tap } from 'rxjs/operators';
 import { LoginCredentials, LoginResponse } from '../types/auth.types';
 
 @Injectable({
@@ -21,13 +21,18 @@ export class AuthService {
     return this.httpClient.post('api/apigw/auth/logout', token);
   }
 
-  verifyToken(token: string): Observable<boolean> {
-    // let statusCode;
-    // this.httpClient.get('api/apigw/verifytoken', { observe: 'response' }).pipe(
-    //   tap((response) => (statusCode = response.status)),
-    //   catchError((error: HttpErrorResponse) => (statusCode = error.status))
-    // );
-    // return statusCode >= 400 ? of(false) : of(true);
+  verifyToken(): Observable<boolean> {
+    // return this.httpClient
+    //   .get('api/apigw/verifytoken', { observe: 'response' })
+    //   .pipe(
+    //     map((response) => {
+    //       console.log(response);
+    //       return response.status >= 400 ? false : true;
+    //     }),
+    //     catchError((error: HttpErrorResponse) => {
+    //       return of(false);
+    //     })
+    //   );
     return of(true);
   }
 }

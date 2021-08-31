@@ -23,18 +23,19 @@
           <p class="landing-page-site-description">
             {{ t("landingPage.siteDescription") }}
           </p>
-          <div *ngIf="showLoginForm" class="landing-page-login-container">
-            <app-login-form></app-login-form>
-          </div>
           <button
+            *ngIf="isLoginFormVisible == false"
             mat-stroked-button
             color="accent"
             class="landing-page-login-button"
             type="submit"
-            (click)="loginButtonHandler()"
+            (click)="showLoginForm()"
           >
             {{ t("landingPage.loginButton") }}
           </button>
+          <div *ngIf="isLoginFormVisible" class="landing-page-login-container">
+            <app-login-form></app-login-form>
+          </div>
         </div>
       </div>
       <div
