@@ -19,12 +19,12 @@ export class EntriesService {
     });
   }
 
-  listEntries(): Observable<ListEntriesResponse> {
+  listEntries(page: number, limit: number): Observable<ListEntriesResponse> {
     let header = this.createAuthorizationHeader();
 
-    return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
-      headers: header,
-    });
+    return this.httpClient.get<ListEntriesResponse>(
+      'api/apigw/entries',
+    { headers: header, params: {page: page+1, limit: limit}});
   }
 
   entryDetail(id: string): Observable<EntryDetail> {

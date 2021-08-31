@@ -3,6 +3,11 @@ import { Subject } from 'rxjs';
 import { addNewFeed, AllFeedsItems } from './admin.types';
 
 
+export interface UpdateFeed {
+  title: string;
+  id: string;
+}
+
 @Injectable({
   providedIn: 'root',
 })
@@ -10,6 +15,7 @@ export class FeedAddService {
 
   public addFeedSubject = new Subject<AllFeedsItems>();
   public deleteFeedSubject = new Subject<string>();
+  public updateFeedSubject = new Subject<UpdateFeed>();
 
   passValue(data) {
     //passing the data as the next observable
@@ -32,6 +38,10 @@ export class FeedAddService {
 
   deleteValue(data) {
     this.deleteFeedSubject.next(data);
+  }
+
+  updateValue(id, newTitle){
+    this.updateFeedSubject.next({title: newTitle, id: id});
   }
 }
 
