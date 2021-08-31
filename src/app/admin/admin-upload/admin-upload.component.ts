@@ -3,14 +3,18 @@ import {MatChipInputEvent} from '@angular/material/chips';
 import {MatAutocompleteSelectedEvent} from '@angular/material/autocomplete';
 import {COMMA, ENTER} from '@angular/cdk/keycodes';
 import {Observable} from 'rxjs';
+import { catchError, take, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 import { FormGroup, FormControl, FormArray, FormBuilder, Validators } from '@angular/forms';
 import {map, startWith} from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from '../services/admin.service';
 import { HttpClient } from '@angular/common/http';
 import { AllEntryItems, EditedData, EntriesData } from '../services/admin.types';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TitleValidators } from '../validators/title.validator';
+import { NotificationService } from 'src/app/common/services/notification/notification.service';
+import { DocumentAddService } from '../services/document-add.service';
+import { TranslocoService } from '@ngneat/transloco';
 
 @Component({
   selector: 'app-admin',
@@ -54,8 +58,10 @@ export class AdminUploadComponent implements OnInit {
     private readonly http: HttpClient,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
-    private _snackBar: MatSnackBar,
-    private readonly titleValidator: TitleValidators
+    private readonly titleValidator: TitleValidators,
+    private readonly notificationService: NotificationService,
+    private readonly documentService: DocumentAddService,
+    private translocoService: TranslocoService
     ) {
 
       this.imageForm = new FormGroup({
@@ -232,11 +238,6 @@ export class AdminUploadComponent implements OnInit {
     return this.allFeeds.filter(fruit => fruit.toLowerCase().includes(filterValue));
   }
 
-  //pdf file uploader
-  fileChange(event) {
-
-  }
-
   //submit button -> POST
   async formUploader() {
 
@@ -252,13 +253,23 @@ export class AdminUploadComponent implements OnInit {
     // console.log(testData.get('file'));
       if(this.uploadForm.status === "VALID" && this.imageFile && this.pdfFile){
         if(this.validSize){
-          this.adminService.upload(testData).subscribe(datas => console.log(datas));
+          this.documentService.passValue(this.uploadForm.get('title').value,
+          this.uploadForm.get('author').get('name').value,
+          this.uploadForm.get('author').get('surname').value);
+
+          this.adminService.upload(testData).subscribe();
+          const message = this.translocoService.translate(
+            'lazy.adminPage.success-message-document'
+          );
+          this.notificationService.success(message);
           this.router.navigate(['../'], { relativeTo: this.route });
         }
         else {
-            this._snackBar.open("Invalid image size!", "Close");
+            this.notificationService.error('Invalid image size!');
         }
-
+      }
+      else {
+        this.notificationService.error("Invalid upload form!")
       }
     }
   }

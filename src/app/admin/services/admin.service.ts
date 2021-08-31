@@ -12,13 +12,11 @@ import {
   GetFeeds,
   UpdateFeeds,
 } from './admin.types';
-import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AdminService {
-  catalog_id = environment.catalogId;
 
   constructor(
     private readonly httpClient: HttpClient,
@@ -28,29 +26,32 @@ export class AdminService {
   createAuthorizationHeader() {
     return new HttpHeaders({
       authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
-      api_key: environment.apiKey,
     });
   }
 
-  getAllEntries(): Observable<GetEntries> {
+  getAllEntries(page: number, limit: number): Observable<GetEntries> {
     const headers = this.createAuthorizationHeader();
     return this.httpClient.get<GetEntries>(
-      'api/apigw/evil-flowers-conn/entries',
-      { headers: headers }
-    );
+      'api/apigw/entries',
+      { headers: headers, params: {page: page+1, limit: limit}});
   }
 
   getAllFeeds(): Observable<GetFeeds> {
     const headers = this.createAuthorizationHeader();
-    return this.httpClient.get<GetFeeds>('api/apigw/evil-flowers-conn/feeds', {
-      headers: headers,
-    });
+    return this.httpClient.get<GetFeeds>('api/apigw/feeds',
+    { headers: headers});
+  }
+
+  getAllFeedsPagination(page: number, limit: number): Observable<GetFeeds> {
+    const headers = this.createAuthorizationHeader();
+    return this.httpClient.get<GetFeeds>('api/apigw/feeds',
+    { headers: headers, params: {page: page+1, limit: limit}});
   }
 
   updateFeed(feedId: string, newFeed: UpdateFeeds) {
     const headers = this.createAuthorizationHeader();
     return this.httpClient.put(
-      `api/apigw/evil-flowers-conn/admin/feeds/${feedId}`,
+      `api/apigw/feeds/${feedId}`,
       newFeed,
       { headers: headers }
     );
@@ -59,7 +60,7 @@ export class AdminService {
   deleteFeed(feedId: string) {
     const headers = this.createAuthorizationHeader();
     return this.httpClient.delete(
-      `api/apigw/evil-flowers-conn/admin/feeds/${feedId}`,
+      `api/apigw/feeds/${feedId}`,
       { headers: headers }
     );
   }
@@ -67,7 +68,7 @@ export class AdminService {
   upload(entriesData: FormData) {
     const headers = this.createAuthorizationHeader();
     return this.httpClient.post(
-      `api/apigw/evil-flowers-conn/admin/catalogs/${this.catalog_id}/entries`,
+      `api/apigw/entries`,
       entriesData,
       { headers: headers }
     );
@@ -76,7 +77,7 @@ export class AdminService {
   deleteEntry(entryId: string) {
     const headers = this.createAuthorizationHeader();
     return this.httpClient.delete(
-      `api/apigw/evil-flowers-conn/admin/catalogs/${this.catalog_id}/entries/${entryId}`,
+      `api/apigw/entries/${entryId}`,
       { headers: headers }
     );
   }
@@ -84,7 +85,7 @@ export class AdminService {
   getOneEntry(entryId: string) {
     const headers = this.createAuthorizationHeader();
     return this.httpClient.get<AllEntryItems>(
-      `api/apigw/evil-flowers-conn/catalogs/${this.catalog_id}/entries/${entryId}`,
+      `api/apigw/entries/${entryId}`,
       { headers: headers }
     );
   }
@@ -92,7 +93,7 @@ export class AdminService {
   updateEntry(entryId: string, entriesData: EditedData) {
     const headers = this.createAuthorizationHeader();
     return this.httpClient.put(
-      `api/apigw/evil-flowers-conn/admin/catalogs/${this.catalog_id}/entries/${entryId}`,
+      `api/apigw/entries/${entryId}`,
       entriesData,
       { headers: headers }
     );
@@ -105,7 +106,7 @@ export class AdminService {
  checkTitle(title: string){
   const headers = this.createAuthorizationHeader();
   return this.httpClient.get<GetEntries>(
-    'api/apigw/evil-flowers-conn/entries',
+    'api/apigw/entries',
     { headers: headers, params: {title: title}}
   );
  }
@@ -114,7 +115,7 @@ export class AdminService {
  addNewFeed(feedData: addNewFeed){
   const headers = this.createAuthorizationHeader();
   return this.httpClient.post(
-    'api/apigw/evil-flowers-conn/admin/feeds',
+    'api/apigw/feeds',
     feedData,
     { headers: headers }
   );

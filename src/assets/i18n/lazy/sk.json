@@ -21,7 +21,13 @@
     "document": "Súbor PDF",
     "document-dropper": "Presuňte svoj PDF sem alebo kliknite sem a prehľadávajte",
     "upload": "Nahrať",
-    "edit": "Upraviť"
+    "edit": "Upraviť",
+    "success-message-feed": "Feed bol úspešne nahraný",
+    "success-message-upload": "Feed bol úspešne aktualizovaný",
+    "success-delete-feed": "Feed bol úspešne odstránený",
+    "success-delete-document": "Dokument bol úspešne odstránený",
+    "success-message-document": "Dokument bol úspešne nahraný",
+    "error-message": "Nahrávanie neuspešná"
   },
   "adminOverview": {
     "search": "Vyhľadávanie",

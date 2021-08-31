@@ -2,6 +2,12 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
 import { AdminService } from 'src/app/admin/services/admin.service';
 import { addNewFeed } from 'src/app/admin/services/admin.types';
+import { NotificationService } from 'src/app/common/services/notification/notification.service';
+import { AdminOverviewComponent } from '../../admin-overview/admin-overview.component';
+import { FeedAddService } from '../../services/feed-add.service';
+import { catchError, take, tap } from 'rxjs/operators';
+import { throwError } from 'rxjs';
+import { TranslocoService } from '@ngneat/transloco';
 
 @Component({
   selector: 'app-new-feed-dialog',
@@ -14,6 +20,9 @@ export class NewFeedDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<NewFeedDialogComponent>,
     private readonly adminService: AdminService,
+    private readonly feedService: FeedAddService,
+    private readonly notificationService: NotificationService,
+    private translocoService: TranslocoService
   ) { }
 
   ngOnInit(): void {
@@ -25,7 +34,12 @@ export class NewFeedDialogComponent implements OnInit {
 
   onYesClcik(): void {
     console.log(this.getFeedData());
-    this.adminService.addNewFeed(this.getFeedData()).subscribe();
+    this.feedService.passValue(this.newFeed);
+    this.adminService.addNewFeed(this.getFeedData()).subscribe()
+    const message = this.translocoService.translate(
+      'lazy.adminPage.success-message-feed'
+    );
+    this.notificationService.success(message);
     this.dialogRef.close();
   }
 

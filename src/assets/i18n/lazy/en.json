@@ -21,7 +21,13 @@
     "document": "PDF File",
     "document-dropper": "Drag your PDF here or click here to browse",
     "upload": "Upload",
-    "edit": "Edit"
+    "edit": "Edit",
+    "success-message-feed": "Successfully uploaded feed",
+    "success-message-upload": "Successfully updated feed",
+    "success-delete-feed": "Successfully deleted feed",
+    "success-delete-document": "Successfully deleted document",
+    "success-message-document": "Successfully uploaded document",
+    "error-message": "Update failed"
   },
   "adminOverview": {
     "search": "Search",
