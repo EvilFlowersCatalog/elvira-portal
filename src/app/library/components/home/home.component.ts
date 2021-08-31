@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, takeUntil } from 'rxjs/operators';
+import { AllEntryItems } from 'src/app/admin/services/admin.types';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
 import { State } from 'src/app/common/services/app-state/app-state.types';
@@ -20,6 +23,11 @@ export class HomeComponent extends DisposableComponent implements OnInit {
   sidebarState$: Observable<boolean>;
   entriesResponse$: Observable<ListEntriesResponse>;
   entries: EntriesItem[];
+  tableData: AllEntryItems[] = [];
+  dataSource: MatTableDataSource<AllEntryItems>;
+  resultsLength = 0;
+
+  @ViewChild('paginator') paginator: MatPaginator;
 
   constructor(
     private readonly appStateService: AppStateService,
@@ -37,8 +45,14 @@ export class HomeComponent extends DisposableComponent implements OnInit {
     );
 
     this.entriesService
-      .listEntries()
-      .subscribe((data) => (this.entries = data.items));
+      .listEntries(0, 12)
+      .subscribe((data) => {
+        this.entries = data.items;
+        this.tableData = data.items;
+        this.resultsLength = data.metadata.total;
+        this.dataSource = new MatTableDataSource(this.tableData);
+        this.dataSource.paginator = this.paginator;
+      });
   }
 
   ngOnDestroy(): void {
@@ -47,5 +61,17 @@ export class HomeComponent extends DisposableComponent implements OnInit {
 
   hideSidebar() {
     this.appStateService.patchState({ sidebar: false });
+  }
+
+  homePagination(){
+    this.entriesService
+      .listEntries(this.paginator.pageIndex, this.paginator.pageSize)
+      .subscribe((data) => {
+        this.entries = data.items;
+        this.tableData = data.items;
+        this.resultsLength = data.metadata.total;
+        this.dataSource = new MatTableDataSource(this.tableData);
+        //this.dataSource.paginator = this.paginator;
+      });
   }
 }
