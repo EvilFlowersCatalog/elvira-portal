@@ -5,7 +5,7 @@ import { DeleteDialogComponent } from 'src/app/admin/dialogs/delete-dialog/delet
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { AdminService } from '../services/admin.service';
-import { addNewFeed, AllEntryItems, AllFeedsItems } from '../services/admin.types';
+import { addNewFeed, AllEntryItems, AllFeedsItems, UpdateFeeds } from '../services/admin.types';
 import { NewFeedDialogComponent } from 'src/app/admin/dialogs/new-feed-dialog/new-feed-dialog.component';
 import { UpdateDialogComponent } from 'src/app/admin/dialogs/update-dialog/update-dialog.component';
 import { NotificationService } from 'src/app/common/services/notification/notification.service';
@@ -176,7 +176,6 @@ export class AdminOverviewComponent extends DisposableComponent implements After
           this.adminService.deleteEntry(row.id).subscribe(
             () => {
               this.changeListenerService.statusChanged();
-              console.log("deleted doc");
             }
           );
 
@@ -219,9 +218,29 @@ export class AdminOverviewComponent extends DisposableComponent implements After
       width: '350px'
     });
     dialogRef.afterClosed().subscribe(result => {
-
-      console.log('The dialog was closed');
+      if(result != 'no'){
+        this.adminService.addNewFeed(this.getFeedData(result)).subscribe(
+          () => {
+            this.changeListenerService.statusChanged()
+          }
+        )
+        const message = this.translocoService.translate(
+      'lazy.adminPage.success-message-feed'
+    );
+    this.notificationService.success(message);
+      }
     });
+  }
+
+  getFeedData(newFeed){
+    const feedData: addNewFeed = {
+      catalog_id: "95e2b439-4851-4080-b33e-0adc1fd90196",
+      title: newFeed,
+      url_name: newFeed,
+      content: "Some popular shit over there",
+      kind: "navigation"
+    }
+    return feedData;
   }
 
   //Function, to get the current clicked row
@@ -244,7 +263,6 @@ export class AdminOverviewComponent extends DisposableComponent implements After
         'lazy.adminPage.success-delete-feed'
       );
       this.notificationService.success(message);
-        console.log('The dialog was closed');
       });
     }
     if(this.iseditFeed){
@@ -254,12 +272,34 @@ export class AdminOverviewComponent extends DisposableComponent implements After
       });
 
       dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed');
+        if(result != 'no'){
+          this.adminService
+      .updateFeed(row.id, this.getFeedsData(row, result))
+      .subscribe(
+        () => {
+          this.changeListenerService.statusChanged();
+        }
+      );
+      const message = this.translocoService.translate(
+        'lazy.adminPage.success-message-upload'
+      );
+      this.notificationService.success(message);
+        }
       });
     }
     //console.log(this.deleteEntryId);
   }
 
+  getFeedsData(row, newFeed) {
+    const feedsData: UpdateFeeds = {
+      catalog_id: row.catalog_id,
+      title: newFeed,
+      url_name: row.url_name,
+      content: row.content,
+      kind: row.kind,
+    };
+    return feedsData;
+  }
   //Function, to give choice, wether we want to delete the document or not
   deleteFeed(){
     this.isdeleteFeed = true;
