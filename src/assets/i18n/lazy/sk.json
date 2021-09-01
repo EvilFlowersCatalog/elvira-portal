@@ -70,5 +70,10 @@
     "unlinkErrorMessage": "Proces odstránenia aplikácie z vášho Google účtu zlyhal, prosím skúste to znova",
     "authSuccessMessage": "Autorizácia prebehla úspešne",
     "authErrorMessage": "Autorizácia zlyhala, prosím skúste to znova"
+  },
+  "paginator": {
+    "items-per-page": "Položky na stránku",
+    "next-page": "Ďalšia stránka",
+    "previous-page": "Predchádzajúca stránka"
   }
 }

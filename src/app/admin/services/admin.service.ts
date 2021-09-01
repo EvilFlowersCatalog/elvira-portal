@@ -39,7 +39,7 @@ export class AdminService {
   getAllFeeds(): Observable<GetFeeds> {
     const headers = this.createAuthorizationHeader();
     return this.httpClient.get<GetFeeds>('api/apigw/feeds',
-    { headers: headers});
+    { headers: headers, params: {limit: 100}});
   }
 
   getAllFeedsPagination(page: number, limit: number): Observable<GetFeeds> {

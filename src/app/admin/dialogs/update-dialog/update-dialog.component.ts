@@ -7,7 +7,6 @@ import { AdminService } from 'src/app/admin/services/admin.service';
 import { AllFeedsItems, UpdateFeeds } from 'src/app/admin/services/admin.types';
 import { NotificationService } from 'src/app/common/services/notification/notification.service';
 import { TranslocoService } from '@ngneat/transloco';
-import { FeedAddService } from '../../services/feed-add.service';
 
 export interface DialogData {
   feedId: string;
@@ -31,7 +30,6 @@ export class UpdateDialogComponent implements OnInit {
     private readonly adminService: AdminService,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService,
-    private readonly feedService: FeedAddService
   ) {}
 
   ngOnInit(): void {}
@@ -44,7 +42,6 @@ export class UpdateDialogComponent implements OnInit {
     // console.log("HOOOA");
     // console.log(this.data.newFeed);
     const data = this.getFeedsData();
-    this.feedService.updateValue(this.data.feedId, data.title);
     this.adminService
       .updateFeed(this.data.feedId, this.getFeedsData())
       .subscribe();
