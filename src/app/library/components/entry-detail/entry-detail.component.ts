@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { EntriesItem, EntryDetail } from '../../services/entries/entries.types';
 import { DateTime } from 'luxon';
 import { MatDialog } from '@angular/material/dialog';
@@ -19,8 +19,10 @@ import { TranslocoService } from '@ngneat/transloco';
 })
 export class EntryDetailComponent implements OnInit {
   @Input() entry: EntriesItem;
+  @Output() onDeleteFromFavorites = new EventEmitter<any>();
   imageSrc: string;
   year: string;
+  currentRoute = this.router.url;
 
   constructor(
     private readonly router: Router,
@@ -28,7 +30,8 @@ export class EntryDetailComponent implements OnInit {
     private readonly appStateService: AppStateService,
     public dialog: MatDialog,
     private readonly notificationService: NotificationService,
-    private translocoService: TranslocoService
+    private translocoService: TranslocoService,
+    private readonly entriesService: EntriesService
   ) {}
 
   ngOnInit(): void {
@@ -80,12 +83,13 @@ export class EntryDetailComponent implements OnInit {
     }
   }
 
-  downloadPdf(id: string) {
-    console.log('downloadPdf', id);
+  addToFavorites(id: string) {
+    this.entriesService.addEntryToFavorites(id).subscribe();
   }
 
-  addToFavorites(id: string) {
-    const feedId = this.appStateService.getStateSnapshot().feedId;
-    console.log('addToFavorites entryId:', id, 'feedId:', feedId);
+  deleteFromFavorites(id: string) {
+    this.entriesService
+      .deleteFromFavorites(id)
+      .subscribe(() => this.onDeleteFromFavorites.emit());
   }
 }

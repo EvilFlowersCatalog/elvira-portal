@@ -2,9 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { environment } from 'src/environments/environment';
 import { UserResponse } from '../../library.types';
-import { EntryDetail } from '../entries/entries.types';
 
 @Injectable({
   providedIn: 'root',
@@ -18,7 +16,6 @@ export class UserService {
   createAuthorizationHeader() {
     return new HttpHeaders({
       authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
-      api_key: environment.apiKey,
     });
   }
 

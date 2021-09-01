@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { FormControl, FormGroup } from '@angular/forms';
+import { FiltersService } from '../../services/filters/filters.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -6,11 +8,17 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./sidebar.component.scss'],
 })
 export class SidebarComponent implements OnInit {
-  constructor() {}
+  searchForm: FormGroup;
+
+  constructor(private readonly filtersService: FiltersService) {
+    this.searchForm = new FormGroup({ searchInput: new FormControl('') });
+  }
 
   ngOnInit(): void {}
 
   search() {
-    console.log('search');
+    this.filtersService
+      .entriesSearch(this.searchForm.value.searchInput)
+      .subscribe((data) => console.log(data));
   }
 }
