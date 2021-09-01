@@ -258,11 +258,11 @@ export class AdminOverviewComponent extends DisposableComponent implements After
               this.changeListenerService.statusChanged();
             }
           );
+          const message = this.translocoService.translate(
+            'lazy.adminPage.success-delete-feed'
+          );
+          this.notificationService.success(message);
         }
-      const message = this.translocoService.translate(
-        'lazy.adminPage.success-delete-feed'
-      );
-      this.notificationService.success(message);
       });
     }
     if(this.iseditFeed){
