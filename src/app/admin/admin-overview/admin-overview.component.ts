@@ -159,6 +159,20 @@ export class AdminOverviewComponent implements AfterViewInit  {
       }
     );
 
+    this.feedService.updateFeedSubject.subscribe(
+      data =>
+      {
+        this.iterator = 0;
+        this.tableDataFeed.map(
+          tableData => {
+            if(tableData.id === data.id){
+              tableData.title = data.title;
+            }
+          }
+        )
+      }
+    )
+
     this.documentService.addDocumentSubject.subscribe(
       data =>
       {
@@ -192,49 +206,81 @@ export class AdminOverviewComponent implements AfterViewInit  {
         this.dataSource.paginator = this.paginator;
       }
     );
+
+
   }
 
   documentPagination(){
-    console.log("Hello gays");
-    if(this.documentPage != this.paginator.pageIndex+1){
-      this.documentPage = this.paginator.pageIndex+1;
-      this.adminService.getAllEntries(this.paginator.pageIndex, this.paginator.pageSize).subscribe(
-        datas => {
-          //console.log(datas);
-          this.tableData = datas.items;
-        }
-      );
-    }
-    else if(this.documentSize < this.paginator.pageSize){
-      this.documentSize = this.paginator.pageSize;
-      this.adminService.getAllEntries(this.paginator.pageIndex, this.paginator.pageSize).subscribe(
-        datas => {
-          //console.log(datas);
-          this.tableData = datas.items;
-        }
-      );
-    }
+    this.adminService.getAllEntries(this.paginator.pageIndex, this.paginator.pageSize).subscribe(
+      datas => {
+        //console.log(datas);
+        this.tableData = datas.items;
+        this.resultsLength = datas.metadata.total;
+        console.log(this.resultsLength);
+        this.dataSource = new MatTableDataSource(this.tableData);
+        //this.dataSource.paginator = this.paginator;
+      }
+    );
+    // console.log("Hello gays");
+    // if(this.documentPage != this.paginator.pageIndex+1){
+    //   this.documentPage = this.paginator.pageIndex+1;
+    //   this.adminService.getAllEntries(this.paginator.pageIndex, this.paginator.pageSize).subscribe(
+    //     datas => {
+    //       //console.log(datas);
+    //       this.tableData = datas.items;
+    //       this.resultsLength = datas.metadata.total;
+    //       console.log(this.resultsLength);
+    //       this.dataSource = new MatTableDataSource(this.tableData);
+    //       //this.dataSource.paginator = this.paginator;
+    //     }
+    //   );
+    // }
+    // else if(this.documentSize < this.paginator.pageSize){
+    //   this.documentSize = this.paginator.pageSize;
+    //   this.adminService.getAllEntries(this.paginator.pageIndex, this.paginator.pageSize).subscribe(
+    //     datas => {
+    //       //console.log(datas);
+    //       this.tableData = datas.items;
+    //       this.resultsLength = datas.metadata.total;
+    //       console.log(this.resultsLength);
+    //       this.dataSource = new MatTableDataSource(this.tableData);
+    //       //this.dataSource.paginator = this.paginator;
+    //     }
+    //   );
+    // }
+    // else {
+    //   //this.dataSource.paginator = this.paginator;
+    // }
   }
 
   feedPagination(){
-    if(this.feedPage != this.Feedpaginator.pageIndex+1){
-      this.feedPage = this.Feedpaginator.pageIndex+1;
-      this.adminService.getAllFeedsPagination(this.Feedpaginator.pageIndex, this.Feedpaginator.pageSize).subscribe(
-        datas => {
-          //console.log(datas);
-          this.tableDataFeed = datas.items;
-        }
-      );
-    }
-    else if(this.feedSize < this.Feedpaginator.pageSize){
-      this.feedSize = this.Feedpaginator.pageSize;
-      this.adminService.getAllFeedsPagination(this.Feedpaginator.pageIndex, this.Feedpaginator.pageSize).subscribe(
-        datas => {
-          //console.log(datas);
-          this.tableDataFeed = datas.items;
-        }
-      );
-    }
+    this.adminService.getAllFeedsPagination(this.paginator.pageIndex, this.paginator.pageSize).subscribe(
+      datas => {
+        //console.log(datas);
+        this.tableDataFeed = datas.items;
+        this.resultsLengthFeed = datas.metadata.total;
+        this.dataSourceFeed = new MatTableDataSource(this.tableDataFeed);
+        //this.dataSourceFeed.paginator = this.Feedpaginator;
+      }
+    );
+    // if(this.feedPage != this.Feedpaginator.pageIndex+1){
+    //   this.feedPage = this.Feedpaginator.pageIndex+1;
+    //   this.adminService.getAllFeedsPagination(this.Feedpaginator.pageIndex, this.Feedpaginator.pageSize).subscribe(
+    //     datas => {
+    //       //console.log(datas);
+    //       this.tableDataFeed = datas.items;
+    //     }
+    //   );
+    // }
+    // else if(this.feedSize < this.Feedpaginator.pageSize){
+    //   this.feedSize = this.Feedpaginator.pageSize;
+    //   this.adminService.getAllFeedsPagination(this.Feedpaginator.pageIndex, this.Feedpaginator.pageSize).subscribe(
+    //     datas => {
+    //       //console.log(datas);
+    //       this.tableDataFeed = datas.items;
+    //     }
+    //   );
+    // }
   }
 
   //Button, to navigate to the upload formular
