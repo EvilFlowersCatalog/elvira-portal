@@ -16,7 +16,7 @@ import {
   selector: 'app-favorites',
   templateUrl: './favorites.component.html',
   styleUrls: ['./favorites.component.scss'],
-  providers: [ChangeListenerService]
+  providers: [ChangeListenerService],
 })
 export class FavoritesComponent extends DisposableComponent implements OnInit {
   entriesResponse$: Observable<ListEntriesResponse>;
@@ -37,20 +37,29 @@ export class FavoritesComponent extends DisposableComponent implements OnInit {
   ngOnInit(): void {
     this.changeListenerService
       .listenToChange()
-      .pipe(startWith({}), takeUntil(this.destroySignal$), concatMap(() => this.getEntries()))
+      .pipe(
+        startWith({}),
+        takeUntil(this.destroySignal$),
+        concatMap(() => this.getEntries())
+      )
       .subscribe();
   }
 
   getEntries() {
-    return this.entriesService.listFavoriteEntries(this.paginator?.pageIndex ?? 0, this.paginator?.pageSize ?? 12).pipe(
-      tap((data) => {
-        this.entries = data.items;
-        this.tableData = data.items;
-        this.resultsLength = data.metadata.total;
-        this.dataSource = new MatTableDataSource(this.tableData);
-        this.dataSource.paginator = this.paginator;
-      })
-    );
+    return this.entriesService
+      .listFavoriteEntries(
+        this.paginator?.pageIndex ?? 0,
+        this.paginator?.pageSize ?? 12
+      )
+      .pipe(
+        tap((data) => {
+          this.entries = data.items;
+          this.tableData = data.items;
+          this.resultsLength = data.metadata.total;
+          this.dataSource = new MatTableDataSource(this.tableData);
+          this.dataSource.paginator = this.paginator;
+        })
+      );
   }
 
   favoritePagination() {
@@ -63,5 +72,9 @@ export class FavoritesComponent extends DisposableComponent implements OnInit {
         this.dataSource = new MatTableDataSource(this.tableData);
         //this.dataSource.paginator = this.paginator;
       });
+  }
+
+  deleteFromFavorites() {
+    this.changeListenerService.statusChanged();
   }
 }

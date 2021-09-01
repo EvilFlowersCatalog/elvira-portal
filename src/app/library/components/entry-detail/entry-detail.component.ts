@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { EntriesItem, EntryDetail } from '../../services/entries/entries.types';
 import { DateTime } from 'luxon';
 import { MatDialog } from '@angular/material/dialog';
@@ -11,7 +11,6 @@ import { AppStateService } from 'src/app/common/services/app-state/app-state.ser
 import { throwError } from 'rxjs';
 import { NotificationService } from 'src/app/common/services/notification/notification.service';
 import { TranslocoService } from '@ngneat/transloco';
-import { ChangeListenerService } from 'src/app/common/services/change-listener/change-listener.service';
 
 @Component({
   selector: 'app-entry-detail',
@@ -20,6 +19,7 @@ import { ChangeListenerService } from 'src/app/common/services/change-listener/c
 })
 export class EntryDetailComponent implements OnInit {
   @Input() entry: EntriesItem;
+  @Output() onDeleteFromFavorites = new EventEmitter<any>();
   imageSrc: string;
   year: string;
   currentRoute = this.router.url;
@@ -31,8 +31,7 @@ export class EntryDetailComponent implements OnInit {
     public dialog: MatDialog,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService,
-    private readonly entriesService: EntriesService,
-    private readonly changeListenerService: ChangeListenerService
+    private readonly entriesService: EntriesService
   ) {}
 
   ngOnInit(): void {
@@ -89,7 +88,8 @@ export class EntryDetailComponent implements OnInit {
   }
 
   deleteFromFavorites(id: string) {
-    this.entriesService.deleteFromFavorites(id).subscribe();
-    this.changeListenerService.statusChanged();
+    this.entriesService
+      .deleteFromFavorites(id)
+      .subscribe(() => this.onDeleteFromFavorites.emit());
   }
 }

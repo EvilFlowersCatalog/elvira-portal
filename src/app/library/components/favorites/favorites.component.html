@@ -7,7 +7,10 @@
       fxFlex.md="25%"
       *ngFor="let entry of entries"
     >
-      <app-entry-detail [entry]="entry"></app-entry-detail>
+      <app-entry-detail
+        (onDeleteFromFavorites)="deleteFromFavorites($event)"
+        [entry]="entry"
+      ></app-entry-detail>
     </div>
   </ng-container>
   <ng-template #empty>
