@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { TranslocoModule, TRANSLOCO_SCOPE } from '@ngneat/transloco';
+import { TranslocoModule, TranslocoService, TRANSLOCO_SCOPE } from '@ngneat/transloco';
 import { ADMIN_ROUTES } from './routing/admin.routes';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AdminUploadComponent } from './admin-upload/admin-upload.component';
@@ -9,7 +9,7 @@ import { AdminOverviewComponent } from './admin-overview/admin-overview.componen
 import { MaterialModule } from '../material.module';
 import { TabGroupDirective } from './directives/tab-group.directive';
 import { MatPaginatorIntl } from '@angular/material/paginator';
-import { CustomPaginationService } from './custom-pagination/custom-pagination.service';
+import {  getPaginatorIntl } from './custom-pagination/custom-pagination.service';
 
 
 @NgModule({
@@ -25,7 +25,9 @@ import { CustomPaginationService } from './custom-pagination/custom-pagination.s
   ],
   providers:[
     { provide: TRANSLOCO_SCOPE, useValue: 'lazy' },
-    //{ provide: MatPaginatorIntl , useValue:  CustomPaginationService}
+    { provide: MatPaginatorIntl ,  useFactory: (TranslocoService: TranslocoService) =>
+      getPaginatorIntl(TranslocoService),
+    deps: [TranslocoService]}
   ]
 })
 export class AdminModule { }

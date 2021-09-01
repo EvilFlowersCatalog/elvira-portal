@@ -70,5 +70,10 @@
     "unlinkErrorMessage": "Unlink process failed, please try again",
     "authSuccessMessage": "Authorization successful",
     "authErrorMessage": "Authorization failed, please try again"
+  },
+  "paginator": {
+    "items-per-page": "Items per page",
+    "next-page": "Next page",
+    "previous-page": "Previous page"
   }
 }
