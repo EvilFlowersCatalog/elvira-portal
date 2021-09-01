@@ -11,6 +11,11 @@
   padding: 16px;
 }
 
+.home-paginator {
+  width: 100%;
+  margin: 16px;
+}
+
 @media screen and (max-width: 599px) {
   .sidenav-container {
     background-color: transparent !important;
@@ -20,9 +25,4 @@
     left: 0;
     right: 0;
   }
-}
-
-.paginator-size {
-  width: 95%;
-  margin-bottom: 30px;
 }

@@ -19,6 +19,6 @@ export class SidebarComponent implements OnInit {
   search() {
     this.filtersService
       .entriesSearch(this.searchForm.value.searchInput)
-      .subscribe();
+      .subscribe((data) => console.log(data));
   }
 }

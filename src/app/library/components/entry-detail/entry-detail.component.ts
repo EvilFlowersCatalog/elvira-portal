@@ -11,6 +11,7 @@ import { AppStateService } from 'src/app/common/services/app-state/app-state.ser
 import { throwError } from 'rxjs';
 import { NotificationService } from 'src/app/common/services/notification/notification.service';
 import { TranslocoService } from '@ngneat/transloco';
+import { ChangeListenerService } from 'src/app/common/services/change-listener/change-listener.service';
 
 @Component({
   selector: 'app-entry-detail',
@@ -21,6 +22,7 @@ export class EntryDetailComponent implements OnInit {
   @Input() entry: EntriesItem;
   imageSrc: string;
   year: string;
+  currentRoute = this.router.url;
 
   constructor(
     private readonly router: Router,
@@ -28,7 +30,9 @@ export class EntryDetailComponent implements OnInit {
     private readonly appStateService: AppStateService,
     public dialog: MatDialog,
     private readonly notificationService: NotificationService,
-    private translocoService: TranslocoService
+    private translocoService: TranslocoService,
+    private readonly entriesService: EntriesService,
+    private readonly changeListenerService: ChangeListenerService
   ) {}
 
   ngOnInit(): void {
@@ -80,12 +84,12 @@ export class EntryDetailComponent implements OnInit {
     }
   }
 
-  downloadPdf(id: string) {
-    console.log('downloadPdf', id);
+  addToFavorites(id: string) {
+    this.entriesService.addEntryToFavorites(id).subscribe();
   }
 
-  addToFavorites(id: string) {
-    const feedId = this.appStateService.getStateSnapshot().feedId;
-    console.log('addToFavorites entryId:', id, 'feedId:', feedId);
+  deleteFromFavorites(id: string) {
+    this.entriesService.deleteFromFavorites(id).subscribe();
+    this.changeListenerService.statusChanged();
   }
 }
