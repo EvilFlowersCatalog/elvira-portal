@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Observable } from 'rxjs';
-import { startWith, takeUntil, tap } from 'rxjs/operators';
+import { concatMap, startWith, takeUntil, tap } from 'rxjs/operators';
 import { AllEntryItems } from 'src/app/admin/services/admin.types';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { ChangeListenerService } from 'src/app/common/services/change-listener/change-listener.service';
@@ -16,6 +16,7 @@ import {
   selector: 'app-favorites',
   templateUrl: './favorites.component.html',
   styleUrls: ['./favorites.component.scss'],
+  providers: [ChangeListenerService]
 })
 export class FavoritesComponent extends DisposableComponent implements OnInit {
   entriesResponse$: Observable<ListEntriesResponse>;
@@ -34,16 +35,14 @@ export class FavoritesComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getEntries();
     this.changeListenerService
       .listenToChange()
-      .pipe(takeUntil(this.destroySignal$))
-      .subscribe(() => this.getEntries());
+      .pipe(startWith({}), takeUntil(this.destroySignal$), concatMap(() => this.getEntries()))
+      .subscribe();
   }
 
   getEntries() {
-    this.entriesService.listFavoriteEntries(0, 12).pipe(
-      takeUntil(this.destroySignal$),
+    return this.entriesService.listFavoriteEntries(this.paginator?.pageIndex ?? 0, this.paginator?.pageSize ?? 12).pipe(
       tap((data) => {
         this.entries = data.items;
         this.tableData = data.items;
