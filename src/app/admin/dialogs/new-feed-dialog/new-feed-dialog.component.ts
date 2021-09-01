@@ -27,27 +27,10 @@ export class NewFeedDialogComponent implements OnInit {
   }
 
   onNoClick(): void {
-    this.dialogRef.close();
+    this.dialogRef.close("no");
   }
 
   onYesClcik(): void {
-    console.log(this.getFeedData());
-    this.adminService.addNewFeed(this.getFeedData()).subscribe()
-    const message = this.translocoService.translate(
-      'lazy.adminPage.success-message-feed'
-    );
-    this.notificationService.success(message);
-    this.dialogRef.close();
-  }
-
-  getFeedData(){
-    const feedData: addNewFeed = {
-      catalog_id: "95e2b439-4851-4080-b33e-0adc1fd90196",
-      title: this.newFeed,
-      url_name: this.newFeed,
-      content: "Some popular shit over there",
-      kind: "navigation"
-    }
-    return feedData;
+    this.dialogRef.close(this.newFeed);
   }
 }
