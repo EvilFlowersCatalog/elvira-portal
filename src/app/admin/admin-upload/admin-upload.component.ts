@@ -13,13 +13,14 @@ import { HttpClient } from '@angular/common/http';
 import { AllEntryItems, EditedData, EntriesData } from '../services/admin.types';
 import { TitleValidators } from '../validators/title.validator';
 import { NotificationService } from 'src/app/common/services/notification/notification.service';
-import { DocumentAddService } from '../services/document-add.service';
 import { TranslocoService } from '@ngneat/transloco';
+//import { ChangeListenerService } from 'src/app/common/services/change-listener/change-listener.service';
 
 @Component({
   selector: 'app-admin',
   templateUrl: './admin-upload.component.html',
   styleUrls: ['./admin-upload.component.scss'],
+  //providers: [ChangeListenerService]
 })
 export class AdminUploadComponent implements OnInit {
   uploadForm: FormGroup;
@@ -38,6 +39,8 @@ export class AdminUploadComponent implements OnInit {
   filteredFeeds: Observable<string[]>;
   feeds: string[] = [];
   allFeeds: string[] = [];
+  feedsIdList: string[] = [];
+  finalFeeds: string[] = [];
   //Image upload variables
   imageFile: File;
   pdfFile: File;
@@ -60,8 +63,8 @@ export class AdminUploadComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly titleValidator: TitleValidators,
     private readonly notificationService: NotificationService,
-    private readonly documentService: DocumentAddService,
-    private translocoService: TranslocoService
+    private translocoService: TranslocoService,
+    //private readonly changeListenerService: ChangeListenerService
     ) {
 
       this.imageForm = new FormGroup({
@@ -101,51 +104,6 @@ export class AdminUploadComponent implements OnInit {
      return this.uploadForm.controls['title'];
    }
 
-
-  //  onBlurTitle(){
-  //    let editTitle = this.uploadForm.get('title').value;
-  //    if(this.isInEditMode){
-  //     this.adminService.checkTitle(this.checkTitle).subscribe(
-  //       data => {
-  //         if(data.metadata.total === 0 || this.isTitleSame) {
-  //           this.isTitleSame = false;
-  //        }
-  //         else {
-  //           data.items.map(
-  //             map => {
-  //               //console.log(map.title.toLowerCase());
-  //               if(editTitle.toLocaleLowerCase() === map.title.toLocaleLowerCase()){
-  //                 this.isTitleSame = true;
-  //               }
-  //               else if(!this.isTitleSame){
-  //                  this.isTitleSame = false;
-  //               }
-  //              }
-  //           )}
-  //          });
-  //    }
-  //    else {
-  //     this.adminService.checkTitle(this.checkTitle).subscribe(
-  //       data => {
-  //         if(data.metadata.total === 0 || this.isTitleSame) {
-  //           this.isTitleSame = false;
-  //        }
-  //         else {
-  //           data.items.map(
-  //             map => {
-  //               //console.log(map.title.toLowerCase());
-  //               if(map.title.toLocaleLowerCase() === this.checkTitle.toLocaleLowerCase()){
-  //                 this.isTitleSame = true;
-  //               }
-  //               else if(!this.isTitleSame){
-  //                  this.isTitleSame = false;
-  //               }
-  //              }
-  //           )}
-  //          });
-  //    }
-  //  }
-
    createItem(): FormGroup {
     return this.formBuilder.group({
       name: '',
@@ -166,12 +124,10 @@ export class AdminUploadComponent implements OnInit {
   ngOnInit(): void {
     this.allFeeds = this.getFeeds();
     this.entryId = this.route.snapshot.paramMap.get('id');
-      //console.log(this.entryId);
       if(this.entryId != null && !this.isInEditMode){
         this.adminService.getOneEntry(this.entryId).subscribe(
           datas => {
             this.editData = datas;
-            //console.log(datas);
             this.isInEditMode = true;
             console.log(this.isInEditMode);
           }
@@ -180,23 +136,23 @@ export class AdminUploadComponent implements OnInit {
       }
 
 
-      //console.log("loaded");
 
       this.filteredFeeds = this.feedCtrl.valueChanges.pipe(
         startWith(null),
         map((fruit: string | null) => fruit ? this._filter(fruit) :this.allFeeds.slice()));
 
-      //console.log(this.isInEditMode);
   }
 
   getFeeds(): string[]{
     let feedsList: string[] = [];
     this.adminService.getAllFeeds().subscribe(
       datas => {
-        datas.items.map(m => feedsList.push(m.title))
+        datas.items.map(m => {
+          feedsList.push(m.title);
+          this.feedsIdList.push(m.id);
+        })
       }
     );
-    //console.log(feedsList);
     return feedsList;
   }
 
@@ -219,6 +175,7 @@ export class AdminUploadComponent implements OnInit {
     const index = this.feeds.indexOf(feed);
 
     if (index >= 0) {
+      this.finalFeeds.splice(index, 1);
       this.feeds.splice(index, 1);
     }
   }
@@ -226,7 +183,8 @@ export class AdminUploadComponent implements OnInit {
   selected(event: MatAutocompleteSelectedEvent): void {
     if(!this.feeds.includes(event.option.viewValue)){
       this.feeds.push(event.option.viewValue);
-
+      console.log(this.feedsIdList[this.allFeeds.indexOf(event.option.viewValue)]);
+      this.finalFeeds.push(this.feedsIdList[this.allFeeds.indexOf(event.option.viewValue)]);
     }
     this.fruitInput.nativeElement.value = '';
     this.feedCtrl.setValue(null);
@@ -249,20 +207,23 @@ export class AdminUploadComponent implements OnInit {
     let testData: FormData = new FormData();
     testData.append('file', this.imageFile, this.imageFile.name);
     testData.append('body', JSON.stringify(await this.getFormData()));
-    // console.log(testData.get('body'));
-    // console.log(testData.get('file'));
       if(this.uploadForm.status === "VALID" && this.imageFile && this.pdfFile){
         if(this.validSize){
-          this.documentService.passValue(this.uploadForm.get('title').value,
           this.uploadForm.get('author').get('name').value,
-          this.uploadForm.get('author').get('surname').value);
+          this.uploadForm.get('author').get('surname').value;
 
-          this.adminService.upload(testData).subscribe();
+          this.adminService.upload(testData).subscribe(
+            () => {
+              //this.changeListenerService.statusChanged();
+              this.router.navigate(['../'], { relativeTo: this.route });
+              //this.router.navigate(['/library/admin'])
+            }
+          );
           const message = this.translocoService.translate(
             'lazy.adminPage.success-message-document'
           );
           this.notificationService.success(message);
-          this.router.navigate(['../'], { relativeTo: this.route });
+
         }
         else {
             this.notificationService.error('Invalid image size!');
@@ -296,6 +257,7 @@ export class AdminUploadComponent implements OnInit {
           surname : this.uploadForm.get('author').get('surname').value,
           },
           contributors: this.getContributors(),
+          feeds: this.finalFeeds,
           summary : this.uploadForm.get('summary').value,
           language_code : this.uploadForm.get('language_code').value,
           acquisitions : [
@@ -305,6 +267,14 @@ export class AdminUploadComponent implements OnInit {
           //console.log(entriesData);
 
           return entriesData;
+  }
+
+  getFeedId(){
+    console.log("feeds");
+    let feed: string[] = [];
+    feed = this.getFeeds();
+    console.log(feed);
+
   }
 
   async getBase(){

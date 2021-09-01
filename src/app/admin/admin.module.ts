@@ -9,7 +9,7 @@ import { AdminOverviewComponent } from './admin-overview/admin-overview.componen
 import { MaterialModule } from '../material.module';
 import { TabGroupDirective } from './directives/tab-group.directive';
 import { MatPaginatorIntl } from '@angular/material/paginator';
-import {  getPaginatorIntl } from './custom-pagination/custom-pagination.service';
+import {  CustomPaginationComponent } from '../common/services/custom-pagination/custom-pagination.service';
 
 
 @NgModule({
@@ -24,10 +24,8 @@ import {  getPaginatorIntl } from './custom-pagination/custom-pagination.service
     ReactiveFormsModule
   ],
   providers:[
-    { provide: TRANSLOCO_SCOPE, useValue: 'lazy' },
-    { provide: MatPaginatorIntl ,  useFactory: (TranslocoService: TranslocoService) =>
-      getPaginatorIntl(TranslocoService),
-    deps: [TranslocoService]}
+    { provide: MatPaginatorIntl, useClass: CustomPaginationComponent},
+    { provide: TRANSLOCO_SCOPE, useValue: 'lazy' }
   ]
 })
 export class AdminModule { }
