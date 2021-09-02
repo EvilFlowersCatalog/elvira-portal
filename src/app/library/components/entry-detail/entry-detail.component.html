@@ -35,13 +35,6 @@
       >
         <mat-icon> add_to_drive </mat-icon>
       </button>
-      <button
-        mat-icon-button
-        matTooltip="{{ t('lazy.entryDetail.download-pdf-tooltip') }}"
-        (click)="downloadPdf(entry.id)"
-      >
-        <mat-icon> file_download </mat-icon>
-      </button>
       <div
         *ngIf="currentRoute === '/library/favorites'; else addToFavoritesBtn"
       >

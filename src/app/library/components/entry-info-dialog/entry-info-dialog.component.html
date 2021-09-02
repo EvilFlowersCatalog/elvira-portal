@@ -1,26 +1,30 @@
-<ng-container *ngIf="entryDetail$ | async as entryDetail">
-  <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center" color="accent">
-    {{ entryDetail.title }}
-  </h2>
-  <mat-dialog-content fxLayout="column" fxLayoutAlign="start start">
-    <p>
-      Author:
-      {{ entryDetail.author.name + " " + entryDetail.author.surname }}
-    </p>
-    <p>
-      Summary:
-      {{ entryDetail.summary }}
-    </p>
-    <p>
-      Language:
-      {{ entryDetail.language.name }}
-    </p>
-    <p>
-      Created:
-      {{ entryDetail.created_at }}
-    </p>
-  </mat-dialog-content>
-  <mat-dialog-actions fxLayout="row" fxLayoutAlign="center center">
-    <button mat-button mat-dialog-close color="accent">zavri picu</button>
-  </mat-dialog-actions>
+<ng-container *transloco="let t">
+  <ng-container *ngIf="entryDetail$ | async as entryDetail">
+    <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center" color="accent">
+      {{ entryDetail.title }}
+    </h2>
+    <mat-dialog-content fxLayout="column" fxLayoutAlign="start start">
+      <p>
+        {{ t("lazy.entryInfoDialog.author") }}
+        {{ entryDetail.author.name + " " + entryDetail.author.surname }}
+      </p>
+      <p>
+        {{ t("lazy.entryInfoDialog.summary") }}
+        {{ entryDetail.summary }}
+      </p>
+      <p>
+        {{ t("lazy.entryInfoDialog.language") }}
+        {{ entryDetail.language.name }}
+      </p>
+      <p>
+        {{ t("lazy.entryInfoDialog.createdAt") }}
+        {{ entryDetail.created_at }}
+      </p>
+    </mat-dialog-content>
+    <mat-dialog-actions fxLayout="row" fxLayoutAlign="center center">
+      <button mat-button mat-dialog-close color="accent">
+        {{ t("lazy.entryInfoDialog.close") }}
+      </button>
+    </mat-dialog-actions>
+  </ng-container>
 </ng-container>
