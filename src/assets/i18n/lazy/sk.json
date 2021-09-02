@@ -42,11 +42,21 @@
   "entryDetail": {
     "info-pdf-tooltip": "Zobraziť informácie",
     "add-pdf-to-drive-tooltip": "Pridať PDF na Google Disk",
-    "download-pdf-tooltip": "Stiahnuť PDF",
     "favorite-pdf-tooltip": "Pridať do obľúbených",
     "drive-success-message": "Úspešne nahrané na disk",
     "drive-error-message": "Nahrávanie na disk zlyhalo",
-    "drive-unauthorized-message": "Prihláste sa najskôr do svojho účtu Google v nastaveniach účtu Elvíry"
+    "drive-unauthorized-message": "Prihláste sa najskôr do svojho účtu Google v <a href='/library/account'>nastaveniach účtu Elvíry</a>",
+    "addToFavoritesSuccessMessage": "Položka bola pridaná do obľúbených",
+    "addToFavoritesErrorMessage": "Položka sa už nachádza v obľúbených",
+    "removeFromFavoritesSuccessMessage": "Položka bola odstránená z obľúbených",
+    "removeFromFavoritesErrorMessage": "Položku sa nepodarilo odstrániť z obľúbených"
+  },
+  "entryInfoDialog": {
+    "author": "Autor:",
+    "summary": "Zhrnutie:",
+    "language": "Jazyk:",
+    "createdAt": "Pridané:",
+    "close": "Zatvoriť"
   },
   "adminDialog": {
     "delete": "Ste si istí, že chcete odstrániť '{{title}}'?",
@@ -70,5 +80,13 @@
     "unlinkErrorMessage": "Proces odstránenia aplikácie z vášho Google účtu zlyhal, prosím skúste to znova",
     "authSuccessMessage": "Autorizácia prebehla úspešne",
     "authErrorMessage": "Autorizácia zlyhala, prosím skúste to znova"
+  },
+  "paginator": {
+    "items-per-page": "Položky na stránku",
+    "next-page": "Ďalšia stránka",
+    "previous-page": "Predchádzajúca stránka"
+  },
+  "favorites": {
+    "emptyFavorites": "V tomto zozname sa nenachádza žiadna položka"
   }
 }

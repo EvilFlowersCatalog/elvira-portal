@@ -1,4 +1,17 @@
-.paginator-size {
-  width: 95%;
-  margin-bottom: 30px;
+.entries-list-container {
+  padding: 16px;
+}
+
+.favorites-paginator {
+  width: 100%;
+  margin: 0 16px;
+}
+
+.favorites-empty-row {
+  width: 100%;
+  margin: 150px 0;
+}
+
+.favorites-empty-text {
+  font-weight: 300;
 }

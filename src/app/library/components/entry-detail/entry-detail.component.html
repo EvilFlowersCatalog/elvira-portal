@@ -35,20 +35,27 @@
       >
         <mat-icon> add_to_drive </mat-icon>
       </button>
-      <button
-        mat-icon-button
-        matTooltip="{{ t('lazy.entryDetail.download-pdf-tooltip') }}"
-        (click)="downloadPdf(entry.id)"
+      <div
+        *ngIf="currentRoute === '/library/favorites'; else addToFavoritesBtn"
       >
-        <mat-icon> file_download </mat-icon>
-      </button>
-      <button
-        mat-icon-button
-        matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
-        (click)="addToFavorites(entry.id)"
-      >
-        <mat-icon> favorite </mat-icon>
-      </button>
+        <button
+          color="accent"
+          mat-icon-button
+          matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
+          (click)="deleteFromFavorites(entry.id)"
+        >
+          <mat-icon> favorite </mat-icon>
+        </button>
+      </div>
+      <ng-template #addToFavoritesBtn>
+        <button
+          mat-icon-button
+          matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
+          (click)="addToFavorites(entry.id)"
+        >
+          <mat-icon> favorite </mat-icon>
+        </button>
+      </ng-template>
     </mat-card-actions>
   </mat-card>
 </ng-container>

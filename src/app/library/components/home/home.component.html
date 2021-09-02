@@ -23,15 +23,15 @@
       </div>
     </div>
     <div fxLayoutAlign="center center">
-    <mat-paginator
-              #paginator
-              (page)="homePagination()"
-              [length]="resultsLength"
-              [pageSizeOptions]="[12, 24, 48]"
-              class="paginator-size"
-              aria-label="Select page">
-    </mat-paginator>
+      <mat-paginator
+        #paginator
+        (page)="homePagination()"
+        [length]="resultsLength"
+        [pageSizeOptions]="[12, 24, 48]"
+        class="home-paginator"
+        aria-label="Select page"
+      >
+      </mat-paginator>
     </div>
   </mat-sidenav-content>
-
 </mat-sidenav-container>

@@ -7,6 +7,7 @@ export interface EntriesData {
     name: string;
     surname: string;
   };
+  feeds: string[];
   contributors: EntriesContributors[];
   summary: string;
   language_code: string;

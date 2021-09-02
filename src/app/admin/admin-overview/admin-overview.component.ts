@@ -5,20 +5,24 @@ import { DeleteDialogComponent } from 'src/app/admin/dialogs/delete-dialog/delet
 import { MatTableDataSource } from '@angular/material/table';
 import { MatPaginator } from '@angular/material/paginator';
 import { AdminService } from '../services/admin.service';
-import { addNewFeed, AllEntryItems, AllFeedsItems } from '../services/admin.types';
+import { addNewFeed, AllEntryItems, AllFeedsItems, UpdateFeeds } from '../services/admin.types';
 import { NewFeedDialogComponent } from 'src/app/admin/dialogs/new-feed-dialog/new-feed-dialog.component';
 import { UpdateDialogComponent } from 'src/app/admin/dialogs/update-dialog/update-dialog.component';
-import { FeedAddService } from '../services/feed-add.service';
-import { DocumentAddService } from '../services/document-add.service';
+import { NotificationService } from 'src/app/common/services/notification/notification.service';
+import { TranslocoService } from '@ngneat/transloco';
+import { ChangeListenerService } from 'src/app/common/services/change-listener/change-listener.service';
+import { DisposableComponent } from 'src/app/common/components/disposable.component';
+import { concatMap, startWith, takeUntil, tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-admin',
   templateUrl: './admin-overview.component.html',
   styleUrls: ['./admin-overview.component.scss'],
+  providers: [ChangeListenerService]
 })
 
 
-export class AdminOverviewComponent implements AfterViewInit  {
+export class AdminOverviewComponent extends DisposableComponent implements AfterViewInit  {
   displayedColumns: string[] = ['title', 'name', 'surname', 'edit', 'delete'];
   currentRow: number = 0;
   resultsLength = 0;
@@ -44,6 +48,7 @@ export class AdminOverviewComponent implements AfterViewInit  {
   iseditFeed: boolean = false;
   deletedFeedId: number;
   iterator: number;
+  isloaded: boolean = false;
 
   @ViewChild('paginator') paginator: MatPaginator;
   @ViewChild('Feedpaginator') Feedpaginator: MatPaginator;
@@ -53,234 +58,100 @@ export class AdminOverviewComponent implements AfterViewInit  {
     private readonly route: ActivatedRoute,
     public dialog: MatDialog,
     private readonly adminService: AdminService,
-    private readonly feedService: FeedAddService,
-    private readonly documentService: DocumentAddService
+    private readonly notificationService: NotificationService,
+    private translocoService: TranslocoService,
+    private readonly changeListenerService: ChangeListenerService,
   ) {
-    //this.paginator.pageIndex = 1;
-    //this.paginator.pageSize = 5;
-  //   this.route.queryParams.subscribe(params => {
-  //     this.tabIndex = params['index'];
-  //     if(this.tabIndex == 1){
-  //       // console.log(this.paginator.page);
-  //       // console.log(this.paginator.pageIndex);
-  //       // console.log(this.paginator.pageSize);
-  //     //   this.adminService.getAllFeedsPagination(this.paginator.pageIndex, this.paginator.pageSize).subscribe(
-  //     //   datas => {
-  //     //     //console.log(datas);
-  //     //     this.tableDataFeed = datas.items;
-  //     //     this.resultsLengthFeed = datas.metadata.total;
-  //     //     this.dataSourceFeed = new MatTableDataSource(this.tableDataFeed);
-  //     //     this.dataSourceFeed.paginator = this.Feedpaginator;
-  //     //   }
-  //     // );
-  //     }
-  //     if(this.tabIndex == 0 && !this.isDocumentLoaded){
-  //       this.isDocumentLoaded = true;
-  //       this.adminService.getAllEntries().subscribe((datas) => {
-  //         //console.log(datas);
-  //         this.tableData = datas.items;
-  //         this.resultsLength = datas.metadata.total;
-  //         this.dataSource = new MatTableDataSource(this.tableData);
-  //         this.dataSource.paginator = this.paginator;
-  //       });
-  //     }
-
-  // });
-
-
+    super();
   }
 
   //Pass info to pagination
   ngAfterViewInit() {
-    console.log("Hey i loaded");
     this.route.queryParams.subscribe(params => {
       this.tabIndex = params['index'];
-      if(this.tabIndex == 1 && !this.isFeedLoaded){
-        // console.log(this.paginator.pageIndex);
-        // console.log(this.paginator.pageSize);
-        console.log("cheese");
-        this.isFeedLoaded = true;
-        this.adminService.getAllFeedsPagination(this.paginator.pageIndex, this.paginator.pageSize).subscribe(
-        datas => {
-          //console.log(datas);
-          this.tableDataFeed = datas.items;
-          this.resultsLengthFeed = datas.metadata.total;
-          this.dataSourceFeed = new MatTableDataSource(this.tableDataFeed);
-          this.dataSourceFeed.paginator = this.Feedpaginator;
-        }
-      );
+      if(this.isloaded){
+        this.getDataPagination();
       }
-      if(this.tabIndex == 0 && !this.isDocumentLoaded){
-        // console.log(this.Feedpaginator.pageIndex);
-        // console.log(this.Feedpaginator.pageSize);
-        this.isDocumentLoaded = true;
-        this.adminService.getAllEntries(this.Feedpaginator.pageIndex, this.Feedpaginator.pageSize).subscribe((datas) => {
-          //console.log(datas);
+      this.isloaded = true;
+    })
+
+    this.changeListenerService
+    .listenToChange()
+    .pipe(
+      startWith({}),
+        takeUntil(this.destroySignal$),
+        concatMap(() => this.getOverviewData())
+    ).subscribe();
+  }
+
+  getDataPagination(){
+      if(this.tabIndex == 1){
+        return this.adminService.getAllFeedsPagination(this.Feedpaginator.pageIndex, this.Feedpaginator.pageSize).subscribe(
+            datas => {
+              this.tableDataFeed = datas.items;
+              this.resultsLengthFeed = datas.metadata.total;
+              this.dataSourceFeed = new MatTableDataSource(this.tableDataFeed);
+            }
+          );
+      }
+      if(this.tabIndex == 0){
+       return this.adminService.getAllEntries(this.paginator.pageIndex, this.paginator.pageSize).subscribe(
+          datas => {
+          this.tableData = datas.items;
+          this.resultsLength = datas.metadata.total;
+          this.dataSource = new MatTableDataSource(this.tableData);
+        }
+        );
+      }
+  }
+
+  getOverviewData(){
+      if(this.tabIndex == 1){
+        return this.adminService.getAllFeedsPagination(this.Feedpaginator.pageIndex ?? 0, this.Feedpaginator.pageSize ?? 5).pipe(
+          tap(
+            datas => {
+              this.tableDataFeed = datas.items;
+              this.resultsLengthFeed = datas.metadata.total;
+              this.dataSourceFeed = new MatTableDataSource(this.tableDataFeed);
+              this.dataSourceFeed.paginator = this.Feedpaginator;
+            }
+          ));
+      }
+      if(this.tabIndex == 0){
+       return this.adminService.getAllEntries(this.paginator.pageIndex ?? 0, this.paginator.pageSize ?? 5).pipe(
+          tap(
+          datas => {
           this.tableData = datas.items;
           this.resultsLength = datas.metadata.total;
           this.dataSource = new MatTableDataSource(this.tableData);
           this.dataSource.paginator = this.paginator;
-        });
+        }
+        ));
       }
-    });
-    // console.log(this.paginator.pageIndex);
-    // console.log(this.paginator.pageSize);
-    this.feedService.addFeedSubject.subscribe(
-      data =>
-      {
-        console.log('next subscribed value: ' + data);
-        this.tableDataFeed.push(data);
-        this.resultsLengthFeed+=1;
-        this.dataSourceFeed = new MatTableDataSource(this.tableDataFeed);
-        this.dataSourceFeed.paginator = this.Feedpaginator;
-      }
-    );
-
-
-    this.feedService.deleteFeedSubject.subscribe(
-      data =>
-      {
-        this.iterator = 0;
-        console.log('next subscribed value: ' + data);
-        this.tableDataFeed.map(
-          tableData => {
-            this.iterator++;
-            if(tableData.id === data){
-            this.deletedFeedId = this.iterator;
-            }
-          }
-        )
-        console.log(this.deletedFeedId);
-        this.tableDataFeed.splice(this.deletedFeedId-1, 1);
-        console.log(this.tableDataFeed);
-        this.resultsLengthFeed-=1;
-        this.dataSourceFeed = new MatTableDataSource(this.tableDataFeed);
-        this.dataSourceFeed.paginator = this.Feedpaginator;
-      }
-    );
-
-    this.feedService.updateFeedSubject.subscribe(
-      data =>
-      {
-        this.iterator = 0;
-        this.tableDataFeed.map(
-          tableData => {
-            if(tableData.id === data.id){
-              tableData.title = data.title;
-            }
-          }
-        )
-      }
-    )
-
-    this.documentService.addDocumentSubject.subscribe(
-      data =>
-      {
-        console.log('next subscribed value DOCUMENT: ' + data.title);
-        this.tableData.push(data);
-        this.resultsLength+=1;
-        this.dataSource = new MatTableDataSource(this.tableData);
-        this.dataSource.paginator = this.paginator;
-      }
-    );
-
-    this.documentService.deleteDocumentSubject.subscribe(
-      data =>
-      {
-        this.iterator = 0;
-        console.log('next subscribed value: ' + data);
-        this.tableData.map(
-          tableData => {
-            this.iterator++;
-            if(tableData.title === data){
-              console.log("fouynd asdasd");
-            this.deleteDocumentId = this.iterator;
-            }
-          }
-        )
-        console.log(this.deleteDocumentId);
-        this.tableData.splice(this.deleteDocumentId-1, 1);
-        console.log(this.tableData);
-        this.resultsLength-=1;
-        this.dataSource = new MatTableDataSource(this.tableData);
-        this.dataSource.paginator = this.paginator;
-      }
-    );
-
-
   }
 
   documentPagination(){
     this.adminService.getAllEntries(this.paginator.pageIndex, this.paginator.pageSize).subscribe(
       datas => {
-        //console.log(datas);
         this.tableData = datas.items;
-        this.resultsLength = datas.metadata.total;
+        //this.resultsLength = datas.metadata.total;
         console.log(this.resultsLength);
         this.dataSource = new MatTableDataSource(this.tableData);
-        //this.dataSource.paginator = this.paginator;
       }
     );
-    // console.log("Hello gays");
-    // if(this.documentPage != this.paginator.pageIndex+1){
-    //   this.documentPage = this.paginator.pageIndex+1;
-    //   this.adminService.getAllEntries(this.paginator.pageIndex, this.paginator.pageSize).subscribe(
-    //     datas => {
-    //       //console.log(datas);
-    //       this.tableData = datas.items;
-    //       this.resultsLength = datas.metadata.total;
-    //       console.log(this.resultsLength);
-    //       this.dataSource = new MatTableDataSource(this.tableData);
-    //       //this.dataSource.paginator = this.paginator;
-    //     }
-    //   );
-    // }
-    // else if(this.documentSize < this.paginator.pageSize){
-    //   this.documentSize = this.paginator.pageSize;
-    //   this.adminService.getAllEntries(this.paginator.pageIndex, this.paginator.pageSize).subscribe(
-    //     datas => {
-    //       //console.log(datas);
-    //       this.tableData = datas.items;
-    //       this.resultsLength = datas.metadata.total;
-    //       console.log(this.resultsLength);
-    //       this.dataSource = new MatTableDataSource(this.tableData);
-    //       //this.dataSource.paginator = this.paginator;
-    //     }
-    //   );
-    // }
-    // else {
-    //   //this.dataSource.paginator = this.paginator;
-    // }
+
   }
 
   feedPagination(){
-    this.adminService.getAllFeedsPagination(this.paginator.pageIndex, this.paginator.pageSize).subscribe(
+    this.adminService.getAllFeedsPagination(this.Feedpaginator.pageIndex, this.Feedpaginator.pageSize).subscribe(
       datas => {
-        //console.log(datas);
         this.tableDataFeed = datas.items;
         this.resultsLengthFeed = datas.metadata.total;
         this.dataSourceFeed = new MatTableDataSource(this.tableDataFeed);
-        //this.dataSourceFeed.paginator = this.Feedpaginator;
+        this.dataSourceFeed.paginator = this.Feedpaginator;
       }
     );
-    // if(this.feedPage != this.Feedpaginator.pageIndex+1){
-    //   this.feedPage = this.Feedpaginator.pageIndex+1;
-    //   this.adminService.getAllFeedsPagination(this.Feedpaginator.pageIndex, this.Feedpaginator.pageSize).subscribe(
-    //     datas => {
-    //       //console.log(datas);
-    //       this.tableDataFeed = datas.items;
-    //     }
-    //   );
-    // }
-    // else if(this.feedSize < this.Feedpaginator.pageSize){
-    //   this.feedSize = this.Feedpaginator.pageSize;
-    //   this.adminService.getAllFeedsPagination(this.Feedpaginator.pageIndex, this.Feedpaginator.pageSize).subscribe(
-    //     datas => {
-    //       //console.log(datas);
-    //       this.tableDataFeed = datas.items;
-    //     }
-    //   );
-    // }
+
   }
 
   //Button, to navigate to the upload formular
@@ -301,13 +172,24 @@ export class AdminOverviewComponent implements AfterViewInit  {
       });
 
       dialogRef.afterClosed().subscribe((result) => {
-        console.log('The dialog was closed');
+        if(result == 'yes'){
+          this.adminService.deleteEntry(row.id).subscribe(
+            () => {
+              this.changeListenerService.statusChanged();
+            }
+          );
+
+      const message = this.translocoService.translate(
+        'lazy.adminPage.success-delete-document'
+      );
+      this.notificationService.success(message);
+        }
+        console.log(result);
       });
     }
     if (this.isedit) {
       this.router.navigate([`./${row.id}`], { relativeTo: this.route });
     }
-    //console.log(this.deleteEntryId);
   }
 
   //Function, to give choice, wether we want to delete the document or not
@@ -336,8 +218,29 @@ export class AdminOverviewComponent implements AfterViewInit  {
       width: '350px'
     });
     dialogRef.afterClosed().subscribe(result => {
-      console.log('The dialog was closed');
+      if(result != 'no'){
+        this.adminService.addNewFeed(this.getFeedData(result)).subscribe(
+          () => {
+            this.changeListenerService.statusChanged()
+          }
+        )
+        const message = this.translocoService.translate(
+      'lazy.adminPage.success-message-feed'
+    );
+    this.notificationService.success(message);
+      }
     });
+  }
+
+  getFeedData(newFeed){
+    const feedData: addNewFeed = {
+      catalog_id: "95e2b439-4851-4080-b33e-0adc1fd90196",
+      title: newFeed,
+      url_name: newFeed,
+      content: "Some popular shit over there",
+      kind: "navigation"
+    }
+    return feedData;
   }
 
   //Function, to get the current clicked row
@@ -349,7 +252,17 @@ export class AdminOverviewComponent implements AfterViewInit  {
       });
 
       dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed');
+        if(result == 'yes'){
+          this.adminService.deleteFeed(row.id).subscribe(
+            () => {
+              this.changeListenerService.statusChanged();
+            }
+          );
+          const message = this.translocoService.translate(
+            'lazy.adminPage.success-delete-feed'
+          );
+          this.notificationService.success(message);
+        }
       });
     }
     if(this.iseditFeed){
@@ -359,12 +272,34 @@ export class AdminOverviewComponent implements AfterViewInit  {
       });
 
       dialogRef.afterClosed().subscribe(result => {
-        console.log('The dialog was closed');
+        if(result != 'no'){
+          this.adminService
+      .updateFeed(row.id, this.getFeedsData(row, result))
+      .subscribe(
+        () => {
+          this.changeListenerService.statusChanged();
+        }
+      );
+      const message = this.translocoService.translate(
+        'lazy.adminPage.success-message-upload'
+      );
+      this.notificationService.success(message);
+        }
       });
     }
     //console.log(this.deleteEntryId);
   }
 
+  getFeedsData(row, newFeed) {
+    const feedsData: UpdateFeeds = {
+      catalog_id: row.catalog_id,
+      title: newFeed,
+      url_name: row.url_name,
+      content: row.content,
+      kind: row.kind,
+    };
+    return feedsData;
+  }
   //Function, to give choice, wether we want to delete the document or not
   deleteFeed(){
     this.isdeleteFeed = true;
