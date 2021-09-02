@@ -8,7 +8,12 @@ import { MAT_SNACK_BAR_DATA } from '@angular/material/snack-bar';
       <mat-icon style="color: #f44336; vertical-align: bottom;">
         error
       </mat-icon>
-      <i style="padding: 0 10px; text-align: center;">{{ data.message }}</i>
+      <i
+        style="padding: 0 10px; text-align: center;"
+        [innerHtml]="data.message"
+      >
+        {{ data.message }}
+      </i>
       <mat-icon
         style="vertical-align: bottom; cursor: pointer;"
         (click)="dismiss()"

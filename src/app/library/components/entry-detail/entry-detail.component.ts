@@ -84,12 +84,46 @@ export class EntryDetailComponent implements OnInit {
   }
 
   addToFavorites(id: string) {
-    this.entriesService.addEntryToFavorites(id).subscribe();
+    this.entriesService
+      .addEntryToFavorites(id)
+      .pipe(
+        tap(() => {
+          const message = this.translocoService.translate(
+            'lazy.entryDetail.addToFavoritesSuccessMessage'
+          );
+          this.notificationService.success(message);
+        }),
+        catchError((err) => {
+          console.log(err);
+          const message = this.translocoService.translate(
+            'lazy.entryDetail.addToFavoritesErrorMessage'
+          );
+          this.notificationService.info(message);
+          return throwError(err);
+        })
+      )
+      .subscribe();
   }
 
   deleteFromFavorites(id: string) {
     this.entriesService
       .deleteFromFavorites(id)
+      .pipe(
+        tap(() => {
+          const message = this.translocoService.translate(
+            'lazy.entryDetail.removeFromFavoritesSuccessMessage'
+          );
+          this.notificationService.success(message);
+        }),
+        catchError((err) => {
+          console.log(err);
+          const message = this.translocoService.translate(
+            'lazy.entryDetail.removeFromFavoritesErrorMessage'
+          );
+          this.notificationService.info(message);
+          return throwError(err);
+        })
+      )
       .subscribe(() => this.onDeleteFromFavorites.emit());
   }
 }
