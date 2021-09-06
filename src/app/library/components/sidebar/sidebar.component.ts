@@ -9,8 +9,10 @@ import {
   map,
   startWith,
   switchMap,
+  takeUntil,
   tap,
 } from 'rxjs/operators';
+import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
 import { Filters } from 'src/app/common/services/app-state/app-state.types';
 import { Author, Authors, FeedTreeNode } from '../../library.types';
@@ -21,7 +23,7 @@ import { FiltersService } from '../../services/filters/filters.service';
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss'],
 })
-export class SidebarComponent implements OnInit {
+export class SidebarComponent extends DisposableComponent implements OnInit {
   searchForm: FormGroup;
   authorForm: FormGroup;
   filters: Filters = { search: null, author: null, feed: null };
@@ -36,33 +38,41 @@ export class SidebarComponent implements OnInit {
     private readonly appStateService: AppStateService,
     private readonly fb: FormBuilder
   ) {
+    super();
     this.searchForm = new FormGroup({ searchInput: new FormControl('') });
-    this.filtersService.getFeedTreeNode().subscribe((data) => {
-      this.dataSource.data = data.entry;
-    });
+    this.filtersService
+      .getFeedTreeNode()
+      .pipe(takeUntil(this.destroySignal$))
+      .subscribe((data) => {
+        this.dataSource.data = data.entry;
+      });
   }
 
   ngOnInit(): void {
     this.initAuthorForm();
     this.searchAuthors('');
-
-    // this.authorInput.valueChanges
-    //   .pipe(
-    //     startWith(''),
-    //     debounceTime(300),
-    //     switchMap((val) => this.filtersService.getAuthorSuggestions(val || ''))
-    //   )
-    //   .subscribe((authors) => (this.authorSuggestions = authors.items));
   }
 
   initAuthorForm() {
     this.authorForm = this.fb.group({
       authorInput: [''],
     });
-    this.authorForm.get('authorInput').valueChanges.subscribe((response) => {
-      console.log('data:', response);
-      this.filterAuthorData(response);
-    });
+    this.authorForm
+      .get('authorInput')
+      .valueChanges.pipe(takeUntil(this.destroySignal$))
+      .subscribe((response) => {
+        console.log('data:', response);
+        this.filterAuthorData(response);
+      });
+  }
+
+  searchAuthors(query: string) {
+    this.filtersService
+      .getAuthorSuggestions(query)
+      .pipe(takeUntil(this.destroySignal$))
+      .subscribe((data: Authors) => {
+        this.authorSuggestions = data.items;
+      });
   }
 
   filterAuthorData(enteredData) {}
@@ -73,34 +83,34 @@ export class SidebarComponent implements OnInit {
     this.filters = newFilter;
   }
 
-  search() {
-    this.patchFilter({ search: this.searchForm.value.searchInput });
-    this.appStateService.patchState({ filters: this.filters });
+  applyFilter() {
+    this.appStateService.patchState({
+      filters: this.filters,
+      sidebar: false,
+      sidenav: false,
+    });
   }
 
-  searchAuthors(query: string) {
-    this.filtersService
-      .getAuthorSuggestions(query)
-      .subscribe((data: Authors) => {
-        this.authorSuggestions = data.items;
-      });
+  search() {
+    this.patchFilter({ search: this.searchForm.value.searchInput });
+    this.applyFilter();
   }
 
   filterByAuthor(author: string) {
     this.patchFilter({ author: author });
-    this.appStateService.patchState({ filters: this.filters });
+    this.applyFilter();
   }
 
   filterByFeed(feed: string) {
     this.patchFilter({ feed: feed });
-    this.appStateService.patchState({ filters: this.filters });
+    this.applyFilter();
+  }
+
+  cancelFilters() {
+    this.filters = { search: null, author: null, feed: null };
+    this.applyFilter();
   }
 
   isNavigationNode = (_: number, node: FeedTreeNode) =>
     !!node.entry && node.entry.length > 0;
-
-  cancelFilters() {
-    this.filters = { search: null, author: null, feed: null };
-    this.appStateService.patchState({ filters: this.filters });
-  }
 }

@@ -23,7 +23,6 @@ export class AppStateService {
       sidebar: false,
       showSidebarToggle: false,
       sidenav: false,
-      feedId: null,
       googleAuthed: false,
       filters: null,
     };
