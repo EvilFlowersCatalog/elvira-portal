@@ -49,9 +49,6 @@ export class LoginFormComponent implements OnInit {
           const googleAuthed = jwtDecode<
             JwtPayload & { googleAuthed: boolean }
           >(response.accessToken).googleAuthed;
-          const feedId = jwtDecode<JwtPayload & { feedId: string }>(
-            response.accessToken
-          ).feedId;
           const mongoId = jwtDecode<JwtPayload & { mongoId: string }>(
             response.accessToken
           ).mongoId;
@@ -61,7 +58,6 @@ export class LoginFormComponent implements OnInit {
             username: response.user.login,
             isLoggedIn: true,
             isAdmin: isAdmin,
-            feedId: feedId,
             googleAuthed: googleAuthed,
             userId: mongoId,
           });

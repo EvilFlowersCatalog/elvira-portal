@@ -88,5 +88,11 @@
   },
   "favorites": {
     "emptyFavorites": "V tomto zozname sa nenachádza žiadna položka"
+  },
+  "sidebar": {
+    "search": "Hľadať",
+    "cancelFilters": "Zrušiť filtre",
+    "author": "Autor",
+    "subjects": "Predmety:"
   }
 }

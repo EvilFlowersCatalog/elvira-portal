@@ -56,7 +56,6 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
       isLoggedIn: false,
       isAdmin: false,
       googleAuthed: false,
-      feedId: null,
     });
 
     this.router.navigate(['/auth/home']);

@@ -88,5 +88,11 @@
   },
   "favorites": {
     "emptyFavorites": "There is no item in this list"
+  },
+  "sidebar": {
+    "search": "Search",
+    "cancelFilters": "Cancel filters",
+    "author": "Author",
+    "subjects": "Subjects:"
   }
 }

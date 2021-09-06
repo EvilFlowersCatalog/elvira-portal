@@ -22,17 +22,6 @@ export class AuthService {
   }
 
   verifyToken(): Observable<boolean> {
-    // return this.httpClient
-    //   .get('api/apigw/verifytoken', { observe: 'response' })
-    //   .pipe(
-    //     map((response) => {
-    //       console.log(response);
-    //       return response.status >= 400 ? false : true;
-    //     }),
-    //     catchError((error: HttpErrorResponse) => {
-    //       return of(false);
-    //     })
-    //   );
-    return of(true);
+    return this.httpClient.get<boolean>('api/apigw/verifytoken');
   }
 }

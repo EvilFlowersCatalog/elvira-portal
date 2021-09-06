@@ -56,7 +56,6 @@ export class MobileSidenavComponent
       isAdmin: false,
       sidenav: false,
       googleAuthed: false,
-      feedId: null,
     });
 
     this.router.navigate(['/auth/home']);

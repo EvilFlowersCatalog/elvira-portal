@@ -15,6 +15,8 @@ import { FavoritesComponent } from './components/favorites/favorites.component';
 import { AccountSettingsComponent } from './components/account-settings/account-settings.component';
 import { GdriveAuthComponent } from './components/gdrive-auth.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatPaginatorIntl } from '@angular/material/paginator';
+import { CustomPaginationComponent } from '../common/services/custom-pagination/custom-pagination.service';
 
 @NgModule({
   declarations: [
@@ -36,7 +38,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     ReactiveFormsModule,
     FormsModule,
   ],
-  providers: [{ provide: TRANSLOCO_SCOPE, useValue: 'lazy' }],
+  providers: [
+    { provide: TRANSLOCO_SCOPE, useValue: 'lazy' },
+    { provide: MatPaginatorIntl, useClass: CustomPaginationComponent },
+  ],
   exports: [SidebarComponent],
 })
 export class LibraryModule {}
