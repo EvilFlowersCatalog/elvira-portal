@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
@@ -26,6 +26,32 @@ export class EntriesService {
       headers: header,
       params: { page: page + 1, limit: limit },
     });
+  }
+
+  searchEntries(
+    page: number,
+    limit: number,
+    query: string
+  ): Observable<ListEntriesResponse> {
+    let header = this.createAuthorizationHeader();
+
+    return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
+      headers: header,
+      params: { page: page + 1, limit: limit, title: query },
+    });
+  }
+
+  getEntriesByFeed(
+    page: number,
+    limit: number,
+    feedId: string
+  ): Observable<ListEntriesResponse> {
+    let header = this.createAuthorizationHeader();
+
+    return this.httpClient.get<ListEntriesResponse>(
+      `api/apigw/feeds/filter/${feedId}`,
+      { headers: header }
+    );
   }
 
   entryDetail(id: string): Observable<EntryDetail> {

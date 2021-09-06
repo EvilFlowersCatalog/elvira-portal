@@ -11,4 +11,11 @@ export interface State {
   sidenav: boolean;
   googleAuthed: boolean;
   feedId: string;
+  filters: Filters;
+}
+
+export interface Filters {
+  search: string;
+  author: string;
+  feed: string;
 }

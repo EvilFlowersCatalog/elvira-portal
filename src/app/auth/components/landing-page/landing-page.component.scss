@@ -104,15 +104,19 @@
   margin-left: 60px;
 }
 
+.landing-page-footer {
+  background-color: rgb(119 119 119 / 50%);
+  padding-top: 15px;
+}
+
 .landing-page-powered-by {
   text-align: center;
-  color: #ffc107;
+  color: #fff;
   font-style: italic;
-  text-shadow: 0 0 40px rgb(255 193 7 / 70%);
 }
 
 .landing-page-image {
-  max-height: 50px;
+  max-height: 45px;
   margin: 40px 0;
 }
 

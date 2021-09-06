@@ -40,11 +40,18 @@ export class AccountSettingsComponent
   }
 
   getUrl() {
+    var popup = window.open(
+      '',
+      'window name',
+      'width=800,height=600,menubar=0,toolbar=0'
+    );
+
     this.gdriveService
       .getAuthUrl()
       .pipe(takeUntil(this.destroySignal$))
-      .subscribe((data: { response: { url: string } }) =>
-        window.open(data.response.url)
+      .subscribe(
+        (data: { response: { url: string } }) =>
+          (popup.location.href = data.response.url)
       );
   }
 

@@ -25,6 +25,7 @@ export class AppStateService {
       sidenav: false,
       feedId: null,
       googleAuthed: false,
+      filters: null,
     };
 
     let initState = JSON.parse(localStorage.getItem('state'));
