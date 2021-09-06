@@ -19,25 +19,43 @@ export class EntriesService {
     });
   }
 
-  listEntries(page: number, limit: number): Observable<ListEntriesResponse> {
+
+  getEntries(page: number, limit: number, query?: string, feedId?: string) {
     let header = this.createAuthorizationHeader();
 
-    return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
-      headers: header,
-      params: { page: page + 1, limit: limit },
-    });
+    if (feedId) {
+      return this.httpClient.get<ListEntriesResponse>(
+        `api/apigw/feeds/filter/${feedId}`,
+        { 
+          headers: header,
+          params: { page: page + 1, limit: limit },
+        },
+      );
+    }
+    else if (query) {
+      return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
+        headers: header,
+        params: { page: page + 1, limit: limit, title: query },
+      });
+    }
+    else {
+      return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
+        headers: header,
+        params: { page: page + 1, limit: limit },
+      });
+    }
   }
 
-  searchEntries(
+  listEntries(
     page: number,
     limit: number,
-    query: string
+    query?: string
   ): Observable<ListEntriesResponse> {
     let header = this.createAuthorizationHeader();
 
     return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
       headers: header,
-      params: { page: page + 1, limit: limit, title: query },
+      params: { page: page + 1, limit: limit, title: query ?? '' },
     });
   }
 
@@ -50,7 +68,10 @@ export class EntriesService {
 
     return this.httpClient.get<ListEntriesResponse>(
       `api/apigw/feeds/filter/${feedId}`,
-      { headers: header }
+      { 
+        headers: header,
+        params: { page: page + 1, limit: limit },
+      },
     );
   }
 
