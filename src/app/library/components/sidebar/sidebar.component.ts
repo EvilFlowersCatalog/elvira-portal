@@ -50,7 +50,13 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
 
   ngOnInit(): void {
     this.initAuthorForm();
-    this.searchAuthors('');
+    const state = this.appStateService.getStateSnapshot();
+    this.searchForm.patchValue({
+      searchInput: state?.filters?.search
+    });
+    this.authorForm.patchValue({
+      authorInput: state?.filters?.author
+    });
   }
 
   initAuthorForm() {
@@ -108,6 +114,8 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
 
   cancelFilters() {
     this.filters = { search: null, author: null, feed: null };
+    this.authorForm.reset();
+    this.searchForm.reset();
     this.applyFilter();
   }
 
