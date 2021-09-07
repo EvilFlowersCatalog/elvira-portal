@@ -23,12 +23,11 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     this.loadingService.showLoading();
     const authToken = this.appStateService.getStateSnapshot().token;
-    const isApiRequest = request.urlWithParams.startsWith(environment.baseUrl);
+    // const isApiRequest = request.urlWithParams.startsWith(environment.baseUrl);
     const options = {
-      headers:
-        authToken && isApiRequest
-          ? request.headers.set('Authorization', `Bearer ${authToken}`)
-          : request.headers,
+      headers: authToken
+        ? request.headers.set('Authorization', `Bearer ${authToken}`)
+        : request.headers,
     };
 
     request = request.clone(options);
