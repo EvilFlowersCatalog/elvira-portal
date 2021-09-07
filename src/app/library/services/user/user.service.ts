@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
@@ -13,18 +13,9 @@ export class UserService {
     private readonly appStateService: AppStateService
   ) {}
 
-  createAuthorizationHeader() {
-    return new HttpHeaders({
-      authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
-    });
-  }
-
   getUser(): Observable<UserResponse> {
-    let header: HttpHeaders = this.createAuthorizationHeader();
     const userId: string = this.appStateService.getStateSnapshot().userId;
 
-    return this.httpClient.get<UserResponse>(`api/apigw/user/${userId}`, {
-      headers: header,
-    });
+    return this.httpClient.get<UserResponse>(`api/apigw/user/${userId}`);
   }
 }

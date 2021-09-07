@@ -48,16 +48,9 @@ export class MobileSidenavComponent
   logout() {
     this.authService
       .logout(this.appStateService.getStateSnapshot().token)
+      .pipe(takeUntil(this.destroySignal$))
       .subscribe();
-    this.appStateService.patchState({
-      token: null,
-      username: null,
-      isLoggedIn: false,
-      isAdmin: false,
-      sidenav: false,
-      googleAuthed: false,
-    });
-
+    this.appStateService.logoutResetState();
     this.router.navigate(['/auth/home']);
   }
 }

@@ -4,6 +4,7 @@ import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import { Observable } from 'rxjs';
 import {
+  concatMap,
   debounceTime,
   distinctUntilChanged,
   map,
@@ -50,32 +51,25 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
 
   ngOnInit(): void {
     this.initAuthorForm();
-    this.searchAuthors('');
   }
 
   initAuthorForm() {
     this.authorForm = this.fb.group({
       authorInput: [''],
     });
+
     this.authorForm
       .get('authorInput')
-      .valueChanges.pipe(takeUntil(this.destroySignal$))
-      .subscribe((response) => {
-        console.log('data:', response);
-        this.filterAuthorData(response);
+      .valueChanges.pipe(
+        takeUntil(this.destroySignal$),
+        debounceTime(300),
+        distinctUntilChanged(),
+        concatMap((value) => this.filtersService.getAuthorSuggestions(value))
+      )
+      .subscribe((response: Authors) => {
+        this.authorSuggestions = response.items;
       });
   }
-
-  searchAuthors(query: string) {
-    this.filtersService
-      .getAuthorSuggestions(query)
-      .pipe(takeUntil(this.destroySignal$))
-      .subscribe((data: Authors) => {
-        this.authorSuggestions = data.items;
-      });
-  }
-
-  filterAuthorData(enteredData) {}
 
   patchFilter(newData) {
     const clearFilters = { search: null, author: null, feed: null };
