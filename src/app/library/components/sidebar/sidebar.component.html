@@ -2,7 +2,7 @@
   <div fxLayout="column" class="sidebar-container">
     <form [formGroup]="searchForm" (submit)="search()">
       <div fxLayout="row">
-        <mat-form-field color="accent">
+        <mat-form-field color="accent" class="sidebar-input">
           <mat-label>
             {{ t("lazy.sidebar.search") }}
           </mat-label>
@@ -27,8 +27,9 @@
     <button mat-raised-button color="accent" (click)="cancelFilters()">
       <mat-icon>filter_alt</mat-icon>{{ t("lazy.sidebar.cancelFilters") }}
     </button>
+
     <form [formGroup]="authorForm" class="sidebar-spacer">
-      <mat-form-field color="accent">
+      <mat-form-field color="accent" class="sidebar-input">
         <mat-label>
           {{ t("lazy.sidebar.author") }}
         </mat-label>
@@ -39,15 +40,13 @@
           [matAutocomplete]="auto"
         />
         <mat-autocomplete #auto="matAutocomplete">
-          <mat-option
-            *ngFor="let option of authorSuggestions | async"
-            [value]="option"
-          >
-            {{ option.name + option.surname }}
+          <mat-option *ngFor="let option of authorSuggestions" [value]="option">
+            {{ option.name + " " + option.surname }}
           </mat-option>
         </mat-autocomplete>
       </mat-form-field>
     </form>
+
     <h5 class="sidebar-filter-title">{{ t("lazy.sidebar.subjects") }}</h5>
     <mat-tree
       [dataSource]="dataSource"
