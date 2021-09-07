@@ -44,6 +44,7 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
       .getFeedTreeNode()
       .pipe(takeUntil(this.destroySignal$))
       .subscribe((data) => {
+        console.log(data);
         this.dataSource.data = data.entry;
       });
   }

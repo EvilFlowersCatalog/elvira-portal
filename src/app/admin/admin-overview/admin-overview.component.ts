@@ -12,7 +12,12 @@ import { NotificationService } from 'src/app/common/services/notification/notifi
 import { TranslocoService } from '@ngneat/transloco';
 import { ChangeListenerService } from 'src/app/common/services/change-listener/change-listener.service';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { concatMap, startWith, takeUntil, tap } from 'rxjs/operators';
+import { concatMap, startWith, take, takeUntil, tap } from 'rxjs/operators';
+import { NestedTreeControl } from '@angular/cdk/tree';
+import { MatTreeNestedDataSource } from '@angular/material/tree';
+import { FeedTreeNode } from '../../library/library.types';
+import { FiltersService } from '../../library/services/filters/filters.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-admin',
@@ -50,6 +55,11 @@ export class AdminOverviewComponent extends DisposableComponent implements After
   iterator: number;
   isloaded: boolean = false;
 
+  fetchFeeds$ = new Subject();
+
+  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.entry);
+  treeDataSource = new MatTreeNestedDataSource<FeedTreeNode>();
+
   @ViewChild('paginator') paginator: MatPaginator;
   @ViewChild('Feedpaginator') Feedpaginator: MatPaginator;
 
@@ -61,6 +71,7 @@ export class AdminOverviewComponent extends DisposableComponent implements After
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService,
     private readonly changeListenerService: ChangeListenerService,
+    private readonly filtersService: FiltersService,
   ) {
     super();
   }
@@ -82,7 +93,19 @@ export class AdminOverviewComponent extends DisposableComponent implements After
         takeUntil(this.destroySignal$),
         concatMap(() => this.getOverviewData())
     ).subscribe();
+
+    this.fetchFeeds$.asObservable().pipe(
+      takeUntil(this.destroySignal$),
+      startWith([]),
+      concatMap(() => this.filtersService.getFeedTreeNode())
+    ).subscribe((data) => {
+      console.log(data);
+      this.treeDataSource.data = data.entry;
+    });
   }
+
+  isNavigationNode = (_: number, node: FeedTreeNode) =>
+  !!node.entry && node.entry.length > 0;
 
   getDataPagination(){
       if(this.tabIndex == 1){
@@ -301,14 +324,22 @@ export class AdminOverviewComponent extends DisposableComponent implements After
     return feedsData;
   }
   //Function, to give choice, wether we want to delete the document or not
-  deleteFeed(){
-    this.isdeleteFeed = true;
-    this.iseditFeed = false;
+  deleteFeed(feedId: string){
+    console.log('deleting', feedId)
+    console.log(this.treeDataSource.data)
+    // this.treeDataSource.data = this.treeDataSource.data.filter(({ id }) => id !== feedId);
+
+    this.adminService.deleteFeed(feedId).pipe(
+      take(1),
+    ).subscribe(res => this.fetchFeeds$.next());
+    // this.isdeleteFeed = true;
+    // this.iseditFeed = false;
   }
 
-  editFeed(){
-    this.isdeleteFeed = false;
-    this.iseditFeed = true;
+  editFeed(feedId: string){
+    console.log('editing', feedId);
+    // this.isdeleteFeed = false;
+    // this.iseditFeed = true;
   }
 
   //Function for searchbar
