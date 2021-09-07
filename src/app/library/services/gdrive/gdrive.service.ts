@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
@@ -11,12 +11,6 @@ export class GdriveService {
     private readonly httpClient: HttpClient,
     private readonly appStateService: AppStateService
   ) {}
-
-  createAuthorizationHeader() {
-    return new HttpHeaders({
-      authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
-    });
-  }
 
   getAuthUrl(): Observable<any> {
     return this.httpClient.get<any>(`api/apigw/oauth/link`);
@@ -31,15 +25,9 @@ export class GdriveService {
   }
 
   uploadFileToDrive(entryId: string, catalogId: string) {
-    let header = this.createAuthorizationHeader();
-
-    return this.httpClient.post(
-      `api/apigw/gdrive/upload`,
-      {
-        entry_id: entryId,
-        catalog_id: catalogId,
-      },
-      { headers: header }
-    );
+    return this.httpClient.post(`api/apigw/gdrive/upload`, {
+      entry_id: entryId,
+      catalog_id: catalogId,
+    });
   }
 }

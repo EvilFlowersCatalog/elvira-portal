@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  baseUrl: `http://localhost:300/api/`,
+  baseUrl: `http://workzone.fiit.stuba.sk/api/`,
 };

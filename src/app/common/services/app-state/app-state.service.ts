@@ -60,4 +60,19 @@ export class AppStateService {
     this._state$.next(null);
     this.localStorageService.clear();
   }
+
+  logoutResetState() {
+    this.patchState({
+      isLoggedIn: false,
+      token: null,
+      username: null,
+      userId: null,
+      isAdmin: false,
+      sidebar: false,
+      showSidebarToggle: false,
+      sidenav: false,
+      googleAuthed: false,
+      filters: null,
+    });
+  }
 }

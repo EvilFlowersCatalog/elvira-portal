@@ -1,6 +1,6 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
 import {
   addNewFeed,
@@ -17,107 +17,64 @@ import {
   providedIn: 'root',
 })
 export class AdminService {
-
   constructor(
     private readonly httpClient: HttpClient,
     private readonly appStateService: AppStateService
   ) {}
 
-  createAuthorizationHeader() {
-    return new HttpHeaders({
-      authorization: `bearer ${this.appStateService.getStateSnapshot().token}`,
+  getAllEntries(page: number, limit: number): Observable<GetEntries> {
+    return this.httpClient.get<GetEntries>('api/apigw/entries', {
+      params: { page: page + 1, limit: limit },
     });
   }
 
-  getAllEntries(page: number, limit: number): Observable<GetEntries> {
-    const headers = this.createAuthorizationHeader();
-    return this.httpClient.get<GetEntries>(
-      'api/apigw/entries',
-      { headers: headers, params: {page: page+1, limit: limit}});
-  }
-
   getAllFeeds(): Observable<GetFeeds> {
-    const headers = this.createAuthorizationHeader();
-    return this.httpClient.get<GetFeeds>('api/apigw/feeds',
-    { headers: headers, params: {limit: 100}});
+    return this.httpClient.get<GetFeeds>('api/apigw/feeds', {
+      params: { limit: 100 },
+    });
   }
 
   getAllFeedsPagination(page: number, limit: number): Observable<GetFeeds> {
-    const headers = this.createAuthorizationHeader();
-    return this.httpClient.get<GetFeeds>('api/apigw/feeds',
-    { headers: headers, params: {page: page+1, limit: limit}});
+    return this.httpClient.get<GetFeeds>('api/apigw/feeds', {
+      params: { page: page + 1, limit: limit },
+    });
   }
 
   updateFeed(feedId: string, newFeed: UpdateFeeds) {
-    const headers = this.createAuthorizationHeader();
-    return this.httpClient.put(
-      `api/apigw/feeds/${feedId}`,
-      newFeed,
-      { headers: headers }
-    );
+    return this.httpClient.put(`api/apigw/feeds/${feedId}`, newFeed);
   }
 
   deleteFeed(feedId: string) {
-    const headers = this.createAuthorizationHeader();
-    return this.httpClient.delete(
-      `api/apigw/feeds/${feedId}`,
-      { headers: headers }
-    );
+    return this.httpClient.delete(`api/apigw/feeds/${feedId}`);
   }
 
   upload(entriesData: FormData) {
-    const headers = this.createAuthorizationHeader();
-    return this.httpClient.post(
-      `api/apigw/entries`,
-      entriesData,
-      { headers: headers }
-    );
+    return this.httpClient.post(`api/apigw/entries`, entriesData);
   }
 
   deleteEntry(entryId: string) {
-    const headers = this.createAuthorizationHeader();
-    return this.httpClient.delete(
-      `api/apigw/entries/${entryId}`,
-      { headers: headers }
-    );
+    return this.httpClient.delete(`api/apigw/entries/${entryId}`);
   }
 
   getOneEntry(entryId: string) {
-    const headers = this.createAuthorizationHeader();
-    return this.httpClient.get<AllEntryItems>(
-      `api/apigw/entries/${entryId}`,
-      { headers: headers }
-    );
+    return this.httpClient.get<AllEntryItems>(`api/apigw/entries/${entryId}`);
   }
 
   updateEntry(entryId: string, entriesData: EditedData) {
-    const headers = this.createAuthorizationHeader();
-    return this.httpClient.put(
-      `api/apigw/entries/${entryId}`,
-      entriesData,
-      { headers: headers }
-    );
+    return this.httpClient.put(`api/apigw/entries/${entryId}`, entriesData);
   }
 
   getIsAdmin(mongoId: string) {
     return this.httpClient.get<boolean>(`api/apigw/isAdmin/${mongoId}`);
   }
 
- checkTitle(title: string){
-  const headers = this.createAuthorizationHeader();
-  return this.httpClient.get<GetEntries>(
-    'api/apigw/entries',
-    { headers: headers, params: {title: title}}
-  );
- }
+  checkTitle(title: string) {
+    return this.httpClient.get<GetEntries>('api/apigw/entries', {
+      params: { title: title },
+    });
+  }
 
-
- addNewFeed(feedData: addNewFeed){
-  const headers = this.createAuthorizationHeader();
-  return this.httpClient.post(
-    'api/apigw/feeds',
-    feedData,
-    { headers: headers }
-  );
- }
+  addNewFeed(feedData: addNewFeed) {
+    return this.httpClient.post('api/apigw/feeds', feedData);
+  }
 }

@@ -44,7 +44,7 @@ export class LibraryGuard implements CanActivate {
       take(1),
       tap((isValid: boolean) => {
         if (!isValid) {
-          this.appStateService.patchState({ token: null });
+          this.appStateService.logoutResetState();
           this.router.navigate(['/auth']);
         }
       })
