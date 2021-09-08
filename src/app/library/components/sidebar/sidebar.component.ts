@@ -116,5 +116,5 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
   }
 
   isNavigationNode = (_: number, node: FeedTreeNode) =>
-    !!node.entry && node.entry.length > 0;
+    node.type === 'navigation';
 }

@@ -1,19 +1,28 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { TranslocoModule, TranslocoService, TRANSLOCO_SCOPE } from '@ngneat/transloco';
+import {
+  TranslocoModule,
+  TranslocoService,
+  TRANSLOCO_SCOPE,
+} from '@ngneat/transloco';
 import { ADMIN_ROUTES } from './routing/admin.routes';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AdminUploadComponent } from './admin-upload/admin-upload.component';
-import { AdminOverviewComponent } from './admin-overview/admin-overview.component';
+import { AdminUploadComponent } from './components/admin-upload/admin-upload.component';
+import { AdminOverviewComponent } from './components/admin-overview/admin-overview.component';
 import { MaterialModule } from '../material.module';
 import { TabGroupDirective } from './directives/tab-group.directive';
 import { MatPaginatorIntl } from '@angular/material/paginator';
-import {  CustomPaginationComponent } from '../common/services/custom-pagination/custom-pagination.service';
-
+import { CustomPaginationComponent } from '../common/services/custom-pagination/custom-pagination.service';
+import { FeedManagementComponent } from './components/feed-management/feed-management.component';
 
 @NgModule({
-  declarations: [AdminOverviewComponent, AdminUploadComponent, TabGroupDirective],
+  declarations: [
+    AdminOverviewComponent,
+    AdminUploadComponent,
+    TabGroupDirective,
+    FeedManagementComponent,
+  ],
   imports: [
     CommonModule,
     RouterModule.forChild(ADMIN_ROUTES),
@@ -21,11 +30,11 @@ import {  CustomPaginationComponent } from '../common/services/custom-pagination
     FormsModule,
     ReactiveFormsModule,
     TranslocoModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
-  providers:[
-    { provide: MatPaginatorIntl, useClass: CustomPaginationComponent},
-    { provide: TRANSLOCO_SCOPE, useValue: 'lazy' }
-  ]
+  providers: [
+    { provide: MatPaginatorIntl, useClass: CustomPaginationComponent },
+    { provide: TRANSLOCO_SCOPE, useValue: 'lazy' },
+  ],
 })
-export class AdminModule { }
+export class AdminModule {}
