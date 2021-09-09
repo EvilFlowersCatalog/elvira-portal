@@ -29,8 +29,6 @@ export class FeedManagementComponent
 
   constructor(
     private readonly filtersService: FiltersService,
-    private readonly router: Router,
-    private readonly route: ActivatedRoute,
     public dialog: MatDialog,
     private readonly adminService: AdminService,
     private readonly notificationService: NotificationService,
@@ -54,22 +52,26 @@ export class FeedManagementComponent
       });
   }
 
-  createFeed(parentFeedId: string) {
-    // const dialogRef = this.dialog.open(NewFeedDialogComponent, {
-    //   width: '350px',
-    // });
-    // dialogRef.afterClosed().subscribe((result) => {
-    //   if (result != 'no') {
-    //     this.adminService.addNewFeed(this.getFeedData(result)).subscribe(() => {
-    //       this.changeListenerService.statusChanged();
-    //     });
-    //     const message = this.translocoService.translate(
-    //       'lazy.adminPage.success-message-feed'
-    //     );
-    //     this.notificationService.success(message);
-    //   }
-    // });
-    console.log('create', parentFeedId);
+  createFeed(parentFeedId: string, parentFeedName: string) {
+    const dialogRef = this.dialog.open(NewFeedDialogComponent, {
+      width: '50%',
+      data: { parentName: parentFeedName },
+    });
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntil(this.destroySignal$))
+      .subscribe((result) => {
+        if (result != 'no') {
+          // this.adminService.addNewFeed(this.getFeedData(result)).subscribe(() => {
+          //   this.changeListenerService.statusChanged();
+          // });
+          // const message = this.translocoService.translate(
+          //   'lazy.adminPage.success-message-feed'
+          // );
+          // this.notificationService.success(message);
+        }
+        console.log(result);
+      });
   }
 
   editFeed(feedId: string) {
@@ -79,10 +81,10 @@ export class FeedManagementComponent
   deleteFeed(feedId: string) {
     console.log('deleting', feedId);
 
-    // this.adminService
-    //   .deleteFeed(feedId)
-    //   .pipe(take(1))
-    //   .subscribe((res) => this.fetchFeeds$.next());
+    this.adminService
+      .deleteFeed(feedId)
+      .pipe(take(1))
+      .subscribe(() => this.fetchFeeds$.next());
   }
 
   isNavigationNode = (_: number, node: FeedTreeNode) =>

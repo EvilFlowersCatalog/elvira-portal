@@ -63,8 +63,6 @@
     "agree-button": "Yes, I am sure!",
     "disagree-button": "No, thanks!",
     "update-feed": "Update ({{feed}}) feed to a new feed",
-    "create-feed": "Create new Feed",
-    "new-feed": "New Feed",
     "create": "Create",
     "cancel": "Cancel"
   },
@@ -94,5 +92,16 @@
     "cancelFilters": "Cancel filters",
     "author": "Author",
     "subjects": "Subjects:"
+  },
+  "newFeedDialog": {
+    "requiredFieldEmptyMessage": "Some of required fields are empty",
+    "title": "Create new feed",
+    "feedTitle": "Title",
+    "feedKind": "Kind",
+    "navigationFeed": "Navigation feed (contains additional feeds)",
+    "acquisitionFeed": "Acquisition feed (contains books)",
+    "parentFeed": "Parent feed",
+    "create": "Create",
+    "cancel": "Cancel"
   }
 }

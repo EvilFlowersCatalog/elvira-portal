@@ -1,5 +1,4 @@
-export interface AdminResponse {
-  };
+export interface AdminResponse {}
 
 export interface EntriesData {
   title: string;
@@ -24,7 +23,6 @@ export interface EntriesContributors {
   surname: string;
 }
 
-
 export interface GetEntries {
   items: AllEntryItems[];
   metadata: {
@@ -32,7 +30,7 @@ export interface GetEntries {
     limit: number;
     pages: number;
     total: number;
-  }
+  };
 }
 
 export interface AllEntryItems {
@@ -55,7 +53,7 @@ export interface AllEntryItems {
   };
   title: string;
   created_at: string;
-  updated_at: string
+  updated_at: string;
 }
 
 export interface DialogData {
@@ -81,7 +79,7 @@ export interface GetFeeds {
     limit: number;
     pages: number;
     total: number;
-  }
+  };
 }
 
 export interface AllFeedsItems {
@@ -107,10 +105,10 @@ export interface UpdateFeeds {
   kind: string;
 }
 
-export interface addNewFeed {
-  catalog_id: string;
-	title: string;
-	url_name: string;
-	content: string;
-	kind: string;
+export interface NewFeed {
+  parent_id: string;
+  title: string;
+  url_name: string;
+  content: string;
+  kind: string;
 }

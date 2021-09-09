@@ -63,8 +63,6 @@
     "agree-button": "Áno, som si istý!",
     "disagree-button": "Nie, ďakujem!",
     "update-feed": "Aktualizujte Feed ({{feed}}) na nový Feed",
-    "create-feed": "Vytvoriť nový feed!",
-    "new-feed": "Nový Feed",
     "create": "Vytvoriť",
     "cancel": "Zrušiť"
   },
@@ -94,5 +92,16 @@
     "cancelFilters": "Zrušiť filtre",
     "author": "Autor",
     "subjects": "Predmety:"
+  },
+  "newFeedDialog": {
+    "requiredFieldEmptyMessage": "Niektoré z povinných polí sú prázdne",
+    "title": "Vytvoriť nový feed",
+    "feedTitle": "Názov",
+    "feedKind": "Druh",
+    "navigationFeed": "Navigačný feed (obsahuje ďalšie feedy)",
+    "acquisitionFeed": "Akvizičný feed (obsahuje knihy)",
+    "parentFeed": "Rodičovský feed",
+    "create": "Vytvoriť",
+    "cancel": "Zrušiť"
   }
 }

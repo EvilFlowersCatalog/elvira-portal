@@ -15,6 +15,9 @@ import { TabGroupDirective } from './directives/tab-group.directive';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { CustomPaginationComponent } from '../common/services/custom-pagination/custom-pagination.service';
 import { FeedManagementComponent } from './components/feed-management/feed-management.component';
+import { DeleteDialogComponent } from './components/dialogs/delete-dialog/delete-dialog.component';
+import { NewFeedDialogComponent } from './components/dialogs/new-feed-dialog/new-feed-dialog.component';
+import { UpdateDialogComponent } from './components/dialogs/update-dialog/update-dialog.component';
 
 @NgModule({
   declarations: [
@@ -22,15 +25,17 @@ import { FeedManagementComponent } from './components/feed-management/feed-manag
     AdminUploadComponent,
     TabGroupDirective,
     FeedManagementComponent,
+    DeleteDialogComponent,
+    UpdateDialogComponent,
+    NewFeedDialogComponent,
   ],
   imports: [
     CommonModule,
     RouterModule.forChild(ADMIN_ROUTES),
     MaterialModule,
-    FormsModule,
-    ReactiveFormsModule,
     TranslocoModule,
     ReactiveFormsModule,
+    FormsModule,
   ],
   providers: [
     { provide: MatPaginatorIntl, useClass: CustomPaginationComponent },
