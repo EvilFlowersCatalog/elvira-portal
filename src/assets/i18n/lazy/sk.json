@@ -22,9 +22,6 @@
     "document-dropper": "Presuňte svoj PDF sem alebo kliknite sem a prehľadávajte",
     "upload": "Nahrať",
     "edit": "Upraviť",
-    "success-message-feed": "Feed bol úspešne nahraný",
-    "success-message-upload": "Feed bol úspešne aktualizovaný",
-    "success-delete-feed": "Feed bol úspešne odstránený",
     "success-delete-document": "Dokument bol úspešne odstránený",
     "success-message-document": "Dokument bol úspešne nahraný",
     "error-message": "Nahrávanie neuspešná"
@@ -63,8 +60,6 @@
     "agree-button": "Áno, som si istý!",
     "disagree-button": "Nie, ďakujem!",
     "update-feed": "Aktualizujte Feed ({{feed}}) na nový Feed",
-    "create-feed": "Vytvoriť nový feed!",
-    "new-feed": "Nový Feed",
     "create": "Vytvoriť",
     "cancel": "Zrušiť"
   },
@@ -94,5 +89,22 @@
     "cancelFilters": "Zrušiť filtre",
     "author": "Autor",
     "subjects": "Predmety:"
+  },
+  "newFeedDialog": {
+    "requiredFieldEmptyMessage": "Niektoré z povinných polí sú prázdne",
+    "title": "Vytvoriť nový feed",
+    "feedTitle": "Názov",
+    "feedKind": "Druh",
+    "navigationFeed": "Navigačný feed (obsahuje ďalšie feedy)",
+    "acquisitionFeed": "Akvizičný feed (obsahuje knihy)",
+    "parentFeed": "Rodičovský feed",
+    "create": "Vytvoriť",
+    "cancel": "Zrušiť"
+  },
+  "feedManagement": {
+    "feedPostSuccess": "Feed bol úspešne vytvorený",
+    "feedPostError": "Vytvorenie feedu zlyhalo",
+    "feedPutSuccess": "Feed bol úspešne aktualizovaný",
+    "feedDeleteSuccess": "Feed bol úspešne odstránený"
   }
 }

@@ -22,9 +22,6 @@
     "document-dropper": "Drag your PDF here or click here to browse",
     "upload": "Upload",
     "edit": "Edit",
-    "success-message-feed": "Successfully uploaded feed",
-    "success-message-upload": "Successfully updated feed",
-    "success-delete-feed": "Successfully deleted feed",
     "success-delete-document": "Successfully deleted document",
     "success-message-document": "Successfully uploaded document",
     "error-message": "Update failed"
@@ -63,8 +60,6 @@
     "agree-button": "Yes, I am sure!",
     "disagree-button": "No, thanks!",
     "update-feed": "Update ({{feed}}) feed to a new feed",
-    "create-feed": "Create new Feed",
-    "new-feed": "New Feed",
     "create": "Create",
     "cancel": "Cancel"
   },
@@ -94,5 +89,22 @@
     "cancelFilters": "Cancel filters",
     "author": "Author",
     "subjects": "Subjects:"
+  },
+  "newFeedDialog": {
+    "requiredFieldEmptyMessage": "Some of required fields are empty",
+    "title": "Create new feed",
+    "feedTitle": "Title",
+    "feedKind": "Kind",
+    "navigationFeed": "Navigation feed (contains additional feeds)",
+    "acquisitionFeed": "Acquisition feed (contains books)",
+    "parentFeed": "Parent feed",
+    "create": "Create",
+    "cancel": "Cancel"
+  },
+  "feedManagement": {
+    "feedPostSuccess": "Feed has been created successfully",
+    "feedPostError": "Feed creation failed",
+    "feedPutSuccess": "Feed has been updated successfully",
+    "feedDeleteSuccess": "Feed has been deleted successfully"
   }
 }

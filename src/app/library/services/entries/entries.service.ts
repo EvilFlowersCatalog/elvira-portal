@@ -13,19 +13,32 @@ export class EntriesService {
     private readonly appStateService: AppStateService
   ) {}
 
-  listEntries(page: number, limit: number): Observable<ListEntriesResponse> {
-    return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
-      params: { page: page + 1, limit: limit },
-    });
+  getEntries(page: number, limit: number, query?: string, feedId?: string) {
+    if (feedId) {
+      return this.httpClient.get<ListEntriesResponse>(
+        `api/apigw/feeds/filter/${feedId}`,
+        {
+          params: { page: page + 1, limit: limit },
+        }
+      );
+    } else if (query) {
+      return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
+        params: { page: page + 1, limit: limit, title: query },
+      });
+    } else {
+      return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
+        params: { page: page + 1, limit: limit },
+      });
+    }
   }
 
-  searchEntries(
+  listEntries(
     page: number,
     limit: number,
-    query: string
+    query?: string
   ): Observable<ListEntriesResponse> {
     return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
-      params: { page: page + 1, limit: limit, title: query },
+      params: { page: page + 1, limit: limit, title: query ?? '' },
     });
   }
 
@@ -35,7 +48,10 @@ export class EntriesService {
     feedId: string
   ): Observable<ListEntriesResponse> {
     return this.httpClient.get<ListEntriesResponse>(
-      `api/apigw/feeds/filter/${feedId}`
+      `api/apigw/feeds/filter/${feedId}`,
+      {
+        params: { page: page + 1, limit: limit },
+      }
     );
   }
 

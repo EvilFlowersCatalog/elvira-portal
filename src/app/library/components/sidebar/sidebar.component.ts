@@ -45,12 +45,20 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
       .getFeedTreeNode()
       .pipe(takeUntil(this.destroySignal$))
       .subscribe((data) => {
+        console.log(data);
         this.dataSource.data = data.entry;
       });
   }
 
   ngOnInit(): void {
     this.initAuthorForm();
+    const state = this.appStateService.getStateSnapshot();
+    this.searchForm.patchValue({
+      searchInput: state?.filters?.search,
+    });
+    this.authorForm.patchValue({
+      authorInput: state?.filters?.author,
+    });
   }
 
   initAuthorForm() {
@@ -102,9 +110,11 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
 
   cancelFilters() {
     this.filters = { search: null, author: null, feed: null };
+    this.authorForm.reset();
+    this.searchForm.reset();
     this.applyFilter();
   }
 
   isNavigationNode = (_: number, node: FeedTreeNode) =>
-    !!node.entry && node.entry.length > 0;
+    node.type === 'navigation';
 }
