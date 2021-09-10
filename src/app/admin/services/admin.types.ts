@@ -106,7 +106,7 @@ export interface UpdateFeeds {
 }
 
 export interface NewFeed {
-  parent_id: string;
+  parents: string[];
   title: string;
   url_name: string;
   content: string;

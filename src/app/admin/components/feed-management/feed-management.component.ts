@@ -70,7 +70,7 @@ export class FeedManagementComponent
       .subscribe((result) => {
         if (result != 'no') {
           const newFeedData: NewFeed = {
-            parent_id: parentFeedId,
+            parents: [parentFeedId],
             title: result.feedTitle,
             url_name: result.feedTitle
               .normalize('NFD')
