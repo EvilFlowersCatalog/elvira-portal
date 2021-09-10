@@ -35,9 +35,7 @@ export class CustomPaginationComponent extends MatPaginatorIntl {
 
   rangeLabelSK = (page: number, pageSize: number, length: number) => {
     if (length == 0 || pageSize == 0) { return `Strana 0 z ${length}`; }
-    console.log(page);
-    console.log(pageSize);
-    console.log(length);
+
     length = Math.max(length, 0);
 
     return `Strana ${page + 1} z ${Math.ceil(length/pageSize)}`;
@@ -45,9 +43,7 @@ export class CustomPaginationComponent extends MatPaginatorIntl {
 
   rangeLabelEN = (page: number, pageSize: number, length: number) => {
     if (length == 0 || pageSize == 0) { return `Page 0 of ${length}`; }
-    console.log(page);
-    console.log(pageSize);
-    console.log(length);
+
     length = Math.max(length, 0);
 
     return `Page ${page + 1} of ${Math.ceil(length/pageSize)}`;

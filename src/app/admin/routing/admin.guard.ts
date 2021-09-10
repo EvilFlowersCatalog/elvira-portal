@@ -41,19 +41,18 @@ export class AdminGuard implements CanLoad {
           }
         }
       )
-      console.log(this.verifyAdmin());
       return this.verifyAdmin();
   }
 
   private verifyAdmin(): Observable<boolean> {
-    const isMobile = this.deviceService.isMobile();
-    const isTablet = this.deviceService.isTablet();
+    // const isMobile = this.deviceService.isMobile();
+    // const isTablet = this.deviceService.isTablet();
     const token = this.appStateService.getStateSnapshot().token;
     const mongoId = jwtDecode<JwtPayload & { mongoId: string }>(token).mongoId;
-    if(isMobile || isTablet){
-      this.router.navigate(['./'], { relativeTo: this.route });
-      return of(false);
-    }
+    // if(isMobile || isTablet){
+    //   this.router.navigate(['./'], { relativeTo: this.route });
+    //   return of(false);
+    // }
     return this.adminService.getIsAdmin(mongoId).pipe(
       map(data => data)
     );

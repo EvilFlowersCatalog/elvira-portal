@@ -1,5 +1,5 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA} from '@angular/material/dialog';
+import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { AdminService } from 'src/app/admin/services/admin.service';
 import { addNewFeed } from 'src/app/admin/services/admin.types';
 import { NotificationService } from 'src/app/common/services/notification/notification.service';
@@ -11,7 +11,7 @@ import { TranslocoService } from '@ngneat/transloco';
 @Component({
   selector: 'app-new-feed-dialog',
   templateUrl: './new-feed-dialog.component.html',
-  styleUrls: ['./new-feed-dialog.component.scss']
+  styleUrls: ['./new-feed-dialog.component.scss'],
 })
 export class NewFeedDialogComponent implements OnInit {
   newFeed: string;
@@ -21,13 +21,12 @@ export class NewFeedDialogComponent implements OnInit {
     private readonly adminService: AdminService,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService
-  ) { }
+  ) {}
 
-  ngOnInit(): void {
-  }
+  ngOnInit(): void {}
 
   onNoClick(): void {
-    this.dialogRef.close("no");
+    this.dialogRef.close('no');
   }
 
   onYesClcik(): void {

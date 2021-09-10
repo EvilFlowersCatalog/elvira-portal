@@ -1,0 +1,21 @@
+<ng-container *transloco="let t">
+  <mat-tab-group elTabGroup mat-align-tabs="center">
+    <mat-tab label="Documents">
+      <app-document-management></app-document-management>
+    </mat-tab>
+    <mat-tab label="Feeds">
+      <div fxLayout="row" fxLayoutAlign="center center">
+        <div
+          fxLayout="column"
+          fxLayoutAlign="center center"
+          fxFlex="50"
+          class="admin-overview-feed-management-container"
+        >
+          <mat-card fxFill>
+            <app-feed-management fxFill></app-feed-management>
+          </mat-card>
+        </div>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</ng-container>
