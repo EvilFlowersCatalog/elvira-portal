@@ -2,16 +2,23 @@ import { NestedTreeControl } from '@angular/cdk/tree';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
-import { Router, ActivatedRoute } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
-import { Subject } from 'rxjs';
-import { concatMap, startWith, take, takeUntil } from 'rxjs/operators';
+import { Subject, throwError } from 'rxjs';
+import {
+  catchError,
+  concatMap,
+  startWith,
+  take,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { ChangeListenerService } from 'src/app/common/services/change-listener/change-listener.service';
 import { NotificationService } from 'src/app/common/services/notification/notification.service';
 import { FeedTreeNode } from 'src/app/library/library.types';
 import { FiltersService } from 'src/app/library/services/filters/filters.service';
 import { AdminService } from '../../services/admin.service';
+import { NewFeed } from '../../services/admin.types';
 import { NewFeedDialogComponent } from '../dialogs/new-feed-dialog/new-feed-dialog.component';
 
 @Component({
@@ -62,15 +69,39 @@ export class FeedManagementComponent
       .pipe(takeUntil(this.destroySignal$))
       .subscribe((result) => {
         if (result != 'no') {
-          // this.adminService.addNewFeed(this.getFeedData(result)).subscribe(() => {
-          //   this.changeListenerService.statusChanged();
-          // });
-          // const message = this.translocoService.translate(
-          //   'lazy.adminPage.success-message-feed'
-          // );
-          // this.notificationService.success(message);
+          const newFeedData: NewFeed = {
+            parent_id: parentFeedId,
+            title: result.feedTitle,
+            url_name: result.feedTitle
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .replace(/\s+/g, '-')
+              .toLowerCase(),
+            content: result.feedTitle,
+            kind: result.feedKind,
+          };
+
+          this.adminService
+            .addNewFeed(newFeedData)
+            .pipe(
+              take(1),
+              tap(() => {
+                const message = this.translocoService.translate(
+                  'lazy.feedManagement.feedPostSuccess'
+                );
+                this.notificationService.success(message);
+              }),
+              catchError((err) => {
+                console.log(err);
+                const message = this.translocoService.translate(
+                  'lazy.feedManagement.feedPostError'
+                );
+                this.notificationService.error(message);
+                return throwError(err);
+              })
+            )
+            .subscribe(() => this.fetchFeeds$.next());
         }
-        console.log(result);
       });
   }
 

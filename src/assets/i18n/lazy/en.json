@@ -22,9 +22,6 @@
     "document-dropper": "Drag your PDF here or click here to browse",
     "upload": "Upload",
     "edit": "Edit",
-    "success-message-feed": "Successfully uploaded feed",
-    "success-message-upload": "Successfully updated feed",
-    "success-delete-feed": "Successfully deleted feed",
     "success-delete-document": "Successfully deleted document",
     "success-message-document": "Successfully uploaded document",
     "error-message": "Update failed"
@@ -103,5 +100,11 @@
     "parentFeed": "Parent feed",
     "create": "Create",
     "cancel": "Cancel"
+  },
+  "feedManagement": {
+    "feedPostSuccess": "Feed has been created successfully",
+    "feedPostError": "Feed creation failed",
+    "feedPutSuccess": "Feed has been updated successfully",
+    "feedDeleteSuccess": "Feed has been deleted successfully"
   }
 }
