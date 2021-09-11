@@ -3,11 +3,23 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import { ActivatedRoute } from '@angular/router';
-import { Subject } from 'rxjs';
-import { concatMap, startWith, take, takeUntil } from 'rxjs/operators';
+import { TranslocoService } from '@ngneat/transloco';
+import { Subject, throwError } from 'rxjs';
+import {
+  catchError,
+  concatMap,
+  startWith,
+  take,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
+import { NotificationService } from 'src/app/common/services/notification/notification.service';
 import { FeedTreeNode } from 'src/app/library/library.types';
 import { FiltersService } from 'src/app/library/services/filters/filters.service';
+import { AdminService } from '../../services/admin.service';
+import { NewFeed } from '../../services/admin.types';
+import { NewFeedDialogComponent } from '../dialogs/new-feed-dialog/new-feed-dialog.component';
 
 @Component({
   selector: 'app-feed-management',
@@ -26,7 +38,10 @@ export class FeedManagementComponent
   constructor(
     private readonly filtersService: FiltersService,
     public dialog: MatDialog,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
+    private readonly adminService: AdminService,
+    private readonly notificationService: NotificationService,
+    private translocoService: TranslocoService
   ) {
     super();
   }
@@ -51,8 +66,50 @@ export class FeedManagementComponent
     });
   }
 
-  createFeed(parentFeedId: string) {
-    console.log('create', parentFeedId);
+  createFeed(parentFeedId: string, parentFeedName: string) {
+    const dialogRef = this.dialog.open(NewFeedDialogComponent, {
+      width: '50%',
+      data: { parentName: parentFeedName },
+    });
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntil(this.destroySignal$))
+      .subscribe((result) => {
+        if (result != 'no') {
+          const newFeedData: NewFeed = {
+            parents: [parentFeedId],
+            title: result.feedTitle,
+            url_name: result.feedTitle
+              .normalize('NFD')
+              .replace(/[\u0300-\u036f]/g, '')
+              .replace(/\s+/g, '-')
+              .toLowerCase(),
+            content: result.feedTitle,
+            kind: result.feedKind,
+          };
+
+          this.adminService
+            .addNewFeed(newFeedData)
+            .pipe(
+              take(1),
+              tap(() => {
+                const message = this.translocoService.translate(
+                  'lazy.feedManagement.feedPostSuccess'
+                );
+                this.notificationService.success(message);
+              }),
+              catchError((err) => {
+                console.log(err);
+                const message = this.translocoService.translate(
+                  'lazy.feedManagement.feedPostError'
+                );
+                this.notificationService.error(message);
+                return throwError(err);
+              })
+            )
+            .subscribe(() => this.fetchFeeds$.next());
+        }
+      });
   }
 
   editFeed(feedId: string) {
@@ -61,6 +118,11 @@ export class FeedManagementComponent
 
   deleteFeed(feedId: string) {
     console.log('deleting', feedId);
+
+    this.adminService
+      .deleteFeed(feedId)
+      .pipe(take(1))
+      .subscribe(() => this.fetchFeeds$.next());
   }
 
   isNavigationNode = (_: number, node: FeedTreeNode) =>

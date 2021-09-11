@@ -1,10 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  CanLoad,
-  Router,
-  ActivatedRoute,
-  UrlTree,
-} from '@angular/router';
+import { CanLoad, Router, ActivatedRoute, UrlTree } from '@angular/router';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { AdminService } from '../services/admin.service';
@@ -24,24 +19,21 @@ export class AdminGuard implements CanLoad {
     private deviceService: DeviceDetectorService
   ) {}
 
- canLoad():
+  canLoad():
     | boolean
     | UrlTree
     | Observable<boolean | UrlTree>
-    | Promise<boolean | UrlTree>
-    {
-      this.verifyAdmin().subscribe(
-        m => {
-          if(m){
-            return of(true);
-          }
-          else {
-            this.router.navigate(['./'], { relativeTo: this.route });
-            return of(false);
-          }
-        }
-      )
-      return this.verifyAdmin();
+    | Promise<boolean | UrlTree> {
+    this.verifyAdmin().subscribe((m) => {
+      if (m) {
+        return of(true);
+      } else {
+        this.router.navigate(['./'], { relativeTo: this.route });
+        return of(false);
+      }
+    });
+    console.log(this.verifyAdmin());
+    return this.verifyAdmin();
   }
 
   private verifyAdmin(): Observable<boolean> {
@@ -53,8 +45,6 @@ export class AdminGuard implements CanLoad {
     //   this.router.navigate(['./'], { relativeTo: this.route });
     //   return of(false);
     // }
-    return this.adminService.getIsAdmin(mongoId).pipe(
-      map(data => data)
-    );
+    return this.adminService.getIsAdmin(mongoId).pipe(map((data) => data));
   }
 }

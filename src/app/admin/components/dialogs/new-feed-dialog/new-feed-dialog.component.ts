@@ -1,12 +1,13 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { AdminService } from 'src/app/admin/services/admin.service';
-import { addNewFeed } from 'src/app/admin/services/admin.types';
-import { NotificationService } from 'src/app/common/services/notification/notification.service';
-import { AdminOverviewComponent } from '../../admin-overview/admin-overview.component';
-import { catchError, take, tap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
 import { TranslocoService } from '@ngneat/transloco';
+import { NotificationService } from 'src/app/common/services/notification/notification.service';
 
 @Component({
   selector: 'app-new-feed-dialog',
@@ -14,14 +15,22 @@ import { TranslocoService } from '@ngneat/transloco';
   styleUrls: ['./new-feed-dialog.component.scss'],
 })
 export class NewFeedDialogComponent implements OnInit {
-  newFeed: string;
+  newFeedForm: FormGroup;
 
   constructor(
     public dialogRef: MatDialogRef<NewFeedDialogComponent>,
-    private readonly adminService: AdminService,
+    @Inject(MAT_DIALOG_DATA) public data: { parentName: string },
+    private readonly fb: FormBuilder,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService
-  ) {}
+  ) {
+    dialogRef.disableClose = true;
+    this.newFeedForm = this.fb.group({
+      feedTitle: ['', [Validators.required]],
+      feedKind: [null, [Validators.required]],
+      feedsParentName: [{ value: this.data.parentName, disabled: true }],
+    });
+  }
 
   ngOnInit(): void {}
 
@@ -29,7 +38,15 @@ export class NewFeedDialogComponent implements OnInit {
     this.dialogRef.close('no');
   }
 
-  onYesClcik(): void {
-    this.dialogRef.close(this.newFeed);
+  onYesClick(): void {
+    const { value, valid } = this.newFeedForm;
+    if (valid) {
+      this.dialogRef.close(value);
+    } else {
+      const message = this.translocoService.translate(
+        'lazy.newFeedDialog.requiredFieldEmptyMessage'
+      );
+      this.notificationService.error(message);
+    }
   }
 }

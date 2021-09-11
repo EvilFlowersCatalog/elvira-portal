@@ -32,7 +32,11 @@
         <button mat-icon-button color="accent" (click)="editFeed(node.id)">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="accent" (click)="createFeed(node.id)">
+        <button
+          mat-icon-button
+          color="accent"
+          (click)="createFeed(node.id, node.title)"
+        >
           <mat-icon>add</mat-icon>
         </button>
       </div>

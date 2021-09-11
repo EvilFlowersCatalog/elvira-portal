@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
 import {
-  addNewFeed,
+  NewFeed,
   AdminResponse,
   AllEntryItems,
   AllFeedsItems,
@@ -74,7 +74,7 @@ export class AdminService {
     });
   }
 
-  addNewFeed(feedData: addNewFeed) {
+  addNewFeed(feedData: NewFeed) {
     return this.httpClient.post('api/apigw/feeds', feedData);
   }
 }
