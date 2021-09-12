@@ -1,10 +1,8 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild, ElementRef, AfterViewInit, OnInit } from '@angular/core';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
 import { Observable } from 'rxjs';
-import { catchError, take, tap } from 'rxjs/operators';
-import { throwError } from 'rxjs';
 import {
   FormGroup,
   FormControl,
@@ -12,10 +10,9 @@ import {
   FormBuilder,
   Validators,
 } from '@angular/forms';
-import { map, startWith } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, map, startWith, switchMap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
-import { HttpClient } from '@angular/common/http';
 import {
   AllEntryItems,
   EditedData,
@@ -24,13 +21,11 @@ import {
 import { TitleValidators } from '../../validators/title.validator';
 import { NotificationService } from 'src/app/common/services/notification/notification.service';
 import { TranslocoService } from '@ngneat/transloco';
-//import { ChangeListenerService } from 'src/app/common/services/change-listener/change-listener.service';
 
 @Component({
   selector: 'app-admin',
   templateUrl: './admin-upload.component.html',
   styleUrls: ['./admin-upload.component.scss'],
-  //providers: [ChangeListenerService]
 })
 export class AdminUploadComponent implements OnInit {
   uploadForm: FormGroup;
@@ -66,14 +61,21 @@ export class AdminUploadComponent implements OnInit {
   constructor(
     private formBuilder: FormBuilder,
     private readonly adminService: AdminService,
-    private readonly http: HttpClient,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly titleValidator: TitleValidators,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService
-  ) //private readonly changeListenerService: ChangeListenerService
-  {
+  ) {
+    this.allFeeds = this.getFeeds();
+
+    setTimeout(() => {
+      this.filteredFeeds = this.feedCtrl.valueChanges.pipe(
+        startWith(null),
+        map((fruit: string | null) => fruit ? this._filter(fruit) : this.allFeeds.slice()));
+    }, 1000);
+
+
     this.imageForm = new FormGroup({
       file: new FormControl(null),
     });
@@ -125,7 +127,6 @@ export class AdminUploadComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.allFeeds = this.getFeeds();
     this.entryId = this.route.snapshot.paramMap.get('id');
     if (this.entryId != null && !this.isInEditMode) {
       this.adminService.getOneEntry(this.entryId).subscribe((datas) => {
@@ -134,13 +135,6 @@ export class AdminUploadComponent implements OnInit {
         console.log(this.isInEditMode);
       });
     }
-
-    this.filteredFeeds = this.feedCtrl.valueChanges.pipe(
-      startWith(null),
-      map((fruit: string | null) =>
-        fruit ? this._filter(fruit) : this.allFeeds.slice()
-      )
-    );
   }
 
   getFeeds(): string[] {
@@ -193,6 +187,7 @@ export class AdminUploadComponent implements OnInit {
   }
 
   private _filter(value: string): string[] {
+
     const filterValue = value.toLowerCase();
 
     return this.allFeeds.filter((fruit) =>
@@ -221,9 +216,7 @@ export class AdminUploadComponent implements OnInit {
             this.uploadForm.get('author').get('surname').value;
 
           this.adminService.upload(testData).subscribe(() => {
-            //this.changeListenerService.statusChanged();
             this.router.navigate(['../'], { relativeTo: this.route });
-            //this.router.navigate(['/library/admin'])
           });
           const message = this.translocoService.translate(
             'lazy.adminPage.success-message-document'
@@ -266,7 +259,6 @@ export class AdminUploadComponent implements OnInit {
         { relation: 'acquisition', content: await this.getBase() },
       ],
     };
-    //console.log(entriesData);
 
     return entriesData;
   }
@@ -288,7 +280,6 @@ export class AdminUploadComponent implements OnInit {
       });
     }
     const base = await getBase64(this.pdfFile);
-    //console.log(base);
     return base;
   }
 
@@ -345,5 +336,9 @@ export class AdminUploadComponent implements OnInit {
       this.validSize = false;
       return false;
     }
+  }
+
+  returnToAdmin() {
+    this.router.navigate(['../'], { relativeTo: this.route });
   }
 }

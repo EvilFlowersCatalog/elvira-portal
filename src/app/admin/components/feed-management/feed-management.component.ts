@@ -2,6 +2,7 @@ import { NestedTreeControl } from '@angular/cdk/tree';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
+import { ActivatedRoute } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
 import { Subject, throwError } from 'rxjs';
 import {
@@ -13,7 +14,6 @@ import {
   tap,
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { ChangeListenerService } from 'src/app/common/services/change-listener/change-listener.service';
 import { NotificationService } from 'src/app/common/services/notification/notification.service';
 import { FeedTreeNode } from 'src/app/library/library.types';
 import { FiltersService } from 'src/app/library/services/filters/filters.service';
@@ -37,10 +37,10 @@ export class FeedManagementComponent
   constructor(
     private readonly filtersService: FiltersService,
     public dialog: MatDialog,
+    private readonly route: ActivatedRoute,
     private readonly adminService: AdminService,
     private readonly notificationService: NotificationService,
-    private translocoService: TranslocoService,
-    private readonly changeListenerService: ChangeListenerService
+    private translocoService: TranslocoService
   ) {
     super();
   }

@@ -37,8 +37,8 @@ export class AdminGuard implements CanLoad {
   }
 
   private verifyAdmin(): Observable<boolean> {
-    const isMobile = this.deviceService.isMobile();
-    const isTablet = this.deviceService.isTablet();
+    // const isMobile = this.deviceService.isMobile();
+    // const isTablet = this.deviceService.isTablet();
     const token = this.appStateService.getStateSnapshot().token;
     const mongoId = jwtDecode<JwtPayload & { mongoId: string }>(token).mongoId;
     // if(isMobile || isTablet){

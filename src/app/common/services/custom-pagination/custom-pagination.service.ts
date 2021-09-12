@@ -33,6 +33,7 @@ export class CustomPaginationComponent extends MatPaginatorIntl {
     if (length == 0 || pageSize == 0) {
       return `Strana 0 z ${length}`;
     }
+
     length = Math.max(length, 0);
 
     return `Strana ${page + 1} z ${Math.ceil(length / pageSize)}`;
@@ -42,6 +43,7 @@ export class CustomPaginationComponent extends MatPaginatorIntl {
     if (length == 0 || pageSize == 0) {
       return `Page 0 of ${length}`;
     }
+
     length = Math.max(length, 0);
 
     return `Page ${page + 1} of ${Math.ceil(length / pageSize)}`;
