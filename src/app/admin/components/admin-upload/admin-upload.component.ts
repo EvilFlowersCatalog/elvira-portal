@@ -109,17 +109,6 @@ export class AdminUploadComponent implements OnInit {
     return this.uploadForm.controls['title'];
   }
 
-
-  // filter(val: string): Observable<any[]> {
-  //   // call the service which makes the http-request
-  //   return  this.adminService.getAllFeeds()
-  //    .pipe(
-  //      map(response => response.items.filter(option => {
-  //        return option.title.toLowerCase().indexOf(val.toLowerCase()) === 0
-  //      }))
-  //    )
-  //  }
-
   createItem(): FormGroup {
     return this.formBuilder.group({
       name: '',
@@ -347,5 +336,9 @@ export class AdminUploadComponent implements OnInit {
       this.validSize = false;
       return false;
     }
+  }
+
+  returnToAdmin() {
+    this.router.navigate(['../'], { relativeTo: this.route });
   }
 }

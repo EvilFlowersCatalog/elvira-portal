@@ -27,7 +27,8 @@
     "success-delete-feed": "Successfully deleted feed",
     "success-delete-document": "Successfully deleted document",
     "success-message-document": "Successfully uploaded document",
-    "error-message": "Update failed"
+    "error-message": "Update failed",
+    "back-to-admin-button": "Back to admin!"
   },
   "adminOverview": {
     "search": "Search",
