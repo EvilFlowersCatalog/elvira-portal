@@ -37,7 +37,7 @@ export class EntryDetailComponent implements OnInit {
   ngOnInit(): void {
     this.imageSrc =
       this.entry.img === 'none'
-        ? 'default'
+        ? 'none'
         : `data:image/png;base64,${this.entry.img}`;
     this.year = DateTime.fromISO(this.entry.created_at).year;
   }

@@ -12,7 +12,12 @@
       class="entry-detail-image-container"
       (click)="openPdf(entry.id)"
     >
-      <img mat-card-image [src]="imageSrc" class="entry-detail-image" />
+      <div *ngIf="imageSrc === 'none'; else image">
+        <mat-icon>broken_image</mat-icon>
+      </div>
+      <ng-template #image>
+        <img mat-card-image [src]="imageSrc" class="entry-detail-image" />
+      </ng-template>
     </mat-card-content>
     <mat-card-content (click)="openPdf(entry.id)">
       <p>{{ entry.author.name + " " + entry.author.surname }}</p>

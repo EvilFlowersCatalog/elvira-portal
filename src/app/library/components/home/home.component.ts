@@ -3,11 +3,21 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { concatMap, distinctUntilKeyChanged, map, pluck, takeUntil, tap } from 'rxjs/operators';
+import {
+  concatMap,
+  distinctUntilKeyChanged,
+  map,
+  pluck,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 import { AllEntryItems } from 'src/app/admin/services/admin.types';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { Filters, State } from 'src/app/common/services/app-state/app-state.types';
+import {
+  Filters,
+  State,
+} from 'src/app/common/services/app-state/app-state.types';
 import { EntriesService } from '../../services/entries/entries.service';
 import {
   EntriesItem,
@@ -80,11 +90,17 @@ export class HomeComponent extends DisposableComponent implements OnInit {
     this.appStateService
       .getState$()
       .pipe(
-        takeUntil(this.destroySignal$), 
+        takeUntil(this.destroySignal$),
         distinctUntilKeyChanged('filters'),
         pluck('filters'),
-        concatMap((filters: Filters) => this.entriesService.getEntries(0, this.paginator?.pageSize ?? 2, filters?.search, filters?.feed)),
-        tap(console.log)
+        concatMap((filters: Filters) =>
+          this.entriesService.getEntries(
+            0,
+            this.paginator?.pageSize ?? 2,
+            filters?.search,
+            filters?.feed
+          )
+        )
       )
       .subscribe((data) => {
         this.entries = data.items;
@@ -104,7 +120,12 @@ export class HomeComponent extends DisposableComponent implements OnInit {
   homePagination() {
     const state = this.appStateService.getStateSnapshot();
     this.entriesService
-      .getEntries(this.paginator.pageIndex, this.paginator.pageSize, state?.filters?.search, state?.filters?.feed)
+      .getEntries(
+        this.paginator.pageIndex,
+        this.paginator.pageSize,
+        state?.filters?.search,
+        state?.filters?.feed
+      )
       .subscribe((data) => {
         this.entries = data.items;
         this.resultsLength = data.metadata.total;
