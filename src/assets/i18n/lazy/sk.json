@@ -24,7 +24,8 @@
     "edit": "Upraviť",
     "success-delete-document": "Dokument bol úspešne odstránený",
     "success-message-document": "Dokument bol úspešne nahraný",
-    "error-message": "Nahrávanie neuspešná"
+    "error-message": "Nahrávanie neuspešná",
+    "back-to-admin-button": "Späť na admin!"
   },
   "adminOverview": {
     "search": "Vyhľadávanie",
