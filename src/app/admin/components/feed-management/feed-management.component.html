@@ -12,7 +12,11 @@
         <button mat-icon-button color="accent" (click)="editFeed(node.id)">
           <mat-icon>edit</mat-icon>
         </button>
-        <button mat-icon-button color="accent" (click)="deleteFeed(node.id)">
+        <button
+          mat-icon-button
+          color="accent"
+          (click)="deleteFeed(node.id, node.title)"
+        >
           <mat-icon>delete</mat-icon>
         </button>
       </div>

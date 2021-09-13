@@ -19,6 +19,7 @@ import { FeedTreeNode } from 'src/app/library/library.types';
 import { FiltersService } from 'src/app/library/services/filters/filters.service';
 import { AdminService } from '../../services/admin.service';
 import { NewFeed } from '../../services/admin.types';
+import { DeleteDialogComponent } from '../dialogs/delete-dialog/delete-dialog.component';
 import { NewFeedDialogComponent } from '../dialogs/new-feed-dialog/new-feed-dialog.component';
 
 @Component({
@@ -63,6 +64,7 @@ export class FeedManagementComponent
       width: '50%',
       data: { parentName: parentFeedName },
     });
+
     dialogRef
       .afterClosed()
       .pipe(takeUntil(this.destroySignal$))
@@ -108,13 +110,39 @@ export class FeedManagementComponent
     console.log('editing', feedId);
   }
 
-  deleteFeed(feedId: string) {
-    console.log('deleting', feedId);
+  deleteFeed(feedId: string, feedTitle: string) {
+    const dialogRef = this.dialog.open(DeleteDialogComponent, {
+      width: '30%',
+      data: { title: feedTitle },
+    });
 
-    this.adminService
-      .deleteFeed(feedId)
-      .pipe(take(1))
-      .subscribe(() => this.fetchFeeds$.next());
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntil(this.destroySignal$))
+      .subscribe((result) => {
+        if (result != 'no') {
+          this.adminService
+            .deleteFeed(feedId)
+            .pipe(
+              take(1),
+              tap(() => {
+                const message = this.translocoService.translate(
+                  'lazy.feedManagement.feedDeleteSuccess'
+                );
+                this.notificationService.success(message);
+              }),
+              catchError((err) => {
+                console.log(err);
+                const message = this.translocoService.translate(
+                  'lazy.feedManagement.feedDeleteError'
+                );
+                this.notificationService.error(message);
+                return throwError(err);
+              })
+            )
+            .subscribe(() => this.fetchFeeds$.next());
+        }
+      });
   }
 
   isNavigationNode = (_: number, node: FeedTreeNode) =>
