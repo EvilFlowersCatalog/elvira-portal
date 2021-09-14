@@ -141,8 +141,10 @@ export class AdminUploadComponent implements OnInit {
     let feedsList: string[] = [];
     this.adminService.getAllFeeds().subscribe((datas) => {
       datas.items.map((m) => {
-        feedsList.push(m.title);
-        this.feedsIdList.push(m.id);
+        if(m.kind === 'acquisition'){
+          feedsList.push(m.title);
+          this.feedsIdList.push(m.id);
+        }
       });
     });
     return feedsList;
