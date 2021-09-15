@@ -30,7 +30,7 @@ export class AdminService {
 
   getAllFeeds(): Observable<GetFeeds> {
     return this.httpClient.get<GetFeeds>('api/apigw/feeds', {
-      params: { limit: 100 },
+      params: { paginate: 'false' },
     });
   }
 
