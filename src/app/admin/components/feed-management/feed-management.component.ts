@@ -21,6 +21,8 @@ import { AdminService } from '../../services/admin.service';
 import { NewFeed } from '../../services/admin.types';
 import { DeleteDialogComponent } from '../dialogs/delete-dialog/delete-dialog.component';
 import { NewFeedDialogComponent } from '../dialogs/new-feed-dialog/new-feed-dialog.component';
+import { UpdateFeedDialogComponent } from '../dialogs/update-feed-dialog/update-feed-dialog.component';
+import { Guid } from 'js-guid';
 
 @Component({
   selector: 'app-feed-management',
@@ -55,6 +57,7 @@ export class FeedManagementComponent
         concatMap(() => this.filtersService.getFeedTreeNode())
       )
       .subscribe((data) => {
+        console.log(data);
         this.treeDataSource.data = data.entry;
       });
   }
@@ -73,14 +76,12 @@ export class FeedManagementComponent
           const newFeedData: NewFeed = {
             parents: [parentFeedId],
             title: result.feedTitle,
-            url_name: result.feedTitle
-              .normalize('NFD')
-              .replace(/[\u0300-\u036f]/g, '')
-              .replace(/\s+/g, '-')
-              .toLowerCase(),
+            url_name: Guid.newGuid().toString(),
             content: result.feedTitle,
             kind: result.feedKind,
           };
+
+          console.log(newFeedData);
 
           this.adminService
             .addNewFeed(newFeedData)
@@ -106,8 +107,47 @@ export class FeedManagementComponent
       });
   }
 
-  editFeed(feedId: string) {
-    console.log('editing', feedId);
+  editFeed(feedTitle: string, feedKind: string, parentFeedName?: string) {
+    const dialogRef = this.dialog.open(UpdateFeedDialogComponent, {
+      width: '50%',
+      data: { title: feedTitle, parentName: parentFeedName, kind: feedKind },
+    });
+
+    dialogRef
+      .afterClosed()
+      .pipe(takeUntil(this.destroySignal$))
+      .subscribe((result) => {
+        if (result != 'no') {
+          // const newFeedData: NewFeed = {
+          //   parents: [parentFeedId],
+          //   title: result.feedTitle,
+          //   url_name: Guid.newGuid().toString(),
+          //   content: result.feedTitle,
+          //   kind: result.feedKind,
+          // };
+          // console.log(newFeedData);
+          // this.adminService
+          //   .addNewFeed(newFeedData)
+          //   .pipe(
+          //     take(1),
+          //     tap(() => {
+          //       const message = this.translocoService.translate(
+          //         'lazy.feedManagement.feedPostSuccess'
+          //       );
+          //       this.notificationService.success(message);
+          //     }),
+          //     catchError((err) => {
+          //       console.log(err);
+          //       const message = this.translocoService.translate(
+          //         'lazy.feedManagement.feedPostError'
+          //       );
+          //       this.notificationService.error(message);
+          //       return throwError(err);
+          //     })
+          //   )
+          //   .subscribe(() => this.fetchFeeds$.next());
+        }
+      });
   }
 
   deleteFeed(feedId: string, feedTitle: string) {

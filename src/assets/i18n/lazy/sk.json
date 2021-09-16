@@ -98,7 +98,7 @@
     "feedTitle": "Názov",
     "feedKind": "Druh",
     "navigationFeed": "Navigačný feed (obsahuje ďalšie feedy)",
-    "acquisitionFeed": "Akvizičný feed (obsahuje knihy)",
+    "acquisitionFeed": "Akvizičný feed (obsahuje publikácie)",
     "parentFeed": "Rodičovský feed",
     "create": "Vytvoriť",
     "cancel": "Zrušiť"

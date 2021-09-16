@@ -98,7 +98,7 @@
     "feedTitle": "Title",
     "feedKind": "Kind",
     "navigationFeed": "Navigation feed (contains additional feeds)",
-    "acquisitionFeed": "Acquisition feed (contains books)",
+    "acquisitionFeed": "Acquisition feed (contains publications)",
     "parentFeed": "Parent feed",
     "create": "Create",
     "cancel": "Cancel"
