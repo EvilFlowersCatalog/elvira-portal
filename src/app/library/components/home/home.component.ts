@@ -19,7 +19,9 @@ import { EntriesService } from '../../services/entries/entries.service';
 
 const filterCompare = (a: Filters, b: Filters) => {
   return (
-    a.search === b.search && a.author?.id === b.author?.id && a.feed === b.feed
+    a?.search === b?.search &&
+    a?.author?.id === b?.author?.id &&
+    a?.feed === b?.feed
   );
 };
 
@@ -87,9 +89,9 @@ export class HomeComponent extends DisposableComponent implements OnInit {
       .getEntries(
         this.paginator.pageIndex,
         this.paginator.pageSize,
-        state?.filters?.search,
-        state?.filters?.author?.id,
-        state?.filters?.feed
+        state.filters?.search,
+        state.filters?.author?.id,
+        state.filters?.feed
       )
       .subscribe((data) => {
         this.entries = data.items;

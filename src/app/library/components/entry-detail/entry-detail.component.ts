@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { DateTime } from 'luxon';
 import { MatDialog } from '@angular/material/dialog';
 import { EntriesService } from '../../services/entries/entries.service';
 import { Router } from '@angular/router';
@@ -21,7 +20,6 @@ export class EntryDetailComponent implements OnInit {
   @Input() entry: EntriesItem;
   @Output() onDeleteFromFavorites = new EventEmitter<any>();
   imageSrc: string;
-  year: string;
   currentRoute = this.router.url;
 
   constructor(
@@ -39,7 +37,6 @@ export class EntryDetailComponent implements OnInit {
       this.entry.img === 'none'
         ? 'none'
         : `data:image/png;base64,${this.entry.img}`;
-    this.year = DateTime.fromISO(this.entry.created_at).year;
   }
 
   openPdf(id: string) {

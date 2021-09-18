@@ -96,10 +96,10 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
 
   // setting view of sidebar based on active filter
   setView(filters: Filters) {
-    this.searchForm.controls.searchInput.setValue(filters.search);
-    this.selectedAuthor = filters.author?.name;
-    this.selectedFeed = filters.feed;
-    if (!filters.feed) {
+    this.searchForm.controls.searchInput.setValue(filters?.search);
+    this.selectedAuthor = filters?.author?.name;
+    this.selectedFeed = filters?.feed;
+    if (!filters?.feed) {
       this.treeControl.collapseAll();
     }
   }

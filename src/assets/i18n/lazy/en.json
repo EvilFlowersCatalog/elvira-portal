@@ -51,6 +51,7 @@
   "entryInfoDialog": {
     "author": "Author:",
     "summary": "Summary:",
+    "feeds": "Feeds:",
     "language": "Language:",
     "createdAt": "Created at:",
     "close": "Close"

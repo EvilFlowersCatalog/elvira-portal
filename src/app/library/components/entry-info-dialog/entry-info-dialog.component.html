@@ -13,12 +13,18 @@
         {{ entryDetail.summary }}
       </p>
       <p>
+        {{ t("lazy.entryInfoDialog.feeds") }}
+      </p>
+      <ul *ngFor="let feed of entryDetail.feeds">
+        <li>{{ feed.title }}</li>
+      </ul>
+      <p>
         {{ t("lazy.entryInfoDialog.language") }}
         {{ entryDetail.language.name }}
       </p>
       <p>
         {{ t("lazy.entryInfoDialog.createdAt") }}
-        {{ entryDetail.created_at }}
+        {{ entryDetail.created_at | date: shortDate }}
       </p>
     </mat-dialog-content>
     <mat-dialog-actions fxLayout="row" fxLayoutAlign="center center">

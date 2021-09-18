@@ -7,11 +7,7 @@ export interface EntriesItem {
   id: string;
   creator_id: string;
   catalog_id: string;
-  author: {
-    id: string;
-    name: string;
-    surname: string;
-  };
+  author: EntryAuthor;
   category: {
     id: string;
     term: string;
@@ -31,15 +27,29 @@ export interface EntryDetail {
   id: string;
   creator_id: string;
   catalog_id: string;
-  author: {
-    id: string;
-    name: string;
-    surname: string;
-  };
+  author: EntryAuthor;
+  contributors: EntryAuthor[];
   category: {
     id: string;
     term: string;
   };
+  feeds: [
+    {
+      catalog_id: string;
+      children: string[];
+      content: string;
+      created_at: string;
+      creator_id: string;
+      id: string;
+      kind: string;
+      parents: string[];
+      per_page: number;
+      title: string;
+      updated_at: string;
+      url: string;
+      url_name: string;
+    }
+  ];
   language: {
     id: string;
     name: string;
@@ -61,6 +71,12 @@ export interface EntryDetail {
     }
   ];
   img: string;
+}
+
+export interface EntryAuthor {
+  id: string;
+  name: string;
+  surname: string;
 }
 
 export interface UserResponse {
