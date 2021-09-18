@@ -1,4 +1,10 @@
-import { Component, ViewChild, ElementRef, AfterViewInit, OnInit } from '@angular/core';
+import {
+  Component,
+  ViewChild,
+  ElementRef,
+  AfterViewInit,
+  OnInit,
+} from '@angular/core';
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
@@ -10,7 +16,14 @@ import {
   FormBuilder,
   Validators,
 } from '@angular/forms';
-import { debounceTime, distinctUntilChanged, map, startWith, switchMap } from 'rxjs/operators';
+import {
+  debounceTime,
+  distinctUntilChanged,
+  map,
+  startWith,
+  switchMap,
+  tap,
+} from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import {
@@ -21,6 +34,11 @@ import {
 import { TitleValidators } from '../../validators/title.validator';
 import { NotificationService } from 'src/app/common/services/notification/notification.service';
 import { TranslocoService } from '@ngneat/transloco';
+import { FiltersService } from 'src/app/library/services/filters/filters.service';
+import { MatTreeNestedDataSource } from '@angular/material/tree';
+import { FeedTreeNode } from 'src/app/library/library.types';
+import { NestedTreeControl } from '@angular/cdk/tree';
+import { EntriesService } from 'src/app/library/services/entries/entries.service';
 
 @Component({
   selector: 'app-admin',
@@ -56,6 +74,9 @@ export class AdminUploadComponent implements OnInit {
   isInEditMode: boolean = false;
   editData: AllEntryItems;
 
+  treeDataSource = new MatTreeNestedDataSource<FeedTreeNode>();
+  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.entry);
+
   @ViewChild('fruitInput') fruitInput: ElementRef<HTMLInputElement>;
 
   constructor(
@@ -65,16 +86,20 @@ export class AdminUploadComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly titleValidator: TitleValidators,
     private readonly notificationService: NotificationService,
-    private translocoService: TranslocoService
+    private translocoService: TranslocoService,
+    private readonly filtersService: FiltersService,
+    private readonly entriesService: EntriesService
   ) {
     this.allFeeds = this.getFeeds();
 
     setTimeout(() => {
       this.filteredFeeds = this.feedCtrl.valueChanges.pipe(
         startWith(null),
-        map((fruit: string | null) => fruit ? this._filter(fruit) : this.allFeeds.slice()));
+        map((fruit: string | null) =>
+          fruit ? this._filter(fruit) : this.allFeeds.slice()
+        )
+      );
     }, 1000);
-
 
     this.imageForm = new FormGroup({
       file: new FormControl(null),
@@ -109,6 +134,9 @@ export class AdminUploadComponent implements OnInit {
     return this.uploadForm.controls['title'];
   }
 
+  isNavigationNode = (_: number, node: FeedTreeNode) =>
+    node.type === 'navigation';
+
   createItem(): FormGroup {
     return this.formBuilder.group({
       name: '',
@@ -130,10 +158,24 @@ export class AdminUploadComponent implements OnInit {
     this.entryId = this.route.snapshot.paramMap.get('id');
     if (this.entryId != null && !this.isInEditMode) {
       this.adminService.getOneEntry(this.entryId).subscribe((datas) => {
-        this.editData = datas;
-        this.isInEditMode = true;
-        console.log(this.isInEditMode);
+        // this.editData = datas;
+        // this.isInEditMode = true;
+        console.log('fasz');
+        console.log(datas);
       });
+    }
+
+    this.filtersService.getFeedTreeNode().subscribe((data) => {
+      this.treeDataSource.data = data.entry;
+    });
+  }
+
+  addFeed(id, title) {
+    console.log(id);
+    console.log(title);
+    if (!this.feeds.includes(title)) {
+      this.feeds.push(title);
+      this.finalFeeds.push(id);
     }
   }
 
@@ -141,7 +183,7 @@ export class AdminUploadComponent implements OnInit {
     let feedsList: string[] = [];
     this.adminService.getAllFeeds().subscribe((datas) => {
       datas.items.map((m) => {
-        if(m.kind === 'acquisition'){
+        if (m.kind === 'acquisition') {
           feedsList.push(m.title);
           this.feedsIdList.push(m.id);
         }
@@ -189,7 +231,6 @@ export class AdminUploadComponent implements OnInit {
   }
 
   private _filter(value: string): string[] {
-
     const filterValue = value.toLowerCase();
 
     return this.allFeeds.filter((fruit) =>

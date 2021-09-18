@@ -13,6 +13,8 @@
     "feeds": "Feeds",
     "feeds-label": "Favourite Feeds",
     "feeds-placeholder": "New feed...",
+    "feeds-list": "List of feeds",
+    "feeds-expansion": "Click to open feeds",
     "summary": "Summary",
     "summary-hint": "Short summary about the documentation",
     "image": "Image",
