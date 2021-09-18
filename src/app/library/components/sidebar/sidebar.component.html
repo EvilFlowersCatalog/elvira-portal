@@ -1,6 +1,10 @@
 <ng-container *transloco="let t">
   <div fxLayout="column" class="sidebar-container">
-    <form [formGroup]="searchForm" (submit)="search()">
+    <button mat-raised-button color="accent" (click)="cancelFilters()">
+      <mat-icon>filter_alt</mat-icon>{{ t("lazy.sidebar.cancelFilters") }}
+    </button>
+
+    <form [formGroup]="searchForm" class="sidebar-spacer" (submit)="search()">
       <div fxLayout="row">
         <mat-form-field color="accent" class="sidebar-input">
           <mat-label>
@@ -23,10 +27,8 @@
         </button>
       </div>
     </form>
-    <hr />
-    <button mat-raised-button color="accent" (click)="cancelFilters()">
-      <mat-icon>filter_alt</mat-icon>{{ t("lazy.sidebar.cancelFilters") }}
-    </button>
+    <!-- <hr /> -->
+    <!-- <mat-divider></mat-divider> -->
 
     <form [formGroup]="authorForm" class="sidebar-spacer">
       <mat-form-field color="accent" class="sidebar-input">
