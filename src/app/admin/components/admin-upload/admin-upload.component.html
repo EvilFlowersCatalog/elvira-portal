@@ -116,13 +116,13 @@
                   t("lazy.adminPage.contributor-surname")
                 }}</mat-label>
                 <div *ngIf="isInEditMode; else elseContributorSurname">
-                <input
-                  matInput
-                  maxlength="30"
-                  formControlName="surname"
-                  required
-                  [(ngModel)]="editData.contributors[i].surname"
-                />
+                  <input
+                    matInput
+                    maxlength="30"
+                    formControlName="surname"
+                    required
+                    [(ngModel)]="editData.contributors[i].surname"
+                  />
                 </div>
                 <ng-template #elseContributorSurname>
                   <input matInput maxlength="50" formControlName="surname" />
@@ -179,7 +179,11 @@
           >
             <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
               <div fxLayout="row" fxLayoutAlign="space-between center">
-                <button mat-flat-button (click)="addFeed(node.id, node.title)" type="button">
+                <button
+                  mat-flat-button
+                  (click)="addFeed(node.id, node.title)"
+                  type="button"
+                >
                   {{ node.title }}
                 </button>
                 <button

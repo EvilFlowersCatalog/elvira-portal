@@ -7,18 +7,7 @@
     </mat-tab>
     <mat-tab label="Feeds">
       <ng-template matTabContent>
-        <div fxLayout="row" fxLayoutAlign="center center">
-          <div
-            fxLayout="column"
-            fxLayoutAlign="center center"
-            fxFlex="50"
-            class="admin-overview-feed-management-container"
-          >
-            <mat-card fxFill>
-              <app-feed-management fxFill></app-feed-management>
-            </mat-card>
-          </div>
-        </div>
+        <app-feed-management fxFill></app-feed-management>
       </ng-template>
     </mat-tab>
   </mat-tab-group>

@@ -102,7 +102,10 @@ export class FeedManagementComponent
           return throwError(err);
         })
       )
-      .subscribe(() => this.fetchFeeds$.next());
+      .subscribe(() => {
+        this.treeDataSource.data = [];
+        this.fetchFeeds$.next();
+      });
   }
 
   editFeed(feedTitle: string, feedKind: string, parentFeedName?: string) {
@@ -144,7 +147,9 @@ export class FeedManagementComponent
     //     return throwError(err);
     //   })
     // )
-    // .subscribe(() => this.fetchFeeds$.next());
+    // .subscribe(() => {
+    // this.treeDataSource.data = [];
+    // this.fetchFeeds$.next()});
   }
 
   deleteFeed(feedId: string, feedTitle: string) {
@@ -174,7 +179,10 @@ export class FeedManagementComponent
           return throwError(err);
         })
       )
-      .subscribe(() => this.fetchFeeds$.next());
+      .subscribe(() => {
+        this.treeDataSource.data = [];
+        this.fetchFeeds$.next();
+      });
   }
 
   isNavigationNode = (_: number, node: FeedTreeNode) =>
