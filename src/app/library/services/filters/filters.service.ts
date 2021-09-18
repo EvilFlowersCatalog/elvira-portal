@@ -1,6 +1,7 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { BYPASS_LOADING } from 'src/app/common/interceptors/http-request.interceptor';
 import {
   Authors,
   FeedTreeNode,
@@ -26,6 +27,7 @@ export class FiltersService {
 
     return this.httpClient.get<Authors>(`api/apigw/authors`, {
       params: params,
+      context: new HttpContext().set(BYPASS_LOADING, true),
     });
   }
 

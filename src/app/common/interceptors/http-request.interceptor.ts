@@ -4,11 +4,14 @@ import {
   HttpHandler,
   HttpEvent,
   HttpInterceptor,
+  HttpContextToken,
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AppStateService } from '../services/app-state/app-state.service';
 import { LoadingService } from '../services/loading/loading.service';
 import { environment } from 'src/environments/environment';
+
+export const BYPASS_LOADING = new HttpContextToken(() => false);
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
@@ -21,7 +24,9 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     request: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    this.loadingService.showLoading();
+    if (request.context.get(BYPASS_LOADING) === false) {
+      this.loadingService.showLoading();
+    }
     const authToken = this.appStateService.getStateSnapshot().token;
     // const isApiRequest = request.urlWithParams.startsWith(environment.baseUrl);
     const options = {

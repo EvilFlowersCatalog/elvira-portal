@@ -7,7 +7,6 @@ import {
   map,
   pluck,
   takeUntil,
-  tap,
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
@@ -34,7 +33,6 @@ export class HomeComponent extends DisposableComponent implements OnInit {
   entriesResponse$: Observable<ListEntriesResponse>;
   entries: EntriesItem[];
   resultsLength = 0;
-
   @ViewChild('paginator') paginator: MatPaginator;
 
   constructor(
