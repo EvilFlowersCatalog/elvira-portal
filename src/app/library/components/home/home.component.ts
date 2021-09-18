@@ -1,11 +1,13 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import {
   concatMap,
   distinctUntilKeyChanged,
   map,
   pluck,
+  startWith,
+  take,
   takeUntil,
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
@@ -14,7 +16,11 @@ import {
   Filters,
   State,
 } from 'src/app/common/services/app-state/app-state.types';
-import { ListEntriesResponse, EntriesItem } from '../../library.types';
+import {
+  ListEntriesResponse,
+  EntriesItem,
+  EntriesParams,
+} from '../../library.types';
 import { EntriesService } from '../../services/entries/entries.service';
 
 const filterCompare = (a: Filters, b: Filters) => {
@@ -35,6 +41,7 @@ export class HomeComponent extends DisposableComponent implements OnInit {
   entriesResponse$: Observable<ListEntriesResponse>;
   entries: EntriesItem[];
   resultsLength = 0;
+  fetchEntries$ = new Subject<EntriesParams>();
   @ViewChild('paginator') paginator: MatPaginator;
 
   constructor(
@@ -52,26 +59,43 @@ export class HomeComponent extends DisposableComponent implements OnInit {
       map((data: State) => data.sidebar)
     );
 
+    this.fetchEntries$
+      .asObservable()
+      .pipe(
+        takeUntil(this.destroySignal$),
+        startWith([]),
+        concatMap((params: EntriesParams) =>
+          this.entriesService.getEntries(
+            params.page ?? 0,
+            params.limit ?? 15,
+            params.search,
+            params.authorId,
+            params.feed
+          )
+        )
+      )
+      .subscribe((data) => {
+        this.entries = data.items;
+        this.paginator.pageIndex = data.metadata.page - 1;
+        this.resultsLength = data.metadata.total;
+      });
+
     this.appStateService
       .getState$()
       .pipe(
         takeUntil(this.destroySignal$),
         distinctUntilKeyChanged('filters', filterCompare),
         pluck('filters'),
-        concatMap((filters: Filters) =>
-          this.entriesService.getEntries(
-            0,
-            this.paginator?.pageSize ?? 2,
-            filters?.search,
-            filters?.author?.id,
-            filters?.feed
-          )
-        )
+        map((filters: Filters) => ({
+          search: filters?.search,
+          authorId: filters?.author?.id,
+          feed: filters?.feed,
+          page: 0,
+          limit: this.paginator?.pageSize ?? 15,
+        }))
       )
       .subscribe((data) => {
-        this.entries = data.items;
-        this.paginator.pageIndex = 0;
-        this.resultsLength = data.metadata.total;
+        this.fetchEntries$.next(data);
       });
   }
 
@@ -83,19 +107,20 @@ export class HomeComponent extends DisposableComponent implements OnInit {
     this.appStateService.patchState({ sidebar: false });
   }
 
-  homePagination() {
-    const state = this.appStateService.getStateSnapshot();
-    this.entriesService
-      .getEntries(
-        this.paginator.pageIndex,
-        this.paginator.pageSize,
-        state.filters?.search,
-        state.filters?.author?.id,
-        state.filters?.feed
+  handlePageChange() {
+    this.appStateService
+      .getState$()
+      .pipe(
+        take(1),
+        pluck('filters'),
+        map((filters: Filters) => ({
+          search: filters?.search,
+          authorId: filters?.author?.id,
+          feed: filters?.feed,
+          page: this.paginator?.pageIndex,
+          limit: this.paginator?.pageSize,
+        }))
       )
-      .subscribe((data) => {
-        this.entries = data.items;
-        this.resultsLength = data.metadata.total;
-      });
+      .subscribe((params) => this.fetchEntries$.next(params));
   }
 }

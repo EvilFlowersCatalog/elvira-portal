@@ -5,22 +5,15 @@ export interface ListEntriesResponse {
 
 export interface EntriesItem {
   id: string;
-  creator_id: string;
-  catalog_id: string;
   author: EntryAuthor;
-  category: {
-    id: string;
-    term: string;
-  };
-  language: {
-    id: string;
-    name: string;
-    code: string;
-  };
+  language: EntryLanguage;
   title: string;
   created_at: string;
   updated_at: string;
   img: string;
+  creator_id: string;
+  catalog_id: string;
+  category: EntryCategory;
 }
 
 export interface EntryDetail {
@@ -29,10 +22,7 @@ export interface EntryDetail {
   catalog_id: string;
   author: EntryAuthor;
   contributors: EntryAuthor[];
-  category: {
-    id: string;
-    term: string;
-  };
+  category: EntryCategory;
   feeds: [
     {
       catalog_id: string;
@@ -50,11 +40,7 @@ export interface EntryDetail {
       url_name: string;
     }
   ];
-  language: {
-    id: string;
-    name: string;
-    code: string;
-  };
+  language: EntryLanguage;
   title: string;
   created_at: string;
   updated_at: string;
@@ -77,6 +63,25 @@ export interface EntryAuthor {
   id: string;
   name: string;
   surname: string;
+}
+
+export interface EntryLanguage {
+  id: string;
+  name: string;
+  code: string;
+}
+
+export interface EntryCategory {
+  id: string;
+  term: string;
+}
+
+export interface EntriesParams {
+  search: string;
+  authorId: string;
+  feed: string;
+  page: number;
+  limit: number;
 }
 
 export interface UserResponse {

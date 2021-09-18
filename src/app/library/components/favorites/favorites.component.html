@@ -1,14 +1,15 @@
 <ng-container *transloco="let t">
   <div
-    class="entries-list-container"
+    class="favorite-entries-container"
     fxLayout="row wrap"
+    fxLayout.xs="column"
     fxLayoutGap="16px grid"
   >
     <ng-container *ngIf="entries.length > 0; else empty">
       <div
         fxFlex="20%"
         fxFlex.xs="100%"
-        fxFlex.sm="33%"
+        fxFlex.sm="33.3%"
         fxFlex.md="25%"
         *ngFor="let entry of entries"
       >
@@ -36,7 +37,7 @@
       #paginator
       (page)="favoritePagination()"
       [length]="resultsLength"
-      [pageSizeOptions]="[12, 24, 48]"
+      [pageSizeOptions]="[15, 30, 50]"
       class="favorites-paginator"
       aria-label="Select page"
     >
