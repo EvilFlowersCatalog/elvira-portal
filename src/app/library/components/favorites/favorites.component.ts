@@ -6,11 +6,8 @@ import { concatMap, startWith, takeUntil, tap } from 'rxjs/operators';
 import { AllEntryItems } from 'src/app/admin/services/admin.types';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { ChangeListenerService } from 'src/app/common/services/change-listener/change-listener.service';
+import { ListEntriesResponse, EntriesItem } from '../../library.types';
 import { EntriesService } from '../../services/entries/entries.service';
-import {
-  EntriesItem,
-  ListEntriesResponse,
-} from '../../services/entries/entries.types';
 
 @Component({
   selector: 'app-favorites',

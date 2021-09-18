@@ -18,7 +18,7 @@ import { FeedManagementComponent } from './components/feed-management/feed-manag
 import { DocumentManagementComponent } from './components/document-management/document-management.component';
 import { DeleteDialogComponent } from './components/dialogs/delete-dialog/delete-dialog.component';
 import { NewFeedDialogComponent } from './components/dialogs/new-feed-dialog/new-feed-dialog.component';
-import { UpdateDialogComponent } from './components/dialogs/update-dialog/update-dialog.component';
+import { UpdateFeedDialogComponent } from './components/dialogs/update-feed-dialog/update-feed-dialog.component';
 
 @NgModule({
   declarations: [
@@ -28,8 +28,8 @@ import { UpdateDialogComponent } from './components/dialogs/update-dialog/update
     FeedManagementComponent,
     DocumentManagementComponent,
     DeleteDialogComponent,
-    UpdateDialogComponent,
     NewFeedDialogComponent,
+    UpdateFeedDialogComponent,
   ],
   imports: [
     CommonModule,

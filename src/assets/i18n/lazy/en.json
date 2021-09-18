@@ -34,8 +34,7 @@
     "name": "Name",
     "surname": "Surname",
     "edit": "Edit",
-    "delete": "Delete",
-    "newFeed": "Created new feed!"
+    "delete": "Delete"
   },
   "entryDetail": {
     "info-pdf-tooltip": "Show info",
@@ -45,7 +44,7 @@
     "drive-error-message": "Upload to drive failed",
     "drive-unauthorized-message": "Sign in to your Google account in <a href='/library/account'>Elvíra's account settings</a> first",
     "addToFavoritesSuccessMessage": "Item was successfully added to favorites",
-    "addToFavoritesErrorMessage": "Item is already in favorites",
+    "addToFavoritesErrorMessage": "Failed to add item to favorites",
     "removeFromFavoritesSuccessMessage": "Item was removed from favorites",
     "removeFromFavoritesErrorMessage": "Item couldn't be removed from favorites"
   },
@@ -57,12 +56,14 @@
     "close": "Close"
   },
   "adminDialog": {
-    "delete": "Are you sure you want to delete '{{title}}'?",
     "agree-button": "Yes, I am sure!",
-    "disagree-button": "No, thanks!",
     "update-feed": "Update ({{feed}}) feed to a new feed",
-    "create": "Create",
     "cancel": "Cancel"
+  },
+  "deleteDialog": {
+    "title": "Are you sure you want to delete '{{title}}'?",
+    "agreeButton": "Yes, I am sure!",
+    "disagreeButton": "No, thanks!"
   },
   "accountSettings": {
     "title": "Account settings",
@@ -97,7 +98,7 @@
     "feedTitle": "Title",
     "feedKind": "Kind",
     "navigationFeed": "Navigation feed (contains additional feeds)",
-    "acquisitionFeed": "Acquisition feed (contains books)",
+    "acquisitionFeed": "Acquisition feed (contains publications)",
     "parentFeed": "Parent feed",
     "create": "Create",
     "cancel": "Cancel"
@@ -106,6 +107,8 @@
     "feedPostSuccess": "Feed has been created successfully",
     "feedPostError": "Feed creation failed",
     "feedPutSuccess": "Feed has been updated successfully",
-    "feedDeleteSuccess": "Feed has been deleted successfully"
+    "feedPutError": "Feed update failed",
+    "feedDeleteSuccess": "Feed has been deleted successfully",
+    "feedDeleteError": "Feed deletion failed"
   }
 }

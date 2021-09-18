@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { EntryDetail, ListEntriesResponse } from './entries.types';
+import { ListEntriesResponse, EntryDetail } from '../../library.types';
 
 @Injectable({
   providedIn: 'root',
@@ -13,7 +13,13 @@ export class EntriesService {
     private readonly appStateService: AppStateService
   ) {}
 
-  getEntries(page: number, limit: number, query?: string, feedId?: string) {
+  getEntries(
+    page: number,
+    limit: number,
+    query?: string,
+    authorId?: string,
+    feedId?: string
+  ) {
     if (feedId) {
       return this.httpClient.get<ListEntriesResponse>(
         `api/apigw/feeds/filter/${feedId}`,
@@ -25,21 +31,15 @@ export class EntriesService {
       return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
         params: { page: page + 1, limit: limit, title: query },
       });
+    } else if (authorId) {
+      return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
+        params: { page: page + 1, limit: limit, author_id: authorId },
+      });
     } else {
       return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
         params: { page: page + 1, limit: limit },
       });
     }
-  }
-
-  listEntries(
-    page: number,
-    limit: number,
-    query?: string
-  ): Observable<ListEntriesResponse> {
-    return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
-      params: { page: page + 1, limit: limit, title: query ?? '' },
-    });
   }
 
   getEntriesByFeed(

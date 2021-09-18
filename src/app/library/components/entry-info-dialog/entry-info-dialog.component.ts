@@ -2,8 +2,8 @@ import { Component, OnInit, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+import { EntryDetail } from '../../library.types';
 import { EntriesService } from '../../services/entries/entries.service';
-import { EntryDetail } from '../../services/entries/entries.types';
 
 @Component({
   selector: 'app-entry-info-dialog',

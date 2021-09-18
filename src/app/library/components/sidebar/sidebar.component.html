@@ -1,6 +1,10 @@
 <ng-container *transloco="let t">
   <div fxLayout="column" class="sidebar-container">
-    <form [formGroup]="searchForm" (submit)="search()">
+    <button mat-raised-button color="accent" (click)="cancelFilters()">
+      <mat-icon>filter_alt</mat-icon>{{ t("lazy.sidebar.cancelFilters") }}
+    </button>
+
+    <form [formGroup]="searchForm" class="sidebar-spacer" (submit)="search()">
       <div fxLayout="row">
         <mat-form-field color="accent" class="sidebar-input">
           <mat-label>
@@ -23,24 +27,43 @@
         </button>
       </div>
     </form>
-    <hr />
-    <button mat-raised-button color="accent" (click)="cancelFilters()">
-      <mat-icon>filter_alt</mat-icon>{{ t("lazy.sidebar.cancelFilters") }}
-    </button>
+    <!-- <hr /> -->
+    <!-- <mat-divider></mat-divider> -->
 
     <form [formGroup]="authorForm" class="sidebar-spacer">
       <mat-form-field color="accent" class="sidebar-input">
         <mat-label>
           {{ t("lazy.sidebar.author") }}
         </mat-label>
-        <input
-          type="text"
-          matInput
-          formControlName="authorInput"
-          [matAutocomplete]="auto"
-        />
-        <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let option of authorSuggestions" [value]="option">
+        <mat-chip-list #chipList>
+          <mat-chip
+            *ngIf="selectedAuthor"
+            [removable]="true"
+            (removed)="cancelFilters()"
+          >
+            {{ selectedAuthor }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+          <input
+            matInput
+            #authorInputNative
+            type="text"
+            formControlName="authorInput"
+            [matAutocomplete]="auto"
+            [matChipInputFor]="chipList"
+          />
+        </mat-chip-list>
+        <mat-autocomplete
+          #auto="matAutocomplete"
+          (optionSelected)="onAuthorSelected($event)"
+        >
+          <mat-option
+            *ngFor="let option of authorSuggestions"
+            [value]="{
+              id: option.id,
+              name: option.name + ' ' + option.surname
+            }"
+          >
             {{ option.name + " " + option.surname }}
           </mat-option>
         </mat-autocomplete>
@@ -54,7 +77,11 @@
       class="example-tree"
     >
       <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
-        <button mat-flat-button (click)="filterByFeed(node.id)">
+        <button
+          mat-flat-button
+          (click)="filterByFeed(node.id)"
+          [ngClass]="{ 'sidebar-active-feed-btn': selectedFeed === node.id }"
+        >
           {{ node.title }}
         </button>
       </mat-tree-node>

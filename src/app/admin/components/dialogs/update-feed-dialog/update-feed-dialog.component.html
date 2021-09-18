@@ -6,7 +6,9 @@
   >
     <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
       <div fxLayout="row" fxLayoutAlign="space-between center">
-        {{ node.title }}
+        <button mat-flat-button (click)="filterByFeed(node.id)">
+          {{ node.title }}
+        </button>
         <button
           mat-icon-button
           color="accent"

@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { EntriesItem, EntryDetail } from '../../services/entries/entries.types';
 import { DateTime } from 'luxon';
 import { MatDialog } from '@angular/material/dialog';
 import { EntriesService } from '../../services/entries/entries.service';
@@ -11,6 +10,7 @@ import { AppStateService } from 'src/app/common/services/app-state/app-state.ser
 import { throwError } from 'rxjs';
 import { NotificationService } from 'src/app/common/services/notification/notification.service';
 import { TranslocoService } from '@ngneat/transloco';
+import { EntriesItem } from '../../library.types';
 
 @Component({
   selector: 'app-entry-detail',

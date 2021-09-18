@@ -34,8 +34,7 @@
     "name": "Meno",
     "surname": "Priezvisko",
     "edit": "Upraviť",
-    "delete": "Vymazať",
-    "newFeed": "Vytvoriť nový feed!"
+    "delete": "Vymazať"
   },
   "entryDetail": {
     "info-pdf-tooltip": "Zobraziť informácie",
@@ -45,7 +44,7 @@
     "drive-error-message": "Nahrávanie na disk zlyhalo",
     "drive-unauthorized-message": "Prihláste sa najskôr do svojho účtu Google v <a href='/library/account'>nastaveniach účtu Elvíry</a>",
     "addToFavoritesSuccessMessage": "Položka bola pridaná do obľúbených",
-    "addToFavoritesErrorMessage": "Položka sa už nachádza v obľúbených",
+    "addToFavoritesErrorMessage": "Pridanie položky do obľúbených zlyhalo",
     "removeFromFavoritesSuccessMessage": "Položka bola odstránená z obľúbených",
     "removeFromFavoritesErrorMessage": "Položku sa nepodarilo odstrániť z obľúbených"
   },
@@ -57,12 +56,14 @@
     "close": "Zatvoriť"
   },
   "adminDialog": {
-    "delete": "Ste si istí, že chcete odstrániť '{{title}}'?",
     "agree-button": "Áno, som si istý!",
-    "disagree-button": "Nie, ďakujem!",
     "update-feed": "Aktualizujte Feed ({{feed}}) na nový Feed",
-    "create": "Vytvoriť",
     "cancel": "Zrušiť"
+  },
+  "deleteDialog": {
+    "title": "Ste si istí, že chcete odstrániť '{{title}}'?",
+    "agreeButton": "Áno, som si istý!",
+    "disagreeButton": "Nie, ďakujem!"
   },
   "accountSettings": {
     "title": "Nastavenia účtu",
@@ -97,7 +98,7 @@
     "feedTitle": "Názov",
     "feedKind": "Druh",
     "navigationFeed": "Navigačný feed (obsahuje ďalšie feedy)",
-    "acquisitionFeed": "Akvizičný feed (obsahuje knihy)",
+    "acquisitionFeed": "Akvizičný feed (obsahuje publikácie)",
     "parentFeed": "Rodičovský feed",
     "create": "Vytvoriť",
     "cancel": "Zrušiť"
@@ -106,6 +107,8 @@
     "feedPostSuccess": "Feed bol úspešne vytvorený",
     "feedPostError": "Vytvorenie feedu zlyhalo",
     "feedPutSuccess": "Feed bol úspešne aktualizovaný",
-    "feedDeleteSuccess": "Feed bol úspešne odstránený"
+    "feedPutError": "Aktualizovanie feedu zlyhalo",
+    "feedDeleteSuccess": "Feed bol úspešne odstránený",
+    "feedDeleteError": "Zmazanie feedu zlyhalo"
   }
 }
