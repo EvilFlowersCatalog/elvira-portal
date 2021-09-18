@@ -3,7 +3,7 @@
     <mat-toolbar color="primary">
       <div *ngIf="appState.showSidebarToggle">
         <button mat-icon-button (click)="onSidebarToggle()">
-          <mat-icon [ngClass]="{ animate: animate }">
+          <mat-icon [ngClass]="{ animate: animateSidebarToggle }">
             {{ appState.sidebar ? "first_page" : "list" }}
           </mat-icon>
         </button>
@@ -36,8 +36,13 @@
         <mat-icon class="navbar-icon">person_outline</mat-icon>
         {{ appState.username }}
       </button>
-      <button mat-icon-button [matMenuTriggerFor]="settingsMenu">
-        <mat-icon>settings</mat-icon>
+      <button
+        mat-icon-button
+        [matMenuTriggerFor]="settingsMenu"
+        (mouseover)="animateSettings = true"
+        (mouseout)="animateSettings = false"
+      >
+        <mat-icon [ngClass]="{ animate: animateSettings }">settings</mat-icon>
       </button>
     </mat-toolbar>
 
