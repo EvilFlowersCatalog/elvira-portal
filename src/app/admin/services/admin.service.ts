@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
+import { ListEntriesResponse } from 'src/app/library/library.types';
 import {
   NewFeed,
   AdminResponse,
@@ -11,6 +12,7 @@ import {
   GetEntries,
   GetFeeds,
   UpdateFeeds,
+  OneEntryItem,
 } from './admin.types';
 
 @Injectable({
@@ -57,7 +59,7 @@ export class AdminService {
   }
 
   getOneEntry(entryId: string) {
-    return this.httpClient.get<AllEntryItems>(`api/apigw/entries/${entryId}`);
+    return this.httpClient.get<OneEntryItem>(`api/apigw/entries/${entryId}`);
   }
 
   updateEntry(entryId: string, entriesData: EditedData) {
@@ -76,5 +78,18 @@ export class AdminService {
 
   addNewFeed(feedData: NewFeed) {
     return this.httpClient.post('api/apigw/feeds', feedData);
+  }
+
+  searchEntries(page: number, limit: number, searchInput?: string,) {
+    if(searchInput){
+      return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
+      params: { page: page + 1, limit: limit, title: searchInput },
+    });
+    } else {
+      return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
+      params: { page: page + 1, limit: limit },
+    });
+    }
+
   }
 }

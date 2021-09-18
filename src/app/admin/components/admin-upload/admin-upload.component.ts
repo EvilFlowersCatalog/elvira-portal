@@ -30,6 +30,7 @@ import {
   AllEntryItems,
   EditedData,
   EntriesData,
+  OneEntryItem,
 } from '../../services/admin.types';
 import { TitleValidators } from '../../validators/title.validator';
 import { NotificationService } from 'src/app/common/services/notification/notification.service';
@@ -72,7 +73,7 @@ export class AdminUploadComponent implements OnInit {
 
   entryId: string;
   isInEditMode: boolean = false;
-  editData: AllEntryItems;
+  editData: OneEntryItem;
 
   treeDataSource = new MatTreeNestedDataSource<FeedTreeNode>();
   treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.entry);
@@ -158,10 +159,13 @@ export class AdminUploadComponent implements OnInit {
     this.entryId = this.route.snapshot.paramMap.get('id');
     if (this.entryId != null && !this.isInEditMode) {
       this.adminService.getOneEntry(this.entryId).subscribe((datas) => {
-        // this.editData = datas;
-        // this.isInEditMode = true;
-        console.log('fasz');
+        this.editData = datas;
+        this.isInEditMode = true;
         console.log(datas);
+        datas.feeds.forEach(feed => {
+          this.feeds.push(feed.title);
+          this.finalFeeds.push(feed.id);
+        })
       });
     }
 
@@ -171,8 +175,6 @@ export class AdminUploadComponent implements OnInit {
   }
 
   addFeed(id, title) {
-    console.log(id);
-    console.log(title);
     if (!this.feeds.includes(title)) {
       this.feeds.push(title);
       this.finalFeeds.push(id);
@@ -214,20 +216,6 @@ export class AdminUploadComponent implements OnInit {
       this.finalFeeds.splice(index, 1);
       this.feeds.splice(index, 1);
     }
-  }
-  //Add selected chips from autocomplete
-  selected(event: MatAutocompleteSelectedEvent): void {
-    if (!this.feeds.includes(event.option.viewValue)) {
-      this.feeds.push(event.option.viewValue);
-      console.log(
-        this.feedsIdList[this.allFeeds.indexOf(event.option.viewValue)]
-      );
-      this.finalFeeds.push(
-        this.feedsIdList[this.allFeeds.indexOf(event.option.viewValue)]
-      );
-    }
-    this.fruitInput.nativeElement.value = '';
-    this.feedCtrl.setValue(null);
   }
 
   private _filter(value: string): string[] {
@@ -281,6 +269,7 @@ export class AdminUploadComponent implements OnInit {
         name: this.uploadForm.get('author').get('name').value,
         surname: this.uploadForm.get('author').get('surname').value,
       },
+      feeds: this.finalFeeds,
       summary: this.uploadForm.get('summary').value,
       language_code: 'sk',
     };

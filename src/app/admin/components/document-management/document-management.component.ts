@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -34,6 +35,7 @@ export class DocumentManagementComponent
   tableData: AllEntryItems[] = [];
   dataSource: MatTableDataSource<AllEntryItems>;
   fetchDocuments$ = new Subject();
+  searchForm: FormGroup;
 
   @ViewChild('paginator') paginator: MatPaginator;
 
@@ -43,9 +45,13 @@ export class DocumentManagementComponent
     public dialog: MatDialog,
     private readonly adminService: AdminService,
     private readonly notificationService: NotificationService,
-    private translocoService: TranslocoService
+    private translocoService: TranslocoService,
+    private readonly fb: FormBuilder
   ) {
     super();
+    this.searchForm = new FormGroup({
+      searchInput: new FormControl(),
+    });
   }
 
   //Pass info to pagination
@@ -56,9 +62,10 @@ export class DocumentManagementComponent
         takeUntil(this.destroySignal$),
         startWith([]),
         concatMap(() =>
-          this.adminService.getAllEntries(
+          this.adminService.searchEntries(
             this.paginator.pageIndex ?? 0,
-            this.paginator.pageSize ?? 5
+            this.paginator.pageSize ?? 5,
+            this.searchForm?.value.searchInput
           )
         )
       )
@@ -68,6 +75,8 @@ export class DocumentManagementComponent
         this.dataSource = new MatTableDataSource(this.tableData);
       });
   }
+
+
 
   documentPagination() {
     this.fetchDocuments$.next();
@@ -108,6 +117,7 @@ export class DocumentManagementComponent
         })
       )
       .subscribe(() => {
+        console.log("deleted");
         this.fetchDocuments$.next();
       });
   }
@@ -117,15 +127,8 @@ export class DocumentManagementComponent
   }
 
   //Function for searchbar
-  applyFilter(event: Event) {
-    // TODO return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
-    //   params: { page: page + 1, limit: limit, title: query },
-    // });
-    const filterValue = (event.target as HTMLInputElement).value;
-    this.dataSource.filter = filterValue.trim().toLowerCase();
-
-    if (this.dataSource.paginator) {
-      this.dataSource.paginator.firstPage();
-    }
-  }
+  applyFilter(search: string) {
+    // TODO
+    this.fetchDocuments$.next();
+   }
 }
