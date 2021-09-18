@@ -68,7 +68,7 @@
             </ng-template>
           </mat-form-field>
         </div>
-        <div *ngIf="!isInEditMode">
+        <div>
           <mat-card-title
             >{{ t("lazy.adminPage.contributor") }}
             <button
@@ -98,23 +98,35 @@
                 <mat-label>{{
                   t("lazy.adminPage.contributor-name")
                 }}</mat-label>
-                <input
-                  matInput
-                  maxlength="50"
-                  formControlName="name"
-                  required
-                />
+                <div *ngIf="isInEditMode; else elseContributorName">
+                  <input
+                    matInput
+                    maxlength="50"
+                    formControlName="name"
+                    required
+                    [(ngModel)]="editData.contributors[i].name"
+                  />
+                </div>
+                <ng-template #elseContributorName>
+                  <input matInput maxlength="50" formControlName="name" />
+                </ng-template>
               </mat-form-field>
               <mat-form-field appearance="legacy" style="width: 41%">
                 <mat-label>{{
                   t("lazy.adminPage.contributor-surname")
                 }}</mat-label>
+                <div *ngIf="isInEditMode; else elseContributorSurname">
                 <input
                   matInput
                   maxlength="30"
                   formControlName="surname"
                   required
+                  [(ngModel)]="editData.contributors[i].surname"
                 />
+                </div>
+                <ng-template #elseContributorSurname>
+                  <input matInput maxlength="50" formControlName="surname" />
+                </ng-template>
               </mat-form-field>
               <button
                 (click)="deleteContributor(i)"

@@ -29,6 +29,7 @@ import { AdminService } from '../../services/admin.service';
 import {
   AllEntryItems,
   EditedData,
+  EntriesContributors,
   EntriesData,
   OneEntryItem,
 } from '../../services/admin.types';
@@ -48,7 +49,6 @@ import { EntriesService } from 'src/app/library/services/entries/entries.service
 })
 export class AdminUploadComponent implements OnInit {
   uploadForm: FormGroup;
-  editForm: FormGroup;
   imageForm: FormGroup;
   contributors: FormArray;
   counter: number = 4;
@@ -121,14 +121,7 @@ export class AdminUploadComponent implements OnInit {
       language_code: new FormControl('sk'),
     });
 
-    this.editForm = new FormGroup({
-      title: new FormControl(''),
-      author: new FormGroup({
-        name: new FormControl(''),
-        surname: new FormControl(''),
-      }),
-      summary: new FormControl(''),
-    });
+
   }
 
   get formTitle() {
@@ -145,6 +138,13 @@ export class AdminUploadComponent implements OnInit {
     });
   }
 
+  createEditItem(name: string, surname: string): FormGroup {
+    return this.formBuilder.group({
+      name: name,
+      surname: surname,
+    });
+  }
+
   addContributor(): void {
     this.contributors = this.uploadForm.get('contributors') as FormArray;
     this.contributors.push(this.createItem());
@@ -155,17 +155,25 @@ export class AdminUploadComponent implements OnInit {
     add.removeAt(index);
   }
 
+
+
+  editContributors(contributors: EntriesContributors[]){
+    contributors.forEach(contributor => {
+      this.addContributor();
+    })
+  }
+
   ngOnInit(): void {
     this.entryId = this.route.snapshot.paramMap.get('id');
     if (this.entryId != null && !this.isInEditMode) {
       this.adminService.getOneEntry(this.entryId).subscribe((datas) => {
         this.editData = datas;
         this.isInEditMode = true;
-        console.log(datas);
         datas.feeds.forEach(feed => {
           this.feeds.push(feed.title);
           this.finalFeeds.push(feed.id);
         })
+        this.editContributors(datas.contributors);
       });
     }
 
@@ -272,6 +280,7 @@ export class AdminUploadComponent implements OnInit {
       feeds: this.finalFeeds,
       summary: this.uploadForm.get('summary').value,
       language_code: 'sk',
+      contributors: this.getContributors()
     };
     return editedData;
   }
@@ -326,6 +335,7 @@ export class AdminUploadComponent implements OnInit {
     }
     return contributors;
   }
+
 
   onImageDropped(file: File) {
     this.imageFile = file;
