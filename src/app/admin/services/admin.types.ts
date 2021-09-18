@@ -56,6 +56,49 @@ export interface AllEntryItems {
   updated_at: string;
 }
 
+export interface OneEntryItem {
+  id: string;
+  creator_id: string;
+  catalog_id: string;
+  author: {
+    id: string;
+    name: string;
+    surname: string;
+  };
+  category: {
+    id: string;
+    term: string;
+  };
+  language: {
+    id: string;
+    name: string;
+    code: string;
+  };
+  title: string;
+  created_at: string;
+  updated_at: string;
+  feeds: FeedsItems[];
+  contributors: EntriesContributors[];
+}
+
+export interface FeedsItems {
+  catalog_id: string;
+  content: string;
+  created_at: string;
+  creator_id: string;
+  id: string;
+  kind: string;
+  parents: string[];
+  children: string[];
+  title: string;
+  updated_at: string;
+}
+
+export interface acquisitions {
+  relation: string;
+  mime: string;
+}
+
 export interface DialogData {
   title: string;
   entryApikey: string;
@@ -68,6 +111,7 @@ export interface EditedData {
     name: string;
     surname: string;
   };
+  feeds: string[];
   summary: string;
   language_code: string;
 }

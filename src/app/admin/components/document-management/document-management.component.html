@@ -1,15 +1,28 @@
 <ng-container *transloco="let t">
   <div fxLayout="row" fxLayoutAlign="space-around center" class="header-box">
     <!-- Searchbar -->
-    <mat-form-field class="search-bar">
-      <mat-label>{{ t("lazy.adminOverview.search") }}</mat-label>
-      <input
-        matInput
-        (keyup)="applyFilter($event)"
-        placeholder="Ex. Title, Name, Surname"
-        #input
-      />
-    </mat-form-field>
+    <form [formGroup]="searchForm" (submit)="applyFilter()" class="document-form">
+      <div fxLayout="row">
+        <mat-form-field color="accent" class="document-form-field">
+          <mat-label>
+            {{ t("lazy.sidebar.search") }}
+          </mat-label>
+          <input
+            matInput
+            formControlName="searchInput"
+            type="text"
+            placeholder="Search"
+          />
+        </mat-form-field>
+        <button
+          mat-icon-button
+          type="submit"
+          color="accent"
+        >
+          <mat-icon>search</mat-icon>
+        </button>
+      </div>
+    </form>
     <!-- New documnet button -->
     <button
       (click)="newDocument()"

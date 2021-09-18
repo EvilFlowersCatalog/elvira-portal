@@ -32,7 +32,6 @@ export class AdminGuard implements CanLoad {
         return of(false);
       }
     });
-    console.log(this.verifyAdmin());
     return this.verifyAdmin();
   }
 
