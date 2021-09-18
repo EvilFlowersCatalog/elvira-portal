@@ -1,29 +1,39 @@
 <ng-container *transloco="let t">
   <ng-container *ngIf="entryDetail$ | async as entryDetail">
+    <!-- <div fxLayout="row" fxLayoutAlign="center center">
+      <div fxLayout="column" fxFlex.gt-sm="80" fxLayoutAlign="center center"> -->
     <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center" color="accent">
       {{ entryDetail.title }}
     </h2>
     <mat-dialog-content fxLayout="column" fxLayoutAlign="start start">
-      <p>
+      <h6>
         {{ t("lazy.entryInfoDialog.author") }}
+      </h6>
+      <p>
         {{ entryDetail.author.name + " " + entryDetail.author.surname }}
       </p>
-      <p>
+      <h6>
         {{ t("lazy.entryInfoDialog.summary") }}
+      </h6>
+      <p>
         {{ entryDetail.summary }}
       </p>
-      <p>
+      <h6>
         {{ t("lazy.entryInfoDialog.feeds") }}
-      </p>
+      </h6>
       <ul *ngFor="let feed of entryDetail.feeds">
         <li>{{ feed.title }}</li>
       </ul>
-      <p>
+      <h6>
         {{ t("lazy.entryInfoDialog.language") }}
+      </h6>
+      <p>
         {{ entryDetail.language.name }}
       </p>
-      <p>
+      <h6>
         {{ t("lazy.entryInfoDialog.createdAt") }}
+      </h6>
+      <p>
         {{ entryDetail.created_at | date: shortDate }}
       </p>
     </mat-dialog-content>
@@ -32,5 +42,7 @@
         {{ t("lazy.entryInfoDialog.close") }}
       </button>
     </mat-dialog-actions>
+    <!-- </div>
+    </div> -->
   </ng-container>
 </ng-container>

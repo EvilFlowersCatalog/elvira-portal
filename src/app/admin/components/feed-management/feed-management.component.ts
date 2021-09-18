@@ -8,6 +8,8 @@ import { Subject, throwError } from 'rxjs';
 import {
   catchError,
   concatMap,
+  filter,
+  map,
   startWith,
   take,
   takeUntil,
@@ -70,41 +72,38 @@ export class FeedManagementComponent
 
     dialogRef
       .afterClosed()
-      .pipe(takeUntil(this.destroySignal$))
-      .subscribe((result) => {
-        if (result != 'no') {
-          const newFeedData: NewFeed = {
-            parents: [parentFeedId],
-            title: result.feedTitle,
-            url_name: Guid.newGuid().toString(),
-            content: result.feedTitle,
-            kind: result.feedKind,
-          };
-
-          console.log(newFeedData);
-
-          this.adminService
-            .addNewFeed(newFeedData)
-            .pipe(
-              take(1),
-              tap(() => {
-                const message = this.translocoService.translate(
-                  'lazy.feedManagement.feedPostSuccess'
-                );
-                this.notificationService.success(message);
-              }),
-              catchError((err) => {
-                console.log(err);
-                const message = this.translocoService.translate(
-                  'lazy.feedManagement.feedPostError'
-                );
-                this.notificationService.error(message);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => this.fetchFeeds$.next());
-        }
-      });
+      .pipe(
+        take(1),
+        filter(
+          (result: 'no' & { feedTitle: string; feedKind: string }) =>
+            result !== 'no'
+        ),
+        map((result) => ({
+          parents: [parentFeedId],
+          title: result.feedTitle,
+          url_name: Guid.newGuid().toString(),
+          content: result.feedTitle,
+          kind: result.feedKind,
+        })),
+        concatMap((newFeedData: NewFeed) =>
+          this.adminService.addNewFeed(newFeedData)
+        ),
+        tap(() => {
+          const message = this.translocoService.translate(
+            'lazy.feedManagement.feedPostSuccess'
+          );
+          this.notificationService.success(message);
+        }),
+        catchError((err) => {
+          console.log(err);
+          const message = this.translocoService.translate(
+            'lazy.feedManagement.feedPostError'
+          );
+          this.notificationService.error(message);
+          return throwError(err);
+        })
+      )
+      .subscribe(() => this.fetchFeeds$.next());
   }
 
   editFeed(feedTitle: string, feedKind: string, parentFeedName?: string) {
@@ -113,41 +112,40 @@ export class FeedManagementComponent
       data: { title: feedTitle, parentName: parentFeedName, kind: feedKind },
     });
 
-    dialogRef
-      .afterClosed()
-      .pipe(takeUntil(this.destroySignal$))
-      .subscribe((result) => {
-        if (result != 'no') {
-          // const newFeedData: NewFeed = {
-          //   parents: [parentFeedId],
-          //   title: result.feedTitle,
-          //   url_name: Guid.newGuid().toString(),
-          //   content: result.feedTitle,
-          //   kind: result.feedKind,
-          // };
-          // console.log(newFeedData);
-          // this.adminService
-          //   .addNewFeed(newFeedData)
-          //   .pipe(
-          //     take(1),
-          //     tap(() => {
-          //       const message = this.translocoService.translate(
-          //         'lazy.feedManagement.feedPostSuccess'
-          //       );
-          //       this.notificationService.success(message);
-          //     }),
-          //     catchError((err) => {
-          //       console.log(err);
-          //       const message = this.translocoService.translate(
-          //         'lazy.feedManagement.feedPostError'
-          //       );
-          //       this.notificationService.error(message);
-          //       return throwError(err);
-          //     })
-          //   )
-          //   .subscribe(() => this.fetchFeeds$.next());
-        }
-      });
+    // dialogRef
+    // .afterClosed()
+    // .pipe(
+    //   take(1),
+    //   filter(
+    //     (result: 'no' & { feedTitle: string; feedKind: string }) =>
+    //       result !== 'no'
+    //   ),
+    //   map((result) => ({
+    //     parents: [parentFeedId],
+    //     title: result.feedTitle,
+    //     url_name: Guid.newGuid().toString(),
+    //     content: result.feedTitle,
+    //     kind: result.feedKind,
+    //   })),
+    //   concatMap((newFeedData: NewFeed) =>
+    //     this.adminService.addNewFeed(newFeedData)
+    //   ),
+    //   tap(() => {
+    //     const message = this.translocoService.translate(
+    //       'lazy.feedManagement.feedPostSuccess'
+    //     );
+    //     this.notificationService.success(message);
+    //   }),
+    //   catchError((err) => {
+    //     console.log(err);
+    //     const message = this.translocoService.translate(
+    //       'lazy.feedManagement.feedPostError'
+    //     );
+    //     this.notificationService.error(message);
+    //     return throwError(err);
+    //   })
+    // )
+    // .subscribe(() => this.fetchFeeds$.next());
   }
 
   deleteFeed(feedId: string, feedTitle: string) {
@@ -158,31 +156,26 @@ export class FeedManagementComponent
 
     dialogRef
       .afterClosed()
-      .pipe(takeUntil(this.destroySignal$))
-      .subscribe((result) => {
-        if (result != 'no') {
-          this.adminService
-            .deleteFeed(feedId)
-            .pipe(
-              take(1),
-              tap(() => {
-                const message = this.translocoService.translate(
-                  'lazy.feedManagement.feedDeleteSuccess'
-                );
-                this.notificationService.success(message);
-              }),
-              catchError((err) => {
-                console.log(err);
-                const message = this.translocoService.translate(
-                  'lazy.feedManagement.feedDeleteError'
-                );
-                this.notificationService.error(message);
-                return throwError(err);
-              })
-            )
-            .subscribe(() => this.fetchFeeds$.next());
-        }
-      });
+      .pipe(
+        take(1),
+        filter((result) => result !== 'no'),
+        concatMap(() => this.adminService.deleteFeed(feedId)),
+        tap(() => {
+          const message = this.translocoService.translate(
+            'lazy.feedManagement.feedDeleteSuccess'
+          );
+          this.notificationService.success(message);
+        }),
+        catchError((err) => {
+          console.log(err);
+          const message = this.translocoService.translate(
+            'lazy.feedManagement.feedDeleteError'
+          );
+          this.notificationService.error(message);
+          return throwError(err);
+        })
+      )
+      .subscribe(() => this.fetchFeeds$.next());
   }
 
   isNavigationNode = (_: number, node: FeedTreeNode) =>

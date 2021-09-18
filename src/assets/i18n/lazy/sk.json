@@ -69,7 +69,6 @@
   "accountSettings": {
     "title": "Nastavenia účtu",
     "nick": "Nick",
-    "role": "Rola",
     "email": "Univerzitný email",
     "firstName": "Meno",
     "lastName": "Priezvisko",

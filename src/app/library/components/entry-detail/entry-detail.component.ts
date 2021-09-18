@@ -45,7 +45,8 @@ export class EntryDetailComponent implements OnInit {
 
   showInfo(id: string) {
     this.dialog.open(EntryInfoDialogComponent, {
-      width: '350px',
+      width: '700px',
+      maxWidth: '95%',
       data: { id },
     });
   }

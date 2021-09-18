@@ -69,7 +69,6 @@
   "accountSettings": {
     "title": "Account settings",
     "nick": "Nick",
-    "role": "Role",
     "email": "University email",
     "firstName": "First Name",
     "lastName": "Last Name",

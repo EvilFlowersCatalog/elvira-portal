@@ -24,6 +24,10 @@
   font-weight: bold;
 }
 
+.account-settings-google-icon {
+  margin-top: -4px;
+}
+
 .account-settings-toggle-label {
   color: #fcc012;
   letter-spacing: 1.5px;
@@ -35,4 +39,18 @@
 
 .account-settings-toggle {
   padding-left: 40px;
+}
+
+@media screen and (max-width: 599px) {
+  .account-settings-container {
+    padding: 16px;
+  }
+
+  .account-settings-form {
+    padding: 0;
+  }
+
+  .account-settings-toggle {
+    padding-left: 10px;
+  }
 }
