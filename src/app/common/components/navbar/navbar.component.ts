@@ -14,6 +14,7 @@ import { Router } from '@angular/router';
 })
 export class NavbarComponent extends DisposableComponent implements OnInit {
   appState$: Observable<State>;
+  animate: boolean = false;
 
   constructor(
     private readonly router: Router,
@@ -42,6 +43,7 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   }
 
   onSidebarToggle() {
+    this.animate = !this.animate;
     const currentSidebarState = this.appStateService.getStateSnapshot().sidebar;
     this.appStateService.patchState({ sidebar: !currentSidebarState });
   }

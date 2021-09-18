@@ -49,6 +49,7 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    console.log(this.dataSource.data);
     this.searchForm = this.initSearchForm();
     this.authorForm = this.initAuthorForm();
 

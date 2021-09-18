@@ -3,7 +3,9 @@
     <mat-toolbar color="primary">
       <div *ngIf="appState.showSidebarToggle">
         <button mat-icon-button (click)="onSidebarToggle()">
-          <mat-icon>list</mat-icon>
+          <mat-icon [ngClass]="{ animate: animate }">
+            {{ appState.sidebar ? "first_page" : "list" }}
+          </mat-icon>
         </button>
       </div>
       <button

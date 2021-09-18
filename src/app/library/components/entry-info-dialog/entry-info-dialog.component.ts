@@ -20,8 +20,6 @@ export class EntryInfoDialogComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.entryDetail$ = this.entriesService
-      .entryDetail(this.data.id)
-      .pipe(tap(console.log));
+    this.entryDetail$ = this.entriesService.entryDetail(this.data.id);
   }
 }

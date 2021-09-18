@@ -8,59 +8,64 @@
       >
     </mat-card-header>
     <mat-divider></mat-divider>
-    <mat-card-content
-      class="entry-detail-image-container"
-      (click)="openPdf(entry.id)"
-    >
+    <div class="entry-detail-image-container" (click)="openPdf(entry.id)">
       <div *ngIf="imageSrc === 'none'; else image">
-        <mat-icon>broken_image</mat-icon>
+        <img
+          mat-card-image
+          src="../../../../assets/no_image.png"
+          class="entry-detail-image"
+        />
       </div>
       <ng-template #image>
         <img mat-card-image [src]="imageSrc" class="entry-detail-image" />
       </ng-template>
-    </mat-card-content>
+    </div>
     <mat-card-content (click)="openPdf(entry.id)">
-      <p>{{ entry.author.name + " " + entry.author.surname }}</p>
-      <p>
-        <i>{{ entry.created_at | date: "yyyy" }}</i>
-      </p>
-    </mat-card-content>
-    <mat-card-actions fxLayout="row" fxLayoutAlign="space-around">
-      <button
-        mat-icon-button
-        matTooltip="{{ t('lazy.entryDetail.info-pdf-tooltip') }}"
-        (click)="showInfo(entry.id)"
-      >
-        <mat-icon> info </mat-icon>
-      </button>
-      <button
-        mat-icon-button
-        matTooltip="{{ t('lazy.entryDetail.add-pdf-to-drive-tooltip') }}"
-        (click)="addPdfToDrive(entry.id, entry.catalog_id)"
-      >
-        <mat-icon> add_to_drive </mat-icon>
-      </button>
-      <div
-        *ngIf="currentRoute === '/library/favorites'; else addToFavoritesBtn"
-      >
-        <button
-          color="accent"
-          mat-icon-button
-          matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
-          (click)="deleteFromFavorites(entry.id)"
-        >
-          <mat-icon> favorite </mat-icon>
-        </button>
+      <div>
+        <p>{{ entry.author.name + " " + entry.author.surname }}</p>
+        <p>
+          <i>{{ entry.created_at | date: "yyyy" }}</i>
+        </p>
       </div>
-      <ng-template #addToFavoritesBtn>
+    </mat-card-content>
+    <mat-card-actions>
+      <div fxLayout="row" fxLayoutAlign="space-around">
         <button
           mat-icon-button
-          matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
-          (click)="addToFavorites(entry.id)"
+          matTooltip="{{ t('lazy.entryDetail.info-pdf-tooltip') }}"
+          (click)="showInfo(entry.id)"
         >
-          <mat-icon> favorite </mat-icon>
+          <mat-icon> info </mat-icon>
         </button>
-      </ng-template>
+        <button
+          mat-icon-button
+          matTooltip="{{ t('lazy.entryDetail.add-pdf-to-drive-tooltip') }}"
+          (click)="addPdfToDrive(entry.id, entry.catalog_id)"
+        >
+          <mat-icon> add_to_drive </mat-icon>
+        </button>
+        <div
+          *ngIf="currentRoute === '/library/favorites'; else addToFavoritesBtn"
+        >
+          <button
+            color="accent"
+            mat-icon-button
+            matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
+            (click)="deleteFromFavorites(entry.id)"
+          >
+            <mat-icon> favorite </mat-icon>
+          </button>
+        </div>
+        <ng-template #addToFavoritesBtn>
+          <button
+            mat-icon-button
+            matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
+            (click)="addToFavorites(entry.id)"
+          >
+            <mat-icon> favorite </mat-icon>
+          </button>
+        </ng-template>
+      </div>
     </mat-card-actions>
   </mat-card>
 </ng-container>

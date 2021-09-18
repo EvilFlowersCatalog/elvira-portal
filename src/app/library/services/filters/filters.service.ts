@@ -32,6 +32,8 @@ export class FiltersService {
   }
 
   getFeedTreeNode(): Observable<FeedTreeNode> {
-    return this.httpClient.get<FeedTreeNode>(`api/apigw/feed-tree`);
+    return this.httpClient.get<FeedTreeNode>(`api/apigw/feed-tree`, {
+      context: new HttpContext().set(BYPASS_LOADING, true),
+    });
   }
 }

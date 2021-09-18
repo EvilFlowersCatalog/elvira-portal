@@ -11,12 +11,13 @@
     <div
       class="entries-list-container"
       fxLayout="row wrap"
+      fxLayout.xs="column"
       fxLayoutGap="16px grid"
     >
       <div
         fxFlex="20%"
         fxFlex.xs="100%"
-        fxFlex.sm="33%"
+        fxFlex.sm="33.3%"
         fxFlex.md="25%"
         *ngFor="let entry of entries"
       >
@@ -25,13 +26,11 @@
     </div>
     <div fxLayoutAlign="center center">
       <mat-paginator
+        (page)="handlePageChange()"
         #paginator
-        (page)="homePagination()"
         [length]="resultsLength"
-        [pageSize]="2"
-        [pageSizeOptions]="[2, 24, 48]"
+        [pageSizeOptions]="[15, 30, 50]"
         class="home-paginator"
-        aria-label="Select page"
       >
       </mat-paginator>
     </div>
