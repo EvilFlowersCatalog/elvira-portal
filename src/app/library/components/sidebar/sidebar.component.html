@@ -57,7 +57,10 @@
         >
           <mat-option
             *ngFor="let option of authorSuggestions"
-            [value]="option.id"
+            [value]="{
+              id: option.id,
+              name: option.name + ' ' + option.surname
+            }"
           >
             {{ option.name + " " + option.surname }}
           </mat-option>
@@ -72,7 +75,11 @@
       class="example-tree"
     >
       <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
-        <button mat-flat-button (click)="filterByFeed(node.id)">
+        <button
+          mat-flat-button
+          (click)="filterByFeed(node.id)"
+          [ngClass]="{ 'sidebar-active-feed-btn': selectedFeed === node.id }"
+        >
           {{ node.title }}
         </button>
       </mat-tree-node>

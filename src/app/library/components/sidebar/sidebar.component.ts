@@ -3,17 +3,21 @@ import { ElementRef } from '@angular/core';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
-import { MatInput } from '@angular/material/input';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
+import { Observable } from 'rxjs';
 import {
   concatMap,
   debounceTime,
   distinctUntilChanged,
+  pluck,
   takeUntil,
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { Filters } from 'src/app/common/services/app-state/app-state.types';
+import {
+  Filters,
+  State,
+} from 'src/app/common/services/app-state/app-state.types';
 import { Author, Authors, FeedTreeNode } from '../../library.types';
 import { FiltersService } from '../../services/filters/filters.service';
 
@@ -31,7 +35,8 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
   treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.entry);
   dataSource = new MatTreeNestedDataSource<FeedTreeNode>();
   selectedAuthor: string;
-
+  selectedFeed: string;
+  appState$: Observable<State>;
   @ViewChild('authorInputNative')
   authorInputNative: ElementRef<HTMLInputElement>;
 
@@ -41,19 +46,27 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
     private readonly fb: FormBuilder
   ) {
     super();
+  }
+
+  ngOnInit(): void {
+    this.searchForm = this.initSearchForm();
+    this.authorForm = this.initAuthorForm();
+
     this.filtersService
       .getFeedTreeNode()
       .pipe(takeUntil(this.destroySignal$))
       .subscribe((data) => {
         this.dataSource.data = data.entry;
       });
-  }
 
-  ngOnInit(): void {
-    const state = this.appStateService.getStateSnapshot();
-    this.searchForm = this.initSearchForm(state?.filters?.search);
-    this.authorForm = this.initAuthorForm();
-    this.selectedAuthor = state?.filters?.author?.name;
+    this.appStateService
+      .getState$()
+      .pipe(
+        takeUntil(this.destroySignal$),
+        distinctUntilChanged(),
+        pluck('filters')
+      )
+      .subscribe((filters: Filters) => this.setView(filters));
 
     this.authorForm
       .get('authorInput')
@@ -68,10 +81,10 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
       });
   }
 
-  initSearchForm(value: string) {
-    const controlValue = value ? value : '';
+  // forms initialization
+  initSearchForm() {
     return this.fb.group({
-      searchInput: [controlValue],
+      searchInput: [''],
     });
   }
 
@@ -81,13 +94,30 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
     });
   }
 
-  patchFilter(newData) {
+  // setting view of sidebar based on active filter
+  setView(filters: Filters) {
+    this.searchForm.controls.searchInput.setValue(filters.search);
+    this.selectedAuthor = filters.author?.name;
+    this.selectedFeed = filters.feed;
+    if (!filters.feed) {
+      this.treeControl.collapseAll();
+    }
+  }
+
+  // local fitlers setters
+  cancelFilters() {
+    this.filters = { search: null, author: null, feed: null };
+    this.applyFilters();
+  }
+
+  patchFilters(newData) {
     const clearFilters = { search: null, author: null, feed: null };
     const newFilter = { ...clearFilters, ...newData };
     this.filters = newFilter;
   }
 
-  applyFilter() {
+  // global filters setter
+  applyFilters() {
     this.appStateService.patchState({
       filters: this.filters,
       sidebar: false,
@@ -95,37 +125,28 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
     });
   }
 
+  // filter functions
   search() {
-    this.patchFilter({ search: this.searchForm.value.searchInput });
-    this.applyFilter();
+    this.patchFilters({ search: this.searchForm.value.searchInput });
+    this.applyFilters();
   }
 
   filterByAuthor(id: string, name: string) {
-    this.patchFilter({ author: { id: id, name: name } });
-    this.applyFilter();
-  }
-
-  onAuthorSelected(event: MatAutocompleteSelectedEvent) {
-    const authorId = event.option.value;
-    const authorName = event.option.viewValue;
-    this.selectedAuthor = authorName;
-    this.authorInputNative.nativeElement.value = '';
-    this.authorForm.controls.authorInput.setValue(null);
-    this.filterByAuthor(authorId, authorName);
+    this.patchFilters({ author: { id: id, name: name } });
+    this.applyFilters();
   }
 
   filterByFeed(feed: string) {
-    this.patchFilter({ feed: feed });
-    this.applyFilter();
+    this.patchFilters({ feed: feed });
+    this.applyFilters();
   }
 
-  cancelFilters() {
-    this.filters = { search: null, author: null, feed: null };
-    this.authorForm.reset();
+  // other
+  onAuthorSelected(event: MatAutocompleteSelectedEvent) {
+    const value = event.option.value;
     this.authorInputNative.nativeElement.value = '';
-    this.selectedAuthor = null;
-    this.searchForm.reset();
-    this.applyFilter();
+    this.authorForm.controls.authorInput.setValue(null);
+    this.filterByAuthor(value.id, value.name);
   }
 
   isNavigationNode = (_: number, node: FeedTreeNode) =>

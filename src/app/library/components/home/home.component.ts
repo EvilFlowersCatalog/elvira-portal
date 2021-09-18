@@ -19,7 +19,6 @@ import { ListEntriesResponse, EntriesItem } from '../../library.types';
 import { EntriesService } from '../../services/entries/entries.service';
 
 const filterCompare = (a: Filters, b: Filters) => {
-  console.log(a, b);
   return (
     a.search === b.search && a.author?.id === b.author?.id && a.feed === b.feed
   );

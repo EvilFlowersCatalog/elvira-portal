@@ -2,6 +2,7 @@
   <mat-sidenav
     mode="over"
     [opened]="sidebarState$ | async"
+    [autoFocus]="false"
     (closedStart)="hideSidebar()"
   >
     <app-sidebar></app-sidebar>
