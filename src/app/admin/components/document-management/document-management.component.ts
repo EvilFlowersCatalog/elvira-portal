@@ -106,11 +106,10 @@ export class DocumentManagementComponent
           );
           this.notificationService.success(message);
         }),
-        // TODO handle error
         catchError((err) => {
           console.log(err);
           const message = this.translocoService.translate(
-            'lazy.adminPage.documentDeleteError'
+            'lazy.adminPage.error-delete-document'
           );
           this.notificationService.error(message);
           return throwError(err);
@@ -127,8 +126,7 @@ export class DocumentManagementComponent
   }
 
   //Function for searchbar
-  applyFilter(search: string) {
-    // TODO
+  applyFilter() {
     this.fetchDocuments$.next();
    }
 }
