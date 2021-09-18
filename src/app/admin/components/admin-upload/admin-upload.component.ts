@@ -8,7 +8,7 @@ import {
 import { MatChipInputEvent } from '@angular/material/chips';
 import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
 import { COMMA, ENTER } from '@angular/cdk/keycodes';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import {
   FormGroup,
   FormControl,
@@ -17,11 +17,13 @@ import {
   Validators,
 } from '@angular/forms';
 import {
+  catchError,
   debounceTime,
   distinctUntilChanged,
   map,
   startWith,
   switchMap,
+  take,
   tap,
 } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -239,8 +241,25 @@ export class AdminUploadComponent implements OnInit {
     if (this.isInEditMode) {
       this.adminService
         .updateEntry(this.entryId, this.getEditedData())
-        .subscribe();
-      this.router.navigate(['../'], { relativeTo: this.route });
+        .pipe(
+          tap(() => {
+            const message = this.translocoService.translate(
+              'lazy.adminPage.success-message-edit-document'
+            );
+            this.notificationService.success(message);
+            this.router.navigate(['../'], { relativeTo: this.route });
+          }),
+          take(1),
+          catchError((err) => {
+            console.log(err);
+            const message = this.translocoService.translate(
+              'lazy.adminPage.error-edit-document'
+            );
+            this.notificationService.error(message);
+            return throwError(err);
+          }))
+          .subscribe()
+
     } else {
       let testData: FormData = new FormData();
       testData.append('file', this.imageFile, this.imageFile.name);
@@ -254,13 +273,27 @@ export class AdminUploadComponent implements OnInit {
           this.uploadForm.get('author').get('name').value,
             this.uploadForm.get('author').get('surname').value;
 
-          this.adminService.upload(testData).subscribe(() => {
-            this.router.navigate(['../'], { relativeTo: this.route });
-          });
-          const message = this.translocoService.translate(
-            'lazy.adminPage.success-message-document'
-          );
-          this.notificationService.success(message);
+          this.adminService.upload(testData)
+          .pipe(
+            tap(() => {
+              const message = this.translocoService.translate(
+                'lazy.adminPage.success-message-document'
+              );
+              this.notificationService.success(message);
+              this.router.navigate(['../'], { relativeTo: this.route });
+            }),
+            take(1),
+            catchError((err) => {
+              console.log(err);
+              const message = this.translocoService.translate(
+                'lazy.adminPage.error-upload-document'
+              );
+              this.notificationService.error(message);
+              return throwError(err);
+            })
+          )
+          .subscribe();
+
         } else {
           this.notificationService.error('Invalid image size!');
         }

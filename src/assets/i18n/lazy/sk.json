@@ -25,8 +25,11 @@
     "upload": "Nahrať",
     "edit": "Upraviť",
     "success-delete-document": "Dokument bol úspešne odstránený",
+    "error-delete-document": "Odstránenie zlyhalo",
     "success-message-document": "Dokument bol úspešne nahraný",
-    "error-message": "Nahrávanie neuspešná",
+    "error-upload-document": "Nahrávanie zlyhalo",
+    "success-message-edit-document": "Dokument bol úspešne upravený",
+    "error-edit-document": "Úprava zlyhala",
     "back-to-admin-button": "Späť na admin!"
   },
   "adminOverview": {

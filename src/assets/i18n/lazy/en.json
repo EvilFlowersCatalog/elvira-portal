@@ -25,8 +25,11 @@
     "upload": "Upload",
     "edit": "Edit",
     "success-delete-document": "Successfully deleted document",
+    "error-delete-document": "Delete failed",
     "success-message-document": "Successfully uploaded document",
-    "error-message": "Update failed",
+    "error-upload-document": "Upload failed",
+    "success-message-edit-document": "Successfully edited document",
+    "error-edit-document": "Edit failed",
     "back-to-admin-button": "Back to admin!"
   },
   "adminOverview": {
