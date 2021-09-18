@@ -7,6 +7,7 @@ import { AppStateService } from './common/services/app-state/app-state.service';
 import { State } from './common/services/app-state/app-state.types';
 import { TranslocoService } from '@ngneat/transloco';
 import { LoadingService } from './common/services/loading/loading.service';
+import { IconLoaderService } from './common/services/icon-loader/icon-loader.service';
 
 @Component({
   selector: 'app-root',
@@ -23,7 +24,8 @@ export class AppComponent extends DisposableComponent {
     private renderer: Renderer2,
     private readonly appStateService: AppStateService,
     private readonly langService: TranslocoService,
-    private readonly loadingService: LoadingService
+    private readonly loadingService: LoadingService,
+    private readonly iconLoaderService: IconLoaderService
   ) {
     super();
   }
@@ -49,6 +51,7 @@ export class AppComponent extends DisposableComponent {
         takeUntil(this.destroySignal$)
       )
       .subscribe();
+    this.iconLoaderService.loadIcons();
     this.initWindowStorageListener();
   }
 

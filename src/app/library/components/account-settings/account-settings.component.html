@@ -5,7 +5,7 @@
       fxLayoutAlign="center"
       class="account-settings-container"
     >
-      <div fxLayout="column" fxFlex="40" fxFlex.lt-md="90">
+      <div fxLayout="column" fxFlex="40" fxFlex.lt-md="60" fxFlex.lt-sm="100">
         <mat-card>
           <div fxLayout="column" class="account-settings-form">
             <div fxLayout="row" fxLayoutAlign="center center">
@@ -22,12 +22,6 @@
             <mat-form-field appearance="fill">
               <mat-label class="account-settings-label">AIS id</mat-label>
               <input matInput disabled value="{{ userData.aisId }}" />
-            </mat-form-field>
-            <mat-form-field appearance="fill">
-              <mat-label class="account-settings-label">
-                {{ t("lazy.accountSettings.role") }}
-              </mat-label>
-              <input matInput disabled value="{{ userData.role }}" />
             </mat-form-field>
             <mat-form-field appearance="fill">
               <mat-label class="account-settings-label">
@@ -48,6 +42,10 @@
               <input matInput disabled value="{{ userData.lastName }}" />
             </mat-form-field>
             <div fxLayout="row">
+              <mat-icon
+                svgIcon="google"
+                class="account-settings-google-icon"
+              ></mat-icon>
               <mat-label class="account-settings-toggle-label">
                 {{ t("lazy.accountSettings.googleAuth") }}
               </mat-label>

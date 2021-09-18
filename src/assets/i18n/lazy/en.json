@@ -51,6 +51,7 @@
   "entryInfoDialog": {
     "author": "Author:",
     "summary": "Summary:",
+    "feeds": "Feeds:",
     "language": "Language:",
     "createdAt": "Created at:",
     "close": "Close"
@@ -68,7 +69,6 @@
   "accountSettings": {
     "title": "Account settings",
     "nick": "Nick",
-    "role": "Role",
     "email": "University email",
     "firstName": "First Name",
     "lastName": "Last Name",

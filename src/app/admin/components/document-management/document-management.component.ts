@@ -4,8 +4,16 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
-import { Subject } from 'rxjs';
-import { concatMap, startWith, take, takeUntil, tap } from 'rxjs/operators';
+import { Subject, throwError } from 'rxjs';
+import {
+  catchError,
+  concatMap,
+  filter,
+  startWith,
+  take,
+  takeUntil,
+  tap,
+} from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { NotificationService } from 'src/app/common/services/notification/notification.service';
 import { AdminService } from '../../services/admin.service';
@@ -25,8 +33,6 @@ export class DocumentManagementComponent
   resultsLength = 0;
   tableData: AllEntryItems[] = [];
   dataSource: MatTableDataSource<AllEntryItems>;
-  isdelete: boolean = false;
-  isedit: boolean = false;
   fetchDocuments$ = new Subject();
 
   @ViewChild('paginator') paginator: MatPaginator;
@@ -51,13 +57,12 @@ export class DocumentManagementComponent
         startWith([]),
         concatMap(() =>
           this.adminService.getAllEntries(
-            this.paginator.pageIndex,
-            this.paginator.pageSize
+            this.paginator.pageIndex ?? 0,
+            this.paginator.pageSize ?? 5
           )
         )
       )
       .subscribe((data) => {
-        console.log(data);
         this.tableData = data.items;
         this.resultsLength = data.metadata.total;
         this.dataSource = new MatTableDataSource(this.tableData);
@@ -65,13 +70,7 @@ export class DocumentManagementComponent
   }
 
   documentPagination() {
-    this.adminService
-      .getAllEntries(this.paginator.pageIndex, this.paginator.pageSize)
-      .subscribe((datas) => {
-        this.tableData = datas.items;
-        console.log(this.resultsLength);
-        this.dataSource = new MatTableDataSource(this.tableData);
-      });
+    this.fetchDocuments$.next();
   }
 
   //Button, to navigate to the upload formular
@@ -79,54 +78,49 @@ export class DocumentManagementComponent
     this.router.navigate(['./upload'], { relativeTo: this.route });
   }
 
-  feedsOverview() {
-    this.router.navigate(['./feeds'], { relativeTo: this.route });
-  }
+  //Function, to give choice, wether we want to delete the document or not
+  deleteDocument(element: AllEntryItems) {
+    const dialogRef = this.dialog.open(DeleteDialogComponent, {
+      width: '30%',
+      data: { title: element.title },
+    });
 
-  //Function, to get the current clicked row
-  getRow(row: AllEntryItems) {
-    const { isdelete } = this;
-    if (isdelete) {
-      const dialogRef = this.dialog.open(DeleteDialogComponent, {
-        width: '350px',
-        data: { title: row.title, entryApikey: row.id, source: 'admin' },
-      });
-
-      dialogRef.afterClosed().subscribe((result) => {
-        if (result == 'yes') {
-          this.adminService
-            .deleteEntry(row.id)
-            .pipe(take(1))
-            .subscribe(() => {
-              this.fetchDocuments$.next();
-            });
-
+    dialogRef
+      .afterClosed()
+      .pipe(
+        take(1),
+        filter((result) => result === 'yes'),
+        concatMap(() => this.adminService.deleteEntry(element.id)),
+        tap(() => {
           const message = this.translocoService.translate(
             'lazy.adminPage.success-delete-document'
           );
           this.notificationService.success(message);
-        }
-        console.log(result);
+        }),
+        // TODO handle error
+        catchError((err) => {
+          console.log(err);
+          const message = this.translocoService.translate(
+            'lazy.adminPage.documentDeleteError'
+          );
+          this.notificationService.error(message);
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        this.fetchDocuments$.next();
       });
-    }
-    if (this.isedit) {
-      this.router.navigate([`./${row.id}`], { relativeTo: this.route });
-    }
   }
 
-  //Function, to give choice, wether we want to delete the document or not
-  deleteDocument() {
-    this.isdelete = true;
-    this.isedit = false;
-  }
-
-  editDocument() {
-    this.isdelete = false;
-    this.isedit = true;
+  editDocument(element: AllEntryItems) {
+    this.router.navigate([`./${element.id}`], { relativeTo: this.route });
   }
 
   //Function for searchbar
   applyFilter(event: Event) {
+    // TODO return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
+    //   params: { page: page + 1, limit: limit, title: query },
+    // });
     const filterValue = (event.target as HTMLInputElement).value;
     this.dataSource.filter = filterValue.trim().toLowerCase();
 

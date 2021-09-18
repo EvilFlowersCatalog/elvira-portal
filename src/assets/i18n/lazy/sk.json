@@ -51,6 +51,7 @@
   "entryInfoDialog": {
     "author": "Autor:",
     "summary": "Zhrnutie:",
+    "feeds": "Feedy",
     "language": "Jazyk:",
     "createdAt": "Pridané:",
     "close": "Zatvoriť"
@@ -68,7 +69,6 @@
   "accountSettings": {
     "title": "Nastavenia účtu",
     "nick": "Nick",
-    "role": "Rola",
     "email": "Univerzitný email",
     "firstName": "Meno",
     "lastName": "Priezvisko",
