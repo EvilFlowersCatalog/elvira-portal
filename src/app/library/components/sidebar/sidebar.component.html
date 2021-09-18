@@ -33,14 +33,32 @@
         <mat-label>
           {{ t("lazy.sidebar.author") }}
         </mat-label>
-        <input
-          type="text"
-          matInput
-          formControlName="authorInput"
-          [matAutocomplete]="auto"
-        />
-        <mat-autocomplete #auto="matAutocomplete">
-          <mat-option *ngFor="let option of authorSuggestions" [value]="option">
+        <mat-chip-list #chipList>
+          <mat-chip
+            *ngIf="selectedAuthor"
+            [removable]="true"
+            (removed)="cancelFilters()"
+          >
+            {{ selectedAuthor }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+          <input
+            matInput
+            #authorInputNative
+            type="text"
+            formControlName="authorInput"
+            [matAutocomplete]="auto"
+            [matChipInputFor]="chipList"
+          />
+        </mat-chip-list>
+        <mat-autocomplete
+          #auto="matAutocomplete"
+          (optionSelected)="onAuthorSelected($event)"
+        >
+          <mat-option
+            *ngFor="let option of authorSuggestions"
+            [value]="option.id"
+          >
             {{ option.name + " " + option.surname }}
           </mat-option>
         </mat-autocomplete>

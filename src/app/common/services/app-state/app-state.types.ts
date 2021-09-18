@@ -15,6 +15,11 @@ export interface State {
 
 export interface Filters {
   search: string;
-  author: string;
+  author: AuthorFilter;
   feed: string;
+}
+
+export interface AuthorFilter {
+  name: string;
+  id: string;
 }

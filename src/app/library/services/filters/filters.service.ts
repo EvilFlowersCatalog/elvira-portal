@@ -1,18 +1,17 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { Authors, FeedTreeNode } from '../../library.types';
-import { ListEntriesResponse } from '../entries/entries.types';
+import {
+  Authors,
+  FeedTreeNode,
+  ListEntriesResponse,
+} from '../../library.types';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FiltersService {
-  constructor(
-    private readonly httpClient: HttpClient,
-    private readonly appStateService: AppStateService
-  ) {}
+  constructor(private readonly httpClient: HttpClient) {}
 
   entriesSearch(keyword: string): Observable<ListEntriesResponse> {
     let params = new HttpParams().set('title', keyword);

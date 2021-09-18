@@ -1,17 +1,15 @@
 import { NestedTreeControl } from '@angular/cdk/tree';
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
+import { MatAutocompleteSelectedEvent } from '@angular/material/autocomplete';
+import { MatInput } from '@angular/material/input';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
-import { Observable } from 'rxjs';
 import {
   concatMap,
   debounceTime,
   distinctUntilChanged,
-  map,
-  startWith,
-  switchMap,
   takeUntil,
-  tap,
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
@@ -32,7 +30,10 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
   FeedTreeNode: FeedTreeNode;
   treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.entry);
   dataSource = new MatTreeNestedDataSource<FeedTreeNode>();
-  // filteredOptions: Observable<Author[]>;
+  selectedAuthor: string;
+
+  @ViewChild('authorInputNative')
+  authorInputNative: ElementRef<HTMLInputElement>;
 
   constructor(
     private readonly filtersService: FiltersService,
@@ -40,7 +41,6 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
     private readonly fb: FormBuilder
   ) {
     super();
-    this.searchForm = new FormGroup({ searchInput: new FormControl('') });
     this.filtersService
       .getFeedTreeNode()
       .pipe(takeUntil(this.destroySignal$))
@@ -50,20 +50,10 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.initAuthorForm();
     const state = this.appStateService.getStateSnapshot();
-    this.searchForm.patchValue({
-      searchInput: state?.filters?.search,
-    });
-    this.authorForm.patchValue({
-      authorInput: state?.filters?.author,
-    });
-  }
-
-  initAuthorForm() {
-    this.authorForm = this.fb.group({
-      authorInput: [''],
-    });
+    this.searchForm = this.initSearchForm(state?.filters?.search);
+    this.authorForm = this.initAuthorForm();
+    this.selectedAuthor = state?.filters?.author?.name;
 
     this.authorForm
       .get('authorInput')
@@ -76,6 +66,19 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
       .subscribe((response: Authors) => {
         this.authorSuggestions = response.items;
       });
+  }
+
+  initSearchForm(value: string) {
+    const controlValue = value ? value : '';
+    return this.fb.group({
+      searchInput: [controlValue],
+    });
+  }
+
+  initAuthorForm() {
+    return this.fb.group({
+      authorInput: [''],
+    });
   }
 
   patchFilter(newData) {
@@ -97,9 +100,18 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
     this.applyFilter();
   }
 
-  filterByAuthor(author: string) {
-    this.patchFilter({ author: author });
+  filterByAuthor(id: string, name: string) {
+    this.patchFilter({ author: { id: id, name: name } });
     this.applyFilter();
+  }
+
+  onAuthorSelected(event: MatAutocompleteSelectedEvent) {
+    const authorId = event.option.value;
+    const authorName = event.option.viewValue;
+    this.selectedAuthor = authorName;
+    this.authorInputNative.nativeElement.value = '';
+    this.authorForm.controls.authorInput.setValue(null);
+    this.filterByAuthor(authorId, authorName);
   }
 
   filterByFeed(feed: string) {
@@ -110,6 +122,8 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
   cancelFilters() {
     this.filters = { search: null, author: null, feed: null };
     this.authorForm.reset();
+    this.authorInputNative.nativeElement.value = '';
+    this.selectedAuthor = null;
     this.searchForm.reset();
     this.applyFilter();
   }
