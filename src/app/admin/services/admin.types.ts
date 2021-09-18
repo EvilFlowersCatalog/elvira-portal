@@ -114,6 +114,7 @@ export interface EditedData {
   feeds: string[];
   summary: string;
   language_code: string;
+  contributors: EntriesContributors[];
 }
 
 export interface GetFeeds {
