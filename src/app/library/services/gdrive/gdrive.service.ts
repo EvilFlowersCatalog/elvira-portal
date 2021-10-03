@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -13,19 +14,21 @@ export class GdriveService {
   ) {}
 
   getAuthUrl(): Observable<any> {
-    return this.httpClient.get<any>(`api/apigw/oauth/link`);
+    return this.httpClient.get<any>(environment.baseUrl + `/apigw/oauth/link`);
   }
 
   postAuthCode(code: string) {
-    return this.httpClient.post(`api/apigw/oauth/callback`, { code: code });
+    return this.httpClient.post(environment.baseUrl + `/apigw/oauth/callback`, {
+      code: code,
+    });
   }
 
   unlinkGoogle() {
-    return this.httpClient.delete('api/apigw/oauth/unlink');
+    return this.httpClient.delete(environment.baseUrl + '/apigw/oauth/unlink');
   }
 
   uploadFileToDrive(entryId: string, catalogId: string) {
-    return this.httpClient.post(`api/apigw/gdrive/upload`, {
+    return this.httpClient.post(environment.baseUrl + `/apigw/gdrive/upload`, {
       entry_id: entryId,
       catalog_id: catalogId,
     });

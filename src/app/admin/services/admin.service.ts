@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
 import { ListEntriesResponse } from 'src/app/library/library.types';
+import { environment } from 'src/environments/environment';
 import {
   NewFeed,
   AdminResponse,
@@ -25,71 +26,99 @@ export class AdminService {
   ) {}
 
   getAllEntries(page: number, limit: number): Observable<GetEntries> {
-    return this.httpClient.get<GetEntries>('api/apigw/entries', {
-      params: { page: page + 1, limit: limit },
-    });
+    return this.httpClient.get<GetEntries>(
+      environment.baseUrl + '/apigw/entries',
+      {
+        params: { page: page + 1, limit: limit },
+      }
+    );
   }
 
   getAllFeeds(): Observable<GetFeeds> {
-    return this.httpClient.get<GetFeeds>('api/apigw/feeds', {
+    return this.httpClient.get<GetFeeds>(environment.baseUrl + '/apigw/feeds', {
       params: { paginate: 'false' },
     });
   }
 
   getAllFeedsPagination(page: number, limit: number): Observable<GetFeeds> {
-    return this.httpClient.get<GetFeeds>('api/apigw/feeds', {
+    return this.httpClient.get<GetFeeds>(environment.baseUrl + '/apigw/feeds', {
       params: { page: page + 1, limit: limit },
     });
   }
 
   updateFeed(feedId: string, newFeed: UpdateFeeds) {
-    return this.httpClient.put(`api/apigw/feeds/${feedId}`, newFeed);
+    return this.httpClient.put(
+      environment.baseUrl + `/apigw/feeds/${feedId}`,
+      newFeed
+    );
   }
 
   deleteFeed(feedId: string) {
-    return this.httpClient.delete(`api/apigw/feeds/${feedId}`);
+    return this.httpClient.delete(
+      environment.baseUrl + `/apigw/feeds/${feedId}`
+    );
   }
 
   upload(entriesData: FormData) {
-    return this.httpClient.post(`api/apigw/entries`, entriesData);
+    return this.httpClient.post(
+      environment.baseUrl + `/apigw/entries`,
+      entriesData
+    );
   }
 
   deleteEntry(entryId: string) {
-    return this.httpClient.delete(`api/apigw/entries/${entryId}`);
+    return this.httpClient.delete(
+      environment.baseUrl + `/apigw/entries/${entryId}`
+    );
   }
 
   getOneEntry(entryId: string) {
-    return this.httpClient.get<OneEntryItem>(`api/apigw/entries/${entryId}`);
+    return this.httpClient.get<OneEntryItem>(
+      environment.baseUrl + `/apigw/entries/${entryId}`
+    );
   }
 
   updateEntry(entryId: string, entriesData: EditedData) {
-    return this.httpClient.put(`api/apigw/entries/${entryId}`, entriesData);
+    return this.httpClient.put(
+      environment.baseUrl + `/apigw/entries/${entryId}`,
+      entriesData
+    );
   }
 
   getIsAdmin(mongoId: string) {
-    return this.httpClient.get<boolean>(`api/apigw/isAdmin/${mongoId}`);
+    return this.httpClient.get<boolean>(
+      environment.baseUrl + `/apigw/isAdmin/${mongoId}`
+    );
   }
 
   checkTitle(title: string) {
-    return this.httpClient.get<GetEntries>('api/apigw/entries', {
-      params: { title: title },
-    });
+    return this.httpClient.get<GetEntries>(
+      environment.baseUrl + '/apigw/entries',
+      {
+        params: { title: title },
+      }
+    );
   }
 
   addNewFeed(feedData: NewFeed) {
-    return this.httpClient.post('api/apigw/feeds', feedData);
+    return this.httpClient.post(environment.baseUrl + '/apigw/feeds', feedData);
   }
 
-  searchEntries(page: number, limit: number, searchInput?: string,) {
-    if(searchInput){
-      return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
-      params: { page: page + 1, limit: limit, title: searchInput },
-    });
+  searchEntries(page: number, limit: number, searchInput?: string) {
+    if (searchInput) {
+      return this.httpClient.get<ListEntriesResponse>(
+        environment.baseUrl + '/apigw/entries',
+        {
+          params: { page: page + 1, limit: limit, title: searchInput },
+        }
+      );
     } else {
-      return this.httpClient.get<ListEntriesResponse>('api/apigw/entries', {
-      params: { page: page + 1, limit: limit },
-    });
+      return this.httpClient.get<ListEntriesResponse>(
+        environment.baseUrl + '/apigw/entries',
+        {
+          params: { page: page + 1, limit: limit },
+        }
+      );
     }
-
   }
 }

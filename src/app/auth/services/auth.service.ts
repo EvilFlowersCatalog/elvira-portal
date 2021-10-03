@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 import { LoginCredentials, LoginResponse } from '../types/auth.types';
 
 @Injectable({
@@ -12,16 +13,21 @@ export class AuthService {
 
   login(loginCredentials: LoginCredentials): Observable<LoginResponse> {
     return this.httpClient.post<LoginResponse>(
-      'api/apigw/auth/login',
+      environment.baseUrl + '/apigw/auth/login',
       loginCredentials
     );
   }
 
   logout(token: string) {
-    return this.httpClient.post('api/apigw/auth/logout', token);
+    return this.httpClient.post(
+      environment.baseUrl + '/apigw/auth/logout',
+      token
+    );
   }
 
   verifyToken(): Observable<boolean> {
-    return this.httpClient.get<boolean>('api/apigw/verifytoken');
+    return this.httpClient.get<boolean>(
+      environment.baseUrl + '/apigw/verifytoken'
+    );
   }
 }
