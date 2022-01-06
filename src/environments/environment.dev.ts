@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  baseUrl: `https://api.elvire.workzone.fiit.stuba.sk`,
-  assetsUrl: `https://elvire.workzone.fiit.stuba.sk/assets`,
+  baseUrl: `http://localhost:8000/api`,
+  assetsUrl: `http://localhost:4200/assets`,
 };
