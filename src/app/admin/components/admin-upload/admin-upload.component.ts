@@ -122,8 +122,6 @@ export class AdminUploadComponent implements OnInit {
       summary: new FormControl(''),
       language_code: new FormControl('sk'),
     });
-
-
   }
 
   get formTitle() {
@@ -157,12 +155,10 @@ export class AdminUploadComponent implements OnInit {
     add.removeAt(index);
   }
 
-
-
-  editContributors(contributors: EntriesContributors[]){
-    contributors.forEach(contributor => {
+  editContributors(contributors: EntriesContributors[]) {
+    contributors.forEach((contributor) => {
       this.addContributor();
-    })
+    });
   }
 
   ngOnInit(): void {
@@ -171,10 +167,10 @@ export class AdminUploadComponent implements OnInit {
       this.adminService.getOneEntry(this.entryId).subscribe((datas) => {
         this.editData = datas;
         this.isInEditMode = true;
-        datas.feeds.forEach(feed => {
+        datas.feeds.forEach((feed) => {
           this.feeds.push(feed.title);
           this.finalFeeds.push(feed.id);
-        })
+        });
         this.editContributors(datas.contributors);
       });
     }
@@ -257,9 +253,9 @@ export class AdminUploadComponent implements OnInit {
             );
             this.notificationService.error(message);
             return throwError(err);
-          }))
-          .subscribe()
-
+          })
+        )
+        .subscribe();
     } else {
       let testData: FormData = new FormData();
       testData.append('file', this.imageFile, this.imageFile.name);
@@ -273,27 +269,27 @@ export class AdminUploadComponent implements OnInit {
           this.uploadForm.get('author').get('name').value,
             this.uploadForm.get('author').get('surname').value;
 
-          this.adminService.upload(testData)
-          .pipe(
-            tap(() => {
-              const message = this.translocoService.translate(
-                'lazy.adminPage.success-message-document'
-              );
-              this.notificationService.success(message);
-              this.router.navigate(['../'], { relativeTo: this.route });
-            }),
-            take(1),
-            catchError((err) => {
-              console.log(err);
-              const message = this.translocoService.translate(
-                'lazy.adminPage.error-upload-document'
-              );
-              this.notificationService.error(message);
-              return throwError(err);
-            })
-          )
-          .subscribe();
-
+          this.adminService
+            .upload(testData)
+            .pipe(
+              tap(() => {
+                const message = this.translocoService.translate(
+                  'lazy.adminPage.success-message-document'
+                );
+                this.notificationService.success(message);
+                this.router.navigate(['../'], { relativeTo: this.route });
+              }),
+              take(1),
+              catchError((err) => {
+                console.log(err);
+                const message = this.translocoService.translate(
+                  'lazy.adminPage.error-upload-document'
+                );
+                this.notificationService.error(message);
+                return throwError(err);
+              })
+            )
+            .subscribe();
         } else {
           this.notificationService.error('Invalid image size!');
         }
@@ -313,7 +309,7 @@ export class AdminUploadComponent implements OnInit {
       feeds: this.finalFeeds,
       summary: this.uploadForm.get('summary').value,
       language_code: 'sk',
-      contributors: this.getContributors()
+      contributors: this.getContributors(),
     };
     return editedData;
   }
@@ -368,7 +364,6 @@ export class AdminUploadComponent implements OnInit {
     }
     return contributors;
   }
-
 
   onImageDropped(file: File) {
     this.imageFile = file;

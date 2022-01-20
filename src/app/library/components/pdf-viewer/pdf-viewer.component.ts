@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
 import { ActivatedRoute } from '@angular/router';
 import { EntriesService } from '../../services/entries/entries.service';
@@ -12,6 +12,7 @@ import { DisposableComponent } from 'src/app/common/components/disposable.compon
   selector: 'app-pdf-viewer',
   templateUrl: './pdf-viewer.component.html',
   styleUrls: ['./pdf-viewer.component.scss'],
+  encapsulation: ViewEncapsulation.None,
 })
 export class PdfViewerComponent extends DisposableComponent implements OnInit {
   public base64: string;
