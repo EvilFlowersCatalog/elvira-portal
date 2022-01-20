@@ -22,6 +22,7 @@ import {
   EntriesParams,
 } from '../../library.types';
 import { EntriesService } from '../../services/entries/entries.service';
+import { MediaObserver } from '@angular/flex-layout';
 
 const filterCompare = (a: Filters, b: Filters) => {
   return (
@@ -46,7 +47,8 @@ export class HomeComponent extends DisposableComponent implements OnInit {
 
   constructor(
     private readonly appStateService: AppStateService,
-    private readonly entriesService: EntriesService
+    private readonly entriesService: EntriesService,
+    public mediaObserver: MediaObserver
   ) {
     super();
   }
