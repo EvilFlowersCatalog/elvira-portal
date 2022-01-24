@@ -1,15 +1,15 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { EntriesService } from '../../services/entries/entries.service';
+import { EntriesService } from '../../services/entries.service';
 import { Router } from '@angular/router';
 import { EntryInfoDialogComponent } from '../entry-info-dialog/entry-info-dialog.component';
 import { catchError, take, tap } from 'rxjs/operators';
-import { GdriveService } from '../../services/gdrive/gdrive.service';
-import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
+import { GdriveService } from '../../services/gdrive.service';
+import { AppStateService } from 'src/app/common/services/app-state.service';
 import { throwError } from 'rxjs';
-import { NotificationService } from 'src/app/common/services/notification/notification.service';
+import { NotificationService } from 'src/app/common/services/notification.service';
 import { TranslocoService } from '@ngneat/transloco';
-import { EntriesItem } from '../../library.types';
+import { EntriesItem } from '../../types/library.types';
 
 @Component({
   selector: 'app-entry-detail',

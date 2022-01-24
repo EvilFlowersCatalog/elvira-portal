@@ -13,13 +13,10 @@ import {
   takeUntil,
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import {
-  Filters,
-  State,
-} from 'src/app/common/services/app-state/app-state.types';
-import { Author, Authors, FeedTreeNode } from '../../library.types';
-import { FiltersService } from '../../services/filters/filters.service';
+import { AppStateService } from 'src/app/common/services/app-state.service';
+import { Filters, State } from 'src/app/common/types/app-state.types';
+import { Author, Authors, FeedTreeNode } from '../../types/library.types';
+import { FiltersService } from '../../services/filters.service';
 
 @Component({
   selector: 'app-sidebar',

@@ -16,9 +16,9 @@ import {
   tap,
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { NotificationService } from 'src/app/common/services/notification/notification.service';
+import { NotificationService } from 'src/app/common/services/notification.service';
 import { AdminService } from '../../services/admin.service';
-import { AllEntryItems } from '../../services/admin.types';
+import { AllEntryItems } from '../../types/admin.types';
 import { DeleteDialogComponent } from '../dialogs/delete-dialog/delete-dialog.component';
 
 @Component({
@@ -76,8 +76,6 @@ export class DocumentManagementComponent
       });
   }
 
-
-
   documentPagination() {
     this.fetchDocuments$.next();
   }
@@ -116,17 +114,16 @@ export class DocumentManagementComponent
         })
       )
       .subscribe(() => {
-        console.log("deleted");
         this.fetchDocuments$.next();
       });
   }
 
   editDocument(element: AllEntryItems) {
-    this.router.navigate([`./${element.id}`], { relativeTo: this.route });
+    this.router.navigate([`./edit/${element.id}`], { relativeTo: this.route });
   }
 
   //Function for searchbar
   applyFilter() {
     this.fetchDocuments$.next();
-   }
+  }
 }

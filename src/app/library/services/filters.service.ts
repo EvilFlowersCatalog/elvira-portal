@@ -7,7 +7,7 @@ import {
   Authors,
   FeedTreeNode,
   ListEntriesResponse,
-} from '../../library.types';
+} from '../types/library.types';
 
 @Injectable({
   providedIn: 'root',

@@ -16,11 +16,11 @@ import {
   tap,
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { NotificationService } from 'src/app/common/services/notification/notification.service';
-import { FeedTreeNode } from 'src/app/library/library.types';
-import { FiltersService } from 'src/app/library/services/filters/filters.service';
+import { NotificationService } from 'src/app/common/services/notification.service';
+import { FeedTreeNode } from 'src/app/library/types/library.types';
+import { FiltersService } from 'src/app/library/services/filters.service';
 import { AdminService } from '../../services/admin.service';
-import { NewFeed } from '../../services/admin.types';
+import { NewFeed } from '../../types/admin.types';
 import { DeleteDialogComponent } from '../dialogs/delete-dialog/delete-dialog.component';
 import { NewFeedDialogComponent } from '../dialogs/new-feed-dialog/new-feed-dialog.component';
 import { UpdateFeedDialogComponent } from '../dialogs/update-feed-dialog/update-feed-dialog.component';

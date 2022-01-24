@@ -1,13 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { GdriveService } from '../../services/gdrive/gdrive.service';
+import { GdriveService } from '../../services/gdrive.service';
 import { catchError, takeUntil, tap } from 'rxjs/operators';
-import { UserService } from '../../services/user/user.service';
-import { UserResponse } from '../../library.types';
-import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
+import { UserService } from '../../services/user.service';
+import { UserResponse } from '../../types/library.types';
+import { AppStateService } from 'src/app/common/services/app-state.service';
 import { Observable, throwError } from 'rxjs';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { State } from 'src/app/common/services/app-state/app-state.types';
-import { NotificationService } from 'src/app/common/services/notification/notification.service';
+import { State } from 'src/app/common/types/app-state.types';
+import { NotificationService } from 'src/app/common/services/notification.service';
 import { TranslocoService } from '@ngneat/transloco';
 
 @Component({

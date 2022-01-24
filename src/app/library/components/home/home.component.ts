@@ -11,17 +11,14 @@ import {
   takeUntil,
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import {
-  Filters,
-  State,
-} from 'src/app/common/services/app-state/app-state.types';
+import { AppStateService } from 'src/app/common/services/app-state.service';
+import { Filters, State } from 'src/app/common/types/app-state.types';
 import {
   ListEntriesResponse,
   EntriesItem,
   EntriesParams,
-} from '../../library.types';
-import { EntriesService } from '../../services/entries/entries.service';
+} from '../../types/library.types';
+import { EntriesService } from '../../services/entries.service';
 import { MediaObserver } from '@angular/flex-layout';
 
 const filterCompare = (a: Filters, b: Filters) => {

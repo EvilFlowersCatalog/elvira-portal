@@ -1,6 +1,6 @@
 {
   "/api": {
-    "target": "http://apigw:8000",
+    "target": "localhost:8000",
     "secure": false,
     "pathRewrite": {
       "^/api": ""

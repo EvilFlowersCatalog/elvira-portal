@@ -1,11 +1,11 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
 import { ActivatedRoute } from '@angular/router';
-import { EntriesService } from '../../services/entries/entries.service';
+import { EntriesService } from '../../services/entries.service';
 import { Observable, Subject } from 'rxjs';
 import { takeUntil, tap } from 'rxjs/operators';
-import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { State } from 'src/app/common/services/app-state/app-state.types';
+import { AppStateService } from 'src/app/common/services/app-state.service';
+import { State } from 'src/app/common/types/app-state.types';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 
 @Component({

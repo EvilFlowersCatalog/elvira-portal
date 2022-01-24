@@ -7,8 +7,8 @@ import {
   HttpContextToken,
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { AppStateService } from '../services/app-state/app-state.service';
-import { LoadingService } from '../services/loading/loading.service';
+import { AppStateService } from '../services/app-state.service';
+import { LoadingService } from '../services/loading.service';
 import { environment } from 'src/environments/environment';
 
 export const BYPASS_LOADING = new HttpContextToken(() => false);

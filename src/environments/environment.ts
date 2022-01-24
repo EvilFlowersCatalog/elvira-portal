@@ -4,7 +4,7 @@
 
 export const environment = {
   production: false,
-  baseUrl: `http://apigw:8000`,
+  baseUrl: `http://localhost:8000`,
   assetsUrl: `http://localhost:4200/assets`,
 };
 

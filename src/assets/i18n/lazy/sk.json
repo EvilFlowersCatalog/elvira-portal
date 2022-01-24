@@ -1,9 +1,5 @@
 {
   "adminPage": {
-    "header-new": "Nahrajte dokument",
-    "header-edit": "Upravte dokument",
-    "title": "Názov",
-    "title-description": "Názov dokumentácie",
     "author": "Autor",
     "author-name": "Meno autora",
     "author-surname": "Priezvisko autora",
@@ -31,6 +27,11 @@
     "success-message-edit-document": "Dokument bol úspešne upravený",
     "error-edit-document": "Úprava zlyhala",
     "back-to-admin-button": "Späť na admin!"
+  },
+  "documentForm": {
+    "headerNew": "Nový dokument",
+    "headerEdit": "Úprava dokumentu",
+    "titleLabel": "Názov dokumentu"
   },
   "adminOverview": {
     "search": "Vyhľadávanie",

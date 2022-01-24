@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { ListEntriesResponse } from 'src/app/library/library.types';
+import { AppStateService } from 'src/app/common/services/app-state.service';
+import { ListEntriesResponse } from 'src/app/library/types/library.types';
 import { environment } from 'src/environments/environment';
 import {
   NewFeed,
@@ -14,7 +14,8 @@ import {
   GetFeeds,
   UpdateFeeds,
   OneEntryItem,
-} from './admin.types';
+} from '../types/admin.types';
+import { BYPASS_LOADING } from 'src/app/common/interceptors/http-request.interceptor';
 
 @Injectable({
   providedIn: 'root',
@@ -96,6 +97,7 @@ export class AdminService {
       environment.baseUrl + '/apigw/entries',
       {
         params: { title: title },
+        context: new HttpContext().set(BYPASS_LOADING, true),
       }
     );
   }

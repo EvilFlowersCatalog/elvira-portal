@@ -3,11 +3,11 @@ import { Component, Inject, Renderer2 } from '@angular/core';
 import { fromEvent, Observable } from 'rxjs';
 import { debounceTime, takeUntil, tap } from 'rxjs/operators';
 import { DisposableComponent } from './common/components/disposable.component';
-import { AppStateService } from './common/services/app-state/app-state.service';
-import { State } from './common/services/app-state/app-state.types';
+import { AppStateService } from './common/services/app-state.service';
+import { State } from './common/types/app-state.types';
 import { TranslocoService } from '@ngneat/transloco';
-import { LoadingService } from './common/services/loading/loading.service';
-import { IconLoaderService } from './common/services/icon-loader/icon-loader.service';
+import { LoadingService } from './common/services/loading.service';
+import { IconLoaderService } from './common/services/icon-loader.service';
 
 @Component({
   selector: 'app-root',

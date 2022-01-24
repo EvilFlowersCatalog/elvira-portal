@@ -4,7 +4,7 @@ import { NotfoundComponent } from './components/notfound/notfound.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { MaterialModule } from '../material.module';
 import { TranslocoRootModule } from '../transloco/transloco-root.module';
-import { LOCAL_STORAGE_TOKEN } from './services/local-storage/local-storage.service';
+import { LOCAL_STORAGE_TOKEN } from './services/local-storage.service';
 import { LibraryModule } from '../library/library.module';
 import { LoadingComponent } from './components/loading.component';
 import { MobileNavbarComponent } from './components/mobile-navbar/mobile-navbar.component';

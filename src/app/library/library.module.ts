@@ -16,7 +16,7 @@ import { AccountSettingsComponent } from './components/account-settings/account-
 import { GdriveAuthComponent } from './components/gdrive-auth.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatPaginatorIntl } from '@angular/material/paginator';
-import { CustomPaginationComponent } from '../common/services/custom-pagination/custom-pagination.service';
+import { CustomPaginationComponent } from '../common/services/custom-pagination.service';
 
 @NgModule({
   declarations: [

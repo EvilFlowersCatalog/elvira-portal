@@ -3,8 +3,8 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AuthService } from 'src/app/auth/services/auth.service';
-import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { State } from 'src/app/common/services/app-state/app-state.types';
+import { AppStateService } from 'src/app/common/services/app-state.service';
+import { State } from 'src/app/common/types/app-state.types';
 import { DisposableComponent } from '../disposable.component';
 
 @Component({

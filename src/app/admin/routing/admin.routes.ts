@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { AdminOverviewComponent } from '../components/admin-overview/admin-overview.component';
-import { AdminUploadComponent } from '../components/admin-upload/admin-upload.component';
+import { DocumentFormComponent } from '../components/document-form/document-form.component';
 
 export const ADMIN_ROUTES: Routes = [
   {
@@ -9,10 +9,10 @@ export const ADMIN_ROUTES: Routes = [
   },
   {
     path: 'upload',
-    component: AdminUploadComponent,
+    component: DocumentFormComponent,
   },
   {
-    path: ':id',
-    component: AdminUploadComponent,
+    path: 'edit/:id',
+    component: DocumentFormComponent,
   },
 ];

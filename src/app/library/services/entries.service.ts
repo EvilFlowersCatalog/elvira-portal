@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { environment } from '../../../../environments/environment';
-import { ListEntriesResponse, EntryDetail } from '../../library.types';
+import { AppStateService } from 'src/app/common/services/app-state.service';
+import { environment } from '../../../environments/environment';
+import { ListEntriesResponse, EntryDetail } from '../types/library.types';
 
 @Injectable({
   providedIn: 'root',

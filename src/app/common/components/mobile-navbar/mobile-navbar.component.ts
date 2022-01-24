@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { State } from '../../services/app-state/app-state.types';
+import { AppStateService } from 'src/app/common/services/app-state.service';
+import { State } from '../../types/app-state.types';
 import { DisposableComponent } from '../disposable.component';
 
 @Component({

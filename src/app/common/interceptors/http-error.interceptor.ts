@@ -8,8 +8,8 @@ import {
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { LoadingService } from '../services/loading/loading.service';
-import { NotificationService } from '../services/notification/notification.service';
+import { LoadingService } from '../services/loading.service';
+import { NotificationService } from '../services/notification.service';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {

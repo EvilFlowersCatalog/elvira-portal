@@ -12,8 +12,7 @@ import { HttpErrorInterceptor } from './common/interceptors/http-error.intercept
 import { HttpRequestInterceptor } from './common/interceptors/http-request.interceptor';
 import { HttpResponseInterceptor } from './common/interceptors/http-response.interceptor';
 import { CommonLibraryModule } from './common/common.module';
-import { AppStateService } from './common/services/app-state/app-state.service';
-
+import { AppStateService } from './common/services/app-state.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -26,7 +25,7 @@ import { AppStateService } from './common/services/app-state/app-state.service';
     MaterialModule,
     BrowserAnimationsModule,
     TranslocoRootModule,
-    CommonLibraryModule
+    CommonLibraryModule,
   ],
   providers: [
     {

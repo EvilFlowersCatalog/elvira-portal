@@ -8,12 +8,12 @@ import {
 } from '@ngneat/transloco';
 import { ADMIN_ROUTES } from './routing/admin.routes';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AdminUploadComponent } from './components/admin-upload/admin-upload.component';
+import { DocumentFormComponent } from './components/document-form/document-form.component';
 import { AdminOverviewComponent } from './components/admin-overview/admin-overview.component';
 import { MaterialModule } from '../material.module';
 import { TabGroupDirective } from './directives/tab-group.directive';
 import { MatPaginatorIntl } from '@angular/material/paginator';
-import { CustomPaginationComponent } from '../common/services/custom-pagination/custom-pagination.service';
+import { CustomPaginationComponent } from '../common/services/custom-pagination.service';
 import { FeedManagementComponent } from './components/feed-management/feed-management.component';
 import { DocumentManagementComponent } from './components/document-management/document-management.component';
 import { DeleteDialogComponent } from './components/dialogs/delete-dialog/delete-dialog.component';
@@ -23,7 +23,7 @@ import { UpdateFeedDialogComponent } from './components/dialogs/update-feed-dial
 @NgModule({
   declarations: [
     AdminOverviewComponent,
-    AdminUploadComponent,
+    DocumentFormComponent,
     TabGroupDirective,
     FeedManagementComponent,
     DocumentManagementComponent,

@@ -2,7 +2,7 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { TranslocoService } from '@ngneat/transloco';
-import { NotificationService } from 'src/app/common/services/notification/notification.service';
+import { NotificationService } from 'src/app/common/services/notification.service';
 import { NewFeedDialogComponent } from '../new-feed-dialog/new-feed-dialog.component';
 
 @Component({

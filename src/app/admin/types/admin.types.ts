@@ -79,6 +79,7 @@ export interface OneEntryItem {
   updated_at: string;
   feeds: FeedsItems[];
   contributors: EntriesContributors[];
+  summary: string;
 }
 
 export interface FeedsItems {

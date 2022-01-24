@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CanLoad, Router, ActivatedRoute, UrlTree } from '@angular/router';
-import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
+import { AppStateService } from 'src/app/common/services/app-state.service';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { AdminService } from '../services/admin.service';
 import { take, map } from 'rxjs/operators';

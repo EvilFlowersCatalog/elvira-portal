@@ -7,7 +7,7 @@ import {
   HttpResponse,
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { LoadingService } from '../services/loading/loading.service';
+import { LoadingService } from '../services/loading.service';
 import { map, tap } from 'rxjs/operators';
 
 @Injectable()

@@ -7,7 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { TranslocoService } from '@ngneat/transloco';
-import { NotificationService } from 'src/app/common/services/notification/notification.service';
+import { NotificationService } from 'src/app/common/services/notification.service';
 
 @Component({
   selector: 'app-new-feed-dialog',

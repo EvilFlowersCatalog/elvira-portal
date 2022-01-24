@@ -8,7 +8,7 @@ import {
 } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, take, tap } from 'rxjs/operators';
-import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
+import { AppStateService } from 'src/app/common/services/app-state.service';
 import { AuthService } from '../../auth/services/auth.service';
 
 @Injectable({

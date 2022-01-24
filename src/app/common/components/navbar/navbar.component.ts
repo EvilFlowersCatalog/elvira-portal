@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { AppStateService } from '../../services/app-state/app-state.service';
+import { AppStateService } from '../../services/app-state.service';
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { State } from '../../services/app-state/app-state.types';
+import { State } from '../../types/app-state.types';
 import { AuthService } from 'src/app/auth/services/auth.service';
 import { DisposableComponent } from '../disposable.component';
 import { Router } from '@angular/router';

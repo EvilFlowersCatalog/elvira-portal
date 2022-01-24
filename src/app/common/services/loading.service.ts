@@ -7,7 +7,7 @@ import {
   OverlayRef,
   ScrollStrategyOptions,
 } from '@angular/cdk/overlay';
-import { LoadingComponent } from '../../components/loading.component';
+import { LoadingComponent } from '../components/loading.component';
 
 @Injectable({
   providedIn: 'root',

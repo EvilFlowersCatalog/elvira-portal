@@ -7,7 +7,7 @@ import {
   UrlTree,
 } from '@angular/router';
 import { Observable } from 'rxjs';
-import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
+import { AppStateService } from 'src/app/common/services/app-state.service';
 import { AuthService } from '../services/auth.service';
 
 @Injectable({

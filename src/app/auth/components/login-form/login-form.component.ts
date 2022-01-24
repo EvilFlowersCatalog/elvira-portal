@@ -5,8 +5,8 @@ import { TranslocoService } from '@ngneat/transloco';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { throwError } from 'rxjs';
 import { catchError, take, tap } from 'rxjs/operators';
-import { AppStateService } from 'src/app/common/services/app-state/app-state.service';
-import { NotificationService } from 'src/app/common/services/notification/notification.service';
+import { AppStateService } from 'src/app/common/services/app-state.service';
+import { NotificationService } from 'src/app/common/services/notification.service';
 import { AuthService } from '../../services/auth.service';
 import { LoginResponse } from '../../types/auth.types';
 

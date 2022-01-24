@@ -3,11 +3,11 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { Observable } from 'rxjs';
 import { concatMap, startWith, takeUntil, tap } from 'rxjs/operators';
-import { AllEntryItems } from 'src/app/admin/services/admin.types';
+import { AllEntryItems } from 'src/app/admin/types/admin.types';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { ChangeListenerService } from 'src/app/common/services/change-listener/change-listener.service';
-import { ListEntriesResponse, EntriesItem } from '../../library.types';
-import { EntriesService } from '../../services/entries/entries.service';
+import { ChangeListenerService } from 'src/app/common/services/change-listener.service';
+import { ListEntriesResponse, EntriesItem } from '../../types/library.types';
+import { EntriesService } from '../../services/entries.service';
 
 @Component({
   selector: 'app-favorites',

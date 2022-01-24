@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ErrorNotificationComponent } from '../../components/notifications/error-notification.component';
-import { InfoNotificationComponent } from '../../components/notifications/info-notification.component';
-import { SuccessNotificationComponent } from '../../components/notifications/success-notification.component';
-import { WarningNotificationComponent } from '../../components/notifications/warning-notification.component';
+import { ErrorNotificationComponent } from '../components/notifications/error-notification.component';
+import { InfoNotificationComponent } from '../components/notifications/info-notification.component';
+import { SuccessNotificationComponent } from '../components/notifications/success-notification.component';
+import { WarningNotificationComponent } from '../components/notifications/warning-notification.component';
 
 @Injectable({
   providedIn: 'root',
