@@ -1,77 +1,51 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
-import { Observable } from 'rxjs';
+import { Subject } from 'rxjs';
 import { concatMap, startWith, takeUntil, tap } from 'rxjs/operators';
-import { AllEntryItems } from 'src/app/admin/types/admin.types';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { ChangeListenerService } from 'src/app/common/services/change-listener.service';
-import { ListEntriesResponse, EntriesItem } from '../../types/library.types';
+import { EntriesItem } from '../../types/library.types';
 import { EntriesService } from '../../services/entries.service';
 
 @Component({
   selector: 'app-favorites',
   templateUrl: './favorites.component.html',
   styleUrls: ['./favorites.component.scss'],
-  providers: [ChangeListenerService],
 })
 export class FavoritesComponent extends DisposableComponent implements OnInit {
-  entriesResponse$: Observable<ListEntriesResponse>;
   entries: EntriesItem[] = [];
-  tableData: AllEntryItems[] = [];
-  dataSource: MatTableDataSource<AllEntryItems>;
   resultsLength = 0;
+  fetchEntries$ = new Subject();
 
   @ViewChild('paginator') paginator: MatPaginator;
 
-  constructor(
-    private readonly entriesService: EntriesService,
-    private readonly changeListenerService: ChangeListenerService
-  ) {
+  constructor(private readonly entriesService: EntriesService) {
     super();
   }
 
   ngOnInit(): void {
-    this.changeListenerService
-      .listenToChange()
+    this.fetchEntries$
+      .asObservable()
       .pipe(
         startWith({}),
         takeUntil(this.destroySignal$),
-        concatMap(() => this.getEntries())
+        concatMap(() =>
+          this.entriesService.listFavoriteEntries(
+            this.paginator?.pageIndex ?? 0,
+            this.paginator?.pageSize ?? 12
+          )
+        )
       )
-      .subscribe();
-  }
-
-  getEntries() {
-    return this.entriesService
-      .listFavoriteEntries(
-        this.paginator?.pageIndex ?? 0,
-        this.paginator?.pageSize ?? 12
-      )
-      .pipe(
-        tap((data) => {
-          this.entries = data.items;
-          this.tableData = data.items;
-          this.resultsLength = data.metadata.total;
-          this.dataSource = new MatTableDataSource(this.tableData);
-          this.dataSource.paginator = this.paginator;
-        })
-      );
-  }
-
-  favoritePagination() {
-    this.entriesService
-      .listFavoriteEntries(this.paginator.pageIndex, this.paginator.pageSize)
       .subscribe((data) => {
         this.entries = data.items;
-        this.tableData = data.items;
         this.resultsLength = data.metadata.total;
-        this.dataSource = new MatTableDataSource(this.tableData);
-        //this.dataSource.paginator = this.paginator;
       });
   }
 
+  favoritePagination() {
+    this.fetchEntries$.next();
+  }
+
   deleteFromFavorites() {
-    this.changeListenerService.statusChanged();
+    this.fetchEntries$.next();
   }
 }

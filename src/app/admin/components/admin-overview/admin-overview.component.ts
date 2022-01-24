@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { TranslocoService } from '@ngneat/transloco';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-admin',
@@ -6,7 +8,17 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./admin-overview.component.scss'],
 })
 export class AdminOverviewComponent implements OnInit {
-  constructor() {}
+  documentsTabLabel: string;
+  feedsTabLabel: string;
 
-  ngOnInit() {}
+  constructor(private translocoService: TranslocoService) {}
+
+  ngOnInit() {
+    this.documentsTabLabel = this.translocoService.translate(
+      'lazy.adminOverview.documentsTab'
+    );
+    this.feedsTabLabel = this.translocoService.translate(
+      'lazy.adminOverview.feedsTab'
+    );
+  }
 }

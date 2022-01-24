@@ -100,14 +100,14 @@ export class DocumentManagementComponent
         concatMap(() => this.adminService.deleteEntry(element.id)),
         tap(() => {
           const message = this.translocoService.translate(
-            'lazy.adminPage.success-delete-document'
+            'lazy.documentManagement.successMessageDeleteDocument'
           );
           this.notificationService.success(message);
         }),
         catchError((err) => {
           console.log(err);
           const message = this.translocoService.translate(
-            'lazy.adminPage.error-delete-document'
+            'lazy.documentManagement.errorMessageDeleteDocument'
           );
           this.notificationService.error(message);
           return throwError(err);

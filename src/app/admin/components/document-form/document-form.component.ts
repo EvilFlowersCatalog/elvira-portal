@@ -139,7 +139,7 @@ export class DocumentFormComponent implements OnInit {
         .pipe(
           tap(() => {
             const message = this.translocoService.translate(
-              'lazy.adminPage.success-message-edit-document'
+              'lazy.documentForm.successMessageEditDocument'
             );
             this.notificationService.success(message);
             this.router.navigate(['../../'], { relativeTo: this.route });
@@ -148,7 +148,7 @@ export class DocumentFormComponent implements OnInit {
           catchError((err) => {
             console.log(err);
             const message = this.translocoService.translate(
-              'lazy.adminPage.error-edit-document'
+              'lazy.documentForm.errorMessageEditDocument'
             );
             this.notificationService.error(message);
             return throwError(err);
@@ -172,7 +172,7 @@ export class DocumentFormComponent implements OnInit {
           .pipe(
             tap(() => {
               const message = this.translocoService.translate(
-                'lazy.adminPage.success-message-document'
+                'lazy.documentForm.successMessageUploadDocument'
               );
               this.notificationService.success(message);
               this.router.navigate(['../'], { relativeTo: this.route });
@@ -181,7 +181,7 @@ export class DocumentFormComponent implements OnInit {
             catchError((err) => {
               console.log(err);
               const message = this.translocoService.translate(
-                'lazy.adminPage.error-upload-document'
+                'lazy.documentForm.errorMessageUploadDocument'
               );
               this.notificationService.error(message);
               return throwError(err);

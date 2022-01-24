@@ -40,7 +40,7 @@
               >
                 <mat-icon>person</mat-icon>
                 <mat-card-title class="document-form-author">
-                  {{ t("lazy.adminPage.author") }}
+                  {{ t("lazy.documentForm.author") }}
                 </mat-card-title>
                 <button
                   (click)="addContributor()"
@@ -59,12 +59,12 @@
                 fxLayoutGap="20px"
               >
                 <mat-form-field fxFlex="40">
-                  <mat-label>{{ t("lazy.adminPage.author-name") }}</mat-label>
+                  <mat-label>{{ t("lazy.documentForm.authorName") }}</mat-label>
                   <input matInput formControlName="authorName" />
                 </mat-form-field>
                 <mat-form-field fxFlex="40">
                   <mat-label>
-                    {{ t("lazy.adminPage.author-surname") }}
+                    {{ t("lazy.documentForm.authorSurname") }}
                   </mat-label>
                   <input matInput formControlName="authorSurname" />
                 </mat-form-field>
@@ -87,13 +87,13 @@
                 >
                   <mat-form-field fxFlex="40">
                     <mat-label>
-                      {{ t("lazy.adminPage.contributor-name") }}
+                      {{ t("lazy.documentForm.contributorName") }}
                     </mat-label>
                     <input matInput formControlName="name" />
                   </mat-form-field>
                   <mat-form-field fxFlex="40">
                     <mat-label>
-                      {{ t("lazy.adminPage.contributor-surname") }}
+                      {{ t("lazy.documentForm.contributorSurname") }}
                     </mat-label>
                     <input matInput formControlName="surname" />
                   </mat-form-field>
@@ -111,7 +111,9 @@
 
             <!-- feeds -->
             <div>
-              <mat-card-title>{{ t("lazy.adminPage.feeds") }}</mat-card-title>
+              <mat-card-title>{{
+                t("lazy.documentForm.feeds")
+              }}</mat-card-title>
               <div
                 fxLayout="row"
                 fxLayoutAlign="start"
@@ -136,10 +138,10 @@
               <mat-expansion-panel>
                 <mat-expansion-panel-header>
                   <mat-panel-title>
-                    {{ t("lazy.adminPage.feeds-list") }}
+                    {{ t("lazy.documentForm.feedsList") }}
                   </mat-panel-title>
                   <mat-panel-description>
-                    {{ t("lazy.adminPage.feeds-expansion") }}
+                    {{ t("lazy.documentForm.feedsExpansion") }}
                   </mat-panel-description>
                 </mat-expansion-panel-header>
                 <div *ngIf="treeDataSource.data.length == 0; else feedTree">
@@ -208,7 +210,9 @@
 
             <!-- summary -->
             <div>
-              <mat-card-title>{{ t("lazy.adminPage.summary") }}</mat-card-title>
+              <mat-card-title>{{
+                t("lazy.documentForm.summary")
+              }}</mat-card-title>
               <div fxLayout="row" fxLayoutAlign="start" fxFill>
                 <mat-form-field fxFlex>
                   <textarea
@@ -216,13 +220,15 @@
                     class="document-form-summary-textfield"
                     formControlName="summary"
                   ></textarea>
-                  <mat-hint>{{ t("lazy.adminPage.summary-hint") }}</mat-hint>
+                  <mat-hint>{{ t("lazy.documentForm.summaryHint") }}</mat-hint>
                 </mat-form-field>
               </div>
             </div>
 
             <div *ngIf="!isInEditMode">
-              <mat-card-title>{{ t("lazy.adminPage.image") }}</mat-card-title>
+              <mat-card-title>{{
+                t("lazy.documentForm.image")
+              }}</mat-card-title>
               <div
                 mat-dialog-content
                 class="document-form-dropzone"
@@ -241,7 +247,7 @@
                     "
                   />
                   <h5 style="text-align: center">
-                    {{ t("lazy.adminPage.image-dropper") }}
+                    {{ t("lazy.documentForm.imageDropper") }}
                   </h5>
                   <h6><i>(MAX 1MB)</i></h6>
                 </ng-template>
@@ -251,7 +257,7 @@
                     {{ formatFileSize(imageFile?.size) }}
                   </h6>
                   <h6 *ngIf="!validSize">
-                    {{ t("lazy.adminPage.image-error") }}
+                    {{ t("lazy.documentForm.imageError") }}
                   </h6>
                   <button
                     mat-icon-button
@@ -265,9 +271,9 @@
             </div>
 
             <div *ngIf="!isInEditMode">
-              <mat-card-title>{{
-                t("lazy.adminPage.document")
-              }}</mat-card-title>
+              <mat-card-title>
+                {{ t("lazy.documentForm.document") }}
+              </mat-card-title>
               <div
                 mat-dialog-content
                 class="document-form-dropzone"
@@ -284,7 +290,7 @@
                     (change)="PDFSelectedFromBrowse(($event.target?.files)[0])"
                   />
                   <h5 style="text-align: center">
-                    {{ t("lazy.adminPage.document-dropper") }}
+                    {{ t("lazy.documentForm.documentDropper") }}
                   </h5>
                 </ng-template>
                 <ng-template [ngIf]="pdfFile">
@@ -302,10 +308,10 @@
 
             <button mat-raised-button color="primary" type="submit">
               <span *ngIf="isInEditMode">
-                {{ t("lazy.adminPage.edit") }}
+                {{ t("lazy.documentForm.edit") }}
               </span>
               <span *ngIf="!isInEditMode">
-                {{ t("lazy.adminPage.upload") }}
+                {{ t("lazy.documentForm.upload") }}
               </span>
             </button>
           </div>
@@ -321,6 +327,6 @@
     routerLink="/library/admin"
     type="button"
   >
-    {{ t("lazy.adminPage.back-to-admin-button") }}
+    {{ t("lazy.documentForm.backToAdmin") }}
   </button>
 </ng-container>
