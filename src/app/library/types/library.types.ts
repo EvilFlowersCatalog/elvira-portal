@@ -115,7 +115,7 @@ export interface FeedTreeNode {
   id: string;
   title: string;
   updated: string;
-  entry?: FeedTreeNode[];
+  children?: FeedTreeNode[];
   type: string;
 }
 
