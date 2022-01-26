@@ -29,7 +29,7 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
   filters: Filters = { search: null, author: null, feed: null };
   authorSuggestions: Author[];
   FeedTreeNode: FeedTreeNode;
-  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.entry);
+  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.children);
   dataSource = new MatTreeNestedDataSource<FeedTreeNode>();
   selectedAuthor: string;
   selectedFeed: string;

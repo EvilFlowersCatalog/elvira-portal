@@ -36,7 +36,7 @@ export class FeedManagementComponent
   implements OnInit
 {
   fetchFeeds$ = new Subject();
-  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.entry);
+  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.children);
   treeDataSource = new MatTreeNestedDataSource<FeedTreeNode>();
 
   constructor(

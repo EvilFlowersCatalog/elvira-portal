@@ -35,7 +35,7 @@ export class DocumentFormComponent implements OnInit {
   entryId: string;
   isInEditMode: boolean = false;
   treeDataSource = new MatTreeNestedDataSource<FeedTreeNode>();
-  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.entry);
+  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.children);
 
   constructor(
     private readonly adminService: AdminService,
