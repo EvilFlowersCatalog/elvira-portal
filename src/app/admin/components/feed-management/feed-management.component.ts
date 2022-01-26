@@ -59,7 +59,7 @@ export class FeedManagementComponent
         concatMap(() => this.filtersService.getFeedTreeNode())
       )
       .subscribe((data) => {
-        this.treeDataSource.data = data.entry;
+        this.treeDataSource.data = data.children;
       });
   }
 

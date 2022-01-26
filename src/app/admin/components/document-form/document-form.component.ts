@@ -65,7 +65,7 @@ export class DocumentFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.filtersService.getFeedTreeNode().subscribe((data) => {
-      this.treeDataSource.data = data.entry;
+      this.treeDataSource.data = data.children;
     });
 
     this.entryId = this.route.snapshot.paramMap.get('id');
