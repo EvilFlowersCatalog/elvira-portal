@@ -56,9 +56,7 @@ export class FeedManagementComponent
       .pipe(
         takeUntil(this.destroySignal$),
         startWith([]),
-        concatMap(() => this.filtersService.getFeedTreeNode()),
-        tap((res) => console.log('feed management', res))
-        // tap(res => {this.dataSource.data = res})
+        concatMap(() => this.filtersService.getFeedTreeNode())
       )
       .subscribe((data) => {
         this.dataSource.data = data;
