@@ -109,10 +109,18 @@ export class FeedManagementComponent
   }
 
   editFeed(feedTitle: string, feedKind: string, parentFeedName?: string) {
-    const dialogRef = this.dialog.open(UpdateFeedDialogComponent, {
-      width: '50%',
-      data: { title: feedTitle, parentName: parentFeedName, kind: feedKind },
-    });
+    console.log(
+      'feedTitle:',
+      feedTitle,
+      'feedKind:',
+      feedKind,
+      'parentFeedName:',
+      parentFeedName
+    );
+    // const dialogRef = this.dialog.open(UpdateFeedDialogComponent, {
+    //   width: '50%',
+    //   data: { title: feedTitle, parentName: parentFeedName, kind: feedKind },
+    // });
 
     // dialogRef
     // .afterClosed()
