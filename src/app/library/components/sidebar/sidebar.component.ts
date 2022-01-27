@@ -10,7 +10,9 @@ import {
   debounceTime,
   distinctUntilChanged,
   pluck,
+  take,
   takeUntil,
+  tap,
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { AppStateService } from 'src/app/common/services/app-state.service';
@@ -29,7 +31,7 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
   filters: Filters = { search: null, author: null, feed: null };
   authorSuggestions: Author[];
   FeedTreeNode: FeedTreeNode;
-  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.entry);
+  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.children);
   dataSource = new MatTreeNestedDataSource<FeedTreeNode>();
   selectedAuthor: string;
   selectedFeed: string;
@@ -46,15 +48,14 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    console.log(this.dataSource.data);
     this.searchForm = this.initSearchForm();
     this.authorForm = this.initAuthorForm();
 
     this.filtersService
       .getFeedTreeNode()
-      .pipe(takeUntil(this.destroySignal$))
+      .pipe(take(1), tap(console.log))
       .subscribe((data) => {
-        this.dataSource.data = data.entry;
+        this.dataSource.data = data;
       });
 
     this.appStateService
@@ -148,5 +149,5 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
   }
 
   isNavigationNode = (_: number, node: FeedTreeNode) =>
-    node.type === 'navigation';
+    node.kind === 'navigation';
 }

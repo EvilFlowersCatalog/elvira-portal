@@ -144,14 +144,14 @@
                     {{ t("lazy.documentForm.feedsExpansion") }}
                   </mat-panel-description>
                 </mat-expansion-panel-header>
-                <div *ngIf="treeDataSource.data.length == 0; else feedTree">
+                <div *ngIf="dataSource.data.length == 0; else feedTree">
                   <div fxFill fxLayoutAlign="center center">
                     <mat-spinner [diameter]="35"></mat-spinner>
                   </div>
                 </div>
                 <ng-template #feedTree>
                   <mat-tree
-                    [dataSource]="treeDataSource"
+                    [dataSource]="dataSource"
                     [treeControl]="treeControl"
                     class="document-form-feed-tree"
                   >

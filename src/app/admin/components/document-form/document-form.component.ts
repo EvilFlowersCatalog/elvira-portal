@@ -34,8 +34,8 @@ export class DocumentFormComponent implements OnInit {
   validSize: boolean = false;
   entryId: string;
   isInEditMode: boolean = false;
-  treeDataSource = new MatTreeNestedDataSource<FeedTreeNode>();
-  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.entry);
+  dataSource = new MatTreeNestedDataSource<FeedTreeNode>();
+  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.children);
 
   constructor(
     private readonly adminService: AdminService,
@@ -65,7 +65,7 @@ export class DocumentFormComponent implements OnInit {
 
   ngOnInit(): void {
     this.filtersService.getFeedTreeNode().subscribe((data) => {
-      this.treeDataSource.data = data.entry;
+      this.dataSource.data = data;
     });
 
     this.entryId = this.route.snapshot.paramMap.get('id');
@@ -95,7 +95,7 @@ export class DocumentFormComponent implements OnInit {
   }
 
   isNavigationNode = (_: number, node: FeedTreeNode) =>
-    node.type === 'navigation';
+    node.kind === 'navigation';
 
   addContributor(name?: string, surname?: string): void {
     this.contributors = this.uploadForm.get('contributors') as FormArray;

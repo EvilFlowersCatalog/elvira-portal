@@ -26,27 +26,6 @@ export class AdminService {
     private readonly appStateService: AppStateService
   ) {}
 
-  getAllEntries(page: number, limit: number): Observable<GetEntries> {
-    return this.httpClient.get<GetEntries>(
-      environment.baseUrl + '/apigw/entries',
-      {
-        params: { page: page + 1, limit: limit },
-      }
-    );
-  }
-
-  getAllFeeds(): Observable<GetFeeds> {
-    return this.httpClient.get<GetFeeds>(environment.baseUrl + '/apigw/feeds', {
-      params: { paginate: 'false' },
-    });
-  }
-
-  getAllFeedsPagination(page: number, limit: number): Observable<GetFeeds> {
-    return this.httpClient.get<GetFeeds>(environment.baseUrl + '/apigw/feeds', {
-      params: { page: page + 1, limit: limit },
-    });
-  }
-
   updateFeed(feedId: string, newFeed: UpdateFeeds) {
     return this.httpClient.put(
       environment.baseUrl + `/apigw/feeds/${feedId}`,

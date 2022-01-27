@@ -1,6 +1,7 @@
 import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { BYPASS_LOADING } from 'src/app/common/interceptors/http-request.interceptor';
 import { environment } from 'src/environments/environment';
 import {
@@ -38,8 +39,8 @@ export class FiltersService {
     );
   }
 
-  getFeedTreeNode(): Observable<FeedTreeNode> {
-    return this.httpClient.get<FeedTreeNode>(
+  getFeedTreeNode(): Observable<FeedTreeNode[]> {
+    return this.httpClient.get<FeedTreeNode[]>(
       environment.baseUrl + `/apigw/feed-tree`,
       {
         context: new HttpContext().set(BYPASS_LOADING, true),

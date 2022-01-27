@@ -114,9 +114,8 @@ export interface Author {
 export interface FeedTreeNode {
   id: string;
   title: string;
-  updated: string;
-  entry?: FeedTreeNode[];
-  type: string;
+  children?: FeedTreeNode[];
+  kind: string;
 }
 
 export interface Metadata {

@@ -36,8 +36,8 @@ export class FeedManagementComponent
   implements OnInit
 {
   fetchFeeds$ = new Subject();
-  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.entry);
-  treeDataSource = new MatTreeNestedDataSource<FeedTreeNode>();
+  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.children);
+  dataSource = new MatTreeNestedDataSource<FeedTreeNode>();
 
   constructor(
     private readonly filtersService: FiltersService,
@@ -56,10 +56,12 @@ export class FeedManagementComponent
       .pipe(
         takeUntil(this.destroySignal$),
         startWith([]),
-        concatMap(() => this.filtersService.getFeedTreeNode())
+        concatMap(() => this.filtersService.getFeedTreeNode()),
+        tap((res) => console.log('feed management', res))
+        // tap(res => {this.dataSource.data = res})
       )
       .subscribe((data) => {
-        this.treeDataSource.data = data.entry;
+        this.dataSource.data = data;
       });
   }
 
@@ -103,7 +105,7 @@ export class FeedManagementComponent
         })
       )
       .subscribe(() => {
-        this.treeDataSource.data = [];
+        this.dataSource.data = [];
         this.fetchFeeds$.next();
       });
   }
@@ -180,11 +182,11 @@ export class FeedManagementComponent
         })
       )
       .subscribe(() => {
-        this.treeDataSource.data = [];
+        this.dataSource.data = [];
         this.fetchFeeds$.next();
       });
   }
 
   isNavigationNode = (_: number, node: FeedTreeNode) =>
-    node.type === 'navigation';
+    node.kind === 'navigation';
 }
