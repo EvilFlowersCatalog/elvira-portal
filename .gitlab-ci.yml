@@ -12,9 +12,15 @@ build:development:
   except:
     - master
   script:
+    - echo "Installing node dependencies"
     - npm install --prod
+
+    - echo "Installing @angular/cli @angular/compiler"
     - npm install -D typescript @angular/cli @angular/compiler
+
+    - echo "Building in development environment"
     - npm run build:dev
+
   artifacts:
     paths:
       - dist
@@ -48,9 +54,15 @@ build:prod:
     - master
     - merge_requests
   script:
+    - echo "Installing node dependencies"
     - npm install --prod
+
+    - echo "Installing @angular/cli @angular/compiler"
     - npm install -D typescript @angular/cli @angular/compiler
+
+    - echo "Building in production environment"
     - npm run build:prod
+
   artifacts:
     paths:
       - dist
