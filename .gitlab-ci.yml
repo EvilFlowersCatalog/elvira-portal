@@ -18,6 +18,9 @@ build:development:
   artifacts:
     paths:
       - dist
+    expire_in: 2 hours
+
+
 
 build_image:development:
   stage: build_image
@@ -51,6 +54,7 @@ build:prod:
   artifacts:
     paths:
       - dist
+    expire_in: 2 hours
 
 build_image:prod:
   stage: build_image
