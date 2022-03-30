@@ -2,6 +2,13 @@ stages:
   - build
   - build_image
 
+
+include:
+  - project: fiit_coworking/devops/templates
+    file:
+      - 'build-local.yml' # build Angular application with 
+
+
 build:development:
   stage: build
   image: node:14
@@ -26,6 +33,8 @@ build:development:
       - dist
     expire_in: 2 hours
 
+
+  
 
 
 build_image:development:
