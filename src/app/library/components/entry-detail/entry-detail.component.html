@@ -1,0 +1,71 @@
+<ng-container *transloco="let t">
+  <mat-card class="entry-detail-card">
+    <mat-card-header (click)="openPdf(entry.id)">
+      <mat-card-title
+        matTooltip="{{ entry.title }}"
+        class="entry-detail-title"
+        >{{ entry.title }}</mat-card-title
+      >
+    </mat-card-header>
+    <mat-divider></mat-divider>
+    <div class="entry-detail-image-container" (click)="openPdf(entry.id)">
+      <div *ngIf="imageSrc === 'none'; else image">
+        <img
+          mat-card-image
+          src="../../../../assets/no_image.png"
+          class="entry-detail-image"
+        />
+      </div>
+      <ng-template #image>
+        <img mat-card-image [src]="imageSrc" class="entry-detail-image" />
+      </ng-template>
+    </div>
+    <mat-card-content (click)="openPdf(entry.id)">
+      <div>
+        <p>{{ entry.author.name + " " + entry.author.surname }}</p>
+        <p>
+          <i>{{ entry.created_at | date: "yyyy" }}</i>
+        </p>
+      </div>
+    </mat-card-content>
+    <mat-card-actions>
+      <div fxLayout="row" fxLayoutAlign="space-around">
+        <button
+          mat-icon-button
+          matTooltip="{{ t('lazy.entryDetail.info-pdf-tooltip') }}"
+          (click)="showInfo(entry.id)"
+        >
+          <mat-icon> info </mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          matTooltip="{{ t('lazy.entryDetail.add-pdf-to-drive-tooltip') }}"
+          (click)="addPdfToDrive(entry.id, entry.catalog_id)"
+        >
+          <mat-icon> add_to_drive </mat-icon>
+        </button>
+        <div
+          *ngIf="currentRoute === '/library/favorites'; else addToFavoritesBtn"
+        >
+          <button
+            color="accent"
+            mat-icon-button
+            matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
+            (click)="deleteFromFavorites(entry.id)"
+          >
+            <mat-icon> favorite </mat-icon>
+          </button>
+        </div>
+        <ng-template #addToFavoritesBtn>
+          <button
+            mat-icon-button
+            matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
+            (click)="addToFavorites(entry.id)"
+          >
+            <mat-icon> favorite </mat-icon>
+          </button>
+        </ng-template>
+      </div>
+    </mat-card-actions>
+  </mat-card>
+</ng-container>

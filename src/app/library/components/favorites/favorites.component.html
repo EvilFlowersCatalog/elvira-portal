@@ -1,0 +1,46 @@
+<ng-container *transloco="let t">
+  <div
+    class="favorite-entries-container"
+    fxLayout="row wrap"
+    fxLayout.xs="column"
+    fxLayoutGap="16px grid"
+  >
+    <ng-container *ngIf="entries.length > 0; else empty">
+      <div
+        fxFlex="20%"
+        fxFlex.xs="100%"
+        fxFlex.sm="33.3%"
+        fxFlex.md="25%"
+        *ngFor="let entry of entries"
+      >
+        <app-entry-detail
+          (onDeleteFromFavorites)="deleteFromFavorites($event)"
+          [entry]="entry"
+        ></app-entry-detail>
+      </div>
+    </ng-container>
+    <ng-template #empty>
+      <div
+        fxLayout="row"
+        fxLayoutAlign="center center"
+        class="favorites-empty-row"
+      >
+        <h1 class="favorites-empty-text">
+          {{ t("lazy.favorites.emptyFavorites") }}
+        </h1>
+      </div>
+    </ng-template>
+  </div>
+  <div fxLayoutAlign="center center">
+    <mat-paginator
+      *ngIf="entries.length > 0"
+      #paginator
+      (page)="favoritePagination()"
+      [length]="resultsLength"
+      [pageSizeOptions]="[15, 30, 50]"
+      class="favorites-paginator"
+      aria-label="Select page"
+    >
+    </mat-paginator>
+  </div>
+</ng-container>

@@ -1,0 +1,37 @@
+.app-header {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 3;
+}
+
+.app-mobile-sidenav {
+  width: 100%;
+}
+
+.app-background-light {
+  background-image: url("../assets/light_bg.png");
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.app-background-dark {
+  background-image: url("../assets/dark_bg.png");
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.app-content {
+  padding-top: 64px;
+  min-height: 100vh !important;
+}
+
+@media screen and (max-width: 599px) {
+  .app-content {
+    padding-top: 56px;
+  }
+}

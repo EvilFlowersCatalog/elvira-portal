@@ -1,0 +1,36 @@
+.feed-management-container {
+  padding: 16px;
+}
+
+.feed-management-tree-invisible {
+  display: none;
+}
+
+.feed-management-tree ul,
+.feed-management-tree li {
+  margin-top: 0;
+  margin-bottom: 0;
+  list-style-type: none;
+}
+
+.feed-management-tree .mat-nested-tree-node div[role="group"] {
+  padding-left: 15px;
+}
+
+.feed-management-tree div[role="group"] > .mat-tree-node {
+  padding-left: 10px;
+}
+
+.mat-tree-navigation-node {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.feed-management-button {
+  opacity: 0.3;
+}
+
+.feed-management-button:hover,
+.feed-management-button:active {
+  opacity: 1;
+}

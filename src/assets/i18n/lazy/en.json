@@ -1,0 +1,119 @@
+{
+  "documentForm": {
+    "headerNew": "Document upload",
+    "headerEdit": "Document edit",
+    "titleLabel": "Document title",
+    "author": "Author",
+    "authorName": "Author's name",
+    "authorSurname": "Author's surname",
+    "contributorName": "Co-author's name",
+    "contributorSurname": "Co-author's surname",
+    "feeds": "Feeds",
+    "feedsList": "List of feeds",
+    "feedsExpansion": "Click to open feeds",
+    "summary": "Summary",
+    "summaryHint": "Short summary about the document",
+    "image": "Image",
+    "imageDropper": "Drag your image here or click here to browse",
+    "imageError": "The image is too big.",
+    "document": "PDF File",
+    "documentDropper": "Drag your PDF here or click here to browse",
+    "edit": "Edit",
+    "upload": "Upload",
+    "backToAdmin": "Back to admin",
+    "successMessageEditDocument": "Document edited successfully",
+    "errorMessageEditDocument": "Edit failed",
+    "successMessageUploadDocument": "Document uploaded successfully",
+    "errorMessageUploadDocument": "Upload failed"
+  },
+  "documentManagement": {
+    "successMessageDeleteDocument": "Successfully deleted document",
+    "errorMessageDeleteDocument": "Delete failed",
+    "search": "Search",
+    "document": "New document",
+    "title": "Title",
+    "name": "Name",
+    "surname": "Surname",
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "adminOverview": {
+    "documentsTab": "Documents",
+    "feedsTab": "Feeds"
+  },
+  "entryDetail": {
+    "info-pdf-tooltip": "Show info",
+    "add-pdf-to-drive-tooltip": "Upload PDF to Google Drive",
+    "favorite-pdf-tooltip": "Add to favorite list",
+    "drive-success-message": "Successfully uploaded to drive",
+    "drive-error-message": "Upload to drive failed",
+    "drive-unauthorized-message": "Sign in to your Google account in <a href='/library/account'>Elvíra's account settings</a> first",
+    "addToFavoritesSuccessMessage": "Item was successfully added to favorites",
+    "addToFavoritesErrorMessage": "Failed to add item to favorites",
+    "removeFromFavoritesSuccessMessage": "Item was removed from favorites",
+    "removeFromFavoritesErrorMessage": "Item couldn't be removed from favorites"
+  },
+  "entryInfoDialog": {
+    "author": "Author:",
+    "summary": "Summary:",
+    "feeds": "Feeds:",
+    "language": "Language:",
+    "createdAt": "Created at:",
+    "close": "Close"
+  },
+  "adminDialog": {
+    "agree-button": "Yes, I am sure!",
+    "update-feed": "Update ({{feed}}) feed to a new feed",
+    "cancel": "Cancel"
+  },
+  "deleteDialog": {
+    "title": "Are you sure you want to delete '{{title}}'?",
+    "agreeButton": "Yes, I am sure!",
+    "disagreeButton": "No, thanks!"
+  },
+  "accountSettings": {
+    "title": "Account settings",
+    "nick": "Nick",
+    "email": "University email",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "googleAuth": "Google authorization",
+    "unlinkSuccessMessage": "This application has been unlinked from your Google account",
+    "unlinkErrorMessage": "Unlink process failed, please try again",
+    "authSuccessMessage": "Authorization successful",
+    "authErrorMessage": "Authorization failed, please try again"
+  },
+  "paginator": {
+    "items-per-page": "Items per page",
+    "next-page": "Next page",
+    "previous-page": "Previous page"
+  },
+  "favorites": {
+    "emptyFavorites": "There is no item in this list"
+  },
+  "sidebar": {
+    "search": "Search",
+    "cancelFilters": "Cancel filters",
+    "author": "Author",
+    "subjects": "Subjects:"
+  },
+  "newFeedDialog": {
+    "requiredFieldEmptyMessage": "Some of required fields are empty",
+    "title": "Create new feed",
+    "feedTitle": "Title",
+    "feedKind": "Kind",
+    "navigationFeed": "Navigation feed (contains additional feeds)",
+    "acquisitionFeed": "Acquisition feed (contains publications)",
+    "parentFeed": "Parent feed",
+    "create": "Create",
+    "cancel": "Cancel"
+  },
+  "feedManagement": {
+    "feedPostSuccess": "Feed has been created successfully",
+    "feedPostError": "Feed creation failed",
+    "feedPutSuccess": "Feed has been updated successfully",
+    "feedPutError": "Feed update failed",
+    "feedDeleteSuccess": "Feed has been deleted successfully",
+    "feedDeleteError": "Feed deletion failed"
+  }
+}

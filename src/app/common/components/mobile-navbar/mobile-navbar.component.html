@@ -1,0 +1,16 @@
+<ng-container *ngIf="appState$ | async as appState">
+  <mat-toolbar color="primary">
+    <button mat-flat-button (click)="navigate('/library/home')" color="primary">
+      <img
+        src="../../../../assets/logos/title_logo.png"
+        class="mobile-navbar-logo"
+      />
+    </button>
+    <span class="navbar-spacer"></span>
+    <button mat-icon-button (click)="toggleSidenav()">
+      <mat-icon [ngClass]="{ animate: animate }">
+        {{ appState.sidenav ? "close" : "menu" }}
+      </mat-icon>
+    </button>
+  </mat-toolbar>
+</ng-container>

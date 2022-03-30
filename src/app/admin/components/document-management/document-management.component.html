@@ -1,0 +1,105 @@
+<ng-container *transloco="let t">
+  <div fxLayout="row" fxLayoutAlign="space-around center" class="header-box">
+    <!-- Searchbar -->
+    <form
+      [formGroup]="searchForm"
+      (submit)="applyFilter()"
+      class="document-form"
+    >
+      <div fxLayout="row">
+        <mat-form-field color="accent" class="document-form-field">
+          <mat-label>
+            {{ t("lazy.sidebar.search") }}
+          </mat-label>
+          <input
+            matInput
+            formControlName="searchInput"
+            type="text"
+            placeholder="Search"
+          />
+        </mat-form-field>
+        <button mat-icon-button type="submit" color="accent">
+          <mat-icon>search</mat-icon>
+        </button>
+      </div>
+    </form>
+    <!-- New documnet button -->
+    <button
+      (click)="newDocument()"
+      mat-raised-button
+      color="primary"
+      style="margin-right: 30px"
+    >
+      {{ t("lazy.documentManagement.document") }}
+    </button>
+  </div>
+
+  <div fxLayout="column" fxLayoutAlign="center center" class="full-box">
+    <mat-table [dataSource]="dataSource" class="main-table">
+      <!-- Title Column -->
+      <ng-container matColumnDef="title">
+        <mat-header-cell *matHeaderCellDef>
+          {{ t("lazy.documentManagement.title") }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">{{ element.title }}</mat-cell>
+      </ng-container>
+
+      <!-- Atuhor name Column -->
+      <ng-container matColumnDef="name">
+        <mat-header-cell *matHeaderCellDef>
+          {{ t("lazy.documentManagement.name") }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          {{ element.author.name }}
+        </mat-cell>
+      </ng-container>
+
+      <!-- Author surname Column -->
+      <ng-container matColumnDef="surname">
+        <mat-header-cell *matHeaderCellDef>
+          {{ t("lazy.documentManagement.surname") }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          {{ element.author.surname }}
+        </mat-cell>
+      </ng-container>
+
+      <!-- Edit Column -->
+      <ng-container matColumnDef="edit">
+        <mat-header-cell *matHeaderCellDef>
+          {{ t("lazy.documentManagement.edit") }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <button mat-icon-button>
+            <mat-icon (click)="editDocument(element)">edit</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+
+      <!-- Delete Column -->
+      <ng-container matColumnDef="delete">
+        <mat-header-cell *matHeaderCellDef>
+          {{ t("lazy.documentManagement.delete") }}
+        </mat-header-cell>
+        <mat-cell *matCellDef="let element">
+          <button mat-icon-button>
+            <mat-icon (click)="deleteDocument(element)">delete</mat-icon>
+          </button>
+        </mat-cell>
+      </ng-container>
+
+      <!-- Event listener -->
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
+    </mat-table>
+    <!-- Paginator -->
+    <mat-paginator
+      (page)="documentPagination()"
+      #paginator
+      [length]="resultsLength"
+      [pageSizeOptions]="[5, 10, 20]"
+      class="paginator-size"
+    >
+    </mat-paginator>
+  </div>
+</ng-container>

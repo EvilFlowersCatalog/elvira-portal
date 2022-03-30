@@ -1,0 +1,16 @@
+:host {
+  .material-icons {
+    transition: all 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    &.animate {
+      transform: rotate(180deg);
+    }
+  }
+}
+
+.navbar-spacer {
+  flex: 1 1 auto;
+}
+
+.mobile-navbar-logo {
+  max-height: 20px;
+}

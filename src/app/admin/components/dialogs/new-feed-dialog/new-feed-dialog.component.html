@@ -1,0 +1,39 @@
+<ng-container *transloco="let t">
+  <h1 mat-dialog-title fxLayoutAlign="center center">
+    {{ t("lazy.newFeedDialog.title") }}
+  </h1>
+  <mat-dialog-content [formGroup]="newFeedForm">
+    <mat-form-field appearance="fill" fxFill>
+      <mat-label>{{ t("lazy.newFeedDialog.feedTitle") }} *</mat-label>
+      <input matInput formControlName="feedTitle" />
+    </mat-form-field>
+    <mat-form-field appearance="fill" fxFill>
+      <mat-label>{{ t("lazy.newFeedDialog.feedKind") }} *</mat-label>
+      <mat-select formControlName="feedKind">
+        <mat-option value="navigation">
+          {{ t("lazy.newFeedDialog.navigationFeed") }}
+        </mat-option>
+        <mat-option value="acquisition">
+          {{ t("lazy.newFeedDialog.acquisitionFeed") }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+    <mat-form-field class="example-full-width" appearance="fill" fxFill>
+      <mat-label>{{ t("lazy.newFeedDialog.parentFeed") }}</mat-label>
+      <input matInput formControlName="feedsParentName" disabled />
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions fxLayout="row" fxLayoutAlign="space-evenly center">
+    <button mat-flat-button (click)="onNoClick()">
+      {{ t("lazy.newFeedDialog.cancel") }}
+    </button>
+    <button
+      mat-flat-button
+      (click)="onYesClick()"
+      color="primary"
+      cdkFocusInitial
+    >
+      {{ t("lazy.newFeedDialog.create") }}
+    </button>
+  </mat-dialog-actions>
+</ng-container>

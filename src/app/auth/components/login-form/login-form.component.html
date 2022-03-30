@@ -1,0 +1,47 @@
+<ng-container *transloco="let t">
+  <form
+    [formGroup]="loginForm"
+    (submit)="submit()"
+    fxLayoutAlign="stretch"
+    fxLayout="column"
+  >
+    <mat-form-field color="accent">
+      <mat-label>{{ t("loginForm.login") }}</mat-label>
+      <input
+        matInput
+        formControlName="username"
+        style="padding: 0 0.75em 0 0.75em"
+        required
+        class="login-form-input"
+      />
+    </mat-form-field>
+    <mat-form-field color="accent">
+      <mat-label>{{ t("loginForm.password") }}</mat-label>
+      <input
+        matInput
+        formControlName="password"
+        type="password"
+        style="padding: 0 0.75em 0 0.75em"
+        required
+        [type]="hidePassword ? 'password' : 'text'"
+        class="login-form-input"
+      />
+      <mat-icon
+        matSuffix
+        (click)="hidePassword = !hidePassword"
+        class="login-form-password-icon"
+        >{{ hidePassword ? "visibility" : "visibility_off" }}</mat-icon
+      >
+    </mat-form-field>
+    <div fxLayout="row" fxLayoutAlign="center">
+      <button
+        mat-stroked-button
+        color="accent"
+        class="login-form-button"
+        type="submit"
+      >
+        {{ t("loginForm.loginButton") }}
+      </button>
+    </div>
+  </form>
+</ng-container>

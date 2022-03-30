@@ -1,0 +1,56 @@
+.account-settings-container {
+  padding: 16px 0;
+}
+
+.account-settings-form {
+  padding: 0 20px;
+}
+
+.account-settings-title {
+  color: #00bcd4;
+  font-weight: 300;
+  text-align: center;
+}
+
+.account-settings-icon {
+  font-size: 40px;
+  margin-bottom: 22px;
+  margin-right: 20px;
+  color: #00bcd4;
+}
+
+.account-settings-label {
+  color: #fcc012;
+  font-weight: bold;
+}
+
+.account-settings-google-icon {
+  margin-top: -4px;
+}
+
+.account-settings-toggle-label {
+  color: #fcc012;
+  letter-spacing: 1.5px;
+  font-size: 13px;
+  font-weight: bold;
+  font-family: Raleway;
+  padding-left: 12px;
+}
+
+.account-settings-toggle {
+  padding-left: 40px;
+}
+
+@media screen and (max-width: 599px) {
+  .account-settings-container {
+    padding: 16px;
+  }
+
+  .account-settings-form {
+    padding: 0;
+  }
+
+  .account-settings-toggle {
+    padding-left: 10px;
+  }
+}

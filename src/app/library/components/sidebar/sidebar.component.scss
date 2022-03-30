@@ -1,0 +1,53 @@
+.sidebar-container {
+  padding: 15px;
+}
+
+.sidebar-input {
+  width: 100%;
+}
+
+.sidebar-search-button {
+  align-self: center;
+}
+
+.sidebar-spacer {
+  padding-top: 15px;
+}
+
+.sidebar-filter-title {
+  padding: 15px 0 10px 0;
+  font-weight: 300;
+  color: #ffc107;
+}
+
+.sidebar-active-feed-btn {
+  color: #ffc107;
+}
+
+.sidebar-tree {
+  margin-left: -15px;
+}
+
+.sidebar-tree-invisible {
+  display: none;
+}
+
+.sidebar-tree ul,
+.sidebar-tree li {
+  margin-top: 0;
+  margin-bottom: 0;
+  list-style-type: none;
+}
+
+.sidebar-tree .mat-nested-tree-node div[role="group"] {
+  padding-left: 12px;
+}
+
+.sidebar-tree div[role="group"] > .mat-tree-node {
+  padding-left: 10px;
+}
+
+.sidebar-tree-navigation-node {
+  font-size: 15px;
+  font-weight: 500;
+}

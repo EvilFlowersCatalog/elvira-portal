@@ -1,0 +1,119 @@
+{
+  "documentForm": {
+    "headerNew": "Nový dokument",
+    "headerEdit": "Úprava dokumentu",
+    "titleLabel": "Názov dokumentu",
+    "author": "Autor",
+    "authorName": "Meno autora",
+    "authorSurname": "Priezvisko autora",
+    "contributorName": "Meno spoluautora",
+    "contributorSurname": "Priezvisko spoluautora",
+    "feeds": "Feedy",
+    "feedsList": "Zoznam feedov",
+    "feedsExpansion": "Kliknutím otvoríte feedy",
+    "summary": "Zhrnutie",
+    "summaryHint": "Krátke zhrnutie dokumentu",
+    "image": "Obrázok",
+    "imageDropper": "Presuňte obrázok sem alebo kliknite sem a prehľadávajte",
+    "imageError": "Obrázok je príliš veľký.",
+    "document": "Súbor PDF",
+    "documentDropper": "Presuňte svoj PDF sem alebo kliknite sem a prehľadávajte",
+    "edit": "Upraviť",
+    "upload": "Nahrať",
+    "backToAdmin": "Späť na admin",
+    "successMessageEditDocument": "Dokument bol úspešne upravený",
+    "errorMessageEditDocument": "Úprava zlyhala",
+    "successMessageUploadDocument": "Dokument bol úspešne nahraný",
+    "errorMessageUploadDocument": "Nahrávanie zlyhalo"
+  },
+  "documentManagement": {
+    "successMessageDeleteDocument": "Dokument bol úspešne odstránený",
+    "errorMessageDeleteDocument": "Odstránenie zlyhalo",
+    "search": "Vyhľadávanie",
+    "document": "Nový dokument",
+    "title": "Názov",
+    "name": "Meno",
+    "surname": "Priezvisko",
+    "edit": "Upraviť",
+    "delete": "Vymazať"
+  },
+  "adminOverview": {
+    "documentsTab": "Dokumenty",
+    "feedsTab": "Feedy"
+  },
+  "entryDetail": {
+    "info-pdf-tooltip": "Zobraziť informácie",
+    "add-pdf-to-drive-tooltip": "Pridať PDF na Google Disk",
+    "favorite-pdf-tooltip": "Pridať do obľúbených",
+    "drive-success-message": "Úspešne nahrané na disk",
+    "drive-error-message": "Nahrávanie na disk zlyhalo",
+    "drive-unauthorized-message": "Prihláste sa najskôr do svojho účtu Google v <a href='/library/account'>nastaveniach účtu Elvíry</a>",
+    "addToFavoritesSuccessMessage": "Položka bola pridaná do obľúbených",
+    "addToFavoritesErrorMessage": "Pridanie položky do obľúbených zlyhalo",
+    "removeFromFavoritesSuccessMessage": "Položka bola odstránená z obľúbených",
+    "removeFromFavoritesErrorMessage": "Položku sa nepodarilo odstrániť z obľúbených"
+  },
+  "entryInfoDialog": {
+    "author": "Autor:",
+    "summary": "Zhrnutie:",
+    "feeds": "Feedy:",
+    "language": "Jazyk:",
+    "createdAt": "Pridané:",
+    "close": "Zatvoriť"
+  },
+  "adminDialog": {
+    "agree-button": "Áno, som si istý!",
+    "update-feed": "Aktualizujte Feed ({{feed}}) na nový Feed",
+    "cancel": "Zrušiť"
+  },
+  "deleteDialog": {
+    "title": "Ste si istí, že chcete odstrániť '{{title}}'?",
+    "agreeButton": "Áno, som si istý!",
+    "disagreeButton": "Nie, ďakujem!"
+  },
+  "accountSettings": {
+    "title": "Nastavenia účtu",
+    "nick": "Nick",
+    "email": "Univerzitný email",
+    "firstName": "Meno",
+    "lastName": "Priezvisko",
+    "googleAuth": "Google autorizácia",
+    "unlinkSuccessMessage": "Aplikácia bola odstránená z vášho Google účtu",
+    "unlinkErrorMessage": "Proces odstránenia aplikácie z vášho Google účtu zlyhal, prosím skúste to znova",
+    "authSuccessMessage": "Autorizácia prebehla úspešne",
+    "authErrorMessage": "Autorizácia zlyhala, prosím skúste to znova"
+  },
+  "paginator": {
+    "items-per-page": "Položky na stránku",
+    "next-page": "Ďalšia stránka",
+    "previous-page": "Predchádzajúca stránka"
+  },
+  "favorites": {
+    "emptyFavorites": "V tomto zozname sa nenachádza žiadna položka"
+  },
+  "sidebar": {
+    "search": "Hľadať",
+    "cancelFilters": "Zrušiť filtre",
+    "author": "Autor",
+    "subjects": "Predmety:"
+  },
+  "newFeedDialog": {
+    "requiredFieldEmptyMessage": "Niektoré z povinných polí sú prázdne",
+    "title": "Vytvoriť nový feed",
+    "feedTitle": "Názov",
+    "feedKind": "Druh",
+    "navigationFeed": "Navigačný feed (obsahuje ďalšie feedy)",
+    "acquisitionFeed": "Akvizičný feed (obsahuje publikácie)",
+    "parentFeed": "Rodičovský feed",
+    "create": "Vytvoriť",
+    "cancel": "Zrušiť"
+  },
+  "feedManagement": {
+    "feedPostSuccess": "Feed bol úspešne vytvorený",
+    "feedPostError": "Vytvorenie feedu zlyhalo",
+    "feedPutSuccess": "Feed bol úspešne aktualizovaný",
+    "feedPutError": "Aktualizovanie feedu zlyhalo",
+    "feedDeleteSuccess": "Feed bol úspešne odstránený",
+    "feedDeleteError": "Zmazanie feedu zlyhalo"
+  }
+}

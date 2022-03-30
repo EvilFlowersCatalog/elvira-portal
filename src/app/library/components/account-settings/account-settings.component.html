@@ -1,0 +1,64 @@
+<ng-container *transloco="let t">
+  <ng-container *ngIf="appState$ | async as appState">
+    <div
+      fxLayout="row"
+      fxLayoutAlign="center"
+      class="account-settings-container"
+    >
+      <div fxLayout="column" fxFlex="40" fxFlex.lt-md="60" fxFlex.lt-sm="100">
+        <mat-card>
+          <div fxLayout="column" class="account-settings-form">
+            <div fxLayout="row" fxLayoutAlign="center center">
+              <mat-icon class="account-settings-icon">person_outline</mat-icon>
+              <h1 class="account-settings-title">
+                {{ t("lazy.accountSettings.title") }}
+              </h1>
+            </div>
+            <hr />
+            <mat-form-field appearance="fill">
+              <mat-label class="account-settings-label">Nick</mat-label>
+              <input matInput disabled value="{{ userData.login }}" />
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label class="account-settings-label">AIS id</mat-label>
+              <input matInput disabled value="{{ userData.aisId }}" />
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label class="account-settings-label">
+                {{ t("lazy.accountSettings.email") }}
+              </mat-label>
+              <input matInput disabled value="{{ userData.email }}" />
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label class="account-settings-label">
+                {{ t("lazy.accountSettings.firstName") }}
+              </mat-label>
+              <input matInput disabled value="{{ userData.firstName }}" />
+            </mat-form-field>
+            <mat-form-field appearance="fill">
+              <mat-label class="account-settings-label">
+                {{ t("lazy.accountSettings.lastName") }}
+              </mat-label>
+              <input matInput disabled value="{{ userData.lastName }}" />
+            </mat-form-field>
+            <div fxLayout="row">
+              <mat-icon
+                svgIcon="google"
+                class="account-settings-google-icon"
+              ></mat-icon>
+              <mat-label class="account-settings-toggle-label">
+                {{ t("lazy.accountSettings.googleAuth") }}
+              </mat-label>
+              <mat-slide-toggle
+                color="primary"
+                class="account-settings-toggle"
+                [checked]="appState.googleAuthed"
+                (change)="handleToggle($event)"
+              ></mat-slide-toggle>
+            </div>
+          </div>
+        </mat-card>
+      </div>
+    </div>
+  </ng-container>
+</ng-container>

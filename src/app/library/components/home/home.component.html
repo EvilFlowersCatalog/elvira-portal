@@ -1,0 +1,38 @@
+<mat-sidenav-container class="sidenav-container">
+  <mat-sidenav
+    mode="over"
+    [opened]="sidebarState$ | async"
+    [autoFocus]="false"
+    (closedStart)="hideSidebar()"
+  >
+    <app-sidebar></app-sidebar>
+  </mat-sidenav>
+  <mat-sidenav-content>
+    <div
+      class="entries-list-container"
+      fxLayout="row wrap"
+      fxLayout.xs="column"
+      fxLayoutGap="16px grid"
+    >
+      <div
+        fxFlex="20%"
+        fxFlex.xs="100%"
+        fxFlex.sm="33.3%"
+        fxFlex.md="25%"
+        *ngFor="let entry of entries"
+      >
+        <app-entry-detail [entry]="entry"></app-entry-detail>
+      </div>
+    </div>
+    <div fxLayoutAlign="center center">
+      <mat-paginator
+        (page)="handlePageChange()"
+        #paginator
+        [length]="resultsLength"
+        [pageSizeOptions]="[15, 30, 50]"
+        class="home-paginator"
+      >
+      </mat-paginator>
+    </div>
+  </mat-sidenav-content>
+</mat-sidenav-container>
