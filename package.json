@@ -7,6 +7,7 @@
     "build": "ng build",
     "build:dev": "ng build -c development",
     "build:prod": "ng build -c production",
+    "build:local": "ng build -c local",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
