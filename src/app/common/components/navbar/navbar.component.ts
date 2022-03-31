@@ -16,6 +16,7 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   appState$: Observable<State>;
   animateSidebarToggle: boolean = false;
   animateSettings: boolean = false;
+  public href: string = "";
 
   constructor(
     private readonly router: Router,
@@ -23,12 +24,17 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
     private readonly authService: AuthService
   ) {
     super();
+    this.router.events.subscribe(() => {
+      this.href = window.location.pathname;
+  });
   }
 
   ngOnInit(): void {
     this.appState$ = this.appStateService
       .getState$()
       .pipe(takeUntil(this.destroySignal$));
+
+      this.href = window.location.pathname;
   }
 
   navigate(link: string) {
