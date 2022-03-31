@@ -21,6 +21,14 @@
       <span class="navbar-spacer"></span>
       <button
         mat-flat-button
+        (click)="navigate('/library/home')"
+        color="primary"
+      >
+      <mat-icon class="navbar-icon">home</mat-icon>
+      {{ t("home") }}
+      </button>
+      <button
+        mat-flat-button
         *ngIf="appState.isAdmin"
         (click)="navigate('/library/admin')"
         color="primary"

@@ -23,6 +23,7 @@
     "log-out": "Log out",
     "settings": "Settings",
     "favorites": "Favorites",
-    "login": "Login"
+    "login": "Login",
+    "home": "Home"
   }
 }
