@@ -32,8 +32,7 @@
     "search": "Vyhľadávanie",
     "document": "Nový dokument",
     "title": "Názov",
-    "name": "Meno",
-    "surname": "Priezvisko",
+    "author": "Autor",
     "edit": "Upraviť",
     "delete": "Vymazať"
   },

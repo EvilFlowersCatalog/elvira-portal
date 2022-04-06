@@ -38,6 +38,8 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
   appState$: Observable<State>;
   @ViewChild('authorInputNative')
   authorInputNative: ElementRef<HTMLInputElement>;
+  authorSearch: { id: string, name: string };
+  querySearch: string;
 
   constructor(
     private readonly filtersService: FiltersService,
@@ -106,12 +108,13 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
   // local fitlers setters
   cancelFilters() {
     this.filters = { search: null, author: null, feed: null };
+    this.querySearch = null;
+    this.authorSearch = null;
     this.applyFilters();
   }
 
-  patchFilters(newData) {
-    const clearFilters = { search: null, author: null, feed: null };
-    const newFilter = { ...clearFilters, ...newData };
+  patchFilters(queryData, authorData) {
+    const newFilter = { search: queryData, author: authorData, feed: null };
     this.filters = newFilter;
   }
 
@@ -126,17 +129,19 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
 
   // filter functions
   search() {
-    this.patchFilters({ search: this.searchForm.value.searchInput });
+    this.patchFilters(this.searchForm.value.searchInput, this.authorSearch);
+    this.querySearch = this.searchForm.value.searchInput;
     this.applyFilters();
   }
 
   filterByAuthor(id: string, name: string) {
-    this.patchFilters({ author: { id: id, name: name } });
+    this.patchFilters(this.querySearch, { id: id, name: name });
+    this.authorSearch = { id: id, name: name };
     this.applyFilters();
   }
 
   filterByFeed(feed: string) {
-    this.patchFilters({ feed: feed });
+    //this.patchFilters({ feed: feed });
     this.applyFilters();
   }
 

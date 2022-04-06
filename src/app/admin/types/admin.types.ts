@@ -37,11 +37,7 @@ export interface AllEntryItems {
   id: string;
   creator_id: string;
   catalog_id: string;
-  author: {
-    id: string;
-    name: string;
-    surname: string;
-  };
+  author: string;
   category: {
     id: string;
     term: string;
