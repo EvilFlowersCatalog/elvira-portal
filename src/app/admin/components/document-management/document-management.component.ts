@@ -30,7 +30,7 @@ export class DocumentManagementComponent
   extends DisposableComponent
   implements AfterViewInit
 {
-  displayedColumns: string[] = ['title', 'name', 'surname', 'edit', 'delete'];
+  displayedColumns: string[] = ['title', 'author', 'edit', 'delete'];
   resultsLength = 0;
   tableData: AllEntryItems[] = [];
   dataSource: MatTableDataSource<AllEntryItems>;

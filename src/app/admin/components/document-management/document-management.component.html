@@ -45,22 +45,12 @@
       </ng-container>
 
       <!-- Atuhor name Column -->
-      <ng-container matColumnDef="name">
+      <ng-container matColumnDef="author">
         <mat-header-cell *matHeaderCellDef>
-          {{ t("lazy.documentManagement.name") }}
+          {{ t("lazy.documentManagement.author") }}
         </mat-header-cell>
         <mat-cell *matCellDef="let element">
-          {{ element.author.name }}
-        </mat-cell>
-      </ng-container>
-
-      <!-- Author surname Column -->
-      <ng-container matColumnDef="surname">
-        <mat-header-cell *matHeaderCellDef>
-          {{ t("lazy.documentManagement.surname") }}
-        </mat-header-cell>
-        <mat-cell *matCellDef="let element">
-          {{ element.author.surname }}
+          {{ element.author }}
         </mat-cell>
       </ng-container>
 

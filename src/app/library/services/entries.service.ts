@@ -28,7 +28,15 @@ export class EntriesService {
           params: { page: page + 1, limit: limit },
         }
       );
-    } else if (query) {
+    } else if (authorId && query) {
+      console.log()
+      return this.httpClient.get<ListEntriesResponse>(
+        environment.baseUrl + '/apigw/entries',
+        {
+          params: { page: page + 1, limit: limit, title: query, author_id: authorId },
+        }
+      );
+    }else if (query) {
       return this.httpClient.get<ListEntriesResponse>(
         environment.baseUrl + '/apigw/entries',
         {
