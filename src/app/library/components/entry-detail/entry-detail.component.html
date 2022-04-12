@@ -22,7 +22,7 @@
     </div>
     <mat-card-content (click)="openPdf(entry.id)">
       <div>
-        <p>{{ entry.author.name + " " + entry.author.surname }}</p>
+        <p>{{ entry.author }}</p>
         <p>
           <i>{{ entry.created_at | date: "yyyy" }}</i>
         </p>

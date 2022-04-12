@@ -5,7 +5,7 @@ export interface ListEntriesResponse {
 
 export interface EntriesItem {
   id: string;
-  author: EntryAuthor;
+  author: string;
   language: EntryLanguage;
   title: string;
   created_at: string;

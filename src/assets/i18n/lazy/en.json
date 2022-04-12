@@ -32,8 +32,7 @@
     "search": "Search",
     "document": "New document",
     "title": "Title",
-    "name": "Name",
-    "surname": "Surname",
+    "author": "Author",
     "edit": "Edit",
     "delete": "Delete"
   },

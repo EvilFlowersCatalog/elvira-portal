@@ -18,6 +18,15 @@
           class="navbar-logo"
         />
       </button>
+      <button
+        mat-flat-button
+        *ngIf="appState.isLoggedIn && href != '/library/home'"
+        (click)="navigate('/library/home')"
+        color="primary"
+      >
+      <mat-icon class="navbar-icon">arrow_back</mat-icon>
+      {{ t("home") }}
+      </button>
       <span class="navbar-spacer"></span>
       <button
         mat-flat-button

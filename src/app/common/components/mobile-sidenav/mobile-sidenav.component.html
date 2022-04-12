@@ -1,6 +1,14 @@
 <ng-container *transloco="let t; read: 'navbar'">
   <ng-container *ngIf="appState$ | async as appState">
     <div class="mobile-sidenav-container">
+      <button
+        mat-flat-button
+        (click)="navigate('/library/home')"
+        class="mobile-sidenav-home-button"
+      >
+      <mat-icon class="navbar-icon">home</mat-icon>
+      {{ t("home") }}
+      </button>
       <mat-accordion>
         <mat-expansion-panel hideToggle *ngIf="appState.showSidebarToggle">
           <mat-expansion-panel-header>
