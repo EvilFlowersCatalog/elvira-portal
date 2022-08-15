@@ -1,94 +1,37 @@
-stages:
+image: node:14.17.0
+
+stages:            # List of stages for jobs, and their order of execution
+  - setup
   - build
-  - build_image
+  - cleanup
 
-
-include:
-  - project: fiit_coworking/devops/templates
-    file:
-      - 'build-local.yml' # build Angular application with 
-
-
-build:development:
-  stage: build
-  image: node:14
-  tags:
-    - docker
-  only:
-    - dev
-  except:
-    - master
+.pre:
+  stage: setup,
   script:
-    - echo "Installing node dependencies"
-    - npm install --prod
+    - mkdir -p dist
+    - npm install -g @angular/cli@12.2.16
+    - npm install  # or `npm install` or whatever you use to install deps
+    - npm start
+    - npm --version
+  cache:
+    paths:
+      - node_modules
+    policy: pull
 
-    - echo "Installing @angular/cli @angular/compiler"
-    - npm install -D typescript @angular/cli @angular/compiler
-
-    - echo "Building in development environment"
-    - npm run build:dev
-
+build-job:
+  stage: build
+  script:          # ... your other build steps here
+    - npm run build_def_mysetup
+    - ls /builds
+  cache:
+    paths:
+      - node_modules
+    policy: pull
   artifacts:
     paths:
-      - dist
-    expire_in: 2 hours
+      - dist/
 
-
-  
-
-
-build_image:development:
-  stage: build_image
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
-  tags:
-    - docker
-    - build_docker
-  only:
-    - dev
-  dependencies:
-    - build:development
+.post:
+  stage: cleanup
   script:
-    - mkdir -p /kaniko/.docker
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:dev
-
-build:prod:
-  stage: build
-  image: node:14
-  tags:
-    - docker
-  only:
-    - master
-    - merge_requests
-  script:
-    - echo "Installing node dependencies"
-    - npm install --prod
-
-    - echo "Installing @angular/cli @angular/compiler"
-    - npm install -D typescript @angular/cli @angular/compiler
-
-    - echo "Building in production environment"
-    - npm run build:prod
-
-  artifacts:
-    paths:
-      - dist
-    expire_in: 2 hours
-
-build_image:prod:
-  stage: build_image
-  image:
-    name: gcr.io/kaniko-project/executor:debug
-    entrypoint: [""]
-  tags:
-    - docker
-  only:
-    - master
-  dependencies:
-    - build:prod
-  script:
-    - mkdir -p /kaniko/.docker
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"}}}" > /kaniko/.docker/config.json
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/Dockerfile --destination $CI_REGISTRY_IMAGE:prod
+    - echo "cleanup called"
