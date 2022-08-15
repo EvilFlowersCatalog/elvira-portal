@@ -7,6 +7,8 @@ stages:            # List of stages for jobs, and their order of execution
 
 .pre:
   stage: setup,
+  tags: 
+    - docker
   script:
     - mkdir -p dist
     - npm install -g @angular/cli@12.2.16
@@ -20,6 +22,8 @@ stages:            # List of stages for jobs, and their order of execution
 
 build-job:
   stage: build
+  tags: 
+  - docker
   script:          # ... your other build steps here
     - npm run build_def_mysetup
     - ls /builds
@@ -32,6 +36,8 @@ build-job:
       - dist/
 
 .post:
+  tags: 
+  - docker
   stage: cleanup
   script:
     - echo "cleanup called"
