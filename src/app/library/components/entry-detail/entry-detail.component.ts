@@ -6,10 +6,10 @@ import { EntryInfoDialogComponent } from '../entry-info-dialog/entry-info-dialog
 import { catchError, take, tap } from 'rxjs/operators';
 import { GdriveService } from '../../services/gdrive.service';
 import { AppStateService } from 'src/app/common/services/app-state.service';
-import { throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { NotificationService } from 'src/app/common/services/notification.service';
 import { TranslocoService } from '@ngneat/transloco';
-import { EntriesItem } from '../../types/library.types';
+import { EntriesItem, EntryDetail } from '../../types/library.types';
 
 @Component({
   selector: 'app-entry-detail',
@@ -21,6 +21,7 @@ export class EntryDetailComponent implements OnInit {
   @Output() onDeleteFromFavorites = new EventEmitter<any>();
   imageSrc: string;
   currentRoute = this.router.url;
+  entryDetail$: Observable<EntryDetail>;
 
   constructor(
     private readonly router: Router,
@@ -33,21 +34,24 @@ export class EntryDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.imageSrc =
-      this.entry.img === 'none'
-        ? 'none'
-        : `data:image/png;base64,${this.entry.img}`;
+    this.imageSrc = this.entry.thumbnail;
   }
 
-  openPdf(id: string) {
-    this.router.navigateByUrl(`/library/pdf-viewer/${id}`);
+  openPdf(catalogID: string, entryID: string) {
+    this.entriesService
+      .entryDetail(catalogID, entryID)
+      .toPromise()
+      .then((entryDetail) => {
+        const acquisitionID = entryDetail.response.acquisitions[0].id;
+        this.router.navigateByUrl(`/library/pdf-viewer/${acquisitionID}`);
+      });
   }
 
-  showInfo(id: string) {
+  showInfo(catalogID: string, entryID: string) {
     this.dialog.open(EntryInfoDialogComponent, {
       width: '700px',
       maxWidth: '95%',
-      data: { id },
+      data: { catalogID, entryID },
     });
   }
 

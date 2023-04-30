@@ -25,7 +25,7 @@ export const LIBRARY_ROUTES: Routes = [
     component: HomeComponent,
   },
   {
-    path: 'pdf-viewer/:id',
+    path: 'pdf-viewer/:acquisitionID',
     canActivate: [LibraryGuard],
     component: PdfViewerComponent,
   },

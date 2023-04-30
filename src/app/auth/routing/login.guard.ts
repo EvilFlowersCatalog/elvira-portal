@@ -32,6 +32,11 @@ export class LoginGuard implements CanActivate {
   }
 
   private verifyAuthTokenValidity() {
+    // const token = this.appStateService.getStateSnapshot().token;
+
+    // if (token === null) {
+    //   return true;
+    // }
     const token = this.appStateService.getStateSnapshot().token;
 
     if (token === null) {

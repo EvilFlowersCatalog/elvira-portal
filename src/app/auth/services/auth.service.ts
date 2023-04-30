@@ -13,7 +13,7 @@ export class AuthService {
 
   login(loginCredentials: LoginCredentials): Observable<LoginResponse> {
     return this.httpClient.post<LoginResponse>(
-      environment.baseUrl + '/apigw/auth/login',
+      environment.baseUrl + '/api/v1/token',
       loginCredentials
     );
   }
@@ -27,7 +27,7 @@ export class AuthService {
 
   verifyToken(): Observable<boolean> {
     return this.httpClient.get<boolean>(
-      environment.baseUrl + '/apigw/verifytoken'
+      environment.baseUrl + '/api/v1/token/refresh'
     );
   }
 }

@@ -44,18 +44,18 @@ export class LoginFormComponent implements OnInit {
       .pipe(
         tap((response: LoginResponse) => {
           const isAdmin = jwtDecode<JwtPayload & { isAdmin: boolean }>(
-            response.accessToken
+            response.response.access_token
           ).isAdmin;
           const googleAuthed = jwtDecode<
             JwtPayload & { googleAuthed: boolean }
-          >(response.accessToken).googleAuthed;
+          >(response.response.refresh_token).googleAuthed;
           const mongoId = jwtDecode<JwtPayload & { mongoId: string }>(
-            response.accessToken
+            response.response.access_token
           ).mongoId;
 
           this.appStateService.patchState({
-            token: response.accessToken,
-            username: response.user.login,
+            token: response.response.access_token,
+            username: 'testUser', // not returned in response
             isLoggedIn: true,
             isAdmin: isAdmin,
             googleAuthed: googleAuthed,

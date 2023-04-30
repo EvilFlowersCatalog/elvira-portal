@@ -41,26 +41,26 @@ export class AdminService {
 
   upload(entriesData: FormData) {
     return this.httpClient.post(
-      environment.baseUrl + `/apigw/entries`,
+      environment.baseUrl + `/api/v1/entries`,
       entriesData
     );
   }
 
   deleteEntry(entryId: string) {
     return this.httpClient.delete(
-      environment.baseUrl + `/apigw/entries/${entryId}`
+      environment.baseUrl + `/apigw/v1/entries/${entryId}`
     );
   }
 
   getOneEntry(entryId: string) {
     return this.httpClient.get<OneEntryItem>(
-      environment.baseUrl + `/apigw/entries/${entryId}`
+      environment.baseUrl + `/apigw/v1/entries/${entryId}`
     );
   }
 
   updateEntry(entryId: string, entriesData: EditedData) {
     return this.httpClient.put(
-      environment.baseUrl + `/apigw/entries/${entryId}`,
+      environment.baseUrl + `/api/v1/entries/${entryId}`,
       entriesData
     );
   }

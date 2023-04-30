@@ -33,6 +33,22 @@ export class LibraryGuard implements CanActivate {
   }
 
   private verifyAuthTokenValidity() {
+    // const token = this.appStateService.getStateSnapshot().token;
+
+    // if (token === null) {
+    //   this.router.navigate(['/auth']);
+    //   return false;
+    // }
+
+    // return this.authService.verifyToken().pipe(
+    //   take(1),
+    //   tap((isValid: boolean) => {
+    //     if (!isValid) {
+    //       this.appStateService.logoutResetState();
+    //       this.router.navigate(['/auth']);
+    //     }
+    //   })
+    // );
     const token = this.appStateService.getStateSnapshot().token;
 
     if (token === null) {
@@ -40,14 +56,15 @@ export class LibraryGuard implements CanActivate {
       return false;
     }
 
-    return this.authService.verifyToken().pipe(
-      take(1),
-      tap((isValid: boolean) => {
-        if (!isValid) {
-          this.appStateService.logoutResetState();
-          this.router.navigate(['/auth']);
-        }
-      })
-    );
+    // return this.authService.verifyToken().pipe(
+    //   take(1),
+    //   tap((isValid: boolean) => {
+    //     if (!isValid) {
+    //       this.appStateService.logoutResetState();
+    //       this.router.navigate(['/auth']);
+    //     }
+    //   })
+    // );
+    return true
   }
 }
