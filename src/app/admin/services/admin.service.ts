@@ -1,17 +1,11 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { AppStateService } from 'src/app/common/services/app-state.service';
 import { ListEntriesResponse } from 'src/app/library/types/library.types';
 import { environment } from 'src/environments/environment';
 import {
   NewFeed,
-  AdminResponse,
-  AllEntryItems,
-  AllFeedsItems,
   EditedData,
   GetEntries,
-  GetFeeds,
   UpdateFeeds,
   OneEntryItem,
 } from '../types/admin.types';
@@ -23,7 +17,6 @@ import { BYPASS_LOADING } from 'src/app/common/interceptors/http-request.interce
 export class AdminService {
   constructor(
     private readonly httpClient: HttpClient,
-    private readonly appStateService: AppStateService
   ) {}
 
   updateFeed(feedId: string, newFeed: UpdateFeeds) {

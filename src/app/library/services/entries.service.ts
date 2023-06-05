@@ -90,24 +90,27 @@ export class EntriesService {
     );
   }
 
+  // NOTE: Not implemented yet in actual version of the API
   addEntryToFavorites(id: string) {
     return this.httpClient.patch(environment.baseUrl + `/apigw/favorite`, {
       entry_id: id,
     });
   }
 
+  // NOTE: Not implemented yet in actual version of the API
   listFavoriteEntries(
     page: number,
     limit: number
   ): Observable<ListEntriesResponse> {
     return this.httpClient.get<ListEntriesResponse>(
-      environment.baseUrl + `/apigw/favorite`,
+      environment.baseUrl + `/api/v1/favorite`,
       {
         params: { page: page + 1, limit: limit },
       }
     );
   }
 
+  // NOTE: Not implemented yet in actual version of the API
   deleteFromFavorites(id: string) {
     return this.httpClient.delete(
       environment.baseUrl + `/apigw/favorite/${id}`

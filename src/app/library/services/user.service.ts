@@ -18,7 +18,7 @@ export class UserService {
     const userId: string = this.appStateService.getStateSnapshot().userId;
 
     return this.httpClient.get<UserResponse>(
-      environment.baseUrl + `/apigw/user/${userId}`
+      environment.baseUrl + `/api/v1/users/${userId}`
     );
   }
 }

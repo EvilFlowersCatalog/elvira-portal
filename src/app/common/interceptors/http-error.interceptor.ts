@@ -10,12 +10,18 @@ import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { LoadingService } from '../services/loading.service';
 import { NotificationService } from '../services/notification.service';
+import { Router } from '@angular/router';
+import { TranslocoService } from '@ngneat/transloco';
+import { AppStateService } from '../services/app-state.service';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
   constructor(
     private readonly notificationService: NotificationService,
-    private readonly loadingService: LoadingService
+    private readonly loadingService: LoadingService,
+    private readonly router: Router,
+    private readonly translocoService: TranslocoService,
+    private readonly appStateService: AppStateService
   ) {}
 
   intercept(
@@ -27,6 +33,13 @@ export class HttpErrorInterceptor implements HttpInterceptor {
         this.loadingService.hideLoading();
         if (error.status >= 500) {
           this.notificationService.error(`Error: ${error.error.message}`);
+        }
+        if (error.status === 401) {
+          this.notificationService.info(
+            this.translocoService.translate('lazy.auth.autoLogout')
+          );
+          this.appStateService.logoutResetState();
+          this.router.navigate(['/auth']);
         }
         return throwError(error);
       })

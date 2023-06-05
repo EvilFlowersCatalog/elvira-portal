@@ -97,16 +97,16 @@ export interface EntriesParams {
 }
 
 export interface UserResponse {
-  aisId: number;
-  email: string;
-  firstName: string;
-  lastName: string;
-  googleAuthed: boolean;
-  isAdmin: boolean;
-  login: string;
-  nick: string;
-  role: string;
-  _id: string;
+  response: {
+    id: string;
+    username: string;
+    name: string;
+    surname: string;
+    is_superuser: boolean;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+  }
 }
 
 export interface Authors {

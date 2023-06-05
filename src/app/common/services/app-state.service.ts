@@ -15,6 +15,7 @@ export class AppStateService {
     const defaultState = {
       isLoggedIn: false,
       token: null,
+      refresh_token: null,
       username: null,
       userId: null,
       isAdmin: false,

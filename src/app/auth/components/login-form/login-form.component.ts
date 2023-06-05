@@ -43,23 +43,14 @@ export class LoginFormComponent implements OnInit {
       .login(loginCredentials)
       .pipe(
         tap((response: LoginResponse) => {
-          const isAdmin = jwtDecode<JwtPayload & { isAdmin: boolean }>(
-            response.response.access_token
-          ).isAdmin;
-          const googleAuthed = jwtDecode<
-            JwtPayload & { googleAuthed: boolean }
-          >(response.response.refresh_token).googleAuthed;
-          const mongoId = jwtDecode<JwtPayload & { mongoId: string }>(
-            response.response.access_token
-          ).mongoId;
-
           this.appStateService.patchState({
             token: response.response.access_token,
-            username: 'testUser', // not returned in response
+            refresh_token: response.response.refresh_token,
+            username: response.response.user.username,
+            name: response.response.user.name,
+            surname: response.response.user.surname,
             isLoggedIn: true,
-            isAdmin: isAdmin,
-            googleAuthed: googleAuthed,
-            userId: mongoId,
+            userId: response.response.user.id,
           });
           this.router.navigate(['../../library'], { relativeTo: this.route });
         }),

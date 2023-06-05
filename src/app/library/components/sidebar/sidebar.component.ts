@@ -53,21 +53,22 @@ export class SidebarComponent extends DisposableComponent implements OnInit {
     this.searchForm = this.initSearchForm();
     this.authorForm = this.initAuthorForm();
 
-    this.filtersService
-      .getFeedTreeNode()
-      .pipe(take(1), tap(console.log))
-      .subscribe((data) => {
-        this.dataSource.data = data;
-      });
+    // Commented out because of 404 - not implemented yet on BE side
+    // this.filtersService
+    //   .getFeedTreeNode()
+    //   .pipe(take(1), tap(console.log))
+    //   .subscribe((data) => {
+    //     this.dataSource.data = data;
+    //   });
 
-    this.appStateService
-      .getState$()
-      .pipe(
-        takeUntil(this.destroySignal$),
-        distinctUntilChanged(),
-        pluck('filters')
-      )
-      .subscribe((filters: Filters) => this.setView(filters));
+    // this.appStateService
+    //   .getState$()
+    //   .pipe(
+    //     takeUntil(this.destroySignal$),
+    //     distinctUntilChanged(),
+    //     pluck('filters')
+    //   )
+    //   .subscribe((filters: Filters) => this.setView(filters));
 
     this.authorForm
       .get('authorInput')

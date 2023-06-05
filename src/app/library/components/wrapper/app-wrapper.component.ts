@@ -1,10 +1,10 @@
 import { AfterViewInit, Component, Input, OnChanges } from '@angular/core';
-import { renderViewer } from '../../../../../../EvilFlowersViewer/dist/evilFlowersViewer.es.js';
+import { renderViewer } from '@evilflowers/evilflowersviewer';
 
 @Component({
   selector: 'evil-flowers-viewer-wrapper',
   template: `<div [id]="rootId"></div>`,
-  styleUrls: ['../../../../../../EvilFlowersViewer/dist/style.css']
+  styleUrls: ['../../../../../node_modules/@evilflowers/evilflowersviewer/dist/styles.css']
 })
 export class AppWrapperComponent implements OnChanges, AfterViewInit {
   @Input() base64: string;
