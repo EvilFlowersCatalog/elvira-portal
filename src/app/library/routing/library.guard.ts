@@ -30,8 +30,8 @@ export class LibraryGuard implements CanActivate {
         });
       });
 
-    // NOTE: Refreshing the token every 10 minutes (adjust the interval duration as needed)
-    interval(10 * 60 * 1000).subscribe(() => {
+    // NOTE: Refreshing the token every 4 minutes (adjust the interval duration as needed)
+    interval(4 * 60 * 1000).subscribe(() => {
       this.authService
         .verifyToken()
         .pipe()
