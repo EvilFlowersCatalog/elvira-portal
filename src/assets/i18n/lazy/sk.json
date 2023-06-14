@@ -26,6 +26,9 @@
     "successMessageUploadDocument": "Dokument bol úspešne nahraný",
     "errorMessageUploadDocument": "Nahrávanie zlyhalo"
   },
+  "auth": {
+    "autoLogout": "Boli ste odhlásený"
+  },
   "documentManagement": {
     "successMessageDeleteDocument": "Dokument bol úspešne odstránený",
     "errorMessageDeleteDocument": "Odstránenie zlyhalo",

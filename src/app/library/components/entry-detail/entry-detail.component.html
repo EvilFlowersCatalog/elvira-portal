@@ -1,6 +1,6 @@
 <ng-container *transloco="let t">
   <mat-card class="entry-detail-card">
-    <mat-card-header (click)="openPdf(entry.id)">
+    <mat-card-header (click)="openPdf(entry.catalog_id, entry.id)">
       <mat-card-title
         matTooltip="{{ entry.title }}"
         class="entry-detail-title"
@@ -8,7 +8,7 @@
       >
     </mat-card-header>
     <mat-divider></mat-divider>
-    <div class="entry-detail-image-container" (click)="openPdf(entry.id)">
+    <div class="entry-detail-image-container" (click)="openPdf(entry.catalog_id, entry.id)">
       <div *ngIf="imageSrc === 'none'; else image">
         <img
           mat-card-image
@@ -22,7 +22,7 @@
     </div>
     <mat-card-content (click)="openPdf(entry.id)">
       <div>
-        <p>{{ entry.author }}</p>
+        <p>{{ entry.author.name }} {{entry.author.surname}}</p>
         <p>
           <i>{{ entry.created_at | date: "yyyy" }}</i>
         </p>
@@ -33,18 +33,23 @@
         <button
           mat-icon-button
           matTooltip="{{ t('lazy.entryDetail.info-pdf-tooltip') }}"
-          (click)="showInfo(entry.id)"
+          (click)="showInfo(entry.catalog_id, entry.id)"
         >
           <mat-icon> info </mat-icon>
         </button>
-        <button
+        <!-- Commented out because google authorization is not supported in actual version -->
+        
+        <!-- <button
           mat-icon-button
           matTooltip="{{ t('lazy.entryDetail.add-pdf-to-drive-tooltip') }}"
           (click)="addPdfToDrive(entry.id, entry.catalog_id)"
         >
           <mat-icon> add_to_drive </mat-icon>
-        </button>
-        <div
+        </button> -->
+        
+        <!-- Commented out because favourites is not implemented in actual version of BE -->
+        
+        <!-- <div
           *ngIf="currentRoute === '/library/favorites'; else addToFavoritesBtn"
         >
           <button
@@ -64,7 +69,7 @@
           >
             <mat-icon> favorite </mat-icon>
           </button>
-        </ng-template>
+        </ng-template> -->
       </div>
     </mat-card-actions>
   </mat-card>

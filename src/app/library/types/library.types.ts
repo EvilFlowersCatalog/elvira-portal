@@ -5,58 +5,70 @@ export interface ListEntriesResponse {
 
 export interface EntriesItem {
   id: string;
-  author: string;
+  author: EntryAuthor;
   language: EntryLanguage;
   title: string;
   created_at: string;
   updated_at: string;
-  img: string;
+  thumbnail: string;
   creator_id: string;
   catalog_id: string;
   category: EntryCategory;
 }
 
+export interface AcquisitionDetail {
+  response: {
+    relation: string;
+    mime: string;
+    url: string;
+    id: string;
+    content: string;
+  };
+}
+
 export interface EntryDetail {
-  id: string;
-  creator_id: string;
-  catalog_id: string;
-  author: EntryAuthor;
-  contributors: EntryAuthor[];
-  category: EntryCategory;
-  feeds: [
-    {
-      catalog_id: string;
-      children: string[];
-      content: string;
-      created_at: string;
-      creator_id: string;
-      id: string;
-      kind: string;
-      parents: string[];
-      per_page: number;
-      title: string;
-      updated_at: string;
-      url: string;
-      url_name: string;
-    }
-  ];
-  language: EntryLanguage;
-  title: string;
-  created_at: string;
-  updated_at: string;
-  summary: string;
-  content: string;
-  identifiers: string;
-  acquisitions: [
-    {
-      relation: string;
-      mime: string;
-      url: string;
-      id: string;
-      content: string;
-    }
-  ];
-  img: string;
+  response: {
+    id: string;
+    creator_id: string;
+    catalog_id: string;
+    author: EntryAuthor;
+    contributors: EntryAuthor[];
+    category: EntryCategory;
+    feeds: [
+      {
+        catalog_id: string;
+        children: string[];
+        content: string;
+        created_at: string;
+        creator_id: string;
+        id: string;
+        kind: string;
+        parents: string[];
+        per_page: number;
+        title: string;
+        updated_at: string;
+        url: string;
+        url_name: string;
+      }
+    ];
+    language: EntryLanguage;
+    title: string;
+    created_at: string;
+    updated_at: string;
+    summary: string;
+    content: string;
+    identifiers: string;
+    acquisitions: [
+      {
+        relation: string;
+        mime: string;
+        url: string;
+        id: string;
+        content: string;
+      }
+    ];
+    img: string;
+  };
 }
 
 export interface EntryAuthor {
@@ -85,16 +97,16 @@ export interface EntriesParams {
 }
 
 export interface UserResponse {
-  aisId: number;
-  email: string;
-  firstName: string;
-  lastName: string;
-  googleAuthed: boolean;
-  isAdmin: boolean;
-  login: string;
-  nick: string;
-  role: string;
-  _id: string;
+  response: {
+    id: string;
+    username: string;
+    name: string;
+    surname: string;
+    is_superuser: boolean;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+  }
 }
 
 export interface Authors {

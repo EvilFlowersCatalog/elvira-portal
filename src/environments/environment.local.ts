@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  baseUrl: `http://localhost:8000`,
+  baseUrl: `https://evilflowers.jakubdubec.me`,
   assetsUrl: `http://localhost:4200/assets`,
 };

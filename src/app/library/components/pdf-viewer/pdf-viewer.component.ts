@@ -2,8 +2,8 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
 import { ActivatedRoute } from '@angular/router';
 import { EntriesService } from '../../services/entries.service';
-import { Observable, Subject } from 'rxjs';
-import { takeUntil, tap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { AppStateService } from 'src/app/common/services/app-state.service';
 import { State } from 'src/app/common/types/app-state.types';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
@@ -28,12 +28,15 @@ export class PdfViewerComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const bookId = this.route.snapshot.paramMap.get('id');
+    const acquisitionID = this.route.snapshot.paramMap.get('acquisitionID');
     this.entriesService
-      .entryDetail(bookId)
+      .acquisitionDetail(acquisitionID)
       .subscribe(
-        (data) => (this.base64 = data.acquisitions[0].content.slice(28))
+        (data) => {
+          this.base64 = data.response.content;
+        }
       );
+
     this.appState$ = this.appStateService
       .getState$()
       .pipe(takeUntil(this.destroySignal$));

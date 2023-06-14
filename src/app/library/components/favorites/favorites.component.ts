@@ -23,22 +23,23 @@ export class FavoritesComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.fetchEntries$
-      .asObservable()
-      .pipe(
-        startWith({}),
-        takeUntil(this.destroySignal$),
-        concatMap(() =>
-          this.entriesService.listFavoriteEntries(
-            this.paginator?.pageIndex ?? 0,
-            this.paginator?.pageSize ?? 12
-          )
-        )
-      )
-      .subscribe((data) => {
-        this.entries = data.items;
-        this.resultsLength = data.metadata.total;
-      });
+    // Commented out because of 404 - not implemented yet on BE side
+    // this.fetchEntries$
+    //   .asObservable()
+    //   .pipe(
+    //     startWith({}),
+    //     takeUntil(this.destroySignal$),
+    //     concatMap(() =>
+    //       this.entriesService.listFavoriteEntries(
+    //         this.paginator?.pageIndex ?? 0,
+    //         this.paginator?.pageSize ?? 12
+    //       )
+    //     )
+    //   )
+    //   .subscribe((data) => {
+    //     this.entries = data.items;
+    //     this.resultsLength = data.metadata.total;
+    //   });
   }
 
   favoritePagination() {

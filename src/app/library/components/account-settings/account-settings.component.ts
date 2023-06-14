@@ -19,7 +19,7 @@ export class AccountSettingsComponent
   extends DisposableComponent
   implements OnInit
 {
-  userData: UserResponse;
+  userData: UserResponse['response'];
   appState$: Observable<State>;
 
   constructor(
@@ -36,7 +36,7 @@ export class AccountSettingsComponent
     this.appState$ = this.appStateService
       .getState$()
       .pipe(takeUntil(this.destroySignal$));
-    this.userService.getUser().subscribe((data) => (this.userData = data));
+    this.userService.getUser().subscribe((data) => (this.userData = data.response));
   }
 
   getUrl() {
