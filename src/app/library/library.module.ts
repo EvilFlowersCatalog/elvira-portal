@@ -17,6 +17,7 @@ import { GdriveAuthComponent } from './components/gdrive-auth.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatPaginatorIntl } from '@angular/material/paginator';
 import { CustomPaginationComponent } from '../common/services/custom-pagination.service';
+import { AppWrapperComponent } from './components/wrapper/app-wrapper.component';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { CustomPaginationComponent } from '../common/services/custom-pagination.
     FavoritesComponent,
     AccountSettingsComponent,
     GdriveAuthComponent,
+    AppWrapperComponent,
   ],
   imports: [
     CommonModule,

@@ -15,11 +15,11 @@ export class EntryInfoDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<EntryInfoDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { id: string },
+    @Inject(MAT_DIALOG_DATA) public data: { catalogID: string, entryID: string },
     private readonly entriesService: EntriesService
   ) {}
 
   ngOnInit(): void {
-    this.entryDetail$ = this.entriesService.entryDetail(this.data.id);
+    this.entryDetail$ = this.entriesService.entryDetail(this.data.catalogID, this.data.entryID);
   }
 }

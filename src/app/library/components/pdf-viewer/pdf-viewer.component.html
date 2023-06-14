@@ -1,5 +1,5 @@
 <ng-container *ngIf="appState$ | async as appState">
-  <ngx-extended-pdf-viewer
+  <!-- <ngx-extended-pdf-viewer
     *ngIf="base64"
     [base64Src]="base64"
     [textLayer]="true"
@@ -11,7 +11,8 @@
     [height]="'100%'"
     [theme]="appState.theme"
   >
-  </ngx-extended-pdf-viewer>
+  </ngx-extended-pdf-viewer> -->
+  <evil-flowers-viewer-wrapper [base64]="base64"></evil-flowers-viewer-wrapper>
 </ng-container>
 
 <ng-template #additionalButtons>

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state.service';
 import { environment } from '../../../environments/environment';
-import { ListEntriesResponse, EntryDetail } from '../types/library.types';
+import { ListEntriesResponse, EntryDetail, AcquisitionDetail } from '../types/library.types';
 
 @Injectable({
   providedIn: 'root',
@@ -29,30 +29,35 @@ export class EntriesService {
         }
       );
     } else if (authorId && query) {
-      console.log()
+      console.log();
       return this.httpClient.get<ListEntriesResponse>(
-        environment.baseUrl + '/apigw/entries',
+        environment.baseUrl + '/api/v1/entries',
         {
-          params: { page: page + 1, limit: limit, title: query, author_id: authorId },
+          params: {
+            page: page + 1,
+            limit: limit,
+            title: query,
+            author_id: authorId,
+          },
         }
       );
-    }else if (query) {
+    } else if (query) {
       return this.httpClient.get<ListEntriesResponse>(
-        environment.baseUrl + '/apigw/entries',
+        environment.baseUrl + '/api/v1/entries',
         {
           params: { page: page + 1, limit: limit, title: query },
         }
       );
     } else if (authorId) {
       return this.httpClient.get<ListEntriesResponse>(
-        environment.baseUrl + '/apigw/entries',
+        environment.baseUrl + '/api/v1/entries',
         {
           params: { page: page + 1, limit: limit, author_id: authorId },
         }
       );
     } else {
       return this.httpClient.get<ListEntriesResponse>(
-        environment.baseUrl + '/apigw/entries',
+        environment.baseUrl + '/api/v1/entries',
         {
           params: { page: page + 1, limit: limit },
         }
@@ -73,30 +78,39 @@ export class EntriesService {
     );
   }
 
-  entryDetail(id: string): Observable<EntryDetail> {
+  entryDetail(catalogID: string, entryID: string): Observable<EntryDetail> {
     return this.httpClient.get<EntryDetail>(
-      environment.baseUrl + `/apigw/entries/${id}`
+      environment.baseUrl + `/api/v1/catalogs/${catalogID}/entries/${entryID}`
     );
   }
 
+  acquisitionDetail(id: string): Observable<AcquisitionDetail> {
+    return this.httpClient.get<AcquisitionDetail>(
+      environment.baseUrl + `/api/v1/acquisitions/${id}`
+    );
+  }
+
+  // NOTE: Not implemented yet in actual version of the API
   addEntryToFavorites(id: string) {
     return this.httpClient.patch(environment.baseUrl + `/apigw/favorite`, {
       entry_id: id,
     });
   }
 
+  // NOTE: Not implemented yet in actual version of the API
   listFavoriteEntries(
     page: number,
     limit: number
   ): Observable<ListEntriesResponse> {
     return this.httpClient.get<ListEntriesResponse>(
-      environment.baseUrl + `/apigw/favorite`,
+      environment.baseUrl + `/api/v1/favorite`,
       {
         params: { page: page + 1, limit: limit },
       }
     );
   }
 
+  // NOTE: Not implemented yet in actual version of the API
   deleteFromFavorites(id: string) {
     return this.httpClient.delete(
       environment.baseUrl + `/apigw/favorite/${id}`

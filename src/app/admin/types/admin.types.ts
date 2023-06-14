@@ -1,3 +1,5 @@
+import { EntryAuthor } from "src/app/library/types/library.types";
+
 export interface AdminResponse {}
 
 export interface EntriesData {
@@ -37,7 +39,7 @@ export interface AllEntryItems {
   id: string;
   creator_id: string;
   catalog_id: string;
-  author: string;
+  author: EntryAuthor;
   category: {
     id: string;
     term: string;

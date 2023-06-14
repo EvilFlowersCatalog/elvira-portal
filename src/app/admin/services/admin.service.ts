@@ -1,17 +1,11 @@
 import { HttpClient, HttpContext } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { AppStateService } from 'src/app/common/services/app-state.service';
 import { ListEntriesResponse } from 'src/app/library/types/library.types';
 import { environment } from 'src/environments/environment';
 import {
   NewFeed,
-  AdminResponse,
-  AllEntryItems,
-  AllFeedsItems,
   EditedData,
   GetEntries,
-  GetFeeds,
   UpdateFeeds,
   OneEntryItem,
 } from '../types/admin.types';
@@ -23,7 +17,6 @@ import { BYPASS_LOADING } from 'src/app/common/interceptors/http-request.interce
 export class AdminService {
   constructor(
     private readonly httpClient: HttpClient,
-    private readonly appStateService: AppStateService
   ) {}
 
   updateFeed(feedId: string, newFeed: UpdateFeeds) {
@@ -41,26 +34,26 @@ export class AdminService {
 
   upload(entriesData: FormData) {
     return this.httpClient.post(
-      environment.baseUrl + `/apigw/entries`,
+      environment.baseUrl + `/api/v1/entries`,
       entriesData
     );
   }
 
   deleteEntry(entryId: string) {
     return this.httpClient.delete(
-      environment.baseUrl + `/apigw/entries/${entryId}`
+      environment.baseUrl + `/apigw/v1/entries/${entryId}`
     );
   }
 
   getOneEntry(entryId: string) {
     return this.httpClient.get<OneEntryItem>(
-      environment.baseUrl + `/apigw/entries/${entryId}`
+      environment.baseUrl + `/apigw/v1/entries/${entryId}`
     );
   }
 
   updateEntry(entryId: string, entriesData: EditedData) {
     return this.httpClient.put(
-      environment.baseUrl + `/apigw/entries/${entryId}`,
+      environment.baseUrl + `/api/v1/entries/${entryId}`,
       entriesData
     );
   }
