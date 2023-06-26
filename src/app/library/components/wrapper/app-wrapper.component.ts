@@ -4,7 +4,7 @@ import { renderViewer } from '@evilflowers/evilflowersviewer';
 @Component({
   selector: 'evil-flowers-viewer-wrapper',
   template: `<div [id]="rootId"></div>`,
-  styleUrls: ['../../../../../node_modules/@evilflowers/evilflowersviewer/dist/styles.css']
+  // styleUrls: ['../../../../../node_modules/@evilflowers/evilflowersviewer/dist/styles.css']
 })
 export class AppWrapperComponent implements OnChanges, AfterViewInit {
   @Input() base64: string;
