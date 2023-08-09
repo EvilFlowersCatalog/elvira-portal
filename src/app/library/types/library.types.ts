@@ -90,7 +90,6 @@ export interface EntryCategory {
 
 export interface EntriesParams {
   search: string;
-  authorId: string;
   feed: string;
   page: number;
   limit: number;
@@ -123,12 +122,27 @@ export interface Author {
   updated_at: string;
 }
 
+export interface ListFeedsResponse {
+  items: FeedTreeNode[];
+  metadata: Metadata;
+}
+
 export interface FeedTreeNode {
   id: string;
   title: string;
-  children: FeedTreeNode[];
+  children?: string[];
   kind: string;
-  parent?: string;
+  parents?: string[];
+}
+
+export interface FeedDetailRespone {
+  response: {
+    id: string;
+    title: string;
+    children?: string[];
+    kind: string;
+    parents?: string[];
+  }
 }
 
 export interface Metadata {
@@ -136,4 +150,21 @@ export interface Metadata {
   limit: number;
   pages: number;
   total: number;
+}
+
+export interface userAcquisitionCreation {
+  acquisition_id: string;
+  type: string;
+}
+
+export interface UserAcquisitionCreationResponse {
+  response: {
+    id: string;
+  }
+}
+
+export interface DownloadUserAcquistionWithQuery {
+  response: {
+    data: string;
+  }
 }

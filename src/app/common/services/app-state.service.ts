@@ -21,11 +21,7 @@ export class AppStateService {
       isAdmin: false,
       theme: 'light',
       lang: 'sk',
-      sidebar: false,
-      showSidebarToggle: false,
       sidenav: false,
-      googleAuthed: false,
-      filters: null,
     };
 
     let initState = JSON.parse(localStorage.getItem('state'));
@@ -66,14 +62,12 @@ export class AppStateService {
     this.patchState({
       isLoggedIn: false,
       token: null,
+      refresh_token: null,
       username: null,
       userId: null,
       isAdmin: false,
-      sidebar: false,
       showSidebarToggle: false,
       sidenav: false,
-      googleAuthed: false,
-      filters: null,
     });
   }
 }

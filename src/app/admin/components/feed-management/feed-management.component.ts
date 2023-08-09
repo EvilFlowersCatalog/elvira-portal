@@ -1,6 +1,6 @@
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import { ActivatedRoute } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
@@ -18,7 +18,7 @@ import {
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { NotificationService } from 'src/app/common/services/notification.service';
 import { FeedTreeNode } from 'src/app/library/types/library.types';
-import { FiltersService } from 'src/app/library/services/filters.service';
+//import { FiltersService } from 'src/app/library/services/filters.service';
 import { AdminService } from '../../services/admin.service';
 import { NewFeed } from '../../types/admin.types';
 import { DeleteDialogComponent } from '../dialogs/delete-dialog/delete-dialog.component';
@@ -36,11 +36,10 @@ export class FeedManagementComponent
   implements OnInit
 {
   fetchFeeds$ = new Subject();
-  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.children);
   dataSource = new MatTreeNestedDataSource<FeedTreeNode>();
 
   constructor(
-    private readonly filtersService: FiltersService,
+    //private readonly filtersService: FiltersService,
     public dialog: MatDialog,
     private readonly route: ActivatedRoute,
     private readonly adminService: AdminService,
@@ -51,16 +50,16 @@ export class FeedManagementComponent
   }
 
   ngOnInit(): void {
-    this.fetchFeeds$
-      .asObservable()
-      .pipe(
-        takeUntil(this.destroySignal$),
-        startWith([]),
-        concatMap(() => this.filtersService.getFeedTreeNode())
-      )
-      .subscribe((data) => {
-        this.dataSource.data = data;
-      });
+    // this.fetchFeeds$
+    //   .asObservable()
+    //   .pipe(
+    //     takeUntil(this.destroySignal$),
+    //     startWith([]),
+    //     concatMap(() => this.filtersService.getFeedTreeNode())
+    //   )
+    //   .subscribe((data) => {
+    //     this.dataSource.data = data;
+    //   });
   }
 
   createFeed(parentFeedId: string, parentFeedName: string) {

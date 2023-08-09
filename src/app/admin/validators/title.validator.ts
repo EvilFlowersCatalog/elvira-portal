@@ -15,9 +15,9 @@ export class TitleValidators {
     private readonly adminService: AdminService,
     ) {}
 
-  searchTitle(text) {
+  searchTitle() {
           // Check if username is available
-      return this.adminService.checkTitle(text).pipe(
+      return this.adminService.getEntriesForTitleCheck().pipe(
         map(
           data => {return data.items;}
         )
@@ -27,7 +27,7 @@ export class TitleValidators {
   titleValidator(): AsyncValidatorFn {
     return (control: AbstractControl) => {
       if (!control.value) { return of(null); }
-      return this.searchTitle(control.value).pipe(
+      return this.searchTitle().pipe(
         map(
           data => {
             if (data.some(item => item.title.toLocaleLowerCase() === control.value.toLocaleLowerCase())){

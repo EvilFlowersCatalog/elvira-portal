@@ -26,13 +26,6 @@ export class AuthService {
     );
   }
 
-  logout(token: string) {
-    return this.httpClient.post(
-      environment.baseUrl + '/apigw/auth/logout',
-      token
-    );
-  }
-
   verifyToken(): Observable<RefreshTokenResponse> {
     return this.httpClient.post<RefreshTokenResponse>(
       environment.baseUrl + '/api/v1/token/refresh',

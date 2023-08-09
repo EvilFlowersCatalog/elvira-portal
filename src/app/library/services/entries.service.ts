@@ -1,44 +1,29 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state.service';
 import { environment } from '../../../environments/environment';
-import { ListEntriesResponse, EntryDetail, AcquisitionDetail } from '../types/library.types';
+import { ListEntriesResponse, EntryDetail, AcquisitionDetail, userAcquisitionCreation } from '../types/library.types';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EntriesService {
   constructor(
-    private readonly httpClient: HttpClient,
-    private readonly appStateService: AppStateService
+    private readonly httpClient: HttpClient
   ) {}
 
   getEntries(
     page: number,
     limit: number,
     query?: string,
-    authorId?: string,
     feedId?: string
   ) {
     if (feedId) {
       return this.httpClient.get<ListEntriesResponse>(
-        environment.baseUrl + `/apigw/feeds/filter/${feedId}`,
+        environment.baseUrl + `/api/v1/entries`,
         {
-          params: { page: page + 1, limit: limit },
-        }
-      );
-    } else if (authorId && query) {
-      console.log();
-      return this.httpClient.get<ListEntriesResponse>(
-        environment.baseUrl + '/api/v1/entries',
-        {
-          params: {
-            page: page + 1,
-            limit: limit,
-            title: query,
-            author_id: authorId,
-          },
+          params: { page: page + 1, limit: limit, feed_id: feedId },
         }
       );
     } else if (query) {
@@ -46,13 +31,6 @@ export class EntriesService {
         environment.baseUrl + '/api/v1/entries',
         {
           params: { page: page + 1, limit: limit, title: query },
-        }
-      );
-    } else if (authorId) {
-      return this.httpClient.get<ListEntriesResponse>(
-        environment.baseUrl + '/api/v1/entries',
-        {
-          params: { page: page + 1, limit: limit, author_id: authorId },
         }
       );
     } else {
@@ -63,19 +41,6 @@ export class EntriesService {
         }
       );
     }
-  }
-
-  getEntriesByFeed(
-    page: number,
-    limit: number,
-    feedId: string
-  ): Observable<ListEntriesResponse> {
-    return this.httpClient.get<ListEntriesResponse>(
-      environment.baseUrl + `/apigw/feeds/filter/${feedId}`,
-      {
-        params: { page: page + 1, limit: limit },
-      }
-    );
   }
 
   entryDetail(catalogID: string, entryID: string): Observable<EntryDetail> {
@@ -115,5 +80,21 @@ export class EntriesService {
     return this.httpClient.delete(
       environment.baseUrl + `/apigw/favorite/${id}`
     );
+  }
+
+  createUserAcquisition(userAcquisition: userAcquisitionCreation) {
+    return this.httpClient.post(
+      environment.baseUrl + `/api/v1/user-acquisitions`,
+      userAcquisition
+    )
+  }
+
+  donwloadUserAcquisition(userAcquisitionId: string, format: string = '') {
+    const params = new HttpParams().set('format', format);
+
+    return this.httpClient.get(
+      environment.baseUrl + `/data/v1/user-acquisitions/${userAcquisitionId}`,
+      { params }
+    )
   }
 }

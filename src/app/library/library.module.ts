@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HomeComponent } from './components/home/home.component';
+import { AllEntriesComponent } from './components/all-entries/allEntries.component';
 import { RouterModule } from '@angular/router';
 import { LIBRARY_ROUTES } from './routing/library.routes';
 import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component';
@@ -8,28 +8,32 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 import { MaterialModule } from '../material.module';
 import { TranslocoRootModule } from '../transloco/transloco-root.module';
 import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
-import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { EntryDetailComponent } from './components/entry-detail/entry-detail.component';
 import { EntryInfoDialogComponent } from './components/entry-info-dialog/entry-info-dialog.component';
 import { FavoritesComponent } from './components/favorites/favorites.component';
 import { AccountSettingsComponent } from './components/account-settings/account-settings.component';
-import { GdriveAuthComponent } from './components/gdrive-auth.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatPaginatorIntl } from '@angular/material/paginator';
+import { MatLegacyPaginatorIntl as MatPaginatorIntl } from '@angular/material/legacy-paginator';
 import { CustomPaginationComponent } from '../common/services/custom-pagination.service';
 import { AppWrapperComponent } from './components/wrapper/app-wrapper.component';
+import { HomeComponent } from './components/home/home.component';
+import { SwipperComponent } from './components/swiper/swiper.component';
+import { FeedsPageComponent } from './components/feeds-page/feeds-page.component'
+import { FeedComponent } from './components/feed.component'
 
 @NgModule({
   declarations: [
     HomeComponent,
+    AllEntriesComponent,
     PdfViewerComponent,
-    SidebarComponent,
     EntryDetailComponent,
     EntryInfoDialogComponent,
     FavoritesComponent,
     AccountSettingsComponent,
-    GdriveAuthComponent,
     AppWrapperComponent,
+    SwipperComponent,
+    FeedsPageComponent,
+    FeedComponent,
   ],
   imports: [
     CommonModule,
@@ -44,6 +48,6 @@ import { AppWrapperComponent } from './components/wrapper/app-wrapper.component'
     { provide: TRANSLOCO_SCOPE, useValue: 'lazy' },
     { provide: MatPaginatorIntl, useClass: CustomPaginationComponent },
   ],
-  exports: [SidebarComponent],
+  exports: [],
 })
 export class LibraryModule {}

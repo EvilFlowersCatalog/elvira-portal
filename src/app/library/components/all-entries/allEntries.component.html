@@ -1,0 +1,55 @@
+<ng-container *transloco="let t">
+  <div class="all-entries-container">
+    <form
+      [formGroup]="searchForm"
+      (submit)="applyFilter()"
+      class="all-entries-search-form"
+    >
+      <div fxLayout="row">
+        <mat-form-field color="accent" class="all-entries-search-field">
+          <mat-label>
+            {{ t("lazy.documentManagement.search") }}
+          </mat-label>
+          <input
+            formControlName="searchInput"
+            matInput
+            type="search"
+          />
+          <mat-icon *ngIf="this.searchForm?.value.searchInput" class="all-entries-search-delete-icon" (click)="clearSearch()">clear</mat-icon>
+        </mat-form-field>
+        <button mat-icon-button type="submit" color="accent" class="all-entries-search-button">
+          <mat-icon style="font-size: 30px;">search</mat-icon>
+        </button>
+      </div>
+    </form>
+    <mat-checkbox (change)="fullTextChange()" labelPosition="after" class="all-entries-search-checkbox">Full-text</mat-checkbox>
+    <div>
+      <div
+        class="entries-list-container"
+        fxLayout="row wrap"
+        fxLayout.xs="column"
+        fxLayoutGap="16px grid"
+      >
+        <div
+          fxFlex="14.28%"
+          fxFlex.md="20%"
+          fxFlex.sm="33.3%"
+          fxFlex.xs="100%"
+          *ngFor="let entry of entries"
+        >
+          <app-entry-detail [entry]="entry"></app-entry-detail>
+        </div>
+      </div>
+      <div fxLayoutAlign="center center">
+        <mat-paginator
+          (page)="handlePageChange()"
+          #paginator
+          [length]="resultsLength"
+          [pageSizeOptions]="[15, 30, 50]"
+          class="home-paginator"
+        >
+        </mat-paginator>
+      </div>
+    </div>
+  </div>
+</ng-container>

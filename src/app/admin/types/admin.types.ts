@@ -1,6 +1,18 @@
 import { EntryAuthor } from "src/app/library/types/library.types";
 
-export interface AdminResponse {}
+export interface AdminResponse {
+  response: {
+		id: string;
+		username: string;
+		name: string;
+		surname: string;
+		is_superuser: boolean;
+		is_active: boolean;
+		last_login: string;
+		created_at: string;
+		updated_at: string;
+	}
+}
 
 export interface EntriesData {
   title: string;
@@ -12,7 +24,11 @@ export interface EntriesData {
   contributors: EntriesContributors[];
   summary: string;
   language_code: string;
-  acquisitions: AcquisitionsItems[];
+  identifiers: {
+		google: string;
+		isbn: string;
+	},
+  image: any;
 }
 
 export interface AcquisitionsItems {
@@ -55,29 +71,31 @@ export interface AllEntryItems {
 }
 
 export interface OneEntryItem {
-  id: string;
-  creator_id: string;
-  catalog_id: string;
-  author: {
+  response: {
     id: string;
-    name: string;
-    surname: string;
-  };
-  category: {
-    id: string;
-    term: string;
-  };
-  language: {
-    id: string;
-    name: string;
-    code: string;
-  };
-  title: string;
-  created_at: string;
-  updated_at: string;
-  feeds: FeedsItems[];
-  contributors: EntriesContributors[];
-  summary: string;
+    creator_id: string;
+    catalog_id: string;
+    author: {
+      id: string;
+      name: string;
+      surname: string;
+    };
+    category: {
+      id: string;
+      term: string;
+    };
+    language: {
+      id: string;
+      name: string;
+      code: string;
+    };
+    title: string;
+    created_at: string;
+    updated_at: string;
+    feeds: FeedsItems[];
+    contributors: EntriesContributors[];
+    summary: string;
+  }
 }
 
 export interface FeedsItems {
@@ -114,6 +132,10 @@ export interface EditedData {
   summary: string;
   language_code: string;
   contributors: EntriesContributors[];
+  identifiers: {
+		google: string;
+		isbn: string;
+	},
 }
 
 export interface GetFeeds {

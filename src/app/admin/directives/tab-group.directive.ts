@@ -1,5 +1,5 @@
 import { AfterContentInit, ContentChildren, Directive, HostListener, QueryList } from '@angular/core';
-import { MatTab, MatTabGroup } from '@angular/material/tabs';
+import { MatLegacyTab as MatTab, MatLegacyTabGroup as MatTabGroup } from '@angular/material/legacy-tabs';
 import { ActivatedRoute, Router } from '@angular/router';
 import { takeUntil } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';

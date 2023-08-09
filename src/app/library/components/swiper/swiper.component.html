@@ -1,0 +1,21 @@
+<div fxLayout="column" *ngIf="swiperEntries !== undefined && swiperEntries.length > 0" class="swiper-container">
+    <div
+        fxFlex="100%"
+        *ngFor="let entry of swiperEntries; let i = index"
+        class="swiper-entire-not-active"
+        [ngClass]="{'swiper-entrie-active': selectedIndex === i}"
+    >
+        <app-entry-detail 
+            [entry]="entry"
+        ></app-entry-detail>
+    </div>
+    <div class="swiper-dot-container">
+        <span 
+            *ngFor="let dot of swiperEntries; let i=index" 
+            class="swiper-dot"
+            [ngClass]="{'swiper-active-dot': selectedIndex === i}"
+            (click)="selectEntrie(i)"
+        >
+        </span>
+    </div>
+</div>

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AppStateService } from '../../services/app-state.service';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { State } from '../../types/app-state.types';
 import { AuthService } from 'src/app/auth/services/auth.service';
@@ -14,14 +14,12 @@ import { Router } from '@angular/router';
 })
 export class NavbarComponent extends DisposableComponent implements OnInit {
   appState$: Observable<State>;
-  animateSidebarToggle: boolean = false;
-  animateSettings: boolean = false;
+  theme: boolean;
   public href: string = "";
 
   constructor(
     private readonly router: Router,
-    private readonly appStateService: AppStateService,
-    private readonly authService: AuthService
+    private readonly appStateService: AppStateService
   ) {
     super();
     this.router.events.subscribe(() => {
@@ -33,15 +31,17 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
     this.appState$ = this.appStateService
       .getState$()
       .pipe(takeUntil(this.destroySignal$));
-
-      this.href = window.location.pathname;
+    this.href = window.location.pathname;
+    this.appState$.subscribe((state) => this.theme = state.theme === 'dark' ? true : false);
   }
 
   navigate(link: string) {
     this.router.navigate([link]);
   }
 
-  changeTheme(theme: string) {
+  changeTheme() {
+    this.theme = !this.theme;
+    const theme = this.theme ? 'dark' : 'light';
     this.appStateService.patchState({ theme: theme });
   }
 
@@ -49,18 +49,8 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
     this.appStateService.patchState({ lang: language });
   }
 
-  onSidebarToggle() {
-    this.animateSidebarToggle = !this.animateSidebarToggle;
-    const currentSidebarState = this.appStateService.getStateSnapshot().sidebar;
-    this.appStateService.patchState({ sidebar: !currentSidebarState });
-  }
-
   logout() {
-    this.authService
-      .logout(this.appStateService.getStateSnapshot().token)
-      .pipe(takeUntil(this.destroySignal$))
-      .subscribe();
     this.appStateService.logoutResetState();
-    this.router.navigate(['/auth/home']);
+    this.router.navigate(['/auth']);
   }
 }

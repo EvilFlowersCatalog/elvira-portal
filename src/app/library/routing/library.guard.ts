@@ -1,11 +1,5 @@
 import { Injectable } from '@angular/core';
-import {
-  CanActivate,
-  Router,
-  ActivatedRouteSnapshot,
-  RouterStateSnapshot,
-  UrlTree,
-} from '@angular/router';
+import { Router, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable, interval } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state.service';
 import { AuthService } from '../../auth/services/auth.service';
@@ -14,7 +8,7 @@ import { RefreshTokenResponse } from 'src/app/auth/types/auth.types';
 @Injectable({
   providedIn: 'root',
 })
-export class LibraryGuard implements CanActivate {
+export class LibraryGuard  {
   constructor(
     protected readonly authService: AuthService,
     protected readonly router: Router,
@@ -56,7 +50,7 @@ export class LibraryGuard implements CanActivate {
 
   private verifyAuthTokenValidity() {
     const token = this.appStateService.getStateSnapshot().token;
-
+    
     if (!token) {
       this.appStateService.logoutResetState();
       this.router.navigate(['/auth']);

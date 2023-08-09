@@ -17,6 +17,7 @@ export class MobileNavbarComponent
 {
   appState$: Observable<State>;
   animate: boolean = false;
+  public href: string = "";
 
   constructor(
     private readonly router: Router,
@@ -26,6 +27,7 @@ export class MobileNavbarComponent
   }
 
   ngOnInit(): void {
+    this.href = window.location.pathname;
     this.appState$ = this.appStateService
       .getState$()
       .pipe(takeUntil(this.destroySignal$));

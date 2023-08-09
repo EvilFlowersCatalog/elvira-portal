@@ -8,6 +8,9 @@ import {
   GetEntries,
   UpdateFeeds,
   OneEntryItem,
+  AdminResponse,
+  EntriesData,
+  AcquisitionsItems,
 } from '../types/admin.types';
 import { BYPASS_LOADING } from 'src/app/common/interceptors/http-request.interceptor';
 
@@ -21,78 +24,76 @@ export class AdminService {
 
   updateFeed(feedId: string, newFeed: UpdateFeeds) {
     return this.httpClient.put(
-      environment.baseUrl + `/apigw/feeds/${feedId}`,
+      environment.baseUrl + `/api/v1/feeds/${feedId}`,
       newFeed
     );
   }
 
   deleteFeed(feedId: string) {
     return this.httpClient.delete(
-      environment.baseUrl + `/apigw/feeds/${feedId}`
+      environment.baseUrl + `/api/v1/feeds/${feedId}`
     );
   }
 
-  upload(entriesData: FormData) {
+  upload(entriesData: EntriesData) {
     return this.httpClient.post(
-      environment.baseUrl + `/api/v1/entries`,
+      environment.baseUrl + `/api/v1/catalogs/1a50a657-7207-4275-8300-c8f1be90e881/entries`,
       entriesData
     );
   }
 
+  async uploadAcquisition(acquisition: FormData, entry_id: string) {
+    return this.httpClient.post(
+      environment.baseUrl + `/api/v1/catalogs/1a50a657-7207-4275-8300-c8f1be90e881/entries/${entry_id}`,
+      acquisition
+    )
+    .toPromise();
+  }
+
   deleteEntry(entryId: string) {
     return this.httpClient.delete(
-      environment.baseUrl + `/apigw/v1/entries/${entryId}`
+      environment.baseUrl + `/api/v1/catalogs/1a50a657-7207-4275-8300-c8f1be90e881/entries/${entryId}`
     );
   }
 
   getOneEntry(entryId: string) {
     return this.httpClient.get<OneEntryItem>(
-      environment.baseUrl + `/apigw/v1/entries/${entryId}`
+      environment.baseUrl + `/api/v1/catalogs/1a50a657-7207-4275-8300-c8f1be90e881/entries/${entryId}`
     );
   }
 
   updateEntry(entryId: string, entriesData: EditedData) {
     return this.httpClient.put(
-      environment.baseUrl + `/api/v1/entries/${entryId}`,
+      environment.baseUrl + `/api/v1/catalogs/1a50a657-7207-4275-8300-c8f1be90e881/entries/${entryId}`,
       entriesData
     );
   }
 
-  getIsAdmin(mongoId: string) {
-    return this.httpClient.get<boolean>(
-      environment.baseUrl + `/apigw/isAdmin/${mongoId}`
+  getIsAdmin(userId: string) {
+    return this.httpClient.get<AdminResponse>(
+      environment.baseUrl + `/api/v1/users/${userId}`
     );
   }
 
-  checkTitle(title: string) {
+  getEntriesForTitleCheck() {
     return this.httpClient.get<GetEntries>(
-      environment.baseUrl + '/apigw/entries',
+      environment.baseUrl + '/api/v1/entries',
       {
-        params: { title: title },
         context: new HttpContext().set(BYPASS_LOADING, true),
       }
     );
   }
 
   addNewFeed(feedData: NewFeed) {
-    return this.httpClient.post(environment.baseUrl + '/apigw/feeds', feedData);
+    return this.httpClient.post(environment.baseUrl + '/api/v1/feeds', feedData);
   }
 
-  searchEntries(page: number, limit: number, searchInput?: string) {
-    if (searchInput) {
-      return this.httpClient.get<ListEntriesResponse>(
-        environment.baseUrl + '/apigw/entries',
-        {
-          params: { page: page + 1, limit: limit, title: searchInput },
-        }
-      );
-    } else {
-      return this.httpClient.get<ListEntriesResponse>(
-        environment.baseUrl + '/apigw/entries',
-        {
-          params: { page: page + 1, limit: limit },
-        }
-      );
-    }
+  searchEntries(page: number, limit: number) {
+    return this.httpClient.get<ListEntriesResponse>(
+      environment.baseUrl + '/api/v1/entries',
+      {
+        params: { page: page + 1, limit: limit },
+      }
+    );
   }
 }

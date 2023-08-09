@@ -12,7 +12,7 @@ import { DocumentFormComponent } from './components/document-form/document-form.
 import { AdminOverviewComponent } from './components/admin-overview/admin-overview.component';
 import { MaterialModule } from '../material.module';
 import { TabGroupDirective } from './directives/tab-group.directive';
-import { MatPaginatorIntl } from '@angular/material/paginator';
+import { MatLegacyPaginatorIntl as MatPaginatorIntl } from '@angular/material/legacy-paginator';
 import { CustomPaginationComponent } from '../common/services/custom-pagination.service';
 import { FeedManagementComponent } from './components/feed-management/feed-management.component';
 import { DocumentManagementComponent } from './components/document-management/document-management.component';

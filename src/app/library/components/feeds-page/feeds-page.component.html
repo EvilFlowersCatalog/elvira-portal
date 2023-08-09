@@ -1,0 +1,43 @@
+<div class="feed-page-container">
+    <form
+      [formGroup]="searchForm"
+      (submit)="applyFilter()"
+      class="feed-page-search-form"
+    >
+      <div fxLayout="row">
+        <mat-form-field color="accent" class="feed-page-search-field">
+          <mat-label>
+            {{ title }}
+          </mat-label>
+          <input
+            formControlName="searchInput"
+            matInput
+            type="search"
+          />
+          <mat-icon *ngIf="this.searchForm?.value.searchInput" class="feed-page-search-delete-icon" (click)="clearSearch()">clear</mat-icon>
+        </mat-form-field>
+        <button mat-icon-button type="submit" color="accent" class="feed-page-search-button">
+          <mat-icon style="font-size: 30px;">search</mat-icon>
+        </button>
+      </div>
+    </form>
+
+    <div>
+        <div 
+        fxLayout="row wrap"
+        fxLayout.xs="column"
+        fxLayoutAlign.xs ="none"
+        fxLayoutGap="16px grid"
+        >
+            <div 
+            fxFlex="20%"
+            fxFlex.md="33.3%"
+            fxFlex.sm="50%"
+            fxFlex.xs="100%"
+            *ngFor="let child of childFeeds"
+            >
+                <app-feed [feed]="child.response" [icon]="'menu_book'"></app-feed>
+            </div>
+        </div>
+    </div>
+</div>

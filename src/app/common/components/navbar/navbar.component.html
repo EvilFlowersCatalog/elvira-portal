@@ -1,73 +1,68 @@
 <ng-container *transloco="let t; read: 'navbar'">
   <ng-container *ngIf="appState$ | async as appState">
-    <mat-toolbar color="primary">
-      <div *ngIf="appState.showSidebarToggle">
-        <button mat-icon-button (click)="onSidebarToggle()">
-          <mat-icon [ngClass]="{ animate: animateSidebarToggle }">
-            {{ appState.sidebar ? "first_page" : "list" }}
-          </mat-icon>
-        </button>
-      </div>
+    <mat-toolbar class="navbar">
       <button
-        mat-flat-button
+        [disabled]="!appState.isLoggedIn"
         (click)="navigate('/library/home')"
-        color="primary"
+        class="navbar-home-button-div"
       >
-        <img
-          src="../../../../assets/logos/title_logo.png"
-          class="navbar-logo"
-        />
+        <div *ngIf="href === '/library/home' || href === '/auth/home'; else home">ELVIRA</div>
+        <ng-template #home>
+          <div>{{ t("home") }}</div>
+        </ng-template>
       </button>
+
       <button
-        mat-flat-button
-        *ngIf="appState.isLoggedIn && href != '/library/home'"
-        (click)="navigate('/library/home')"
-        color="primary"
+        *ngIf="appState.isLoggedIn"
+        (click)="navigate('/library/favorites')"
+        class="navbar-button"
       >
-      <mat-icon class="navbar-icon">arrow_back</mat-icon>
-      {{ t("home") }}
+        <mat-icon class="navbar-icon">favorite</mat-icon>
+        {{t("favorites")}}
       </button>
-      <span class="navbar-spacer"></span>
+
       <button
-        mat-flat-button
+        *ngIf="appState.isLoggedIn"
+        (click)="navigate('/library/all-entries')"
+        class="navbar-button"
+      >
+        <mat-icon class="navbar-icon">library_books</mat-icon>
+        {{t("library")}}
+      </button>
+
+      <button
         *ngIf="appState.isAdmin"
         (click)="navigate('/library/admin')"
-        color="primary"
+        class="navbar-button"
       >
         Admin
       </button>
-      <button
-        mat-flat-button
-        *ngIf="appState.isLoggedIn"
-        [matMenuTriggerFor]="profileMenu"
-        color="primary"
-      >
-        <mat-icon class="navbar-icon">person_outline</mat-icon>
-        {{ appState.name }} {{appState.surname}}
-      </button>
-      <button
-        mat-icon-button
-        [matMenuTriggerFor]="settingsMenu"
-        (mouseover)="animateSettings = true"
-        (mouseout)="animateSettings = false"
-      >
-        <mat-icon [ngClass]="{ animate: animateSettings }">settings</mat-icon>
-      </button>
-    </mat-toolbar>
 
-    <mat-menu #settingsMenu="matMenu">
-      <div *ngIf="appState.theme === 'dark'; else darkModeBtn">
-        <button mat-menu-item (click)="changeTheme('light')">
-          <mat-icon>light_mode</mat-icon>
-          <span>{{ t("light") }}</span>
+      <span class="navbar-spacer"></span>
+      
+      <div style="display: flex; justify-content: center; align-items: center;">
+        <button class="navbar-button-theme-switcher" (click)="changeTheme()">
+          <mat-icon>dark_mode</mat-icon>
+          <span class="navbar-spacer"></span>
+          <mat-icon >light_mode</mat-icon>
+          <div class="navbar-button-theme-circle" [ngClass]="{'navbar-button-theme-circle-dark-mode': theme}"></div>
         </button>
       </div>
-      <ng-template #darkModeBtn>
-        <button mat-menu-item (click)="changeTheme('dark')">
-          <mat-icon>dark_mode</mat-icon>
-          <span>{{ t("dark") }}</span>
-        </button>
-      </ng-template>
+
+      <button
+        [matMenuTriggerFor]="settingsMenu"
+        class="navbar-button"
+      >
+        <mat-icon>settings</mat-icon>
+      </button>
+    </mat-toolbar>
+    
+    <mat-menu #settingsMenu="matMenu">
+      <button *ngIf="appState.isLoggedIn" mat-menu-item (click)="navigate('/library/account')">
+        <mat-icon>account_circle</mat-icon>
+        <span>{{ appState.name }} {{appState.surname}}</span>
+      </button> 
+
       <div *ngIf="appState.lang === 'en'; else enVersionBtn">
         <button mat-menu-item (click)="changeLanguage('sk')">
           <mat-icon>translate</mat-icon>
@@ -80,18 +75,8 @@
           <span>{{ t("eng") }}</span>
         </button>
       </ng-template>
-    </mat-menu>
 
-    <mat-menu #profileMenu="matMenu">
-      <button mat-menu-item (click)="navigate('/library/favorites')">
-        <mat-icon>favorite</mat-icon>
-        <span>{{ t("favorites") }}</span>
-      </button>
-      <button mat-menu-item (click)="navigate('/library/account')">
-        <mat-icon>account_circle</mat-icon>
-        <span>{{ t("profile") }}</span>
-      </button>
-      <button mat-menu-item (click)="logout()">
+      <button *ngIf="appState.isLoggedIn" mat-menu-item (click)="logout()">
         <mat-icon>logout</mat-icon>
         <span>{{ t("log-out") }}</span>
       </button>

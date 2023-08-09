@@ -1,8 +1,8 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
-import { MatDialog } from '@angular/material/dialog';
-import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
+import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
+import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
 import { Subject, throwError } from 'rxjs';
@@ -35,7 +35,7 @@ export class DocumentManagementComponent
   tableData: AllEntryItems[] = [];
   dataSource: MatTableDataSource<AllEntryItems>;
   fetchDocuments$ = new Subject();
-  searchForm: FormGroup;
+  searchForm: UntypedFormGroup;
 
   @ViewChild('paginator') paginator: MatPaginator;
 
@@ -46,11 +46,11 @@ export class DocumentManagementComponent
     private readonly adminService: AdminService,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService,
-    private readonly fb: FormBuilder
+    private readonly fb: UntypedFormBuilder
   ) {
     super();
-    this.searchForm = new FormGroup({
-      searchInput: new FormControl(),
+    this.searchForm = new UntypedFormGroup({
+      searchInput: new UntypedFormControl(),
     });
   }
 
@@ -65,12 +65,16 @@ export class DocumentManagementComponent
           this.adminService.searchEntries(
             this.paginator.pageIndex ?? 0,
             this.paginator.pageSize ?? 5,
-            this.searchForm?.value.searchInput
           )
         )
       )
       .subscribe((data) => {
-        this.tableData = data.items;
+        if(this.searchForm?.value.searchInput){
+          this.tableData = data.items.filter(entry => entry.title.toLocaleLowerCase().includes(this.searchForm?.value.searchInput.toLocaleLowerCase()));
+        }
+        else{
+          this.tableData = data.items;
+        }
         this.resultsLength = data.metadata.total;
         this.dataSource = new MatTableDataSource(this.tableData);
       });

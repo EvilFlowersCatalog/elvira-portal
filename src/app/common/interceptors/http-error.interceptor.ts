@@ -13,6 +13,7 @@ import { NotificationService } from '../services/notification.service';
 import { Router } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
 import { AppStateService } from '../services/app-state.service';
+import { RequestCounterService } from '../services/request-counter.service';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
@@ -21,7 +22,8 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     private readonly loadingService: LoadingService,
     private readonly router: Router,
     private readonly translocoService: TranslocoService,
-    private readonly appStateService: AppStateService
+    private readonly appStateService: AppStateService,
+    private readonly requestCounterService: RequestCounterService
   ) {}
 
   intercept(
@@ -30,11 +32,12 @@ export class HttpErrorInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
+        this.requestCounterService.decrement();
         this.loadingService.hideLoading();
         if (error.status >= 500) {
           this.notificationService.error(`Error: ${error.error.message}`);
         }
-        if (error.status === 401) {
+        else {
           this.notificationService.info(
             this.translocoService.translate('lazy.auth.autoLogout')
           );

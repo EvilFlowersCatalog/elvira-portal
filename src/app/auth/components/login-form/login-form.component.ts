@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup } from '@angular/forms';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
@@ -16,7 +16,7 @@ import { LoginResponse } from '../../types/auth.types';
   styleUrls: ['./login-form.component.scss'],
 })
 export class LoginFormComponent implements OnInit {
-  loginForm: FormGroup;
+  loginForm: UntypedFormGroup;
   username: string;
   password: string;
   hidePassword: boolean = true;
@@ -29,9 +29,9 @@ export class LoginFormComponent implements OnInit {
     private readonly notificationService: NotificationService,
     private readonly translocoService: TranslocoService
   ) {
-    this.loginForm = new FormGroup({
-      username: new FormControl(''),
-      password: new FormControl(''),
+    this.loginForm = new UntypedFormGroup({
+      username: new UntypedFormControl(''),
+      password: new UntypedFormControl(''),
     });
   }
 
@@ -50,6 +50,7 @@ export class LoginFormComponent implements OnInit {
             name: response.response.user.name,
             surname: response.response.user.surname,
             isLoggedIn: true,
+            isAdmin: response.response.user.is_superuser,
             userId: response.response.user.id,
           });
           this.router.navigate(['../../library'], { relativeTo: this.route });

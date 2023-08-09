@@ -1,38 +1,57 @@
-<mat-sidenav-container class="sidenav-container">
-  <mat-sidenav
-    mode="over"
-    [opened]="sidebarState$ | async"
-    [autoFocus]="false"
-    (closedStart)="hideSidebar()"
-  >
-    <app-sidebar></app-sidebar>
-  </mat-sidenav>
-  <mat-sidenav-content>
-    <div
-      class="entries-list-container"
-      fxLayout="row wrap"
-      fxLayout.xs="column"
-      fxLayoutGap="16px grid"
-    >
-      <div
-        fxFlex="14.28%"
-        fxFlex.xs="100%"
-        fxFlex.sm="33.3%"
-        fxFlex.md="20%"
-        *ngFor="let entry of entries"
-      >
-        <app-entry-detail [entry]="entry"></app-entry-detail>
-      </div>
+<ng-container *transloco="let t">
+    <div fxLayout="column" class="home-container">
+        <div class="home-column-container">
+            <div 
+                fxLayout="row" 
+                fxLayout.xs="column"
+            >
+                <div 
+                class="home-feeds-container"
+                >
+                    <div 
+                    fxLayout="row wrap"
+                    fxLayout.xs="column"
+                    style="height: 100%;"
+                    fxLayoutGap="16px grid"
+                    >
+                        <div 
+                        fxFlex="50%"
+                        fxFlex.xs="100%"
+                        style="height: 50%;"
+                        *ngFor="let feed of mainFeeds; let i = index"
+                        >
+                            <app-feed [feed]="feed" [icon]="iconsForMainFeeds[i]"></app-feed>
+                        </div>
+                    </div>
+                </div>
+                <div 
+                fxFlex="19%"
+                fxFlex.md="32.3"
+                fxFlex.sm="49%"
+                fxFlex.xs="100%"
+                >   
+                    <div *ngIf="screenWidth < 599" class="home-titles">{{ t( "lazy.homeLibrary.popular" ) }}</div>
+                    <app-swiper [swiperEntries]="popularEntries"></app-swiper>
+                </div>
+            </div>
+            <div style="flex: 1; margin-top: 16px;">
+                <div class="home-titles">{{ t( "lazy.homeLibrary.lastAdded" ) }}</div>
+                <div
+                    fxLayout="row wrap"
+                    fxLayout.xs="column"
+                    fxLayoutGap="16px grid"
+                >
+                    <div
+                    fxFlex="20%"
+                    fxFlex.md="33.3%"
+                    fxFlex.sm="50%"
+                    fxFlex.xs="100%"
+                    *ngFor="let entry of lastAddedEntries"
+                    >
+                        <app-entry-detail [entry]="entry"></app-entry-detail>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div fxLayoutAlign="center center">
-      <mat-paginator
-        (page)="handlePageChange()"
-        #paginator
-        [length]="resultsLength"
-        [pageSizeOptions]="[15, 30, 50]"
-        class="home-paginator"
-      >
-      </mat-paginator>
-    </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+</ng-container>

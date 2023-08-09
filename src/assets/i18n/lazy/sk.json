@@ -1,4 +1,8 @@
 {
+  "homeLibrary" :{
+    "popular": "Populárne",
+    "lastAdded": "Naposledy pridané"
+  },
   "documentForm": {
     "headerNew": "Nový dokument",
     "headerEdit": "Úprava dokumentu",
@@ -45,11 +49,7 @@
   },
   "entryDetail": {
     "info-pdf-tooltip": "Zobraziť informácie",
-    "add-pdf-to-drive-tooltip": "Pridať PDF na Google Disk",
     "favorite-pdf-tooltip": "Pridať do obľúbených",
-    "drive-success-message": "Úspešne nahrané na disk",
-    "drive-error-message": "Nahrávanie na disk zlyhalo",
-    "drive-unauthorized-message": "Prihláste sa najskôr do svojho účtu Google v <a href='/library/account'>nastaveniach účtu Elvíry</a>",
     "addToFavoritesSuccessMessage": "Položka bola pridaná do obľúbených",
     "addToFavoritesErrorMessage": "Pridanie položky do obľúbených zlyhalo",
     "removeFromFavoritesSuccessMessage": "Položka bola odstránená z obľúbených",

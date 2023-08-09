@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatPaginator } from '@angular/material/paginator';
+import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
 import { Subject } from 'rxjs';
 import { concatMap, startWith, takeUntil, tap } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';

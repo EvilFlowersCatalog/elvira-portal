@@ -8,22 +8,19 @@
   },
   "landingPage": {
     "siteDescription": "Moderný digitálny knižničný systém",
-    "booksDescription": "V digitálnej knižnici nájdeš možstvo kníh, ktoré ti pomôžu pri štúdiu. Knihy si teraz môžeš prezerať online v PDF zobrazovači kdekoľvek budeš chcieť!",
-    "filtersDescription": "Knihy môžeš filtrovať podľa predmetov, semestrov, autora a taktiež môžeš prehľadávať zoznam kníh pomocou full-textového vyhľadávania.",
-    "favoritesDescription": "Je pre teba zoznam kníh neprehľadný a musíš dlho hľadať knihy, ktoré potrebuješ? Vytvor si zoznam obľúbených kníh, ktoré práve čítaš alebo sa k ním chceš vrátiť.",
-    "driveDescription": "Systém ponúka možnosť prepojenia s Google diskom. Po úspešnej autorizácii si budeš môcť pridávať súbory na svoj disk a tak si ešte viac zjednodušiť prístup ku knihám. Na disku si ich môžeš rozdeliť do priečinkov prípadne s nimi ďalej pracovať.",
     "loginButton": "Prihlásiť sa"
   },
   "navbar": {
     "light": "Svetlý režim",
     "dark": "Tmavý režim",
     "svk": "Slovensky",
-    "eng": "English",
+    "eng": "Anglicky",
     "profile": "Profil",
     "log-out": "Odhlásiť sa",
     "settings": "Nastavenia",
     "favorites": "Obľúbené",
     "login": "Prihlásiť sa",
-    "home": "Späť"
+    "home": "DOMOV",
+    "library": "Knižnica"
   }
 }

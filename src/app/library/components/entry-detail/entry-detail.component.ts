@@ -1,15 +1,14 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { EntriesService } from '../../services/entries.service';
 import { Router } from '@angular/router';
 import { EntryInfoDialogComponent } from '../entry-info-dialog/entry-info-dialog.component';
 import { catchError, take, tap } from 'rxjs/operators';
-import { GdriveService } from '../../services/gdrive.service';
 import { AppStateService } from 'src/app/common/services/app-state.service';
 import { Observable, throwError } from 'rxjs';
 import { NotificationService } from 'src/app/common/services/notification.service';
 import { TranslocoService } from '@ngneat/transloco';
-import { EntriesItem, EntryDetail } from '../../types/library.types';
+import { EntriesItem, EntryDetail, UserAcquisitionCreationResponse, userAcquisitionCreation } from '../../types/library.types';
 
 @Component({
   selector: 'app-entry-detail',
@@ -25,7 +24,6 @@ export class EntryDetailComponent implements OnInit {
 
   constructor(
     private readonly router: Router,
-    private readonly gdriveService: GdriveService,
     private readonly appStateService: AppStateService,
     public dialog: MatDialog,
     private readonly notificationService: NotificationService,
@@ -37,13 +35,24 @@ export class EntryDetailComponent implements OnInit {
     this.imageSrc = this.entry.thumbnail;
   }
 
-  openPdf(catalogID: string, entryID: string) {
+  openPdf(catalogID: string, entryID: string) { 
     this.entriesService
       .entryDetail(catalogID, entryID)
       .toPromise()
       .then((entryDetail) => {
-        const acquisitionID = entryDetail.response.acquisitions[0].id;
-        this.router.navigateByUrl(`/library/pdf-viewer/${acquisitionID}`);
+        const userAcquisition: userAcquisitionCreation = {
+          acquisition_id: entryDetail.response.acquisitions[0].id,
+          type: "personal"
+        }
+        this.entriesService
+        .createUserAcquisition(userAcquisition)
+        .toPromise()
+        .then((res: UserAcquisitionCreationResponse) => {
+          this.router.navigateByUrl(`/library/pdf-viewer/${res.response.id}`);
+        })
+        .catch((err) => {
+          console.log(err);
+        })
       });
   }
 
@@ -53,36 +62,6 @@ export class EntryDetailComponent implements OnInit {
       maxWidth: '95%',
       data: { catalogID, entryID },
     });
-  }
-
-  addPdfToDrive(entryId: string, catalogId: string) {
-    if (this.appStateService.getStateSnapshot().googleAuthed) {
-      this.gdriveService
-        .uploadFileToDrive(entryId, catalogId)
-        .pipe(
-          tap(() => {
-            const message = this.translocoService.translate(
-              'lazy.entryDetail.drive-success-message'
-            );
-            this.notificationService.success(message);
-          }),
-          take(1),
-          catchError((err) => {
-            console.log(err);
-            const message = this.translocoService.translate(
-              'lazy.entryDetail.drive-error-message'
-            );
-            this.notificationService.error(message);
-            return throwError(err);
-          })
-        )
-        .subscribe();
-    } else {
-      const message = this.translocoService.translate(
-        'lazy.entryDetail.drive-unauthorized-message'
-      );
-      this.notificationService.info(message);
-    }
   }
 
   addToFavorites(id: string) {

@@ -2,6 +2,7 @@
   max-width: -webkit-fill-available;
   max-width: -moz-available;
   background-color: transparent !important;
+  font-size: 18x;
 }
 
 .login-form-password-icon {
@@ -14,5 +15,23 @@
   border-width: 4px;
   border-color: #ffc107 !important;
   width: 60%;
-  margin-top: 20px;
+  margin-top: 100px;
+}
+
+@media screen and (max-width: 1250px) {
+  .login-form-button {
+    font-size: 18px;
+    border-width: 3px;
+  }
+}
+
+@media screen and (max-width: 959px) {
+  .login-form-button {
+    font-size: 15px;
+    border-width: 3px;
+  }
+
+  .login-form-input {
+    font-size: 15px;
+  }
 }

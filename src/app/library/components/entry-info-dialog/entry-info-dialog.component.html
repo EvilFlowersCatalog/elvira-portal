@@ -1,7 +1,7 @@
 <ng-container *transloco="let t">
   <ng-container *ngIf="entryDetail$ | async as entryDetail">
     <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center" color="accent">
-      {{ entryDetail.title }}
+      {{ entryDetail.response.title }}
     </h2>
     <mat-dialog-content
       fxLayout="column"
@@ -13,7 +13,7 @@
           {{ t("lazy.entryInfoDialog.author") }}
         </h6>
         <p>
-          {{ entryDetail.author.name + " " + entryDetail.author.surname }}
+          {{ entryDetail.response.author.name + " " + entryDetail.response.author.surname }}
         </p>
       </div>
 
@@ -22,7 +22,7 @@
           {{ t("lazy.entryInfoDialog.summary") }}
         </h6>
         <p>
-          {{ entryDetail.summary }}
+          {{ entryDetail.response.summary }}
         </p>
       </div>
 
@@ -31,7 +31,7 @@
           {{ t("lazy.entryInfoDialog.feeds") }}
         </h6>
         <ul *ngFor="let feed of entryDetail.feeds">
-          <li>{{ feed.title }}</li>
+          <li>{{ feed.response.title }}</li>
         </ul>
       </div>
 
@@ -39,8 +39,8 @@
         <h6>
           {{ t("lazy.entryInfoDialog.language") }}
         </h6>
-        <p>
-          {{ entryDetail.language.name }}
+        <p> 
+          {{ entryDetail.response.language ? entryDetail.response.language.name : 'N/A'}}
         </p>
       </div>
 
@@ -49,7 +49,7 @@
           {{ t("lazy.entryInfoDialog.createdAt") }}
         </h6>
         <p>
-          {{ entryDetail.created_at | date: "dd.MM.yyyy" }}
+          {{ entryDetail.response.created_at | date: "dd.MM.yyyy" }}
         </p>
       </div>
     </mat-dialog-content>

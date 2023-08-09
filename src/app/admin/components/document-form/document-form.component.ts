@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { throwError } from 'rxjs';
-import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms';
-import { catchError, take, tap } from 'rxjs/operators';
+import { UntypedFormGroup, UntypedFormControl, UntypedFormArray, Validators } from '@angular/forms';
+import { catchError, map, take, tap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AdminService } from '../../services/admin.service';
 import {
+  AcquisitionsItems,
   EditedData,
   EntriesContributors,
   EntriesData,
@@ -13,11 +14,12 @@ import {
 import { TitleValidators } from '../../validators/title.validator';
 import { NotificationService } from 'src/app/common/services/notification.service';
 import { TranslocoService } from '@ngneat/transloco';
-import { FiltersService } from 'src/app/library/services/filters.service';
+//import { FiltersService } from 'src/app/library/services/filters.service';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
-import { FeedTreeNode } from 'src/app/library/types/library.types';
+import { EntriesItem, FeedTreeNode } from 'src/app/library/types/library.types';
 import { NestedTreeControl } from '@angular/cdk/tree';
 import { EntriesService } from 'src/app/library/services/entries.service';
+import { FeedsService } from 'src/app/library/services/feeds.service';
 
 @Component({
   selector: 'app-admin',
@@ -25,68 +27,71 @@ import { EntriesService } from 'src/app/library/services/entries.service';
   styleUrls: ['./document-form.component.scss'],
 })
 export class DocumentFormComponent implements OnInit {
-  uploadForm: FormGroup;
-  imageForm: FormGroup;
-  contributors: FormArray;
+  uploadForm: UntypedFormGroup;
+  imageForm: UntypedFormGroup;
+  contributors: UntypedFormArray;
   feeds: { title: string; id: string }[] = [];
   imageFile: File;
   pdfFile: File;
   validSize: boolean = false;
   entryId: string;
   isInEditMode: boolean = false;
-  dataSource = new MatTreeNestedDataSource<FeedTreeNode>();
-  treeControl = new NestedTreeControl<FeedTreeNode>((node) => node.children);
+  dataSource: { title: string; id: string }[] = [];
 
   constructor(
     private readonly adminService: AdminService,
+    private readonly feedsService: FeedsService,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly titleValidator: TitleValidators,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService,
-    private readonly filtersService: FiltersService
   ) {
-    this.imageForm = new FormGroup({
-      file: new FormControl(null),
+    this.imageForm = new UntypedFormGroup({
+      file: new UntypedFormControl(null),
     });
 
-    this.uploadForm = new FormGroup({
-      title: new FormControl('', {
+    this.uploadForm = new UntypedFormGroup({
+      title: new UntypedFormControl('', {
         validators: [Validators.required],
         asyncValidators: [titleValidator.titleValidator()],
         updateOn: 'blur',
       }),
-      authorName: new FormControl('', Validators.required),
-      authorSurname: new FormControl('', Validators.required),
-      contributors: new FormArray([]),
-      summary: new FormControl(''),
+      authorName: new UntypedFormControl('', Validators.required),
+      authorSurname: new UntypedFormControl('', Validators.required),
+      contributors: new UntypedFormArray([]),
+      summary: new UntypedFormControl(''),
     });
   }
 
   ngOnInit(): void {
-    this.filtersService.getFeedTreeNode().subscribe((data) => {
-      this.dataSource.data = data;
+    this.feedsService.getFeeds(100)
+    .pipe(
+      map((data) => data.items.filter(feed => feed.kind === "acquisition").map(feed => ({ title: feed.title, id: feed.id })))
+    )
+    .subscribe((dataSource) => {  
+      this.dataSource = dataSource;
     });
 
     this.entryId = this.route.snapshot.paramMap.get('id');
     if (this.entryId) {
       this.isInEditMode = true;
-      this.adminService.getOneEntry(this.entryId).subscribe((res) => {
-        this.initUploadForm(res);
-        this.feeds = res.feeds.map((feed) => {
+      this.adminService.getOneEntry(this.entryId).subscribe((response) => {
+        this.initUploadForm(response);
+        this.feeds = response.response.feeds.map((feed) => {
           return { title: feed.title, id: feed.id };
         });
-        this.initContributors(res.contributors);
+        this.initContributors(response.response.contributors);
       });
     }
   }
 
   initUploadForm(data: OneEntryItem) {
     this.uploadForm.patchValue({
-      title: data.title,
-      authorName: data.author.name,
-      authorSurname: data.author.surname,
-      summary: data.summary,
+      title: data.response.title,
+      authorName: data.response.author.name,
+      authorSurname: data.response.author.surname,
+      summary: data.response.summary,
     });
   }
 
@@ -94,21 +99,18 @@ export class DocumentFormComponent implements OnInit {
     return this.uploadForm.controls['title'];
   }
 
-  isNavigationNode = (_: number, node: FeedTreeNode) =>
-    node.kind === 'navigation';
-
   addContributor(name?: string, surname?: string): void {
-    this.contributors = this.uploadForm.get('contributors') as FormArray;
+    this.contributors = this.uploadForm.get('contributors') as UntypedFormArray;
     this.contributors.push(
-      new FormGroup({
-        name: new FormControl(name ?? '', Validators.required),
-        surname: new FormControl(surname ?? '', Validators.required),
+      new UntypedFormGroup({
+        name: new UntypedFormControl(name ?? '', Validators.required),
+        surname: new UntypedFormControl(surname ?? '', Validators.required),
       })
     );
   }
 
   deleteContributor(index: number) {
-    const add = this.uploadForm.get('contributors') as FormArray;
+    const add = this.uploadForm.get('contributors') as UntypedFormArray;
     add.removeAt(index);
   }
 
@@ -119,7 +121,14 @@ export class DocumentFormComponent implements OnInit {
   }
 
   addFeed(feed) {
-    if (!this.feeds.includes({ title: feed.title, id: feed.id })) {
+    let contains = false
+    for(let i = 0; i < this.feeds.length; i++) {
+      if(this.feeds[i].id === feed.id) {
+        contains = true;
+        break;
+      }
+    }
+    if (!contains) {
       this.feeds.push({ title: feed.title, id: feed.id });
     }
   }
@@ -132,7 +141,7 @@ export class DocumentFormComponent implements OnInit {
     }
   }
 
-  async onSubmit() {
+  async createOrUpdateEntry() {
     if (this.isInEditMode) {
       this.adminService
         .updateEntry(this.entryId, this.getEditedData())
@@ -156,10 +165,6 @@ export class DocumentFormComponent implements OnInit {
         )
         .subscribe();
     } else {
-      let testData: FormData = new FormData();
-      testData.append('file', this.imageFile, this.imageFile.name);
-      testData.append('body', JSON.stringify(await this.getFormData()));
-
       if (this.uploadForm.invalid) {
         this.notificationService.error('Invalid upload form!');
       } else if (!this.validSize) {
@@ -167,19 +172,43 @@ export class DocumentFormComponent implements OnInit {
       } else if (!this.imageFile || !this.pdfFile) {
         this.notificationService.error('Seems like some files are missing!');
       } else {
+        const newEntry = await this.getFormData();
+        
         this.adminService
-          .upload(testData)
+          .upload(newEntry)
           .pipe(
-            tap(() => {
-              const message = this.translocoService.translate(
-                'lazy.documentForm.successMessageUploadDocument'
-              );
-              this.notificationService.success(message);
-              this.router.navigate(['../'], { relativeTo: this.route });
+            tap(async (response: OneEntryItem) => {
+              
+              let acquisitionData = new FormData();
+              let metadata = {
+                relation: "open-access",
+              }
+              acquisitionData.append('content', this.pdfFile);
+              acquisitionData.append('metadata', JSON.stringify(metadata));
+
+              try {
+                await this.adminService.uploadAcquisition(acquisitionData, response.response.id);
+
+                const message = this.translocoService.translate(
+                  'lazy.documentForm.successMessageUploadDocument'
+                );
+                this.notificationService.success(message);
+                this.router.navigate(['../'], { relativeTo: this.route });
+              } catch (error) {
+                // Ak sa niečo stane pri nahraní pdfka a nepodarí sa nahrať, vymaž vytvorenú entrie
+                this.adminService
+                  .deleteEntry(response.response.id)
+                  .toPromise();
+
+                  const message = this.translocoService.translate(
+                    'lazy.documentForm.errorMessageUploadDocument'
+                  );
+                  this.notificationService.error(message);
+                  return throwError(error);
+              }
             }),
             take(1),
             catchError((err) => {
-              console.log(err);
               const message = this.translocoService.translate(
                 'lazy.documentForm.errorMessageUploadDocument'
               );
@@ -205,6 +234,10 @@ export class DocumentFormComponent implements OnInit {
       summary: this.uploadForm.get('summary').value,
       language_code: 'sk',
       contributors: this.getContributors(),
+      identifiers: {
+        google: "XIXIX",
+        isbn: "null"
+      },
     };
     return editedData;
   }
@@ -222,16 +255,21 @@ export class DocumentFormComponent implements OnInit {
       }),
       summary: this.uploadForm.get('summary').value,
       language_code: 'sk',
-      acquisitions: [
-        { relation: 'acquisition', content: await this.getBase() },
-      ],
+      // acquisitions: [
+      //   { relation: 'acquisition', content: await this.getBase(this.pdfFile) },
+      // ],
+      identifiers: {
+        google: "XIXIX",
+        isbn: "null"
+      },
+      image: await this.getBase(this.imageFile)
     };
 
     return entriesData;
   }
 
-  async getBase() {
-    const getBase64 = (file) => {
+  async getBase(fileBase: File) {
+    const getBase64 = (file: File) => {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -239,12 +277,12 @@ export class DocumentFormComponent implements OnInit {
         reader.onerror = (error) => reject(error);
       });
     };
-    const base = await getBase64(this.pdfFile);
+    const base = await getBase64(fileBase);
     return base;
   }
 
   getContributors() {
-    const formArray = this.uploadForm.get('contributors') as FormArray;
+    const formArray = this.uploadForm.get('contributors') as UntypedFormArray;
     return formArray.controls.map((control) => {
       return {
         name: control.get('name').value,

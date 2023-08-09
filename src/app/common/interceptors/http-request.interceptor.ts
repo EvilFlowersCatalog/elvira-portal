@@ -5,19 +5,25 @@ import {
   HttpEvent,
   HttpInterceptor,
   HttpContextToken,
+  HttpResponse,
+  HttpErrorResponse,
 } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
 import { AppStateService } from '../services/app-state.service';
 import { LoadingService } from '../services/loading.service';
-import { environment } from 'src/environments/environment';
+import { catchError, tap } from 'rxjs/operators';
+import { RequestCounterService } from '../services/request-counter.service';
 
 export const BYPASS_LOADING = new HttpContextToken(() => false);
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
+  private requestsCount = 0; // Track the number of requests
+
   constructor(
     private readonly appStateService: AppStateService,
-    private readonly loadingService: LoadingService
+    private readonly loadingService: LoadingService,
+    private readonly requestCounterService: RequestCounterService
   ) {}
 
   intercept(
@@ -26,9 +32,10 @@ export class HttpRequestInterceptor implements HttpInterceptor {
   ): Observable<HttpEvent<any>> {
     if (request.context.get(BYPASS_LOADING) === false) {
       this.loadingService.showLoading();
+      this.requestCounterService.increment();
     }
+
     const authToken = this.appStateService.getStateSnapshot().token;
-    // const isApiRequest = request.urlWithParams.startsWith(environment.baseUrl);
     const options = {
       headers: authToken
         ? request.headers.set('Authorization', `Bearer ${authToken}`)
@@ -36,6 +43,23 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     };
 
     request = request.clone(options);
-    return next.handle(request);
+
+    return next.handle(request).pipe(
+      catchError((error: HttpErrorResponse) => {
+        this.requestCounterService.decrement();
+        if (this.requestCounterService.getCount() === 0) {
+          this.loadingService.hideLoading();
+        }
+        return throwError(error);
+      }),
+      tap((event) => {
+        if (event instanceof HttpResponse) {
+          this.requestCounterService.decrement();
+          if (this.requestCounterService.getCount() === 0) {
+            this.loadingService.hideLoading();
+          }
+        }
+      })
+    );
   }
 }

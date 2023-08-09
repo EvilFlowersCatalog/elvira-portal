@@ -1,0 +1,41 @@
+.feed-page-container {
+    position: absolute;
+    top: 70px;
+    bottom: 0;
+    width: 100%;
+    padding: 16px;
+    background: transparent !important;
+}
+
+.feed-page-search-form {
+    width: 100%;
+}
+  
+.feed-page-search-field {
+    width: 50%;
+    min-width: 200px;
+}
+
+.feed-page-search-button {
+    margin: auto 0;
+}
+
+.feed-page-search-delete-icon {
+    position: absolute; 
+    right: 0; 
+    color: red; 
+    font-size: 20px;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 959px) {
+    .feed-page-search-field {
+      width: 80%; 
+    }
+  }
+  
+  @media screen and (max-width: 599px) {
+    .feed-page-container {
+      top: 56px;
+    }
+  }

@@ -11,6 +11,21 @@
 }
 
 .mobile-sidenav-home-button {
+  background-color: rgba(white, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
   width: 100%;
-  background-color: white;
+  border: none;
+  padding: 10px;
 }
+
+span {
+  font-size: 17px;
+}
+
+button {
+  margin-bottom: 10px;
+}
+

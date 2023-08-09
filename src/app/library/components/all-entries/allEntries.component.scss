@@ -1,0 +1,64 @@
+.all-entries-container {
+  background-color: transparent !important;
+  padding: 16px 0 16px 16px;
+  position: absolute;
+  top: 70px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  overflow: auto;
+}
+
+.all-entries-search-form {
+  width: 100%;
+}
+
+.all-entries-search-field {
+  width: 50%;
+  min-width: 200px;
+}
+
+.all-entries-search-button {
+  margin: auto 0;
+}
+
+.all-entries-search-delete-icon {
+  position: absolute; 
+  right: 0; 
+  color: red; 
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.all-entries-search-checkbox {
+  color: #ffc107; 
+  margin: auto 0;
+}
+
+
+.entries-list-container {
+  padding-top: 16px;
+  margin: 0 !important; 
+}
+
+.home-paginator {
+  width: 100%;
+  margin-right: 16px;
+}
+
+@media screen and (max-width: 959px) {
+  .all-entries-search-field {
+    width: 80%; 
+  }
+}
+
+@media screen and (max-width: 599px) {
+  .all-entries-container {
+    background-color: transparent !important;
+    position: absolute;
+    top: 56px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+}

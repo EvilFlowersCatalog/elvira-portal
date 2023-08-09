@@ -7,6 +7,7 @@ import { takeUntil } from 'rxjs/operators';
 import { AppStateService } from 'src/app/common/services/app-state.service';
 import { State } from 'src/app/common/types/app-state.types';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
+import { DownloadUserAcquistionWithQuery } from '../../types/library.types';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -28,12 +29,12 @@ export class PdfViewerComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const acquisitionID = this.route.snapshot.paramMap.get('acquisitionID');
+    const userAcquisitionID = this.route.snapshot.paramMap.get('userAcquisitionID');
     this.entriesService
-      .acquisitionDetail(acquisitionID)
+      .donwloadUserAcquisition(userAcquisitionID, 'base64')
       .subscribe(
-        (data) => {
-          this.base64 = data.response.content;
+        (data: DownloadUserAcquistionWithQuery) => {
+          this.base64 = data.response.data;
         }
       );
 

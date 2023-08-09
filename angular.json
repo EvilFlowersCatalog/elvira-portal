@@ -42,6 +42,10 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
+            "allowedCommonJsDependencies": [
+              "js-guid",
+              "flat"
+            ],
             "outputPath": "dist/elibrary-portal",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -189,6 +193,5 @@
         }
       }
     }
-  },
-  "defaultProject": "elibrary-portal"
+  }
 }

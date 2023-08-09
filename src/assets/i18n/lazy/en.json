@@ -1,4 +1,8 @@
 {
+  "homeLibrary" :{
+    "popular": "Popular",
+    "lastAdded": "Lastly added"
+  },
   "documentForm": {
     "headerNew": "Document upload",
     "headerEdit": "Document edit",
@@ -42,11 +46,7 @@
   },
   "entryDetail": {
     "info-pdf-tooltip": "Show info",
-    "add-pdf-to-drive-tooltip": "Upload PDF to Google Drive",
     "favorite-pdf-tooltip": "Add to favorite list",
-    "drive-success-message": "Successfully uploaded to drive",
-    "drive-error-message": "Upload to drive failed",
-    "drive-unauthorized-message": "Sign in to your Google account in <a href='/library/account'>Elvíra's account settings</a> first",
     "addToFavoritesSuccessMessage": "Item was successfully added to favorites",
     "addToFavoritesErrorMessage": "Failed to add item to favorites",
     "removeFromFavoritesSuccessMessage": "Item was removed from favorites",

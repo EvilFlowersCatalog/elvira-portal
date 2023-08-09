@@ -1,11 +1,12 @@
 import { Routes } from '@angular/router';
 import { AdminGuard } from 'src/app/admin/routing/admin.guard';
-import { HomeComponent } from '../components/home/home.component';
+import { AllEntriesComponent } from '../components/all-entries/allEntries.component';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { FavoritesComponent } from '../components/favorites/favorites.component';
 import { AccountSettingsComponent } from '../components/account-settings/account-settings.component';
 import { LibraryGuard } from './library.guard';
-import { GdriveAuthComponent } from '../components/gdrive-auth.component';
+import { HomeComponent } from '../components/home/home.component';
+import { FeedsPageComponent } from '../components/feeds-page/feeds-page.component';
 
 export const LIBRARY_ROUTES: Routes = [
   {
@@ -25,7 +26,27 @@ export const LIBRARY_ROUTES: Routes = [
     component: HomeComponent,
   },
   {
-    path: 'pdf-viewer/:acquisitionID',
+    path: 'feeds',
+    redirectTo: 'home',
+    pathMatch: 'full',
+  },
+  {
+    path: 'feeds/:feedId',
+    canActivate: [LibraryGuard],
+    component: FeedsPageComponent,
+  },
+  {
+    path: 'all-entries',
+    canActivate: [LibraryGuard],
+    component: AllEntriesComponent,
+  },
+  {
+    path: 'all-entries/:feedId',
+    canActivate: [LibraryGuard],
+    component: AllEntriesComponent,
+  },
+  {
+    path: 'pdf-viewer/:userAcquisitionID',
     canActivate: [LibraryGuard],
     component: PdfViewerComponent,
   },
@@ -38,10 +59,5 @@ export const LIBRARY_ROUTES: Routes = [
     path: 'account',
     canActivate: [LibraryGuard],
     component: AccountSettingsComponent,
-  },
-  {
-    path: 'account/gdrive-auth',
-    canActivate: [LibraryGuard],
-    component: GdriveAuthComponent,
   },
 ];

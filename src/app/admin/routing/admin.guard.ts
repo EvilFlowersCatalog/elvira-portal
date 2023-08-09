@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CanLoad, Router, ActivatedRoute, UrlTree } from '@angular/router';
+import { Router, ActivatedRoute, UrlTree } from '@angular/router';
 import { AppStateService } from 'src/app/common/services/app-state.service';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { AdminService } from '../services/admin.service';
@@ -10,7 +10,7 @@ import { DeviceDetectorService } from 'ngx-device-detector';
 @Injectable({
   providedIn: 'root',
 })
-export class AdminGuard implements CanLoad {
+export class AdminGuard  {
   constructor(
     protected readonly router: Router,
     protected readonly route: ActivatedRoute,
@@ -39,11 +39,11 @@ export class AdminGuard implements CanLoad {
     // const isMobile = this.deviceService.isMobile();
     // const isTablet = this.deviceService.isTablet();
     const token = this.appStateService.getStateSnapshot().token;
-    const mongoId = jwtDecode<JwtPayload & { mongoId: string }>(token).mongoId;
+    const userId = jwtDecode<JwtPayload & { sub: string }>(token).sub;
     // if(isMobile || isTablet){
     //   this.router.navigate(['./'], { relativeTo: this.route });
     //   return of(false);
     // }
-    return this.adminService.getIsAdmin(mongoId).pipe(map((data) => data));
+    return this.adminService.getIsAdmin(userId).pipe(map((response) => response.response.is_superuser));
   }
 }

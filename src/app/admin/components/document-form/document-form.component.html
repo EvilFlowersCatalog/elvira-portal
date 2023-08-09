@@ -19,7 +19,7 @@
       <mat-divider></mat-divider>
 
       <mat-card-content class="document-form-content">
-        <form [formGroup]="uploadForm" (ngSubmit)="onSubmit()">
+        <form [formGroup]="uploadForm" (submit)="createOrUpdateEntry()">
           <div fxLayout="column" fxLayoutAlign="start" fxLayoutGap="20px">
             <div fxLayout="row" fxLayoutAlign="space-between center">
               <mat-form-field style="width: 100%">
@@ -56,13 +56,13 @@
               <div
                 fxLayout="row"
                 fxLayoutAlign="start center"
-                fxLayoutGap="20px"
+                fxLayoutGap="16px"
               >
-                <mat-form-field fxFlex="40">
+                <mat-form-field fxFlex="50">
                   <mat-label>{{ t("lazy.documentForm.authorName") }}</mat-label>
                   <input matInput formControlName="authorName" />
                 </mat-form-field>
-                <mat-form-field fxFlex="40">
+                <mat-form-field fxFlex="50">
                   <mat-label>
                     {{ t("lazy.documentForm.authorSurname") }}
                   </mat-label>
@@ -136,7 +136,7 @@
               </div>
 
               <mat-expansion-panel>
-                <mat-expansion-panel-header>
+                <mat-expansion-panel-header style="padding: 5px 10px;">
                   <mat-panel-title>
                     {{ t("lazy.documentForm.feedsList") }}
                   </mat-panel-title>
@@ -144,66 +144,19 @@
                     {{ t("lazy.documentForm.feedsExpansion") }}
                   </mat-panel-description>
                 </mat-expansion-panel-header>
-                <div *ngIf="dataSource.data.length == 0; else feedTree">
+                <div *ngIf="dataSource && dataSource.length === 0; else feedTree">
                   <div fxFill fxLayoutAlign="center center">
                     <mat-spinner [diameter]="35"></mat-spinner>
                   </div>
                 </div>
                 <ng-template #feedTree>
-                  <mat-tree
-                    [dataSource]="dataSource"
-                    [treeControl]="treeControl"
-                    class="document-form-feed-tree"
+                  <div 
+                  *ngFor="let feed of dataSource"
                   >
-                    <mat-tree-node *matTreeNodeDef="let node" matTreeNodeToggle>
-                      <div fxLayout="row" fxLayoutAlign="space-between center">
-                        <button
-                          mat-flat-button
-                          (click)="addFeed(node)"
-                          type="button"
-                        >
-                          {{ node.title }}
-                        </button>
-                        <button
-                          mat-icon-button
-                          color="accent"
-                          type="button"
-                          (click)="addFeed(node)"
-                        >
-                          <mat-icon>add</mat-icon>
-                        </button>
-                      </div>
-                    </mat-tree-node>
-                    <mat-nested-tree-node
-                      *matTreeNodeDef="let node; when: isNavigationNode"
-                    >
-                      <div class="mat-tree-node">
-                        <button
-                          type="button"
-                          mat-icon-button
-                          matTreeNodeToggle
-                          [attr.aria-label]="'Toggle ' + node.title"
-                        >
-                          <mat-icon class="mat-icon-rtl-mirror">
-                            {{
-                              treeControl.isExpanded(node)
-                                ? "expand_more"
-                                : "chevron_right"
-                            }}
-                          </mat-icon>
-                        </button>
-                        {{ node.title }}
-                      </div>
-                      <div
-                        [class.document-form-feed-tree-invisible]="
-                          !treeControl.isExpanded(node)
-                        "
-                        role="group"
-                      >
-                        <ng-container matTreeNodeOutlet></ng-container>
-                      </div>
-                    </mat-nested-tree-node>
-                  </mat-tree>
+                    <div mat-menu-item (click)="addFeed(feed)">
+                      {{ feed.title }}
+                    </div>
+                  </div>
                 </ng-template>
               </mat-expansion-panel>
             </div>

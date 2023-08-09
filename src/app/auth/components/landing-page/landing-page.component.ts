@@ -6,13 +6,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./landing-page.component.scss'],
 })
 export class LandingPageComponent implements OnInit {
-  isLoginFormVisible = false;
 
   constructor() {}
 
   ngOnInit(): void {}
-
-  showLoginForm() {
-    this.isLoginFormVisible = true;
-  }
 }

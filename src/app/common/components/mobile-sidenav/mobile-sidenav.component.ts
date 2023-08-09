@@ -46,10 +46,6 @@ export class MobileSidenavComponent
   }
 
   logout() {
-    this.authService
-      .logout(this.appStateService.getStateSnapshot().token)
-      .pipe(takeUntil(this.destroySignal$))
-      .subscribe();
     this.appStateService.logoutResetState();
     this.router.navigate(['/auth/home']);
   }

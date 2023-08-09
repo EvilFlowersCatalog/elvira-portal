@@ -1,9 +1,9 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
 import {
-  FormBuilder,
+  UntypedFormBuilder,
   FormControl,
-  FormGroup,
+  UntypedFormGroup,
   Validators,
 } from '@angular/forms';
 import { TranslocoService } from '@ngneat/transloco';
@@ -15,12 +15,12 @@ import { NotificationService } from 'src/app/common/services/notification.servic
   styleUrls: ['./new-feed-dialog.component.scss'],
 })
 export class NewFeedDialogComponent implements OnInit {
-  newFeedForm: FormGroup;
+  newFeedForm: UntypedFormGroup;
 
   constructor(
     public dialogRef: MatDialogRef<NewFeedDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { parentName: string },
-    private readonly fb: FormBuilder,
+    private readonly fb: UntypedFormBuilder,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService
   ) {

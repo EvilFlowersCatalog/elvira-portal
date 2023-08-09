@@ -7,10 +7,27 @@
   }
 }
 
+img {
+  height: 20px;
+}
+
 .navbar-spacer {
   flex: 1 1 auto;
 }
 
-.mobile-navbar-logo {
-  max-height: 20px;
+.navbar {
+  background-color: black;
+  padding: 0 16px;
+}
+
+.navbar-home-button-div {
+  height: 35px;
+  display: flex; 
+  padding-right: 16px;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px; 
+  color: white; 
+  border: none;
+  background: none;
 }

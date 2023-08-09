@@ -1,5 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { GdriveService } from '../../services/gdrive.service';
 import { catchError, takeUntil, tap } from 'rxjs/operators';
 import { UserService } from '../../services/user.service';
 import { UserResponse } from '../../types/library.types';
@@ -23,7 +22,6 @@ export class AccountSettingsComponent
   appState$: Observable<State>;
 
   constructor(
-    private readonly gdriveService: GdriveService,
     private readonly userService: UserService,
     private readonly appStateService: AppStateService,
     private readonly notificationService: NotificationService,
@@ -37,54 +35,5 @@ export class AccountSettingsComponent
       .getState$()
       .pipe(takeUntil(this.destroySignal$));
     this.userService.getUser().subscribe((data) => (this.userData = data.response));
-  }
-
-  getUrl() {
-    var popup = window.open(
-      '',
-      'window name',
-      'width=800,height=600,menubar=0,toolbar=0'
-    );
-
-    this.gdriveService
-      .getAuthUrl()
-      .pipe(takeUntil(this.destroySignal$))
-      .subscribe(
-        (data: { response: { url: string } }) =>
-          (popup.location.href = data.response.url)
-      );
-  }
-
-  unlinkGoogle() {
-    this.gdriveService
-      .unlinkGoogle()
-      .pipe(
-        takeUntil(this.destroySignal$),
-        tap(() => {
-          const message = this.translocoService.translate(
-            'lazy.accountSettings.unlinkSuccessMessage'
-          );
-          this.notificationService.info(message);
-          this.appStateService.patchState({ googleAuthed: false });
-        }),
-        catchError((err) => {
-          console.log(err);
-          const message = this.translocoService.translate(
-            'lazy.accountSettings.unlinkErrorMessage'
-          );
-          this.notificationService.error(message);
-          return throwError(err);
-        })
-      )
-      .subscribe();
-  }
-
-  handleToggle(e) {
-    if (this.appStateService.getStateSnapshot().googleAuthed) {
-      this.unlinkGoogle();
-    } else {
-      e.source.checked = false;
-      this.getUrl();
-    }
   }
 }

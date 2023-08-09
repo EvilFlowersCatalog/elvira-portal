@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state.service';
 import { environment } from 'src/environments/environment';
-import { UserResponse } from '../types/library.types';
+import { UserResponse, userAcquisitionCreation } from '../types/library.types';
 
 @Injectable({
   providedIn: 'root',
