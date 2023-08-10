@@ -9,8 +9,8 @@ export class FilterService {
     private limit: number = 15;
     private title: string = "";
     private feed: string = "";
-    private titleChangedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-    titleChanged$: Observable<boolean> = this.titleChangedSubject.asObservable();
+    private changedSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+    changed$: Observable<boolean> = this.changedSubject.asObservable();
 
     setPage(page: number) {
         this.page = page + 1;
@@ -23,14 +23,15 @@ export class FilterService {
     setTitle(title: string) {
         if (title !== this.title) {
             this.title = title;
-            this.titleChangedSubject.next(true);
-        } else { this.titleChangedSubject.next(false); }
+            this.changedSubject.next(true);
+        } else { this.changedSubject.next(false); }
     }
 
     setFeed(feed: string) {
-        if(feed) {
+        if (feed !== this.feed) {
             this.feed = feed;
-        } else { this.feed = null }
+            this.changedSubject.next(true);
+        } else { this.changedSubject.next(false); }
     }
 
     getFilter() {

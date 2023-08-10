@@ -45,12 +45,11 @@ export class HomeComponent extends DisposableComponent implements OnInit {
       this.popularEntries = data.items
     });
     
-    this.feedsService.getFeeds({page: 1, limit: 100})
-    .subscribe((data) => {
-      this.mainFeeds = data.items.filter((item) => {
-        return item.parents.length === 0;
-      })
-    });
-
+    this.feedsService.getFeeds({
+      page: 1, 
+      limit: 4, 
+      parent_id: "null"
+    })
+    .subscribe((data) => this.mainFeeds = data.items);
   }
 }

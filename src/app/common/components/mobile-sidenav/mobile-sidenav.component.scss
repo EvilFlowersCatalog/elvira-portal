@@ -2,6 +2,12 @@
   padding-top: 10px;
 }
 
+.mobile-sidenav-close-button {
+  position: absolute; 
+  top: 5px; 
+  right: 0;
+}
+
 .mobile-sidenav-icon {
   margin-right: 15px;
 }
@@ -15,6 +21,11 @@
   width: 100%;
   border: none;
   padding: 10px;
+}
+
+.mobile-sidenav-bottom-container {
+  position: absolute; 
+  bottom: 0;
 }
 
 span {

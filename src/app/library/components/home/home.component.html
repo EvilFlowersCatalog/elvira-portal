@@ -5,36 +5,34 @@
                 fxLayout="row" 
                 fxLayout.xs="column"
             >
-                <div 
-                class="home-feeds-container"
-                >
+                <div class="home-feeds-container">
                     <div 
-                    fxLayout="row wrap"
-                    fxLayout.xs="column"
-                    style="height: 100%;"
-                    fxLayoutGap="16px grid"
+                        fxLayout="row wrap"
+                        fxLayout.xs="column"
+                        class="home-feed-row-container"
+                        fxLayoutGap="16px grid"
                     >
                         <div 
-                        fxFlex="50%"
-                        fxFlex.xs="100%"
-                        style="height: 50%;"
-                        *ngFor="let feed of mainFeeds; let i = index"
+                            fxFlex="50%"
+                            fxFlex.xs="100%"
+                            class="home-feed-element"
+                            *ngFor="let feed of mainFeeds; let i = index"
                         >
                             <app-feed [feed]="feed" [icon]="iconsForMainFeeds[i]"></app-feed>
                         </div>
                     </div>
                 </div>
                 <div 
-                fxFlex="19%"
-                fxFlex.md="32.3"
-                fxFlex.sm="49%"
-                fxFlex.xs="100%"
+                    fxFlex="19%"
+                    fxFlex.md="32.3"
+                    fxFlex.sm="49%"
+                    fxFlex.xs="100%"
                 >   
                     <div *ngIf="screenWidth < 599" class="home-titles">{{ t( "lazy.homeLibrary.popular" ) }}</div>
                     <app-swiper [swiperEntries]="popularEntries"></app-swiper>
                 </div>
             </div>
-            <div style="flex: 1; margin-top: 16px;">
+            <div class="home-last-added-container">
                 <div class="home-titles">{{ t( "lazy.homeLibrary.lastAdded" ) }}</div>
                 <div
                     fxLayout="row wrap"
@@ -42,11 +40,11 @@
                     fxLayoutGap="16px grid"
                 >
                     <div
-                    fxFlex="20%"
-                    fxFlex.md="33.3%"
-                    fxFlex.sm="50%"
-                    fxFlex.xs="100%"
-                    *ngFor="let entry of lastAddedEntries"
+                        fxFlex="20%"
+                        fxFlex.md="33.3%"
+                        fxFlex.sm="50%"
+                        fxFlex.xs="100%"
+                        *ngFor="let entry of lastAddedEntries"
                     >
                         <app-entry-detail [entry]="entry"></app-entry-detail>
                     </div>

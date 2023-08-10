@@ -50,6 +50,7 @@
   "entryDetail": {
     "info-pdf-tooltip": "Zobraziť informácie",
     "favorite-pdf-tooltip": "Pridať do obľúbených",
+    "open-pdf-tooltip": "Otvoriť PDF",
     "addToFavoritesSuccessMessage": "Položka bola pridaná do obľúbených",
     "addToFavoritesErrorMessage": "Pridanie položky do obľúbených zlyhalo",
     "removeFromFavoritesSuccessMessage": "Položka bola odstránená z obľúbených",
@@ -93,12 +94,6 @@
   "favorites": {
     "emptyFavorites": "V tomto zozname sa nenachádza žiadna položka"
   },
-  "sidebar": {
-    "search": "Hľadať",
-    "cancelFilters": "Zrušiť filtre",
-    "author": "Autor",
-    "subjects": "Predmety:"
-  },
   "newFeedDialog": {
     "requiredFieldEmptyMessage": "Niektoré z povinných polí sú prázdne",
     "title": "Vytvoriť nový feed",
@@ -117,5 +112,11 @@
     "feedPutError": "Aktualizovanie feedu zlyhalo",
     "feedDeleteSuccess": "Feed bol úspešne odstránený",
     "feedDeleteError": "Zmazanie feedu zlyhalo"
+  },
+  "filter": {
+    "filters": "Filtry",
+    "title": "Titul",
+    "feed": "Predmet",
+    "noFilters": "Žiadne filtre"
   }
 }

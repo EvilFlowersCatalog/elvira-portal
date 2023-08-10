@@ -9,6 +9,7 @@ import { FilterService } from '../services/filter.service';
     <div class="feed-container" (click)="feedNavigator()">
         <mat-icon>{{icon}}</mat-icon>
         <div>{{ feed.title }}</div>
+        <p>{{ feed.content }}</p>
     </div>
     `,
     styles: [`
@@ -32,6 +33,10 @@ import { FilterService } from '../services/filter.service';
         font-size: 80px;
         height: 80px;
         width: 80px;
+    }
+
+    p {
+        font-size: 12px
     }
 
     @media screen and (max-width: 1250px) {

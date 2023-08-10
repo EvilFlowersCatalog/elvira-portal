@@ -1,4 +1,4 @@
-import { Component, OnInit} from '@angular/core'
+import { Component, OnInit, ViewChild} from '@angular/core'
 import { ActivatedRoute } from '@angular/router';
 import { FeedDetailRespone, FeedTreeNode, ListFeedsResponse } from '../../types/library.types';
 import { FeedsService } from '../../services/feeds.service';
@@ -6,6 +6,7 @@ import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Subject, Subscription, forkJoin } from 'rxjs';
 import { concatMap, startWith, takeUntil } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
     selector: 'app-feeds-page',
@@ -16,8 +17,10 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
     childFeeds: FeedTreeNode[] = [];
     title: string;
     searchForm: UntypedFormGroup;
+    resultsLength = 0;
     wasApplied: boolean = false;
     fetchFeeds$ = new Subject();
+    @ViewChild('paginator') paginator: MatPaginator;
 
     constructor (
         private readonly route: ActivatedRoute,
@@ -40,10 +43,17 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
         .pipe(
             takeUntil(this.destroySignal$),
             startWith([]),
-            concatMap((title: string) => this.feedsService.getFeeds({page: 1, limit: 100, parent_id: feedId, title: title}))
+            concatMap((title: string = "") => this.feedsService.getFeeds({
+                page: this.paginator?.pageIndex ? this.paginator?.pageIndex + 1 : 1, 
+                limit: this.paginator?.pageSize ?? 15, 
+                parent_id: feedId, 
+                title: title
+            }))
         )
         .subscribe((data) => {
             this.childFeeds = data.items;
+            this.resultsLength = data.metadata.total;
+            this.paginator.pageIndex = data.metadata.page - 1;
         })
     }
 
@@ -58,5 +68,9 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
     applyFilter() {
         this.wasApplied = true;
         this.fetchFeeds$.next(this.searchForm?.value.searchInput ? this.searchForm?.value.searchInput : "");
+    }
+
+    handlePageChange() {
+        this.fetchFeeds$.next();
     }
 }

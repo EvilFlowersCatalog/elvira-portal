@@ -3,12 +3,13 @@ import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { EntriesService } from '../../services/entries.service';
 import { Router } from '@angular/router';
 import { EntryInfoDialogComponent } from '../entry-info-dialog/entry-info-dialog.component';
-import { catchError, take, tap } from 'rxjs/operators';
+import { catchError, filter, take, tap } from 'rxjs/operators';
 import { AppStateService } from 'src/app/common/services/app-state.service';
 import { Observable, throwError } from 'rxjs';
 import { NotificationService } from 'src/app/common/services/notification.service';
 import { TranslocoService } from '@ngneat/transloco';
 import { EntriesItem, EntryDetail, UserAcquisitionCreationResponse, userAcquisitionCreation } from '../../types/library.types';
+import { FilterService } from '../../services/filter.service';
 
 @Component({
   selector: 'app-entry-detail',
@@ -28,7 +29,8 @@ export class EntryDetailComponent implements OnInit {
     public dialog: MatDialog,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService,
-    private readonly entriesService: EntriesService
+    private readonly entriesService: EntriesService,
+    private readonly filterService: FilterService,
   ) {}
 
   ngOnInit(): void {
@@ -106,5 +108,10 @@ export class EntryDetailComponent implements OnInit {
         })
       )
       .subscribe(() => this.onDeleteFromFavorites.emit());
+  }
+
+  navigate(feedId: string) {
+    this.filterService.setFeed(feedId);
+    this.router.navigateByUrl(`library/all-entries`);
   }
 }

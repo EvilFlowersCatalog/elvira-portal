@@ -1,5 +1,65 @@
 <ng-container *transloco="let t">
   <div class="all-entries-container">
+    <div 
+      fxLayout="column" 
+      class="all-entier-filter-container"
+    >
+      <div 
+        class="all-entries-filer-button"
+        (click)="showFilters = !showFilters"
+      >
+        {{ t( "lazy.filter.filters" ) }} 
+        <mat-icon class="all-entries-filter-icon"> filter_list </mat-icon>
+      </div>
+
+      <div 
+        *ngIf="showFilters"
+        class="all-entries-filter-rows-container"
+      >
+        <div *ngIf="filters.params.title || feedName; else nothing">
+          <div 
+            *ngIf="filters.params.title" 
+            fxLayoutAlign="space-between" 
+            class="all-entries-row"
+          >
+            <span>
+              {{ t( "lazy.filter.title" ) }} : {{ filters.params.title }}
+            </span>
+
+            <mat-icon class="all-entries-delete-filter" (click)="removeFilter('title')">close</mat-icon>
+          </div>
+
+          <div 
+            *ngIf="feedName" 
+            fxLayoutAlign="space-between" 
+            class="all-entries-row"
+          >
+            <span>
+              {{ t( "lazy.filter.feed" ) }} : {{feedName}}
+            </span>
+            <mat-icon class="all-entries-delete-filter" (click)="removeFilter('feed')">close</mat-icon>
+          </div>
+    
+          <!-- Ak bude treba viac -->
+          <!-- <div *ngIf="filters.params.title" class="all-entries-row">
+            
+          </div>
+          <div *ngIf="filters.params.title" class="all-entries-row">
+            
+          </div>
+          <div *ngIf="filters.params.title" class="all-entries-row">
+            
+          </div> -->
+        </div>
+
+        <ng-template #nothing>
+          <div class="all-entries-no-filter">
+            {{ t("lazy.filter.noFilters") }}
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
     <div
       class="entries-list-container"
       fxLayout="row wrap"
@@ -21,7 +81,7 @@
         (page)="handlePageChange()"
         #paginator
         [length]="resultsLength"
-        [pageSizeOptions]="[15, 30, 50]"
+        [pageSizeOptions]="[5, 20, 50]"
         class="home-paginator"
       >
       </mat-paginator>

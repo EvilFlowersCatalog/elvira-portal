@@ -88,11 +88,11 @@ export class AdminService {
     return this.httpClient.post(environment.baseUrl + '/api/v1/feeds', feedData);
   }
 
-  searchEntries(page: number, limit: number) {
+  searchEntries(page: number, limit: number, title: string = "") {
     return this.httpClient.get<ListEntriesResponse>(
       environment.baseUrl + '/api/v1/entries',
       {
-        params: { page: page + 1, limit: limit },
+        params: { page: page + 1, limit: limit, title: title },
       }
     );
   }

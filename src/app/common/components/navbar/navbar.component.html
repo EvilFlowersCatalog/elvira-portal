@@ -72,28 +72,33 @@
             class="navbar-button"
             *ngIf="appState.isLoggedIn"
           >
-            <mat-icon style="font-size: 30px; height: 100%; width: 30px;">account_circle</mat-icon>
+            <mat-icon class="navbar-account-button">account_circle</mat-icon>
           </button>
         </div>
         
         <div 
-        *ngIf="appState.isLoggedIn"
-        fxLayout="row" 
-        class="navbar-bottom-row">
+          *ngIf="appState.isLoggedIn"
+          fxLayout="row" 
+          class="navbar-bottom-row"
+        >
           <form
-          [formGroup]="searchForm" 
-          (submit)="submit()"
-          class="navbar-form"
+            [formGroup]="searchForm" 
+            (submit)="submit()"
+            class="navbar-form"
           >
-            <div fxLayout="row" fxLayoutAlign="flex-end flex-end" style="height: 100%; padding-top: 7px;">
+            <div 
+              fxLayout="row" 
+              fxLayoutAlign="flex-end flex-end" 
+              class="navbar-form-field-container"
+            >
               <mat-form-field color="accent" class="navbar-form-field">
                 <mat-label>
                   {{ t("search") }}
                 </mat-label>
                 <input
-                formControlName="searchInput"
-                matInput
-                type="search"
+                  formControlName="searchInput"
+                  matInput
+                  type="search"
                 />
               </mat-form-field>
               <button mat-icon-button type="submit" color="accent">

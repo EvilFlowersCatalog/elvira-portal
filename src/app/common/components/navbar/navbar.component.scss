@@ -99,6 +99,12 @@
   cursor: pointer;
 }
 
+.navbar-account-button {
+  font-size: 30px; 
+  height: 100%; 
+  width: 30px;
+}
+
 .navbar-button-theme-circle {
   position: absolute;
   margin-left: -6px;
@@ -118,6 +124,10 @@
   width: 70%;
 }
 
+.navbar-form-field-container {
+  height: 100%; 
+  padding-top: 7px;
+}
 
 .navbar-form-field {
   flex: 1;

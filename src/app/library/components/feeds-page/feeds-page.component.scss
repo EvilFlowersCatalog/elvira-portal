@@ -18,12 +18,24 @@
     margin: auto 0;
 }
 
+.feed-page-search-icon {
+  font-size: 30;
+}
+
+.feed-page-feeds-container {
+  margin-bottom: 16px;
+}
+
 .feed-page-search-delete-icon {
     position: absolute; 
     right: 0; 
     color: red; 
     font-size: 20px;
     cursor: pointer;
+}
+
+.feed-page-paginator {
+  width: 100%;
 }
 
 @media screen and (max-width: 959px) {

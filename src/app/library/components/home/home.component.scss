@@ -24,8 +24,21 @@
   margin-right: 16px;
 }
 
+.home-feed-row-container {
+  height: 100%;
+}
+
+.home-feed-element {
+  height: 50%;
+}
+
 .home-popular-container {
   padding-bottom: 30px;
+}
+
+.home-last-added-container {
+  flex: 1; 
+  margin-top: 16px;
 }
 
 @media screen and (max-width: 1250px) {

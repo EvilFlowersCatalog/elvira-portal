@@ -46,7 +46,6 @@ export class DocumentManagementComponent
     private readonly adminService: AdminService,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService,
-    private readonly fb: UntypedFormBuilder
   ) {
     super();
     this.searchForm = new UntypedFormGroup({
@@ -65,16 +64,12 @@ export class DocumentManagementComponent
           this.adminService.searchEntries(
             this.paginator.pageIndex ?? 0,
             this.paginator.pageSize ?? 5,
+            this.searchForm?.value.searchInput ?? "",
           )
         )
       )
       .subscribe((data) => {
-        if(this.searchForm?.value.searchInput){
-          this.tableData = data.items.filter(entry => entry.title.toLocaleLowerCase().includes(this.searchForm?.value.searchInput.toLocaleLowerCase()));
-        }
-        else{
-          this.tableData = data.items;
-        }
+        this.tableData = data.items;
         this.resultsLength = data.metadata.total;
         this.dataSource = new MatTableDataSource(this.tableData);
       });

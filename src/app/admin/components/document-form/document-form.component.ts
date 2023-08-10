@@ -65,7 +65,11 @@ export class DocumentFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.feedsService.getFeeds({page: 1, limit: 100, kind: "acquisition"})
+    this.feedsService.getFeeds({
+      page: 1, 
+      limit: 100, 
+      kind: "acquisition"
+    })
     .subscribe((dataSource) => {  
       dataSource.items.forEach(item => {
         this.dataSource.push({title: item.title, id: item.id});
@@ -127,7 +131,7 @@ export class DocumentFormComponent implements OnInit {
         break;
       }
     }
-    if (!contains) {
+    if (!contains && this.feeds.length < 5) {
       this.feeds.push({ title: feed.title, id: feed.id });
     }
   }

@@ -133,6 +133,7 @@ export interface FeedTreeNode {
   children?: string[];
   kind: string;
   parents?: string[];
+  content: string;
 }
 
 export interface FeedDetailRespone {

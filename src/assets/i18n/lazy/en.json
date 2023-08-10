@@ -1,7 +1,7 @@
 {
   "homeLibrary" :{
     "popular": "Popular",
-    "lastAdded": "Lastly added"
+    "lastAdded": "Last added"
   },
   "documentForm": {
     "headerNew": "Document upload",
@@ -30,6 +30,9 @@
     "successMessageUploadDocument": "Document uploaded successfully",
     "errorMessageUploadDocument": "Upload failed"
   },
+  "auth": {
+    "autoLogout": "You have been logged out"
+  },
   "documentManagement": {
     "successMessageDeleteDocument": "Successfully deleted document",
     "errorMessageDeleteDocument": "Delete failed",
@@ -47,6 +50,7 @@
   "entryDetail": {
     "info-pdf-tooltip": "Show info",
     "favorite-pdf-tooltip": "Add to favorite list",
+    "open-pdf-tooltip": "Open PDF",
     "addToFavoritesSuccessMessage": "Item was successfully added to favorites",
     "addToFavoritesErrorMessage": "Failed to add item to favorites",
     "removeFromFavoritesSuccessMessage": "Item was removed from favorites",
@@ -90,12 +94,6 @@
   "favorites": {
     "emptyFavorites": "There is no item in this list"
   },
-  "sidebar": {
-    "search": "Search",
-    "cancelFilters": "Cancel filters",
-    "author": "Author",
-    "subjects": "Subjects:"
-  },
   "newFeedDialog": {
     "requiredFieldEmptyMessage": "Some of required fields are empty",
     "title": "Create new feed",
@@ -114,5 +112,11 @@
     "feedPutError": "Feed update failed",
     "feedDeleteSuccess": "Feed has been deleted successfully",
     "feedDeleteError": "Feed deletion failed"
+  },
+  "filter": {
+    "filters": "Filters",
+    "title": "Title",
+    "feed": "Feed",
+    "noFilters": "No filters"
   }
 }
