@@ -13,14 +13,16 @@
   "navbar": {
     "light": "Svetlý režim",
     "dark": "Tmavý režim",
-    "svk": "Slovensky",
-    "eng": "Anglicky",
+    "svk": "SVK",
+    "eng": "ENG",
     "profile": "Profil",
     "log-out": "Odhlásiť sa",
     "settings": "Nastavenia",
     "favorites": "Obľúbené",
     "login": "Prihlásiť sa",
-    "home": "DOMOV",
+    "home": "Domov",
+    "advanced": "Pokročilé",
+    "search": "Hľadať",
     "library": "Knižnica"
   }
 }

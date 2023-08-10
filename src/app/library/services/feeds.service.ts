@@ -13,34 +13,14 @@ export class FeedsService {
   ) {}
 
   getFeeds(
-    limit: number,
-    title?: string,
-    parentId?: string
+    query?: any
     ): Observable<ListFeedsResponse> {
-      if (title) {
-        return this.httpClient.get<ListFeedsResponse>(
-          environment.baseUrl + `/api/v1/feeds`,
-          {
-            params: { page: 1, limit: limit, title: title },
-          }
-        );
-      }
-      else if (parentId) {
-        return this.httpClient.get<ListFeedsResponse>(
-          environment.baseUrl + `/api/v1/feeds`,
-          {
-            params: { page: 1, limit: limit, parent_id: parentId },
-          }
-        );
-      }
-      else {
-        return this.httpClient.get<ListFeedsResponse>(
-          environment.baseUrl + `/api/v1/feeds`,
-          {
-            params: { page: 1, limit: limit },
-          }
-        );
-      }
+      return this.httpClient.get<ListFeedsResponse>(
+        environment.baseUrl + `/api/v1/feeds`,
+        {
+          params: query
+        }
+      );
   }
 
   getFeedDetails(id: string): Observable<FeedDetailRespone> {

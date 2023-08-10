@@ -5,6 +5,7 @@ import { takeUntil } from 'rxjs/operators';
 import { AppStateService } from 'src/app/common/services/app-state.service';
 import { State } from '../../types/app-state.types';
 import { DisposableComponent } from '../disposable.component';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-mobile-navbar',
@@ -16,18 +17,19 @@ export class MobileNavbarComponent
   implements OnInit
 {
   appState$: Observable<State>;
-  animate: boolean = false;
-  public href: string = "";
+  searchForm: UntypedFormGroup;
 
   constructor(
     private readonly router: Router,
     private readonly appStateService: AppStateService
   ) {
     super();
+    this.searchForm = new UntypedFormGroup({
+      searchInput: new UntypedFormControl(),
+    });
   }
 
   ngOnInit(): void {
-    this.href = window.location.pathname;
     this.appState$ = this.appStateService
       .getState$()
       .pipe(takeUntil(this.destroySignal$));
@@ -38,12 +40,15 @@ export class MobileNavbarComponent
   }
 
   toggleSidenav() {
-    this.animate = !this.animate;
     const currentSidenavState = this.appStateService.getStateSnapshot().sidenav;
     this.appStateService.patchState({ sidenav: !currentSidenavState });
   }
 
   navigate(link: string) {
     this.router.navigate([link]);
+  }
+
+  submit() {
+    console.log("nieco");
   }
 }

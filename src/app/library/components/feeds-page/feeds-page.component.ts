@@ -1,6 +1,6 @@
 import { Component, OnInit} from '@angular/core'
 import { ActivatedRoute } from '@angular/router';
-import { FeedDetailRespone } from '../../types/library.types';
+import { FeedDetailRespone, FeedTreeNode, ListFeedsResponse } from '../../types/library.types';
 import { FeedsService } from '../../services/feeds.service';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Subject, Subscription, forkJoin } from 'rxjs';
@@ -13,12 +13,11 @@ import { DisposableComponent } from 'src/app/common/components/disposable.compon
     styleUrls: ['./feeds-page.component.scss'],
 })
 export class FeedsPageComponent extends DisposableComponent implements OnInit {
-    childFeeds: FeedDetailRespone[] = [];
+    childFeeds: FeedTreeNode[] = [];
     title: string;
     searchForm: UntypedFormGroup;
     wasApplied: boolean = false;
     fetchFeeds$ = new Subject();
-    private subscriptions = new Subscription();
 
     constructor (
         private readonly route: ActivatedRoute,
@@ -33,42 +32,19 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
     ngOnInit(): void {
         const feedId = this.route.snapshot.paramMap.get('feedId');
 
+        this.feedsService.getFeedDetails(feedId)
+        .subscribe((data) => this.title = data.response.title);
+
         this.fetchFeeds$
         .asObservable()
         .pipe(
             takeUntil(this.destroySignal$),
             startWith([]),
-            concatMap(() => this.feedsService.getFeedDetails(feedId))
+            concatMap((title: string) => this.feedsService.getFeeds({page: 1, limit: 100, parent_id: feedId, title: title}))
         )
-        .subscribe(
-            (parentFeed) => {
-              this.title = parentFeed.response.title;
-              const children = parentFeed.response.children?.map(childId =>
-                this.feedsService.getFeedDetails(childId)
-              ) || [];
-    
-              this.subscriptions.add(
-                forkJoin(children)
-                .subscribe(
-                    (childFeeds) => {
-                        if(!this.searchForm?.value.searchInput) {
-                            this.childFeeds = childFeeds;
-                        }
-                        else {
-                            this.childFeeds = childFeeds.filter((childFeed) =>
-                            childFeed.response.title.toLocaleLowerCase().includes(this.searchForm.value.searchInput.toLocaleLowerCase()));
-                        }
-                    },
-                    (err) => {
-                        console.log(err);
-                    }
-                )
-              );
-            },
-            (err) => {
-              console.log(err);
-            }
-        )
+        .subscribe((data) => {
+            this.childFeeds = data.items;
+        })
     }
 
     clearSearch() {
@@ -81,10 +57,6 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
 
     applyFilter() {
         this.wasApplied = true;
-        this.fetchFeeds$.next();
-    }
-
-    ngOnDestroy(): void {
-        this.subscriptions.unsubscribe();
+        this.fetchFeeds$.next(this.searchForm?.value.searchInput ? this.searchForm?.value.searchInput : "");
     }
 }

@@ -1,7 +1,8 @@
 .favorite-entries-container {
-  padding-top: 16px;
-  padding-left: 16px;
-  margin: 0 !important;
+  background-color: transparent !important;
+  padding: 16px;
+  height: 100%;
+  width: 100%;
 }
 
 .favorites-paginator {
@@ -11,6 +12,7 @@
 
 .favorites-empty-row {
   width: 100%;
+  text-align: center;
   margin: 150px 0;
 }
 

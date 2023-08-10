@@ -1,10 +1,8 @@
 .feed-page-container {
-    position: absolute;
-    top: 70px;
-    bottom: 0;
-    width: 100%;
-    padding: 16px;
-    background: transparent !important;
+  background-color: transparent !important;
+  padding: 16px;
+  height: 100%;
+  width: 100%;
 }
 
 .feed-page-search-form {
@@ -29,13 +27,7 @@
 }
 
 @media screen and (max-width: 959px) {
-    .feed-page-search-field {
-      width: 80%; 
-    }
+  .feed-page-search-field {
+    width: 80%; 
   }
-  
-  @media screen and (max-width: 599px) {
-    .feed-page-container {
-      top: 56px;
-    }
-  }
+}

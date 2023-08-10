@@ -1,6 +1,8 @@
 .document-form-container {
-  margin-top: 50px;
-  padding-bottom: 50px;
+  background-color: transparent !important;
+  padding: 16px 0 16px 16px;
+  height: 100%;
+  width: 100%;
 }
 
 .document-form-content {
@@ -61,6 +63,6 @@
 
 .document-form-back-btn {
   position: fixed;
-  top: 100px;
+  top: 136px;
   right: 200px;
 }

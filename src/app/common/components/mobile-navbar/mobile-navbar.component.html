@@ -1,23 +1,56 @@
 <ng-container *transloco="let t; read: 'navbar'">
   <ng-container *ngIf="appState$ | async as appState">
-    <mat-toolbar class="navbar">
-      <button
-      [disabled]="!appState.isLoggedIn"
-      (click)="navigate('/library/home')"
-          class="navbar-home-button-div"
+    <mat-toolbar fxLayout="column" class="navbar-container">
+      <button 
+      mat-icon-button 
+      (click)="toggleSidenav()"
+      class="mobile-navbar-menu-button"
       >
-        <img src="../../../../assets/logos/title_logo.png">
+        <mat-icon>menu</mat-icon>
       </button>
 
-      <span class="navbar-spacer"></span>
+      <div
+      fxLayoutAlign="center center"
+      fxLayoutAlign.xs="flex-start center" 
+      class="navbar-home-button-container"
+      >
+        <button
+        [disabled]="!appState.isLoggedIn"
+        (click)="navigate('/library/home')"
+        class="navbar-home-button"
+        >
+          <img src="../../../../assets/logos/title_logo.png">
+        </button>
+      </div>
 
-      <button mat-icon-button (click)="toggleSidenav()">
-        <mat-icon style="color: white;" [ngClass]="{ animate: animate }">
-          {{ appState.sidenav ? "close" : "menu" }}
-        </mat-icon>
-      </button>
-
-
+      <div 
+      fxLayout="row" 
+      fxLayoutAlign="flex-end flex-end" 
+      class="mobile-navbar-bottom-row"
+      >
+        <form
+        [formGroup]="searchForm" 
+        (submit)="submit()"
+        class="mobile-navbar-form"
+        *ngIf="appState.isLoggedIn"
+        >
+          <div fxLayout="row" fxLayoutAlign="center flex-end" class="mobile-navbar-form-field-container">
+            <mat-form-field color="accent" class="mobile-navbar-form-field">
+              <mat-label>
+                {{ t("search") }}
+              </mat-label>
+              <input
+              formControlName="searchInput"
+              matInput
+              type="search"
+              />
+            </mat-form-field>
+            <button mat-icon-button type="submit" color="accent">
+              <mat-icon>search</mat-icon>
+            </button>
+          </div>
+        </form>
+      </div>
     </mat-toolbar>
   </ng-container>
 </ng-container>

@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { AppStateService } from 'src/app/common/services/app-state.service';
 import { environment } from '../../../environments/environment';
 import { ListEntriesResponse, EntryDetail, AcquisitionDetail, userAcquisitionCreation } from '../types/library.types';
+import { FilterService } from './filter.service';
 
 @Injectable({
   providedIn: 'root',
@@ -13,34 +14,11 @@ export class EntriesService {
     private readonly httpClient: HttpClient
   ) {}
 
-  getEntries(
-    page: number,
-    limit: number,
-    query?: string,
-    feedId?: string
-  ) {
-    if (feedId) {
-      return this.httpClient.get<ListEntriesResponse>(
-        environment.baseUrl + `/api/v1/entries`,
-        {
-          params: { page: page + 1, limit: limit, feed_id: feedId },
-        }
-      );
-    } else if (query) {
-      return this.httpClient.get<ListEntriesResponse>(
-        environment.baseUrl + '/api/v1/entries',
-        {
-          params: { page: page + 1, limit: limit, title: query },
-        }
-      );
-    } else {
-      return this.httpClient.get<ListEntriesResponse>(
-        environment.baseUrl + '/api/v1/entries',
-        {
-          params: { page: page + 1, limit: limit },
-        }
-      );
-    }
+  getEntries(query: Object) {
+    return this.httpClient.get<ListEntriesResponse>(
+      environment.baseUrl + '/api/v1/entries',
+      query
+    );
   }
 
   entryDetail(catalogID: string, entryID: string): Observable<EntryDetail> {

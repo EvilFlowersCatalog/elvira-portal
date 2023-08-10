@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core'
 import { FeedTreeNode } from '../types/library.types'
 import { Router } from '@angular/router';
+import { FilterService } from '../services/filter.service';
 
 @Component({
     selector: 'app-feed',
@@ -67,6 +68,7 @@ export class FeedComponent {
 
     constructor (
         private readonly router: Router,
+        private readonly filterService: FilterService,
     ) {}
 
     feedNavigator() {
@@ -74,7 +76,8 @@ export class FeedComponent {
             this.router.navigateByUrl(`/library/feeds/${this.feed.id}`);
         }
         else {
-            this.router.navigateByUrl(`/library/all-entries/${this.feed.id}`);
+            this.filterService.setFeed(this.feed.id)
+            this.router.navigateByUrl(`/library/all-entries`);
         }
     }
 

@@ -10,7 +10,7 @@ import { LoadingComponent } from './components/loading.component';
 import { MobileNavbarComponent } from './components/mobile-navbar/mobile-navbar.component';
 import { HeaderComponent } from './components/header/header.component';
 import { MobileSidenavComponent } from './components/mobile-sidenav/mobile-sidenav.component';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ErrorNotificationComponent } from './components/notifications/error-notification.component';
 import { WarningNotificationComponent } from './components/notifications/warning-notification.component';
 import { InfoNotificationComponent } from './components/notifications/info-notification.component';
@@ -34,6 +34,7 @@ import { SuccessNotificationComponent } from './components/notifications/success
     MaterialModule,
     LibraryModule,
     TranslocoRootModule,
+    ReactiveFormsModule,
     FormsModule,
   ],
   exports: [

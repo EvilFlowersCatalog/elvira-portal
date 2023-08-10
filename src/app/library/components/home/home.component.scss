@@ -1,14 +1,10 @@
 .home-container {
   background-color: transparent !important;
-  position: absolute;
-  padding-top: 16px;
+  padding: 16px;
   display: flex;
   align-items: center;
-  top: 70px;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  overflow: auto;
+  height: 100%;
+  width: 100%;
 }
 
 .home-column-container {
@@ -33,9 +29,6 @@
 }
 
 @media screen and (max-width: 1250px) {
-  .home-container {
-    padding: 16px;
-  }
 
   .home-column-container {
     width: 100%;
@@ -43,10 +36,6 @@
 }
 
 @media screen and (max-width: 599px) {
-  .home-container {
-    padding: 0 16px 16px;
-  }
-
   .home-titles {
     width: 100%;
   }

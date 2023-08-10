@@ -13,14 +13,16 @@
   "navbar": {
     "light": "Light mode",
     "dark": "Dark mode",
-    "svk": "Slovakia",
-    "eng": "English",
+    "svk": "SVK",
+    "eng": "ENG",
     "profile": "Profile",
     "log-out": "Log out",
     "settings": "Settings",
     "favorites": "Favorites",
     "login": "Login",
-    "home": "HOME",
+    "home": "Home",
+    "advanced": "Advanced",
+    "search": "Search",
     "library": "Library"
   }
 }

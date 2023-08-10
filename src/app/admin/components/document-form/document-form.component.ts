@@ -65,12 +65,11 @@ export class DocumentFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.feedsService.getFeeds(100)
-    .pipe(
-      map((data) => data.items.filter(feed => feed.kind === "acquisition").map(feed => ({ title: feed.title, id: feed.id })))
-    )
+    this.feedsService.getFeeds({page: 1, limit: 100, kind: "acquisition"})
     .subscribe((dataSource) => {  
-      this.dataSource = dataSource;
+      dataSource.items.forEach(item => {
+        this.dataSource.push({title: item.title, id: item.id});
+      });
     });
 
     this.entryId = this.route.snapshot.paramMap.get('id');

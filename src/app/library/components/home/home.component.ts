@@ -5,6 +5,7 @@ import { EntriesItem, EntriesParams, FeedTreeNode, ListEntriesResponse } from '.
 import { concatMap, startWith, takeUntil } from 'rxjs/operators';
 import { EntriesService } from '../../services/entries.service';
 import { FeedsService } from '../../services/feeds.service';
+import { FilterService } from '../../services/filter.service';
 
 @Component({
   selector: 'app-home',
@@ -25,6 +26,7 @@ export class HomeComponent extends DisposableComponent implements OnInit {
   constructor(
     private readonly entriesService: EntriesService,
     private readonly feedsService: FeedsService,
+    private readonly filterService: FilterService,
   ) { super() }
   
   @HostListener('window:resize', ['$event'])
@@ -33,23 +35,17 @@ export class HomeComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.entriesService.getEntries(0, 10, null, null)
+    this.entriesService.getEntries(this.filterService.getFilterFor10Latest())
     .subscribe((data) => {
+      this.lastAddedEntries = data.items
+    });
 
-      this.lastAddedEntries = data.items.sort((a, b) => {
-        const dateA = new Date(a.created_at);
-        const dateB = new Date(b.created_at);
-        return dateB.getTime() - dateA.getTime();
-      });
-
-      this.popularEntries = data.items.sort((a, b) => {
-        const dateA = new Date(a.created_at);
-        const dateB = new Date(b.created_at);
-        return dateB.getTime() - dateA.getTime();
-      }).slice(0, 5);
+    this.entriesService.getEntries(this.filterService.getFilterForTop5())
+    .subscribe((data) => {
+      this.popularEntries = data.items
     });
     
-    this.feedsService.getFeeds(100, null, null)
+    this.feedsService.getFeeds({page: 1, limit: 100})
     .subscribe((data) => {
       this.mainFeeds = data.items.filter((item) => {
         return item.parents.length === 0;

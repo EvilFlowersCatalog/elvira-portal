@@ -1,28 +1,71 @@
-.navbar {
-  height: 70px;
-  background-color: black;
-  padding: 0 16px;
+.navbar-container {
+  height: 120px;
+  background-color: rgba(22, 22, 22, 0.9);
+  padding: 16px 16px 0 16px;
 }
 
-.navbar-spacer {
-  flex: 1 1 auto;
+.navbar-first-column {
+  height: 100%;
+  flex: 1;
 }
 
-.navbar-home-button-div {
-  height: 40px;
-  display: flex; 
-  padding-right: 20px;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px; 
-  color: white; 
+.navbar-image {
+  height: 58%;
+}
+
+.navbar-image-offline {
+  margin-top: 15px;
+}
+
+.navbar-buttons-container {
+  justify-content: flex-start;
+  align-items: flex-end;
+  height: 42%;
+}
+
+.navbar-main-button {
+  display: flex;
+  margin-right: 16px;
   border: none;
-  border-right: 2px solid white;
+  color: white;
+  justify-content: center;
+  align-items: center;
   background: none;
+  font-size: 17px;
+  padding: auto;
+  transition: tansform 1s ease;
 }
 
-.navbar-icon {
-  margin-right: 10px;
+.navbar-main-button:hover {
+  transform: scale(1.05);
+  border-bottom: 2px solid #ffc107;
+}
+
+.navbar-second-column {
+  height: 100%;
+  flex: 2;
+}
+
+.navbar-top-row {
+  height: 40%;
+  justify-content: flex-end;
+  align-items: flex-start;
+}
+
+.navbar-bottom-row {
+  height: 60%;
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+
+.navbar-bottom-row button {
+  margin: 0;
+  margin-left: 5px;
+}
+
+.navbar-bottom-row mat-icon {
+  width: 30px;
+  font-size: 30px; 
 }
 
 .navbar-button {
@@ -35,17 +78,17 @@
   background: none;
   font-size: 17px;
   padding: auto;
-  transition: tansform 1s ease;
 }
 
-.navbar-button:hover {
-  transform: scale(1.1);
+.navbar-icon {
+  margin-right: 10px;
 }
 
 .navbar-button-theme-switcher {
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   color: white;
   width: 80px;
   height: 30px;
@@ -70,11 +113,16 @@
   transform: translateX(40px); /* Move the circle to the left in dark mode */
 }
 
-@media screen and (max-width: 959px) {
-  .navbar-icon {
-    margin-right: 5px;  
-  }
-  .navbar-button {
-    margin-left: 15px;
-  }
+.navbar-form {
+  height: 100%;
+  width: 70%;
+}
+
+
+.navbar-form-field {
+  flex: 1;
+  max-width: 500px;
+  height: 100%;
+  color: white;
+  font-size: 17px;
 }

@@ -41,11 +41,6 @@ export const LIBRARY_ROUTES: Routes = [
     component: AllEntriesComponent,
   },
   {
-    path: 'all-entries/:feedId',
-    canActivate: [LibraryGuard],
-    component: AllEntriesComponent,
-  },
-  {
     path: 'pdf-viewer/:userAcquisitionID',
     canActivate: [LibraryGuard],
     component: PdfViewerComponent,

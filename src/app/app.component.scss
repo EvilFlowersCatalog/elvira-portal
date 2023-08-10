@@ -6,7 +6,10 @@
 }
 
 .app-mobile-sidenav {
-  width: 100%;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  width: 50%;
 }
 
 .app-background-light {
@@ -26,12 +29,13 @@
 }
 
 .app-content {
-  padding-top: 70px;
   min-height: 100vh !important;
+  padding-top: 120px;
+  overflow: hidden !important;
 }
 
 @media screen and (max-width: 599px) {
-  .app-content {
-    padding-top: 56px;
+  .app-mobile-sidenav {
+    width: 100%;
   }
 }

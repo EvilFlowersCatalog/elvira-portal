@@ -45,6 +45,10 @@ export class MobileSidenavComponent
     this.appStateService.patchState({ lang: language, sidenav: false });
   }
 
+  hideSidenav() {
+    this.appStateService.patchState({ sidenav: false });
+  }
+
   logout() {
     this.appStateService.logoutResetState();
     this.router.navigate(['/auth/home']);
