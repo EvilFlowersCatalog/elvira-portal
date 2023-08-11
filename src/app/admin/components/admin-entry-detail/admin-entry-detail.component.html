@@ -41,39 +41,19 @@
     >
       <button
         mat-icon-button
-        matTooltip="{{ t('lazy.entryDetail.info-pdf-tooltip') }}"
-        (click)="showInfo(entry.catalog_id, entry.id)"
+        matTooltip="{{ t('lazy.entryDetail.edit-tooltip') }}"
+        (click)="onEditClick()"
       >
-        <mat-icon> info </mat-icon>
+        <mat-icon> edit </mat-icon>
       </button> 
-
-      <div *ngIf="currentRoute === '/library/favorites'; else addToFavoritesBtn">
-        <button
-          color="accent"
-          mat-icon-button
-          matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
-          (click)="deleteFromFavorites(entry.id)"
-        >
-          <mat-icon> favorite </mat-icon>
-        </button>
-      </div>
-      <ng-template #addToFavoritesBtn>
-        <button
-          mat-icon-button
-          matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
-          (click)="addToFavorites(entry.id)"
-        >
-          <mat-icon> favorite </mat-icon>
-        </button>
-      </ng-template>
 
       <button
         mat-icon-button
-        matTooltip="{{ t('lazy.entryDetail.open-pdf-tooltip') }}"
-        (click)="openPdf(entry.catalog_id, entry.id)"
+        matTooltip="{{ t('lazy.entryDetail.delete-tooltip') }}"
+        (click)="onDeleteClick()"
       >
-        <mat-icon> picture_as_pdf </mat-icon>
-      </button> 
+        <mat-icon> delete </mat-icon>
+      </button>
     </div>
   </mat-card>
   <div

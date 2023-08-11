@@ -51,6 +51,30 @@ export interface GetEntries {
   };
 }
 
+export interface EntriesItem {
+  id: string;
+  author: EntryAuthor;
+  language: EntryLanguage;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  thumbnail: string;
+  creator_id: string;
+  catalog_id: string;
+  category: EntryCategory;
+}
+
+export interface EntryLanguage {
+  id: string;
+  name: string;
+  code: string;
+}
+
+export interface EntryCategory {
+  id: string;
+  term: string;
+}
+
 export interface AllEntryItems {
   id: string;
   creator_id: string;
@@ -95,6 +119,7 @@ export interface OneEntryItem {
     feeds: FeedsItems[];
     contributors: EntriesContributors[];
     summary: string;
+    thumbnail: string;
   }
 }
 
@@ -136,6 +161,7 @@ export interface EditedData {
 		google: string;
 		isbn: string;
 	},
+  image: any;
 }
 
 export interface GetFeeds {

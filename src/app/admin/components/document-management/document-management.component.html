@@ -1,15 +1,22 @@
 <ng-container *transloco="let t">
-  <div fxLayout="row" fxLayoutAlign="space-around center" class="header-box">
+  <div 
+    fxLayout="row" 
+    fxLayoutAlign="space-between center" 
+    class="header-box"
+  >
     <!-- Searchbar -->
     <form
       [formGroup]="searchForm"
       (submit)="applyFilter()"
       class="document-form"
     >
-      <div fxLayout="row">
+      <div 
+        fxLayout="row" 
+        fxLayoutAlign="center center"
+      >
         <mat-form-field color="accent" class="document-form-field">
           <mat-label>
-            {{ t("lazy.sidebar.search") }}
+            {{ t("lazy.documentManagement.search") }}
           </mat-label>
           <input
             matInput
@@ -27,66 +34,42 @@
       (click)="newDocument()"
       mat-raised-button
       color="primary"
-      style="margin-right: 30px"
     >
       {{ t("lazy.documentManagement.document") }}
     </button>
   </div>
 
-  <div fxLayout="column" fxLayoutAlign="center center" class="full-box">
-    <mat-table [dataSource]="dataSource" class="main-table">
-      <!-- Title Column -->
-      <ng-container matColumnDef="title">
-        <mat-header-cell *matHeaderCellDef>
-          {{ t("lazy.documentManagement.title") }}
-        </mat-header-cell>
-        <mat-cell *matCellDef="let element">{{ element.title }}</mat-cell>
-      </ng-container>
+  <div class="document-container">
 
-      <!-- Atuhor name Column -->
-      <ng-container matColumnDef="author">
-        <mat-header-cell *matHeaderCellDef>
-          {{ t("lazy.documentManagement.author") }}
-        </mat-header-cell>
-        <mat-cell *matCellDef="let element">
-          {{ element.author.name }} {{ element.author.surname }}
-        </mat-cell>
-      </ng-container>
+    <!-- Entries  -->
+    <div
+      class="document-entries-container"
+      fxLayout="row wrap"
+      fxLayout.xs="column"
+      fxLayoutGap="16px grid"
+    >
+      <div
+        fxFlex="14.28%"
+        fxFlex.md="20%"
+        fxFlex.sm="33.3%"
+        fxFlex.xs="100%"
+        *ngFor="let entry of entries"
+      >
+        <app-admin-entry-detail 
+          [entry]="entry"
+          (editClicked)="editDocument($event)" 
+          (deleteClicked)="deleteDocument($event)" 
+        >
+        </app-admin-entry-detail>
+      </div>
+    </div>
 
-      <!-- Edit Column -->
-      <ng-container matColumnDef="edit">
-        <mat-header-cell *matHeaderCellDef>
-          {{ t("lazy.documentManagement.edit") }}
-        </mat-header-cell>
-        <mat-cell *matCellDef="let element">
-          <button mat-icon-button>
-            <mat-icon (click)="editDocument(element)">edit</mat-icon>
-          </button>
-        </mat-cell>
-      </ng-container>
-
-      <!-- Delete Column -->
-      <ng-container matColumnDef="delete">
-        <mat-header-cell *matHeaderCellDef>
-          {{ t("lazy.documentManagement.delete") }}
-        </mat-header-cell>
-        <mat-cell *matCellDef="let element">
-          <button mat-icon-button>
-            <mat-icon (click)="deleteDocument(element)">delete</mat-icon>
-          </button>
-        </mat-cell>
-      </ng-container>
-
-      <!-- Event listener -->
-      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
-      <mat-row *matRowDef="let row; columns: displayedColumns"></mat-row>
-    </mat-table>
     <!-- Paginator -->
     <mat-paginator
       (page)="documentPagination()"
       #paginator
       [length]="resultsLength"
-      [pageSizeOptions]="[5, 10, 20]"
+      [pageSizeOptions]="[15, 30, 50]"
       class="paginator-size"
     >
     </mat-paginator>

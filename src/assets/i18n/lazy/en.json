@@ -48,6 +48,8 @@
     "feedsTab": "Feeds"
   },
   "entryDetail": {
+    "edit-tooltip": "Edit document",
+    "delete-tooltip": "Delete document",
     "info-pdf-tooltip": "Show info",
     "favorite-pdf-tooltip": "Add to favorite list",
     "open-pdf-tooltip": "Open PDF",

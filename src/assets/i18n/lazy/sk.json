@@ -48,6 +48,8 @@
     "feedsTab": "Feedy"
   },
   "entryDetail": {
+    "edit-tooltip": "Upraviť dokument",
+    "delete-tooltip": "Vymazať dokument",
     "info-pdf-tooltip": "Zobraziť informácie",
     "favorite-pdf-tooltip": "Pridať do obľúbených",
     "open-pdf-tooltip": "Otvoriť PDF",
@@ -115,7 +117,7 @@
   },
   "filter": {
     "filters": "Filtry",
-    "title": "Titul",
+    "title": "Názov",
     "feed": "Predmet",
     "noFilters": "Žiadne filtre"
   }

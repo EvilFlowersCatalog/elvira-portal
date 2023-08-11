@@ -36,6 +36,7 @@ export class DocumentFormComponent implements OnInit {
   validSize: boolean = false;
   entryId: string;
   isInEditMode: boolean = false;
+  thumbnail: string;
   dataSource: { title: string; id: string }[] = [];
 
   constructor(
@@ -85,6 +86,7 @@ export class DocumentFormComponent implements OnInit {
           return { title: feed.title, id: feed.id };
         });
         this.initContributors(response.response.contributors);
+        this.thumbnail = response.response.thumbnail;
       });
     }
   }
@@ -147,7 +149,7 @@ export class DocumentFormComponent implements OnInit {
   async createOrUpdateEntry() {
     if (this.isInEditMode) {
       this.adminService
-        .updateEntry(this.entryId, this.getEditedData())
+        .updateEntry(this.entryId, await this.getEditedData())
         .pipe(
           tap(() => {
             const message = this.translocoService.translate(
@@ -224,7 +226,7 @@ export class DocumentFormComponent implements OnInit {
     }
   }
 
-  getEditedData() {
+  async getEditedData() {
     const editedData: EditedData = {
       title: this.uploadForm.get('title').value,
       author: {
@@ -241,6 +243,7 @@ export class DocumentFormComponent implements OnInit {
         google: "XIXIX",
         isbn: "null"
       },
+      image: this.imageFile ? await this.getBase(this.imageFile) : this.thumbnail
     };
     return editedData;
   }

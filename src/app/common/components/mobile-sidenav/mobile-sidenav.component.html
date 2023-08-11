@@ -1,22 +1,27 @@
 <ng-container *transloco="let t; read: 'navbar'">
   <ng-container *ngIf="appState$ | async as appState">
     <div fxLayout="column" fxLayoutAlign="start start" class="mobile-sidenav-container">
-      <button  
-      mat-flat-button
-      class="mobile-sidenav-close-button"
-      (click)="hideSidenav()"
-      >
-        <mat-icon>close</mat-icon>
-      </button>
-      
-      <button  
-      *ngIf="appState.isLoggedIn" 
-      mat-flat-button
-      (click)="navigate('/library/home')"
-      >
-        <mat-icon class="mobile-sidenav-icon">home</mat-icon>
-        <span>{{ t("home") }}</span>
-      </button>
+      <div 
+        fxLayout="row" 
+        fxLayoutAlign="space-between"
+        style="width: 100%;"
+      >        
+        <button  
+        *ngIf="appState.isLoggedIn" 
+        mat-flat-button
+        (click)="navigate('/library/home')"
+        >
+          <mat-icon class="mobile-sidenav-icon">home</mat-icon>
+          <span>{{ t("home") }}</span>
+        </button>
+
+        <button  
+        mat-flat-button
+        (click)="hideSidenav()"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
 
       <button
       mat-flat-button 

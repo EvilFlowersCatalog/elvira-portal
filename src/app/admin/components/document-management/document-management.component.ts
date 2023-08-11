@@ -32,7 +32,7 @@ export class DocumentManagementComponent
 {
   displayedColumns: string[] = ['title', 'author', 'edit', 'delete'];
   resultsLength = 0;
-  tableData: AllEntryItems[] = [];
+  entries: AllEntryItems[] = [];
   dataSource: MatTableDataSource<AllEntryItems>;
   fetchDocuments$ = new Subject();
   searchForm: UntypedFormGroup;
@@ -63,15 +63,14 @@ export class DocumentManagementComponent
         concatMap(() =>
           this.adminService.searchEntries(
             this.paginator.pageIndex ?? 0,
-            this.paginator.pageSize ?? 5,
+            this.paginator.pageSize ?? 15,
             this.searchForm?.value.searchInput ?? "",
           )
         )
       )
       .subscribe((data) => {
-        this.tableData = data.items;
+        this.entries = data.items;
         this.resultsLength = data.metadata.total;
-        this.dataSource = new MatTableDataSource(this.tableData);
       });
   }
 

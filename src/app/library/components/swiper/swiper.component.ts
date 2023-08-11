@@ -11,6 +11,7 @@ export class SwipperComponent implements OnInit {
     @Input() swiperEntries: EntriesItem[];
 
     ngOnInit(): void {
+        this.swiperEntries === undefined ? this.swiperEntries = [] : this.swiperEntries;
         this.autoSlideEntries();
     }
 

@@ -19,6 +19,7 @@ import { DocumentManagementComponent } from './components/document-management/do
 import { DeleteDialogComponent } from './components/dialogs/delete-dialog/delete-dialog.component';
 import { NewFeedDialogComponent } from './components/dialogs/new-feed-dialog/new-feed-dialog.component';
 import { UpdateFeedDialogComponent } from './components/dialogs/update-feed-dialog/update-feed-dialog.component';
+import { AdminEntryDetailComponent } from './components/admin-entry-detail/admin-entry-detail.component';
 
 @NgModule({
   declarations: [
@@ -30,6 +31,7 @@ import { UpdateFeedDialogComponent } from './components/dialogs/update-feed-dial
     DeleteDialogComponent,
     NewFeedDialogComponent,
     UpdateFeedDialogComponent,
+    AdminEntryDetailComponent,
   ],
   imports: [
     CommonModule,

@@ -30,8 +30,8 @@
         <h6>
           {{ t("lazy.entryInfoDialog.feeds") }}
         </h6>
-        <ul *ngFor="let feed of entryDetail.feeds">
-          <li>{{ feed.response.title }}</li>
+        <ul *ngFor="let feed of entryDetail.response.feeds">
+          <li>{{ feed.title }}</li>
         </ul>
       </div>
 
