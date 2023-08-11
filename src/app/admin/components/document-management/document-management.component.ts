@@ -1,8 +1,6 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
-import { MatLegacyTableDataSource as MatTableDataSource } from '@angular/material/legacy-table';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
 import { Subject, throwError } from 'rxjs';
@@ -20,6 +18,7 @@ import { NotificationService } from 'src/app/common/services/notification.servic
 import { AdminService } from '../../services/admin.service';
 import { AllEntryItems } from '../../types/admin.types';
 import { DeleteDialogComponent } from '../dialogs/delete-dialog/delete-dialog.component';
+import { MatPaginator } from '@angular/material/paginator';
 
 @Component({
   selector: 'app-document-management',
@@ -33,10 +32,8 @@ export class DocumentManagementComponent
   displayedColumns: string[] = ['title', 'author', 'edit', 'delete'];
   resultsLength = 0;
   entries: AllEntryItems[] = [];
-  dataSource: MatTableDataSource<AllEntryItems>;
   fetchDocuments$ = new Subject();
   searchForm: UntypedFormGroup;
-
   @ViewChild('paginator') paginator: MatPaginator;
 
   constructor(
@@ -71,6 +68,7 @@ export class DocumentManagementComponent
       .subscribe((data) => {
         this.entries = data.items;
         this.resultsLength = data.metadata.total;
+        this.paginator.pageIndex = data.metadata.page - 1;
       });
   }
 

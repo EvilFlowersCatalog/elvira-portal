@@ -18,7 +18,6 @@ export class HomeComponent extends DisposableComponent implements OnInit {
   lastAddedEntries: EntriesItem[];
   popularEntries: EntriesItem[];
   mainFeeds: FeedTreeNode[];
-  iconsForMainFeeds: string[] = ["menu_book", "book", "book", "calendar_month"]
   fetchEntries$ = new Subject<EntriesParams>(); 
   fetchFeeds$ = new Subject();
   screenWidth: number;

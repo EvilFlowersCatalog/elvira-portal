@@ -1,36 +1,50 @@
-.feed-management-container {
-  padding: 16px;
+.feed-container {
+  background-color: transparent !important;
+  padding: 0 16px 16px 16px;
+  height: 100%;
+  width: 100%;
 }
 
-.feed-management-tree-invisible {
-  display: none;
+.feed-header-box {
+  padding: 20px 16px;
+  width: 100%;
 }
 
-.feed-management-tree ul,
-.feed-management-tree li {
-  margin-top: 0;
-  margin-bottom: 0;
-  list-style-type: none;
+.feed-form-field {
+  width: 100%;
 }
 
-.feed-management-tree .mat-nested-tree-node div[role="group"] {
-  padding-left: 15px;
+.feed-form {
+  width: 50%;
 }
 
-.feed-management-tree div[role="group"] > .mat-tree-node {
-  padding-left: 10px;
+.feed-feeds-container {
+  margin-bottom: 16px;
 }
 
-.mat-tree-navigation-node {
-  font-size: 15px;
-  font-weight: 500;
+.feed-add-feed {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px dashed #00bcd4;
+  transition: background-color 0.5s ease;
+  cursor: pointer;
 }
 
-.feed-management-button {
-  opacity: 0.3;
+.feed-add-feed:hover {
+  background-color: rgba(#00bcd4, 0.1);
 }
 
-.feed-management-button:hover,
-.feed-management-button:active {
-  opacity: 1;
+.feed-add-icon {
+  width: 100px;
+  height: 100px;
+  font-size: 100px;
+  color: #ffc107;
+}
+
+
+.feed-paginator {
+  width: 100%;
 }

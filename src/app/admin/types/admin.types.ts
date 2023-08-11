@@ -164,29 +164,20 @@ export interface EditedData {
   image: any;
 }
 
-export interface GetFeeds {
-  items: AllFeedsItems[];
-  metadata: {
-    page: number;
-    limit: number;
-    pages: number;
-    total: number;
-  };
+export interface Metadata {
+  page: number;
+  limit: number;
+  pages: number;
+  total: number;
 }
 
-export interface AllFeedsItems {
+export interface FeedTreeNode {
   id: string;
-  catalog_id: string;
-  parent_id: string;
-  creator_id: string;
   title: string;
+  children?: string[];
   kind: string;
-  url_name: string;
-  url: string;
+  parents?: string[];
   content: string;
-  per_page: number;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface UpdateFeeds {

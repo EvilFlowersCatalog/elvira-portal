@@ -16,9 +16,9 @@
                             fxFlex="50%"
                             fxFlex.xs="100%"
                             class="home-feed-element"
-                            *ngFor="let feed of mainFeeds; let i = index"
+                            *ngFor="let feed of mainFeeds"
                         >
-                            <app-feed [feed]="feed" [icon]="iconsForMainFeeds[i]"></app-feed>
+                            <app-feed [feed]="feed"></app-feed>
                         </div>
                     </div>
                 </div>

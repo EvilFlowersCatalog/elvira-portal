@@ -1,10 +1,10 @@
 import { Component, Input } from '@angular/core'
-import { FeedTreeNode } from '../types/library.types'
+import { FeedTreeNode } from '../types/admin.types'
 import { Router } from '@angular/router';
-import { FilterService } from '../services/filter.service';
+import { FilterService } from 'src/app/library/services/filter.service';
 
 @Component({
-    selector: 'app-feed',
+    selector: 'app-admin-feed',
     template: `
     <div class="feed-container" (click)="feedNavigator()">
         <mat-icon> book </mat-icon>
@@ -66,7 +66,7 @@ import { FilterService } from '../services/filter.service';
     }
     `],
 })
-export class FeedComponent {
+export class FeedAdminComponent {
  
     @Input() feed: FeedTreeNode;
 
@@ -76,13 +76,13 @@ export class FeedComponent {
     ) {}
 
     feedNavigator() {
-        if(this.feed.kind === 'navigation') {
-            this.router.navigateByUrl(`/library/feeds/${this.feed.id}`);
-        }
-        else {
-            this.filterService.setFeed(this.feed.id)
-            this.router.navigateByUrl(`/library/all-entries`);
-        }
+        // if(this.feed.kind === 'navigation') {
+        //     this.router.navigateByUrl(`/library/feeds/${this.feed.id}`);
+        // }
+        // else {
+        //     this.filterService.setFeed(this.feed.id)
+        //     this.router.navigateByUrl(`/library/all-entries`);
+        // }
     }
 
 }

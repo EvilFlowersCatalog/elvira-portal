@@ -37,14 +37,14 @@ export class AdminService {
 
   upload(entriesData: EntriesData) {
     return this.httpClient.post(
-      environment.baseUrl + `/api/v1/catalogs/1a50a657-7207-4275-8300-c8f1be90e881/entries`,
+      environment.baseUrl + `/api/v1/catalogs/${environment.catalogId}/entries`,
       entriesData
     );
   }
 
   async uploadAcquisition(acquisition: FormData, entry_id: string) {
     return this.httpClient.post(
-      environment.baseUrl + `/api/v1/catalogs/1a50a657-7207-4275-8300-c8f1be90e881/entries/${entry_id}`,
+      environment.baseUrl + `/api/v1/catalogs/${environment.catalogId}/entries/${entry_id}`,
       acquisition
     )
     .toPromise();
@@ -52,19 +52,19 @@ export class AdminService {
 
   deleteEntry(entryId: string) {
     return this.httpClient.delete(
-      environment.baseUrl + `/api/v1/catalogs/1a50a657-7207-4275-8300-c8f1be90e881/entries/${entryId}`
+      environment.baseUrl + `/api/v1/catalogs/${environment.catalogId}/entries/${entryId}`
     );
   }
 
   getOneEntry(entryId: string) {
     return this.httpClient.get<OneEntryItem>(
-      environment.baseUrl + `/api/v1/catalogs/1a50a657-7207-4275-8300-c8f1be90e881/entries/${entryId}`
+      environment.baseUrl + `/api/v1/catalogs/${environment.catalogId}/entries/${entryId}`
     );
   }
 
   updateEntry(entryId: string, entriesData: EditedData) {
     return this.httpClient.put(
-      environment.baseUrl + `/api/v1/catalogs/1a50a657-7207-4275-8300-c8f1be90e881/entries/${entryId}`,
+      environment.baseUrl + `/api/v1/catalogs/${environment.catalogId}/entries/${entryId}`,
       entriesData
     );
   }

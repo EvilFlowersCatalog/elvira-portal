@@ -1,5 +1,5 @@
 import { NestedTreeControl } from '@angular/cdk/tree';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { MatTreeNestedDataSource } from '@angular/material/tree';
 import { ActivatedRoute } from '@angular/router';
@@ -17,14 +17,16 @@ import {
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { NotificationService } from 'src/app/common/services/notification.service';
-import { FeedTreeNode } from 'src/app/library/types/library.types';
 //import { FiltersService } from 'src/app/library/services/filters.service';
 import { AdminService } from '../../services/admin.service';
-import { NewFeed } from '../../types/admin.types';
+import { FeedTreeNode, NewFeed } from '../../types/admin.types';
 import { DeleteDialogComponent } from '../dialogs/delete-dialog/delete-dialog.component';
 import { NewFeedDialogComponent } from '../dialogs/new-feed-dialog/new-feed-dialog.component';
 import { UpdateFeedDialogComponent } from '../dialogs/update-feed-dialog/update-feed-dialog.component';
 import { Guid } from 'js-guid';
+import { FeedsService } from 'src/app/library/services/feeds.service';
+import { MatPaginator } from '@angular/material/paginator';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-feed-management',
@@ -36,7 +38,12 @@ export class FeedManagementComponent
   implements OnInit
 {
   fetchFeeds$ = new Subject();
-  dataSource = new MatTreeNestedDataSource<FeedTreeNode>();
+  dataSource: FeedTreeNode[] = []; 
+  searchForm: UntypedFormGroup;
+  resultsLength: number = 0;
+  parent_id: string = "null";
+  parentName: string = "Main feed"
+  @ViewChild('paginator') paginator: MatPaginator;
 
   constructor(
     //private readonly filtersService: FiltersService,
@@ -44,28 +51,57 @@ export class FeedManagementComponent
     private readonly route: ActivatedRoute,
     private readonly adminService: AdminService,
     private readonly notificationService: NotificationService,
+    private readonly feedsService: FeedsService,
     private translocoService: TranslocoService
   ) {
     super();
+    this.searchForm = new UntypedFormGroup({
+      searchInput: new UntypedFormControl(),
+    });
   }
 
   ngOnInit(): void {
-    // this.fetchFeeds$
-    //   .asObservable()
-    //   .pipe(
-    //     takeUntil(this.destroySignal$),
-    //     startWith([]),
-    //     concatMap(() => this.filtersService.getFeedTreeNode())
-    //   )
-    //   .subscribe((data) => {
-    //     this.dataSource.data = data;
-    //   });
+    this.fetchFeeds$
+      .asObservable()
+      .pipe(
+        takeUntil(this.destroySignal$),
+        startWith([]),
+        concatMap(() => this.feedsService.getFeeds({
+          page: this.paginator?.pageIndex ? this.paginator?.pageIndex + 1 : 1,
+          limit: this.paginator?.pageSize ?? 15,
+          parent_id: this.parent_id,
+          title: this.searchForm?.value.searchInput ?? "",
+        }))
+      )
+      .subscribe((data) => {
+        this.dataSource = data.items;
+        this.resultsLength = data.metadata.total;
+        this.paginator.pageIndex = data.metadata.page - 1;
+      });
   }
 
-  createFeed(parentFeedId: string, parentFeedName: string) {
+  nextFeeds(feed: FeedTreeNode) {
+    if(feed.kind === "navigation") {
+      this.parentName = feed.title;
+      this.parent_id = feed.id;
+      this.fetchFeeds$.next();
+    }
+  }
+
+  goBack() {
+    if(this.parent_id !== "null") {
+      this.feedsService.getFeedDetails(this.parent_id)
+      .subscribe((data) => {
+        this.parent_id = data.response.parents.length !== 0 ? data.response.parents[0] : "null";
+        this.fetchFeeds$.next();
+      });
+    }
+  }
+
+  createFeed() {
     const dialogRef = this.dialog.open(NewFeedDialogComponent, {
       width: '50%',
-      data: { parentName: parentFeedName },
+      data: { parentName: this.parentName },
     });
 
     dialogRef
@@ -77,7 +113,7 @@ export class FeedManagementComponent
             result !== 'no'
         ),
         map((result) => ({
-          parents: [parentFeedId],
+          parents: [this.parent_id === "null" ? "" : this.parent_id],
           title: result.feedTitle,
           url_name: Guid.newGuid().toString(),
           content: result.feedTitle,
@@ -102,7 +138,7 @@ export class FeedManagementComponent
         })
       )
       .subscribe(() => {
-        this.dataSource.data = [];
+        //this.dataSource = [];
         this.fetchFeeds$.next();
       });
   }
@@ -187,11 +223,16 @@ export class FeedManagementComponent
         })
       )
       .subscribe(() => {
-        this.dataSource.data = [];
+        //this.dataSource = [];
         this.fetchFeeds$.next();
       });
   }
 
-  isNavigationNode = (_: number, node: FeedTreeNode) =>
-    node.kind === 'navigation';
+  applyFilter() {
+    this.fetchFeeds$.next();
+  }
+
+  handlePageChange() {
+    this.fetchFeeds$.next();
+}
 }
