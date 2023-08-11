@@ -1,85 +1,83 @@
 <ng-container *transloco="let t">
-  <mat-card class="entry-detail-card">
-    
-    <div class="entry-detail-image-container">
-      <div *ngIf="imageSrc === 'none'; else image">
-        <img
-          mat-card-image
-          src="../../../../assets/no_image.png"
-          class="entry-detail-image"
-        />
+  <div class="entry-detail-container">
+    <mat-card class="entry-detail-card">
+      
+      <div 
+        class="entry-detail-image-container"
+        (click)="openPdf(entry.catalog_id, entry.id)"
+      >
+        <div *ngIf="imageSrc === 'none'; else image">
+          <img
+            mat-card-image
+            src="../../../../assets/no_image.png"
+            class="entry-detail-image"
+          />
+        </div>
+
+        <ng-template #image>
+          <img mat-card-image [src]="imageSrc" class="entry-detail-image" />
+        </ng-template>
       </div>
 
-      <ng-template #image>
-        <img mat-card-image [src]="imageSrc" class="entry-detail-image" />
-      </ng-template>
-    </div>
-
-    <div class="entry-detail-content">
-      <div 
-        fxLayout="row wrap" 
-        fxLayoutGap="5px"
-        class="entry-detail-feeds-container"
-      >
+      <div class="entry-detail-content">
         <div 
-          *ngFor="let feed of entry.feeds"
+          fxLayout="row wrap" 
+          fxLayoutGap="5px"
+          class="entry-detail-feeds-container"
         >
           <div 
-            class="entry-detail-feed" 
-            (click)="navigate(feed.id)"
+            *ngFor="let feed of entry.feeds"
           >
-            {{ feed.title }}
+            <div 
+              class="entry-detail-feed" 
+              (click)="navigate(feed.id)"
+            >
+              {{ feed.title }}
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div 
-      fxLayout="row" 
-      fxLayoutAlign="space-around" 
-      class="entry-detail-actions"
-    >
-      <button
-        mat-icon-button
-        matTooltip="{{ t('lazy.entryDetail.info-pdf-tooltip') }}"
-        (click)="showInfo(entry.catalog_id, entry.id)"
+      <div 
+        fxLayout="row" 
+        fxLayoutAlign="space-around" 
+        class="entry-detail-actions"
       >
-        <mat-icon> info </mat-icon>
-      </button> 
-
-      <div *ngIf="currentRoute === '/library/favorites'; else addToFavoritesBtn">
         <button
-          color="accent"
           mat-icon-button
-          matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
-          (click)="deleteFromFavorites(entry.id)"
+          matTooltip="{{ t('lazy.entryDetail.info-pdf-tooltip') }}"
+          (click)="showInfo(entry.catalog_id, entry.id)"
         >
-          <mat-icon> favorite </mat-icon>
-        </button>
+          <mat-icon> info </mat-icon>
+        </button> 
+
+        <div *ngIf="currentRoute === '/library/favorites'; else addToFavoritesBtn">
+          <button
+            color="accent"
+            mat-icon-button
+            matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
+            (click)="deleteFromFavorites(entry.id)"
+          >
+            <mat-icon> favorite </mat-icon>
+          </button>
+        </div>
+        <ng-template #addToFavoritesBtn>
+          <button
+            mat-icon-button
+            matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
+            (click)="addToFavorites(entry.id)"
+          >
+            <mat-icon> favorite </mat-icon>
+          </button>
+        </ng-template>
       </div>
-      <ng-template #addToFavoritesBtn>
-        <button
-          mat-icon-button
-          matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
-          (click)="addToFavorites(entry.id)"
-        >
-          <mat-icon> favorite </mat-icon>
-        </button>
-      </ng-template>
-
-      <button
-        mat-icon-button
-        matTooltip="{{ t('lazy.entryDetail.open-pdf-tooltip') }}"
-        (click)="openPdf(entry.catalog_id, entry.id)"
-      >
-        <mat-icon> picture_as_pdf </mat-icon>
-      </button> 
+    </mat-card>
+    <div
+      class="entry-detail-title"
+      [title]="entry.title"
+      (click)="openPdf(entry.catalog_id, entry.id)"
+    >
+      {{ entry.title }}
     </div>
-  </mat-card>
-  <div
-    class="entry-detail-title"
-    [title]="entry.title"
-  >
-    {{ entry.title }}
   </div>
 </ng-container>

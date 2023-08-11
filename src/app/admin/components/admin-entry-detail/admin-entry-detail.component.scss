@@ -18,11 +18,9 @@
 }
 
 .entry-detail-title {
-  font-size: 15px;
-  text-align: center;
+  font-size: 17px;
   overflow: hidden;
   padding: 5px;
-  background-color: #00bcd4;
   -webkit-line-clamp: 1;
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -35,8 +33,7 @@
   padding: 5px;
   position: absolute;
   display: flex;
-  bottom: 40px;
-  width: 100%;
+  bottom: 0;
 }
 
 .entry-detail-actions {
@@ -57,12 +54,7 @@
   margin-bottom: 5px;
   background-color: #ffc107; 
   color: black;
-  cursor: pointer;
   transition: background-color 0.3s ease;
-}
-
-.entry-detail-feed:hover {
-  background-color: rgba(#ffc107, 0.5);
 }
 
 @media screen and (max-width: 1280px) {

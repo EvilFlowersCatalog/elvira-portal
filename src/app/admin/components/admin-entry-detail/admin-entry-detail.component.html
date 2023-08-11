@@ -1,6 +1,27 @@
 <ng-container *transloco="let t">
   <mat-card class="entry-detail-card">
-    
+    <div 
+      fxLayout="row" 
+      fxLayoutAlign="space-around" 
+      class="entry-detail-actions"
+    >
+      <button
+        mat-icon-button
+        matTooltip="{{ t('lazy.entryDetail.edit-tooltip') }}"
+        (click)="onEditClick()"
+      >
+        <mat-icon> edit </mat-icon>
+      </button> 
+
+      <button
+        mat-icon-button
+        matTooltip="{{ t('lazy.entryDetail.delete-tooltip') }}"
+        (click)="onDeleteClick()"
+      >
+        <mat-icon> delete </mat-icon>
+      </button>
+    </div>
+
     <div class="entry-detail-image-container">
       <div *ngIf="imageSrc === 'none'; else image">
         <img
@@ -26,34 +47,11 @@
         >
           <div 
             class="entry-detail-feed" 
-            (click)="navigate(feed.id)"
           >
             {{ feed.title }}
           </div>
         </div>
       </div>
-    </div>
-
-    <div 
-      fxLayout="row" 
-      fxLayoutAlign="space-around" 
-      class="entry-detail-actions"
-    >
-      <button
-        mat-icon-button
-        matTooltip="{{ t('lazy.entryDetail.edit-tooltip') }}"
-        (click)="onEditClick()"
-      >
-        <mat-icon> edit </mat-icon>
-      </button> 
-
-      <button
-        mat-icon-button
-        matTooltip="{{ t('lazy.entryDetail.delete-tooltip') }}"
-        (click)="onDeleteClick()"
-      >
-        <mat-icon> delete </mat-icon>
-      </button>
     </div>
   </mat-card>
   <div
