@@ -97,15 +97,33 @@
   "favorites": {
     "emptyFavorites": "There is no item in this list"
   },
+  "feed": {
+    "edit-tooltip": "Edit feed",
+    "delete-tooltip": "Delete feed"
+  },
   "newFeedDialog": {
     "requiredFieldEmptyMessage": "Some of required fields are empty",
     "title": "Create new feed",
     "feedTitle": "Title",
     "feedKind": "Kind",
+    "feedContent": "Content",
     "navigationFeed": "Navigation feed (contains additional feeds)",
     "acquisitionFeed": "Acquisition feed (contains publications)",
     "parentFeed": "Parent feed",
     "create": "Create",
+    "cancel": "Cancel"
+  },
+  "updateFeedDialog": {
+    "requiredFieldEmptyMessage": "Some of required fields are empty",
+    "title": "Edit: ",
+    "empty": "Empty",
+    "feedTitle": "Title",
+    "feedKind": "Kind",
+    "feedContent": "Content",
+    "navigationFeed": "Navigation feed (contains additional feeds)",
+    "acquisitionFeed": "Acquisition feed (contains publications)",
+    "parentFeed": "Parent feed",
+    "edit": "Edit",
     "cancel": "Cancel"
   },
   "feedManagement": {

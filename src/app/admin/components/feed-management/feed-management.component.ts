@@ -19,7 +19,7 @@ import { DisposableComponent } from 'src/app/common/components/disposable.compon
 import { NotificationService } from 'src/app/common/services/notification.service';
 //import { FiltersService } from 'src/app/library/services/filters.service';
 import { AdminService } from '../../services/admin.service';
-import { FeedTreeNode, NewFeed } from '../../types/admin.types';
+import { FeedTreeNode, NewFeed, UpdateFeeds } from '../../types/admin.types';
 import { DeleteDialogComponent } from '../dialogs/delete-dialog/delete-dialog.component';
 import { NewFeedDialogComponent } from '../dialogs/new-feed-dialog/new-feed-dialog.component';
 import { UpdateFeedDialogComponent } from '../dialogs/update-feed-dialog/update-feed-dialog.component';
@@ -27,6 +27,7 @@ import { Guid } from 'js-guid';
 import { FeedsService } from 'src/app/library/services/feeds.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-feed-management',
@@ -109,14 +110,15 @@ export class FeedManagementComponent
       .pipe(
         take(1),
         filter(
-          (result: 'no' & { feedTitle: string; feedKind: string }) =>
+          (result: 'no' & { feedTitle: string; feedKind: string; feedContent: string }) =>
             result !== 'no'
         ),
         map((result) => ({
+          catalog_id: environment.catalogId,
           parents: [this.parent_id === "null" ? "" : this.parent_id],
           title: result.feedTitle,
           url_name: Guid.newGuid().toString(),
-          content: result.feedTitle,
+          content: result.feedContent,
           kind: result.feedKind,
         })),
         concatMap((newFeedData: NewFeed) =>
@@ -138,67 +140,57 @@ export class FeedManagementComponent
         })
       )
       .subscribe(() => {
-        //this.dataSource = [];
         this.fetchFeeds$.next();
       });
   }
 
-  editFeed(feedTitle: string, feedKind: string, parentFeedName?: string) {
-    console.log(
-      'feedTitle:',
-      feedTitle,
-      'feedKind:',
-      feedKind,
-      'parentFeedName:',
-      parentFeedName
-    );
-    // const dialogRef = this.dialog.open(UpdateFeedDialogComponent, {
-    //   width: '50%',
-    //   data: { title: feedTitle, parentName: parentFeedName, kind: feedKind },
-    // });
+  editFeed(feed: FeedTreeNode) {
+    const dialogRef = this.dialog.open(UpdateFeedDialogComponent, {
+      width: '50%',
+      data: { title: feed.title, parentId: feed.parents[0], kind: feed.kind, content: feed.content },
+    });
 
-    // dialogRef
-    // .afterClosed()
-    // .pipe(
-    //   take(1),
-    //   filter(
-    //     (result: 'no' & { feedTitle: string; feedKind: string }) =>
-    //       result !== 'no'
-    //   ),
-    //   map((result) => ({
-    //     parents: [parentFeedId],
-    //     title: result.feedTitle,
-    //     url_name: Guid.newGuid().toString(),
-    //     content: result.feedTitle,
-    //     kind: result.feedKind,
-    //   })),
-    //   concatMap((newFeedData: NewFeed) =>
-    //     this.adminService.addNewFeed(newFeedData)
-    //   ),
-    //   tap(() => {
-    //     const message = this.translocoService.translate(
-    //       'lazy.feedManagement.feedPostSuccess'
-    //     );
-    //     this.notificationService.success(message);
-    //   }),
-    //   catchError((err) => {
-    //     console.log(err);
-    //     const message = this.translocoService.translate(
-    //       'lazy.feedManagement.feedPostError'
-    //     );
-    //     this.notificationService.error(message);
-    //     return throwError(err);
-    //   })
-    // )
-    // .subscribe(() => {
-    // this.treeDataSource.data = [];
-    // this.fetchFeeds$.next()});
+    dialogRef
+    .afterClosed()
+    .pipe(
+      take(1),
+      filter(
+        (result: 'no' & { feedTitle: string; feedKind: string; feedsParentName: string; feedContent: string }) =>
+          result !== 'no'
+      ),
+      map((result) => ({
+        catalog_id: environment.catalogId,
+        title: result.feedTitle,
+        url_name: Guid.newGuid().toString(),
+        content: result.feedContent,
+        kind: result.feedKind,
+      })),
+      concatMap((newFeedData: UpdateFeeds) =>
+        this.adminService.updateFeed(feed.id, newFeedData)
+      ),
+      tap(() => {
+        const message = this.translocoService.translate(
+          'lazy.feedManagement.feedPostSuccess'
+        );
+        this.notificationService.success(message);
+      }),
+      catchError((err) => {
+        console.log(err);
+        const message = this.translocoService.translate(
+          'lazy.feedManagement.feedPostError'
+        );
+        this.notificationService.error(message);
+        return throwError(err);
+      })
+    )
+    .subscribe(() => {
+    this.fetchFeeds$.next()});
   }
 
-  deleteFeed(feedId: string, feedTitle: string) {
+  deleteFeed(feed: FeedTreeNode) {
     const dialogRef = this.dialog.open(DeleteDialogComponent, {
       width: '30%',
-      data: { title: feedTitle },
+      data: { title: feed.title },
     });
 
     dialogRef
@@ -206,7 +198,7 @@ export class FeedManagementComponent
       .pipe(
         take(1),
         filter((result) => result !== 'no'),
-        concatMap(() => this.adminService.deleteFeed(feedId)),
+        concatMap(() => this.adminService.deleteFeed(feed.id)),
         tap(() => {
           const message = this.translocoService.translate(
             'lazy.feedManagement.feedDeleteSuccess'
@@ -223,7 +215,6 @@ export class FeedManagementComponent
         })
       )
       .subscribe(() => {
-        //this.dataSource = [];
         this.fetchFeeds$.next();
       });
   }
@@ -234,5 +225,5 @@ export class FeedManagementComponent
 
   handlePageChange() {
     this.fetchFeeds$.next();
-}
+  }
 }

@@ -20,7 +20,7 @@ import { DeleteDialogComponent } from './components/dialogs/delete-dialog/delete
 import { NewFeedDialogComponent } from './components/dialogs/new-feed-dialog/new-feed-dialog.component';
 import { UpdateFeedDialogComponent } from './components/dialogs/update-feed-dialog/update-feed-dialog.component';
 import { AdminEntryDetailComponent } from './components/admin-entry-detail/admin-entry-detail.component';
-import { FeedAdminComponent } from './components/feed.component';
+import { FeedAdminComponent } from './components/admin-feed/admin-feed.component';
 
 @NgModule({
   declarations: [

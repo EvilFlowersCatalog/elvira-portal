@@ -97,15 +97,33 @@
   "favorites": {
     "emptyFavorites": "V tomto zozname sa nenachádza žiadna položka"
   },
+  "feed": {
+    "edit-tooltip": "Upraviť druh",
+    "delete-tooltip": "Vymazať druh"
+  },
   "newFeedDialog": {
     "requiredFieldEmptyMessage": "Niektoré z povinných polí sú prázdne",
     "title": "Vytvoriť nový feed",
     "feedTitle": "Názov",
     "feedKind": "Druh",
+    "feedContent": "Kontent",
     "navigationFeed": "Navigačný feed (obsahuje ďalšie feedy)",
     "acquisitionFeed": "Akvizičný feed (obsahuje publikácie)",
     "parentFeed": "Rodičovský feed",
     "create": "Vytvoriť",
+    "cancel": "Zrušiť"
+  },
+  "updateFeedDialog": {
+    "requiredFieldEmptyMessage": "Niektoré z povinných polí sú prázdne",
+    "title": "Upraviť: ",
+    "empty": "Prázdne",
+    "feedTitle": "Názov",
+    "feedKind": "Druh",
+    "feedContent": "Kontent",
+    "navigationFeed": "Navigačný feed (obsahuje ďalšie feedy)",
+    "acquisitionFeed": "Akvizičný feed (obsahuje publikácie)",
+    "parentFeed": "Rodičovský feed",
+    "edit": "Upraviť",
     "cancel": "Zrušiť"
   },
   "feedManagement": {

@@ -189,6 +189,7 @@ export interface UpdateFeeds {
 }
 
 export interface NewFeed {
+  catalog_id: string;
   parents: string[];
   title: string;
   url_name: string;

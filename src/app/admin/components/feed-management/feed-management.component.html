@@ -40,7 +40,7 @@
   </div>
 
   <div class="feed-container">
-    <div class="feed-feeds-container">
+    <div>
       <div 
         fxLayout="row wrap"
         fxLayout.xs="column"
@@ -66,7 +66,12 @@
           fxFlex.xs="100%"
           *ngFor="let feed of dataSource"
         >
-          <app-admin-feed [feed]="feed" (click)="nextFeeds(feed)"></app-admin-feed>
+          <app-admin-feed 
+            [feed]="feed" 
+            (nextClicked)="nextFeeds($event)"
+            (editClicked)="editFeed($event)"
+            (deleteClicked)="deleteFeed($event)"
+          ></app-admin-feed>
         </div>
       </div>
     </div>

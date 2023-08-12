@@ -1,0 +1,52 @@
+.feed-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 10px;
+    background-color: #00bcd4;
+    flex: 1;
+    height: 300px;
+    cursor: pointer;
+}
+
+.feed-container div {
+    font-size: 30px;
+}
+
+.feed-container mat-icon {
+    font-size: 80px;
+    height: 80px;
+    width: 80px;
+}
+
+p {
+    font-size: 12px
+}
+
+@media screen and (max-width: 1250px) {
+    .feed-container mat-icon {
+        font-size: 70px;
+        height: 70px;
+        width: 70px;
+    }
+}
+
+@media screen and (max-width: 959px) {
+    .feed-container div {
+        font-size: 18px;
+    }
+}
+
+@media screen and (max-width: 599px) {
+    .feed-container div {
+        font-size: 15px;
+    }
+
+    .feed-container mat-icon {
+        font-size: 50px;
+        height: 50px;
+        width: 50px;
+    }
+}

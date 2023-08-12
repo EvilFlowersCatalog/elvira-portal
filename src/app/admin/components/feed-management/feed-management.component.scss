@@ -1,8 +1,7 @@
 .feed-container {
   background-color: transparent !important;
   padding: 0 16px 16px 16px;
-  height: 100%;
-  width: 100%;
+  flex: 1;
 }
 
 .feed-header-box {
@@ -16,10 +15,6 @@
 
 .feed-form {
   width: 50%;
-}
-
-.feed-feeds-container {
-  margin-bottom: 16px;
 }
 
 .feed-add-feed {

@@ -28,6 +28,7 @@ export class NewFeedDialogComponent implements OnInit {
     this.newFeedForm = this.fb.group({
       feedTitle: ['', [Validators.required]],
       feedKind: [null, [Validators.required]],
+      feedContent: ['', [Validators.required]],
       feedsParentName: [{ value: this.data.parentName, disabled: true }],
     });
   }
