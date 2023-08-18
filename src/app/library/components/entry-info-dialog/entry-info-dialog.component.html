@@ -2,41 +2,40 @@
   <ng-container *ngIf="entryDetail$ | async as entryDetail">
 
     <!-- Title -->
-    <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center" color="accent">{{ entryDetail.response.title }}</h2>
+    <h2 fxLayout="row" fxLayoutAlign="center" class="entry-info-title">{{ entryDetail.response.title }}
+    </h2>
 
     <!-- Dialog content -->
     <mat-dialog-content fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="16px">
 
       <!-- Author -->
-      <div class="entry-info-paragraph">
-        <h6>{{ t("lazy.entryInfoDialog.author") }}</h6>
-        <p>{{ entryDetail.response.author.name + " " + entryDetail.response.author.surname }}</p>
+      <div class="entry-info-paragraph" fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <span class="entry-info-paragraph-title">{{ t("lazy.entryInfoDialog.author") }}</span>
+        <span>{{ entryDetail.response.author.name + " " + entryDetail.response.author.surname }}</span>
       </div>
 
-      <!-- Author -->
-      <div class="entry-info-paragraph">
-        <h6>{{ t("lazy.entryInfoDialog.contributors") }}</h6>
+      <!-- Contributors -->
+      <div class="entry-info-paragraph" fxLayout="column">
+        <span class="entry-info-paragraph-title">{{ t("lazy.entryInfoDialog.contributors") }}</span>
         <div *ngIf="entryDetail.response.contributors.length > 0; else noneContributors">
           <div *ngFor="let contributor of entryDetail.response.contributors">
-            <p>{{ contributor.name + " " + contributor.surname }}</p>
+            <span>{{ contributor.name + " " + contributor.surname }}</span>
           </div>
         </div>
         <ng-template #noneContributors>
-          <p>{{ t("lazy.entryInfoDialog.none") }}</p>
+          <span>{{ t("lazy.entryInfoDialog.none") }}</span>
         </ng-template>
       </div>
 
       <!-- Summary -->
-      <div class="entry-info-paragraph">
-        <h6>{{ t("lazy.entryInfoDialog.summary") }}</h6>
-        <p>{{ entryDetail.response.summary }}</p>
+      <div class="entry-info-paragraph" fxLayout="column">
+        <span class="entry-info-paragraph-title">{{ t("lazy.entryInfoDialog.summary") }}</span>
+        <span>{{ entryDetail.response.summary }}</span>
       </div>
 
       <!-- Feeds list -->
       <div class="entry-info-paragraph">
-        <h6>
-          {{ t("lazy.entryInfoDialog.feeds") }}
-        </h6>
+        <span class="entry-info-paragraph-title">{{ t("lazy.entryInfoDialog.feeds") }}</span>
         <div fxLayout="row wrap" fxLayoutGap="10px">
           <div *ngFor="let feed of entryDetail.response.feeds">
             <div class="entry-info-feed">
@@ -47,9 +46,9 @@
       </div>
 
       <!-- Created at date -->
-      <div class="entry-info-paragraph">
-        <h6>{{ t("lazy.entryInfoDialog.createdAt") }}</h6>
-        <p>{{ entryDetail.response.created_at | date: "dd.MM.yyyy" }}</p>
+      <div class="entry-info-paragraph" fxLayout="row" fxLayoutAlign="start start" fxLayoutGap="16px">
+        <span class="entry-info-paragraph-title">{{ t("lazy.entryInfoDialog.createdAt") }}</span>
+        <span>{{ entryDetail.response.created_at | date: "dd.MM.yyyy" }}</span>
       </div>
     </mat-dialog-content>
 
