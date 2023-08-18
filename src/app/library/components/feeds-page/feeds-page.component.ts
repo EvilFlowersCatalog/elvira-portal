@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core'
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { concatMap, startWith, takeUntil } from 'rxjs/operators';
@@ -21,11 +21,13 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
   was_applied: boolean = false;
   fetchFeeds$ = new Subject();
   feed_id: string;
+  feed_path: string[] = [];
   @ViewChild('paginator') paginator: MatPaginator;
 
   constructor(
     private readonly route: ActivatedRoute,
     private readonly feedService: FeedService,
+    private readonly router: Router,
   ) {
     super();
     this.search_form = new UntypedFormGroup({
@@ -39,6 +41,7 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
       .pipe(takeUntil(this.destroySignal$))
       .subscribe((paramMap) => {
         this.feed_id = paramMap.get('feed_id');
+        this.feed_path.push(this.feed_id); // push id to path
         // Trigger fetching of feeds whenever feed_id changes
         this.fetchFeeds$.next();
       });
@@ -77,7 +80,13 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
   }
 
   goBack() {
-    window.history.back(); // for now,
+    if (this.feed_path.length > 1) { // if there is more than 1 id (means there is more than main feed) go back
+      this.feed_path.pop(); // remove last id
+      this.router.navigateByUrl(`/library/feeds/${this.feed_path[this.feed_path.length - 1]}`);
+    } else { // if there is only main feed_id
+      this.feed_path.pop(); // remove 
+      this.router.navigateByUrl('library/home');
+    }
   }
 
   applyFilter() {
