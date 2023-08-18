@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { LocalStorageService } from './local-storage.service';
 import { BehaviorSubject } from 'rxjs';
 import { Observable } from 'rxjs';
-import { State } from '../types/app-state.types';
+import { State } from '../../types/general.types';
 
 @Injectable({
   providedIn: 'root',

@@ -1,87 +1,77 @@
 <ng-container *transloco="let t; read: 'navbar'">
   <ng-container *ngIf="appState$ | async as appState">
     <div fxLayout="column" fxLayoutAlign="start start" class="mobile-sidenav-container">
-      <div 
-        fxLayout="row" 
-        fxLayoutAlign="space-between"
-        style="width: 100%;"
-      >        
-        <button  
-        *ngIf="appState.isLoggedIn" 
-        mat-flat-button
-        (click)="navigate('/library/home')"
-        >
+
+      <!-- Upper row -->
+      <div fxLayout="row" fxLayoutAlign="space-between" style="width: 100%;">
+
+        <!-- Hom button -->
+        <button *ngIf="appState.isLoggedIn" mat-flat-button (click)="navigate('/library/home')">
           <mat-icon class="mobile-sidenav-icon">home</mat-icon>
           <span>{{ t("home") }}</span>
         </button>
 
-        <button  
-        mat-flat-button
-        (click)="hideSidenav()"
-        >
+        <!-- Close button -->
+        <button mat-flat-button (click)="hideSidenav()">
           <mat-icon>close</mat-icon>
         </button>
       </div>
 
-      <button
-      mat-flat-button 
-      *ngIf="appState.isLoggedIn" 
-      (click)="navigate('/library/favorites')"
-      >
+      <!-- Library button -->
+      <button mat-flat-button *ngIf="appState.isLoggedIn" (click)="navigate('/library/all-entries')">
+        <mat-icon class="mobile-sidenav-icon">menu_book</mat-icon>
+        <span>{{ t("library") }}</span>
+      </button>
+
+      <!-- Favorite button -->
+      <button mat-flat-button *ngIf="appState.isLoggedIn" (click)="navigate('/library/favorites')">
         <mat-icon class="mobile-sidenav-icon">favorite</mat-icon>
         <span>{{ t("favorites") }}</span>
       </button>
 
-      <button
-      mat-flat-button 
-      *ngIf="appState.isLoggedIn" 
-      (click)="navigate('/library/all-entries')"
-      >
-        <mat-icon class="mobile-sidenav-icon">menu_book</mat-icon>
-        <span>{{ t("library") }}</span>
+      <!-- Advanced search button -->
+      <button mat-flat-button *ngIf="appState.isLoggedIn" (click)="openAdvanced()">
+        <mat-icon class="mobile-sidenav-icon"> search </mat-icon>
+        <span> {{ t("advanced") }} </span>
       </button>
-      
-      <div *ngIf="appState.lang === 'en'; else enVersionBtn">
-        <button mat-flat-button (click)="changeLanguage('sk')">
-          <mat-icon class="mobile-sidenav-icon">translate</mat-icon>
-          <span>{{ t("svk") }}</span>
-        </button>
-      </div>
-      <ng-template #enVersionBtn>
-        <button mat-flat-button (click)="changeLanguage('en')">
-          <mat-icon class="mobile-sidenav-icon">language</mat-icon>
-          <span>{{ t("eng") }}</span>
-        </button>
-      </ng-template>
-      <div *ngIf="appState.theme === 'dark'; else darkModeBtn">
-        <button mat-flat-button (click)="changeTheme('light')">
-          <mat-icon class="mobile-sidenav-icon">light_mode</mat-icon>
-          <span>{{ t("light") }}</span>
-        </button>
-      </div>
-      <ng-template #darkModeBtn>
-        <button mat-flat-button (click)="changeTheme('dark')">
-          <mat-icon class="mobile-sidenav-icon">dark_mode</mat-icon>
-          <span>{{ t("dark") }}</span>
-        </button>
-      </ng-template>
 
+      <!-- down row column -->
       <div fxLayout="column" class="mobile-sidenav-bottom-container">
-        <button 
-        mat-flat-button 
-        *ngIf="appState.isLoggedIn" 
-        (click)="navigate('/library/account')"
-        >
-          <mat-icon class="mobile-sidenav-icon">account_circle</mat-icon>
-          <span>{{ appState.name }} {{appState.surname}}</span>
-        </button>
 
-        <button
-        *ngIf="appState.isLoggedIn" 
-        mat-flat-button 
-        style="display: flex;"
-        (click)="logout()"
-        >
+        <!-- Translate button -->
+        <div *ngIf="appState.lang === 'en'; else enVersionBtn">
+          <!-- svk -->
+          <button mat-flat-button (click)="changeLanguage('sk')">
+            <mat-icon class="mobile-sidenav-icon">translate</mat-icon>
+            <span>{{ t("svk") }}</span>
+          </button>
+        </div>
+        <!-- en -->
+        <ng-template #enVersionBtn>
+          <button mat-flat-button (click)="changeLanguage('en')">
+            <mat-icon class="mobile-sidenav-icon">language</mat-icon>
+            <span>{{ t("eng") }}</span>
+          </button>
+        </ng-template>
+
+        <!-- Theme button -->
+        <div *ngIf="appState.theme === 'dark'; else darkModeBtn">
+          <!-- light -->
+          <button mat-flat-button (click)="changeTheme('light')">
+            <mat-icon class="mobile-sidenav-icon">light_mode</mat-icon>
+            <span>{{ t("light") }}</span>
+          </button>
+        </div>
+        <!-- dark -->
+        <ng-template #darkModeBtn>
+          <button mat-flat-button (click)="changeTheme('dark')">
+            <mat-icon class="mobile-sidenav-icon">dark_mode</mat-icon>
+            <span>{{ t("dark") }}</span>
+          </button>
+        </ng-template>
+
+        <!-- Logout button -->
+        <button *ngIf="appState.isLoggedIn" mat-flat-button style="display: flex;" (click)="logout()">
           <mat-icon class="mobile-sidenav-icon">logout</mat-icon>
           <span>{{ t("log-out") }}</span>
         </button>

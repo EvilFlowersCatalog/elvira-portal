@@ -7,7 +7,7 @@ import {
   OverlayRef,
   ScrollStrategyOptions,
 } from '@angular/cdk/overlay';
-import { LoadingComponent } from '../components/loading.component';
+import { LoadingComponent } from 'src/app/common/components/loading.component';
 
 @Injectable({
   providedIn: 'root',
@@ -19,7 +19,7 @@ export class LoadingService {
   constructor(
     private readonly scrollStrategy: ScrollStrategyOptions,
     public overlay: Overlay
-  ) {}
+  ) { }
 
   private showOverlay() {
     const position = this.overlay

@@ -4,17 +4,21 @@
   flex: 1;
 }
 
-.feed-page-search-form {
-    width: 100%;
+.feed-page-up-row {
+  width: 100%;
 }
-  
+
+.feed-page-search-form {
+  width: 100%;
+}
+
 .feed-page-search-field {
-    width: 50%;
-    min-width: 200px;
+  width: 50%;
+  min-width: 200px;
 }
 
 .feed-page-search-button {
-    margin: auto 0;
+  margin: auto 0;
 }
 
 .feed-page-search-icon {
@@ -26,11 +30,11 @@
 }
 
 .feed-page-search-delete-icon {
-    position: absolute; 
-    right: 0; 
-    color: red; 
-    font-size: 20px;
-    cursor: pointer;
+  position: absolute;
+  right: 0;
+  color: red;
+  font-size: 20px;
+  cursor: pointer;
 }
 
 .feed-page-paginator {
@@ -39,6 +43,6 @@
 
 @media screen and (max-width: 959px) {
   .feed-page-search-field {
-    width: 80%; 
+    width: 80%;
   }
 }

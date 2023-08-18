@@ -1,76 +1,91 @@
-import { Component, OnInit, ViewChild} from '@angular/core'
+import { Component, OnInit, ViewChild } from '@angular/core'
 import { ActivatedRoute } from '@angular/router';
-import { FeedDetailRespone, FeedTreeNode, ListFeedsResponse } from '../../types/library.types';
-import { FeedsService } from '../../services/feeds.service';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { Subject, Subscription, forkJoin } from 'rxjs';
+import { Subject } from 'rxjs';
 import { concatMap, startWith, takeUntil } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { MatPaginator } from '@angular/material/paginator';
+import { Feed } from 'src/app/types/feed.types';
+import { FeedService } from 'src/app/services/feed.service';
 
 @Component({
-    selector: 'app-feeds-page',
-    templateUrl: './feeds-page.component.html',
-    styleUrls: ['./feeds-page.component.scss'],
+  selector: 'app-feeds-page',
+  templateUrl: './feeds-page.component.html',
+  styleUrls: ['./feeds-page.component.scss'],
 })
 export class FeedsPageComponent extends DisposableComponent implements OnInit {
-    childFeeds: FeedTreeNode[] = [];
-    title: string;
-    searchForm: UntypedFormGroup;
-    resultsLength = 0;
-    wasApplied: boolean = false;
-    fetchFeeds$ = new Subject();
-    @ViewChild('paginator') paginator: MatPaginator;
+  feeds_children: Feed[] = []; // used in html
+  title: string; // used in html
+  search_form: UntypedFormGroup; // used in html
+  results_length = 0; // used in html
+  was_applied: boolean = false;
+  fetchFeeds$ = new Subject();
+  feed_id: string;
+  @ViewChild('paginator') paginator: MatPaginator;
 
-    constructor (
-        private readonly route: ActivatedRoute,
-        private readonly feedsService: FeedsService,
-    ) {
-        super();
-        this.searchForm = new UntypedFormGroup({
-            searchInput: new UntypedFormControl(),
-        });
-    }
+  constructor(
+    private readonly route: ActivatedRoute,
+    private readonly feedService: FeedService,
+  ) {
+    super();
+    this.search_form = new UntypedFormGroup({
+      search_input: new UntypedFormControl(),
+    });
+  }
 
-    ngOnInit(): void {
-        const feedId = this.route.snapshot.paramMap.get('feedId');
-
-        this.feedsService.getFeedDetails(feedId)
-        .subscribe((data) => this.title = data.response.title);
-
-        this.fetchFeeds$
-        .asObservable()
-        .pipe(
-            takeUntil(this.destroySignal$),
-            startWith([]),
-            concatMap((title: string = "") => this.feedsService.getFeeds({
-                page: this.paginator?.pageIndex ? this.paginator?.pageIndex + 1 : 1, 
-                limit: this.paginator?.pageSize ?? 15, 
-                parent_id: feedId, 
-                title: title
-            }))
-        )
-        .subscribe((data) => {
-            this.childFeeds = data.items;
-            this.resultsLength = data.metadata.total;
-            this.paginator.pageIndex = data.metadata.page - 1;
-        })
-    }
-
-    clearSearch() {
-        this.searchForm.controls['searchInput'].reset();
-        if(this.wasApplied) {
-          this.applyFilter();
-          this.wasApplied = false;
-        }
-      }
-
-    applyFilter() {
-        this.wasApplied = true;
-        this.fetchFeeds$.next(this.searchForm?.value.searchInput ? this.searchForm?.value.searchInput : "");
-    }
-
-    handlePageChange() {
+  ngOnInit(): void {
+    // Get feed id
+    this.route.paramMap
+      .pipe(takeUntil(this.destroySignal$))
+      .subscribe((paramMap) => {
+        this.feed_id = paramMap.get('feed_id');
+        // Trigger fetching of feeds whenever feed_id changes
         this.fetchFeeds$.next();
+      });
+
+    // Get feed detail
+    this.feedService.getFeedDetail(this.feed_id)
+      .subscribe((data) => this.title = data.response.title);
+
+    // Used for continually changing feeds
+    this.fetchFeeds$
+      .asObservable()
+      .pipe(
+        takeUntil(this.destroySignal$),
+        startWith([]),
+        concatMap((title: string = "") => this.feedService.getFeedsList({
+          page: this.paginator?.pageIndex ?? 0,
+          limit: this.paginator?.pageSize ?? 15,
+          parent_id: this.feed_id,
+          title: title
+        }))
+      )
+      .subscribe((data) => {
+        this.feeds_children = data.items;
+        this.results_length = data.metadata.total;
+        this.paginator.pageIndex = data.metadata.page - 1;
+      })
+  }
+
+  // Used in html, for clear input
+  clearSearch() {
+    this.search_form.controls['search_input'].reset();
+    if (this.was_applied) {
+      this.applyFilter();
+      this.was_applied = false;
     }
+  }
+
+  goBack() {
+    window.history.back(); // for now,
+  }
+
+  applyFilter() {
+    this.was_applied = true;
+    this.fetchFeeds$.next(this.search_form?.value.search_input ? this.search_form?.value.search_input : "");
+  }
+
+  handlePageChange() {
+    this.fetchFeeds$.next();
+  }
 }

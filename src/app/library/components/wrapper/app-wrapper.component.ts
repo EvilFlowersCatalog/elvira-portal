@@ -3,14 +3,14 @@ import { renderViewer } from '@evilflowers/evilflowersviewer';
 
 @Component({
   selector: 'evil-flowers-viewer-wrapper',
-  template: `<div [id]="rootId"></div>`,
+  template: `<div [id]="root_id"></div>`,
   styleUrls: ['../../../../../node_modules/@evilflowers/evilflowersviewer/dist/styles.css']
 })
 export class AppWrapperComponent implements OnChanges, AfterViewInit {
   @Input() base64: string;
 
-  public rootId = 'evilFLowersViewer-root';
-  private hasViewLoaded = false;
+  public root_id = 'evilFLowersViewer-root'; // used in html
+  private has_view_loaded = false;
 
   public ngOnChanges() {
     console.log('test changed');
@@ -19,17 +19,17 @@ export class AppWrapperComponent implements OnChanges, AfterViewInit {
 
   public ngAfterViewInit() {
     console.log('test init');
-    this.hasViewLoaded = true;
+    this.has_view_loaded = true;
     this.renderComponent();
   }
 
   private renderComponent() {
     console.log('test render');
-    if (!this.hasViewLoaded) {
+    if (!this.has_view_loaded) {
       return;
     }
 
-    renderViewer(this.rootId, this.base64)
+    renderViewer(this.root_id, this.base64)
     console.log('test rendered');
   }
 }

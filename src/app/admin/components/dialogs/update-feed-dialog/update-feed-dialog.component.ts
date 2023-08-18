@@ -2,11 +2,10 @@ import { Component, Inject, OnInit } from '@angular/core';
 import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
 import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
 import { TranslocoService } from '@ngneat/transloco';
-import { NotificationService } from 'src/app/common/services/notification.service';
 import { NewFeedDialogComponent } from '../new-feed-dialog/new-feed-dialog.component';
-import { FeedTreeNode } from 'src/app/admin/types/admin.types';
-import { AdminService } from 'src/app/admin/services/admin.service';
-import { FeedsService } from 'src/app/library/services/feeds.service';
+import { FeedService } from 'src/app/services/feed.service';
+import { NotificationService } from 'src/app/services/general/notification.service';
+import { Feed } from 'src/app/types/feed.types';
 
 @Component({
   selector: 'app-update-feed-dialog',
@@ -14,38 +13,76 @@ import { FeedsService } from 'src/app/library/services/feeds.service';
   styleUrls: ['./update-feed-dialog.component.scss'],
 })
 export class UpdateFeedDialogComponent implements OnInit {
-  newFeedForm: UntypedFormGroup;
-  navigationFeeds: FeedTreeNode[] = [];
+  feed_form: UntypedFormGroup; // used in html
+  navigation_feeds: Feed[] = []; // used in html
+  picked_feeds: string[] = []; // used in html
+  picked_feeds_id: string[] = [];
 
   constructor(
     public dialogRef: MatDialogRef<NewFeedDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { title: string, parentId: string, kind: string, content: string },
+    @Inject(MAT_DIALOG_DATA) public data: { title: string, parents: string[], kind: string, content: string },
     private readonly fb: UntypedFormBuilder,
     private readonly notificationService: NotificationService,
-    private readonly feedsService: FeedsService,
+    private readonly feedService: FeedService,
     private translocoService: TranslocoService
   ) {
     dialogRef.disableClose = true;
-    this.newFeedForm = this.fb.group({
-      feedTitle: [this.data.title, [Validators.required]],
-      feedKind: [this.data.kind, [Validators.required]],
-      feedsParentName: [this.data.parentId ? this.data.parentId : ""],
-      feedContent: [this.data.content, [Validators.required]]
+    this.feed_form = this.fb.group({
+      feed_title: [this.data.title, [Validators.required]],
+      feed_kind: [this.data.kind, [Validators.required]],
+      feed_content: [this.data.content, [Validators.required]],
+      feed_parents: [this.data.parents.length > 0 ? this.data.parents[this.data.parents.length - 1] : '']
     });
   }
 
   ngOnInit(): void {
-    this.feedsService.getFeeds({page: 1, limit: 100, kind: "navigation"})
-    .subscribe((data) => this.navigationFeeds = data.items)
+    this.feedService.getFeedsList({
+      page: 0,
+      limit: 100,
+      kind: "navigation"
+    })
+      .subscribe((data) => this.navigation_feeds = data.items)
+
+    for (let i = 0; i < this.data.parents.length; i++) {
+      // push id
+      this.picked_feeds_id.push(this.data.parents[i]);
+      this.feedService.getFeedDetail(this.data.parents[i])
+        .subscribe((data) => this.picked_feeds.push(data.response.title)); // push name
+    }
   }
 
+  // add new parents
+  addFeed(feed: { title: string, id: string }) {
+    if (!this.picked_feeds.includes(feed.title)) {
+      this.picked_feeds.push(feed.title);
+      this.picked_feeds_id.push(feed.id);
+    }
+  }
+
+  // Clear everything (option empty)
+  clearEverything() {
+    this.picked_feeds = [];
+    this.picked_feeds_id = [];
+  }
+
+  // remove feed
+  removeFeed(feed_name: string) {
+    const index = this.picked_feeds.indexOf(feed_name);
+    this.picked_feeds.splice(index, 1);
+    this.picked_feeds_id.splice(index, 1);
+  }
+
+  // clicked no
   onNoClick(): void {
     this.dialogRef.close('no');
   }
 
+  // clicked yes
   onYesClick(): void {
-    const { value, valid } = this.newFeedForm;
+    const { value, valid } = this.feed_form;
     if (valid) {
+      // set parents to picked ones
+      value.feed_parents = this.picked_feeds_id;
       this.dialogRef.close(value);
     } else {
       const message = this.translocoService.translate(

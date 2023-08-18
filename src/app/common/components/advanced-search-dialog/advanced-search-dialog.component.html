@@ -1,0 +1,52 @@
+<ng-container *transloco="let t">
+
+  <!-- Title -->
+  <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center" color="accent">{{ t("lazy.advancedSearchDialog.name") }}
+  </h2>
+
+  <!-- Dialog content -->
+  <mat-dialog-content fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="16px">
+
+    <!-- Form -->
+    <form fxFill fxLayout="column" [formGroup]="advanced_form">
+
+      <!-- Title -->
+      <mat-form-field color="accent">
+        <mat-label>{{ t("lazy.advancedSearchDialog.title") }}</mat-label>
+
+        <!-- input -->
+        <input matInput formControlName="title" />
+      </mat-form-field>
+
+      <!-- Author name -->
+      <mat-form-field color="accent">
+        <mat-label>{{ t("lazy.advancedSearchDialog.author") }}</mat-label>
+
+        <!-- input -->
+        <input matInput formControlName="author" />
+      </mat-form-field>
+
+      <!-- Created at -->
+      <mat-form-field color="accent">
+        <mat-label>{{ t("lazy.advancedSearchDialog.created_at") }}</mat-label>
+
+        <!-- input -->
+        <input matInput formControlName="created_at" />
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <!-- Action buttons -->
+  <mat-dialog-actions fxLayout="row" fxLayoutAlign="space-evenly center">
+
+    <!-- Cancel button -->
+    <button mat-button mat-dialog-close color="accent">
+      {{ t("lazy.advancedSearchDialog.cancel") }}
+    </button>
+
+    <!-- Find button -->
+    <button mat-button mat-dialog-close color="primary" form="advanced_form" (click)="search()">
+      {{ t("lazy.advancedSearchDialog.find") }}
+    </button>
+  </mat-dialog-actions>
+</ng-container>

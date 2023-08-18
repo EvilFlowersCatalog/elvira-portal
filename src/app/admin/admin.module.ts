@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import {
   TranslocoModule,
-  TranslocoService,
   TRANSLOCO_SCOPE,
 } from '@ngneat/transloco';
 import { ADMIN_ROUTES } from './routing/admin.routes';
@@ -13,7 +12,6 @@ import { AdminOverviewComponent } from './components/admin-overview/admin-overvi
 import { MaterialModule } from '../material.module';
 import { TabGroupDirective } from './directives/tab-group.directive';
 import { MatLegacyPaginatorIntl as MatPaginatorIntl } from '@angular/material/legacy-paginator';
-import { CustomPaginationComponent } from '../common/services/custom-pagination.service';
 import { FeedManagementComponent } from './components/feed-management/feed-management.component';
 import { DocumentManagementComponent } from './components/document-management/document-management.component';
 import { DeleteDialogComponent } from './components/dialogs/delete-dialog/delete-dialog.component';
@@ -21,6 +19,7 @@ import { NewFeedDialogComponent } from './components/dialogs/new-feed-dialog/new
 import { UpdateFeedDialogComponent } from './components/dialogs/update-feed-dialog/update-feed-dialog.component';
 import { AdminEntryDetailComponent } from './components/admin-entry-detail/admin-entry-detail.component';
 import { FeedAdminComponent } from './components/admin-feed/admin-feed.component';
+import { CustomPaginationComponent } from '../services/general/custom-pagination.service';
 
 @NgModule({
   declarations: [
@@ -48,4 +47,4 @@ import { FeedAdminComponent } from './components/admin-feed/admin-feed.component
     { provide: TRANSLOCO_SCOPE, useValue: 'lazy' },
   ],
 })
-export class AdminModule {}
+export class AdminModule { }

@@ -1,54 +1,49 @@
 <ng-container *transloco="let t">
   <div class="feed-page-container">
-    <form
-      [formGroup]="searchForm"
-      (submit)="applyFilter()"
-      class="feed-page-search-form"
-    >
-      <div fxLayout="row">
-        <mat-form-field color="accent" class="feed-page-search-field">
-          <mat-label>
-            {{ title }}
-          </mat-label>
-          <input
-            formControlName="searchInput"
-            matInput
-            type="search"
-          />
-          <mat-icon *ngIf="this.searchForm?.value.searchInput" class="feed-page-search-delete-icon" (click)="clearSearch()">clear</mat-icon>
-        </mat-form-field>
-        <button mat-icon-button type="submit" color="accent" class="feed-page-search-button">
-          <mat-icon class="feed-page-search-icon">search</mat-icon>
-        </button>
-      </div>
-    </form>
+    <div fxLayout="row" fxLayoutAlign="space-between center" class="feed-page-up-row">
 
+      <!-- Form for searching feeds -->
+      <form [formGroup]="search_form" (submit)="applyFilter()" class="feed-page-search-form">
+        <div fxLayout="row">
+          <mat-form-field color="accent" class="feed-page-search-field">
+            <mat-label>
+              {{ title }}
+            </mat-label>
+
+            <!-- Input -->
+            <input formControlName="search_input" matInput type="search" />
+
+            <!-- Button for clear search input -->
+            <mat-icon *ngIf="this.search_form?.value.search_input" class="feed-page-search-delete-icon"
+              (click)="clearSearch()">clear</mat-icon>
+          </mat-form-field>
+
+          <!-- Button for submit -->
+          <button mat-icon-button type="submit" color="accent" class="feed-page-search-button">
+            <mat-icon class="feed-page-search-icon">search</mat-icon>
+          </button>
+        </div>
+      </form>
+
+      <!-- Back button -->
+      <button (click)="goBack()" mat-raised-button color="primary">
+        {{ t("lazy.documentManagement.feed") }}
+      </button>
+    </div>
+
+    <!-- Feeds children list -->
     <div class="feed-page-feeds-container">
-      <div 
-        fxLayout="row wrap"
-        fxLayout.xs="column"
-        fxLayoutAlign.xs ="none"
-        fxLayoutGap="16px grid"
-      >
-        <div 
-          fxFlex="20%"
-          fxFlex.md="33.3%"
-          fxFlex.sm="50%"
-          fxFlex.xs="100%"
-          *ngFor="let child of childFeeds"
-        >
-          <app-feed [feed]="child"></app-feed>
+      <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutAlign.xs="none" fxLayoutGap="16px grid">
+        <div fxFlex="20%" fxFlex.md="33.3%" fxFlex.sm="50%" fxFlex.xs="100%" *ngFor="let feed of feeds_children">
+          <app-feed [feed]="feed"></app-feed>
         </div>
       </div>
     </div>
+
+    <!-- Paginator -->
     <div fxLayoutAlign="center center">
-      <mat-paginator
-        (page)="handlePageChange()"
-        #paginator
-        [length]="resultsLength"
-        [pageSizeOptions]="[15, 30, 50]"
-        class="feed-page-paginator"
-      >
+      <mat-paginator (page)="handlePageChange()" #paginator [length]="results_length" [pageSizeOptions]="[15, 30, 50]"
+        class="feed-page-paginator">
       </mat-paginator>
     </div>
   </div>

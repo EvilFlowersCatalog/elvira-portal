@@ -1,86 +1,52 @@
 <ng-container *transloco="let t">
-  <div 
-    fxLayout="row" 
-    fxLayoutAlign="space-between center" 
-    class="feed-header-box"
-  >
+  <div fxLayout="row" fxLayoutAlign="space-between center" class="feed-header-box">
     <!-- Searchbar -->
-    <form
-      [formGroup]="searchForm"
-      (submit)="applyFilter()"
-      class="feed-form"
-    >
-      <div 
-        fxLayout="row" 
-        fxLayoutAlign="center center"
-      >
+    <form [formGroup]="search_form" (submit)="applyFilter()" class="feed-form">
+      <div fxLayout="row" fxLayoutAlign="center center">
         <mat-form-field color="accent" class="feed-form-field">
           <mat-label>
             {{ t("lazy.documentManagement.search") }}
           </mat-label>
-          <input
-            matInput
-            formControlName="searchInput"
-            type="text"
-          />
+
+          <!-- Input -->
+          <input matInput formControlName="search_input" type="text" />
         </mat-form-field>
+
+        <!-- Button for submit -->
         <button mat-icon-button type="submit" color="accent">
           <mat-icon>search</mat-icon>
         </button>
       </div>
     </form>
-    <!-- New documnet button -->
-    <button
-      (click)="goBack()"
-      mat-raised-button
-      color="primary"
-    >
+
+    <!-- Back button -->
+    <button (click)="goBack()" mat-raised-button color="primary">
       {{ t("lazy.documentManagement.feed") }}
     </button>
   </div>
 
+  <!-- Feeds list -->
   <div class="feed-container">
     <div>
-      <div 
-        fxLayout="row wrap"
-        fxLayout.xs="column"
-        fxLayoutAlign.xs ="none"
-        fxLayoutGap="16px grid"
-      >
-      <div 
-        fxFlex="20%"
-        fxFlex.md="33.3%"
-        fxFlex.sm="50%"
-        fxFlex.xs="100%"
-        (click)="createFeed()"
-      >
-        <div class="feed-add-feed">
-          <mat-icon class="feed-add-icon">add</mat-icon>
-        </div>
-      </div>
+      <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutAlign.xs="none" fxLayoutGap="16px grid">
+        <div fxFlex="20%" fxFlex.md="33.3%" fxFlex.sm="50%" fxFlex.xs="100%" (click)="createFeed()">
 
-        <div 
-          fxFlex="20%"
-          fxFlex.md="33.3%"
-          fxFlex.sm="50%"
-          fxFlex.xs="100%"
-          *ngFor="let feed of dataSource"
-        >
-          <app-admin-feed 
-            [feed]="feed" 
-            (nextClicked)="nextFeeds($event)"
-            (editClicked)="editFeed($event)"
-            (deleteClicked)="deleteFeed($event)"
-          ></app-admin-feed>
+          <!-- Add button -->
+          <div class="feed-add-feed">
+            <mat-icon class="feed-add-icon">add</mat-icon>
+          </div>
+        </div>
+
+        <!-- Feeds -->
+        <div fxFlex="20%" fxFlex.md="33.3%" fxFlex.sm="50%" fxFlex.xs="100%" *ngFor="let feed of data_source">
+          <app-admin-feed [feed]="feed" (nextClicked)="nextFeeds($event)" (editClicked)="editFeed($event)"
+            (deleteClicked)="deleteFeed($event)"></app-admin-feed>
         </div>
       </div>
     </div>
   </div>
-  <mat-paginator
-    (page)="handlePageChange()"
-    #paginator
-    [length]="resultsLength"
-    [pageSizeOptions]="[15, 30, 50]"
-    class="feed-paginator"
-  ></mat-paginator>
+
+  <!-- Paginator -->
+  <mat-paginator (page)="handlePageChange()" #paginator [length]="results_length" [pageSizeOptions]="[15, 30, 50]"
+    class="feed-paginator"></mat-paginator>
 </ng-container>

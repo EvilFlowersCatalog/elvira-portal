@@ -2,10 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { AuthService } from 'src/app/auth/services/auth.service';
-import { AppStateService } from 'src/app/common/services/app-state.service';
-import { State } from 'src/app/common/types/app-state.types';
 import { DisposableComponent } from '../disposable.component';
+import { State } from 'src/app/types/general.types';
+import { AppStateService } from 'src/app/services/general/app-state.service';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { AuthService } from 'src/app/services/auth.service';
+import { AdvancedSearchDialogComponent } from '../advanced-search-dialog/advanced-search-dialog.component';
 
 @Component({
   selector: 'app-mobile-sidenav',
@@ -14,12 +16,12 @@ import { DisposableComponent } from '../disposable.component';
 })
 export class MobileSidenavComponent
   extends DisposableComponent
-  implements OnInit
-{
-  appState$: Observable<State>;
+  implements OnInit {
+  appState$: Observable<State>; // used in html
 
   constructor(
     private readonly router: Router,
+    public dialog: MatDialog,
     private readonly appStateService: AppStateService,
     private readonly authService: AuthService
   ) {
@@ -32,19 +34,33 @@ export class MobileSidenavComponent
       .pipe(takeUntil(this.destroySignal$));
   }
 
+  // Navigation for button
   navigate(link: string) {
-    this.router.navigate([link]);
     this.appStateService.patchState({ sidenav: false });
+    this.router.navigate([link]);
   }
 
+  // change theme
   changeTheme(theme: string) {
     this.appStateService.patchState({ theme: theme, sidenav: false });
   }
 
+  // Change language
   changeLanguage(language: string) {
     this.appStateService.patchState({ lang: language, sidenav: false });
   }
 
+  // Open advanced search
+  openAdvanced() {
+    this.appStateService.patchState({ sidenav: false });
+    this.dialog.open(AdvancedSearchDialogComponent, {
+      width: '700px',
+      maxWidth: '95%',
+      data: {},
+    });
+  }
+
+  // Closing sidebar
   hideSidenav() {
     this.appStateService.patchState({ sidenav: false });
   }

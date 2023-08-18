@@ -1,6 +1,6 @@
 import { Component, OnInit, Inject } from '@angular/core';
 import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
-import { DialogData } from 'src/app/admin/types/admin.types';
+import { DialogData } from 'src/app/types/general.types';
 
 @Component({
   selector: 'app-delete-dialog',
@@ -15,8 +15,9 @@ export class DeleteDialogComponent implements OnInit {
     dialogRef.disableClose = true;
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
+  // yes or no
   onClick(result: string): void {
     this.dialogRef.close(result);
   }

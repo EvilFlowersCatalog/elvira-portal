@@ -11,15 +11,14 @@ import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
 import { EntryDetailComponent } from './components/entry-detail/entry-detail.component';
 import { EntryInfoDialogComponent } from './components/entry-info-dialog/entry-info-dialog.component';
 import { FavoritesComponent } from './components/favorites/favorites.component';
-import { AccountSettingsComponent } from './components/account-settings/account-settings.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatLegacyPaginatorIntl as MatPaginatorIntl } from '@angular/material/legacy-paginator';
-import { CustomPaginationComponent } from '../common/services/custom-pagination.service';
 import { AppWrapperComponent } from './components/wrapper/app-wrapper.component';
 import { HomeComponent } from './components/home/home.component';
 import { SwipperComponent } from './components/swiper/swiper.component';
 import { FeedsPageComponent } from './components/feeds-page/feeds-page.component'
 import { FeedComponent } from './components/feed.component'
+import { CustomPaginationComponent } from '../services/general/custom-pagination.service';
 
 @NgModule({
   declarations: [
@@ -29,7 +28,6 @@ import { FeedComponent } from './components/feed.component'
     EntryDetailComponent,
     EntryInfoDialogComponent,
     FavoritesComponent,
-    AccountSettingsComponent,
     AppWrapperComponent,
     SwipperComponent,
     FeedsPageComponent,
@@ -50,4 +48,4 @@ import { FeedComponent } from './components/feed.component'
   ],
   exports: [],
 })
-export class LibraryModule {}
+export class LibraryModule { }

@@ -1,57 +1,33 @@
 <ng-container *transloco="let t; read: 'navbar'">
   <ng-container *ngIf="appState$ | async as appState">
     <mat-toolbar fxLayout="column" class="navbar-container">
-      <button 
-        mat-icon-button 
-        (click)="toggleSidenav()"
-        class="mobile-navbar-menu-button"
-      >
+
+      <!-- Menu button -->
+      <button mat-icon-button (click)="toggleSidenav()" class="mobile-navbar-menu-button">
         <mat-icon>menu</mat-icon>
       </button>
 
-      <div
-        fxLayoutAlign="center center"
-        fxLayoutAlign.xs="flex-start center" 
-        class="navbar-home-button-container"
-      >
-        <button
-          [disabled]="!appState.isLoggedIn"
-          (click)="navigate('/library/home')"
-          class="navbar-home-button"
-        >
+      <!-- Image elvira -->
+      <div fxLayoutAlign="center center" fxLayoutAlign.xs="flex-start center" class="navbar-home-button-container">
+        <button [disabled]="!appState.isLoggedIn" (click)="navigate('/library/home')" class="navbar-home-button">
           <img src="../../../../assets/logos/title_logo.png">
         </button>
       </div>
 
-      <div 
-        fxLayout="row" 
-        fxLayoutAlign="flex-end flex-end" 
-        class="mobile-navbar-bottom-row"
-      >
-        <form
-          [formGroup]="searchForm" 
-          (submit)="submit()"
-          class="mobile-navbar-form"
-          *ngIf="appState.isLoggedIn"
-        >
-          <div 
-            fxLayout="row" 
-            fxLayoutAlign="center flex-end" 
-            class="mobile-navbar-form-field-container"
-          >
-            <mat-form-field 
-              color="accent" 
-              class="mobile-navbar-form-field"
-            >
+      <!-- Search form -->
+      <div fxLayout="row" fxLayoutAlign="flex-end flex-end" class="mobile-navbar-bottom-row">
+        <form [formGroup]="search_form" (submit)="submit()" class="mobile-navbar-form" *ngIf="appState.isLoggedIn">
+          <div fxLayout="row" fxLayoutAlign="center flex-end" class="mobile-navbar-form-field-container">
+            <mat-form-field color="accent" class="mobile-navbar-form-field">
               <mat-label>
                 {{ t("search") }}
               </mat-label>
-              <input
-                formControlName="searchInput"
-                matInput
-                type="search"
-              />
+
+              <!-- Input -->
+              <input formControlName="search_input" matInput type="search" />
             </mat-form-field>
+
+            <!-- Button for submit -->
             <button mat-icon-button type="submit" color="accent">
               <mat-icon>search</mat-icon>
             </button>

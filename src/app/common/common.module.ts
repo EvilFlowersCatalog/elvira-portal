@@ -4,7 +4,6 @@ import { NotfoundComponent } from './components/notfound/notfound.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { MaterialModule } from '../material.module';
 import { TranslocoRootModule } from '../transloco/transloco-root.module';
-import { LOCAL_STORAGE_TOKEN } from './services/local-storage.service';
 import { LibraryModule } from '../library/library.module';
 import { LoadingComponent } from './components/loading.component';
 import { MobileNavbarComponent } from './components/mobile-navbar/mobile-navbar.component';
@@ -15,6 +14,9 @@ import { ErrorNotificationComponent } from './components/notifications/error-not
 import { WarningNotificationComponent } from './components/notifications/warning-notification.component';
 import { InfoNotificationComponent } from './components/notifications/info-notification.component';
 import { SuccessNotificationComponent } from './components/notifications/success-notification.component';
+import { LOCAL_STORAGE_TOKEN } from '../services/general/local-storage.service';
+import { AdvancedSearchDialogComponent } from './components/advanced-search-dialog/advanced-search-dialog.component';
+import { FooterComponent } from './components/footer/footer.component';
 
 @NgModule({
   declarations: [
@@ -23,11 +25,13 @@ import { SuccessNotificationComponent } from './components/notifications/success
     LoadingComponent,
     MobileNavbarComponent,
     HeaderComponent,
+    FooterComponent,
     MobileSidenavComponent,
     SuccessNotificationComponent,
     ErrorNotificationComponent,
     InfoNotificationComponent,
     WarningNotificationComponent,
+    AdvancedSearchDialogComponent,
   ],
   imports: [
     CommonModule,
@@ -41,8 +45,9 @@ import { SuccessNotificationComponent } from './components/notifications/success
     NotfoundComponent,
     LoadingComponent,
     HeaderComponent,
+    FooterComponent,
     MobileSidenavComponent,
   ],
   providers: [{ provide: LOCAL_STORAGE_TOKEN, useValue: localStorage }],
 })
-export class CommonLibraryModule {}
+export class CommonLibraryModule { }

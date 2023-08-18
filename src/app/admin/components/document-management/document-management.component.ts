@@ -14,11 +14,11 @@ import {
   tap,
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { NotificationService } from 'src/app/common/services/notification.service';
-import { AdminService } from '../../services/admin.service';
-import { AllEntryItems } from '../../types/admin.types';
 import { DeleteDialogComponent } from '../dialogs/delete-dialog/delete-dialog.component';
 import { MatPaginator } from '@angular/material/paginator';
+import { NotificationService } from 'src/app/services/general/notification.service';
+import { Entry } from 'src/app/types/entry.types';
+import { EntryService } from 'src/app/services/entry.service';
 
 @Component({
   selector: 'app-document-management',
@@ -27,11 +27,10 @@ import { MatPaginator } from '@angular/material/paginator';
 })
 export class DocumentManagementComponent
   extends DisposableComponent
-  implements AfterViewInit
-{
+  implements AfterViewInit {
   displayedColumns: string[] = ['title', 'author', 'edit', 'delete'];
   resultsLength = 0;
-  entries: AllEntryItems[] = [];
+  entries: Entry[] = [];
   fetchDocuments$ = new Subject();
   searchForm: UntypedFormGroup;
   @ViewChild('paginator') paginator: MatPaginator;
@@ -40,7 +39,7 @@ export class DocumentManagementComponent
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     public dialog: MatDialog,
-    private readonly adminService: AdminService,
+    private readonly entryService: EntryService,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService,
   ) {
@@ -58,10 +57,11 @@ export class DocumentManagementComponent
         takeUntil(this.destroySignal$),
         startWith([]),
         concatMap(() =>
-          this.adminService.searchEntries(
-            this.paginator.pageIndex ?? 0,
-            this.paginator.pageSize ?? 15,
-            this.searchForm?.value.searchInput ?? "",
+          this.entryService.getEntriesList({
+            page: this.paginator.pageIndex ?? 0,
+            limit: this.paginator.pageSize ?? 15,
+            title: this.searchForm?.value.searchInput ?? "",
+          }
           )
         )
       )
@@ -82,10 +82,10 @@ export class DocumentManagementComponent
   }
 
   //Function, to give choice, wether we want to delete the document or not
-  deleteDocument(element: AllEntryItems) {
+  deleteDocument(entry: Entry) {
     const dialogRef = this.dialog.open(DeleteDialogComponent, {
       width: '30%',
-      data: { title: element.title },
+      data: { title: entry.title },
     });
 
     dialogRef
@@ -93,7 +93,7 @@ export class DocumentManagementComponent
       .pipe(
         take(1),
         filter((result) => result === 'yes'),
-        concatMap(() => this.adminService.deleteEntry(element.id)),
+        concatMap(() => this.entryService.deleteEntry(entry.id)),
         tap(() => {
           const message = this.translocoService.translate(
             'lazy.documentManagement.successMessageDeleteDocument'
@@ -110,12 +110,13 @@ export class DocumentManagementComponent
         })
       )
       .subscribe(() => {
-        this.fetchDocuments$.next();
+        this.fetchDocuments$.next(); // update
       });
   }
 
-  editDocument(element: AllEntryItems) {
-    this.router.navigate([`./edit/${element.id}`], { relativeTo: this.route });
+  // Function for editing document
+  editDocument(entry: Entry) {
+    this.router.navigate([`./edit/${entry.id}`], { relativeTo: this.route });
   }
 
   //Function for searchbar

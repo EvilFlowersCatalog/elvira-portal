@@ -31,7 +31,7 @@
   padding: 5px;
   position: absolute;
   display: flex;
-  bottom: 0;
+  bottom: 40px;
 }
 
 .entry-detail-actions {
@@ -46,11 +46,11 @@
 .entry-detail-feed {
   justify-content: center;
   align-items: center;
-  display: flex; 
-  padding: 2px 10px; 
-  border-radius: 20px; 
+  display: flex;
+  padding: 2px 10px;
+  border-radius: 20px;
   margin-bottom: 5px;
-  background-color: #ffc107; 
+  background-color: #ffc107;
   color: black;
   transition: background-color 0.3s ease;
 }

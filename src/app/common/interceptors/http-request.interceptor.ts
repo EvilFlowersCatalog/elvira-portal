@@ -9,10 +9,10 @@ import {
   HttpErrorResponse,
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { AppStateService } from '../services/app-state.service';
-import { LoadingService } from '../services/loading.service';
 import { catchError, tap } from 'rxjs/operators';
-import { RequestCounterService } from '../services/request-counter.service';
+import { AppStateService } from 'src/app/services/general/app-state.service';
+import { LoadingService } from 'src/app/services/general/loading.service';
+import { RequestCounterService } from 'src/app/services/general/request-counter.service';
 
 export const BYPASS_LOADING = new HttpContextToken(() => false);
 
@@ -24,7 +24,7 @@ export class HttpRequestInterceptor implements HttpInterceptor {
     private readonly appStateService: AppStateService,
     private readonly loadingService: LoadingService,
     private readonly requestCounterService: RequestCounterService
-  ) {}
+  ) { }
 
   intercept(
     request: HttpRequest<any>,

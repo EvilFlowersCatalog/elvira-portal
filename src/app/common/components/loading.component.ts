@@ -12,11 +12,11 @@ import { Component, OnInit } from '@angular/core';
     fxLayout="row" 
     style="width: 100%; margin-top: 120px"
     >
-      <div class="loading-dot-tmp" [ngClass]="{'loading-active-dot-one': activeIndex === 1}"></div>
-      <div class="loading-dot" [ngClass]="{'loading-active-dot-one': activeIndex === 2}"></div>
-      <div class="loading-dot" [ngClass]="{'loading-active-dot-one': activeIndex === 3}"></div>
-      <div class="loading-dot" [ngClass]="{'loading-active-dot-one': activeIndex === 4}"></div>
-      <div class="loading-dot" [ngClass]="{'loading-active-dot-one': activeIndex === 5}"></div>
+      <div class="loading-dot-tmp" [ngClass]="{'loading-active-dot-one': active_index === 1}"></div>
+      <div class="loading-dot" [ngClass]="{'loading-active-dot-one': active_index === 2}"></div>
+      <div class="loading-dot" [ngClass]="{'loading-active-dot-one': active_index === 3}"></div>
+      <div class="loading-dot" [ngClass]="{'loading-active-dot-one': active_index === 4}"></div>
+      <div class="loading-dot" [ngClass]="{'loading-active-dot-one': active_index === 5}"></div>
     </div>
   </div>`,
   styles: [`
@@ -63,16 +63,16 @@ import { Component, OnInit } from '@angular/core';
   }
   `],
 })
-export class LoadingComponent implements OnInit{
-  activeIndex = 1;
-  
+export class LoadingComponent implements OnInit {
+  active_index = 1; // used in html
+
   ngOnInit(): void {
     setInterval(() => {
-      if(this.activeIndex === 5) {
-        this.activeIndex = 1;
+      if (this.active_index === 5) {
+        this.active_index = 1;
       }
       else {
-        this.activeIndex++;
+        this.active_index++;
       }
     }, 300);
   }

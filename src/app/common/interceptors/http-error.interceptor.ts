@@ -8,12 +8,12 @@ import {
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { LoadingService } from '../services/loading.service';
-import { NotificationService } from '../services/notification.service';
 import { Router } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
-import { AppStateService } from '../services/app-state.service';
-import { RequestCounterService } from '../services/request-counter.service';
+import { NotificationService } from 'src/app/services/general/notification.service';
+import { LoadingService } from 'src/app/services/general/loading.service';
+import { AppStateService } from 'src/app/services/general/app-state.service';
+import { RequestCounterService } from 'src/app/services/general/request-counter.service';
 
 @Injectable()
 export class HttpErrorInterceptor implements HttpInterceptor {
@@ -24,7 +24,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     private readonly translocoService: TranslocoService,
     private readonly appStateService: AppStateService,
     private readonly requestCounterService: RequestCounterService
-  ) {}
+  ) { }
 
   intercept(
     request: HttpRequest<any>,

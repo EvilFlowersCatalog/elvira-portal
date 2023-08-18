@@ -1,7 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
-import { FeedTreeNode } from '../../types/admin.types'
-import { Router } from '@angular/router';
-import { FilterService } from 'src/app/library/services/filter.service';
+import { Feed } from 'src/app/types/feed.types';
 
 @Component({
     selector: 'app-admin-feed',
@@ -9,10 +7,10 @@ import { FilterService } from 'src/app/library/services/filter.service';
     styleUrls: [`./admin-feed.component.scss`],
 })
 export class FeedAdminComponent {
-    @Input() feed: FeedTreeNode;
-    @Output() editClicked = new EventEmitter<FeedTreeNode>();
-    @Output() deleteClicked = new EventEmitter<FeedTreeNode>();
-    @Output() nextClicked = new EventEmitter<FeedTreeNode>();
+    @Input() feed: Feed;
+    @Output() editClicked = new EventEmitter<Feed>();
+    @Output() deleteClicked = new EventEmitter<Feed>();
+    @Output() nextClicked = new EventEmitter<Feed>();
 
     onEditClick() {
         this.editClicked.emit(this.feed);

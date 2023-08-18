@@ -1,9 +1,8 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
+import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
 import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { EntryDetail } from '../../types/library.types';
-import { EntriesService } from '../../services/entries.service';
+import { EntryService } from 'src/app/services/entry.service';
+import { EntryDetail } from 'src/app/types/entry.types';
 
 @Component({
   selector: 'app-entry-info-dialog',
@@ -11,15 +10,14 @@ import { EntriesService } from '../../services/entries.service';
   styleUrls: ['./entry-info-dialog.component.scss'],
 })
 export class EntryInfoDialogComponent implements OnInit {
-  entryDetail$: Observable<EntryDetail>;
+  entryDetail$: Observable<EntryDetail>; // Used in html
 
   constructor(
-    public dialogRef: MatDialogRef<EntryInfoDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { catalogID: string, entryID: string },
-    private readonly entriesService: EntriesService
-  ) {}
+    @Inject(MAT_DIALOG_DATA) public data: { entry_id: string },
+    private readonly entryService: EntryService
+  ) { }
 
   ngOnInit(): void {
-    this.entryDetail$ = this.entriesService.entryDetail(this.data.catalogID, this.data.entryID);
+    this.entryDetail$ = this.entryService.getEntryDetail(this.data.entry_id);
   }
 }

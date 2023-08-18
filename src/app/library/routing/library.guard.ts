@@ -1,14 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
 import { Observable, interval } from 'rxjs';
-import { AppStateService } from 'src/app/common/services/app-state.service';
-import { AuthService } from '../../auth/services/auth.service';
-import { RefreshTokenResponse } from 'src/app/auth/types/auth.types';
+import { AuthService } from 'src/app/services/auth.service';
+import { AppStateService } from 'src/app/services/general/app-state.service';
+import { UserRefreshToken } from 'src/app/types/user.types';
 
 @Injectable({
   providedIn: 'root',
 })
-export class LibraryGuard  {
+export class LibraryGuard {
   constructor(
     protected readonly authService: AuthService,
     protected readonly router: Router,
@@ -18,7 +18,7 @@ export class LibraryGuard  {
     this.authService
       .verifyToken()
       .pipe()
-      .subscribe((response?: RefreshTokenResponse) => {
+      .subscribe((response?: UserRefreshToken) => {
         this.appStateService.patchState({
           token: response.response.access_token,
         });
@@ -29,7 +29,7 @@ export class LibraryGuard  {
       this.authService
         .verifyToken()
         .pipe()
-        .subscribe((response?: RefreshTokenResponse) => {
+        .subscribe((response?: UserRefreshToken) => {
           this.appStateService.patchState({
             token: response.response.access_token,
           });
@@ -50,7 +50,7 @@ export class LibraryGuard  {
 
   private verifyAuthTokenValidity() {
     const token = this.appStateService.getStateSnapshot().token;
-    
+
     if (!token) {
       this.appStateService.logoutResetState();
       this.router.navigate(['/auth']);

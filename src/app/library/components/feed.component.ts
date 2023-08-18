@@ -1,88 +1,83 @@
-import { Component, Input } from '@angular/core'
-import { FeedTreeNode } from '../types/library.types'
+import { Component, Input, Output, EventEmitter } from '@angular/core'
 import { Router } from '@angular/router';
-import { FilterService } from '../services/filter.service';
+import { FilterService } from 'src/app/services/general/filter.service';
+import { Feed } from 'src/app/types/feed.types';
 
 @Component({
-    selector: 'app-feed',
-    template: `
-    <div class="feed-container" (click)="feedNavigator()">
-        <mat-icon> book </mat-icon>
+  selector: 'app-feed',
+  template: `
+    <div class="feed-container" fxLayout="row" fxLayoutAlign="center center" (click)="feedNavigator()">
+      <mat-icon> book </mat-icon>
+      <div class="feed-info-container">
         <div>{{ feed.title }}</div>
         <p>{{ feed.content }}</p>
+      </div>
     </div>
     `,
-    styles: [`
+  styles: [`
     .feed-container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        text-align: center;
-        padding: 10px;
-        background-color: #00bcd4;
-        height: 100%;
-        cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background-color: #00bcd4;
+      height: 100%;
+      padding: 10px;
+      cursor: pointer;
     }
 
-    .feed-container div {
-        font-size: 30px;
+    .feed-info-container {
+      flex: 3;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .feed-info-container div {
+      font-size: 30px;
     }
 
     .feed-container mat-icon {
-        font-size: 80px;
-        height: 80px;
-        width: 80px;
+      flex: 1;
+      font-size: 50px;
+      height: 50px;
+      width: 50px;
     }
 
     p {
-        font-size: 12px
-    }
-
-    @media screen and (max-width: 1250px) {
-        .feed-container mat-icon {
-            font-size: 70px;
-            height: 70px;
-            width: 70px;
-        }
+      font-size: 12px
     }
 
     @media screen and (max-width: 959px) {
-        .feed-container div {
-            font-size: 18px;
-        }
+      .feed-info-container div {
+        font-size: 18px;
+      }
     }
 
     @media screen and (max-width: 599px) {
-        .feed-container div {
-            font-size: 15px;
-        }
-
-        .feed-container mat-icon {
-            font-size: 50px;
-            height: 50px;
-            width: 50px;
-        }
+      .feed-info-container div {
+        font-size: 15px;
+      }
     }
-    `],
+  `],
 })
 export class FeedComponent {
- 
-    @Input() feed: FeedTreeNode;
+  @Input() feed: Feed;
 
-    constructor (
-        private readonly router: Router,
-        private readonly filterService: FilterService,
-    ) {}
+  constructor(
+    private readonly router: Router,
+    private readonly filterService: FilterService,
+  ) { }
 
-    feedNavigator() {
-        if(this.feed.kind === 'navigation') {
-            this.router.navigateByUrl(`/library/feeds/${this.feed.id}`);
-        }
-        else {
-            this.filterService.setFeed(this.feed.id)
-            this.router.navigateByUrl(`/library/all-entries`);
-        }
+  // If the feed's kind is navigation go to /feed/id, else go to library
+  feedNavigator() {
+    if (this.feed.kind === 'navigation') {
+      this.router.navigateByUrl(`/library/feeds/${this.feed.id}`);
     }
+    else {
+      this.filterService.setFeed(this.feed.id); // set feed to filter
+      this.router.navigateByUrl(`/library/all-entries`);
+    }
+  }
 
 }

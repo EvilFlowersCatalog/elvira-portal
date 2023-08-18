@@ -1,23 +1,23 @@
 import { Injectable } from '@angular/core';
 import { Router, ActivatedRoute, UrlTree } from '@angular/router';
-import { AppStateService } from 'src/app/common/services/app-state.service';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
-import { AdminService } from '../services/admin.service';
-import { take, map } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { DeviceDetectorService } from 'ngx-device-detector';
+import { AppStateService } from 'src/app/services/general/app-state.service';
+import { UserService } from 'src/app/services/user.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class AdminGuard  {
+export class AdminGuard {
   constructor(
     protected readonly router: Router,
     protected readonly route: ActivatedRoute,
     protected readonly appStateService: AppStateService,
-    private readonly adminService: AdminService,
+    private readonly userService: UserService,
     private deviceService: DeviceDetectorService
-  ) {}
+  ) { }
 
   canLoad():
     | boolean
@@ -44,6 +44,6 @@ export class AdminGuard  {
     //   this.router.navigate(['./'], { relativeTo: this.route });
     //   return of(false);
     // }
-    return this.adminService.getIsAdmin(userId).pipe(map((response) => response.response.is_superuser));
+    return this.userService.getUserDetail(userId).pipe(map((response) => response.response.is_superuser));
   }
 }

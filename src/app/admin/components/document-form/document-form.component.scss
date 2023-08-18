@@ -1,8 +1,7 @@
 .document-form-container {
   background-color: transparent !important;
   padding: 16px 0 16px 16px;
-  height: 100%;
-  width: 100%;
+  flex: 1;
 }
 
 .document-form-content {
@@ -30,13 +29,16 @@
   opacity: 0.5;
   position: relative;
   border: 1px dashed;
+
   h5 {
     font-weight: 300;
   }
+
   h6 {
     font-weight: 300;
     margin-top: 0.5rem;
   }
+
   .input-file {
     opacity: 0;
     position: absolute;
@@ -47,6 +49,7 @@
     left: 0;
     cursor: pointer;
   }
+
   .btn-remove-file {
     position: absolute;
     top: 5px;
@@ -56,6 +59,7 @@
 
 .urlzone {
   height: 170px;
+
   h4 {
     margin-top: 0.5rem;
   }

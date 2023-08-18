@@ -1,36 +1,38 @@
-import { Component, Input, OnInit} from '@angular/core'
-import { EntriesItem } from '../../types/library.types'
+import { Component, Input, OnInit } from '@angular/core'
+import { Entry } from 'src/app/types/entry.types';
 
 @Component({
-    selector: 'app-swiper',
-    templateUrl: './swiper.component.html',
-    styleUrls: ['./swiper.component.scss'],
+  selector: 'app-swiper',
+  templateUrl: './swiper.component.html',
+  styleUrls: ['./swiper.component.scss'],
 })
 export class SwipperComponent implements OnInit {
-    selectedIndex = 0;
-    @Input() swiperEntries: EntriesItem[];
+  selected_index = 0; // Used in html
+  @Input() swiper_entries: Entry[]; // Used in html
 
-    ngOnInit(): void {
-        this.swiperEntries === undefined ? this.swiperEntries = [] : this.swiperEntries;
-        this.autoSlideEntries();
-    }
+  ngOnInit(): void {
+    this.swiper_entries === undefined ? this.swiper_entries = [] : this.swiper_entries; // Cuz of poping error that, reading lenght of undefined
+    this.autoSlideEntries(); // start slider
+  }
 
-    selectEntrie(index: number) {
-        this.selectedIndex = index;
-    }
+  selectEntrie(index: number) {
+    this.selected_index = index;
+  }
 
-    autoSlideEntries(): void {
-        setInterval(() => {
-            this.nextEntrie();
-        }, 5000);
-    }
+  // Automatic slider
+  autoSlideEntries(): void {
+    setInterval(() => {
+      this.nextEntrie();
+    }, 5000);
+  }
 
-    nextEntrie(): void {
-        if(this.selectedIndex === this.swiperEntries.length -1) {
-            this.selectedIndex = 0
-        }
-        else {
-            this.selectedIndex++;
-        }
+  // Function for changind active entry
+  nextEntrie(): void {
+    if (this.selected_index === this.swiper_entries.length - 1) {
+      this.selected_index = 0
     }
+    else {
+      this.selected_index++;
+    }
+  }
 }

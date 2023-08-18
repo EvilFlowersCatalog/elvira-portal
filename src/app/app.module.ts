@@ -12,7 +12,7 @@ import { HttpErrorInterceptor } from './common/interceptors/http-error.intercept
 import { HttpRequestInterceptor } from './common/interceptors/http-request.interceptor';
 import { HttpResponseInterceptor } from './common/interceptors/http-response.interceptor';
 import { CommonLibraryModule } from './common/common.module';
-import { AppStateService } from './common/services/app-state.service';
+import { AppStateService } from './services/general/app-state.service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -47,5 +47,5 @@ import { AppStateService } from './common/services/app-state.service';
   bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(private readonly appStateService: AppStateService) {}
+  constructor(private readonly appStateService: AppStateService) { }
 }

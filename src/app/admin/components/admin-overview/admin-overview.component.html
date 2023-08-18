@@ -1,11 +1,15 @@
 <ng-container *transloco="let t">
   <mat-tab-group elTabGroup mat-align-tabs="center">
+
+    <!-- Management entry -->
     <mat-tab [label]="documentsTabLabel">
       <ng-template md-tab-label> {{ documentsTabLabel }} </ng-template>
       <ng-template matTabContent>
         <app-document-management></app-document-management>
       </ng-template>
     </mat-tab>
+
+    <!-- Management feeds -->
     <mat-tab [label]="feedsTabLabel">
       <ng-template md-tab-label>
         {{ feedsTabLabel }}

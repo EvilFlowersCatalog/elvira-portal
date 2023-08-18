@@ -7,12 +7,11 @@ import {
   HttpResponse,
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { LoadingService } from '../services/loading.service';
 import { map } from 'rxjs/operators';
 
 @Injectable()
 export class HttpResponseInterceptor implements HttpInterceptor {
-  constructor() {}
+  constructor() { }
 
   intercept(
     request: HttpRequest<any>,

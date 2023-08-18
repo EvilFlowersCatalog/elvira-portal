@@ -1,15 +1,16 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { EntriesService } from '../../services/entries.service';
 import { Router } from '@angular/router';
 import { EntryInfoDialogComponent } from '../entry-info-dialog/entry-info-dialog.component';
-import { catchError, filter, take, tap } from 'rxjs/operators';
-import { AppStateService } from 'src/app/common/services/app-state.service';
-import { Observable, throwError } from 'rxjs';
-import { NotificationService } from 'src/app/common/services/notification.service';
+import { Observable } from 'rxjs';
 import { TranslocoService } from '@ngneat/transloco';
-import { EntriesItem, EntryDetail, UserAcquisitionCreationResponse, userAcquisitionCreation } from '../../types/library.types';
-import { FilterService } from '../../services/filter.service';
+import { Entry, EntryDetail } from 'src/app/types/entry.types';
+import { EntryService } from 'src/app/services/entry.service';
+import { FilterService } from 'src/app/services/general/filter.service';
+import { UserAcquisition, UserAcquisitionId } from 'src/app/types/acquisition.types';
+import { AcquisitionService } from 'src/app/services/acquisition.service';
+import { AppStateService } from 'src/app/services/general/app-state.service';
+import { NotificationService } from 'src/app/services/general/notification.service';
 
 @Component({
   selector: 'app-entry-detail',
@@ -17,11 +18,9 @@ import { FilterService } from '../../services/filter.service';
   styleUrls: ['./entry-detail.component.scss'],
 })
 export class EntryDetailComponent implements OnInit {
-  @Input() entry: EntriesItem;
-  @Output() onDeleteFromFavorites = new EventEmitter<any>();
-  imageSrc: string;
-  currentRoute = this.router.url;
-  entryDetail$: Observable<EntryDetail>;
+  @Input() entry: Entry;
+  image_src: string; // used in html
+  current_route = this.router.url; // used in html
 
   constructor(
     private readonly router: Router,
@@ -29,85 +28,47 @@ export class EntryDetailComponent implements OnInit {
     public dialog: MatDialog,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService,
-    private readonly entriesService: EntriesService,
+    private readonly entryService: EntryService,
     private readonly filterService: FilterService,
-  ) {}
+    private readonly acquisitionService: AcquisitionService
+  ) { }
 
   ngOnInit(): void {
-    this.imageSrc = this.entry.thumbnail;
+    this.image_src = this.entry.thumbnail;
   }
 
-  openPdf(catalogID: string, entryID: string) { 
-    this.entriesService
-      .entryDetail(catalogID, entryID)
+  // Get acquisition id and open pdf
+  openPdf(entry_id: string) {
+    this.entryService
+      .getEntryDetail(entry_id)
       .toPromise()
       .then((entryDetail) => {
-        const userAcquisition: userAcquisitionCreation = {
+        // Create user acquisition
+        const userAcquisition: UserAcquisition = {
           acquisition_id: entryDetail.response.acquisitions[0].id,
           type: "personal"
         }
-        this.entriesService
-        .createUserAcquisition(userAcquisition)
-        .toPromise()
-        .then((res: UserAcquisitionCreationResponse) => {
-          this.router.navigateByUrl(`/library/pdf-viewer/${res.response.id}`);
-        })
-        .catch((err) => {
-          console.log(err);
-        })
+        // create user acquisition
+        this.acquisitionService
+          .createUserAcquisition(userAcquisition)
+          .toPromise()
+          .then((res: UserAcquisitionId) => {
+            // When there is a response... move
+            this.router.navigateByUrl(`/library/pdf-viewer/${res.response.id}`);
+          })
+          .catch((err) => {
+            console.log(err);
+          })
       });
   }
 
-  showInfo(catalogID: string, entryID: string) {
+  // Show info dialog
+  showInfo(entry_id: string) {
     this.dialog.open(EntryInfoDialogComponent, {
       width: '700px',
       maxWidth: '95%',
-      data: { catalogID, entryID },
+      data: { entry_id },
     });
-  }
-
-  addToFavorites(id: string) {
-    this.entriesService
-      .addEntryToFavorites(id)
-      .pipe(
-        tap(() => {
-          const message = this.translocoService.translate(
-            'lazy.entryDetail.addToFavoritesSuccessMessage'
-          );
-          this.notificationService.success(message);
-        }),
-        catchError((err) => {
-          console.log(err);
-          const message = this.translocoService.translate(
-            'lazy.entryDetail.addToFavoritesErrorMessage'
-          );
-          this.notificationService.info(message);
-          return throwError(err);
-        })
-      )
-      .subscribe();
-  }
-
-  deleteFromFavorites(id: string) {
-    this.entriesService
-      .deleteFromFavorites(id)
-      .pipe(
-        tap(() => {
-          const message = this.translocoService.translate(
-            'lazy.entryDetail.removeFromFavoritesSuccessMessage'
-          );
-          this.notificationService.success(message);
-        }),
-        catchError((err) => {
-          console.log(err);
-          const message = this.translocoService.translate(
-            'lazy.entryDetail.removeFromFavoritesErrorMessage'
-          );
-          this.notificationService.info(message);
-          return throwError(err);
-        })
-      )
-      .subscribe(() => this.onDeleteFromFavorites.emit());
   }
 
   navigate(feedId: string) {

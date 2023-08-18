@@ -65,7 +65,7 @@
 
 .navbar-bottom-row mat-icon {
   width: 30px;
-  font-size: 30px; 
+  font-size: 30px;
 }
 
 .navbar-button {
@@ -100,8 +100,8 @@
 }
 
 .navbar-account-button {
-  font-size: 30px; 
-  height: 100%; 
+  font-size: 30px;
+  height: 100%;
   width: 30px;
 }
 
@@ -111,12 +111,19 @@
   width: 50%;
   height: 100%;
   border-radius: 20px;
-  background-color: white; /* white color for the circle */
+  background-color: white;
+  /* white color for the circle */
   transition: transform 0.3s ease;
 }
 
 .navbar-button-theme-circle-dark-mode {
-  transform: translateX(40px); /* Move the circle to the left in dark mode */
+  transform: translateX(40px);
+  /* Move the circle to the left in dark mode */
+}
+
+.navbar-acc-picture {
+  width: 30px;
+  border-radius: 50%;
 }
 
 .navbar-form {
@@ -125,7 +132,7 @@
 }
 
 .navbar-form-field-container {
-  height: 100%; 
+  height: 100%;
 }
 
 .navbar-form-field {

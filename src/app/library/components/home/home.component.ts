@@ -1,11 +1,11 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { EntriesItem, EntriesParams, FeedTreeNode, ListEntriesResponse } from '../../types/library.types';
-import { concatMap, startWith, takeUntil } from 'rxjs/operators';
-import { EntriesService } from '../../services/entries.service';
-import { FeedsService } from '../../services/feeds.service';
-import { FilterService } from '../../services/filter.service';
+import { EntryService } from 'src/app/services/entry.service';
+import { FeedService } from 'src/app/services/feed.service';
+import { FilterService } from 'src/app/services/general/filter.service';
+import { Entry } from 'src/app/types/entry.types';
+import { Feed } from 'src/app/types/feed.types';
 
 @Component({
   selector: 'app-home',
@@ -13,42 +13,40 @@ import { FilterService } from '../../services/filter.service';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent extends DisposableComponent implements OnInit {
-  sidebarState$: Observable<boolean>;
-  entriesResponse$: Observable<ListEntriesResponse>;
-  lastAddedEntries: EntriesItem[];
-  popularEntries: EntriesItem[];
-  mainFeeds: FeedTreeNode[];
-  fetchEntries$ = new Subject<EntriesParams>(); 
-  fetchFeeds$ = new Subject();
-  screenWidth: number;
+  last_added_entries: Entry[]; // used in html
+  popular_entries: Entry[]; // used in html
+  main_feeds: Feed[]; // used in html
+  screen_width: number; // used in html
 
   constructor(
-    private readonly entriesService: EntriesService,
-    private readonly feedsService: FeedsService,
+    private readonly entryService: EntryService,
+    private readonly feedService: FeedService,
     private readonly filterService: FilterService,
   ) { super() }
-  
+
+  // For html component in popupal entries -> only shows when screen is < 599
   @HostListener('window:resize', ['$event'])
   onResize(event) {
-    this.screenWidth = window.innerWidth;
+    this.screen_width = window.innerWidth;
   }
 
   ngOnInit(): void {
-    this.entriesService.getEntries(this.filterService.getFilterFor10Latest())
-    .subscribe((data) => {
-      this.lastAddedEntries = data.items
-    });
+    // Get last added entries
+    this.entryService.getEntriesList(this.filterService.get10LastAdded())
+      .subscribe((data) => {
+        this.last_added_entries = data.items
+      });
+    // Get top most popular entries
+    this.entryService.getEntriesList(this.filterService.getTop5())
+      .subscribe((data) => {
+        this.popular_entries = data.items
+      });
 
-    this.entriesService.getEntries(this.filterService.getFilterForTop5())
-    .subscribe((data) => {
-      this.popularEntries = data.items
-    });
-    
-    this.feedsService.getFeeds({
-      page: 1, 
-      limit: 4, 
-      parent_id: "null"
-    })
-    .subscribe((data) => this.mainFeeds = data.items);
+    // Get main feeds
+    this.feedService.getFeedsList({
+      page: 0,
+      limit: 4,
+      parent_id: "null" // query for main feeds (has no parent)
+    }).subscribe((data) => this.main_feeds = data.items);
   }
 }

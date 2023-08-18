@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { AllEntryItems, EntriesItem, OneEntryItem } from '../../types/admin.types';
+import { Entry } from 'src/app/types/entry.types';
 
 @Component({
   selector: 'app-admin-entry-detail',
@@ -10,17 +10,17 @@ import { AllEntryItems, EntriesItem, OneEntryItem } from '../../types/admin.type
   styleUrls: ['./admin-entry-detail.component.scss'],
 })
 export class AdminEntryDetailComponent implements OnInit {
-  @Input() entry: EntriesItem;
-  @Output() editClicked = new EventEmitter<AllEntryItems>();
-  @Output() deleteClicked = new EventEmitter<AllEntryItems>(); 
+  @Input() entry: Entry;
+  @Output() editClicked = new EventEmitter<Entry>();
+  @Output() deleteClicked = new EventEmitter<Entry>();
   imageSrc: string;
   currentRoute = this.router.url;
-  entryDetail$: Observable<OneEntryItem>;
+  entryDetail$: Observable<Entry>;
 
   constructor(
     private readonly router: Router,
     public dialog: MatDialog,
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.imageSrc = this.entry.thumbnail;

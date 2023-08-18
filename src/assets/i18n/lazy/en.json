@@ -1,5 +1,5 @@
 {
-  "homeLibrary" :{
+  "homeLibrary": {
     "popular": "Popular",
     "lastAdded": "Last added"
   },
@@ -48,6 +48,14 @@
     "documentsTab": "Documents",
     "feedsTab": "Feeds"
   },
+  "advancedSearchDialog": {
+    "name": "Advanced search",
+    "title": "Title",
+    "author": "Author name",
+    "created_at": "Created at",
+    "find": "Find",
+    "cancel": "Cancel"
+  },
   "entryDetail": {
     "edit-tooltip": "Edit document",
     "delete-tooltip": "Delete document",
@@ -63,7 +71,8 @@
     "author": "Author:",
     "summary": "Summary:",
     "feeds": "Feeds:",
-    "language": "Language:",
+    "contributors": "Contributors:",
+    "none": "None",
     "createdAt": "Created at:",
     "close": "Close"
   },
@@ -138,6 +147,7 @@
     "filters": "Filters",
     "title": "Title",
     "feed": "Feed",
-    "noFilters": "No filters"
+    "noFilters": "No filters",
+    "nothingFound": "No documents were found"
   }
 }

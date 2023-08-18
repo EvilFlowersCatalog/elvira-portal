@@ -1,5 +1,5 @@
 {
-  "homeLibrary" :{
+  "homeLibrary": {
     "popular": "Populárne",
     "lastAdded": "Naposledy pridané"
   },
@@ -48,6 +48,14 @@
     "documentsTab": "Dokumenty",
     "feedsTab": "Feedy"
   },
+  "advancedSearchDialog": {
+    "name": "Pokročilé vyhľadávanie",
+    "title": "Nadpis",
+    "author": "Meno autora",
+    "created_at": "Vytvorené v",
+    "find": "Hľadať",
+    "cancel": "Zrušiť"
+  },
   "entryDetail": {
     "edit-tooltip": "Upraviť dokument",
     "delete-tooltip": "Vymazať dokument",
@@ -63,7 +71,8 @@
     "author": "Autor:",
     "summary": "Zhrnutie:",
     "feeds": "Feedy:",
-    "language": "Jazyk:",
+    "contributors": "Pomocníci:",
+    "none": "Žiaden",
     "createdAt": "Pridané:",
     "close": "Zatvoriť"
   },
@@ -138,6 +147,7 @@
     "filters": "Filtry",
     "title": "Názov",
     "feed": "Predmet",
-    "noFilters": "Žiadne filtre"
+    "noFilters": "Žiadne filtre",
+    "nothingFound": "Nič nebolo nájdené"
   }
 }

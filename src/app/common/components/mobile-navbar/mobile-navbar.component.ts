@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { AppStateService } from 'src/app/common/services/app-state.service';
-import { State } from '../../types/app-state.types';
 import { DisposableComponent } from '../disposable.component';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import { State } from 'src/app/types/general.types';
+import { AppStateService } from 'src/app/services/general/app-state.service';
+import { FilterService } from 'src/app/services/general/filter.service';
 
 @Component({
   selector: 'app-mobile-navbar',
@@ -14,18 +15,18 @@ import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 })
 export class MobileNavbarComponent
   extends DisposableComponent
-  implements OnInit
-{
-  appState$: Observable<State>;
-  searchForm: UntypedFormGroup;
+  implements OnInit {
+  appState$: Observable<State>; // used in html
+  search_form: UntypedFormGroup; // used in html
 
   constructor(
     private readonly router: Router,
-    private readonly appStateService: AppStateService
+    private readonly appStateService: AppStateService,
+    private readonly filterService: FilterService,
   ) {
     super();
-    this.searchForm = new UntypedFormGroup({
-      searchInput: new UntypedFormControl(),
+    this.search_form = new UntypedFormGroup({
+      search_input: new UntypedFormControl(),
     });
   }
 
@@ -35,20 +36,28 @@ export class MobileNavbarComponent
       .pipe(takeUntil(this.destroySignal$));
   }
 
+  // Hide sidenav
   ngOnDestroy() {
     this.appStateService.patchState({ sidenav: false });
   }
 
+  // Show sidenav
   toggleSidenav() {
     const currentSidenavState = this.appStateService.getStateSnapshot().sidenav;
     this.appStateService.patchState({ sidenav: !currentSidenavState });
   }
 
+  // Navigation for buttons
   navigate(link: string) {
     this.router.navigate([link]);
   }
 
+  // Submit... clear search input and navigate
   submit() {
-    console.log("nieco");
+    if (this.search_form?.value.search_input) {
+      this.filterService.setTitle(this.search_form.value.search_input)
+      this.search_form.controls['search_input'].reset();
+      this.navigate('library/all-entries');
+    }
   }
 }

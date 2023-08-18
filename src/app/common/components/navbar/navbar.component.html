@@ -1,58 +1,57 @@
 <ng-container *transloco="let t; read: 'navbar'">
   <ng-container *ngIf="appState$ | async as appState">
     <mat-toolbar fxLayout="row" class="navbar-container">
+
+      <!-- First column -->
       <div class="navbar-first-column">
-        <img 
-        src="../../../../assets/logos/title_logo.png" 
-        class="navbar-image"
-        [ngClass]="{'navbar-image-offline': !appState.isLoggedIn}"
-        >
-        <div 
-        *ngIf="appState.isLoggedIn"
-        fxLayout="row" 
-        class="navbar-buttons-container">
-          <button
-            [disabled]="!appState.isLoggedIn"
-            (click)="navigate('/library/home')"
-            class="navbar-main-button"
-          >
+
+        <!-- Image (Elvira) first row -->
+        <img src="../../../../assets/logos/title_logo.png" class="navbar-image"
+          [ngClass]="{'navbar-image-offline': !appState.isLoggedIn}">
+
+        <!-- Second row -->
+        <div *ngIf="appState.isLoggedIn" fxLayout="row" class="navbar-buttons-container">
+
+          <!-- Home button -->
+          <button [disabled]="!appState.isLoggedIn" (click)="navigate('/library/home')" class="navbar-main-button">
             <mat-icon class="navbar-icon">home</mat-icon>
             {{ t("home") }}
           </button>
 
-          <button
-            (click)="navigate('/library/favorites')"
-            class="navbar-main-button"
-          >
-            <mat-icon class="navbar-icon">favorite</mat-icon>
-            {{t("favorites")}}
-          </button>
-
-          <button
-            (click)="navigate('/library/all-entries')"
-            class="navbar-main-button"
-          >
+          <!-- Library button -->
+          <button (click)="navigate('/library/all-entries')" class="navbar-main-button">
             <mat-icon class="navbar-icon"> menu_book </mat-icon>
             {{t("library")}}
           </button>
 
-          <button
-            *ngIf="appState.isAdmin"
-            (click)="navigate('/library/admin')"
-            class="navbar-main-button"
-          >
+          <!-- Favorites button -->
+          <button (click)="navigate('/library/favorites')" class="navbar-main-button">
+            <mat-icon class="navbar-icon">favorite</mat-icon>
+            {{t("favorites")}}
+          </button>
+
+          <!-- Admin button -->
+          <button *ngIf="appState.isAdmin" (click)="navigate('/library/admin')" class="navbar-main-button">
             Admin
           </button>
         </div>
       </div>
+
+      <!-- Second column -->
       <div class="navbar-second-column">
+
+        <!-- First row -->
         <div fxLayout="row" class="navbar-top-row">
+
+          <!-- Translate button -->
           <div *ngIf="appState.lang === 'en'; else enVersionBtn">
+            <!-- sk -->
             <button class="navbar-button" (click)="changeLanguage('sk')">
               <mat-icon class="navbar-icon">translate</mat-icon>
               <span>{{ t("svk") }}</span>
             </button>
           </div>
+          <!-- en -->
           <ng-template #enVersionBtn>
             <button class="navbar-button" (click)="changeLanguage('en')">
               <mat-icon class="navbar-icon">language</mat-icon>
@@ -60,73 +59,56 @@
             </button>
           </ng-template>
 
+          <!-- Theme mode button -->
           <button class="navbar-button-theme-switcher" (click)="changeTheme()">
             <mat-icon>dark_mode</mat-icon>
             <span class="navbar-spacer"></span>
-            <mat-icon >light_mode</mat-icon>
+            <mat-icon>light_mode</mat-icon>
             <div class="navbar-button-theme-circle" [ngClass]="{'navbar-button-theme-circle-dark-mode': theme}"></div>
           </button>
 
-          <button
-            [matMenuTriggerFor]="accountMenu"
-            class="navbar-button"
-            *ngIf="appState.isLoggedIn"
-          >
-            <mat-icon class="navbar-account-button">account_circle</mat-icon>
+          <!-- Account button -->
+          <button [matMenuTriggerFor]="accountMenu" class="navbar-button" *ngIf="appState.isLoggedIn">
+            <img [src]="avatar_url" class="navbar-acc-picture">
           </button>
         </div>
-        
-        <div 
-          *ngIf="appState.isLoggedIn"
-          fxLayout="row" 
-          class="navbar-bottom-row"
-        >
-          <form
-            [formGroup]="searchForm" 
-            (submit)="submit()"
-            class="navbar-form"
-          >
-            <div 
-              fxLayout="row" 
-              fxLayoutAlign="flex-end flex-end" 
-              class="navbar-form-field-container"
-            >
+
+        <!-- Second row -->
+        <div *ngIf="appState.isLoggedIn" fxLayout="row" class="navbar-bottom-row">
+
+          <!-- Search form -->
+          <form [formGroup]="search_form" (submit)="submit()" class="navbar-form">
+            <div fxLayout="row" fxLayoutAlign="flex-end flex-end" class="navbar-form-field-container">
               <mat-form-field color="accent" class="navbar-form-field">
                 <mat-label>
                   {{ t("search") }}
                 </mat-label>
-                <input
-                  formControlName="searchInput"
-                  matInput
-                  type="search"
-                />
+
+                <!-- Input -->
+                <input formControlName="search_input" matInput type="search" />
               </mat-form-field>
+
+              <!-- Button for submit -->
               <button mat-icon-button type="submit" color="accent">
                 <mat-icon>search</mat-icon>
               </button>
             </div>
           </form>
 
-          <button
-            (click)="navigate('/library/home')"
-            class="navbar-main-button"
-          >
+          <!-- Advanced button -->
+          <button (click)="openAdvanced()" class="navbar-main-button">
             {{ t("advanced") }}
           </button>
         </div>
       </div>
     </mat-toolbar>
-    
-    <mat-menu #accountMenu="matMenu">
-      <button *ngIf="appState.isLoggedIn" mat-menu-item (click)="navigate('/library/account')">
-        <mat-icon>account_circle</mat-icon>
-        <span>{{ appState.name }} {{appState.surname}}</span>
-      </button> 
 
+    <!-- Account mat menu -->
+    <mat-menu #accountMenu="matMenu">
       <button *ngIf="appState.isLoggedIn" mat-menu-item (click)="logout()">
         <mat-icon>logout</mat-icon>
         <span>{{ t("log-out") }}</span>
       </button>
-    </mat-menu> 
+    </mat-menu>
   </ng-container>
 </ng-container>

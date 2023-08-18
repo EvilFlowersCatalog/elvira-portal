@@ -3,7 +3,6 @@ import { AdminGuard } from 'src/app/admin/routing/admin.guard';
 import { AllEntriesComponent } from '../components/all-entries/allEntries.component';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { FavoritesComponent } from '../components/favorites/favorites.component';
-import { AccountSettingsComponent } from '../components/account-settings/account-settings.component';
 import { LibraryGuard } from './library.guard';
 import { HomeComponent } from '../components/home/home.component';
 import { FeedsPageComponent } from '../components/feeds-page/feeds-page.component';
@@ -31,7 +30,7 @@ export const LIBRARY_ROUTES: Routes = [
     pathMatch: 'full',
   },
   {
-    path: 'feeds/:feedId',
+    path: 'feeds/:feed_id',
     canActivate: [LibraryGuard],
     component: FeedsPageComponent,
   },
@@ -41,7 +40,7 @@ export const LIBRARY_ROUTES: Routes = [
     component: AllEntriesComponent,
   },
   {
-    path: 'pdf-viewer/:userAcquisitionID',
+    path: 'pdf-viewer/:user_acquisition_id',
     canActivate: [LibraryGuard],
     component: PdfViewerComponent,
   },
@@ -49,10 +48,5 @@ export const LIBRARY_ROUTES: Routes = [
     path: 'favorites',
     canActivate: [LibraryGuard],
     component: FavoritesComponent,
-  },
-  {
-    path: 'account',
-    canActivate: [LibraryGuard],
-    component: AccountSettingsComponent,
   },
 ];

@@ -1,11 +1,19 @@
 <ng-container *transloco="let t">
+
+  <!-- Feed title -->
   <h1 mat-dialog-title fxLayoutAlign="center center">
     {{ t("lazy.deleteDialog.title", { title: data.title }) }}
   </h1>
+
+  <!-- Buttons -->
   <div fxLayout="row" fxLayoutAlign="space-evenly center">
+
+    <!-- Button cancel -->
     <button mat-flat-button (click)="onClick('no')">
       {{ t("lazy.deleteDialog.disagreeButton") }}
     </button>
+
+    <!-- Button accept -->
     <button mat-flat-button (click)="onClick('yes')" color="warn">
       {{ t("lazy.deleteDialog.agreeButton") }}
     </button>

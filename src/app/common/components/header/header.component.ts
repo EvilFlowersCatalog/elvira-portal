@@ -6,16 +6,16 @@ import { Component, HostListener, OnInit } from '@angular/core';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
-  screenWidth: number;
+  screen_width: number; // used in html
 
-  constructor() {}
+  constructor() { }
 
   @HostListener('window:resize', ['$event'])
   onResize(event) {
-    this.screenWidth = window.innerWidth;
+    this.screen_width = window.innerWidth;
   }
 
   ngOnInit(): void {
-    this.screenWidth = window.innerWidth;
+    this.screen_width = window.innerWidth;
   }
 }

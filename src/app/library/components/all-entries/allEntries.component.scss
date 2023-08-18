@@ -1,6 +1,6 @@
 .all-entries-container {
   background-color: transparent !important;
-  padding: 16px 0 16px 16px;
+  padding: 0 0 16px 16px;
   flex: 1;
 }
 
@@ -13,7 +13,10 @@
 }
 
 .all-entries-no-filter {
-  text-align: center; 
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
   margin-top: 16px;
 }
 
@@ -21,16 +24,23 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 5px 20px;
-  cursor: pointer;
+  width: 100%;
+  height: 40px; // size of inner container
   color: black;
-  font-size: 15px;
-  background-color: #ffc107;
-  transition: background-color 0.5s ease;
 }
 
-.all-entries-filer-button:active {
-  background-color: rgba(#ffc107, 0.5);
+.all-entries-filter-button-inner-container {
+  position: absolute;
+  top: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 5px 20px;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+  font-size: 20px;
+  background-color: #ffc107;
 }
 
 .all-entries-filter-icon {
@@ -41,14 +51,27 @@
   width: 50%;
 }
 
-
-.all-entries-row {
+.entries-list-empty {
+  text-align: center;
+  align-items: center;
+  justify-content: center;
   width: 100%;
+  font-size: 40px;
+  margin-bottom: 16px;
+  padding-right: 16px;
+}
+
+.all-entries-not-found-icon {
   margin-top: 16px;
-  border-bottom: 2px solid #ffc107;
+  font-size: 50px;
+  width: 50px;
+  height: 50px;
 }
 
 .all-entries-delete-filter {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
   color: red;
   cursor: pointer;
 }
@@ -58,7 +81,7 @@ span {
 }
 
 .entries-list-container {
-  margin: 0 !important; 
+  margin: 0 !important;
 }
 
 .home-paginator {
@@ -68,10 +91,10 @@ span {
 
 @media screen and (max-width: 959px) {
   .all-entries-search-field {
-    width: 80%; 
+    width: 80%;
   }
+
   .all-entries-filter-rows-container {
     width: 100%;
   }
 }
-

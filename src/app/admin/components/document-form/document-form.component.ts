@@ -3,23 +3,15 @@ import { throwError } from 'rxjs';
 import { UntypedFormGroup, UntypedFormControl, UntypedFormArray, Validators } from '@angular/forms';
 import { catchError, map, take, tap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AdminService } from '../../services/admin.service';
-import {
-  AcquisitionsItems,
-  EditedData,
-  EntriesContributors,
-  EntriesData,
-  OneEntryItem,
-} from '../../types/admin.types';
 import { TitleValidators } from '../../validators/title.validator';
-import { NotificationService } from 'src/app/common/services/notification.service';
 import { TranslocoService } from '@ngneat/transloco';
-//import { FiltersService } from 'src/app/library/services/filters.service';
-import { MatTreeNestedDataSource } from '@angular/material/tree';
-import { EntriesItem, FeedTreeNode } from 'src/app/library/types/library.types';
-import { NestedTreeControl } from '@angular/cdk/tree';
-import { EntriesService } from 'src/app/library/services/entries.service';
-import { FeedsService } from 'src/app/library/services/feeds.service';
+import { FeedService } from 'src/app/services/feed.service';
+import { NotificationService } from 'src/app/services/general/notification.service';
+import { EntryService } from 'src/app/services/entry.service';
+import { Entry, EntryDetail, EntryNew } from 'src/app/types/entry.types';
+import { environment } from 'src/environments/environment';
+import { EntryAuthor } from 'src/app/types/author.types';
+import { Feed } from 'src/app/types/feed.types';
 
 @Component({
   selector: 'app-admin',
@@ -27,22 +19,21 @@ import { FeedsService } from 'src/app/library/services/feeds.service';
   styleUrls: ['./document-form.component.scss'],
 })
 export class DocumentFormComponent implements OnInit {
-  uploadForm: UntypedFormGroup;
-  imageForm: UntypedFormGroup;
-  contributors: UntypedFormArray;
-  feeds: { title: string; id: string }[] = [];
-  imageFile: File;
-  pdfFile: File;
-  validSize: boolean = false;
-  entryId: string;
-  isInEditMode: boolean = false;
-  thumbnail: string;
-  dataSource: { title: string; id: string }[] = [];
+  uploadForm: UntypedFormGroup; // used in html
+  imageForm: UntypedFormGroup; // used in html
+  contributors: UntypedFormArray; // used in html
+  feeds: { title: string; id: string }[] = []; //used in html
+  imageFile: File; // used in html
+  pdfFile: File; // used in html
+  validSize: boolean = false; // used in html
+  entry_id: string;
+  isInEditMode: boolean = false; // used in html
+  dataSource: { title: string; id: string }[] = []; // used in html
 
   constructor(
-    private readonly adminService: AdminService,
-    private readonly feedsService: FeedsService,
+    private readonly feedService: FeedService,
     private readonly router: Router,
+    private readonly entryService: EntryService,
     private readonly route: ActivatedRoute,
     private readonly titleValidator: TitleValidators,
     private readonly notificationService: NotificationService,
@@ -66,32 +57,63 @@ export class DocumentFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.feedsService.getFeeds({
-      page: 1, 
-      limit: 100, 
+    // Get acquisition feeds
+    this.feedService.getFeedsList({
+      page: 0,
+      limit: 100,
       kind: "acquisition"
     })
-    .subscribe((dataSource) => {  
-      dataSource.items.forEach(item => {
-        this.dataSource.push({title: item.title, id: item.id});
-      });
-    });
-
-    this.entryId = this.route.snapshot.paramMap.get('id');
-    if (this.entryId) {
-      this.isInEditMode = true;
-      this.adminService.getOneEntry(this.entryId).subscribe((response) => {
-        this.initUploadForm(response);
-        this.feeds = response.response.feeds.map((feed) => {
-          return { title: feed.title, id: feed.id };
+      .subscribe((dataSource) => {
+        dataSource.items.forEach(item => {
+          this.dataSource.push({ title: item.title, id: item.id }); // set to dataSource in way we want
         });
-        this.initContributors(response.response.contributors);
-        this.thumbnail = response.response.thumbnail;
       });
+
+    // Get entry id, if there is 
+    this.entry_id = this.route.snapshot.paramMap.get('id');
+    if (this.entry_id) { // is there
+      this.isInEditMode = true; // it means we are in edit mode
+      this.entryService.getEntryDetail(this.entry_id) // get details of given entry
+        .subscribe((response) => {
+          // Set everything in form
+          this.initUploadForm(response);
+          this.initFeeds(response.response.feeds);
+          this.initContributors(response.response.contributors);
+          this.convertToImageFile(response.response.thumbnail); // convert thumbnail to image
+        });
     }
   }
 
-  initUploadForm(data: OneEntryItem) {
+  // Get image type
+  getImageType(base64Image: string): string {
+    const matches = base64Image.match(/^data:image\/([a-zA-Z]+);base64,/);
+    if (matches && matches.length === 2) {
+      return matches[1]; // The image type (e.g., 'jpeg' or 'png')
+    } else {
+      // Default to 'jpeg' if the image type can't be determined
+      return 'jpeg';
+    }
+  }
+
+  // Convert base64 to image file
+  convertToImageFile(base64: string): void {
+    const imageType = this.getImageType(base64); // get image type
+    // replace first info, (cuz it will pass the atob func)
+    const base64WithoutPrefix = base64.replace(/^data:image\/[a-zA-Z]+;base64,/, '');
+    // encode
+    const byteCharacters = atob(base64WithoutPrefix);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: `image/${imageType}` }); // create Blob
+    // Set image
+    this.imageFile = new File([blob], 'Picture', { type: `image/${imageType}` });
+  }
+
+  // Set data in edit mode to form
+  initUploadForm(data: EntryDetail) {
     this.uploadForm.patchValue({
       title: data.response.title,
       authorName: data.response.author.name,
@@ -100,10 +122,12 @@ export class DocumentFormComponent implements OnInit {
     });
   }
 
+  // get title
   get formTitle() {
     return this.uploadForm.controls['title'];
   }
 
+  // Add contributors
   addContributor(name?: string, surname?: string): void {
     this.contributors = this.uploadForm.get('contributors') as UntypedFormArray;
     this.contributors.push(
@@ -114,76 +138,100 @@ export class DocumentFormComponent implements OnInit {
     );
   }
 
+  // Delete contributor
   deleteContributor(index: number) {
     const add = this.uploadForm.get('contributors') as UntypedFormArray;
     add.removeAt(index);
   }
 
-  initContributors(contributors: EntriesContributors[]) {
+  // In editmode, get contributors
+  initContributors(contributors: EntryAuthor[]) {
     contributors.forEach((contributor) => {
       this.addContributor(contributor.name, contributor.surname);
     });
   }
 
+  // in editmode, get feeds
+  initFeeds(feeds: Feed[]) {
+    this.feeds = feeds.map((feed) => {
+      return { title: feed.title, id: feed.id };
+    });
+  }
+
+  // add feed
   addFeed(feed) {
     let contains = false
-    for(let i = 0; i < this.feeds.length; i++) {
-      if(this.feeds[i].id === feed.id) {
+    // Check if it's now already used
+    for (let i = 0; i < this.feeds.length; i++) {
+      if (this.feeds[i].id === feed.id) {
         contains = true;
         break;
       }
     }
+    // if not push it
     if (!contains && this.feeds.length < 5) {
       this.feeds.push({ title: feed.title, id: feed.id });
     }
   }
 
+  // remove feed
   removeFeed(feed) {
     const index = this.feeds.indexOf(feed);
-
     if (index >= 0) {
       this.feeds.splice(index, 1);
     }
   }
 
+  // Creare or update func
   async createOrUpdateEntry() {
+    // If is in edit mode
     if (this.isInEditMode) {
-      this.adminService
-        .updateEntry(this.entryId, await this.getEditedData())
-        .pipe(
-          tap(() => {
-            const message = this.translocoService.translate(
-              'lazy.documentForm.successMessageEditDocument'
-            );
-            this.notificationService.success(message);
-            this.router.navigate(['../../'], { relativeTo: this.route });
-          }),
-          take(1),
-          catchError((err) => {
-            console.log(err);
-            const message = this.translocoService.translate(
-              'lazy.documentForm.errorMessageEditDocument'
-            );
-            this.notificationService.error(message);
-            return throwError(err);
-          })
-        )
-        .subscribe();
-    } else {
-      if (this.uploadForm.invalid) {
+      if (this.uploadForm.invalid) {  // if something missing
         this.notificationService.error('Invalid upload form!');
-      } else if (!this.validSize) {
+      } else if (!this.validSize) { // if image has not valid size
         this.notificationService.error('Invalid image size!');
-      } else if (!this.imageFile || !this.pdfFile) {
+      } else if (!this.imageFile) { // if there is no image
         this.notificationService.error('Seems like some files are missing!');
-      } else {
-        const newEntry = await this.getFormData();
-        
-        this.adminService
-          .upload(newEntry)
+      } else { // if everything is fine
+        this.entryService
+          .updateEntry(this.entry_id, await this.getFormData()) // get edited data
           .pipe(
-            tap(async (response: OneEntryItem) => {
-              
+            tap(() => {
+              const message = this.translocoService.translate(
+                'lazy.documentForm.successMessageEditDocument'
+              );
+              this.notificationService.success(message);
+              this.router.navigate(['../../'], { relativeTo: this.route });
+            }),
+            take(1),
+            catchError((err) => {
+              console.log(err);
+              const message = this.translocoService.translate(
+                'lazy.documentForm.errorMessageEditDocument'
+              );
+              this.notificationService.error(message);
+              return throwError(err);
+            })
+          )
+          .subscribe();
+      }
+    }
+    // Else is not in edited mode.. so it's upload
+    else {
+      if (this.uploadForm.invalid) { // if anything is missing
+        this.notificationService.error('Invalid upload form!');
+      } else if (!this.validSize) { // if image has not valid size
+        this.notificationService.error('Invalid image size!');
+      } else if (!this.imageFile || !this.pdfFile) { // if there is no image or pdf
+        this.notificationService.error('Seems like some files are missing!');
+      } else { // if everything is fine
+        const newEntry = await this.getFormData(); // get data
+
+        this.entryService
+          .createEntry(newEntry)
+          .pipe(
+            tap(async (response: EntryDetail) => {
+              // if entry was created create acquisition as FormData
               let acquisitionData = new FormData();
               let metadata = {
                 relation: "open-access",
@@ -192,7 +240,8 @@ export class DocumentFormComponent implements OnInit {
               acquisitionData.append('metadata', JSON.stringify(metadata));
 
               try {
-                await this.adminService.uploadAcquisition(acquisitionData, response.response.id);
+                // upload acquistion
+                await this.entryService.uploadEntryAcquisition(acquisitionData, response.response.id);
 
                 const message = this.translocoService.translate(
                   'lazy.documentForm.successMessageUploadDocument'
@@ -200,16 +249,16 @@ export class DocumentFormComponent implements OnInit {
                 this.notificationService.success(message);
                 this.router.navigate(['../'], { relativeTo: this.route });
               } catch (error) {
-                // Ak sa niečo stane pri nahraní pdfka a nepodarí sa nahrať, vymaž vytvorenú entrie
-                this.adminService
+                // If something went wrong during uploading file, delete created entry
+                this.entryService
                   .deleteEntry(response.response.id)
-                  .toPromise();
+                  .subscribe();
 
-                  const message = this.translocoService.translate(
-                    'lazy.documentForm.errorMessageUploadDocument'
-                  );
-                  this.notificationService.error(message);
-                  return throwError(error);
+                const message = this.translocoService.translate(
+                  'lazy.documentForm.errorMessageUploadDocument'
+                );
+                this.notificationService.error(message);
+                return throwError(error);
               }
             }),
             take(1),
@@ -226,55 +275,33 @@ export class DocumentFormComponent implements OnInit {
     }
   }
 
-  async getEditedData() {
-    const editedData: EditedData = {
-      title: this.uploadForm.get('title').value,
-      author: {
-        name: this.uploadForm.get('authorName').value,
-        surname: this.uploadForm.get('authorSurname').value,
-      },
-      feeds: this.feeds.map((feed) => {
-        return feed.id;
-      }),
-      summary: this.uploadForm.get('summary').value,
-      language_code: 'sk',
-      contributors: this.getContributors(),
-      identifiers: {
-        google: "XIXIX",
-        isbn: "null"
-      },
-      image: this.imageFile ? await this.getBase(this.imageFile) : this.thumbnail
-    };
-    return editedData;
-  }
-
+  // Get data
   async getFormData() {
-    const entriesData: EntriesData = {
+    // Set data
+    const entry: EntryNew = {
       title: this.uploadForm.get('title').value,
       author: {
         name: this.uploadForm.get('authorName').value,
         surname: this.uploadForm.get('authorSurname').value,
       },
-      contributors: this.getContributors(),
       feeds: this.feeds.map((feed) => {
         return feed.id;
       }),
       summary: this.uploadForm.get('summary').value,
       language_code: 'sk',
-      // acquisitions: [
-      //   { relation: 'acquisition', content: await this.getBase(this.pdfFile) },
-      // ],
+      contributors: this.getContributors(),
       identifiers: {
         google: "XIXIX",
         isbn: "null"
       },
       image: await this.getBase(this.imageFile)
     };
-
-    return entriesData;
+    return entry;
   }
 
+  // Create Base64 file
   async getBase(fileBase: File) {
+    // func for creating
     const getBase64 = (file: File) => {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -283,10 +310,12 @@ export class DocumentFormComponent implements OnInit {
         reader.onerror = (error) => reject(error);
       });
     };
+    // file
     const base = await getBase64(fileBase);
     return base;
   }
 
+  // Get contributors
   getContributors() {
     const formArray = this.uploadForm.get('contributors') as UntypedFormArray;
     return formArray.controls.map((control) => {
@@ -297,6 +326,7 @@ export class DocumentFormComponent implements OnInit {
     });
   }
 
+  // Functions for image
   onImageDropped(file: File) {
     this.imageFile = file;
   }
@@ -307,6 +337,7 @@ export class DocumentFormComponent implements OnInit {
     this.imageFile = null;
   }
 
+  // Functions for pdf
   onPDFDropped(file: File) {
     this.pdfFile = file;
   }
@@ -317,6 +348,7 @@ export class DocumentFormComponent implements OnInit {
     this.pdfFile = null;
   }
 
+  // Get file size
   formatFileSize(bytes: number, decimals = 0) {
     if (bytes === 0) {
       return '0 Bytes';
@@ -329,6 +361,7 @@ export class DocumentFormComponent implements OnInit {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
   }
 
+  // Check if image has valid size
   checkImageSize() {
     if (this.imageFile.size < 1024 * 1024) {
       this.validSize = true;

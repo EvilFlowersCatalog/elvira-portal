@@ -16,18 +16,17 @@ import {
   tap,
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { NotificationService } from 'src/app/common/services/notification.service';
 //import { FiltersService } from 'src/app/library/services/filters.service';
-import { AdminService } from '../../services/admin.service';
-import { FeedTreeNode, NewFeed, UpdateFeeds } from '../../types/admin.types';
 import { DeleteDialogComponent } from '../dialogs/delete-dialog/delete-dialog.component';
 import { NewFeedDialogComponent } from '../dialogs/new-feed-dialog/new-feed-dialog.component';
 import { UpdateFeedDialogComponent } from '../dialogs/update-feed-dialog/update-feed-dialog.component';
 import { Guid } from 'js-guid';
-import { FeedsService } from 'src/app/library/services/feeds.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { environment } from 'src/environments/environment';
+import { FeedService } from 'src/app/services/feed.service';
+import { NotificationService } from 'src/app/services/general/notification.service';
+import { Feed, FeedNew } from 'src/app/types/feed.types';
 
 @Component({
   selector: 'app-feed-management',
@@ -36,93 +35,93 @@ import { environment } from 'src/environments/environment';
 })
 export class FeedManagementComponent
   extends DisposableComponent
-  implements OnInit
-{
+  implements OnInit {
   fetchFeeds$ = new Subject();
-  dataSource: FeedTreeNode[] = []; 
-  searchForm: UntypedFormGroup;
-  resultsLength: number = 0;
-  parent_id: string = "null";
-  parentName: string = "Main feed"
+  data_source: Feed[] = []; // used in html
+  search_form: UntypedFormGroup; // used in html
+  results_length: number = 0; // used in html
+  feed_path: { title: string, id: string }[] = []; // path of feeds
   @ViewChild('paginator') paginator: MatPaginator;
 
   constructor(
-    //private readonly filtersService: FiltersService,
     public dialog: MatDialog,
-    private readonly route: ActivatedRoute,
-    private readonly adminService: AdminService,
+    private readonly feedService: FeedService,
     private readonly notificationService: NotificationService,
-    private readonly feedsService: FeedsService,
     private translocoService: TranslocoService
   ) {
     super();
-    this.searchForm = new UntypedFormGroup({
-      searchInput: new UntypedFormControl(),
+    this.search_form = new UntypedFormGroup({
+      search_input: new UntypedFormControl(),
     });
   }
 
   ngOnInit(): void {
+    // Push first parent id as null
+    this.feed_path.push({ title: '', id: 'null' });
+
     this.fetchFeeds$
       .asObservable()
       .pipe(
         takeUntil(this.destroySignal$),
         startWith([]),
-        concatMap(() => this.feedsService.getFeeds({
-          page: this.paginator?.pageIndex ? this.paginator?.pageIndex + 1 : 1,
+        concatMap((title: string = "") => this.feedService.getFeedsList({
+          page: this.paginator?.pageIndex ?? 0,
           limit: this.paginator?.pageSize ?? 15,
-          parent_id: this.parent_id,
-          title: this.searchForm?.value.searchInput ?? "",
+          parent_id: this.feed_path[this.feed_path.length - 1].id, // whatever is actuall feed id
+          title: title,
         }))
       )
       .subscribe((data) => {
-        this.dataSource = data.items;
-        this.resultsLength = data.metadata.total;
+        this.data_source = data.items;
+        this.results_length = data.metadata.total;
         this.paginator.pageIndex = data.metadata.page - 1;
       });
   }
 
-  nextFeeds(feed: FeedTreeNode) {
-    if(feed.kind === "navigation") {
-      this.parentName = feed.title;
-      this.parent_id = feed.id;
+  // next feeds
+  nextFeeds(feed: Feed) {
+    if (feed.kind === "navigation") {
+      this.feed_path.push({ title: feed.title, id: feed.id }); // push new parent id
       this.fetchFeeds$.next();
     }
   }
 
+  // go back in path
   goBack() {
-    if(this.parent_id !== "null") {
-      this.feedsService.getFeedDetails(this.parent_id)
-      .subscribe((data) => {
-        this.parent_id = data.response.parents.length !== 0 ? data.response.parents[0] : "null";
-        this.fetchFeeds$.next();
-      });
+    if (this.feed_path[this.feed_path.length - 1].id !== "null") {
+      this.feed_path.pop(); // pop old parent id
+      this.fetchFeeds$.next();
     }
   }
 
+  // create new feed
   createFeed() {
+    // create dialog
     const dialogRef = this.dialog.open(NewFeedDialogComponent, {
       width: '50%',
-      data: { parentName: this.parentName },
+      data: { parent_id: this.feed_path[this.feed_path.length - 1].id, parent_name: this.feed_path[this.feed_path.length - 1].title },
     });
 
+    // after dialog is closed
     dialogRef
       .afterClosed()
       .pipe(
         take(1),
         filter(
-          (result: 'no' & { feedTitle: string; feedKind: string; feedContent: string }) =>
+          (result: 'no' & { feed_title: string; feed_kind: string; feed_content: string, feed_parents: string[] }) =>
             result !== 'no'
         ),
         map((result) => ({
-          catalog_id: environment.catalogId,
-          parents: [this.parent_id === "null" ? "" : this.parent_id],
-          title: result.feedTitle,
+          // Set new feed
+          catalog_id: environment.catalog_id,
+          parents: result.feed_parents,
+          title: result.feed_title,
           url_name: Guid.newGuid().toString(),
-          content: result.feedContent,
-          kind: result.feedKind,
+          content: result.feed_content,
+          kind: result.feed_kind,
         })),
-        concatMap((newFeedData: NewFeed) =>
-          this.adminService.addNewFeed(newFeedData)
+        concatMap((feed: FeedNew) =>
+          this.feedService.createFeed(feed)
         ),
         tap(() => {
           const message = this.translocoService.translate(
@@ -140,65 +139,74 @@ export class FeedManagementComponent
         })
       )
       .subscribe(() => {
-        this.fetchFeeds$.next();
+        this.fetchFeeds$.next(); // update new list of feeds
       });
   }
 
-  editFeed(feed: FeedTreeNode) {
+  // Edit existing feed
+  editFeed(feed: Feed) {
+    // create edit dialog
     const dialogRef = this.dialog.open(UpdateFeedDialogComponent, {
       width: '50%',
-      data: { title: feed.title, parentId: feed.parents[0], kind: feed.kind, content: feed.content },
+      data: { title: feed.title, parents: feed.parents, kind: feed.kind, content: feed.content },
     });
 
+    // after dialog is closed
     dialogRef
-    .afterClosed()
-    .pipe(
-      take(1),
-      filter(
-        (result: 'no' & { feedTitle: string; feedKind: string; feedsParentName: string; feedContent: string }) =>
-          result !== 'no'
-      ),
-      map((result) => ({
-        catalog_id: environment.catalogId,
-        title: result.feedTitle,
-        url_name: Guid.newGuid().toString(),
-        content: result.feedContent,
-        kind: result.feedKind,
-      })),
-      concatMap((newFeedData: UpdateFeeds) =>
-        this.adminService.updateFeed(feed.id, newFeedData)
-      ),
-      tap(() => {
-        const message = this.translocoService.translate(
-          'lazy.feedManagement.feedPostSuccess'
-        );
-        this.notificationService.success(message);
-      }),
-      catchError((err) => {
-        console.log(err);
-        const message = this.translocoService.translate(
-          'lazy.feedManagement.feedPostError'
-        );
-        this.notificationService.error(message);
-        return throwError(err);
-      })
-    )
-    .subscribe(() => {
-    this.fetchFeeds$.next()});
+      .afterClosed()
+      .pipe(
+        take(1),
+        filter(
+          (result: 'no' & { feed_title: string; feed_kind: string; feed_parents: string[]; feed_content: string }) =>
+            result !== 'no'
+        ),
+        map((result) => ({
+          // set edited data
+          catalog_id: environment.catalog_id,
+          title: result.feed_title,
+          parents: result.feed_parents,
+          url_name: feed.url_name, // this already exists (do not need to be changed), but it's required on BE
+          content: result.feed_content,
+          kind: result.feed_kind,
+        })),
+        concatMap((updated_feed: FeedNew) =>
+          this.feedService.updateFeed(feed.id, updated_feed)
+        ),
+        tap(() => {
+          const message = this.translocoService.translate(
+            'lazy.feedManagement.feedPostSuccess'
+          );
+          this.notificationService.success(message);
+        }),
+        catchError((err) => {
+          console.log(err);
+          const message = this.translocoService.translate(
+            'lazy.feedManagement.feedPostError'
+          );
+          this.notificationService.error(message);
+          return throwError(err);
+        })
+      )
+      .subscribe(() => {
+        this.fetchFeeds$.next() // reload
+      });
   }
 
-  deleteFeed(feed: FeedTreeNode) {
+  // delete feed
+  deleteFeed(feed: Feed) {
     const dialogRef = this.dialog.open(DeleteDialogComponent, {
       width: '30%',
       data: { title: feed.title },
     });
 
+    // after closed
     dialogRef
       .afterClosed()
       .pipe(
         take(1),
+        // if result is not 'no' then delete
         filter((result) => result !== 'no'),
-        concatMap(() => this.adminService.deleteFeed(feed.id)),
+        concatMap(() => this.feedService.deleteFeed(feed.id)),
         tap(() => {
           const message = this.translocoService.translate(
             'lazy.feedManagement.feedDeleteSuccess'
@@ -215,12 +223,12 @@ export class FeedManagementComponent
         })
       )
       .subscribe(() => {
-        this.fetchFeeds$.next();
+        this.fetchFeeds$.next(); // reload
       });
   }
 
   applyFilter() {
-    this.fetchFeeds$.next();
+    this.fetchFeeds$.next(this.search_form?.value.search_input);
   }
 
   handlePageChange() {

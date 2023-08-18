@@ -1,13 +1,15 @@
 import { Component, OnInit } from '@angular/core';
-import { AppStateService } from '../../services/app-state.service';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { State } from '../../types/app-state.types';
-import { AuthService } from 'src/app/auth/services/auth.service';
 import { DisposableComponent } from '../disposable.component';
 import { Router } from '@angular/router';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { FilterService } from 'src/app/library/services/filter.service';
+import { FilterService } from 'src/app/services/general/filter.service';
+import { State } from 'src/app/types/general.types';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
+import { AppStateService } from 'src/app/services/general/app-state.service';
+import { AdvancedSearchDialogComponent } from '../advanced-search-dialog/advanced-search-dialog.component';
+import { Md5 } from 'ts-md5';
 
 @Component({
   selector: 'app-navbar',
@@ -16,17 +18,19 @@ import { FilterService } from 'src/app/library/services/filter.service';
 })
 export class NavbarComponent extends DisposableComponent implements OnInit {
   appState$: Observable<State>;
-  theme: boolean;
-  searchForm: UntypedFormGroup;
+  theme: boolean; // used in html
+  search_form: UntypedFormGroup; // used in html
+  avatar_url: string; // used in html
 
   constructor(
     private readonly router: Router,
     private readonly appStateService: AppStateService,
+    public dialog: MatDialog,
     private readonly filterService: FilterService
   ) {
     super();
-    this.searchForm = new UntypedFormGroup({
-      searchInput: new UntypedFormControl(),
+    this.search_form = new UntypedFormGroup({
+      search_input: new UntypedFormControl(),
     });
   }
 
@@ -35,31 +39,50 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
       .getState$()
       .pipe(takeUntil(this.destroySignal$));
     this.appState$.subscribe((state) => this.theme = state.theme === 'dark' ? true : false);
+
+    const email = 'jakub.dubec@gmail.com';
+    const email_hash = Md5.hashStr(email.trim().toLowerCase());
+    const gravatar_url = 'https://www.gravatar.com/avatar/';
+    this.avatar_url = `${gravatar_url}${email_hash}`;
   }
 
+  // Navigation for button
   navigate(link: string) {
     this.router.navigate([link]);
   }
 
+  // Changing theme
   changeTheme() {
+    // Setting for animating button for themes
     this.theme = !this.theme;
     const theme = this.theme ? 'dark' : 'light';
     this.appStateService.patchState({ theme: theme });
   }
 
+  // Change language
   changeLanguage(language: string) {
     this.appStateService.patchState({ lang: language });
   }
 
+  // Logout
   logout() {
     this.appStateService.logoutResetState();
     this.router.navigate(['/auth']);
   }
 
+  openAdvanced() {
+    this.dialog.open(AdvancedSearchDialogComponent, {
+      width: '700px',
+      maxWidth: '95%',
+      data: {},
+    });
+  }
+
+  // Submit... clear search input and navigate
   submit() {
-    if(this.searchForm?.value.searchInput) {
-      this.filterService.setTitle(this.searchForm.value.searchInput)
-      this.searchForm.controls['searchInput'].reset();
+    if (this.search_form?.value.search_input) {
+      this.filterService.setTitle(this.search_form.value.search_input)
+      this.search_form.controls['search_input'].reset();
       this.navigate('library/all-entries');
     }
   }

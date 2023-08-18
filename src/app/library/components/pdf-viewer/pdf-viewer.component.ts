@@ -1,13 +1,8 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { pdfDefaultOptions } from 'ngx-extended-pdf-viewer';
 import { ActivatedRoute } from '@angular/router';
-import { EntriesService } from '../../services/entries.service';
-import { Observable } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
-import { AppStateService } from 'src/app/common/services/app-state.service';
-import { State } from 'src/app/common/types/app-state.types';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { DownloadUserAcquistionWithQuery } from '../../types/library.types';
+import { AcquisitionService } from 'src/app/services/acquisition.service';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -17,29 +12,21 @@ import { DownloadUserAcquistionWithQuery } from '../../types/library.types';
 })
 export class PdfViewerComponent extends DisposableComponent implements OnInit {
   public base64: string;
-  public appState$: Observable<State>;
 
   constructor(
     private readonly route: ActivatedRoute,
-    private readonly entriesService: EntriesService,
-    private appStateService: AppStateService
+    private readonly acquisitionService: AcquisitionService,
   ) {
     super();
     pdfDefaultOptions.assetsFolder = 'assets';
   }
 
   ngOnInit(): void {
-    const userAcquisitionID = this.route.snapshot.paramMap.get('userAcquisitionID');
-    this.entriesService
-      .donwloadUserAcquisition(userAcquisitionID, 'base64')
-      .subscribe(
-        (data: DownloadUserAcquistionWithQuery) => {
-          this.base64 = data.response.data;
-        }
-      );
+    const user_acquisition_id = this.route.snapshot.paramMap.get('user_acquisition_id');
 
-    this.appState$ = this.appStateService
-      .getState$()
-      .pipe(takeUntil(this.destroySignal$));
+    // Get base64 file from BE 
+    this.acquisitionService
+      .getUserAcquisition(user_acquisition_id, 'base64')
+      .subscribe((data) => { this.base64 = data.response.data; });
   }
 }

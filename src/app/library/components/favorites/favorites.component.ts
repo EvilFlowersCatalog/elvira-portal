@@ -1,10 +1,9 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
 import { Subject } from 'rxjs';
-import { concatMap, startWith, takeUntil, tap } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { EntriesItem } from '../../types/library.types';
-import { EntriesService } from '../../services/entries.service';
+import { EntryService } from 'src/app/services/entry.service';
+import { Entry } from 'src/app/types/entry.types';
 
 @Component({
   selector: 'app-favorites',
@@ -12,13 +11,13 @@ import { EntriesService } from '../../services/entries.service';
   styleUrls: ['./favorites.component.scss'],
 })
 export class FavoritesComponent extends DisposableComponent implements OnInit {
-  entries: EntriesItem[] = [];
+  entries: Entry[] = [];
   resultsLength = 0;
   fetchEntries$ = new Subject();
 
   @ViewChild('paginator') paginator: MatPaginator;
 
-  constructor(private readonly entriesService: EntriesService) {
+  constructor(private readonly entryService: EntryService) {
     super();
   }
 
