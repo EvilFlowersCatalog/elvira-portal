@@ -40,7 +40,7 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
       .pipe(takeUntil(this.destroySignal$));
     this.appState$.subscribe((state) => this.theme = state.theme === 'dark' ? true : false);
 
-    const email = 'jakub.dubec@gmail.com';
+    const email = '';
     const email_hash = Md5.hashStr(email.trim().toLowerCase());
     const gravatar_url = 'https://www.gravatar.com/avatar/';
     this.avatar_url = `${gravatar_url}${email_hash}`;

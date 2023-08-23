@@ -70,8 +70,8 @@
   "entryInfoDialog": {
     "author": "Autor:",
     "summary": "Zhrnutie:",
-    "feeds": "Feedy:",
-    "contributors": "Pomocníci:",
+    "feeds": "Priradenie:",
+    "contributors": "Spolu autori:",
     "none": "Žiaden",
     "createdAt": "Pridané:",
     "close": "Zatvoriť"

@@ -7,7 +7,7 @@
 
         <!-- Image (Elvira) first row -->
         <img src="../../../../assets/logos/title_logo.png" class="navbar-image"
-          [ngClass]="{'navbar-image-offline': !appState.isLoggedIn}">
+          [ngClass]="{'navbar-image-offline': !appState.isLoggedIn}" (click)="navigate('/library/home')">
 
         <!-- Second row -->
         <div *ngIf="appState.isLoggedIn" fxLayout="row" class="navbar-buttons-container">
