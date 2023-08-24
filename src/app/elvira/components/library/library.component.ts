@@ -15,10 +15,10 @@ import { FeedService } from 'src/app/services/feed.service';
 
 @Component({
   selector: 'app-all-entries',
-  templateUrl: './allEntries.component.html',
-  styleUrls: ['./allEntries.component.scss'],
+  templateUrl: './library.component.html',
+  styleUrls: ['./library.component.scss'],
 })
-export class AllEntriesComponent extends DisposableComponent implements OnInit {
+export class LibraryComponent extends DisposableComponent implements OnInit {
   entries: Entry[] = []; // used in html
   results_length = 0; // used in html
   fetchEntries$ = new Subject();

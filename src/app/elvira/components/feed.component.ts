@@ -1,12 +1,13 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core'
 import { Router } from '@angular/router';
 import { FilterService } from 'src/app/services/general/filter.service';
+import { NavigationService } from 'src/app/services/general/navigation.service';
 import { Feed } from 'src/app/types/feed.types';
 
 @Component({
   selector: 'app-feed',
   template: `
-    <div class="feed-container" fxLayout="row" fxLayoutAlign="center center" (click)="feedNavigator()">
+    <div class="feed-container" fxLayout="row" fxLayoutAlign="center center" (click)="feedNavigator($event)">
       <mat-icon> book </mat-icon>
       <div class="feed-info-container">
         <div>{{ feed.title }}</div>
@@ -65,18 +66,18 @@ export class FeedComponent {
   @Input() feed: Feed;
 
   constructor(
-    private readonly router: Router,
+    private readonly navigationService: NavigationService,
     private readonly filterService: FilterService,
   ) { }
 
   // If the feed's kind is navigation go to /feed/id, else go to library
-  feedNavigator() {
+  feedNavigator($event: PointerEvent) {
     if (this.feed.kind === 'navigation') {
-      this.router.navigateByUrl(`/library/feeds/${this.feed.id}`);
+      this.navigationService.modifiedNavigation(`/elvira/feeds/${this.feed.id}`, $event);
     }
     else {
       this.filterService.setFeed(this.feed.id); // set feed to filter
-      this.router.navigateByUrl(`/library/all-entries`);
+      this.navigationService.modifiedNavigation(`/elvira/library`, $event);
     }
   }
 

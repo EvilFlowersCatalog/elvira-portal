@@ -3,7 +3,7 @@
     <mat-card class="entry-detail-card">
 
       <!-- Image of entry if there is no image -->
-      <div class="entry-detail-image-container" (click)="openPdf(entry.id)">
+      <div class="entry-detail-image-container" (click)="openPdf(entry.id, $event)">
         <div *ngIf="image_src === 'none'; else image">
           <img mat-card-image src="../../../../assets/no_image.png" class="entry-detail-image" />
         </div>
@@ -34,21 +34,14 @@
         </button>
 
         <!-- Favorite button -->
-        <div *ngIf="current_route === '/library/favorites'; else addToFavoritesBtn">
-          <button color="accent" mat-icon-button matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}">
-            <mat-icon> favorite </mat-icon>
-          </button>
-        </div>
-        <ng-template #addToFavoritesBtn>
-          <button mat-icon-button matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}">
-            <mat-icon> favorite_border </mat-icon>
-          </button>
-        </ng-template>
+        <button mat-icon-button matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}">
+          <mat-icon> favorite_border </mat-icon>
+        </button>
       </div>
     </mat-card>
 
     <!-- Entry title -->
-    <div class="entry-detail-title" [title]="entry.title" (click)="openPdf(entry.id)">
+    <div class="entry-detail-title" [title]="entry.title" (click)="openPdf(entry.id, $event)">
       {{ entry.title }}
     </div>
   </div>

@@ -10,6 +10,7 @@ import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { AppStateService } from 'src/app/services/general/app-state.service';
 import { AdvancedSearchDialogComponent } from '../advanced-search-dialog/advanced-search-dialog.component';
 import { Md5 } from 'ts-md5';
+import { NavigationService } from 'src/app/services/general/navigation.service';
 
 @Component({
   selector: 'app-navbar',
@@ -26,7 +27,8 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
     private readonly router: Router,
     private readonly appStateService: AppStateService,
     public dialog: MatDialog,
-    private readonly filterService: FilterService
+    private readonly filterService: FilterService,
+    private readonly navigationService: NavigationService
   ) {
     super();
     this.search_form = new UntypedFormGroup({
@@ -47,8 +49,8 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   }
 
   // Navigation for button
-  navigate(link: string) {
-    this.router.navigate([link]);
+  navigate(link: string, event: PointerEvent) {
+    this.navigationService.modifiedNavigation(link, event);
   }
 
   goToSTU() {
@@ -71,7 +73,7 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   // Logout
   logout() {
     this.appStateService.logoutResetState();
-    this.router.navigate(['/auth']);
+    this.router.navigate(['/auth/home']);
   }
 
   openAdvanced() {
@@ -87,7 +89,7 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
     if (this.search_form?.value.search_input) {
       this.filterService.setTitle(this.search_form.value.search_input)
       this.search_form.controls['search_input'].reset();
-      this.navigate('library/all-entries');
+      this.navigate('elvira/library', null);
     }
   }
 }

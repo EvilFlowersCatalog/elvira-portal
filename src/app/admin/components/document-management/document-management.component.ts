@@ -19,6 +19,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { NotificationService } from 'src/app/services/general/notification.service';
 import { Entry } from 'src/app/types/entry.types';
 import { EntryService } from 'src/app/services/entry.service';
+import { NavigationService } from 'src/app/services/general/navigation.service';
 
 @Component({
   selector: 'app-document-management',
@@ -36,7 +37,7 @@ export class DocumentManagementComponent
   @ViewChild('paginator') paginator: MatPaginator;
 
   constructor(
-    private readonly router: Router,
+    private readonly navigationService: NavigationService,
     private readonly route: ActivatedRoute,
     public dialog: MatDialog,
     private readonly entryService: EntryService,
@@ -77,8 +78,8 @@ export class DocumentManagementComponent
   }
 
   //Button, to navigate to the upload formular
-  newDocument() {
-    this.router.navigate(['./upload'], { relativeTo: this.route });
+  newDocument($event: PointerEvent) {
+    this.navigationService.modifiedNavigation('/admin/upload', $event);
   }
 
   //Function, to give choice, wether we want to delete the document or not
@@ -116,7 +117,7 @@ export class DocumentManagementComponent
 
   // Function for editing document
   editDocument(entry: Entry) {
-    this.router.navigate([`./edit/${entry.id}`], { relativeTo: this.route });
+    this.navigationService.modifiedNavigation(`/admin/edit/${entry.id}`);
   }
 
   //Function for searchbar

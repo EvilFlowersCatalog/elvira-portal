@@ -36,14 +36,9 @@ export class AdminGuard {
   }
 
   private verifyAdmin(): Observable<boolean> {
-    // const isMobile = this.deviceService.isMobile();
-    // const isTablet = this.deviceService.isTablet();
     const token = this.appStateService.getStateSnapshot().token;
     const userId = jwtDecode<JwtPayload & { sub: string }>(token).sub;
-    // if(isMobile || isTablet){
-    //   this.router.navigate(['./'], { relativeTo: this.route });
-    //   return of(false);
-    // }
+
     return this.userService.getUserDetail(userId).pipe(map((response) => response.response.is_superuser));
   }
 }

@@ -6,7 +6,7 @@
       <div fxLayout="row" fxLayoutAlign="space-between" style="width: 100%;">
 
         <!-- Hom button -->
-        <button *ngIf="appState.isLoggedIn" mat-flat-button (click)="navigate('/library/home')">
+        <button *ngIf="appState.isLoggedIn" mat-flat-button (click)="navigate('/elvira/home')">
           <mat-icon class="mobile-sidenav-icon">home</mat-icon>
           <span>{{ t("home") }}</span>
         </button>
@@ -18,13 +18,13 @@
       </div>
 
       <!-- Library button -->
-      <button mat-flat-button *ngIf="appState.isLoggedIn" (click)="navigate('/library/all-entries')">
+      <button mat-flat-button *ngIf="appState.isLoggedIn" (click)="navigate('/elvira/library')">
         <mat-icon class="mobile-sidenav-icon">menu_book</mat-icon>
         <span>{{ t("library") }}</span>
       </button>
 
       <!-- Favorite button -->
-      <button mat-flat-button *ngIf="appState.isLoggedIn" (click)="navigate('/library/favorites')">
+      <button mat-flat-button *ngIf="appState.isLoggedIn" (click)="navigate('/elvira/favorites')">
         <mat-icon class="mobile-sidenav-icon">favorite</mat-icon>
         <span>{{ t("favorites") }}</span>
       </button>
@@ -33,6 +33,11 @@
       <button mat-flat-button *ngIf="appState.isLoggedIn" (click)="openAdvanced()">
         <mat-icon class="mobile-sidenav-icon"> search </mat-icon>
         <span> {{ t("advanced") }} </span>
+      </button>
+
+      <!-- Admin button -->
+      <button mat-flat-button *ngIf="appState.isLoggedIn" (click)="navigate('/elvira/admin')">
+        <span> admin </span>
       </button>
 
       <!-- down row column -->

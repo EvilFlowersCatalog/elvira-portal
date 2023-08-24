@@ -56,7 +56,7 @@ export class LoginFormComponent implements OnInit {
             userId: response.response.user.id,
           });
           // navigate to libarary
-          this.router.navigate(['../../library'], { relativeTo: this.route });
+          this.router.navigate(['../../elvira'], { relativeTo: this.route });
         }),
         take(1),
         catchError((err) => {

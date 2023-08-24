@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AllEntriesComponent } from './components/all-entries/allEntries.component';
+import { LibraryComponent } from './components/library/library.component';
 import { RouterModule } from '@angular/router';
 import { LIBRARY_ROUTES } from './routing/library.routes';
 import { PdfViewerComponent } from './components/pdf-viewer/pdf-viewer.component';
@@ -23,7 +23,7 @@ import { CustomPaginationComponent } from '../services/general/custom-pagination
 @NgModule({
   declarations: [
     HomeComponent,
-    AllEntriesComponent,
+    LibraryComponent,
     PdfViewerComponent,
     EntryDetailComponent,
     EntryInfoDialogComponent,
@@ -48,4 +48,4 @@ import { CustomPaginationComponent } from '../services/general/custom-pagination
   ],
   exports: [],
 })
-export class LibraryModule { }
+export class ElviraModule { }

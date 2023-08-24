@@ -1,16 +1,15 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { Router } from '@angular/router';
 import { EntryInfoDialogComponent } from '../entry-info-dialog/entry-info-dialog.component';
-import { Observable } from 'rxjs';
 import { TranslocoService } from '@ngneat/transloco';
-import { Entry, EntryDetail } from 'src/app/types/entry.types';
+import { Entry } from 'src/app/types/entry.types';
 import { EntryService } from 'src/app/services/entry.service';
 import { FilterService } from 'src/app/services/general/filter.service';
 import { UserAcquisition, UserAcquisitionId } from 'src/app/types/acquisition.types';
 import { AcquisitionService } from 'src/app/services/acquisition.service';
 import { AppStateService } from 'src/app/services/general/app-state.service';
 import { NotificationService } from 'src/app/services/general/notification.service';
+import { NavigationService } from 'src/app/services/general/navigation.service';
 
 @Component({
   selector: 'app-entry-detail',
@@ -20,10 +19,9 @@ import { NotificationService } from 'src/app/services/general/notification.servi
 export class EntryDetailComponent implements OnInit {
   @Input() entry: Entry;
   image_src: string; // used in html
-  current_route = this.router.url; // used in html
 
   constructor(
-    private readonly router: Router,
+    private readonly navigationService: NavigationService,
     private readonly appStateService: AppStateService,
     public dialog: MatDialog,
     private readonly notificationService: NotificationService,
@@ -38,7 +36,7 @@ export class EntryDetailComponent implements OnInit {
   }
 
   // Get acquisition id and open pdf
-  openPdf(entry_id: string) {
+  openPdf(entry_id: string, $event: PointerEvent) {
     this.entryService
       .getEntryDetail(entry_id)
       .toPromise()
@@ -54,7 +52,7 @@ export class EntryDetailComponent implements OnInit {
           .toPromise()
           .then((res: UserAcquisitionId) => {
             // When there is a response... move
-            this.router.navigateByUrl(`/library/pdf-viewer/${res.response.id}`);
+            this.navigationService.modifiedNavigation(`/elvira/pdf-viewer/${res.response.id}`, $event);
           })
           .catch((err) => {
             console.log(err);
@@ -73,6 +71,6 @@ export class EntryDetailComponent implements OnInit {
 
   navigate(feedId: string) {
     this.filterService.setFeed(feedId);
-    this.router.navigateByUrl(`library/all-entries`);
+    this.navigationService.modifiedNavigation(`elvira/library`);
   }
 }

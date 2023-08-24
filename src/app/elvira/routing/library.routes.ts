@@ -1,6 +1,6 @@
 import { Routes } from '@angular/router';
 import { AdminGuard } from 'src/app/admin/routing/admin.guard';
-import { AllEntriesComponent } from '../components/all-entries/allEntries.component';
+import { LibraryComponent } from '../components/library/library.component';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { FavoritesComponent } from '../components/favorites/favorites.component';
 import { LibraryGuard } from './library.guard';
@@ -35,9 +35,9 @@ export const LIBRARY_ROUTES: Routes = [
     component: FeedsPageComponent,
   },
   {
-    path: 'all-entries',
+    path: 'library',
     canActivate: [LibraryGuard],
-    component: AllEntriesComponent,
+    component: LibraryComponent,
   },
   {
     path: 'pdf-viewer/:user_acquisition_id',

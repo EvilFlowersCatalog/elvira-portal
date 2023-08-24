@@ -11,7 +11,7 @@ import { TranslocoRootModule } from './transloco/transloco-root.module';
 import { HttpErrorInterceptor } from './common/interceptors/http-error.interceptor';
 import { HttpRequestInterceptor } from './common/interceptors/http-request.interceptor';
 import { HttpResponseInterceptor } from './common/interceptors/http-response.interceptor';
-import { CommonLibraryModule } from './common/common.module';
+import { CommonElviraModule } from './common/common.module';
 import { AppStateService } from './services/general/app-state.service';
 
 @NgModule({
@@ -25,7 +25,7 @@ import { AppStateService } from './services/general/app-state.service';
     MaterialModule,
     BrowserAnimationsModule,
     TranslocoRootModule,
-    CommonLibraryModule,
+    CommonElviraModule
   ],
   providers: [
     {

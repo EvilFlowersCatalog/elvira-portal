@@ -9,7 +9,8 @@
         <div fxLayout="row" class="navbar-images-first-row">
 
           <!-- Image (Elvira) first row -->
-          <img src="../../../../assets/logos/title_logo.png" class="navbar-image" (click)="navigate('/library/home')">
+          <img src="../../../../assets/logos/title_logo.png" class="navbar-image"
+            (click)="navigate('/elvira/home', $event)">
 
           <!-- STU logo -->
           <img src="../../../../assets/logos/fiit_logo.png" class="navbar-image-stu-logo" (click)="goToSTU()">
@@ -19,25 +20,25 @@
         <div *ngIf="appState.isLoggedIn" fxLayout="row" class="navbar-buttons-container">
 
           <!-- Home button -->
-          <button [disabled]="!appState.isLoggedIn" (click)="navigate('/library/home')" class="navbar-main-button">
+          <button (click)="navigate('/elvira/home', $event)" class="navbar-main-button">
             <mat-icon class="navbar-icon">home</mat-icon>
             {{ t("home") }}
           </button>
 
-          <!-- Library button -->
-          <button (click)="navigate('/library/all-entries')" class="navbar-main-button">
+          <!-- elvira button -->
+          <button (click)="navigate('/elvira/library', $event)" class="navbar-main-button">
             <mat-icon class="navbar-icon"> menu_book </mat-icon>
             {{t("library")}}
           </button>
 
           <!-- Favorites button -->
-          <button (click)="navigate('/library/favorites')" class="navbar-main-button">
+          <button (click)="navigate('/elvira/favorites', $event)" class="navbar-main-button">
             <mat-icon class="navbar-icon">favorite</mat-icon>
             {{t("favorites")}}
           </button>
 
           <!-- Admin button -->
-          <button *ngIf="appState.isAdmin" (click)="navigate('/library/admin')" class="navbar-main-button">
+          <button *ngIf="appState.isAdmin" (click)="navigate('/elvira/admin', $event)" class="navbar-main-button">
             Admin
           </button>
         </div>

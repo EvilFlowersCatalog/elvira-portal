@@ -13,8 +13,8 @@ const routes: Routes = [
     loadChildren: () => import('./auth/auth.module').then((m) => m.AuthModule),
   },
   {
-    path: 'library',
-    loadChildren: () => import('./library/library.module').then((m) => m.LibraryModule),
+    path: 'elvira',
+    loadChildren: () => import('./elvira/elvira.module').then((m) => m.ElviraModule),
   },
   {
     path: '404',
@@ -30,4 +30,4 @@ const routes: Routes = [
   imports: [RouterModule.forRoot(routes)],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }

@@ -82,10 +82,10 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
   goBack() {
     if (this.feed_path.length > 1) { // if there is more than 1 id (means there is more than main feed) go back
       this.feed_path.pop(); // remove last id
-      this.router.navigateByUrl(`/library/feeds/${this.feed_path[this.feed_path.length - 1]}`);
+      this.router.navigateByUrl(`/elvira/feeds/${this.feed_path[this.feed_path.length - 1]}`);
     } else { // if there is only main feed_id
       this.feed_path.pop(); // remove 
-      this.router.navigateByUrl('library/home');
+      this.router.navigateByUrl('/elvira/home');
     }
   }
 

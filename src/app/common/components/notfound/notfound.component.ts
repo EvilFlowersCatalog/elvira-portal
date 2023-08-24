@@ -7,11 +7,11 @@ import { Router } from '@angular/router';
   styleUrls: ['./notfound.component.scss'],
 })
 export class NotfoundComponent implements OnInit {
-  constructor(private readonly router: Router) {}
+  constructor(private readonly router: Router) { }
 
-  ngOnInit(): void {}
+  ngOnInit(): void { }
 
   goBack() {
-    this.router.navigate(['/']);
+    this.router.navigateByUrl('/elvira/home');
   }
 }

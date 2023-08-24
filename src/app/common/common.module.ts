@@ -4,7 +4,6 @@ import { NotfoundComponent } from './components/notfound/notfound.component';
 import { NavbarComponent } from './components/navbar/navbar.component';
 import { MaterialModule } from '../material.module';
 import { TranslocoRootModule } from '../transloco/transloco-root.module';
-import { LibraryModule } from '../library/library.module';
 import { LoadingComponent } from './components/loading.component';
 import { MobileNavbarComponent } from './components/mobile-navbar/mobile-navbar.component';
 import { HeaderComponent } from './components/header/header.component';
@@ -17,6 +16,7 @@ import { SuccessNotificationComponent } from './components/notifications/success
 import { LOCAL_STORAGE_TOKEN } from '../services/general/local-storage.service';
 import { AdvancedSearchDialogComponent } from './components/advanced-search-dialog/advanced-search-dialog.component';
 import { FooterComponent } from './components/footer/footer.component';
+import { ElviraModule } from '../elvira/elvira.module';
 
 @NgModule({
   declarations: [
@@ -36,7 +36,7 @@ import { FooterComponent } from './components/footer/footer.component';
   imports: [
     CommonModule,
     MaterialModule,
-    LibraryModule,
+    ElviraModule,
     TranslocoRootModule,
     ReactiveFormsModule,
     FormsModule,
@@ -50,4 +50,4 @@ import { FooterComponent } from './components/footer/footer.component';
   ],
   providers: [{ provide: LOCAL_STORAGE_TOKEN, useValue: localStorage }],
 })
-export class CommonLibraryModule { }
+export class CommonElviraModule { }
