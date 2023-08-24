@@ -13,10 +13,11 @@
     "contributorName": "Meno spoluautora",
     "contributorSurname": "Priezvisko spoluautora",
     "feeds": "Feedy",
-    "feedsList": "Zoznam feedov",
-    "feedsExpansion": "Kliknutím otvoríte feedy",
+    "identifiers": "Identifikátory",
     "summary": "Zhrnutie",
     "summaryHint": "Krátke zhrnutie dokumentu",
+    "citation": "Citácia",
+    "citationHint": "Ocituj tento dokument",
     "image": "Obrázok",
     "imageDropper": "Presuňte obrázok sem alebo kliknite sem a prehľadávajte",
     "imageError": "Obrázok je príliš veľký.",
@@ -149,5 +150,10 @@
     "feed": "Predmet",
     "noFilters": "Žiadne filtre",
     "nothingFound": "Nič nebolo nájdené"
+  },
+  "addFeedDialog": {
+    "title": "Feedy",
+    "search": "Hľadať",
+    "cancel": "Zrušiť"
   }
 }

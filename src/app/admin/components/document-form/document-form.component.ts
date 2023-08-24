@@ -1,17 +1,18 @@
 import { Component, OnInit } from '@angular/core';
 import { throwError } from 'rxjs';
 import { UntypedFormGroup, UntypedFormControl, UntypedFormArray, Validators } from '@angular/forms';
-import { catchError, map, take, tap } from 'rxjs/operators';
+import { catchError, concatMap, filter, map, take, tap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TitleValidators } from '../../validators/title.validator';
 import { TranslocoService } from '@ngneat/transloco';
 import { FeedService } from 'src/app/services/feed.service';
 import { NotificationService } from 'src/app/services/general/notification.service';
 import { EntryService } from 'src/app/services/entry.service';
-import { Entry, EntryDetail, EntryNew } from 'src/app/types/entry.types';
-import { environment } from 'src/environments/environment';
+import { EntryDetail, EntryNew } from 'src/app/types/entry.types';;
 import { EntryAuthor } from 'src/app/types/author.types';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Feed } from 'src/app/types/feed.types';
+import { AddFeedDialogComponent } from '../dialogs/add-feed-dialog/add-feed-dialog.component';
 
 @Component({
   selector: 'app-admin',
@@ -20,7 +21,6 @@ import { Feed } from 'src/app/types/feed.types';
 })
 export class DocumentFormComponent implements OnInit {
   uploadForm: UntypedFormGroup; // used in html
-  imageForm: UntypedFormGroup; // used in html
   contributors: UntypedFormArray; // used in html
   feeds: { title: string; id: string }[] = []; //used in html
   imageFile: File; // used in html
@@ -33,16 +33,13 @@ export class DocumentFormComponent implements OnInit {
   constructor(
     private readonly feedService: FeedService,
     private readonly router: Router,
+    public dialog: MatDialog,
     private readonly entryService: EntryService,
     private readonly route: ActivatedRoute,
     private readonly titleValidator: TitleValidators,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService,
   ) {
-    this.imageForm = new UntypedFormGroup({
-      file: new UntypedFormControl(null),
-    });
-
     this.uploadForm = new UntypedFormGroup({
       title: new UntypedFormControl('', {
         validators: [Validators.required],
@@ -52,6 +49,9 @@ export class DocumentFormComponent implements OnInit {
       authorName: new UntypedFormControl('', Validators.required),
       authorSurname: new UntypedFormControl('', Validators.required),
       contributors: new UntypedFormArray([]),
+      citation: new UntypedFormControl(''),
+      isbn: new UntypedFormControl(''),
+      doi: new UntypedFormControl(''),
       summary: new UntypedFormControl(''),
     });
   }
@@ -79,6 +79,7 @@ export class DocumentFormComponent implements OnInit {
           this.initUploadForm(response);
           this.initFeeds(response.response.feeds);
           this.initContributors(response.response.contributors);
+
           this.convertToImageFile(response.response.thumbnail); // convert thumbnail to image
         });
     }
@@ -119,6 +120,9 @@ export class DocumentFormComponent implements OnInit {
       authorName: data.response.author.name,
       authorSurname: data.response.author.surname,
       summary: data.response.summary,
+      doi: data.response.identifiers.doi,
+      isbn: data.response.identifiers.isbn,
+      citation: data.response.citation
     });
   }
 
@@ -159,19 +163,32 @@ export class DocumentFormComponent implements OnInit {
   }
 
   // add feed
-  addFeed(feed) {
-    let contains = false
-    // Check if it's now already used
-    for (let i = 0; i < this.feeds.length; i++) {
-      if (this.feeds[i].id === feed.id) {
-        contains = true;
-        break;
-      }
-    }
-    // if not push it
-    if (!contains && this.feeds.length < 5) {
-      this.feeds.push({ title: feed.title, id: feed.id });
-    }
+  addFeeds() {
+    const dialogRef = this.dialog.open(AddFeedDialogComponent, {
+      width: '700px',
+      maxWidth: '95%',
+      data: {},
+    });
+
+    // after dialog is closed
+    dialogRef
+      .afterClosed()
+      .subscribe((result: { title: string, id: string }) => {
+        if (result) {
+          let contains = false
+          // Check if it's already used
+          for (let i = 0; i < this.feeds.length; i++) {
+            if (this.feeds[i].id === result.id) {
+              contains = true;
+              break;
+            }
+          }
+          // if not push it
+          if (!contains && this.feeds.length < 5) {
+            this.feeds.push({ title: result.title, id: result.id });
+          }
+        }
+      });
   }
 
   // remove feed
@@ -291,9 +308,10 @@ export class DocumentFormComponent implements OnInit {
       language_code: 'sk',
       contributors: this.getContributors(),
       identifiers: {
-        google: "XIXIX",
-        isbn: "null"
+        doi: this.uploadForm.get('doi').value,
+        isbn: this.uploadForm.get('doi').value
       },
+      citation: this.uploadForm.get('citation').value,
       image: await this.getBase(this.imageFile)
     };
     return entry;

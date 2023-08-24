@@ -1,0 +1,42 @@
+<ng-container *transloco="let t">
+
+  <!-- Title -->
+  <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center" color="accent">{{ t("lazy.addFeedDialog.title") }}</h2>
+
+  <!-- Form -->
+  <form fxFill fxLayout="row" [formGroup]="search_form" fxLayoutAlign="start center" (submit)="searchFeed()">
+
+    <!-- Title -->
+    <mat-form-field color="accent" style="width: 80%;">
+      <mat-label>{{ t("lazy.addFeedDialog.search") }}</mat-label>
+
+      <!-- input -->
+      <input matInput formControlName="search_input" />
+    </mat-form-field>
+
+    <!-- Button for submit -->
+    <button mat-icon-button type=" submit" color="accent">
+      <mat-icon>search</mat-icon>
+    </button>
+  </form>
+
+  <!-- Content -->
+  <mat-dialog-content fxLayoutAlign="start start">
+
+    <!-- Feeds -->
+    <div *ngIf="data_source.length > 0" fxLayout="row wrap" fxLayoutGap="10px" class="add-feed-feed-container">
+      <div *ngFor="let feed of data_source" (click)="onYesClick(feed)" class="add-feed-feed">
+        {{ feed.title }}
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <!-- Action buttons -->
+  <mat-dialog-actions fxLayout="row" fxLayoutAlign="space-evenly center">
+
+    <!-- Cancel button -->
+    <button mat-button mat-dialog-close color="accent">
+      {{ t("lazy.addFeedDialog.cancel") }}
+    </button>
+  </mat-dialog-actions>
+</ng-container>

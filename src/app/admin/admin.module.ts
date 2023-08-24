@@ -20,6 +20,7 @@ import { UpdateFeedDialogComponent } from './components/dialogs/update-feed-dial
 import { AdminEntryDetailComponent } from './components/admin-entry-detail/admin-entry-detail.component';
 import { FeedAdminComponent } from './components/admin-feed/admin-feed.component';
 import { CustomPaginationComponent } from '../services/general/custom-pagination.service';
+import { AddFeedDialogComponent } from './components/dialogs/add-feed-dialog/add-feed-dialog.component';
 
 @NgModule({
   declarations: [
@@ -29,6 +30,7 @@ import { CustomPaginationComponent } from '../services/general/custom-pagination
     FeedManagementComponent,
     DocumentManagementComponent,
     DeleteDialogComponent,
+    AddFeedDialogComponent,
     NewFeedDialogComponent,
     UpdateFeedDialogComponent,
     AdminEntryDetailComponent,

@@ -40,6 +40,7 @@ export interface EntryDetail {
     content: string;
     identifiers: EntryIdentifiers;
     acquisitions: EntryAcquisition[];
+    citation: string;
     img: string;
     thumbnail: string;
   };
@@ -61,6 +62,7 @@ export interface EntryNew {
   language_code: string;
   contributors: EntryAuthor[];
   identifiers: EntryIdentifiers;
+  citation: string,
   image: any;
 }
 
@@ -70,7 +72,7 @@ export interface EntryCategory {
 }
 
 export interface EntryIdentifiers {
-  google: string;
+  doi: string;
   isbn: string;
 }
 

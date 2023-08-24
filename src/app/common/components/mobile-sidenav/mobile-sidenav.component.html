@@ -42,31 +42,33 @@
         <div *ngIf="appState.lang === 'en'; else enVersionBtn">
           <!-- svk -->
           <button mat-flat-button (click)="changeLanguage('sk')">
-            <mat-icon class="mobile-sidenav-icon">translate</mat-icon>
-            <span>{{ t("svk") }}</span>
+            <mat-icon class="mobile-sidenav-icon">language</mat-icon>
+            <span>{{ t("eng") }}</span>
           </button>
         </div>
         <!-- en -->
         <ng-template #enVersionBtn>
-          <button mat-flat-button (click)="changeLanguage('en')">
-            <mat-icon class="mobile-sidenav-icon">language</mat-icon>
-            <span>{{ t("eng") }}</span>
-          </button>
+          <div>
+            <button mat-flat-button (click)="changeLanguage('en')">
+              <mat-icon class="mobile-sidenav-icon">translate</mat-icon>
+              <span>{{ t("svk") }}</span>
+            </button>
+          </div>
         </ng-template>
 
         <!-- Theme button -->
         <div *ngIf="appState.theme === 'dark'; else darkModeBtn">
           <!-- light -->
           <button mat-flat-button (click)="changeTheme('light')">
-            <mat-icon class="mobile-sidenav-icon">light_mode</mat-icon>
-            <span>{{ t("light") }}</span>
+            <mat-icon class="mobile-sidenav-icon">dark_mode</mat-icon>
+            <span>{{ t("dark") }}</span>
           </button>
         </div>
         <!-- dark -->
         <ng-template #darkModeBtn>
           <button mat-flat-button (click)="changeTheme('dark')">
-            <mat-icon class="mobile-sidenav-icon">dark_mode</mat-icon>
-            <span>{{ t("dark") }}</span>
+            <mat-icon class="mobile-sidenav-icon">light_mode</mat-icon>
+            <span>{{ t("light") }}</span>
           </button>
         </ng-template>
 

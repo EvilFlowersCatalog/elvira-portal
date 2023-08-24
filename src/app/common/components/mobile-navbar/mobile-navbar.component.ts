@@ -52,6 +52,10 @@ export class MobileNavbarComponent
     this.router.navigate([link]);
   }
 
+  goToSTU() {
+    window.open('https://www.fiit.stuba.sk/', '_blank');
+  }
+
   // Submit... clear search input and navigate
   submit() {
     if (this.search_form?.value.search_input) {

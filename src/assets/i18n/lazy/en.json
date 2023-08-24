@@ -13,10 +13,11 @@
     "contributorName": "Co-author's name",
     "contributorSurname": "Co-author's surname",
     "feeds": "Feeds",
-    "feedsList": "List of feeds",
-    "feedsExpansion": "Click to open feeds",
+    "identifiers": "Identifiers",
     "summary": "Summary",
     "summaryHint": "Short summary about the document",
+    "citation": "Citation",
+    "citationHint": "Citate this document",
     "image": "Image",
     "imageDropper": "Drag your image here or click here to browse",
     "imageError": "The image is too big.",
@@ -149,5 +150,10 @@
     "feed": "Feed",
     "noFilters": "No filters",
     "nothingFound": "No documents were found"
+  },
+  "addFeedDialog": {
+    "title": "Feeds",
+    "search": "Search",
+    "cancel": "Cancel"
   }
 }

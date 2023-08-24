@@ -1,30 +1,51 @@
 .document-form-container {
   background-color: transparent !important;
-  padding: 16px 0 16px 16px;
+  padding: 16px;
   flex: 1;
 }
 
-.document-form-content {
-  margin-top: 20px;
+.document-form-back-button {
+  padding: 0 20px;
 }
 
-.document-form-author {
+.document-form-column {
+  flex: 1;
+}
+
+.document-form-mat-card-author {
+  height: 250px;
+  overflow: auto;
+}
+
+.document-form-section-title-container {
+  margin-bottom: 10px;
+  padding: 5px 0;
+  border-bottom: 1px solid;
+}
+
+.document-form-section-title {
   margin: 0;
 }
 
-.document-form-feed-list {
-  margin-bottom: 8px;
+.document-form-mat-card-feeds {
+  height: 250px;
 }
 
 .document-form-summary-textfield {
-  height: 80px;
+  height: 70px;
+}
+
+.dragonzone-container {
+  display: flex;
+  width: 100%;
+  align-items: center;
 }
 
 .document-form-dropzone {
-  height: 170px;
-  width: inherit;
+  height: 168px;
   margin-left: 0;
   margin-right: 0;
+  padding: 0 10px;
   border-radius: 5px;
   opacity: 0.5;
   position: relative;
@@ -57,16 +78,11 @@
   }
 }
 
-.urlzone {
-  height: 170px;
-
-  h4 {
-    margin-top: 0.5rem;
-  }
+.document-form-citation-textfield {
+  height: 230px;
 }
 
-.document-form-back-btn {
-  position: fixed;
-  top: 116px;
-  right: 200px;
+.document-form-submit-button {
+  width: 100%;
+  padding: 16px;
 }

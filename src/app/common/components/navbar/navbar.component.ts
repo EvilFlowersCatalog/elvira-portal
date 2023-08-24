@@ -51,6 +51,10 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
     this.router.navigate([link]);
   }
 
+  goToSTU() {
+    window.open('https://www.fiit.stuba.sk/', '_blank');
+  }
+
   // Changing theme
   changeTheme() {
     // Setting for animating button for themes

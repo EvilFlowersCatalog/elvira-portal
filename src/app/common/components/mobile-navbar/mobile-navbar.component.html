@@ -2,16 +2,14 @@
   <ng-container *ngIf="appState$ | async as appState">
     <mat-toolbar fxLayout="column" class="navbar-container">
 
-      <!-- Menu button -->
-      <button mat-icon-button (click)="toggleSidenav()" class="mobile-navbar-menu-button">
-        <mat-icon>menu</mat-icon>
-      </button>
+      <!-- STU logo -->
+      <img src="../../../../assets/logos/fiit_logo.png" class="mobile-navbar-image-stu-logo" (click)="goToSTU()">
 
       <!-- Image elvira -->
-      <div fxLayoutAlign="center center" fxLayoutAlign.xs="flex-start center" class="navbar-home-button-container">
-        <button [disabled]="!appState.isLoggedIn" (click)="navigate('/library/home')" class="navbar-home-button">
-          <img src="../../../../assets/logos/title_logo.png">
-        </button>
+      <div fxLayoutAlign="flex-start center" class="navbar-home-button-container"
+        [ngClass]="{'navbar-home-button-container-offline': !appState.isLoggedIn}">
+        <img src="../../../../assets/logos/title_logo.png" [disabled]="!appState.isLoggedIn"
+          (click)="navigate('/library/home')" class="navbar-elvira-img">
       </div>
 
       <!-- Search form -->
@@ -33,6 +31,11 @@
             </button>
           </div>
         </form>
+
+        <!-- Menu button -->
+        <button mat-icon-button (click)="toggleSidenav()" class="mobile-navbar-menu-button">
+          <mat-icon>menu</mat-icon>
+        </button>
       </div>
     </mat-toolbar>
   </ng-container>

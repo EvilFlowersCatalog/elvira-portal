@@ -9,14 +9,30 @@
   flex: 1;
 }
 
-.navbar-image {
+.navbar-images-first-row {
   height: 50%;
+  justify-content: flex-start;
+  align-items: flex-end;
+}
+
+.navbar-image {
+  height: 100%;
   cursor: pointer;
 }
 
-.navbar-image-offline {
-  margin-top: 15px;
+.navbar-image-stu-logo {
+  height: 80%;
+  margin: auto 30px;
+  cursor: pointer;
 }
+
+.navbar-first-column-offline {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-bottom: 16px;
+}
+
 
 .navbar-buttons-container {
   justify-content: flex-start;

@@ -3,11 +3,17 @@
     <mat-toolbar fxLayout="row" class="navbar-container">
 
       <!-- First column -->
-      <div class="navbar-first-column">
+      <div class="navbar-first-column" [ngClass]="{'navbar-first-column-offline': !appState.isLoggedIn}">
 
-        <!-- Image (Elvira) first row -->
-        <img src="../../../../assets/logos/title_logo.png" class="navbar-image"
-          [ngClass]="{'navbar-image-offline': !appState.isLoggedIn}" (click)="navigate('/library/home')">
+        <!-- First row  -->
+        <div fxLayout="row" class="navbar-images-first-row">
+
+          <!-- Image (Elvira) first row -->
+          <img src="../../../../assets/logos/title_logo.png" class="navbar-image" (click)="navigate('/library/home')">
+
+          <!-- STU logo -->
+          <img src="../../../../assets/logos/fiit_logo.png" class="navbar-image-stu-logo" (click)="goToSTU()">
+        </div>
 
         <!-- Second row -->
         <div *ngIf="appState.isLoggedIn" fxLayout="row" class="navbar-buttons-container">
@@ -47,15 +53,15 @@
           <div *ngIf="appState.lang === 'en'; else enVersionBtn">
             <!-- sk -->
             <button class="navbar-button" (click)="changeLanguage('sk')">
-              <mat-icon class="navbar-icon">translate</mat-icon>
-              <span>{{ t("svk") }}</span>
+              <mat-icon class="navbar-icon">language</mat-icon>
+              <span>{{ t("eng") }}</span>
             </button>
           </div>
           <!-- en -->
           <ng-template #enVersionBtn>
             <button class="navbar-button" (click)="changeLanguage('en')">
-              <mat-icon class="navbar-icon">language</mat-icon>
-              <span>{{ t("eng") }}</span>
+              <mat-icon class="navbar-icon">translate</mat-icon>
+              <span>{{ t("svk") }}</span>
             </button>
           </ng-template>
 
