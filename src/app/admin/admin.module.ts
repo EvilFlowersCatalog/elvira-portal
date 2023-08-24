@@ -21,6 +21,7 @@ import { AdminEntryDetailComponent } from './components/admin-entry-detail/admin
 import { FeedAdminComponent } from './components/admin-feed/admin-feed.component';
 import { CustomPaginationComponent } from '../services/general/custom-pagination.service';
 import { AddFeedDialogComponent } from './components/dialogs/add-feed-dialog/add-feed-dialog.component';
+import { ElviraClickDirective } from '../elvira/directives/elviraClick.directive';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { AddFeedDialogComponent } from './components/dialogs/add-feed-dialog/add
     UpdateFeedDialogComponent,
     AdminEntryDetailComponent,
     FeedAdminComponent,
+    ElviraClickDirective,
   ],
   imports: [
     CommonModule,

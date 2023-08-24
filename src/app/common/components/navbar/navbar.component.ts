@@ -49,11 +49,13 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   }
 
   // Navigation for button
-  navigate(link: string, event: PointerEvent) {
+  navigate(link: string, event: any) {
+    event.preventDefault();
     this.navigationService.modifiedNavigation(link, event);
   }
 
-  goToSTU() {
+  goToSTU(event: any) {
+    event.preventDefault();
     window.open('https://www.fiit.stuba.sk/', '_blank');
   }
 

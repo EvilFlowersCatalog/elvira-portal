@@ -78,8 +78,8 @@ export class DocumentManagementComponent
   }
 
   //Button, to navigate to the upload formular
-  newDocument($event: PointerEvent) {
-    this.navigationService.modifiedNavigation('/admin/upload', $event);
+  newDocument(event: any) {
+    this.navigationService.modifiedNavigation('/elvira/admin/upload', event);
   }
 
   //Function, to give choice, wether we want to delete the document or not
@@ -117,7 +117,7 @@ export class DocumentManagementComponent
 
   // Function for editing document
   editDocument(entry: Entry) {
-    this.navigationService.modifiedNavigation(`/admin/edit/${entry.id}`);
+    this.navigationService.modifiedNavigation(`/elvira/admin/edit/${entry.id}`);
   }
 
   //Function for searchbar

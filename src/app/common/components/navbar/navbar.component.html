@@ -10,35 +10,36 @@
 
           <!-- Image (Elvira) first row -->
           <img src="../../../../assets/logos/title_logo.png" class="navbar-image"
-            (click)="navigate('/elvira/home', $event)">
+            (elviraclick)="navigate('/elvira/home', $event)">
 
           <!-- STU logo -->
-          <img src="../../../../assets/logos/fiit_logo.png" class="navbar-image-stu-logo" (click)="goToSTU()">
+          <img src="../../../../assets/logos/fiit_logo.png" class="navbar-image-stu-logo"
+            (elviraclick)="goToSTU($event)">
         </div>
 
         <!-- Second row -->
         <div *ngIf="appState.isLoggedIn" fxLayout="row" class="navbar-buttons-container">
 
           <!-- Home button -->
-          <button (click)="navigate('/elvira/home', $event)" class="navbar-main-button">
+          <button (elviraclick)="navigate('/elvira/home', $event)" class="navbar-main-button">
             <mat-icon class="navbar-icon">home</mat-icon>
             {{ t("home") }}
           </button>
 
           <!-- elvira button -->
-          <button (click)="navigate('/elvira/library', $event)" class="navbar-main-button">
+          <button (elviraclick)="navigate('/elvira/library', $event)" class="navbar-main-button">
             <mat-icon class="navbar-icon"> menu_book </mat-icon>
             {{t("library")}}
           </button>
 
           <!-- Favorites button -->
-          <button (click)="navigate('/elvira/favorites', $event)" class="navbar-main-button">
+          <button (elviraclick)="navigate('/elvira/favorites', $event)" class="navbar-main-button">
             <mat-icon class="navbar-icon">favorite</mat-icon>
             {{t("favorites")}}
           </button>
 
           <!-- Admin button -->
-          <button *ngIf="appState.isAdmin" (click)="navigate('/elvira/admin', $event)" class="navbar-main-button">
+          <button *ngIf="appState.isAdmin" (elviraclick)="navigate('/elvira/admin', $event)" class="navbar-main-button">
             Admin
           </button>
         </div>

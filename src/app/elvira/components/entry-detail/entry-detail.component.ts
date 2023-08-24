@@ -36,7 +36,7 @@ export class EntryDetailComponent implements OnInit {
   }
 
   // Get acquisition id and open pdf
-  openPdf(entry_id: string, $event: PointerEvent) {
+  openPdf(entry_id: string, event: any) {
     this.entryService
       .getEntryDetail(entry_id)
       .toPromise()
@@ -52,7 +52,7 @@ export class EntryDetailComponent implements OnInit {
           .toPromise()
           .then((res: UserAcquisitionId) => {
             // When there is a response... move
-            this.navigationService.modifiedNavigation(`/elvira/pdf-viewer/${res.response.id}`, $event);
+            this.navigationService.modifiedNavigation(`/elvira/pdf-viewer/${res.response.id}`, event);
           })
           .catch((err) => {
             console.log(err);

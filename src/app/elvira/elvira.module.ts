@@ -19,6 +19,7 @@ import { SwipperComponent } from './components/swiper/swiper.component';
 import { FeedsPageComponent } from './components/feeds-page/feeds-page.component'
 import { FeedComponent } from './components/feed.component'
 import { CustomPaginationComponent } from '../services/general/custom-pagination.service';
+import { ElviraClickDirective } from './directives/elviraClick.directive';
 
 @NgModule({
   declarations: [
@@ -32,6 +33,7 @@ import { CustomPaginationComponent } from '../services/general/custom-pagination
     SwipperComponent,
     FeedsPageComponent,
     FeedComponent,
+    ElviraClickDirective,
   ],
   imports: [
     CommonModule,
@@ -46,6 +48,6 @@ import { CustomPaginationComponent } from '../services/general/custom-pagination
     { provide: TRANSLOCO_SCOPE, useValue: 'lazy' },
     { provide: MatPaginatorIntl, useClass: CustomPaginationComponent },
   ],
-  exports: [],
+  exports: [ElviraClickDirective],
 })
 export class ElviraModule { }

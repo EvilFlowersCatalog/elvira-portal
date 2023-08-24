@@ -31,7 +31,7 @@ export class LoginGuard {
     if (token === null) {
       return true;
     }
-    this.router.navigate(['/library']);
+    this.router.navigate(['/elvira']);
     return false;
   }
 }

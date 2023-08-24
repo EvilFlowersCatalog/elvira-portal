@@ -7,7 +7,7 @@ import { Feed } from 'src/app/types/feed.types';
 @Component({
   selector: 'app-feed',
   template: `
-    <div class="feed-container" fxLayout="row" fxLayoutAlign="center center" (click)="feedNavigator($event)">
+    <div class="feed-container" fxLayout="row" fxLayoutAlign="center center" (elviraclick)="feedNavigator($event)">
       <mat-icon> book </mat-icon>
       <div class="feed-info-container">
         <div>{{ feed.title }}</div>
@@ -71,13 +71,13 @@ export class FeedComponent {
   ) { }
 
   // If the feed's kind is navigation go to /feed/id, else go to library
-  feedNavigator($event: PointerEvent) {
+  feedNavigator(event: any) {
     if (this.feed.kind === 'navigation') {
-      this.navigationService.modifiedNavigation(`/elvira/feeds/${this.feed.id}`, $event);
+      this.navigationService.modifiedNavigation(`/elvira/feeds/${this.feed.id}`, event);
     }
     else {
       this.filterService.setFeed(this.feed.id); // set feed to filter
-      this.navigationService.modifiedNavigation(`/elvira/library`, $event);
+      this.navigationService.modifiedNavigation(`/elvira/library`);
     }
   }
 
