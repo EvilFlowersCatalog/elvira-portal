@@ -51,6 +51,7 @@ export interface EntryQuery {
   limit: number;
   title?: string;
   feed_id?: string;
+  author?: string;
   order_by?: string;
 }
 

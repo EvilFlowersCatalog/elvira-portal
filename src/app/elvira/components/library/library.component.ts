@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import {
   concatMap,
   startWith,
@@ -8,10 +8,11 @@ import {
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { MediaObserver } from '@angular/flex-layout';
-import { Entry, EntryQuery } from 'src/app/types/entry.types';
+import { Entry } from 'src/app/types/entry.types';
 import { EntryService } from 'src/app/services/entry.service';
-import { FilterService } from 'src/app/services/general/filter.service';
 import { FeedService } from 'src/app/services/feed.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Filters } from 'src/app/types/general.types';
 
 @Component({
   selector: 'app-all-entries',
@@ -22,23 +23,27 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
   entries: Entry[] = []; // used in html
   results_length = 0; // used in html
   fetchEntries$ = new Subject();
-  filters: EntryQuery; // used in html
+  filters = new Filters(); // used in html
   show_filters: boolean = false; // used in html
   feed_name: string = ""; // used in html
+  routeSubscription: Subscription;
   @ViewChild('paginator') paginator: MatPaginator;
 
   constructor(
     private readonly entryService: EntryService,
-    private readonly filterService: FilterService,
     private readonly feedService: FeedService,
-    public mediaObserver: MediaObserver
+    private readonly route: ActivatedRoute,
+    public mediaObserver: MediaObserver,
+    private readonly router: Router,
   ) {
     super();
   }
 
   ngOnInit(): void {
-    this.filters = this.filterService.getFilter(); // Get used filters
-    // idk
+    this.routeSubscription = this.route.paramMap.subscribe(params => {
+      const filters = params.get('filters');
+      this.getFilters(filters); // Reload your data based on the updated filters value
+    });
     window.onbeforeunload = () => this.ngOnDestroy();
 
     // For dinamic changes
@@ -47,31 +52,23 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
       .pipe(
         takeUntil(this.destroySignal$),
         startWith([]),
-        concatMap(() => this.entryService.getEntriesList(this.filterService.getFilter()))
+        concatMap(() => this.entryService.getEntriesList({
+          page: this.paginator?.pageIndex ?? 0,
+          limit: this.paginator?.pageSize ?? 15,
+          title: this.filters.title,
+          feed_id: this.filters.feed,
+          author: this.filters.author
+        }))
       )
       .subscribe((data) => {
         this.entries = data.items;
         this.results_length = data.metadata.total;
         this.paginator.pageIndex = data.metadata.page - 1;
       });
-
-    this.filterService.changed$.pipe(
-      takeUntil(this.destroySignal$)
-    ).subscribe((changed) => {
-      if (changed) {
-        this.fetchEntries$.next();
-        this.filters = this.filterService.getFilter();
-        if (this.filters.feed_id) {
-          this.getFeedName(this.filters.feed_id);
-        }
-      }
-    });
   }
 
   // Paginator handling
   handlePageChange() {
-    this.filterService.setPage(this.paginator?.pageIndex);
-    this.filterService.setLimit(this.paginator?.pageSize);
     this.fetchEntries$.next();
   }
 
@@ -83,13 +80,43 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
 
   // Removing filters
   removeFilter(type: string) {
+    this.show_filters = false;
     if (type === "title") {
-      this.filterService.setTitle("");
+      this.filters.title = '';
+    } else if (type === "feed") {
+      this.filters.feed = '';
+      this.feed_name = ''; // do not forget name
+    } else if (type === "author") {
+      this.filters.author = '';
     }
-    else if (type === "feed") {
-      this.filterService.setFeed("");
-      this.feed_name = "";
+    this.router.navigateByUrl(`/elvira/library/${this.filters.getFilters()}`);
+    this.fetchEntries$.next();
+  }
+
+  getFilters(url_filters: string) {
+    const params_array = url_filters.split('&');
+
+    // Initialize an object to store the extracted values
+    const extracted_values = {};
+
+    // Loop through the array and extract parameter-value pairs
+    params_array.forEach(param => {
+      const [key, value] = param.split('=');
+      extracted_values[key] = value;
+    });
+
+    this.filters.title = extracted_values["title"] ?? '';
+
+    this.filters.feed = extracted_values["feed"] ?? '';
+    if (this.filters.feed) {
+      this.getFeedName(this.filters.feed);
     }
+    else {
+      this.feed_name = '';
+    }
+
+    this.filters.author = extracted_values["author"] ?? '';
+
     this.fetchEntries$.next();
   }
 

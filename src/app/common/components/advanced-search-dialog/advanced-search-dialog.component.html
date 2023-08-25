@@ -26,13 +26,56 @@
         <input matInput formControlName="author" />
       </mat-form-field>
 
-      <!-- Created at -->
+      <!-- From -->
       <mat-form-field color="accent">
-        <mat-label>{{ t("lazy.advancedSearchDialog.created_at") }}</mat-label>
+        <mat-label>{{ t("lazy.advancedSearchDialog.from") }}</mat-label>
 
         <!-- input -->
-        <input matInput formControlName="created_at" />
+        <input matInput formControlName="from" />
       </mat-form-field>
+
+      <!-- To -->
+      <mat-form-field color="accent">
+        <mat-label>{{ t("lazy.advancedSearchDialog.to") }}</mat-label>
+
+        <!-- input -->
+        <input matInput formControlName="to" />
+      </mat-form-field>
+
+
+      <!-- Feed title and picked on -->
+      <div fxFill fxLayout="row" fxLayoutAlign="start center">
+        {{ t("lazy.advancedSearchDialog.feed") }}
+        <div *ngIf="picked_feed.title" fxLayoutAlign="center center" style="margin-left: 20px;">
+          {{ picked_feed.title }}
+          <mat-icon style="cursor: pointer; margin-left: 10px;"
+            (click)="picked_feed = {title: '', id: ''}">cancel</mat-icon>
+        </div>
+      </div>
+
+      <!-- Search feeds -->
+      <form fxFill fxLayout="row" [formGroup]="search_form" fxLayoutAlign="start center" (submit)="searchFeed()">
+
+        <!-- Title -->
+        <mat-form-field color="accent" style="width: 100%;">
+          <mat-label>{{ t("lazy.advancedSearchDialog.searchFeed") }}</mat-label>
+
+          <!-- input -->
+          <input matInput formControlName="search_input" />
+        </mat-form-field>
+
+        <!-- Button for submit -->
+        <button mat-icon-button type="submit" color="accent">
+          <mat-icon>search</mat-icon>
+        </button>
+      </form>
+
+      <!-- Feeds list -->
+      <div *ngIf="data_source.length > 0" fxLayout="row wrap" fxLayoutGap="10px" class="advanced-search-feed-container">
+        <div *ngFor="let feed of data_source" (click)="pick(feed)" class="advanced-search-feed">
+          {{ feed.title }}
+        </div>
+      </div>
     </form>
   </mat-dialog-content>
 

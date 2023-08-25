@@ -1,8 +1,7 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core'
-import { Router } from '@angular/router';
-import { FilterService } from 'src/app/services/general/filter.service';
+import { Component, Input } from '@angular/core'
 import { NavigationService } from 'src/app/services/general/navigation.service';
 import { Feed } from 'src/app/types/feed.types';
+import { Filters } from 'src/app/types/general.types';
 
 @Component({
   selector: 'app-feed',
@@ -67,7 +66,6 @@ export class FeedComponent {
 
   constructor(
     private readonly navigationService: NavigationService,
-    private readonly filterService: FilterService,
   ) { }
 
   // If the feed's kind is navigation go to /feed/id, else go to library
@@ -76,8 +74,7 @@ export class FeedComponent {
       this.navigationService.modifiedNavigation(`/elvira/feeds/${this.feed.id}`, event);
     }
     else {
-      this.filterService.setFeed(this.feed.id); // set feed to filter
-      this.navigationService.modifiedNavigation(`/elvira/library`);
+      this.navigationService.modifiedNavigation(`/elvira/library/${new Filters("", "", this.feed.id).getFilters()}`, event);
     }
   }
 

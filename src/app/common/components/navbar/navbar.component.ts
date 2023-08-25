@@ -4,8 +4,7 @@ import { takeUntil } from 'rxjs/operators';
 import { DisposableComponent } from '../disposable.component';
 import { Router } from '@angular/router';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { FilterService } from 'src/app/services/general/filter.service';
-import { State } from 'src/app/types/general.types';
+import { Filters, State } from 'src/app/types/general.types';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { AppStateService } from 'src/app/services/general/app-state.service';
 import { AdvancedSearchDialogComponent } from '../advanced-search-dialog/advanced-search-dialog.component';
@@ -27,7 +26,6 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
     private readonly router: Router,
     private readonly appStateService: AppStateService,
     public dialog: MatDialog,
-    private readonly filterService: FilterService,
     private readonly navigationService: NavigationService
   ) {
     super();
@@ -50,8 +48,12 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
 
   // Navigation for button
   navigate(link: string, event: any) {
-    event.preventDefault();
     this.navigationService.modifiedNavigation(link, event);
+  }
+
+  navigateToLibrary(event: any) {
+    // empty filters
+    this.navigationService.modifiedNavigation(`elvira/library/${new Filters().getFilters()}`, event);
   }
 
   goToSTU(event: any) {
@@ -89,9 +91,9 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   // Submit... clear search input and navigate
   submit() {
     if (this.search_form?.value.search_input) {
-      this.filterService.setTitle(this.search_form.value.search_input)
+      const title = this.search_form.value.search_input;
       this.search_form.controls['search_input'].reset();
-      this.navigate('elvira/library', null);
+      this.navigate(`elvira/library/${new Filters(title).getFilters()}`, null);
     }
   }
 }

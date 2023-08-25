@@ -53,9 +53,13 @@
     "name": "Pokročilé vyhľadávanie",
     "title": "Nadpis",
     "author": "Meno autora",
-    "created_at": "Vytvorené v",
+    "from": "Od (rok)",
+    "to": "Do (rok)",
+    "reset": "Vymazať",
     "find": "Hľadať",
-    "cancel": "Zrušiť"
+    "cancel": "Zrušiť",
+    "feed": "Sekcia: ",
+    "searchFeed": "Hľadať sekciu"
   },
   "entryDetail": {
     "edit-tooltip": "Upraviť dokument",
@@ -145,7 +149,7 @@
     "feedDeleteError": "Zmazanie feedu zlyhalo"
   },
   "filter": {
-    "filters": "Filtre",
+    "filters": "FILTRE",
     "title": "Názov",
     "feed": "Predmet",
     "noFilters": "Žiadne filtre",
@@ -155,5 +159,8 @@
     "title": "Feedy",
     "search": "Hľadať",
     "cancel": "Zrušiť"
+  },
+  "pdfViewer": {
+    "somethingWentWrong": "Niečo nevyšlo :/"
   }
 }

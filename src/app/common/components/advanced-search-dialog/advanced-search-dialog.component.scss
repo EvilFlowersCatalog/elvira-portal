@@ -1,0 +1,17 @@
+.advanced-search-feed-container {
+  display: flex;
+  max-height: 300px;
+  width: 100%;
+  overflow: auto;
+}
+
+.advanced-search-feed {
+  display: flex;
+  padding: 5px 20px;
+  background-color: #ffc107;
+  border-radius: 20px;
+  color: black;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: background-color 0.5s ease;
+}

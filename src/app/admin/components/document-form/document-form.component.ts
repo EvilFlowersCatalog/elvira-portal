@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { throwError } from 'rxjs';
 import { UntypedFormGroup, UntypedFormControl, UntypedFormArray, Validators } from '@angular/forms';
-import { catchError, concatMap, filter, map, take, tap } from 'rxjs/operators';
+import { catchError, take, tap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TitleValidators } from '../../validators/title.validator';
 import { TranslocoService } from '@ngneat/transloco';

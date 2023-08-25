@@ -35,12 +35,12 @@ export const LIBRARY_ROUTES: Routes = [
     component: FeedsPageComponent,
   },
   {
-    path: 'library',
+    path: 'library/:filters',
     canActivate: [LibraryGuard],
     component: LibraryComponent,
   },
   {
-    path: 'pdf-viewer/:user_acquisition_id',
+    path: 'pdf-viewer/:entry_id',
     canActivate: [LibraryGuard],
     component: PdfViewerComponent,
   },

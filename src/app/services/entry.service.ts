@@ -24,6 +24,7 @@ export class EntryService {
     if (query.title) { params = params.set('title', query.title); }
     if (query.feed_id) { params = params.set('feed_id', query.feed_id); }
     if (query.order_by) { params = params.set('order_by', query.order_by); }
+    if (query.author) { params = params.set('author', query.author); }
 
     return this.httpClient.get<EntriesList>(
       environment.baseUrl + '/api/v1/entries',

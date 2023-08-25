@@ -4,9 +4,8 @@ import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DisposableComponent } from '../disposable.component';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { State } from 'src/app/types/general.types';
+import { Filters, State } from 'src/app/types/general.types';
 import { AppStateService } from 'src/app/services/general/app-state.service';
-import { FilterService } from 'src/app/services/general/filter.service';
 
 @Component({
   selector: 'app-mobile-navbar',
@@ -22,7 +21,6 @@ export class MobileNavbarComponent
   constructor(
     private readonly router: Router,
     private readonly appStateService: AppStateService,
-    private readonly filterService: FilterService,
   ) {
     super();
     this.search_form = new UntypedFormGroup({
@@ -59,9 +57,9 @@ export class MobileNavbarComponent
   // Submit... clear search input and navigate
   submit() {
     if (this.search_form?.value.search_input) {
-      this.filterService.setTitle(this.search_form.value.search_input)
+      const title = this.search_form.value.search_input;
       this.search_form.controls['search_input'].reset();
-      this.navigate('library/all-entries');
+      this.navigate(`elvira/library/${new Filters(title).getFilters()}`);
     }
   }
 }

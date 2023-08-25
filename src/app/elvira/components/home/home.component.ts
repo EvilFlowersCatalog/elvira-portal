@@ -3,7 +3,6 @@ import { Observable } from 'rxjs';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { EntryService } from 'src/app/services/entry.service';
 import { FeedService } from 'src/app/services/feed.service';
-import { FilterService } from 'src/app/services/general/filter.service';
 import { Entry } from 'src/app/types/entry.types';
 import { Feed } from 'src/app/types/feed.types';
 
@@ -21,7 +20,6 @@ export class HomeComponent extends DisposableComponent implements OnInit {
   constructor(
     private readonly entryService: EntryService,
     private readonly feedService: FeedService,
-    private readonly filterService: FilterService,
   ) { super() }
 
   // For html component in popupal entries -> only shows when screen is < 599
@@ -32,12 +30,20 @@ export class HomeComponent extends DisposableComponent implements OnInit {
 
   ngOnInit(): void {
     // Get last added entries
-    this.entryService.getEntriesList(this.filterService.get10LastAdded())
+    this.entryService.getEntriesList({
+      page: 0,
+      limit: 10,
+      order_by: "-created_at"
+    })
       .subscribe((data) => {
         this.last_added_entries = data.items
       });
     // Get top most popular entries
-    this.entryService.getEntriesList(this.filterService.getTop5())
+    this.entryService.getEntriesList({
+      page: 0,
+      limit: 5,
+      order_by: "-popularity"
+    })
       .subscribe((data) => {
         this.popular_entries = data.items
       });

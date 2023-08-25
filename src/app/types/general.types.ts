@@ -22,3 +22,15 @@ export interface DialogData {
   entryApikey: string;
   source: string;
 }
+
+export class Filters {
+  title: string;
+  author: string;
+  feed: string;
+  constructor(title: string = '', author: string = '', feed: string = '') {
+    this.title = title;
+    this.author = author;
+    this.feed = feed;
+  }
+  getFilters() { return `title=${this.title}&feed=${this.feed}&author=${this.author}`; }
+}

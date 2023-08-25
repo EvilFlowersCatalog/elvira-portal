@@ -1,59 +1,46 @@
 <ng-container *transloco="let t">
   <div class="all-entries-container">
+
+    <!-- Filter container -->
     <div fxLayout="column" class="all-entier-filter-container">
 
-      <!-- Filter button -->
-      <div class="all-entries-filer-button" (click)="show_filters = !show_filters">
-        <div class="all-entries-filter-button-inner-container">
-          {{ t( "lazy.filter.filters" ) }}
-          <mat-icon class="all-entries-filter-icon"> filter_list </mat-icon>
-        </div>
-      </div>
+      <!-- Filters -->
+      <div fxLayout="column" class="all-entries-filter-button">
+        <div fxLayout="column" class="all-entries-filters" [ngClass]="{'all-entries-filters-oppend': show_filters}">
 
-      <!-- Hidden filters -->
-      <div *ngIf="show_filters" class="all-entries-filter-rows-container">
+          <div fxLayout="column" fxLayoutGap="10px" class="filters-container">
 
-        <!-- If there is something show -->
-        <div *ngIf="filters.title || feed_name; else nothing" fxLayout="row" fxLayoutAlign="center center"
-          fxLayoutGap="16px" style="margin-top: 16px;">
+            <!-- Filters title -->
+            <div class="filter" *ngIf="filters.title" color="primary" fxLayoutAlign="space-between center">
+              {{ filters.title.length > 15 ? (filters.title | slice: 0:15) + '...' : filters.title }}
+              <mat-icon class="filter-icon" (click)="removeFilter('title')">cancel</mat-icon>
+            </div>
 
-          <!-- Used title -->
-          <div *ngIf="filters.title" fxLayout="row" fxLayoutAlign="start">
-            <mat-chip-list>
-              <mat-chip [removable]="true" (removed)="removeFilter('title')" [selectable]="false" color="primary"
-                selected>
+            <!-- Filters feed name -->
+            <div class="filter" *ngIf="feed_name" color="primary" fxLayoutAlign="space-between center">
+              {{ feed_name }}
+              <mat-icon class="filter-icon" (click)="removeFilter('feed')">cancel</mat-icon>
+            </div>
 
-                <!-- Title -->
-                <span>{{ t( "lazy.filter.title" ) }} : {{ filters.title }}</span>
-
-                <!-- Cancel button -->
-                <mat-icon matChipRemove>cancel</mat-icon>
-              </mat-chip>
-            </mat-chip-list>
+            <!-- Author name -->
+            <div class="filter" *ngIf="filters.author" color="primary" fxLayoutAlign="space-between center">
+              {{ filters.author.length > 15 ? (filters.author | slice: 0:15) + '...' : filters.author }}
+              <mat-icon class="filter-icon" (click)="removeFilter('author')">cancel</mat-icon>
+            </div>
           </div>
 
-          <!-- Used feed -->
-          <div *ngIf="feed_name" fxLayout="row" fxLayoutAlign="start">
-            <mat-chip-list>
-              <mat-chip [removable]="true" (removed)="removeFilter('feed')" [selectable]="false" color="primary"
-                selected>
+          <!-- title -->
+          {{ t("lazy.filter.filters") }}
 
-                <!-- Feed -->
-                <span>{{ t( "lazy.filter.feed" ) }} : {{ feed_name }}</span>
-
-                <!-- Cancel button -->
-                <mat-icon matChipRemove>cancel</mat-icon>
-              </mat-chip>
-            </mat-chip-list>
-          </div>
         </div>
 
-        <!-- If there is nothing -->
-        <ng-template #nothing>
-          <div class="all-entries-no-filter">
-            {{ t("lazy.filter.noFilters") }}
-          </div>
-        </ng-template>
+        <!-- Filter icon -->
+        <div style="width: 40%;" fxLayoutAlign="center center" (click)="show_filters = !show_filters">
+          <mat-icon *ngIf="!show_filters; else up" class="all-entries-filter-icon"> filter_list </mat-icon>
+          <ng-template #up>
+            <mat-icon class="all-entries-filter-icon"> keyboard_arrow_up </mat-icon>
+          </ng-template>
+        </div>
       </div>
     </div>
 

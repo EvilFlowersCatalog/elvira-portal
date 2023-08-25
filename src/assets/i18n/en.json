@@ -22,6 +22,7 @@
     "login": "Login",
     "home": "Home",
     "advanced": "Advanced",
+    "mobileAdvanced": "Advanced search",
     "search": "Search",
     "library": "Library"
   }

@@ -53,9 +53,13 @@
     "name": "Advanced search",
     "title": "Title",
     "author": "Author name",
-    "created_at": "Created at",
+    "from": "From (year)",
+    "to": "To (year)",
+    "reset": "Reset",
     "find": "Find",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "feed": "Feed:",
+    "searchFeed": "Search feed"
   },
   "entryDetail": {
     "edit-tooltip": "Edit document",
@@ -145,15 +149,18 @@
     "feedDeleteError": "Feed deletion failed"
   },
   "filter": {
-    "filters": "Filters",
+    "filters": "FILTERS",
     "title": "Title",
     "feed": "Feed",
     "noFilters": "No filters",
-    "nothingFound": "No documents were found"
+    "nothingFound": "No documents found"
   },
   "addFeedDialog": {
     "title": "Feeds",
     "search": "Search",
     "cancel": "Cancel"
+  },
+  "pdfViewer": {
+    "somethingWentWrong": "Something went wrong :/"
   }
 }

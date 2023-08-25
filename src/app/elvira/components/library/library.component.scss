@@ -1,50 +1,70 @@
 .all-entries-container {
   background-color: transparent !important;
-  padding: 0 0 16px 16px;
+  padding: 32px 0 16px 16px;
   flex: 1;
 }
 
 .all-entier-filter-container {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  padding-right: 16px;
-  margin-bottom: 16px;
-}
-
-.all-entries-no-filter {
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-  margin-top: 16px;
-}
-
-.all-entries-filer-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 40px; // size of inner container
-  color: black;
-}
-
-.all-entries-filter-button-inner-container {
-  position: absolute;
+  position: fixed;
   top: 100px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1;
+}
+
+.all-entries-filter-button {
   display: flex;
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  padding: 5px 20px;
-  border-bottom-left-radius: 15px;
-  border-bottom-right-radius: 15px;
-  font-size: 20px;
-  background-color: #ffc107;
+  padding: 0 10px;
+  width: 300px;
+  border-bottom-left-radius: 50%;
+  border-bottom-right-radius: 50%;
+  background-color: rgba(22, 22, 22, 0.9);
+}
+
+.all-entries-filters {
+  height: 0;
+  width: 90%;
+  margin-bottom: 0;
+  display: none;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: hidden;
+  transition: height 0.7s ease, margin-bottom 0.7s ease;
+}
+
+.all-entries-filters-oppend {
+  height: 200px;
+  margin-bottom: 5px;
+}
+
+.filters-container {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.filter {
+  display: flex;
+  background-color: #00bcd4;
+  padding: 5px 10px;
+  border-radius: 20px;
+}
+
+.filter-icon {
+  height: 15px;
+  cursor: pointer;
+  width: 15px;
+  font-size: 15px;
 }
 
 .all-entries-filter-icon {
-  margin-left: 10px;
+  color: #ffc107;
+  font-weight: bold;
 }
 
 .all-entries-filter-rows-container {

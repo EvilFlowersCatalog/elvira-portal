@@ -18,7 +18,7 @@
       <div class="entry-detail-content">
         <div fxLayout="row wrap" fxLayoutGap="5px" class="entry-detail-feeds-container">
           <div *ngFor="let feed of entry.feeds">
-            <div class="entry-detail-feed" (click)="navigate(feed.id)">
+            <div class="entry-detail-feed" (elviraclick)="navigate(feed.id, $event)">
               {{ feed.title }}
             </div>
           </div>
