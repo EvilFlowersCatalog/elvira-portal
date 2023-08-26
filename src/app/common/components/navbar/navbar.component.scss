@@ -145,7 +145,7 @@
 
 .navbar-form {
   height: 100%;
-  width: 70%;
+  width: 50%;
 }
 
 .navbar-form-field-container {
@@ -153,9 +153,19 @@
 }
 
 .navbar-form-field {
-  flex: 1;
-  max-width: 500px;
   height: 100%;
-  color: white;
+  display: flex;
+  align-items: flex-end;
+}
+
+.navbar-form-input {
+  height: 60%;
+  width: 100%;
   font-size: 17px;
+  color: white;
+  border-bottom: 2px solid rgb(141, 141, 141);
+}
+
+.navbar-form-input:focus {
+  border-bottom: 2px solid #ffc107;
 }

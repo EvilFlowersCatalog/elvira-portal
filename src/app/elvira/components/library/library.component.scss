@@ -11,7 +11,7 @@
   right: 0;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
   z-index: 1;
 }
 
@@ -21,8 +21,6 @@
   align-items: center;
   padding: 0 10px;
   width: 300px;
-  border-bottom-left-radius: 50%;
-  border-bottom-right-radius: 50%;
   background-color: rgba(22, 22, 22, 0.9);
 }
 
@@ -86,6 +84,12 @@
   transform: rotate(180deg);
 }
 
+.library-title-FILTERS-container {
+  margin-left: 50px;
+  font-weight: bold;
+  color: white;
+}
+
 .all-entries-filter-rows-container {
   width: 50%;
 }
@@ -136,4 +140,11 @@ span {
   .all-entries-filter-rows-container {
     width: 100%;
   }
+}
+
+@media screen and (max-width: 425px) {
+  .all-entries-filter-button {
+    width: 100%;
+  }
+
 }

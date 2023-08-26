@@ -19,7 +19,7 @@ import { SwipperComponent } from './components/swiper/swiper.component';
 import { FeedsPageComponent } from './components/feeds-page/feeds-page.component'
 import { FeedComponent } from './components/feed.component'
 import { CustomPaginationComponent } from '../services/general/custom-pagination.service';
-import { ElviraClickDirective } from './directives/elviraClick.directive';
+import { ElviraClickDirective } from './directives/elvira-click.directive';
 
 @NgModule({
   declarations: [

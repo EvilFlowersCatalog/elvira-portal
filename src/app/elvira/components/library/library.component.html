@@ -55,7 +55,7 @@
           </div>
 
           <!-- title -->
-          <div style="color: white; font-weight: bold; margin-left: 50px;" fxLayoutAlign="center center">
+          <div class="library-title-FILTERS-container" fxLayoutAlign="center center">
             {{ t("lazy.filter.filters") }}
             <mat-icon matTooltip="{{ t('lazy.filter.clear') }}" class="filter-icon-delete"
               (click)="clearFilter()">delete</mat-icon>
@@ -64,7 +64,7 @@
         </div>
 
         <!-- Filter icon -->
-        <div style="width: 40%; cursor: pointer;" fxLayoutAlign="center center" (click)="show_filters = !show_filters">
+        <div fxFill fxLayoutAlign="center center" style="cursor: pointer;" (click)="show_filters = !show_filters">
           <mat-icon class="all-entries-filter-icon" [ngClass]="{'animate': show_filters}">
             {{ !show_filters ? "filter_list" : "keyboard_arrow_down" }}
           </mat-icon>

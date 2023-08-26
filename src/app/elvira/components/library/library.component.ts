@@ -42,7 +42,7 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
   ngOnInit(): void {
     this.routeSubscription = this.route.paramMap.subscribe(params => {
       const filters = params.get('filters');
-      this.getFilters(filters); // Reload your data based on the updated filters value
+      this.getFilters(filters); // Reload data based on the updated filters value
     });
     window.onbeforeunload = () => this.ngOnDestroy();
 
