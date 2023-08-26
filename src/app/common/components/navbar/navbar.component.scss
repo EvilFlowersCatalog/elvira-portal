@@ -161,9 +161,21 @@
 .navbar-form-input {
   height: 60%;
   width: 100%;
+  background: none;
+  border: none;
+  outline: none;
   font-size: 17px;
   color: white;
-  border-bottom: 2px solid rgb(141, 141, 141);
+  border-bottom: 2px solid white;
+}
+
+.navbar-form-input::placeholder {
+  color: white;
+  font-weight: 300;
+}
+
+.navbar-form-input::-webkit-search-cancel-button {
+  display: none;
 }
 
 .navbar-form-input:focus {
