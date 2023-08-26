@@ -57,6 +57,7 @@ export class MobileNavbarComponent
   // Submit... clear search input and navigate
   submit() {
     if (this.search_form?.value.search_input) {
+      this.appStateService.patchState({ sidenav: false });
       const title = this.search_form.value.search_input;
       this.search_form.controls['search_input'].reset();
       this.navigate(`elvira/library/${new Filters(title).getFilters()}`);

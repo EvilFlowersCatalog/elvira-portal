@@ -2,41 +2,34 @@
   <ng-container *ngIf="appState$ | async as appState">
     <div fxLayout="column" fxLayoutAlign="start start" class="mobile-sidenav-container">
 
-      <!-- Upper row -->
-      <div fxLayout="row" fxLayoutAlign="space-between" style="width: 100%;">
-
-        <!-- Hom button -->
-        <button *ngIf="appState.isLoggedIn" class="mobile-sidenav-button" (click)="navigate('/elvira/home')">
-          <mat-icon class="mobile-sidenav-icon">home</mat-icon>
-          <span>{{ t("home") }}</span>
-        </button>
-
-        <!-- Close button -->
-        <mat-icon (click)="hideSidenav()">close</mat-icon>
+      <!-- Home button -->
+      <div *ngIf="appState.isLoggedIn" class="mobile-sidenav-button" (click)="navigate('/elvira/home')">
+        <mat-icon class="mobile-sidenav-icon">home</mat-icon>
+        <span>{{ t("home") }}</span>
       </div>
 
       <!-- Library button -->
-      <button class="mobile-sidenav-button" *ngIf="appState.isLoggedIn" (click)="navigate('/elvira/library')">
+      <div class="mobile-sidenav-button" *ngIf="appState.isLoggedIn" (click)="navigateToLibrary()">
         <mat-icon class="mobile-sidenav-icon">menu_book</mat-icon>
         <span>{{ t("library") }}</span>
-      </button>
+      </div>
 
       <!-- Favorite button -->
-      <button class="mobile-sidenav-button" *ngIf="appState.isLoggedIn" (click)="navigate('/elvira/favorites')">
+      <div class="mobile-sidenav-button" *ngIf="appState.isLoggedIn" (click)="navigate('/elvira/favorites')">
         <mat-icon class="mobile-sidenav-icon">favorite</mat-icon>
         <span>{{ t("favorites") }}</span>
-      </button>
+      </div>
 
       <!-- Advanced search button -->
-      <button class="mobile-sidenav-button" *ngIf="appState.isLoggedIn" (click)="openAdvanced()">
+      <div class="mobile-sidenav-button" *ngIf="appState.isLoggedIn" (click)="openAdvanced()">
         <mat-icon class="mobile-sidenav-icon"> search </mat-icon>
         <span> {{ t("mobileAdvanced") }} </span>
-      </button>
+      </div>
 
       <!-- Admin button -->
-      <button class="mobile-sidenav-button" *ngIf="appState.isLoggedIn" (click)="navigate('/elvira/admin')">
+      <div class="mobile-sidenav-button" *ngIf="appState.isLoggedIn" (click)="navigate('/elvira/admin')">
         <span> admin </span>
-      </button>
+      </div>
 
       <!-- down row column -->
       <div fxLayout="column" class="mobile-sidenav-bottom-container">
@@ -44,42 +37,42 @@
         <!-- Translate button -->
         <div *ngIf="appState.lang === 'en'; else enVersionBtn">
           <!-- svk -->
-          <button class="mobile-sidenav-button" (click)="changeLanguage('sk')">
+          <div class="mobile-sidenav-button" (click)="changeLanguage('sk')">
             <mat-icon class="mobile-sidenav-icon">language</mat-icon>
             <span>{{ t("eng") }}</span>
-          </button>
+          </div>
         </div>
         <!-- en -->
         <ng-template #enVersionBtn>
           <div>
-            <button class="mobile-sidenav-button" (click)="changeLanguage('en')">
+            <div class="mobile-sidenav-button" (click)="changeLanguage('en')">
               <mat-icon class="mobile-sidenav-icon">translate</mat-icon>
               <span>{{ t("svk") }}</span>
-            </button>
+            </div>
           </div>
         </ng-template>
 
         <!-- Theme button -->
         <div *ngIf="appState.theme === 'dark'; else darkModeBtn">
           <!-- light -->
-          <button class="mobile-sidenav-button" (click)="changeTheme('light')">
+          <div class="mobile-sidenav-button" (click)="changeTheme('light')">
             <mat-icon class="mobile-sidenav-icon">dark_mode</mat-icon>
             <span>{{ t("dark") }}</span>
-          </button>
+          </div>
         </div>
         <!-- dark -->
         <ng-template #darkModeBtn>
-          <button class="mobile-sidenav-button" (click)="changeTheme('dark')">
+          <div class="mobile-sidenav-button" (click)="changeTheme('dark')">
             <mat-icon class="mobile-sidenav-icon">light_mode</mat-icon>
             <span>{{ t("light") }}</span>
-          </button>
+          </div>
         </ng-template>
 
         <!-- Logout button -->
-        <button *ngIf="appState.isLoggedIn" class="mobile-sidenav-button" style="display: flex;" (click)="logout()">
+        <div *ngIf="appState.isLoggedIn" class="mobile-sidenav-button" style="display: flex;" (click)="logout()">
           <mat-icon class="mobile-sidenav-icon">logout</mat-icon>
           <span>{{ t("log-out") }}</span>
-        </button>
+        </div>
       </div>
     </div>
   </ng-container>

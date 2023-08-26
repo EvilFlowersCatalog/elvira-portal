@@ -1,4 +1,7 @@
 <div>
+
+  <!-- Header -->
+  <app-header class="app-header"></app-header>
   <mat-sidenav-container>
 
     <!-- Sidenav -->
@@ -11,16 +14,14 @@
       <div [ngClass]="background">
         <div class="app-content">
 
-          <!-- Header -->
-          <app-header class="app-header"></app-header>
-
           <!-- Body -->
           <router-outlet></router-outlet>
-        </div>
 
-        <!-- Footer -->
-        <app-footer></app-footer>
+          <!-- Footer -->
+          <app-footer></app-footer>
+        </div>
       </div>
     </mat-sidenav-content>
   </mat-sidenav-container>
+
 </div>

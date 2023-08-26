@@ -42,9 +42,10 @@ export class MobileSidenavComponent
     this.router.navigate([link]);
   }
 
-  navigateToLibrary(event: any) {
+  navigateToLibrary() {
+    this.appStateService.patchState({ sidenav: false });
     // empty filters
-    this.navigationService.modifiedNavigation(`elvira/library/${new Filters().getFilters()}`, event);
+    this.navigationService.modifiedNavigation(`elvira/library/${new Filters().getFilters()}`);
   }
 
   // change theme

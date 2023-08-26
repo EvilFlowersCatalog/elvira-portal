@@ -34,7 +34,7 @@
 
         <!-- Menu button -->
         <button mat-icon-button (click)="toggleSidenav()" class="mobile-navbar-menu-button">
-          <mat-icon>menu</mat-icon>
+          <mat-icon>{{ appState.sidenav ? 'close' : 'menu' }}</mat-icon>
         </button>
       </div>
     </mat-toolbar>
