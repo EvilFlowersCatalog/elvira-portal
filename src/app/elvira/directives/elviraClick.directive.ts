@@ -15,19 +15,28 @@ export class ElviraClickDirective {
     }
   }
 
-  // Imitate click -> pressed down
+  // Imitate click
+  // pressed down
   @HostListener('mousedown', ['$event'])
-  pressedDown(event) {
-    this.pressed_down = true;
+  onPressedDown(event: MouseEvent) {
+    event.preventDefault();
+    if (event.button !== 2) { // not for right click
+      this.pressed_down = true;
+    }
   }
 
   // up -> released
   @HostListener('mouseup', ['$event'])
-  released(event) {
+  onReleased(event) {
+    event.preventDefault();
     if (this.pressed_down) { // if was pressed down, only than
       this.pressed_down = false;
-      event.preventDefault();
       this.elviraclick.emit(event);
     }
+  }
+
+  @HostListener('mouseleave', ['$event'])
+  onMouseLeave() {
+    this.pressed_down = false; // Reset the flag if the mouse leaves the button
   }
 }

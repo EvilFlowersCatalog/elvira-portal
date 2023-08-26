@@ -152,7 +152,10 @@
     "filters": "FILTERS",
     "title": "Title",
     "feed": "Feed",
-    "noFilters": "No filters",
+    "author": "Author",
+    "from": "From",
+    "to": "To",
+    "clear": "Delete filters",
     "nothingFound": "No documents found"
   },
   "addFeedDialog": {

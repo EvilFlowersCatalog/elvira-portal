@@ -150,9 +150,12 @@
   },
   "filter": {
     "filters": "FILTRE",
-    "title": "Názov",
-    "feed": "Predmet",
-    "noFilters": "Žiadne filtre",
+    "title": "Nadpis",
+    "feed": "Sekcia",
+    "author": "Autor",
+    "from": "Od",
+    "to": "Do",
+    "clear": "Vymazať filtre",
     "nothingFound": "Nič nebolo nájdené"
   },
   "addFeedDialog": {

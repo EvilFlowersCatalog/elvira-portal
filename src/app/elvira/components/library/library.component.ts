@@ -80,7 +80,6 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
 
   // Removing filters
   removeFilter(type: string) {
-    this.show_filters = false;
     if (type === "title") {
       this.filters.title = '';
     } else if (type === "feed") {
@@ -90,7 +89,6 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
       this.filters.author = '';
     }
     this.router.navigateByUrl(`/elvira/library/${this.filters.getFilters()}`);
-    this.fetchEntries$.next();
   }
 
   getFilters(url_filters: string) {
@@ -120,4 +118,14 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
     this.fetchEntries$.next();
   }
 
+  clearFilter() {
+    if (this.filters.title || this.filters.author || this.filters.feed) {
+      this.filters.title = '';
+      this.filters.feed = '';
+      this.feed_name = '';
+      this.filters.author = '';
+      this.show_filters = false;
+      this.router.navigateByUrl(`/elvira/library/${this.filters.getFilters()}`);
+    }
+  }
 }

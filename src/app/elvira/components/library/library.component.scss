@@ -19,7 +19,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
   padding: 0 10px;
   width: 300px;
   border-bottom-left-radius: 50%;
@@ -39,32 +38,52 @@
 }
 
 .all-entries-filters-oppend {
-  height: 200px;
+  height: 180px;
   margin-bottom: 5px;
 }
 
 .filters-container {
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-title {
+  color: white;
 }
 
 .filter {
   display: flex;
-  background-color: #00bcd4;
-  padding: 5px 10px;
-  border-radius: 20px;
+  margin-left: 20px;
+  color: white;
 }
 
 .filter-icon {
-  height: 15px;
+  height: 20px;
+  width: 20px;
+  font-size: 20px;
+  margin-left: 20px;
+  color: #00bcd4;
   cursor: pointer;
-  width: 15px;
-  font-size: 15px;
+}
+
+.filter-icon-delete {
+  height: 20px;
+  width: 20px;
+  font-size: 20px;
+  margin-left: 30px;
+  margin-top: -2px;
+  color: rgb(255, 40, 40);
+  cursor: pointer;
 }
 
 .all-entries-filter-icon {
   color: #ffc107;
   font-weight: bold;
+  transition: transform 0.7s ease;
+}
+
+.animate {
+  transform: rotate(180deg);
 }
 
 .all-entries-filter-rows-container {
