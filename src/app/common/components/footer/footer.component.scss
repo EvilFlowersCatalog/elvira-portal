@@ -1,6 +1,7 @@
 .footer-container {
   flex: 1;
   margin-top: 32px;
+  padding: 16px;
   background-color: rgba(30, 30, 30, 0.5);
 }
 
@@ -9,7 +10,6 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 16px;
 }
 
 .footer-image {
@@ -30,9 +30,6 @@ h5:hover {
 .footer-version-container {
   flex: 1;
   display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  padding: 5px 10px;
 }
 
 p {

@@ -3,11 +3,12 @@ import { Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DisposableComponent } from '../disposable.component';
-import { State } from 'src/app/types/general.types';
+import { Filters, State } from 'src/app/types/general.types';
 import { AppStateService } from 'src/app/services/general/app-state.service';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { AuthService } from 'src/app/services/auth.service';
 import { AdvancedSearchDialogComponent } from '../advanced-search-dialog/advanced-search-dialog.component';
+import { NavigationService } from 'src/app/services/general/navigation.service';
 
 @Component({
   selector: 'app-mobile-sidenav',
@@ -23,7 +24,8 @@ export class MobileSidenavComponent
     private readonly router: Router,
     public dialog: MatDialog,
     private readonly appStateService: AppStateService,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly navigationService: NavigationService,
   ) {
     super();
   }
@@ -38,6 +40,11 @@ export class MobileSidenavComponent
   navigate(link: string) {
     this.appStateService.patchState({ sidenav: false });
     this.router.navigate([link]);
+  }
+
+  navigateToLibrary(event: any) {
+    // empty filters
+    this.navigationService.modifiedNavigation(`elvira/library/${new Filters().getFilters()}`, event);
   }
 
   // change theme

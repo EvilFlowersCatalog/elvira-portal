@@ -1,11 +1,5 @@
 .mobile-sidenav-container {
-  padding-top: 10px;
-}
-
-.mobile-sidenav-close-button {
-  position: absolute; 
-  top: 5px; 
-  right: 0;
+  padding: 16px;
 }
 
 .mobile-sidenav-icon {
@@ -24,7 +18,7 @@
 }
 
 .mobile-sidenav-bottom-container {
-  position: absolute; 
+  position: absolute;
   bottom: 0;
 }
 
@@ -32,7 +26,13 @@ span {
   font-size: 17px;
 }
 
-button {
-  margin-bottom: 10px;
+.mobile-sidenav-button {
+  margin-bottom: 16px;
+  padding: 0;
+  background-color: transparent;
+  color: white;
+  border: none;
+  display: flex;
+  justify-self: center;
+  align-items: flex-start;
 }
-

@@ -10,6 +10,33 @@
 
           <div fxLayout="column" fxLayoutGap="10px" class="filters-container">
 
+            <!-- Filters title -->
+            <div fxFlex="100" fxLayoutAlign="start center">
+              <span class="filter-title">{{ t("lazy.filter.title") }} :</span>
+              <span *ngIf="filters.title" class="filter" fxLayoutAlign="center center">
+                {{ filters.title.length > 15 ? (filters.title | slice: 0:15) + '...' : filters.title }}
+                <mat-icon class="filter-icon" (click)="removeFilter('title')">clear</mat-icon>
+              </span>
+            </div>
+
+            <!-- Author name -->
+            <div fxFlex="100" fxLayoutAlign="start center">
+              <span class="filter-title">{{ t("lazy.filter.author") }} :</span>
+              <span *ngIf="filters.author" class="filter" fxLayoutAlign="center center">
+                {{ filters.title.author > 15 ? (filters.author | slice: 0:15) + '...' : filters.author }}
+                <mat-icon class="filter-icon" (click)="removeFilter('author')">clear</mat-icon>
+              </span>
+            </div>
+
+            <!-- Filters feed name -->
+            <div fxFlex="100" fxLayoutAlign="start center">
+              <span class="filter-title">{{ t("lazy.filter.feed") }} :</span>
+              <span *ngIf="feed_name" class="filter" fxLayoutAlign="center center">
+                {{ feed_name }}
+                <mat-icon class="filter-icon" (click)="removeFilter('feed')">clear</mat-icon>
+              </span>
+            </div>
+
             <!-- From - to -->
             <div fxFlex="100" fxLayout="row" fxLayoutAlign="space-between center">
 
@@ -24,33 +51,6 @@
                 <span class="filter-title">{{ t("lazy.filter.to") }} :</span>
                 <span></span>
               </div>
-            </div>
-
-            <!-- Filters title -->
-            <div fxFlex="100" fxLayoutAlign="start center">
-              <span class="filter-title">{{ t("lazy.filter.title") }} :</span>
-              <span *ngIf="filters.title" class="filter" fxLayoutAlign="center center">
-                {{ filters.title.length > 15 ? (filters.title | slice: 0:15) + '...' : filters.title }}
-                <mat-icon class="filter-icon" (click)="removeFilter('title')">clear</mat-icon>
-              </span>
-            </div>
-
-            <!-- Filters feed name -->
-            <div fxFlex="100" fxLayoutAlign="start center">
-              <span class="filter-title">{{ t("lazy.filter.feed") }} :</span>
-              <span *ngIf="feed_name" class="filter" fxLayoutAlign="center center">
-                {{ feed_name }}
-                <mat-icon class="filter-icon" (click)="removeFilter('feed')">clear</mat-icon>
-              </span>
-            </div>
-
-            <!-- Author name -->
-            <div fxFlex="100" fxLayoutAlign="start center">
-              <span class="filter-title">{{ t("lazy.filter.author") }} :</span>
-              <span *ngIf="filters.author" class="filter" fxLayoutAlign="center center">
-                {{ filters.title.author > 15 ? (filters.author | slice: 0:15) + '...' : filters.author }}
-                <mat-icon class="filter-icon" (click)="removeFilter('author')">clear</mat-icon>
-              </span>
             </div>
           </div>
 
