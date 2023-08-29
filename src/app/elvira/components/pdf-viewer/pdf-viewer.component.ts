@@ -7,7 +7,7 @@ import { UserAcquisition, UserAcquisitionId } from 'src/app/types/acquisition.ty
 import { EntryService } from 'src/app/services/entry.service';
 import { TranslocoService } from '@ngneat/transloco';
 import { NotificationService } from 'src/app/services/general/notification.service';
-import { throwError } from 'rxjs';
+import { AppStateService } from 'src/app/services/general/app-state.service';
 
 @Component({
   selector: 'app-pdf-viewer',
@@ -26,6 +26,7 @@ export class PdfViewerComponent extends DisposableComponent implements OnInit {
     private translocoService: TranslocoService,
     private readonly notificationService: NotificationService,
     private readonly router: Router,
+    private readonly appStateService: AppStateService,
   ) {
     super();
     pdfDefaultOptions.assetsFolder = 'assets';
@@ -76,5 +77,9 @@ export class PdfViewerComponent extends DisposableComponent implements OnInit {
         .getUserAcquisition(this.user_acquisition_id, 'base64')
         .subscribe((data) => { this.base64 = data.response.data; });
     }
+  }
+
+  ngOnDestroy(): void {
+    this.appStateService.patchState({ footer_visible: true });
   }
 }

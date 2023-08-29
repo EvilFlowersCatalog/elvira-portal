@@ -12,8 +12,8 @@ import { Feed } from 'src/app/types/feed.types';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent extends DisposableComponent implements OnInit {
-  last_added_entries: Entry[]; // used in html
-  popular_entries: Entry[]; // used in html
+  last_added_entries: Entry[] = []; // used in html
+  popular_entries: Entry[] = []; // used in html
   main_feeds: Feed[]; // used in html
   screen_width: number; // used in html
 

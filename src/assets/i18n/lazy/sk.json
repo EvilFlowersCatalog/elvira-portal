@@ -17,7 +17,7 @@
     "summary": "Zhrnutie",
     "summaryHint": "Krátke zhrnutie dokumentu",
     "citation": "Citácia",
-    "citationHint": "Ocituj tento dokument",
+    "citationHint": "Ocituj tento dokument v BibTeX-u",
     "image": "Obrázok",
     "imageDropper": "Presuňte obrázok sem alebo kliknite sem a prehľadávajte",
     "imageError": "Obrázok je príliš veľký.",
@@ -148,16 +148,6 @@
     "feedDeleteSuccess": "Feed bol úspešne odstránený",
     "feedDeleteError": "Zmazanie feedu zlyhalo"
   },
-  "filter": {
-    "filters": "FILTRE",
-    "title": "Nadpis",
-    "feed": "Sekcia",
-    "author": "Autor",
-    "from": "Od",
-    "to": "Do",
-    "clear": "Vymazať filtre",
-    "nothingFound": "Nič nebolo nájdené"
-  },
   "addFeedDialog": {
     "title": "Feedy",
     "search": "Hľadať",
@@ -165,5 +155,8 @@
   },
   "pdfViewer": {
     "somethingWentWrong": "Niečo nevyšlo :/"
+  },
+  "library": {
+    "notFound": "Nič nebolo nájdené"
   }
 }

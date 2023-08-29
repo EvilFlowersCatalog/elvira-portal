@@ -33,7 +33,7 @@
 
     <!-- Feeds children list -->
     <div class="feed-page-feeds-container">
-      <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutAlign.xs="none" fxLayoutGap="16px grid">
+      <div fxLayout.gt-xs="row wrap" fxLayout.xs="column" fxLayoutGap="16px grid">
         <div fxFlex="20%" fxFlex.md="33.3%" fxFlex.sm="50%" fxFlex.xs="100%" *ngFor="let feed of feeds_children">
           <app-feed [feed]="feed"></app-feed>
         </div>

@@ -20,6 +20,9 @@ import { FeedsPageComponent } from './components/feeds-page/feeds-page.component
 import { FeedComponent } from './components/feed.component'
 import { CustomPaginationComponent } from '../services/general/custom-pagination.service';
 import { ElviraClickDirective } from './directives/elvira-click.directive';
+import { AboutProjectComponent } from './components/footer-components/about-project/about-project.component';
+import { ReaderSettingsComponent } from './components/footer-components/reader-settings/reader-settings.component';
+import { ChangeLogComponent } from './components/footer-components/change-log/change-log.component';
 
 @NgModule({
   declarations: [
@@ -34,6 +37,12 @@ import { ElviraClickDirective } from './directives/elvira-click.directive';
     FeedsPageComponent,
     FeedComponent,
     ElviraClickDirective,
+    AboutProjectComponent,
+    ReaderSettingsComponent,
+    ChangeLogComponent,
+    AboutProjectComponent,
+    ReaderSettingsComponent,
+    ChangeLogComponent
   ],
   imports: [
     CommonModule,

@@ -34,6 +34,14 @@
   overflow: hidden !important;
 }
 
+.visible {
+  display: block;
+}
+
+.hide {
+  display: none;
+}
+
 @media screen and (max-width: 500px) {
   .app-mobile-sidenav {
     width: 100%;

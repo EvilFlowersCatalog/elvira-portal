@@ -50,12 +50,12 @@
   <mat-dialog-actions fxLayout="row" fxLayoutAlign="space-evenly center">
 
     <!-- Cancel button -->
-    <button mat-button mat-dialog-close color="accent">
+    <button mat-button mat-dialog-close (click)="onNoClick()" color="accent">
       {{ t("lazy.advancedSearchDialog.cancel") }}
     </button>
 
     <!-- Find button -->
-    <button mat-button mat-dialog-close color="primary" form="advanced_form" (click)="search()">
+    <button mat-button mat-dialog-close color="primary" form="advanced_form" (click)="onYesClick()">
       {{ t("lazy.advancedSearchDialog.find") }}
     </button>
   </mat-dialog-actions>

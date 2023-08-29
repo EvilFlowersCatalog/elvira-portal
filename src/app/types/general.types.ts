@@ -33,4 +33,5 @@ export class Filters {
     this.feed = feed;
   }
   getFilters() { return `title=${this.title}&feed=${this.feed}&author=${this.author}`; }
+  isActive() { if (this.title || this.author || this.feed) return true; return false }
 }

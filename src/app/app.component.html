@@ -5,7 +5,7 @@
   <mat-sidenav-container>
 
     <!-- Sidenav -->
-    <mat-sidenav mode="over" [opened]="sidenav_state" [disableClose]="true" class="app-mobile-sidenav">
+    <mat-sidenav mode="over" [opened]="sidenav_state" disableClose="true" class="app-mobile-sidenav">
       <app-mobile-sidenav></app-mobile-sidenav>
     </mat-sidenav>
     <mat-sidenav-content>
@@ -17,8 +17,11 @@
           <!-- Body -->
           <router-outlet></router-outlet>
         </div>
+
         <!-- Footer -->
-        <app-footer></app-footer>
+        <div [ngClass]="footer_state">
+          <app-footer></app-footer>
+        </div>
       </div>
     </mat-sidenav-content>
   </mat-sidenav-container>

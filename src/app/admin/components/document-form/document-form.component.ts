@@ -52,7 +52,7 @@ export class DocumentFormComponent implements OnInit {
       citation: new UntypedFormControl(''),
       isbn: new UntypedFormControl(''),
       doi: new UntypedFormControl(''),
-      summary: new UntypedFormControl(''),
+      summary: new UntypedFormControl('', Validators.required),
     });
   }
 
@@ -308,10 +308,10 @@ export class DocumentFormComponent implements OnInit {
       language_code: 'sk',
       contributors: this.getContributors(),
       identifiers: {
-        doi: this.uploadForm.get('doi').value,
-        isbn: this.uploadForm.get('doi').value
+        doi: this.uploadForm.get('doi').value ? this.uploadForm.get('doi').value : null,
+        isbn: this.uploadForm.get('isbn').value ? this.uploadForm.get('isbn').value : null
       },
-      citation: this.uploadForm.get('citation').value,
+      citation: this.uploadForm.get('citation').value ? this.uploadForm.get('citation').value : null,
       image: await this.getBase(this.imageFile)
     };
     return entry;

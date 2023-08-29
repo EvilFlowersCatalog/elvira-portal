@@ -1,97 +1,7 @@
 .all-entries-container {
   background-color: transparent !important;
-  padding: 32px 0 16px 16px;
+  padding: 16px 0 16px 16px;
   flex: 1;
-}
-
-.all-entier-filter-container {
-  position: fixed;
-  top: 100px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  z-index: 1;
-}
-
-.all-entries-filter-button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0 10px;
-  width: 300px;
-  background-color: rgba(22, 22, 22, 0.9);
-}
-
-.all-entries-filters {
-  height: 0;
-  width: 90%;
-  margin-bottom: 0;
-  display: none;
-  align-items: center;
-  justify-content: flex-end;
-  overflow: hidden;
-  transition: height 0.7s ease, margin-bottom 0.7s ease;
-}
-
-.all-entries-filters-oppend {
-  height: 180px;
-  margin-bottom: 5px;
-}
-
-.filters-container {
-  width: 100%;
-  margin-bottom: 20px;
-}
-
-.filter-title {
-  color: white;
-}
-
-.filter {
-  display: flex;
-  margin-left: 20px;
-  color: white;
-}
-
-.filter-icon {
-  height: 20px;
-  width: 20px;
-  font-size: 20px;
-  margin-left: 20px;
-  color: #00bcd4;
-  cursor: pointer;
-}
-
-.filter-icon-delete {
-  height: 20px;
-  width: 20px;
-  font-size: 20px;
-  margin-left: 30px;
-  margin-top: -2px;
-  color: rgb(255, 40, 40);
-  cursor: pointer;
-}
-
-.all-entries-filter-icon {
-  color: #ffc107;
-  font-weight: bold;
-  transition: transform 0.7s ease;
-}
-
-.animate {
-  transform: rotate(180deg);
-}
-
-.library-title-FILTERS-container {
-  margin-left: 50px;
-  font-weight: bold;
-  color: white;
-}
-
-.all-entries-filter-rows-container {
-  width: 50%;
 }
 
 .entries-list-empty {
@@ -99,28 +9,23 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  font-size: 40px;
-  margin-bottom: 16px;
+  font-size: 50px;
+  margin-bottom: 300px;
   padding-right: 16px;
 }
 
 .all-entries-not-found-icon {
-  margin-top: 16px;
-  font-size: 50px;
-  width: 50px;
-  height: 50px;
-}
-
-.all-entries-delete-filter {
-  font-size: 20px;
-  width: 20px;
-  height: 20px;
-  color: red;
+  margin-top: 30px;
+  font-size: 80px;
+  width: 80px;
+  height: 80px;
   cursor: pointer;
+  transition: color 1s ease, transform 1s ease;
 }
 
-span {
-  font-size: 15px;
+.all-entries-not-found-icon:hover {
+  color: #ffc107;
+  transform: scale(1.05);
 }
 
 .entries-list-container {
@@ -136,15 +41,4 @@ span {
   .all-entries-search-field {
     width: 80%;
   }
-
-  .all-entries-filter-rows-container {
-    width: 100%;
-  }
-}
-
-@media screen and (max-width: 425px) {
-  .all-entries-filter-button {
-    width: 100%;
-  }
-
 }

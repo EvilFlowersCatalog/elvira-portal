@@ -9,8 +9,8 @@
 
         <!-- Feeds -->
         <div class="home-feeds-container">
-          <div fxLayout="column" class="home-feed-row-container" fxLayoutGap="16px grid">
-            <div fxFlex="100%" class="home-feed-element" *ngFor="let feed of main_feeds">
+          <div fxLayout="row wrap" fxLayout.xs="column" class="home-feed-row-container" fxLayoutGap="16px grid">
+            <div fxFlex="50" fxFlex.xs="100" class="home-feed-element" *ngFor="let feed of main_feeds">
               <app-feed [feed]="feed"></app-feed>
             </div>
           </div>
@@ -25,7 +25,7 @@
 
       <!-- Last added entries -->
       <div class="home-last-added-container">
-        <div class="home-titles">{{ t( "lazy.homeLibrary.lastAdded" ) }}</div>
+        <div *ngIf="last_added_entries.length > 0" class="home-titles">{{ t( "lazy.homeLibrary.lastAdded" ) }}</div>
 
         <!-- List of last added entries -->
         <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="16px grid">

@@ -1,77 +1,6 @@
 <ng-container *transloco="let t">
   <div class="all-entries-container">
 
-    <!-- Filter container -->
-    <div fxLayout="column" class="all-entier-filter-container">
-
-      <!-- Filters -->
-      <div fxLayout="column" class="all-entries-filter-button">
-        <div fxLayout="column" class="all-entries-filters" [ngClass]="{'all-entries-filters-oppend': show_filters}">
-
-          <div fxLayout="column" fxLayoutGap="10px" class="filters-container">
-
-            <!-- Filters title -->
-            <div fxFlex="100" fxLayoutAlign="start center">
-              <span class="filter-title">{{ t("lazy.filter.title") }} :</span>
-              <span *ngIf="filters.title" class="filter" fxLayoutAlign="center center">
-                {{ filters.title.length > 15 ? (filters.title | slice: 0:15) + '...' : filters.title }}
-                <mat-icon class="filter-icon" (click)="removeFilter('title')">clear</mat-icon>
-              </span>
-            </div>
-
-            <!-- Author name -->
-            <div fxFlex="100" fxLayoutAlign="start center">
-              <span class="filter-title">{{ t("lazy.filter.author") }} :</span>
-              <span *ngIf="filters.author" class="filter" fxLayoutAlign="center center">
-                {{ filters.title.author > 15 ? (filters.author | slice: 0:15) + '...' : filters.author }}
-                <mat-icon class="filter-icon" (click)="removeFilter('author')">clear</mat-icon>
-              </span>
-            </div>
-
-            <!-- Filters feed name -->
-            <div fxFlex="100" fxLayoutAlign="start center">
-              <span class="filter-title">{{ t("lazy.filter.feed") }} :</span>
-              <span *ngIf="feed_name" class="filter" fxLayoutAlign="center center">
-                {{ feed_name }}
-                <mat-icon class="filter-icon" (click)="removeFilter('feed')">clear</mat-icon>
-              </span>
-            </div>
-
-            <!-- From - to -->
-            <div fxFlex="100" fxLayout="row" fxLayoutAlign="space-between center">
-
-              <!-- From -->
-              <div fxFlex="45">
-                <span class="filter-title">{{ t("lazy.filter.from") }} :</span>
-                <span></span>
-              </div>
-
-              <!-- To -->
-              <div fxFlex="45">
-                <span class="filter-title">{{ t("lazy.filter.to") }} :</span>
-                <span></span>
-              </div>
-            </div>
-          </div>
-
-          <!-- title -->
-          <div class="library-title-FILTERS-container" fxLayoutAlign="center center">
-            {{ t("lazy.filter.filters") }}
-            <mat-icon matTooltip="{{ t('lazy.filter.clear') }}" class="filter-icon-delete"
-              (click)="clearFilter()">delete</mat-icon>
-          </div>
-
-        </div>
-
-        <!-- Filter icon -->
-        <div fxFill fxLayoutAlign="center center" style="cursor: pointer;" (click)="show_filters = !show_filters">
-          <mat-icon class="all-entries-filter-icon" [ngClass]="{'animate': show_filters}">
-            {{ !show_filters ? "filter_list" : "keyboard_arrow_down" }}
-          </mat-icon>
-        </div>
-      </div>
-    </div>
-
     <!-- List of founded entries -->
     <div *ngIf="entries.length > 0; else nothingFound" class="entries-list-container" fxLayout="row wrap"
       fxLayout.xs="column" fxLayoutGap="16px grid">
@@ -82,9 +11,10 @@
 
     <!-- IF there are no entries -->
     <ng-template #nothingFound>
-      <div class="entries-list-empty" fxLayout="column">
-        {{ t("lazy.filter.nothingFound") }}
-        <mat-icon class="all-entries-not-found-icon"> youtube_searched_for </mat-icon>
+      <!-- If the filter is active / only than show -->
+      <div *ngIf="filters.isActive()" class="entries-list-empty" fxLayout="column">
+        {{ t("lazy.library.notFound") }}
+        <mat-icon class="all-entries-not-found-icon" (click)="clearFilter()"> youtube_searched_for </mat-icon>
       </div>
     </ng-template>
 

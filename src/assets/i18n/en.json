@@ -24,6 +24,15 @@
     "advanced": "Advanced",
     "mobileAdvanced": "Advanced search",
     "search": "Search",
-    "library": "Library"
+    "library": "Library",
+    "filters": "Show filters",
+    "hideFilters": "Hide filters",
+    "title": "Title",
+    "feed": "Feed",
+    "author": "Author",
+    "from": "From",
+    "to": "To",
+    "clear": "Delete filters",
+    "nothingFound": "No documents found"
   }
 }

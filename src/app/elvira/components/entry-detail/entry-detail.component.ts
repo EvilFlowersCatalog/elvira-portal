@@ -5,6 +5,7 @@ import { TranslocoService } from '@ngneat/transloco';
 import { Entry } from 'src/app/types/entry.types';
 import { NavigationService } from 'src/app/services/general/navigation.service';
 import { Filters } from 'src/app/types/general.types';
+import { AppStateService } from 'src/app/services/general/app-state.service';
 
 @Component({
   selector: 'app-entry-detail',
@@ -19,6 +20,7 @@ export class EntryDetailComponent implements OnInit {
     private readonly navigationService: NavigationService,
     public dialog: MatDialog,
     private translocoService: TranslocoService,
+    private readonly appStateService: AppStateService,
   ) { }
 
   ngOnInit(): void {
@@ -27,6 +29,7 @@ export class EntryDetailComponent implements OnInit {
 
   // Open pdf
   openPdf(entry_id: string, event: any) {
+    this.appStateService.patchState({ footer_visible: false });
     this.navigationService.modifiedNavigation(`/elvira/pdf-viewer/${entry_id}`, event);
   }
 

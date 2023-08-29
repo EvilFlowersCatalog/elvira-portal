@@ -6,20 +6,17 @@ import { Filters } from 'src/app/types/general.types';
 @Component({
   selector: 'app-feed',
   template: `
-    <div class="feed-container" fxLayout="row" fxLayoutAlign="center center" (elviraclick)="feedNavigator($event)">
-      <mat-icon> book </mat-icon>
-      <div class="feed-info-container">
-        <div>{{ feed.title }}</div>
+    <div class="feed-container" fxLayout="column" fxLayoutAlign="center center" (elviraclick)="feedNavigator($event)">
+      <mat-icon class="feed-icon"> book </mat-icon>
+      <div fxLayoutAlign="center center" fxLayout="column">
+        <div class="feed-title">{{ feed.title }}</div>
         <p>{{ feed.content }}</p>
       </div>
     </div>
     `,
   styles: [`
     .feed-container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      border: 2px solid transparent;
       text-align: center;
       background-color: #00bcd4;
       height: 100%;
@@ -27,21 +24,18 @@ import { Filters } from 'src/app/types/general.types';
       cursor: pointer;
     }
 
-    .feed-info-container {
-      flex: 3;
-      align-items: center;
-      justify-content: center;
+    .feed-container:hover {
+      border: 2px solid;
     }
 
-    .feed-info-container div {
-      font-size: 30px;
-    }
-
-    .feed-container mat-icon {
-      flex: 1;
-      font-size: 50px;
-      height: 50px;
+    .feed-icon {
       width: 50px;
+      height: 50px;
+      font-size: 50px;
+    }
+
+    .feed-title {
+      font-size: 20px;
     }
 
     p {
@@ -49,13 +43,13 @@ import { Filters } from 'src/app/types/general.types';
     }
 
     @media screen and (max-width: 959px) {
-      .feed-info-container div {
-        font-size: 18px;
+      .feed-title {
+        font-size: 17px;
       }
     }
 
     @media screen and (max-width: 599px) {
-      .feed-info-container div {
+      .feed-title {
         font-size: 15px;
       }
     }

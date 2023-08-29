@@ -6,6 +6,9 @@ import { FavoritesComponent } from '../components/favorites/favorites.component'
 import { LibraryGuard } from './library.guard';
 import { HomeComponent } from '../components/home/home.component';
 import { FeedsPageComponent } from '../components/feeds-page/feeds-page.component';
+import { AboutProjectComponent } from '../components/footer-components/about-project/about-project.component';
+import { ReaderSettingsComponent } from '../components/footer-components/reader-settings/reader-settings.component';
+import { ChangeLogComponent } from '../components/footer-components/change-log/change-log.component';
 
 export const LIBRARY_ROUTES: Routes = [
   {
@@ -49,4 +52,19 @@ export const LIBRARY_ROUTES: Routes = [
     canActivate: [LibraryGuard],
     component: FavoritesComponent,
   },
+  {
+    path: 'about-project',
+    canActivate: [LibraryGuard],
+    component: AboutProjectComponent,
+  },
+  {
+    path: 'reader-settings',
+    canActivate: [LibraryGuard],
+    component: ReaderSettingsComponent,
+  },
+  {
+    path: 'change-log',
+    canActivate: [LibraryGuard],
+    component: ChangeLogComponent,
+  }
 ];

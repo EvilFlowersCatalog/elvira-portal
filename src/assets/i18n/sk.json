@@ -24,6 +24,15 @@
     "advanced": "Pokročilé",
     "mobileAdvanced": "Pokročilé hľadanie",
     "search": "Hľadať",
-    "library": "Knižnica"
+    "library": "Knižnica",
+    "filters": "Ukáž filtre",
+    "hideFilters": "Schovaj filtre",
+    "title": "Nadpis",
+    "feed": "Sekcia",
+    "author": "Autor",
+    "from": "Od",
+    "to": "Do",
+    "clear": "Vymazať filtre",
+    "nothingFound": "Nič nebolo nájdené"
   }
 }

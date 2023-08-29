@@ -47,6 +47,7 @@ export class EntryService {
    * @returns Answer
    */
   createEntry(entry: EntryNew) {
+    console.log(entry);
     return this.httpClient.post(
       environment.baseUrl + `/api/v1/catalogs/${environment.catalog_id}/entries`,
       entry

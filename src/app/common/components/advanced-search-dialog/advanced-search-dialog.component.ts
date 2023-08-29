@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
+import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
 import { Router } from '@angular/router';
 import { Filters } from 'src/app/types/general.types';
 
@@ -15,19 +15,29 @@ export class AdvancedSearchDialogComponent {
   data_source: { title: string, id: string }[] = []; // used in html
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public data,
+    public dialogRef: MatDialogRef<AdvancedSearchDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { filters: Filters },
     private readonly router: Router,
   ) {
     this.advanced_form = new UntypedFormGroup({
-      title: new UntypedFormControl(''),
-      author: new UntypedFormControl(''),
+      title: new UntypedFormControl(this.data.filters.title),
+      author: new UntypedFormControl(this.data.filters.author),
       from: new UntypedFormControl(''),
       to: new UntypedFormControl('')
     });
   }
 
-  // search, set new data to filter and move to library
-  search() {
-    this.router.navigateByUrl(`elvira/library/${new Filters(this.advanced_form?.value.title ?? '', this.advanced_form?.value.author ?? '').getFilters()}`);
+  // If close return no
+  onNoClick(): void {
+    this.dialogRef.close('no');
+  }
+
+  // if create return values
+  onYesClick(): void {
+    const { value, valid } = this.advanced_form;
+    if (valid) {
+      // set value of parents
+      this.dialogRef.close(value);
+    }
   }
 }

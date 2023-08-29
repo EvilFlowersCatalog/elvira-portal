@@ -17,7 +17,7 @@
     "summary": "Summary",
     "summaryHint": "Short summary about the document",
     "citation": "Citation",
-    "citationHint": "Citate this document",
+    "citationHint": "Citate this document in BibTeX",
     "image": "Image",
     "imageDropper": "Drag your image here or click here to browse",
     "imageError": "The image is too big.",
@@ -148,16 +148,6 @@
     "feedDeleteSuccess": "Feed has been deleted successfully",
     "feedDeleteError": "Feed deletion failed"
   },
-  "filter": {
-    "filters": "FILTERS",
-    "title": "Title",
-    "feed": "Feed",
-    "author": "Author",
-    "from": "From",
-    "to": "To",
-    "clear": "Delete filters",
-    "nothingFound": "No documents found"
-  },
   "addFeedDialog": {
     "title": "Feeds",
     "search": "Search",
@@ -165,5 +155,8 @@
   },
   "pdfViewer": {
     "somethingWentWrong": "Something went wrong :/"
+  },
+  "library": {
+    "notFound": "Nothing was found"
   }
 }

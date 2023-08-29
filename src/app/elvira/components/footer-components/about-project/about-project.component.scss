@@ -1,0 +1,22 @@
+.about-project-container {
+  background-color: transparent !important;
+  padding: 16px;
+  flex: 1;
+}
+
+.about-project-title {
+  padding: 10px;
+  border-bottom: 5px solid #ffc107;
+  margin-bottom: 16px;
+}
+
+p {
+  width: 50%;
+  text-align: justify;
+}
+
+@media screen and (max-width: 599px) {
+  p {
+    width: 95%;
+  }
+}

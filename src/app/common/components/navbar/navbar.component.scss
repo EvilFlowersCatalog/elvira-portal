@@ -166,7 +166,8 @@
   outline: none;
   font-size: 17px;
   color: white;
-  border-bottom: 2px solid transparent;
+  border-bottom: 2px solid;
+  margin-bottom: 5px;
 }
 
 .navbar-form-input::placeholder {
@@ -180,4 +181,68 @@
 
 .navbar-form-input:focus {
   border-bottom: 2px solid #ffc107;
+}
+
+.navbar-filter-button {
+  color: white;
+  cursor: pointer;
+  font-weight: 300;
+  margin-left: 16px;
+  margin-right: 5px;
+  margin-bottom: 10px;
+  transition: transform 0.7s ease, margin-bottom 0.7s ease;
+}
+
+.navbar-filter-button:hover {
+  color: #ffc107;
+}
+
+.filters-container {
+  position: fixed;
+  top: 100px;
+  overflow: hidden;
+  right: 0;
+  height: 0;
+  width: 300px;
+  transition: height 0.7s ease;
+}
+
+.filters-inner-container {
+  padding: 16px;
+  background-color: rgba(22, 22, 22, 0.9);
+}
+
+.filters-container-opened {
+  height: 230px;
+}
+
+.filter-title {
+  color: white;
+  font-size: 15px;
+}
+
+.filter {
+  display: flex;
+  font-size: 15px;
+  margin-left: 20px;
+  color: white;
+}
+
+.filter-icon {
+  height: 20px;
+  width: 20px;
+  font-size: 20px;
+  margin-left: 20px;
+  color: #00bcd4;
+  cursor: pointer;
+}
+
+.filter-icon-delete {
+  color: rgb(255, 40, 40);
+  cursor: pointer;
+}
+
+.animate {
+  transform: rotate(180deg);
+  margin-bottom: 0;
 }

@@ -19,4 +19,4 @@ import { LoginFormComponent } from './components/login-form/login-form.component
     TranslocoRootModule,
   ],
 })
-export class AuthModule {}
+export class AuthModule { }

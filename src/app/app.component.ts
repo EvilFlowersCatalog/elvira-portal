@@ -8,6 +8,7 @@ import { AppStateService } from './services/general/app-state.service';
 import { LoadingService } from './services/general/loading.service';
 import { IconLoaderService } from './services/general/icon-loader.service';
 import { State } from './types/general.types';
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,7 @@ import { State } from './types/general.types';
 export class AppComponent extends DisposableComponent {
   // Variables
   background: string; // used in html
+  footer_state: string; // used in html
   sidenav_state: boolean; // used in html
   windowStoreChange$: Observable<any>;
 
@@ -25,6 +27,7 @@ export class AppComponent extends DisposableComponent {
     private readonly langService: TranslocoService,
     private readonly loadingService: LoadingService,
     private readonly iconLoaderService: IconLoaderService,
+    private readonly router: Router,
     private renderer: Renderer2,
     @Inject(DOCUMENT) private document: Document
   ) {
@@ -32,6 +35,17 @@ export class AppComponent extends DisposableComponent {
   }
 
   ngOnInit() {
+    // If we are at pdf-viewer hide footer
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        if (event.toString().includes("/elvira/pdf-viewer/")) {
+          this.footer_state = 'hide'
+        } else { // else visible
+          this.footer_state = 'visible'
+        }
+      }
+    });
+
     this.appStateService
       .getState$()
       .pipe(takeUntil(this.destroySignal$))
