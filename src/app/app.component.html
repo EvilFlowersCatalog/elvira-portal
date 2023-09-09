@@ -1,7 +1,9 @@
 <div>
 
   <!-- Header -->
-  <app-header class="app-header"></app-header>
+  <div [ngClass]="visibility">
+    <app-header class="app-header"></app-header>
+  </div>
   <mat-sidenav-container>
 
     <!-- Sidenav -->
@@ -12,16 +14,14 @@
 
       <!-- App -->
       <div [ngClass]="background">
-        <div class="app-content">
+        <div class="app-content" [ngClass]="{'app-content-viewer': pdfViewer}">
 
           <!-- Body -->
           <router-outlet></router-outlet>
         </div>
 
         <!-- Footer -->
-        <div [ngClass]="footer_state">
-          <app-footer></app-footer>
-        </div>
+        <app-footer [ngClass]="visibility"></app-footer>
       </div>
     </mat-sidenav-content>
   </mat-sidenav-container>

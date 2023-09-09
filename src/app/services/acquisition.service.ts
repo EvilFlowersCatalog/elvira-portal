@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { AcquisitionDetail, UserAcquisition, UserAcquisitionData } from '../types/acquisition.types';
+import { AcquisitionDetail, UserAcquisition, UserAcquisitionData, UserAcquisitionShare } from '../types/acquisition.types';
 
 @Injectable({
   providedIn: 'root',
@@ -26,7 +26,7 @@ export class AcquisitionService {
    * @param user_acquisition UserAcquisition type, ...
    * @returns Answer
    */
-  createUserAcquisition(user_acquisition: UserAcquisition) {
+  createUserAcquisition(user_acquisition: UserAcquisition | UserAcquisitionShare) {
     return this.httpClient.post(
       environment.baseUrl + `/api/v1/user-acquisitions`,
       user_acquisition

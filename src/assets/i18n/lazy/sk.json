@@ -17,7 +17,7 @@
     "summary": "Zhrnutie",
     "summaryHint": "Krátke zhrnutie dokumentu",
     "citation": "Citácia",
-    "citationHint": "Ocituj tento dokument v BibTeX-u",
+    "citationHint": "Vložte BibTeX citáciu pre tento dokument",
     "image": "Obrázok",
     "imageDropper": "Presuňte obrázok sem alebo kliknite sem a prehľadávajte",
     "imageError": "Obrázok je príliš veľký.",

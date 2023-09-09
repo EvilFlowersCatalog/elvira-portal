@@ -36,6 +36,7 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     // Get feed id
     this.route.paramMap
       .pipe(takeUntil(this.destroySignal$))

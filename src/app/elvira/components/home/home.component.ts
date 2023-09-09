@@ -29,6 +29,7 @@ export class HomeComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     // Get last added entries
     this.entryService.getEntriesList({
       page: 0,

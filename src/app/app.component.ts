@@ -18,7 +18,8 @@ import { Router, NavigationEnd } from '@angular/router';
 export class AppComponent extends DisposableComponent {
   // Variables
   background: string; // used in html
-  footer_state: string; // used in html
+  visibility: string; // used in html
+  pdfViewer: boolean; // used in html
   sidenav_state: boolean; // used in html
   windowStoreChange$: Observable<any>;
 
@@ -39,9 +40,11 @@ export class AppComponent extends DisposableComponent {
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
         if (event.toString().includes("/elvira/pdf-viewer/")) {
-          this.footer_state = 'hide'
+          this.visibility = 'hide';
+          this.pdfViewer = true;
         } else { // else visible
-          this.footer_state = 'visible'
+          this.visibility = 'visible';
+          this.pdfViewer = false;
         }
       }
     });
@@ -57,7 +60,7 @@ export class AppComponent extends DisposableComponent {
     this.loadingService.loadingStatus$
       .pipe(
         tap((status) => {
-          if (status) {
+          if (status && !this.pdfViewer) { // not for pdfViewer, described in pdf-viewer
             this.loadingService.onShowLoading();
           } else {
             this.loadingService.onHideLoading();

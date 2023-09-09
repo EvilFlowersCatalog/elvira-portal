@@ -13,9 +13,22 @@ export interface UserAcquisition {
   type: string;
 }
 
+export interface UserAcquisitionShare {
+  acquisition_id: string;
+  type: string;
+  range: string;
+  expires_at: string;
+}
+
 export interface UserAcquisitionId {
   response: {
     id: string;
+  }
+}
+
+export interface UserAcquisitionAbsoluteUrl {
+  response: {
+    url: string;
   }
 }
 

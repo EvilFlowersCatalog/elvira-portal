@@ -29,7 +29,6 @@ export class EntryDetailComponent implements OnInit {
 
   // Open pdf
   openPdf(entry_id: string, event: any) {
-    this.appStateService.patchState({ footer_visible: false });
     this.navigationService.modifiedNavigation(`/elvira/pdf-viewer/${entry_id}`, event);
   }
 

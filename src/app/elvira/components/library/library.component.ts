@@ -36,6 +36,7 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     this.routeSubscription = this.route.paramMap.subscribe(params => {
       const filters = params.get('filters');
       this.getFilters(filters); // Reload data based on the updated filters value

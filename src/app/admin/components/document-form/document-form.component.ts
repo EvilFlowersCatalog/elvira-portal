@@ -381,7 +381,7 @@ export class DocumentFormComponent implements OnInit {
 
   // Check if image has valid size
   checkImageSize() {
-    if (this.imageFile.size < 1024 * 1024) {
+    if (this.imageFile.size < (1024 * 1024) * 5) { // 5MB
       this.validSize = true;
       return true;
     } else {

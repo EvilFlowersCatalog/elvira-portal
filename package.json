@@ -7,7 +7,6 @@
     "build": "ng build",
     "build:dev": "ng build -c development",
     "build:prod": "ng build -c production",
-    "build:local": "ng build -c local",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
@@ -25,7 +24,7 @@
     "@angular/platform-browser": "^16.1.2",
     "@angular/platform-browser-dynamic": "^16.1.2",
     "@angular/router": "^16.1.2",
-    "@evilflowers/evilflowersviewer": "^0.2.0",
+    "@evilflowers/evilflowersviewer": "^0.3.2",
     "@ngneat/transloco": "^4.3.0",
     "form-data": "^2.3.3",
     "is-svg": "^4.3.1",

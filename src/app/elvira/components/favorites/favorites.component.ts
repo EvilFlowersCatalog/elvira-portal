@@ -22,6 +22,7 @@ export class FavoritesComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    window.scrollTo(0, 0);
     // Commented out because of 404 - not implemented yet on BE side
     // this.fetchEntries$
     //   .asObservable()
