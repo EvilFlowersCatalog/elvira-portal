@@ -33,7 +33,6 @@
   padding-bottom: 16px;
 }
 
-
 .navbar-buttons-container {
   justify-content: flex-start;
   align-items: flex-end;
@@ -51,6 +50,26 @@
   font-size: 17px;
   padding: auto;
   transition: tansform 1s ease;
+}
+
+.navbar-library-counter {
+  opacity: 0;
+  display: none;
+}
+.navbar-counter-visible {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  bottom: 3px;
+  right: -8.5px;
+  height: 15px;
+  min-width: 15px;
+  padding: 0 5px;
+  border-radius: 50%;
+  background-color: red;
+  font-size: 10px;
+  opacity: 1;
 }
 
 .navbar-main-button:hover {

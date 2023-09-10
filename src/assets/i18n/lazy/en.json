@@ -66,6 +66,7 @@
     "delete-tooltip": "Delete document",
     "info-pdf-tooltip": "Show info",
     "favorite-pdf-tooltip": "Add to favorite list",
+    "remove-favorite-pdf-tooltip": "Remove from favorite list",
     "open-pdf-tooltip": "Open PDF",
     "addToFavoritesSuccessMessage": "Item was successfully added to favorites",
     "addToFavoritesErrorMessage": "Failed to add item to favorites",
@@ -109,6 +110,7 @@
     "previous-page": "Previous page"
   },
   "favorites": {
+    "search": "Search",
     "emptyFavorites": "There is no item in this list"
   },
   "feed": {

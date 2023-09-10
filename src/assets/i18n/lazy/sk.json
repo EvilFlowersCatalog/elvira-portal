@@ -66,6 +66,7 @@
     "delete-tooltip": "Vymazať dokument",
     "info-pdf-tooltip": "Zobraziť informácie",
     "favorite-pdf-tooltip": "Pridať do obľúbených",
+    "remove-favorite-pdf-tooltip": "Odstrániť z obľúbených",
     "open-pdf-tooltip": "Otvoriť PDF",
     "addToFavoritesSuccessMessage": "Položka bola pridaná do obľúbených",
     "addToFavoritesErrorMessage": "Pridanie položky do obľúbených zlyhalo",
@@ -109,6 +110,7 @@
     "previous-page": "Predchádzajúca stránka"
   },
   "favorites": {
+    "search": "Hľadať",
     "emptyFavorites": "V tomto zozname sa nenachádza žiadna položka"
   },
   "feed": {

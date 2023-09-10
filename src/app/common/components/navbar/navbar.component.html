@@ -1,44 +1,76 @@
 <ng-container *transloco="let t; read: 'navbar'">
   <ng-container *ngIf="appState$ | async as appState">
     <mat-toolbar fxLayout="row" class="navbar-container">
-
       <!-- First column -->
-      <div class="navbar-first-column" [ngClass]="{'navbar-first-column-offline': !appState.isLoggedIn}">
-
+      <div
+        class="navbar-first-column"
+        [ngClass]="{ 'navbar-first-column-offline': !appState.isLoggedIn }"
+      >
         <!-- First row  -->
         <div fxLayout="row" class="navbar-images-first-row">
-
           <!-- Image (Elvira) first row -->
-          <img src="../../../../assets/logos/title_logo.png" class="navbar-image"
-            (elviraclick)="navigate('/elvira/home', $event)">
+          <img
+            src="../../../../assets/logos/title_logo.png"
+            class="navbar-image"
+            (elviraclick)="navigate('/elvira/home', $event)"
+          />
 
           <!-- STU logo -->
-          <img src="../../../../assets/logos/fiit_logo.png" class="navbar-image-stu-logo" (elviraclick)="goToSTU()">
+          <img
+            src="../../../../assets/logos/fiit_logo.png"
+            class="navbar-image-stu-logo"
+            (elviraclick)="goToSTU()"
+          />
         </div>
 
         <!-- Second row -->
-        <div *ngIf="appState.isLoggedIn" fxLayout="row" class="navbar-buttons-container">
-
+        <div
+          *ngIf="appState.isLoggedIn"
+          fxLayout="row"
+          class="navbar-buttons-container"
+        >
           <!-- Home button -->
-          <button (elviraclick)="navigate('/elvira/home', $event)" class="navbar-main-button">
+          <button
+            (elviraclick)="navigate('/elvira/home', $event)"
+            class="navbar-main-button"
+          >
             <mat-icon class="navbar-icon">home</mat-icon>
             {{ t("home") }}
           </button>
 
           <!-- Library button -->
-          <button (elviraclick)="navigateToLibrary($event)" class="navbar-main-button">
+          <button
+            (elviraclick)="navigateToLibrary($event)"
+            class="navbar-main-button"
+          >
             <mat-icon class="navbar-icon"> menu_book </mat-icon>
             {{ t("library") }}
           </button>
 
           <!-- Favorites button -->
-          <button (elviraclick)="navigate('/elvira/favorites', $event)" class="navbar-main-button">
+          <button
+            (elviraclick)="navigate('/elvira/favorites', $event)"
+            class="navbar-main-button"
+            style="position: relative"
+          >
             <mat-icon class="navbar-icon">favorite</mat-icon>
-            {{t("favorites")}}
+            {{ t("favorites") }}
+            <div
+              class="navbar-library-counter"
+              [ngClass]="{
+                'navbar-counter-visible': appState.count
+              }"
+            >
+              {{ appState.count }}
+            </div>
           </button>
 
           <!-- Admin button -->
-          <button *ngIf="appState.isAdmin" (elviraclick)="navigate('/elvira/admin', $event)" class="navbar-main-button">
+          <button
+            *ngIf="appState.isAdmin"
+            (elviraclick)="navigate('/elvira/admin', $event)"
+            class="navbar-main-button"
+          >
             Admin
           </button>
         </div>
@@ -46,10 +78,8 @@
 
       <!-- Second column -->
       <div class="navbar-second-column">
-
         <!-- First row -->
         <div fxLayout="row" class="navbar-top-row">
-
           <!-- Translate button -->
           <div *ngIf="appState.lang === 'en'; else enVersionBtn">
             <!-- sk -->
@@ -71,26 +101,47 @@
             <mat-icon>dark_mode</mat-icon>
             <span class="navbar-spacer"></span>
             <mat-icon>light_mode</mat-icon>
-            <div class="navbar-button-theme-circle" [ngClass]="{'navbar-button-theme-circle-dark-mode': theme}"></div>
+            <div
+              class="navbar-button-theme-circle"
+              [ngClass]="{ 'navbar-button-theme-circle-dark-mode': theme }"
+            ></div>
           </button>
 
           <!-- Account button -->
-          <button [matMenuTriggerFor]="accountMenu" class="navbar-button" *ngIf="appState.isLoggedIn">
-            <img [src]="avatar_url" class="navbar-acc-picture">
+          <button
+            [matMenuTriggerFor]="accountMenu"
+            class="navbar-button"
+            *ngIf="appState.isLoggedIn"
+          >
+            <img [src]="avatar_url" class="navbar-acc-picture" />
           </button>
         </div>
 
         <!-- Second row -->
-        <div *ngIf="appState.isLoggedIn" fxLayout="row" class="navbar-bottom-row">
-
+        <div
+          *ngIf="appState.isLoggedIn"
+          fxLayout="row"
+          class="navbar-bottom-row"
+        >
           <!-- Search form -->
-          <form [formGroup]="search_form" (submit)="submit()" class="navbar-form">
-            <div fxLayout="row" fxLayoutAlign="end end" class="navbar-form-field-container">
+          <form
+            [formGroup]="search_form"
+            (submit)="submit()"
+            class="navbar-form"
+          >
+            <div
+              fxLayout="row"
+              fxLayoutAlign="end end"
+              class="navbar-form-field-container"
+            >
               <div fxFill fxLayout="start end" class="navbar-form-field">
-
                 <!-- Input -->
-                <input placeholder="{{ t('search') }}" formControlName="search_input" class="navbar-form-input"
-                  type="search" />
+                <input
+                  placeholder="{{ t('search') }}"
+                  formControlName="search_input"
+                  class="navbar-form-input"
+                  type="search"
+                />
               </div>
 
               <!-- Button for submit -->
@@ -106,48 +157,82 @@
           </button>
 
           <!-- Filter button -->
-          <mat-icon matTooltip="{{ !show_filters ? t('filters') : t('hideFilters') }}" class="navbar-filter-button"
-            [ngClass]="{'animate': show_filters}" (click)="show_filters = !show_filters">
+          <mat-icon
+            matTooltip="{{ !show_filters ? t('filters') : t('hideFilters') }}"
+            class="navbar-filter-button"
+            [ngClass]="{ animate: show_filters }"
+            (click)="show_filters = !show_filters"
+          >
             {{ !show_filters ? "filter_list" : "keyboard_arrow_down" }}
           </mat-icon>
-
         </div>
       </div>
 
       <!-- Filters list -->
-      <div class="filters-container" [ngClass]="{'filters-container-opened': show_filters}">
-        <div fxLayout="column" fxLayoutGap="10px" class="filters-inner-container">
-
+      <div
+        class="filters-container"
+        [ngClass]="{ 'filters-container-opened': show_filters }"
+      >
+        <div
+          fxLayout="column"
+          fxLayoutGap="10px"
+          class="filters-inner-container"
+        >
           <!-- Filters title -->
           <div fxFlex="100" fxLayoutAlign="start center">
             <span class="filter-title">{{ t("title") }} :</span>
-            <span *ngIf="filters.title" class="filter" fxLayoutAlign="center center">
-              {{ filters.title.length > 15 ? (filters.title | slice: 0:15) + '...' : filters.title }}
-              <mat-icon class="filter-icon" (click)="removeFilter('title')">clear</mat-icon>
+            <span
+              *ngIf="filters.title"
+              class="filter"
+              fxLayoutAlign="center center"
+            >
+              {{
+                filters.title.length > 15
+                  ? (filters.title | slice : 0 : 15) + "..."
+                  : filters.title
+              }}
+              <mat-icon class="filter-icon" (click)="removeFilter('title')"
+                >clear</mat-icon
+              >
             </span>
           </div>
 
           <!-- Author name -->
           <div fxFlex="100" fxLayoutAlign="start center">
             <span class="filter-title">{{ t("author") }} :</span>
-            <span *ngIf="filters.author" class="filter" fxLayoutAlign="center center">
-              {{ filters.title.author > 15 ? (filters.author | slice: 0:15) + '...' : filters.author }}
-              <mat-icon class="filter-icon" (click)="removeFilter('author')">clear</mat-icon>
+            <span
+              *ngIf="filters.author"
+              class="filter"
+              fxLayoutAlign="center center"
+            >
+              {{
+                filters.title.author > 15
+                  ? (filters.author | slice : 0 : 15) + "..."
+                  : filters.author
+              }}
+              <mat-icon class="filter-icon" (click)="removeFilter('author')"
+                >clear</mat-icon
+              >
             </span>
           </div>
 
           <!-- Filters feed name -->
           <div fxFlex="100" fxLayoutAlign="start center">
             <span class="filter-title">{{ t("feed") }} :</span>
-            <span *ngIf="feed_name" class="filter" fxLayoutAlign="center center">
+            <span
+              *ngIf="feed_name"
+              class="filter"
+              fxLayoutAlign="center center"
+            >
               {{ feed_name }}
-              <mat-icon class="filter-icon" (click)="removeFilter('feed')">clear</mat-icon>
+              <mat-icon class="filter-icon" (click)="removeFilter('feed')"
+                >clear</mat-icon
+              >
             </span>
           </div>
 
           <!-- From - to -->
           <div fxFlex="100" fxLayout="row" fxLayoutAlign="space-between center">
-
             <!-- From -->
             <div fxFlex="45">
               <span class="filter-title">{{ t("from") }} :</span>
@@ -162,13 +247,16 @@
           </div>
 
           <div fxFLex="100" fxLayoutAlign="center center">
-            <mat-icon matTooltip="{{ t('clear') }}" class="filter-icon-delete" (click)="clearFilter()">
+            <mat-icon
+              matTooltip="{{ t('clear') }}"
+              class="filter-icon-delete"
+              (click)="clearFilter()"
+            >
               delete
             </mat-icon>
           </div>
         </div>
       </div>
-
     </mat-toolbar>
 
     <!-- Account mat menu -->

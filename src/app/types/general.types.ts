@@ -5,9 +5,10 @@ export interface State {
   username: string;
   userId: string;
   isAdmin: boolean;
-  theme: string;
+  theme: 'dark' | 'light';
   lang: string;
   sidenav: boolean;
+  count: number;
 }
 
 export interface Metadata {
@@ -32,6 +33,11 @@ export class Filters {
     this.author = author;
     this.feed = feed;
   }
-  getFilters() { return `title=${this.title}&feed=${this.feed}&author=${this.author}`; }
-  isActive() { if (this.title || this.author || this.feed) return true; return false }
+  getFilters() {
+    return `title=${this.title}&feed=${this.feed}&author=${this.author}`;
+  }
+  isActive() {
+    if (this.title || this.author || this.feed) return true;
+    return false;
+  }
 }

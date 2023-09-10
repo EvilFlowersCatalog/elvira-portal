@@ -1,0 +1,41 @@
+### Changelog
+
+#### 2.0.0 : 2023-09-09
+
+- **Added**: Library component and page
+- **Added**: Footer
+- **Added**: Share function in pdf-viewer
+- **Added**: Entry component for admin
+- **Added**: Feed component for admin
+- **Added**: Page for feeds that users use
+- **Added**: Feed component used in feed page
+- **Added**: Global folder for services and types
+- **Added**: Feed dialog in admin
+- **Added**: Footer components such as 'about project', 'change log' and 'reader settings'
+- **Added**: Evira directive, for own buttin click handler
+- **Added**: Rooting for new pages such as elvira/library
+- **Added**: Swiper for popular entries
+- **Added**: Sentences in translating
+- **Added**: Favorites service
+- **Added**: Favorites types
+- **Added**: Markdown library for change log
+- **Added**: Service for elvira directive, modified navigator
+- **Chnaged**: Routing for new components
+- **Chnaged**: Names for components
+- **Chnaged**: Entrey types
+- **Chnaged**: Loading component
+- **Changed**: Home component and page
+- **Changed**: In admin add-entry
+- **Changed**: In admin add feed
+- **Changed**: Login page
+- **Changed**: Name library.module -> elvira.module
+- **Changed**: Filters
+- **Changed**: Services and types to global
+- **Changed**: Favorites
+- **Changed**: Endpoints and overall functions that are used for endpoints call
+- **Changed**: Entry detail component
+- **Changed**: Entry detail info dialog
+- **Changed**: Header changed and buttons init
+- **Changed**: Interpretors
+- **Changed**: Project design
+- **Changed**: Nearly everything

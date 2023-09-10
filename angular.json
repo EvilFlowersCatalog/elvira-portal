@@ -42,10 +42,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "allowedCommonJsDependencies": [
-              "js-guid",
-              "flat"
-            ],
+            "allowedCommonJsDependencies": ["js-guid", "flat"],
             "outputPath": "dist/elibrary-portal",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -54,6 +51,7 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
+              "src/CHANGELOG.md",
               {
                 "glob": "**/*",
                 "input": "node_modules/ngx-extended-pdf-viewer/assets/",
@@ -144,10 +142,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "assets": [
-              "src/favicon.ico",
-              "src/assets"
-            ],
+            "assets": ["src/favicon.ico", "src/assets", "src/CHANGELOG.md"],
             "styles": [
               {
                 "input": "node_modules/@progress/kendo-theme-default/dist/all.css"
@@ -166,9 +161,7 @@
               "tsconfig.spec.json",
               "e2e/tsconfig.json"
             ],
-            "exclude": [
-              "**/node_modules/**"
-            ]
+            "exclude": ["**/node_modules/**"]
           }
         },
         "e2e": {

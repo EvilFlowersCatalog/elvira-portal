@@ -1,27 +1,52 @@
 <ng-container *transloco="let t">
   <div class="all-entries-container">
-
     <!-- List of founded entries -->
-    <div *ngIf="entries.length > 0; else nothingFound" class="entries-list-container" fxLayout="row wrap"
-      fxLayout.xs="column" fxLayoutGap="16px grid">
-      <div fxFlex="14.28%" fxFlex.md="25%" fxFlex.sm="33.3%" fxFlex.xs="100%" *ngFor="let entry of entries">
-        <app-entry-detail [entry]="entry"></app-entry-detail>
+    <div
+      *ngIf="entries.length > 0; else nothingFound"
+      class="entries-list-container"
+      fxLayout="row wrap"
+      fxLayout.xs="column"
+      fxLayoutGap="16px grid"
+    >
+      <div
+        fxFlex="14.28%"
+        fxFlex.md="25%"
+        fxFlex.sm="33.3%"
+        fxFlex.xs="100%"
+        *ngFor="let entry of entries"
+      >
+        <app-entry-detail
+          [entry]="entry"
+          [show]="true"
+          (onLikedChange)="reload()"
+        ></app-entry-detail>
       </div>
     </div>
 
     <!-- IF there are no entries -->
     <ng-template #nothingFound>
       <!-- If the filter is active / only than show -->
-      <div *ngIf="filters.isActive()" class="entries-list-empty" fxLayout="column">
+      <div
+        *ngIf="filters.isActive()"
+        class="entries-list-empty"
+        fxLayout="column"
+      >
         {{ t("lazy.library.notFound") }}
-        <mat-icon class="all-entries-not-found-icon" (click)="clearFilter()"> youtube_searched_for </mat-icon>
+        <mat-icon class="all-entries-not-found-icon" (click)="clearFilter()">
+          youtube_searched_for
+        </mat-icon>
       </div>
     </ng-template>
 
     <!-- Paginator -->
     <div fxLayoutAlign="center center">
-      <mat-paginator (page)="handlePageChange()" #paginator [length]="resultsLength" [pageSizeOptions]="[15, 30, 50]"
-        class="home-paginator">
+      <mat-paginator
+        (page)="handlePageChange()"
+        #paginator
+        [length]="resultsLength"
+        [pageSizeOptions]="[15, 30, 50]"
+        class="home-paginator"
+      >
       </mat-paginator>
     </div>
   </div>

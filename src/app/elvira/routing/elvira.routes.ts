@@ -3,14 +3,14 @@ import { AdminGuard } from 'src/app/admin/routing/admin.guard';
 import { LibraryComponent } from '../components/library/library.component';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
 import { FavoritesComponent } from '../components/favorites/favorites.component';
-import { LibraryGuard } from './library.guard';
+import { ElviraGuard } from './elvira.guard';
 import { HomeComponent } from '../components/home/home.component';
 import { FeedsPageComponent } from '../components/feeds-page/feeds-page.component';
 import { AboutProjectComponent } from '../components/footer-components/about-project/about-project.component';
 import { ReaderSettingsComponent } from '../components/footer-components/reader-settings/reader-settings.component';
 import { ChangeLogComponent } from '../components/footer-components/change-log/change-log.component';
 
-export const LIBRARY_ROUTES: Routes = [
+export const ELVIRA_ROUTES: Routes = [
   {
     path: 'admin',
     canLoad: [AdminGuard],
@@ -24,7 +24,7 @@ export const LIBRARY_ROUTES: Routes = [
   },
   {
     path: 'home',
-    canActivate: [LibraryGuard],
+    canActivate: [ElviraGuard],
     component: HomeComponent,
   },
   {
@@ -34,37 +34,37 @@ export const LIBRARY_ROUTES: Routes = [
   },
   {
     path: 'feeds/:feed_id',
-    canActivate: [LibraryGuard],
+    canActivate: [ElviraGuard],
     component: FeedsPageComponent,
   },
   {
     path: 'library/:filters',
-    canActivate: [LibraryGuard],
+    canActivate: [ElviraGuard],
     component: LibraryComponent,
   },
   {
     path: 'pdf-viewer/:entry_id',
-    canActivate: [LibraryGuard],
+    canActivate: [ElviraGuard],
     component: PdfViewerComponent,
   },
   {
     path: 'favorites',
-    canActivate: [LibraryGuard],
+    canActivate: [ElviraGuard],
     component: FavoritesComponent,
   },
   {
     path: 'about-project',
-    canActivate: [LibraryGuard],
+    canActivate: [ElviraGuard],
     component: AboutProjectComponent,
   },
   {
     path: 'reader-settings',
-    canActivate: [LibraryGuard],
+    canActivate: [ElviraGuard],
     component: ReaderSettingsComponent,
   },
   {
     path: 'change-log',
-    canActivate: [LibraryGuard],
+    canActivate: [ElviraGuard],
     component: ChangeLogComponent,
-  }
+  },
 ];

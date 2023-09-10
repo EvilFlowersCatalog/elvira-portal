@@ -1,7 +1,7 @@
-import { EntryAcquisition } from "./acquisition.types";
-import { EntryAuthor } from "./author.types";
-import { Feed } from "./feed.types";
-import { Metadata } from "./general.types";
+import { EntryAcquisition } from './acquisition.types';
+import { EntryAuthor } from './author.types';
+import { Feed } from './feed.types';
+import { Metadata } from './general.types';
 
 export interface EntriesList {
   items: Entry[];
@@ -20,6 +20,7 @@ export interface Entry {
   catalog_id: string;
   created_at: string;
   updated_at: string;
+  shelf_record_id: string;
   thumbnail: string;
 }
 
@@ -42,6 +43,7 @@ export interface EntryDetail {
     acquisitions: EntryAcquisition[];
     citation: string;
     img: string;
+    shelf_record_id: string;
     thumbnail: string;
   };
 }
@@ -57,13 +59,13 @@ export interface EntryQuery {
 
 export interface EntryNew {
   title: string;
-  author: EntryAuthor
+  author: EntryAuthor;
   feeds: string[];
   summary: string;
   language_code: string;
   contributors: EntryAuthor[];
   identifiers: EntryIdentifiers;
-  citation: string,
+  citation: string;
   image: any;
 }
 

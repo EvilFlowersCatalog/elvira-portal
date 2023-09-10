@@ -1,13 +1,16 @@
 import { AfterViewInit, Component, Input, OnChanges } from '@angular/core';
 import { AcquisitionService } from 'src/app/services/acquisition.service';
-import { UserAcquisitionAbsoluteUrl, UserAcquisitionShare } from 'src/app/types/acquisition.types';
-//import { renderViewer } from '@evilflowers/evilflowersviewer';
-import { renderViewer } from '../../../../../../../Elvira-viewer/EvilFlowersViewer/src/lib/components/Viewer';
+import {
+  UserAcquisitionAbsoluteUrl,
+  UserAcquisitionShare,
+} from 'src/app/types/acquisition.types';
+import { AppStateService } from 'src/app/services/general/app-state.service';
+import { renderViewer } from '@evilflowers/evilflowersviewer';
+//import { renderViewer } from '../../../../../../../Viewer/EvilFlowersViewer/src/lib/components/Viewer';
 
 @Component({
   selector: 'evil-flowers-viewer-wrapper',
   template: `<div [id]="rootId"></div>`,
-  //styleUrls: ['../../../../../node_modules/@evilflowers/evilflowersviewer/dist/styles.css']
 })
 export class AppWrapperComponent implements OnChanges, AfterViewInit {
   @Input() base64: string;
@@ -16,7 +19,10 @@ export class AppWrapperComponent implements OnChanges, AfterViewInit {
   public rootId = 'pdf-viewer-wrapper'; // used in html
   private hasViewLoaded = false;
 
-  constructor(private readonly acquisitionService: AcquisitionService) { }
+  constructor(
+    private readonly acquisitionService: AcquisitionService,
+    private readonly appStateService: AppStateService
+  ) {}
 
   public ngOnChanges() {
     this.renderComponent();
@@ -31,8 +37,17 @@ export class AppWrapperComponent implements OnChanges, AfterViewInit {
     if (!this.hasViewLoaded) {
       return;
     }
+
+    // Get state for lang and theme
+    const state = this.appStateService.getStateSnapshot();
+
     // evil flowers viewer render func
-    renderViewer(this.rootId, this.base64, { shareFunction: this.shareFunction });
+    renderViewer(this.rootId, this.base64, {
+      citationBib: this.citation ?? null,
+      shareFunction: this.shareFunction,
+      lang: state.lang,
+      theme: state.theme,
+    });
   }
 
   /**
@@ -47,8 +62,8 @@ export class AppWrapperComponent implements OnChanges, AfterViewInit {
       acquisition_id: this.acquisitionId,
       range: pages,
       type: 'shared',
-      expires_at: expireDate
-    }
+      expires_at: expireDate,
+    };
     console.log(userAcquisitionShare);
     let link = '';
 
@@ -61,8 +76,8 @@ export class AppWrapperComponent implements OnChanges, AfterViewInit {
       })
       .catch((err) => {
         console.log('Error:', err);
-      })
+      });
 
-    return '';
-  }
+    return link;
+  };
 }

@@ -1,46 +1,76 @@
 <ng-container *transloco="let t">
-  <div
-    class="favorite-entries-container"
-    fxLayout="row wrap"
-    fxLayout.xs="column"
-    fxLayoutGap="16px grid"
-  >
-    <ng-container *ngIf="entries.length > 0; else empty">
-      <div
-        fxFlex="20%"
-        fxFlex.xs="100%"
-        fxFlex.sm="33.3%"
-        fxFlex.md="25%"
-        *ngFor="let entry of entries"
-      >
-        <app-entry-detail
-          (onDeleteFromFavorites)="deleteFromFavorites($event)"
-          [entry]="entry"
-        ></app-entry-detail>
-      </div>
-    </ng-container>
-    <ng-template #empty>
-      <div
-        fxLayout="row"
-        fxLayoutAlign="center center"
-        class="favorites-empty-row"
-      >
-        <h1 class="favorites-empty-text">
-          {{ t("lazy.favorites.emptyFavorites") }}
-        </h1>
-      </div>
-    </ng-template>
-  </div>
-  <div fxLayoutAlign="center center">
-    <mat-paginator
-      *ngIf="entries.length > 0"
-      #paginator
-      (page)="favoritePagination()"
-      [length]="resultsLength"
-      [pageSizeOptions]="[15, 30, 50]"
-      class="favorites-paginator"
-      aria-label="Select page"
+  <div class="favorities-container" fxLayout="column">
+    <!-- Form for search -->
+    <form
+      [formGroup]="searchForm"
+      (submit)="submit()"
+      fxLayoutAlign="start center"
+      fxFlex="100%"
+      fxLayout="row"
     >
-    </mat-paginator>
+      <!-- Search form field -->
+      <mat-form-field fxFlex.gt-xs="50%" fxFlex.xs="100%" color="accent">
+        <mat-label>{{ t("lazy.favorites.search") }}</mat-label>
+
+        <!-- input -->
+        <input matInput formControlName="search" />
+      </mat-form-field>
+
+      <!-- Button for submit -->
+      <button mat-icon-button type="submit" color="accent">
+        <mat-icon>search</mat-icon>
+      </button>
+    </form>
+
+    <!-- Entries -->
+    <div
+      fxFlex="100%"
+      fxLayout="row wrap"
+      fxLayout.xs="column"
+      fxLayoutGap="16px grid"
+    >
+      <ng-container *ngIf="favorities.length > 0; else empty">
+        <div
+          fxFlex="14.28%"
+          fxFlex.md="25%"
+          fxFlex.sm="33.3%"
+          fxFlex.xs="100%"
+          *ngFor="let favorite of favorities"
+        >
+          <app-entry-detail
+            [entry]="favorite.entry"
+            [show]="true"
+            (onLikedChange)="reload()"
+          ></app-entry-detail>
+        </div>
+      </ng-container>
+
+      <!-- If favorities are empty -->
+      <ng-template #empty>
+        <div
+          fxLayout="row"
+          fxLayoutAlign="center center"
+          class="favorites-empty-row"
+        >
+          <h1 class="favorites-empty-text">
+            {{ t("lazy.favorites.emptyFavorites") }}
+          </h1>
+        </div>
+      </ng-template>
+    </div>
+
+    <!-- Paginator -->
+    <div fxLayoutAlign="center center">
+      <mat-paginator
+        *ngIf="favorities.length > 0"
+        #paginator
+        (page)="favoritePagination()"
+        [length]="resultsLength"
+        [pageSizeOptions]="[15, 30, 50]"
+        class="favorites-paginator"
+        aria-label="Select page"
+      >
+      </mat-paginator>
+    </div>
   </div>
 </ng-container>

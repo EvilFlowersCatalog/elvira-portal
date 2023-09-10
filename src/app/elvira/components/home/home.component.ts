@@ -19,8 +19,10 @@ export class HomeComponent extends DisposableComponent implements OnInit {
 
   constructor(
     private readonly entryService: EntryService,
-    private readonly feedService: FeedService,
-  ) { super() }
+    private readonly feedService: FeedService
+  ) {
+    super();
+  }
 
   // For html component in popupal entries -> only shows when screen is < 599
   @HostListener('window:resize', ['$event'])
@@ -29,31 +31,35 @@ export class HomeComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    window.scrollTo(0, 0);
     // Get last added entries
-    this.entryService.getEntriesList({
-      page: 0,
-      limit: 10,
-      order_by: "-created_at"
-    })
+    this.entryService
+      .getEntriesList({
+        page: 0,
+        limit: 10,
+        order_by: '-created_at',
+      })
       .subscribe((data) => {
-        this.last_added_entries = data.items
+        this.last_added_entries = data.items;
+        window.scrollTo(0, 0);
       });
     // Get top most popular entries
-    this.entryService.getEntriesList({
-      page: 0,
-      limit: 5,
-      order_by: "-popularity"
-    })
+    this.entryService
+      .getEntriesList({
+        page: 0,
+        limit: 5,
+        order_by: '-popularity',
+      })
       .subscribe((data) => {
-        this.popular_entries = data.items
+        this.popular_entries = data.items;
       });
 
     // Get main feeds
-    this.feedService.getFeedsList({
-      page: 0,
-      limit: 4,
-      parent_id: "null" // query for main feeds (has no parent)
-    }).subscribe((data) => this.main_feeds = data.items);
+    this.feedService
+      .getFeedsList({
+        page: 0,
+        limit: 4,
+        parent_id: 'null', // query for main feeds (has no parent)
+      })
+      .subscribe((data) => (this.main_feeds = data.items));
   }
 }

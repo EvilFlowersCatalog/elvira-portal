@@ -5,13 +5,20 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class NavigationService {
-  constructor(private readonly router: Router) { }
+  constructor(private readonly router: Router) {}
 
   // Navigation with possibility to open with new tab
   modifiedNavigation(link: string, event: PointerEvent | MouseEvent = null) {
     // handle ctrl + left click or middle click
-    if (event?.ctrlKey || event?.button === 1 || event?.metaKey) { // 1 indicates middle
-      window.open(this.router.serializeUrl(this.router.createUrlTree([link])), '_blank');
+    if (
+      event?.ctrlKey ||
+      event?.button === 1 || // 1 indicates middle
+      (event?.metaKey && window.navigator.userAgent.includes('Macintosh'))
+    ) {
+      window.open(
+        this.router.serializeUrl(this.router.createUrlTree([link])),
+        '_blank'
+      );
     } else {
       this.router.navigateByUrl(link);
     }

@@ -1,24 +1,63 @@
-<div class="footer-container" fxLayout.gt-sm="row" fxLayout.sm="column" fxLayout.xs="column" fxLayoutGap="16px">
-  <div class="footer-main-content-container" fxLayout.gt-sm="row" fxLayout.sm="column" fxLayout.xs="column"
-    fxLayoutAlign="space-evenly center" fxLayoutGap="16px">
-
+<div
+  class="footer-container"
+  fxLayout.gt-sm="row"
+  fxLayout.sm="column"
+  fxLayout.xs="column"
+  fxLayoutGap="16px"
+>
+  <div
+    class="footer-main-content-container"
+    fxLayout.gt-sm="row"
+    fxLayout.sm="column"
+    fxLayout.xs="column"
+    fxLayoutAlign="space-evenly center"
+    fxLayoutGap="16px"
+  >
     <!-- Elvira image -->
-    <img src="../../../../assets/logos/title_logo.png" alt="elvira-logo" class="footer-image"
-      (elviraclick)="navigate('/elvira/home', $event)">
+    <img
+      src="../../../../assets/logos/title_logo.png"
+      alt="elvira-logo"
+      class="footer-image"
+      (elviraclick)="navigate('/elvira/home', $event)"
+    />
 
     <!-- STU image -->
-    <img src="../../../../assets/logos/fiit_logo.png" alt="elvira-logo" class="footer-image" (elviraclick)="goToSTU()">
+    <img
+      src="../../../../assets/logos/fiit_logo.png"
+      alt="elvira-logo"
+      class="footer-image"
+      (elviraclick)="goToSTU()"
+    />
 
     <!-- About project -->
-    <p (elviraclick)="navigate('/elvira/about-project', $event)" class="footer-button">O projekte</p>
+    <p
+      (elviraclick)="navigate('/elvira/about-project', $event)"
+      class="footer-button"
+    >
+      O projekte
+    </p>
 
     <!-- Reader settings -->
-    <p (elviraclick)="navigate('/elvira/reader-settings', $event)" class="footer-button">Nastavenie čítačky</p>
+    <p
+      (elviraclick)="navigate('/elvira/reader-settings', $event)"
+      class="footer-button"
+    >
+      Nastavenie čítačky
+    </p>
   </div>
 
   <!-- Version and change-log -->
-  <div class="footer-version-container" fxLayoutAlign.gt-sm="end center" fxLayoutAlign.sm="center center"
-    fxLayoutAlign.xs="center center">
-    <p>verzia: 2.0.0(<span (elviraclick)="navigate('/elvira/change-log', $event)">change log</span>)</p>
+  <div
+    class="footer-version-container"
+    fxLayoutAlign.gt-sm="end center"
+    fxLayoutAlign.sm="center center"
+    fxLayoutAlign.xs="center center"
+  >
+    <p>
+      verzia: {{ version }}(<span
+        (elviraclick)="navigate('/elvira/change-log', $event)"
+        >change log</span
+      >)
+    </p>
   </div>
 </div>

@@ -1,11 +1,7 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
 import { Subject, Subscription } from 'rxjs';
-import {
-  concatMap,
-  startWith,
-  takeUntil,
-} from 'rxjs/operators';
+import { concatMap, startWith, takeUntil } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { MediaObserver } from '@angular/flex-layout';
 import { Entry } from 'src/app/types/entry.types';
@@ -30,14 +26,13 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
     private readonly entryService: EntryService,
     private readonly route: ActivatedRoute,
     public mediaObserver: MediaObserver,
-    private readonly router: Router,
+    private readonly router: Router
   ) {
     super();
   }
 
   ngOnInit(): void {
-    window.scrollTo(0, 0);
-    this.routeSubscription = this.route.paramMap.subscribe(params => {
+    this.routeSubscription = this.route.paramMap.subscribe((params) => {
       const filters = params.get('filters');
       this.getFilters(filters); // Reload data based on the updated filters value
     });
@@ -49,18 +44,21 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
       .pipe(
         takeUntil(this.destroySignal$),
         startWith([]),
-        concatMap(() => this.entryService.getEntriesList({
-          page: this.paginator?.pageIndex ?? 0,
-          limit: this.paginator?.pageSize ?? 15,
-          title: this.filters.title,
-          feed_id: this.filters.feed,
-          author: this.filters.author
-        }))
+        concatMap(() =>
+          this.entryService.getEntriesList({
+            page: this.paginator?.pageIndex ?? 0,
+            limit: this.paginator?.pageSize ?? 15,
+            title: this.filters.title,
+            feed_id: this.filters.feed,
+            author: this.filters.author,
+          })
+        )
       )
       .subscribe((data) => {
         this.entries = data.items;
         this.results_length = data.metadata.total;
         this.paginator.pageIndex = data.metadata.page - 1;
+        window.scrollTo(0, 0);
       });
   }
 
@@ -76,14 +74,14 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
     const extracted_values = {};
 
     // Loop through the array and extract parameter-value pairs
-    params_array.forEach(param => {
+    params_array.forEach((param) => {
       const [key, value] = param.split('=');
       extracted_values[key] = value;
     });
 
-    this.filters.title = extracted_values["title"] ?? '';
-    this.filters.feed = extracted_values["feed"] ?? '';
-    this.filters.author = extracted_values["author"] ?? '';
+    this.filters.title = extracted_values['title'] ?? '';
+    this.filters.feed = extracted_values['feed'] ?? '';
+    this.filters.author = extracted_values['author'] ?? '';
     this.fetchEntries$.next();
   }
 
@@ -94,5 +92,9 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
       this.filters.author = '';
       this.router.navigateByUrl(`/elvira/library/${this.filters.getFilters()}`);
     }
+  }
+
+  reload() {
+    this.fetchEntries$.next();
   }
 }

@@ -1,24 +1,44 @@
 <ng-container *transloco="let t">
   <div class="entry-detail-container">
     <mat-card class="entry-detail-card">
-
       <!-- Image of entry if there is no image -->
-      <div class="entry-detail-image-container" (elviraclick)="openPdf(entry.id, $event)">
+      <div
+        class="entry-detail-image-container"
+        (elviraclick)="openPdf(entry.id, $event)"
+      >
         <div *ngIf="image_src === 'none'; else image">
-          <img mat-card-image src="../../../../assets/no_image.png" class="entry-detail-image" />
+          <img
+            mat-card-image
+            src="../../../../assets/no_image.png"
+            class="entry-detail-image"
+          />
         </div>
 
         <!-- Image if there is image -->
         <ng-template #image>
-          <img mat-card-image [src]="image_src" class="entry-detail-image" />
+          <img
+            mat-card-image
+            [src]="entry.thumbnail"
+            class="entry-detail-image"
+          />
         </ng-template>
       </div>
 
       <!-- Feeds list of current entry -->
-      <div class="entry-detail-content">
-        <div fxLayout="row wrap" fxLayoutGap="5px" class="entry-detail-feeds-container">
+      <div
+        class="entry-detail-content"
+        [ngClass]="{ 'entry-detail-content-show': show }"
+      >
+        <div
+          fxLayout="row wrap"
+          fxLayoutGap="5px"
+          class="entry-detail-feeds-container"
+        >
           <div *ngFor="let feed of entry.feeds">
-            <div class="entry-detail-feed" (elviraclick)="navigate(feed.id, $event)">
+            <div
+              class="entry-detail-feed"
+              (elviraclick)="navigate(feed.id, $event)"
+            >
               {{ feed.title }}
             </div>
           </div>
@@ -26,22 +46,50 @@
       </div>
 
       <!-- Buttons -->
-      <div fxLayout="row" fxLayoutAlign="space-around" class="entry-detail-actions">
-
+      <div
+        fxLayout="row"
+        fxLayoutAlign="space-around"
+        class="entry-detail-actions"
+        *ngIf="show"
+      >
         <!-- Info button -->
-        <button mat-icon-button matTooltip="{{ t('lazy.entryDetail.info-pdf-tooltip') }}" (click)="showInfo(entry.id)">
+        <button
+          mat-icon-button
+          matTooltip="{{ t('lazy.entryDetail.info-pdf-tooltip') }}"
+          (click)="showInfo(entry.id)"
+        >
           <mat-icon> info_outline </mat-icon>
         </button>
 
         <!-- Favorite button -->
-        <button mat-icon-button matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}">
+        <button
+          *ngIf="!entry.shelf_record_id; else liked"
+          mat-icon-button
+          matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
+          (click)="addToFavorite(entry.id)"
+        >
           <mat-icon> favorite_border </mat-icon>
         </button>
+
+        <!-- If entry was added to favorite -->
+        <ng-template #liked>
+          <button
+            mat-icon-button
+            matTooltip="{{ t('lazy.entryDetail.remove-favorite-pdf-tooltip') }}"
+            (click)="removeFromFavorite(entry.shelf_record_id, entry.id)"
+          >
+            <mat-icon> favorite </mat-icon>
+          </button>
+        </ng-template>
       </div>
     </mat-card>
 
     <!-- Entry title -->
-    <div class="entry-detail-title" [title]="entry.title" (elviraclick)="openPdf(entry.id, $event)">
+    <div
+      class="entry-detail-title"
+      [title]="entry.title"
+      (elviraclick)="openPdf(entry.id, $event)"
+    >
       {{ entry.title }}
     </div>
   </div>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core'
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -27,7 +27,7 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
   constructor(
     private readonly route: ActivatedRoute,
     private readonly feedService: FeedService,
-    private readonly router: Router,
+    private readonly router: Router
   ) {
     super();
     this.search_form = new UntypedFormGroup({
@@ -36,7 +36,6 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    window.scrollTo(0, 0);
     // Get feed id
     this.route.paramMap
       .pipe(takeUntil(this.destroySignal$))
@@ -48,8 +47,9 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
       });
 
     // Get feed detail
-    this.feedService.getFeedDetail(this.feed_id)
-      .subscribe((data) => this.title = data.response.title);
+    this.feedService
+      .getFeedDetail(this.feed_id)
+      .subscribe((data) => (this.title = data.response.title));
 
     // Used for continually changing feeds
     this.fetchFeeds$
@@ -57,18 +57,20 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
       .pipe(
         takeUntil(this.destroySignal$),
         startWith([]),
-        concatMap((title: string = "") => this.feedService.getFeedsList({
-          page: this.paginator?.pageIndex ?? 0,
-          limit: this.paginator?.pageSize ?? 15,
-          parent_id: this.feed_id,
-          title: title
-        }))
+        concatMap((title: string = '') =>
+          this.feedService.getFeedsList({
+            page: this.paginator?.pageIndex ?? 0,
+            limit: this.paginator?.pageSize ?? 15,
+            parent_id: this.feed_id,
+            title: title,
+          })
+        )
       )
       .subscribe((data) => {
         this.feeds_children = data.items;
         this.results_length = data.metadata.total;
         this.paginator.pageIndex = data.metadata.page - 1;
-      })
+      });
   }
 
   // Used in html, for clear input
@@ -81,18 +83,26 @@ export class FeedsPageComponent extends DisposableComponent implements OnInit {
   }
 
   goBack() {
-    if (this.feed_path.length > 1) { // if there is more than 1 id (means there is more than main feed) go back
+    if (this.feed_path.length > 1) {
+      // if there is more than 1 id (means there is more than main feed) go back
       this.feed_path.pop(); // remove last id
-      this.router.navigateByUrl(`/elvira/feeds/${this.feed_path[this.feed_path.length - 1]}`);
-    } else { // if there is only main feed_id
-      this.feed_path.pop(); // remove 
+      this.router.navigateByUrl(
+        `/elvira/feeds/${this.feed_path[this.feed_path.length - 1]}`
+      );
+    } else {
+      // if there is only main feed_id
+      this.feed_path.pop(); // remove
       this.router.navigateByUrl('/elvira/home');
     }
   }
 
   applyFilter() {
     this.was_applied = true;
-    this.fetchFeeds$.next(this.search_form?.value.search_input ? this.search_form?.value.search_input : "");
+    this.fetchFeeds$.next(
+      this.search_form?.value.search_input
+        ? this.search_form?.value.search_input
+        : ''
+    );
   }
 
   handlePageChange() {

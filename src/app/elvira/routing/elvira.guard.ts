@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { Router, ActivatedRouteSnapshot, RouterStateSnapshot, UrlTree } from '@angular/router';
+import {
+  Router,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+  UrlTree,
+} from '@angular/router';
 import { Observable, interval } from 'rxjs';
 import { AuthService } from 'src/app/services/auth.service';
 import { AppStateService } from 'src/app/services/general/app-state.service';
@@ -8,7 +13,7 @@ import { UserRefreshToken } from 'src/app/types/user.types';
 @Injectable({
   providedIn: 'root',
 })
-export class LibraryGuard {
+export class ElviraGuard {
   constructor(
     protected readonly authService: AuthService,
     protected readonly router: Router,

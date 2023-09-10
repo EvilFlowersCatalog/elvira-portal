@@ -1,16 +1,23 @@
 <ng-container *transloco="let t">
   <div fxLayout="column" class="home-container">
-
     <!-- Main page -->
     <div class="home-column-container">
-
       <!-- Upper row (feeds and popular entries) -->
       <div fxLayout="row" fxLayout.xs="column">
-
         <!-- Feeds -->
         <div class="home-feeds-container">
-          <div fxLayout="row wrap" fxLayout.xs="column" class="home-feed-row-container" fxLayoutGap="16px grid">
-            <div fxFlex="50" fxFlex.xs="100" class="home-feed-element" *ngFor="let feed of main_feeds">
+          <div
+            fxLayout="row wrap"
+            fxLayout.xs="column"
+            class="home-feed-row-container"
+            fxLayoutGap="16px grid"
+          >
+            <div
+              fxFlex="50"
+              fxFlex.xs="100"
+              class="home-feed-element"
+              *ngFor="let feed of main_feeds"
+            >
               <app-feed [feed]="feed"></app-feed>
             </div>
           </div>
@@ -18,19 +25,29 @@
 
         <!-- Popular netries -->
         <div fxFlex="19%" fxFlex.md="24%" fxFlex.sm="32.3%" fxFlex.xs="100%">
-          <div *ngIf="screen_width < 599" class="home-titles">{{ t( "lazy.homeLibrary.popular" ) }}</div>
+          <div *ngIf="screen_width < 599" class="home-titles">
+            {{ t("lazy.homeLibrary.popular") }}
+          </div>
           <app-swiper [swiper_entries]="popular_entries"></app-swiper>
         </div>
       </div>
 
       <!-- Last added entries -->
       <div class="home-last-added-container">
-        <div *ngIf="last_added_entries.length > 0" class="home-titles">{{ t( "lazy.homeLibrary.lastAdded" ) }}</div>
+        <div *ngIf="last_added_entries.length > 0" class="home-titles">
+          {{ t("lazy.homeLibrary.lastAdded") }}
+        </div>
 
         <!-- List of last added entries -->
         <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="16px grid">
-          <div fxFlex="20%" fxFlex.md="25%" fxFlex.sm="33.3%" fxFlex.xs="100%" *ngFor="let entry of last_added_entries">
-            <app-entry-detail [entry]="entry"></app-entry-detail>
+          <div
+            fxFlex="20%"
+            fxFlex.md="25%"
+            fxFlex.sm="33.3%"
+            fxFlex.xs="100%"
+            *ngFor="let entry of last_added_entries"
+          >
+            <app-entry-detail [entry]="entry" [show]="false"></app-entry-detail>
           </div>
         </div>
       </div>

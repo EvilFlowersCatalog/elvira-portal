@@ -11,7 +11,7 @@ import { map } from 'rxjs/operators';
 
 @Injectable()
 export class HttpResponseInterceptor implements HttpInterceptor {
-  constructor() { }
+  constructor() {}
 
   intercept(
     request: HttpRequest<any>,
