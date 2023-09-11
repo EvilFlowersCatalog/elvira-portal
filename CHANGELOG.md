@@ -43,6 +43,7 @@
 #### 2.0.1 : 2023-09-11
 
 - **Changed**: lib in tsconfig.json
+- **Changed**: evilFlowersViewer 0.3.4 -> 0.3.5
 - **Changed**: feed design (centering)
 - **Changed**: loading pdf from BE
 - **Delete**: Few useless lines in app-wrapper

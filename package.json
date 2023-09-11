@@ -1,6 +1,6 @@
 {
   "name": "elibrary-portal",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -24,7 +24,7 @@
     "@angular/platform-browser": "^16.1.2",
     "@angular/platform-browser-dynamic": "^16.1.2",
     "@angular/router": "^16.1.2",
-    "@evilflowers/evilflowersviewer": "^0.3.4",
+    "@evilflowers/evilflowersviewer": "^0.3.5",
     "@ngneat/transloco": "^4.3.0",
     "form-data": "^2.3.3",
     "is-svg": "^4.3.1",
