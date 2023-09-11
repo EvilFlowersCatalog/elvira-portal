@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { throwError } from 'rxjs';
-import { UntypedFormGroup, UntypedFormControl, UntypedFormArray, Validators } from '@angular/forms';
+import {
+  UntypedFormGroup,
+  UntypedFormControl,
+  UntypedFormArray,
+  Validators,
+} from '@angular/forms';
 import { catchError, take, tap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TitleValidators } from '../../validators/title.validator';
@@ -8,7 +13,7 @@ import { TranslocoService } from '@ngneat/transloco';
 import { FeedService } from 'src/app/services/feed.service';
 import { NotificationService } from 'src/app/services/general/notification.service';
 import { EntryService } from 'src/app/services/entry.service';
-import { EntryDetail, EntryNew } from 'src/app/types/entry.types';;
+import { EntryDetail, EntryNew } from 'src/app/types/entry.types';
 import { EntryAuthor } from 'src/app/types/author.types';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Feed } from 'src/app/types/feed.types';
@@ -26,7 +31,7 @@ export class DocumentFormComponent implements OnInit {
   imageFile: File; // used in html
   pdfFile: File; // used in html
   validSize: boolean = false; // used in html
-  entry_id: string;
+  entry_id: string = this.route.snapshot.paramMap.get('id') ?? '';
   isInEditMode: boolean = false; // used in html
   dataSource: { title: string; id: string }[] = []; // used in html
 
@@ -38,12 +43,12 @@ export class DocumentFormComponent implements OnInit {
     private readonly route: ActivatedRoute,
     private readonly titleValidator: TitleValidators,
     private readonly notificationService: NotificationService,
-    private translocoService: TranslocoService,
+    private translocoService: TranslocoService
   ) {
     this.uploadForm = new UntypedFormGroup({
       title: new UntypedFormControl('', {
         validators: [Validators.required],
-        asyncValidators: [titleValidator.titleValidator()],
+        asyncValidators: [titleValidator.titleValidator(this.entry_id)],
         updateOn: 'blur',
       }),
       authorName: new UntypedFormControl('', Validators.required),
@@ -58,22 +63,24 @@ export class DocumentFormComponent implements OnInit {
 
   ngOnInit(): void {
     // Get acquisition feeds
-    this.feedService.getFeedsList({
-      page: 0,
-      limit: 100,
-      kind: "acquisition"
-    })
+    this.feedService
+      .getFeedsList({
+        page: 0,
+        limit: 100,
+        kind: 'acquisition',
+      })
       .subscribe((dataSource) => {
-        dataSource.items.forEach(item => {
+        dataSource.items.forEach((item) => {
           this.dataSource.push({ title: item.title, id: item.id }); // set to dataSource in way we want
         });
       });
 
-    // Get entry id, if there is 
-    this.entry_id = this.route.snapshot.paramMap.get('id');
-    if (this.entry_id) { // is there
+    // if we have entry_id
+    if (this.entry_id) {
+      // is there
       this.isInEditMode = true; // it means we are in edit mode
-      this.entryService.getEntryDetail(this.entry_id) // get details of given entry
+      this.entryService
+        .getEntryDetail(this.entry_id) // get details of given entry
         .subscribe((response) => {
           // Set everything in form
           this.initUploadForm(response);
@@ -100,7 +107,10 @@ export class DocumentFormComponent implements OnInit {
   convertToImageFile(base64: string): void {
     const imageType = this.getImageType(base64); // get image type
     // replace first info, (cuz it will pass the atob func)
-    const base64WithoutPrefix = base64.replace(/^data:image\/[a-zA-Z]+;base64,/, '');
+    const base64WithoutPrefix = base64.replace(
+      /^data:image\/[a-zA-Z]+;base64,/,
+      ''
+    );
     // encode
     const byteCharacters = atob(base64WithoutPrefix);
     const byteNumbers = new Array(byteCharacters.length);
@@ -110,7 +120,9 @@ export class DocumentFormComponent implements OnInit {
     const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], { type: `image/${imageType}` }); // create Blob
     // Set image
-    this.imageFile = new File([blob], 'Picture', { type: `image/${imageType}` });
+    this.imageFile = new File([blob], 'Picture', {
+      type: `image/${imageType}`,
+    });
   }
 
   // Set data in edit mode to form
@@ -122,7 +134,7 @@ export class DocumentFormComponent implements OnInit {
       summary: data.response.summary,
       doi: data.response.identifiers.doi,
       isbn: data.response.identifiers.isbn,
-      citation: data.response.citation
+      citation: data.response.citation,
     });
   }
 
@@ -173,9 +185,9 @@ export class DocumentFormComponent implements OnInit {
     // after dialog is closed
     dialogRef
       .afterClosed()
-      .subscribe((result: { title: string, id: string }) => {
+      .subscribe((result: { title: string; id: string }) => {
         if (result) {
-          let contains = false
+          let contains = false;
           // Check if it's already used
           for (let i = 0; i < this.feeds.length; i++) {
             if (this.feeds[i].id === result.id) {
@@ -203,13 +215,17 @@ export class DocumentFormComponent implements OnInit {
   async createOrUpdateEntry() {
     // If is in edit mode
     if (this.isInEditMode) {
-      if (this.uploadForm.invalid) {  // if something missing
+      if (this.uploadForm.invalid) {
+        // if something missing
         this.notificationService.error('Invalid upload form!');
-      } else if (!this.validSize) { // if image has not valid size
+      } else if (!this.validSize) {
+        // if image has not valid size
         this.notificationService.error('Invalid image size!');
-      } else if (!this.imageFile) { // if there is no image
+      } else if (!this.imageFile) {
+        // if there is no image
         this.notificationService.error('Seems like some files are missing!');
-      } else { // if everything is fine
+      } else {
+        // if everything is fine
         this.entryService
           .updateEntry(this.entry_id, await this.getFormData()) // get edited data
           .pipe(
@@ -235,13 +251,17 @@ export class DocumentFormComponent implements OnInit {
     }
     // Else is not in edited mode.. so it's upload
     else {
-      if (this.uploadForm.invalid) { // if anything is missing
+      if (this.uploadForm.invalid) {
+        // if anything is missing
         this.notificationService.error('Invalid upload form!');
-      } else if (!this.validSize) { // if image has not valid size
+      } else if (!this.validSize) {
+        // if image has not valid size
         this.notificationService.error('Invalid image size!');
-      } else if (!this.imageFile || !this.pdfFile) { // if there is no image or pdf
+      } else if (!this.imageFile || !this.pdfFile) {
+        // if there is no image or pdf
         this.notificationService.error('Seems like some files are missing!');
-      } else { // if everything is fine
+      } else {
+        // if everything is fine
         const newEntry = await this.getFormData(); // get data
 
         this.entryService
@@ -251,14 +271,17 @@ export class DocumentFormComponent implements OnInit {
               // if entry was created create acquisition as FormData
               let acquisitionData = new FormData();
               let metadata = {
-                relation: "open-access",
-              }
+                relation: 'open-access',
+              };
               acquisitionData.append('content', this.pdfFile);
               acquisitionData.append('metadata', JSON.stringify(metadata));
 
               try {
                 // upload acquistion
-                await this.entryService.uploadEntryAcquisition(acquisitionData, response.response.id);
+                await this.entryService.uploadEntryAcquisition(
+                  acquisitionData,
+                  response.response.id
+                );
 
                 const message = this.translocoService.translate(
                   'lazy.documentForm.successMessageUploadDocument'
@@ -267,9 +290,7 @@ export class DocumentFormComponent implements OnInit {
                 this.router.navigate(['../'], { relativeTo: this.route });
               } catch (error) {
                 // If something went wrong during uploading file, delete created entry
-                this.entryService
-                  .deleteEntry(response.response.id)
-                  .subscribe();
+                this.entryService.deleteEntry(response.response.id).subscribe();
 
                 const message = this.translocoService.translate(
                   'lazy.documentForm.errorMessageUploadDocument'
@@ -308,11 +329,17 @@ export class DocumentFormComponent implements OnInit {
       language_code: 'sk',
       contributors: this.getContributors(),
       identifiers: {
-        doi: this.uploadForm.get('doi').value ? this.uploadForm.get('doi').value : null,
-        isbn: this.uploadForm.get('isbn').value ? this.uploadForm.get('isbn').value : null
+        doi: this.uploadForm.get('doi').value
+          ? this.uploadForm.get('doi').value
+          : null,
+        isbn: this.uploadForm.get('isbn').value
+          ? this.uploadForm.get('isbn').value
+          : null,
       },
-      citation: this.uploadForm.get('citation').value ? this.uploadForm.get('citation').value : null,
-      image: await this.getBase(this.imageFile)
+      citation: this.uploadForm.get('citation').value
+        ? this.uploadForm.get('citation').value
+        : null,
+      image: await this.getBase(this.imageFile),
     };
     return entry;
   }
@@ -381,7 +408,8 @@ export class DocumentFormComponent implements OnInit {
 
   // Check if image has valid size
   checkImageSize() {
-    if (this.imageFile.size < (1024 * 1024) * 5) { // 5MB
+    if (this.imageFile.size < 1024 * 1024 * 5) {
+      // 5MB
       this.validSize = true;
       return true;
     } else {

@@ -2,16 +2,19 @@ import { HttpClient, HttpContext, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { EntriesList, EntryNew, EntryDetail, EntryQuery } from '../types/entry.types';
+import {
+  EntriesList,
+  EntryNew,
+  EntryDetail,
+  EntryQuery,
+} from '../types/entry.types';
 import { BYPASS_LOADING } from '../common/interceptors/http-request.interceptor';
 
 @Injectable({
   providedIn: 'root',
 })
 export class EntryService {
-  constructor(
-    private readonly httpClient: HttpClient
-  ) { }
+  constructor(private readonly httpClient: HttpClient) {}
 
   /**
    * @param query EntryQuery type, spceification for what entries we want
@@ -21,10 +24,18 @@ export class EntryService {
     let params = new HttpParams()
       .set('page', query.page + 1)
       .set('limit', query.limit);
-    if (query.title) { params = params.set('title', query.title); }
-    if (query.feed_id) { params = params.set('feed_id', query.feed_id); }
-    if (query.order_by) { params = params.set('order_by', query.order_by); }
-    if (query.author) { params = params.set('author', query.author); }
+    if (query.title) {
+      params = params.set('title', query.title);
+    }
+    if (query.feed_id) {
+      params = params.set('feed_id', query.feed_id);
+    }
+    if (query.order_by) {
+      params = params.set('order_by', query.order_by);
+    }
+    if (query.author) {
+      params = params.set('author', query.author);
+    }
 
     return this.httpClient.get<EntriesList>(
       environment.baseUrl + '/api/v1/entries',
@@ -38,7 +49,8 @@ export class EntryService {
    */
   getEntryDetail(entry_id: string): Observable<EntryDetail> {
     return this.httpClient.get<EntryDetail>(
-      environment.baseUrl + `/api/v1/catalogs/${environment.catalog_id}/entries/${entry_id}`
+      environment.baseUrl +
+        `/api/v1/catalogs/${environment.catalog_id}/entries/${entry_id}`
     );
   }
 
@@ -47,9 +59,9 @@ export class EntryService {
    * @returns Answer
    */
   createEntry(entry: EntryNew) {
-    console.log(entry);
     return this.httpClient.post(
-      environment.baseUrl + `/api/v1/catalogs/${environment.catalog_id}/entries`,
+      environment.baseUrl +
+        `/api/v1/catalogs/${environment.catalog_id}/entries`,
       entry
     );
   }
@@ -61,7 +73,8 @@ export class EntryService {
    */
   updateEntry(entry_id: string, entry: EntryNew) {
     return this.httpClient.put(
-      environment.baseUrl + `/api/v1/catalogs/${environment.catalog_id}/entries/${entry_id}`,
+      environment.baseUrl +
+        `/api/v1/catalogs/${environment.catalog_id}/entries/${entry_id}`,
       entry
     );
   }
@@ -72,7 +85,8 @@ export class EntryService {
    */
   deleteEntry(entry_id: string) {
     return this.httpClient.delete(
-      environment.baseUrl + `/api/v1/catalogs/${environment.catalog_id}/entries/${entry_id}`
+      environment.baseUrl +
+        `/api/v1/catalogs/${environment.catalog_id}/entries/${entry_id}`
     );
   }
 
@@ -82,10 +96,12 @@ export class EntryService {
    * @returns Answer
    */
   async uploadEntryAcquisition(acquisition: FormData, entry_id: string) {
-    return this.httpClient.post(
-      environment.baseUrl + `/api/v1/catalogs/${environment.catalog_id}/entries/${entry_id}`,
-      acquisition
-    )
+    return this.httpClient
+      .post(
+        environment.baseUrl +
+          `/api/v1/catalogs/${environment.catalog_id}/entries/${entry_id}`,
+        acquisition
+      )
       .toPromise();
   }
 

@@ -43,7 +43,7 @@ export class AppWrapperComponent implements OnChanges, AfterViewInit {
 
     // evil flowers viewer render func
     renderViewer(this.rootId, this.base64, {
-      citationBib: this.citation ?? null,
+      citationBib: this.citation,
       shareFunction: this.shareFunction,
       lang: state.lang,
       theme: state.theme,
@@ -64,7 +64,6 @@ export class AppWrapperComponent implements OnChanges, AfterViewInit {
       type: 'shared',
       expires_at: expireDate,
     };
-    console.log(userAcquisitionShare);
     let link = '';
 
     // create user acquistion and get url

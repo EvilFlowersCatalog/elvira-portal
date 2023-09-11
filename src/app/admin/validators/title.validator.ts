@@ -7,39 +7,41 @@ import { of } from 'rxjs';
 import { EntryService } from 'src/app/services/entry.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class TitleValidators {
   constructor(
     private http: HttpClient,
     private readonly entryService: EntryService
-  ) { }
+  ) {}
 
   searchTitle() {
     // Check if username is available
     return this.entryService.titleCheck().pipe(
-      map(
-        data => { return data.items; }
-      )
+      map((data) => {
+        return data.items;
+      })
     );
   }
 
-  titleValidator(): AsyncValidatorFn {
+  titleValidator(id: string): AsyncValidatorFn {
     return (control: AbstractControl) => {
-      if (!control.value) { return of(null); }
+      if (!control.value) {
+        return of(null);
+      }
       return this.searchTitle().pipe(
-        map(
-          data => {
-            if (data.some(item => item.title.toLocaleLowerCase() === control.value.toLocaleLowerCase())) {
-              return { 'titleExists': true };
-            }
-            else return null;
-          }
-        )
-      )
+        map((data) => {
+          if (
+            data.some(
+              (item) =>
+                item.title.toLocaleLowerCase() ===
+                  control.value.toLocaleLowerCase() && item.id !== id
+            )
+          ) {
+            return { titleExists: true };
+          } else return null;
+        })
+      );
     };
   }
-
 }
-
-

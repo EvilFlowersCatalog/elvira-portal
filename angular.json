@@ -42,7 +42,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "allowedCommonJsDependencies": ["js-guid", "flat"],
+            "allowedCommonJsDependencies": ["js-guid", "flat", "lodash"],
             "outputPath": "dist/elibrary-portal",
             "index": "src/index.html",
             "main": "src/main.ts",
@@ -51,10 +51,19 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/CHANGELOG.md",
               {
                 "glob": "**/*",
                 "input": "node_modules/ngx-extended-pdf-viewer/assets/",
+                "output": "/assets/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/@evilflowers/evilflowersviewer/dist/assets/",
+                "output": "/assets/"
+              },
+              {
+                "glob": "CHANGELOG.md",
+                "input": "./",
                 "output": "/assets/"
               }
             ],
@@ -142,7 +151,7 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "tsconfig.spec.json",
             "karmaConfig": "karma.conf.js",
-            "assets": ["src/favicon.ico", "src/assets", "src/CHANGELOG.md"],
+            "assets": ["src/favicon.ico", "src/assets"],
             "styles": [
               {
                 "input": "node_modules/@progress/kendo-theme-default/dist/all.css"

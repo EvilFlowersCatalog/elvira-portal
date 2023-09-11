@@ -20,10 +20,10 @@
 - **Added**: Favorites types
 - **Added**: Markdown library for change log
 - **Added**: Service for elvira directive, modified navigator
-- **Chnaged**: Routing for new components
-- **Chnaged**: Names for components
-- **Chnaged**: Entrey types
-- **Chnaged**: Loading component
+- **Changed**: Routing for new components
+- **Changed**: Names for components
+- **Changed**: Entrey types
+- **Changed**: Loading component
 - **Changed**: Home component and page
 - **Changed**: In admin add-entry
 - **Changed**: In admin add feed
@@ -39,3 +39,13 @@
 - **Changed**: Interpretors
 - **Changed**: Project design
 - **Changed**: Nearly everything
+
+#### 2.0.1 : 2023-09-11
+
+- **Changed**: lib in tsconfig.json
+- **Changed**: feed design (centering)
+- **Changed**: loading pdf from BE
+- **Delete**: Few useless lines in app-wrapper
+- **Moved**: CHANGLELOG.md from src folder
+- **Fixed**: title validator
+- **Fixed**: viewer searchWorker

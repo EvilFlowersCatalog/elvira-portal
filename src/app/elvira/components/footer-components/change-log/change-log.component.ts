@@ -26,7 +26,7 @@ export class ChangeLogComponent implements OnInit {
 
   ngOnInit(): void {
     this.markdownService
-      .getSource('CHANGELOG.md')
+      .getSource('assets/CHANGELOG.md')
       .subscribe((content: string) => {
         this.changeLog = content;
         window.scrollTo(0, 0);
