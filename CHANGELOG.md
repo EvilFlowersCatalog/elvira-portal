@@ -1,6 +1,17 @@
-### Changelog
+# Changelog
 
-#### 2.0.0 : 2023-09-09
+## 2.0.1 : 2023-09-11
+
+- **Changed**: lib in tsconfig.json
+- **Changed**: evilFlowersViewer 0.3.4 -> 0.3.5
+- **Changed**: feed design (centering)
+- **Changed**: loading pdf from BE
+- **Removed**: Few useless lines in app-wrapper
+- **Moved**: CHANGELOG.md from `src` folder
+- **Fixed**: title validator
+- **Fixed**: viewer searchWorker
+
+## 2.0.0 : 2023-09-09
 
 - **Added**: Library component and page
 - **Added**: Footer
@@ -11,8 +22,8 @@
 - **Added**: Feed component used in feed page
 - **Added**: Global folder for services and types
 - **Added**: Feed dialog in admin
-- **Added**: Footer components such as 'about project', 'change log' and 'reader settings'
-- **Added**: Evira directive, for own buttin click handler
+- **Added**: Footer components such as `about project`, `change log` and `reader settings`
+- **Added**: Elvira directive, for own button click handler
 - **Added**: Rooting for new pages such as elvira/library
 - **Added**: Swiper for popular entries
 - **Added**: Sentences in translating
@@ -22,7 +33,7 @@
 - **Added**: Service for elvira directive, modified navigator
 - **Changed**: Routing for new components
 - **Changed**: Names for components
-- **Changed**: Entrey types
+- **Changed**: Entry types
 - **Changed**: Loading component
 - **Changed**: Home component and page
 - **Changed**: In admin add-entry
@@ -36,17 +47,6 @@
 - **Changed**: Entry detail component
 - **Changed**: Entry detail info dialog
 - **Changed**: Header changed and buttons init
-- **Changed**: Interpretors
+- **Changed**: Interpreters
 - **Changed**: Project design
 - **Changed**: Nearly everything
-
-#### 2.0.1 : 2023-09-11
-
-- **Changed**: lib in tsconfig.json
-- **Changed**: evilFlowersViewer 0.3.4 -> 0.3.5
-- **Changed**: feed design (centering)
-- **Changed**: loading pdf from BE
-- **Delete**: Few useless lines in app-wrapper
-- **Moved**: CHANGLELOG.md from src folder
-- **Fixed**: title validator
-- **Fixed**: viewer searchWorker
