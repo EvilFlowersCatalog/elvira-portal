@@ -31,6 +31,19 @@
   overflow: hidden;
   padding: 5px;
   cursor: pointer;
+  -webkit-line-clamp: 2;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  display: -moz-box;
+  -moz-line-clamp: 2;
+  -moz-box-orient: vertical;
+}
+
+.entry-detail-title-one-row {
+  font-size: 17px;
+  overflow: hidden;
+  padding: 5px;
+  cursor: pointer;
   -webkit-line-clamp: 1;
   display: -webkit-box;
   -webkit-box-orient: vertical;

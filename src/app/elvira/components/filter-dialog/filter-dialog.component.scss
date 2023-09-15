@@ -1,0 +1,39 @@
+.filter-dialog-section {
+  border-bottom: 2px solid #ffc107;
+  padding-bottom: 5px;
+  position: relative;
+  width: 100%;
+  margin-bottom: 32px;
+}
+
+.filter-dialog-section-title {
+  color: #ffc107;
+}
+
+.filter-dialog-section-span {
+  margin-left: 20px;
+}
+
+.filter-dialog-section-icon {
+  position: absolute;
+  right: 0;
+  bottom: 5px;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.5s ease;
+}
+.filter-dialog-section-icon:hover {
+  color: red;
+}
+
+.filter-dialog-empty {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 0;
+  font-size: 20px;
+  margin-bottom: 10px;
+}

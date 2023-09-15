@@ -55,11 +55,8 @@
     "author": "Meno autora",
     "from": "Od (rok)",
     "to": "Do (rok)",
-    "reset": "Vymazať",
     "find": "Hľadať",
-    "cancel": "Zrušiť",
-    "feed": "Sekcia: ",
-    "searchFeed": "Hľadať sekciu"
+    "cancel": "Zrušiť"
   },
   "entryDetail": {
     "edit-tooltip": "Upraviť dokument",
@@ -77,7 +74,7 @@
     "author": "Autor:",
     "summary": "Zhrnutie:",
     "feeds": "Priradenie:",
-    "contributors": "Spolu autori:",
+    "contributors": "Spoluautori:",
     "none": "Žiaden",
     "createdAt": "Pridané:",
     "close": "Zatvoriť"
@@ -159,6 +156,24 @@
     "somethingWentWrong": "Niečo nevyšlo :/"
   },
   "library": {
-    "notFound": "Nič nebolo nájdené"
+    "notFound": "Nič nebolo nájdené",
+    "filtersToolTip": "Ukázať filtre",
+    "aZToolTip": "Zoradiť podľa názvu a-Z",
+    "zAToolTip": "Zoradiť podľa názvu z-A",
+    "ASCToolTip": "Zoradiť podľa vytvorenia vzostupne",
+    "DESCToolTip": "Zoradiť podľa vytvorenia zostupne"
+  },
+  "filterDialog": {
+    "name": "Filtre",
+    "title": "Nadpis",
+    "author": "Meno autora",
+    "from": "Od (rok)",
+    "to": "Do (rok)",
+    "feed": "Sekcia",
+    "remove": "Remove filter",
+    "update": "Aktualizovať filter",
+    "delete": "Delete filters",
+    "cancel": "Cancel",
+    "empty": "Filter je prázdny"
   }
 }

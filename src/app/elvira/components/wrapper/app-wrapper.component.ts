@@ -4,6 +4,7 @@ import {
   UserAcquisitionAbsoluteUrl,
   UserAcquisitionShare,
 } from 'src/app/types/acquisition.types';
+import { Router } from '@angular/router';
 import { AppStateService } from 'src/app/services/general/app-state.service';
 import { renderViewer } from '@evilflowers/evilflowersviewer';
 //import { renderViewer } from '../../../../../../../Viewer/EvilFlowersViewer/src/lib/components/Viewer';
@@ -21,7 +22,8 @@ export class AppWrapperComponent implements OnChanges, AfterViewInit {
 
   constructor(
     private readonly acquisitionService: AcquisitionService,
-    private readonly appStateService: AppStateService
+    private readonly appStateService: AppStateService,
+    private readonly router: Router
   ) {}
 
   public ngOnChanges() {
@@ -45,6 +47,7 @@ export class AppWrapperComponent implements OnChanges, AfterViewInit {
     renderViewer(this.rootId, this.base64, {
       citationBib: this.citation,
       shareFunction: this.shareFunction,
+      homeFunction: this.homeFunction,
       lang: state.lang,
       theme: state.theme,
     });
@@ -78,5 +81,9 @@ export class AppWrapperComponent implements OnChanges, AfterViewInit {
       });
 
     return link;
+  };
+
+  private homeFunction = () => {
+    this.router.navigateByUrl('/elvira/home');
   };
 }

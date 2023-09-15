@@ -1,5 +1,19 @@
 # Changelog
 
+## 2.0.2 2023-09-15
+
+- **Added**: tools in library
+- **Added**: sorting in library
+- **Added**: filter dialog
+- **Changed**: filter
+- **Changed**: reader setting button in footer desibled
+- **Changed**: little design
+- **Changed**: change-log design
+- **Changed**: viewer version 0.3.5 -> 0.3.6
+- **Changed**: visible lines in entry title (1 -> 2)
+- **Removed**: filter from navbar
+- **Fixed**: gravatar for profile picture
+
 ## 2.0.1 : 2023-09-11
 
 - **Changed**: lib in tsconfig.json

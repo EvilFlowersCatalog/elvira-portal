@@ -57,11 +57,11 @@ export const ELVIRA_ROUTES: Routes = [
     canActivate: [ElviraGuard],
     component: AboutProjectComponent,
   },
-  {
-    path: 'reader-settings',
-    canActivate: [ElviraGuard],
-    component: ReaderSettingsComponent,
-  },
+  // {
+  //   path: 'reader-settings',
+  //   canActivate: [ElviraGuard],
+  //   component: ReaderSettingsComponent,
+  // },
   {
     path: 'change-log',
     canActivate: [ElviraGuard],

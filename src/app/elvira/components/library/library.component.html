@@ -1,5 +1,33 @@
 <ng-container *transloco="let t">
-  <div class="all-entries-container">
+  <div class="library-container">
+    <!-- Tools -->
+    <div class="library-tools-container">
+      <div
+        class="library-tools"
+        fxLayout="column"
+        fxLayout.sm="row"
+        fxLayout.xs="row"
+      >
+        <!-- Tools buttons -->
+        <div
+          class="library-tools-buttons-container"
+          *ngFor="let button of buttons"
+        >
+          <mat-icon
+            matTooltip="{{ t(button.toolTip) }}"
+            fxLayout="column"
+            color="accent"
+            class="{{ button.class }}"
+            [ngClass]="{ 'library-tools-active-button': button.active }"
+            (click)="button.onClick()"
+          >
+            {{ button.icon }}
+            <span class="library-tools-button-span">{{ button.title }}</span>
+          </mat-icon>
+        </div>
+      </div>
+    </div>
+
     <!-- List of founded entries -->
     <div
       *ngIf="entries.length > 0; else nothingFound"
@@ -32,7 +60,7 @@
         fxLayout="column"
       >
         {{ t("lazy.library.notFound") }}
-        <mat-icon class="all-entries-not-found-icon" (click)="clearFilter()">
+        <mat-icon class="library-not-found-icon" (click)="clearFilter()">
           youtube_searched_for
         </mat-icon>
       </div>

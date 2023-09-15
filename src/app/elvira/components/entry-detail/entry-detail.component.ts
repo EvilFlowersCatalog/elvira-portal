@@ -9,7 +9,6 @@ import { FavoriteService } from 'src/app/services/favorite.service';
 import { catchError, take, tap } from 'rxjs/operators';
 import { NotificationService } from 'src/app/services/general/notification.service';
 import { throwError } from 'rxjs';
-import { AppStateService } from 'src/app/services/general/app-state.service';
 import { FavoriteCounterService } from 'src/app/services/general/favorite-count.service';
 
 @Component({
@@ -19,7 +18,8 @@ import { FavoriteCounterService } from 'src/app/services/general/favorite-count.
 })
 export class EntryDetailComponent {
   @Input() entry: Entry;
-  @Input() show: Boolean;
+  @Input() titleRow: boolean = false;
+  @Input() show: boolean = false;
   @Output() onLikedChange = new EventEmitter<boolean>();
 
   constructor(

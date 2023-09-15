@@ -113,7 +113,7 @@
             class="navbar-button"
             *ngIf="appState.isLoggedIn"
           >
-            <img [src]="avatar_url" class="navbar-acc-picture" />
+            <img ngxGravatar [email]="email" size="29" />
           </button>
         </div>
 
@@ -155,106 +155,6 @@
           <button (click)="openAdvanced()" class="navbar-main-button">
             {{ t("advanced") }}
           </button>
-
-          <!-- Filter button -->
-          <mat-icon
-            matTooltip="{{ !show_filters ? t('filters') : t('hideFilters') }}"
-            class="navbar-filter-button"
-            [ngClass]="{ animate: show_filters }"
-            (click)="show_filters = !show_filters"
-          >
-            {{ !show_filters ? "filter_list" : "keyboard_arrow_down" }}
-          </mat-icon>
-        </div>
-      </div>
-
-      <!-- Filters list -->
-      <div
-        class="filters-container"
-        [ngClass]="{ 'filters-container-opened': show_filters }"
-      >
-        <div
-          fxLayout="column"
-          fxLayoutGap="10px"
-          class="filters-inner-container"
-        >
-          <!-- Filters title -->
-          <div fxFlex="100" fxLayoutAlign="start center">
-            <span class="filter-title">{{ t("title") }} :</span>
-            <span
-              *ngIf="filters.title"
-              class="filter"
-              fxLayoutAlign="center center"
-            >
-              {{
-                filters.title.length > 15
-                  ? (filters.title | slice : 0 : 15) + "..."
-                  : filters.title
-              }}
-              <mat-icon class="filter-icon" (click)="removeFilter('title')"
-                >clear</mat-icon
-              >
-            </span>
-          </div>
-
-          <!-- Author name -->
-          <div fxFlex="100" fxLayoutAlign="start center">
-            <span class="filter-title">{{ t("author") }} :</span>
-            <span
-              *ngIf="filters.author"
-              class="filter"
-              fxLayoutAlign="center center"
-            >
-              {{
-                filters.title.author > 15
-                  ? (filters.author | slice : 0 : 15) + "..."
-                  : filters.author
-              }}
-              <mat-icon class="filter-icon" (click)="removeFilter('author')"
-                >clear</mat-icon
-              >
-            </span>
-          </div>
-
-          <!-- Filters feed name -->
-          <div fxFlex="100" fxLayoutAlign="start center">
-            <span class="filter-title">{{ t("feed") }} :</span>
-            <span
-              *ngIf="feed_name"
-              class="filter"
-              fxLayoutAlign="center center"
-            >
-              {{ feed_name }}
-              <mat-icon class="filter-icon" (click)="removeFilter('feed')"
-                >clear</mat-icon
-              >
-            </span>
-          </div>
-
-          <!-- From - to -->
-          <div fxFlex="100" fxLayout="row" fxLayoutAlign="space-between center">
-            <!-- From -->
-            <div fxFlex="45">
-              <span class="filter-title">{{ t("from") }} :</span>
-              <span></span>
-            </div>
-
-            <!-- To -->
-            <div fxFlex="45">
-              <span class="filter-title">{{ t("to") }} :</span>
-              <span></span>
-            </div>
-          </div>
-
-          <div fxFLex="100" fxLayoutAlign="center center">
-            <mat-icon
-              matTooltip="{{ t('clear') }}"
-              class="filter-icon-delete"
-              (click)="clearFilter()"
-            >
-              delete
-            </mat-icon>
-          </div>
         </div>
       </div>
     </mat-toolbar>

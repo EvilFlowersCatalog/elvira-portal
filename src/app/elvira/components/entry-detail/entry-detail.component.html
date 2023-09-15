@@ -87,6 +87,7 @@
     <!-- Entry title -->
     <div
       class="entry-detail-title"
+      [ngClass]="{ 'entry-detail-title-one-row': titleRow }"
       [title]="entry.title"
       (elviraclick)="openPdf(entry.id, $event)"
     >

@@ -55,11 +55,8 @@
     "author": "Author name",
     "from": "From (year)",
     "to": "To (year)",
-    "reset": "Reset",
     "find": "Find",
-    "cancel": "Cancel",
-    "feed": "Feed:",
-    "searchFeed": "Search feed"
+    "cancel": "Cancel"
   },
   "entryDetail": {
     "edit-tooltip": "Edit document",
@@ -159,6 +156,24 @@
     "somethingWentWrong": "Something went wrong :/"
   },
   "library": {
-    "notFound": "Nothing was found"
+    "notFound": "Nothing was found",
+    "filtersToolTip": "Show filters",
+    "aZToolTip": "Order by title a-Z",
+    "zAToolTip": "Order by title z-A",
+    "ASCToolTip": "Order by creation ascending",
+    "DESCToolTip": "Order by creation descending"
+  },
+  "filterDialog": {
+    "name": "Filters",
+    "title": "Title",
+    "author": "Author name",
+    "from": "From (year)",
+    "to": "To (year)",
+    "feed": "Feed",
+    "update": "Update filter",
+    "remove": "Remove filter",
+    "delete": "Delete filters",
+    "cancel": "Cancel",
+    "empty": "Filter is empty"
   }
 }

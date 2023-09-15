@@ -1,6 +1,6 @@
 {
   "name": "elibrary-portal",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
@@ -24,7 +24,7 @@
     "@angular/platform-browser": "^16.1.2",
     "@angular/platform-browser-dynamic": "^16.1.2",
     "@angular/router": "^16.1.2",
-    "@evilflowers/evilflowersviewer": "^0.3.5",
+    "@evilflowers/evilflowersviewer": "^0.3.6",
     "@ngneat/transloco": "^4.3.0",
     "form-data": "^2.3.3",
     "is-svg": "^4.3.1",
@@ -33,6 +33,7 @@
     "luxon": "^2.0.2",
     "ngx-device-detector": "^6.0.2",
     "ngx-extended-pdf-viewer": "^17.2.0",
+    "ngx-gravatar": "^13.0.0",
     "ngx-markdown": "^16.0.0",
     "pdf-to-base64": "^1.0.3",
     "react": "^18.2.0",

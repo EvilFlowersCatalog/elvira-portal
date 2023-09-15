@@ -17,6 +17,7 @@ import { LOCAL_STORAGE_TOKEN } from '../services/general/local-storage.service';
 import { AdvancedSearchDialogComponent } from './components/advanced-search-dialog/advanced-search-dialog.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { ElviraModule } from '../elvira/elvira.module';
+import { GravatarModule } from 'ngx-gravatar';
 
 @NgModule({
   declarations: [
@@ -40,6 +41,7 @@ import { ElviraModule } from '../elvira/elvira.module';
     TranslocoRootModule,
     ReactiveFormsModule,
     FormsModule,
+    GravatarModule,
   ],
   exports: [
     NotfoundComponent,
@@ -50,4 +52,4 @@ import { ElviraModule } from '../elvira/elvira.module';
   ],
   providers: [{ provide: LOCAL_STORAGE_TOKEN, useValue: localStorage }],
 })
-export class CommonElviraModule { }
+export class CommonElviraModule {}

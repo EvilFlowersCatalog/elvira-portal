@@ -16,6 +16,17 @@ import { MarkdownService } from 'ngx-markdown';
         padding: 16px;
         flex: 1;
       }
+
+      markdown {
+        font-size: 15px;
+      }
+      markdown ::ng-deep h1 {
+        font-size: 30px;
+      }
+      markdown ::ng-deep h2 {
+        font-size: 20px;
+        margin-top: 32px;
+      }
     `,
   ],
 })

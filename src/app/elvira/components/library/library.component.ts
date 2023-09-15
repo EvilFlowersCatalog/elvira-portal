@@ -1,13 +1,22 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
-import { Subject, Subscription } from 'rxjs';
-import { concatMap, startWith, takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import {
+  concatMap,
+  filter,
+  map,
+  startWith,
+  take,
+  takeUntil,
+} from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { MediaObserver } from '@angular/flex-layout';
 import { Entry } from 'src/app/types/entry.types';
 import { EntryService } from 'src/app/services/entry.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Filters } from 'src/app/types/general.types';
+import { FilterDialogComponent } from '../filter-dialog/filter-dialog.component';
 
 @Component({
   selector: 'app-all-entries',
@@ -19,20 +28,72 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
   results_length = 0; // used in html
   fetchEntries$ = new Subject();
   filters = new Filters(); // used in html
-  routeSubscription: Subscription;
+  private orderBy: string = 'title';
   @ViewChild('paginator') paginator: MatPaginator;
+
+  // buttons used in html, in tools
+  buttons: {
+    title: string;
+    icon: string;
+    class: string;
+    toolTip: string;
+    active: boolean;
+    onClick: () => void;
+  }[] = [
+    {
+      title: '',
+      icon: 'filter_list',
+      class: 'library-tools-filter-button',
+      toolTip: 'lazy.library.filtersToolTip',
+      active: false,
+      onClick: () => this.openFilters(),
+    },
+    {
+      title: 'a-Z',
+      icon: 'sort',
+      class: 'library-tools-button',
+      toolTip: 'lazy.library.aZToolTip',
+      active: true,
+      onClick: () => this.sort('title', this.buttons[1].title),
+    },
+    {
+      title: 'z-A',
+      icon: 'sort',
+      class: 'library-tools-button',
+      toolTip: 'lazy.library.zAToolTip',
+      active: false,
+      onClick: () => this.sort('-title', this.buttons[2].title),
+    },
+    {
+      title: 'ASC',
+      icon: '',
+      class: 'library-tools-button',
+      toolTip: 'lazy.library.ASCToolTip',
+      active: false,
+      onClick: () => this.sort('created_at', this.buttons[3].title),
+    },
+    {
+      title: 'DE\nSC',
+      icon: '',
+      class: 'library-tools-button',
+      toolTip: 'lazy.library.DESCToolTip',
+      active: false,
+      onClick: () => this.sort('-created_at', this.buttons[4].title),
+    },
+  ];
 
   constructor(
     private readonly entryService: EntryService,
     private readonly route: ActivatedRoute,
+    private readonly router: Router,
     public mediaObserver: MediaObserver,
-    private readonly router: Router
+    public dialog: MatDialog
   ) {
     super();
   }
 
   ngOnInit(): void {
-    this.routeSubscription = this.route.paramMap.subscribe((params) => {
+    this.route.paramMap.subscribe((params) => {
       const filters = params.get('filters');
       this.getFilters(filters); // Reload data based on the updated filters value
     });
@@ -51,6 +112,7 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
             title: this.filters.title,
             feed_id: this.filters.feed,
             author: this.filters.author,
+            order_by: this.orderBy,
           })
         )
       )
@@ -67,24 +129,83 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
     this.fetchEntries$.next();
   }
 
-  getFilters(url_filters: string) {
-    const params_array = url_filters.split('&');
+  getFilters(urlFilters: string) {
+    const params = urlFilters.split('&');
 
     // Initialize an object to store the extracted values
-    const extracted_values = {};
+    const extractedValues = {};
 
     // Loop through the array and extract parameter-value pairs
-    params_array.forEach((param) => {
+    params.forEach((param) => {
       const [key, value] = param.split('=');
-      extracted_values[key] = value;
+      extractedValues[key] = value;
     });
 
-    this.filters.title = extracted_values['title'] ?? '';
-    this.filters.feed = extracted_values['feed'] ?? '';
-    this.filters.author = extracted_values['author'] ?? '';
+    this.filters.title = extractedValues['title'] ?? '';
+    this.filters.feed = extractedValues['feed'] ?? '';
+    this.filters.author = extractedValues['author'] ?? '';
     this.fetchEntries$.next();
   }
 
+  // Sort by
+  sort(orderBy: string, activeButton: string) {
+    // set active button based on given title
+    this.buttons = this.buttons.map((button) => {
+      if (button.title === activeButton) {
+        return { ...button, active: true };
+      } else {
+        return { ...button, active: false };
+      }
+    });
+    this.orderBy = orderBy; // set type
+    this.fetchEntries$.next(); // fetch
+  }
+
+  // Open filters dialog
+  openFilters() {
+    const dialogRef = this.dialog.open(FilterDialogComponent, {
+      width: '500px',
+      maxWidth: '95%',
+      data: { filters: this.filters },
+    });
+
+    // when closed
+    dialogRef
+      .afterClosed()
+      .pipe(
+        take(1),
+        filter(
+          (
+            result: 'no' & {
+              title: string;
+              author: string;
+              feed: string;
+              from: string;
+              to: string;
+            }
+          ) => result !== 'no' && result !== undefined
+        ),
+        map(
+          (result) => (
+            // set filters
+            (this.filters.title = result.title),
+            (this.filters.author = result.author),
+            (this.filters.feed = result.feed)
+          )
+        )
+      )
+      .subscribe(() => {
+        this.router.navigateByUrl(
+          `elvira/library/${this.filters.getFilters()}` // go go go
+        );
+      });
+  }
+
+  reload() {
+    this.fetchEntries$.next();
+  }
+
+  // Clear filters used when there were no results
   clearFilter() {
     if (this.filters.title || this.filters.author || this.filters.feed) {
       this.filters.title = '';
@@ -92,9 +213,5 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
       this.filters.author = '';
       this.router.navigateByUrl(`/elvira/library/${this.filters.getFilters()}`);
     }
-  }
-
-  reload() {
-    this.fetchEntries$.next();
   }
 }

@@ -17,13 +17,14 @@ import { AppWrapperComponent } from './components/wrapper/app-wrapper.component'
 import { HomeComponent } from './components/home/home.component';
 import { SwipperComponent } from './components/swiper/swiper.component';
 import { FeedsPageComponent } from './components/feeds-page/feeds-page.component';
-import { FeedComponent } from './components/feed.component';
+import { FeedComponent } from './components/feed/feed.component';
 import { CustomPaginationComponent } from '../services/general/custom-pagination.service';
 import { ElviraClickDirective } from './directives/elvira-click.directive';
 import { AboutProjectComponent } from './components/footer-components/about-project/about-project.component';
 import { ReaderSettingsComponent } from './components/footer-components/reader-settings/reader-settings.component';
 import { ChangeLogComponent } from './components/footer-components/change-log/change-log.component';
 import { MarkdownModule } from 'ngx-markdown';
+import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.component';
 
 @NgModule({
   declarations: [
@@ -44,6 +45,7 @@ import { MarkdownModule } from 'ngx-markdown';
     AboutProjectComponent,
     ReaderSettingsComponent,
     ChangeLogComponent,
+    FilterDialogComponent,
   ],
   imports: [
     CommonModule,
