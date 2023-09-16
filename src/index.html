@@ -34,7 +34,17 @@
         script.src = "https://analytics.elvira.fiit.stuba.sk/script.js";
         script.setAttribute(
           "data-website-id",
-          "1c86d0f6-1d99-45d1-b785-d9633cafa206"
+          "afe12559-da42-4f71-99f0-18fffc15ba67"
+        );
+        document.head.appendChild(script);
+      }
+      else if (window.location.hostname === "elvira.fiit.stuba.sk") {
+        let script = document.createElement("script");
+        script.async = true;
+        script.src = "https://analytics.elvira.fiit.stuba.sk/script.js";
+        script.setAttribute(
+          "data-website-id",
+          "2fb837fb-1927-404a-8154-32df4945927c"
         );
         document.head.appendChild(script);
       }
