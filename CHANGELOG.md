@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.3 2023-09-16
+
+- **Added**: interval interceptor
+- **Added**: observer on request interval
+- **Fixed**: detection of slow internet
+
 ## 2.0.2 2023-09-15
 
 - **Added**: tools in library

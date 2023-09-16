@@ -175,5 +175,6 @@
     "delete": "Delete filters",
     "cancel": "Cancel",
     "empty": "Filter is empty"
-  }
+  },
+  "timeoutErr": "Slow internet, request timed out"
 }

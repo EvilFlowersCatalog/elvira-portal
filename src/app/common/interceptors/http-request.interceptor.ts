@@ -18,13 +18,11 @@ export const BYPASS_LOADING = new HttpContextToken(() => false);
 
 @Injectable()
 export class HttpRequestInterceptor implements HttpInterceptor {
-  private requestsCount = 0; // Track the number of requests
-
   constructor(
     private readonly appStateService: AppStateService,
     private readonly loadingService: LoadingService,
     private readonly requestCounterService: RequestCounterService
-  ) { }
+  ) {}
 
   intercept(
     request: HttpRequest<any>,

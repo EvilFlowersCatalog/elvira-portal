@@ -34,7 +34,7 @@ export class LoginFormComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {}
 
   submit() {
     // Inputed data

@@ -175,5 +175,6 @@
     "delete": "Delete filters",
     "cancel": "Cancel",
     "empty": "Filter je prázdny"
-  }
+  },
+  "timeoutErr": "Pomalý internet, časový limit requestu vypršal"
 }

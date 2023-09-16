@@ -13,6 +13,7 @@ import { HttpRequestInterceptor } from './common/interceptors/http-request.inter
 import { HttpResponseInterceptor } from './common/interceptors/http-response.interceptor';
 import { CommonElviraModule } from './common/common.module';
 import { AppStateService } from './services/general/app-state.service';
+import { HttpTimeoutInterceptor } from './common/interceptors/http-timeout.interceptor';
 
 @NgModule({
   declarations: [AppComponent],
@@ -25,7 +26,7 @@ import { AppStateService } from './services/general/app-state.service';
     MaterialModule,
     BrowserAnimationsModule,
     TranslocoRootModule,
-    CommonElviraModule
+    CommonElviraModule,
   ],
   providers: [
     {
@@ -43,9 +44,14 @@ import { AppStateService } from './services/general/app-state.service';
       useClass: HttpResponseInterceptor,
       multi: true,
     },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: HttpTimeoutInterceptor,
+      multi: true,
+    },
   ],
   bootstrap: [AppComponent],
 })
 export class AppModule {
-  constructor(private readonly appStateService: AppStateService) { }
+  constructor(private readonly appStateService: AppStateService) {}
 }

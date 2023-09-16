@@ -24,7 +24,7 @@ export class HttpErrorInterceptor implements HttpInterceptor {
     private readonly translocoService: TranslocoService,
     private readonly appStateService: AppStateService,
     private readonly requestCounterService: RequestCounterService
-  ) { }
+  ) {}
 
   intercept(
     request: HttpRequest<any>,
@@ -34,10 +34,9 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         this.requestCounterService.decrement();
         this.loadingService.hideLoading();
-        if (error.status >= 500) {
+        if (error.status !== 401) {
           this.notificationService.error(`Error: ${error.error.message}`);
-        }
-        else {
+        } else {
           this.notificationService.info(
             this.translocoService.translate('lazy.auth.autoLogout')
           );
