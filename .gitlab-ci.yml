@@ -1,6 +1,7 @@
 stages:
   - build
   - deploy
+  - notify
 
 build dev:
   stage: build
@@ -27,6 +28,18 @@ deploy dev:
     BUILD_DIR: dist/elibrary-portal
   script:
     - NODE_PATH=/usr/local/lib/node_modules node /opt/node-deployer/deploy.js
+  environment:
+    name: dev
+    url: https://elvira-dev.fiit.stuba.sk/
+  only:
+    - dev
+
+notify dev:
+  stage: notify
+  image: dgkanatsios/o365-notify
+  variables:
+    GIT_STRATEGY: none
+    O365_MESSAGE: New deploy to elvira-dev.fiit.stuba.sk
   environment:
     name: dev
     url: https://elvira-dev.fiit.stuba.sk/
