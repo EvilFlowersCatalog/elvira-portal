@@ -18,3 +18,17 @@ build dev:
     url: https://elvira-dev.fiit.stuba.sk/
   only:
     - dev
+
+deploy dev:
+  stage: deploy
+  image: registry.gitlab.com/langio/node-deployer:latest
+  variables:
+    GIT_STRATEGY: none
+    BUILD_DIR: dist/elibrary-portal
+  script:
+    - NODE_PATH=/usr/local/lib/node_modules node /opt/node-deployer/deploy.js
+  environment:
+    name: dev
+    url: https://elvira-dev.fiit.stuba.sk/
+  only:
+    - dev
