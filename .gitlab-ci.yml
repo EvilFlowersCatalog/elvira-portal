@@ -34,14 +34,14 @@ deploy dev:
   only:
     - dev
 
-notify dev:
-  stage: notify
-  image: dgkanatsios/o365-notify
-  variables:
-    GIT_STRATEGY: none
-    O365_MESSAGE: New deploy to elvira-dev.fiit.stuba.sk
-  environment:
-    name: dev
-    url: https://elvira-dev.fiit.stuba.sk/
-  only:
-    - dev
+#notify dev:
+#  stage: notify
+#  image: dgkanatsios/o365-notify
+#  variables:
+#    GIT_STRATEGY: none
+#    O365_MESSAGE: New deploy to elvira-dev.fiit.stuba.sk
+#  environment:
+#    name: dev
+#    url: https://elvira-dev.fiit.stuba.sk/
+#  only:
+#    - dev
