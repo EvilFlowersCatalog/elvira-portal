@@ -1,29 +1,54 @@
 <ng-container *transloco="let t; read: 'navbar'">
   <ng-container *ngIf="appState$ | async as appState">
-    <mat-toolbar fxLayout="column" class="navbar-container">
+    <mat-toolbar fxLayout="column" class="mobile-navbar-container">
+      <!-- TOP ROW -->
+      <div
+        fxLayout="row"
+        fxLayoutAlign="space-between center"
+        class="mobile-navbar-upper-row"
+      >
+        <!-- Image elvira -->
+        <img
+          src="../../../../assets/logos/title_logo.png"
+          [disabled]="!appState.isLoggedIn"
+          (click)="navigate('/library/home')"
+          class="navbar-elvira-img"
+        />
 
-      <!-- STU logo -->
-      <img src="../../../../assets/logos/fiit_logo.png" class="mobile-navbar-image-stu-logo" (click)="goToSTU()">
-
-      <!-- Image elvira -->
-      <div fxLayoutAlign="flex-start center" class="navbar-home-button-container"
-        [ngClass]="{'navbar-home-button-container-offline': !appState.isLoggedIn}">
-        <img src="../../../../assets/logos/title_logo.png" [disabled]="!appState.isLoggedIn"
-          (click)="navigate('/library/home')" class="navbar-elvira-img">
+        <!-- STU logo -->
+        <img
+          src="../../../../assets/logos/fiit_logo.png"
+          class="mobile-navbar-image-stu-logo"
+          (click)="goToSTU()"
+        />
       </div>
 
-      <!-- Search form -->
-      <div fxLayout="row" fxLayoutAlign="flex-end flex-end" class="mobile-navbar-bottom-row">
-        <form [formGroup]="search_form" (submit)="submit()" class="mobile-navbar-form" *ngIf="appState.isLoggedIn">
-          <div fxLayout="row" fxLayoutAlign="center flex-end" class="mobile-navbar-form-field-container">
-            <mat-form-field color="accent" class="mobile-navbar-form-field">
-              <mat-label>
-                {{ t("search") }}
-              </mat-label>
-
-              <!-- Input -->
-              <input formControlName="search_input" matInput type="search" />
-            </mat-form-field>
+      <!-- BOTTOM ROW -->
+      <div
+        fxLayout="row"
+        fxLayoutAlign="start center"
+        class="mobile-navbar-bottom-row"
+      >
+        <!-- Search form -->
+        <form
+          [formGroup]="search_form"
+          (submit)="submit()"
+          class="mobile-navbar-form"
+          fxLayoutAlign="start"
+          *ngIf="appState.isLoggedIn"
+        >
+          <div
+            fxLayout="row"
+            fxLayoutAlign="center center"
+            class="mobile-navbar-form-field-container"
+          >
+            <!-- Input -->
+            <input
+              placeholder="{{ t('search') }}"
+              formControlName="search_input"
+              class="mobile-navbar-form-input"
+              type="search"
+            />
 
             <!-- Button for submit -->
             <button mat-icon-button type="submit" color="accent">
@@ -33,8 +58,13 @@
         </form>
 
         <!-- Menu button -->
-        <button mat-icon-button (click)="toggleSidenav()" class="mobile-navbar-menu-button">
-          <mat-icon>{{ appState.sidenav ? 'close' : 'menu' }}</mat-icon>
+        <button
+          mat-icon-button
+          (click)="toggleSidenav()"
+          class="mobile-navbar-menu-button"
+          fxLayoutAlign="center center"
+        >
+          <mat-icon>{{ appState.sidenav ? "close" : "menu" }}</mat-icon>
         </button>
       </div>
     </mat-toolbar>

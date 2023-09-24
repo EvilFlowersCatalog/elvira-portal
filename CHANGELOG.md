@@ -4,6 +4,7 @@
 
 - **Added**: infinit scroll in library
 - **Fixed**: auto logout
+- **Fixed**: mobile/tablet navbar
 - **Removed**: interval interceptor
 - **Removed**: paginator in library
 - **Changed**: feed styles in entries
