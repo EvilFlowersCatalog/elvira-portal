@@ -17,7 +17,7 @@ import { LOCAL_STORAGE_TOKEN } from '../services/general/local-storage.service';
 import { AdvancedSearchDialogComponent } from './components/advanced-search-dialog/advanced-search-dialog.component';
 import { FooterComponent } from './components/footer/footer.component';
 import { ElviraModule } from '../elvira/elvira.module';
-import { GravatarModule } from 'ngx-gravatar';
+import { AvatarModule } from 'ngx-avatars';
 
 @NgModule({
   declarations: [
@@ -41,7 +41,7 @@ import { GravatarModule } from 'ngx-gravatar';
     TranslocoRootModule,
     ReactiveFormsModule,
     FormsModule,
-    GravatarModule,
+    AvatarModule,
   ],
   exports: [
     NotfoundComponent,

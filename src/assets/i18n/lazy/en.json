@@ -152,9 +152,6 @@
     "search": "Search",
     "cancel": "Cancel"
   },
-  "pdfViewer": {
-    "somethingWentWrong": "Something went wrong :/"
-  },
   "library": {
     "notFound": "Nothing was found",
     "filtersToolTip": "Show filters",
@@ -176,5 +173,5 @@
     "cancel": "Cancel",
     "empty": "Filter is empty"
   },
-  "timeoutErr": "Slow internet, request timed out"
+  "somethingWentWrong": "Something went wrong :/"
 }

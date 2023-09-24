@@ -23,7 +23,8 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   avatar_url: string; // used in html
   feed_name: string = ''; // used in html
   routeSubscription: Subscription;
-  email: string;
+  email: string = '';
+  name: string = '';
 
   constructor(
     private readonly router: Router,
@@ -46,6 +47,11 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
     this.appState$.subscribe((state) => {
       this.theme = state.theme === 'dark' ? true : false;
       this.email = state.username + '@stuba.sk';
+      if (state.username[0].toLocaleLowerCase() === 'x') {
+        this.name = state.username[1] + ' ' + state.username[2];
+      } else {
+        this.name = state.username[0] + ' ' + state.username[1];
+      }
     });
   }
 

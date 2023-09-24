@@ -7,7 +7,6 @@ import {
 import { Router } from '@angular/router';
 import { AppStateService } from 'src/app/services/general/app-state.service';
 import { renderViewer } from '@evilflowers/evilflowersviewer';
-//import { renderViewer } from '../../../../../../../Viewer/EvilFlowersViewer/src/lib/components/Viewer';
 
 @Component({
   selector: 'evil-flowers-viewer-wrapper',

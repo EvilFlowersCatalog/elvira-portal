@@ -69,6 +69,11 @@ export class AppStateService {
       isAdmin: false,
       showSidebarToggle: false,
       sidenav: false,
+      count:
+        this.getStateSnapshot().count === null ||
+        this.getStateSnapshot().count === undefined
+          ? 0
+          : this.getStateSnapshot().count,
     });
   }
 }

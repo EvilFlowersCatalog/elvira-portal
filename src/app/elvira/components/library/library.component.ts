@@ -1,5 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
+import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { Subject } from 'rxjs';
 import {
   concatMap,
@@ -25,11 +24,15 @@ import { FilterDialogComponent } from '../filter-dialog/filter-dialog.component'
 })
 export class LibraryComponent extends DisposableComponent implements OnInit {
   entries: Entry[] = []; // used in html
-  results_length = 0; // used in html
   fetchEntries$ = new Subject();
   filters = new Filters(); // used in html
+  page: number = 0;
+  refresh: boolean = false;
+  firstScroll: boolean = true;
+  resetEntries: boolean = false; // in fetch entries
+  liked: boolean = false; // when liked button is pressed, reload different
+  lenght: number = 0; // for saving actual entires.lenght, for reaload (used when entry was liked)
   private orderBy: string = 'title';
-  @ViewChild('paginator') paginator: MatPaginator;
 
   // buttons used in html, in tools
   buttons: {
@@ -92,9 +95,22 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
     super();
   }
 
+  @HostListener('window:scroll', ['$event'])
+  onScroll(event: Event): void {
+    const windowHeight = window.innerHeight;
+    const scrollPosition = window.scrollY;
+    const pageHeight = document.body.scrollHeight;
+    // if we are at bottom and there is possible refresh, fetch entries
+    if (scrollPosition + windowHeight + 10 >= pageHeight && this.refresh) {
+      this.refresh = false;
+      this.fetchEntries$.next();
+    }
+  }
+
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
       const filters = params.get('filters');
+      this.reset();
       this.getFilters(filters); // Reload data based on the updated filters value
     });
     window.onbeforeunload = () => this.ngOnDestroy();
@@ -107,8 +123,8 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
         startWith([]),
         concatMap(() =>
           this.entryService.getEntriesList({
-            page: this.paginator?.pageIndex ?? 0,
-            limit: this.paginator?.pageSize ?? 15,
+            page: this.page,
+            limit: this.liked ? this.lenght : 25, // if entry was liked, set limit to saved lenght
             title: this.filters.title,
             feed_id: this.filters.feed,
             author: this.filters.author,
@@ -117,16 +133,26 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
         )
       )
       .subscribe((data) => {
-        this.entries = data.items;
-        this.results_length = data.metadata.total;
-        this.paginator.pageIndex = data.metadata.page - 1;
-        window.scrollTo(0, 0);
-      });
-  }
+        this.liked = false; // reset liked
+        if (this.resetEntries) {
+          this.resetEntries = false;
+          this.entries = data.items;
+        } else {
+          this.entries.push(...data.items); // push
+        }
 
-  // Paginator handling
-  handlePageChange() {
-    this.fetchEntries$.next();
+        // When user comes to library first time scroll up or entries were reseted (reset funtion)
+        if (this.firstScroll) {
+          this.firstScroll = false;
+          window.scrollTo(0, 0);
+        }
+
+        // Check if actuall page is last or not, if not user can refresh
+        if (this.page !== data.metadata.pages - 1) {
+          this.refresh = true;
+          this.page += 1; // next page
+        }
+      });
   }
 
   getFilters(urlFilters: string) {
@@ -158,6 +184,7 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
       }
     });
     this.orderBy = orderBy; // set type
+    this.reset();
     this.fetchEntries$.next(); // fetch
   }
 
@@ -201,8 +228,20 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
       });
   }
 
+  // reload when entry was liked
   reload() {
+    this.liked = true; // set to true
+    this.lenght = this.entries.length; // save lenght to set limit
+    this.page = 0; // reset
+    this.resetEntries = true;
     this.fetchEntries$.next();
+  }
+
+  // reset everything when filter or order-by change
+  reset() {
+    this.page = 0;
+    this.resetEntries = true;
+    this.firstScroll = true;
   }
 
   // Clear filters used when there were no results

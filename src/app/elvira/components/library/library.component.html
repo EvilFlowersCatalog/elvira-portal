@@ -65,17 +65,5 @@
         </mat-icon>
       </div>
     </ng-template>
-
-    <!-- Paginator -->
-    <div fxLayoutAlign="center center">
-      <mat-paginator
-        (page)="handlePageChange()"
-        #paginator
-        [length]="resultsLength"
-        [pageSizeOptions]="[15, 30, 50]"
-        class="home-paginator"
-      >
-      </mat-paginator>
-    </div>
   </div>
 </ng-container>

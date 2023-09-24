@@ -176,5 +176,5 @@
     "cancel": "Cancel",
     "empty": "Filter je prázdny"
   },
-  "timeoutErr": "Pomalý internet, časový limit requestu vypršal"
+  "somethingWentWrong": "Something went wrong :/"
 }

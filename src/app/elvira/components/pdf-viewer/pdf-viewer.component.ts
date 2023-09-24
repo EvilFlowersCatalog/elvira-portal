@@ -110,7 +110,7 @@ export class PdfViewerComponent extends DisposableComponent implements OnInit {
     } catch (error) {
       // If something went wrong
       const message = this.translocoService.translate(
-        'lazy.pdfViewer.somethingWentWrong'
+        'lazy.somethingWentWrong'
       );
       this.notificationService.error(message);
       this.router.navigateByUrl('elvira/home');

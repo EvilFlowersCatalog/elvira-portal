@@ -13,7 +13,6 @@ import { HttpRequestInterceptor } from './common/interceptors/http-request.inter
 import { HttpResponseInterceptor } from './common/interceptors/http-response.interceptor';
 import { CommonElviraModule } from './common/common.module';
 import { AppStateService } from './services/general/app-state.service';
-import { HttpTimeoutInterceptor } from './common/interceptors/http-timeout.interceptor';
 
 @NgModule({
   declarations: [AppComponent],
@@ -42,11 +41,6 @@ import { HttpTimeoutInterceptor } from './common/interceptors/http-timeout.inter
     {
       provide: HTTP_INTERCEPTORS,
       useClass: HttpResponseInterceptor,
-      multi: true,
-    },
-    {
-      provide: HTTP_INTERCEPTORS,
-      useClass: HttpTimeoutInterceptor,
       multi: true,
     },
   ],

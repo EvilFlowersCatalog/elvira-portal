@@ -70,7 +70,7 @@
             "styles": [
               "src/theme.scss",
               "src/styles.scss",
-              "node_modules/@evilflowers/evilflowersviewer/dist/styles.css"
+              "node_modules/@evilflowers/evilflowersviewer/dist/style.css"
             ],
             "scripts": [],
             "vendorChunk": true,

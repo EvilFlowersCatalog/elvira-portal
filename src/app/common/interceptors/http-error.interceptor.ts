@@ -34,8 +34,14 @@ export class HttpErrorInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         this.requestCounterService.decrement();
         this.loadingService.hideLoading();
-        if (error.status !== 401) {
+        if (error.status >= 500) {
           this.notificationService.error(`Error: ${error.error.message}`);
+        } else if (error.status >= 400 && error.status !== 401) {
+          this.notificationService.error(
+            `Error: ${this.translocoService.translate(
+              'lazy.somethingWentWrong'
+            )}`
+          );
         } else {
           this.notificationService.info(
             this.translocoService.translate('lazy.auth.autoLogout')

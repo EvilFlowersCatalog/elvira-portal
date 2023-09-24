@@ -108,13 +108,14 @@
           </button>
 
           <!-- Account button -->
-          <button
+          <ngx-avatars
+            *ngIf="appState.isLoggedIn"
+            [gravatarId]="email"
+            [name]="name"
+            size="32"
             [matMenuTriggerFor]="accountMenu"
             class="navbar-button"
-            *ngIf="appState.isLoggedIn"
-          >
-            <img ngxGravatar [email]="email" size="29" />
-          </button>
+          />
         </div>
 
         <!-- Second row -->

@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.4 2023-09-23
+
+- **Added**: infinit scroll in library
+- **Fixed**: auto logout
+- **Removed**: interval interceptor
+- **Removed**: paginator in library
+- **Changed**: feed styles in entries
+- **Changed**: `o projekte` and `nastavenie čítačky` in footer were hidden
+- **Changed**: viewer 0.3.6 -> 0.3.9
+
 ## 2.0.3 2023-09-16
 
 - **Added**: interval interceptor
