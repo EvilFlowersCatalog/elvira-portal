@@ -1,5 +1,9 @@
 import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import { UntypedFormBuilder, UntypedFormControl, UntypedFormGroup } from '@angular/forms';
+import {
+  UntypedFormBuilder,
+  UntypedFormControl,
+  UntypedFormGroup,
+} from '@angular/forms';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
@@ -28,7 +32,8 @@ import { NavigationService } from 'src/app/services/general/navigation.service';
 })
 export class DocumentManagementComponent
   extends DisposableComponent
-  implements AfterViewInit {
+  implements AfterViewInit
+{
   displayedColumns: string[] = ['title', 'author', 'edit', 'delete'];
   resultsLength = 0;
   entries: Entry[] = [];
@@ -42,7 +47,7 @@ export class DocumentManagementComponent
     public dialog: MatDialog,
     private readonly entryService: EntryService,
     private readonly notificationService: NotificationService,
-    private translocoService: TranslocoService,
+    private translocoService: TranslocoService
   ) {
     super();
     this.searchForm = new UntypedFormGroup({
@@ -61,9 +66,8 @@ export class DocumentManagementComponent
           this.entryService.getEntriesList({
             page: this.paginator.pageIndex ?? 0,
             limit: this.paginator.pageSize ?? 15,
-            title: this.searchForm?.value.searchInput ?? "",
-          }
-          )
+            title: this.searchForm?.value.searchInput ?? '',
+          })
         )
       )
       .subscribe((data) => {

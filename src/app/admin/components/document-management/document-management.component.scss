@@ -1,11 +1,16 @@
-.header-box {
-  padding: 20px 16px;
-  width: 100%;
+.document-container {
+  background-color: transparent !important;
+  padding: 16px;
+  padding-right: 0;
+  margin-top: 10px;
+  height: fit-content;
+  flex: 1;
 }
 
-.paginator-size {
+.header-box {
+  padding: 20px 0;
+  padding-right: 16px;
   width: 100%;
-  margin-bottom: 16px;
 }
 
 .document-form-field {
@@ -16,11 +21,11 @@
   width: 50%;
 }
 
-.document-container {
-  flex: 1 1 auto;
-  padding: 0 16px;
+.entry-list-container {
+  width: 100%;
+  margin: 0 !important;
 }
 
-.document-entries-container {
-  padding-bottom: 16px;
+.paginator-size {
+  width: 100%;
 }

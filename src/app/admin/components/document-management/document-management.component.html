@@ -1,44 +1,68 @@
 <ng-container *transloco="let t">
-  <div fxLayout="row" fxLayoutAlign="space-between center" class="header-box">
+  <div class="document-container" fxLayout="column">
+    <div fxLayout="row" fxLayoutAlign="space-between center" class="header-box">
+      <!-- Searchbar -->
+      <form
+        [formGroup]="searchForm"
+        (submit)="applyFilter()"
+        class="document-form"
+      >
+        <div fxLayout="row" fxLayoutAlign="center center">
+          <mat-form-field color="accent" class="document-form-field">
+            <mat-label>
+              {{ t("lazy.documentManagement.search") }}
+            </mat-label>
 
-    <!-- Searchbar -->
-    <form [formGroup]="searchForm" (submit)="applyFilter()" class="document-form">
-      <div fxLayout="row" fxLayoutAlign="center center">
-        <mat-form-field color="accent" class="document-form-field">
-          <mat-label>
-            {{ t("lazy.documentManagement.search") }}
-          </mat-label>
+            <!-- Input -->
+            <input matInput formControlName="searchInput" type="text" />
+          </mat-form-field>
 
-          <!-- Input -->
-          <input matInput formControlName="searchInput" type="text" />
-        </mat-form-field>
+          <!-- Button for submit -->
+          <button mat-icon-button type="submit" color="accent">
+            <mat-icon>search</mat-icon>
+          </button>
+        </div>
+      </form>
 
-        <!-- Button for submit -->
-        <button mat-icon-button type="submit" color="accent">
-          <mat-icon>search</mat-icon>
-        </button>
-      </div>
-    </form>
+      <!-- New documnet button -->
+      <button (click)="newDocument($event)" mat-raised-button color="primary">
+        {{ t("lazy.documentManagement.document") }}
+      </button>
+    </div>
 
-    <!-- New documnet button -->
-    <button (click)="newDocument($event)" mat-raised-button color="primary">
-      {{ t("lazy.documentManagement.document") }}
-    </button>
-  </div>
-
-  <!-- List of entries -->
-  <div class="document-container">
-    <div class="document-entries-container" fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="16px grid">
-      <div fxFlex="14.28%" fxFlex.md="20%" fxFlex.sm="33.3%" fxFlex.xs="100%" *ngFor="let entry of entries">
-        <app-admin-entry-detail [entry]="entry" (editClicked)="editDocument($event)"
-          (deleteClicked)="deleteDocument($event)">
+    <!-- List of entries -->
+    <div
+      fxLayout="row wrap"
+      fxLayout.xs="column"
+      fxLayoutGap="16px grid"
+      class="entry-list-container"
+    >
+      <div
+        fxFlex="14.28%"
+        fxFlex.md="25%"
+        fxFlex.sm="33.3%"
+        fxFlex.xs="100%"
+        *ngFor="let entry of entries"
+      >
+        <app-admin-entry-detail
+          [entry]="entry"
+          (editClicked)="editDocument($event)"
+          (deleteClicked)="deleteDocument($event)"
+        >
         </app-admin-entry-detail>
       </div>
     </div>
 
-    <!-- Paginator -->
-    <mat-paginator (page)="documentPagination()" #paginator [length]="resultsLength" [pageSizeOptions]="[15, 30, 50]"
-      class="paginator-size">
-    </mat-paginator>
+    <div style="width: 100%; padding-right: 16px">
+      <!-- Paginator -->
+      <mat-paginator
+        (page)="documentPagination()"
+        #paginator
+        [length]="resultsLength"
+        [pageSizeOptions]="[15, 30, 50]"
+        class="paginator-size"
+      >
+      </mat-paginator>
+    </div>
   </div>
 </ng-container>

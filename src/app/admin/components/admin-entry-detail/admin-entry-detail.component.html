@@ -1,10 +1,13 @@
 <ng-container *transloco="let t">
   <mat-card class="entry-detail-card">
-
     <!-- No image -->
     <div class="entry-detail-image-container">
       <div *ngIf="imageSrc === 'none'; else image">
-        <img mat-card-image src="../../../../assets/no_image.png" class="entry-detail-image" />
+        <img
+          mat-card-image
+          src="../../../../assets/no_image.png"
+          class="entry-detail-image"
+        />
       </div>
 
       <!-- If there is image -->
@@ -15,7 +18,11 @@
 
     <!-- Feeds -->
     <div class="entry-detail-content">
-      <div fxLayout="row wrap" fxLayoutGap="5px" class="entry-detail-feeds-container">
+      <div
+        fxLayout="row wrap"
+        fxLayoutGap="5px"
+        class="entry-detail-feeds-container"
+      >
         <div *ngFor="let feed of entry.feeds">
           <div class="entry-detail-feed">
             {{ feed.title }}
@@ -25,15 +32,26 @@
     </div>
 
     <!-- Buttons -->
-    <div fxLayout="row" fxLayoutAlign="space-around" class="entry-detail-actions">
-
+    <div
+      fxLayout="row"
+      fxLayoutAlign="space-around"
+      class="entry-detail-actions"
+    >
       <!-- Edit -->
-      <button mat-icon-button matTooltip="{{ t('lazy.entryDetail.edit-tooltip') }}" (click)="onEditClick()">
+      <button
+        mat-icon-button
+        matTooltip="{{ t('lazy.entryDetail.edit-tooltip') }}"
+        (click)="onEditClick()"
+      >
         <mat-icon> edit </mat-icon>
       </button>
 
       <!-- Delete -->
-      <button mat-icon-button matTooltip="{{ t('lazy.entryDetail.delete-tooltip') }}" (click)="onDeleteClick()">
+      <button
+        mat-icon-button
+        matTooltip="{{ t('lazy.entryDetail.delete-tooltip') }}"
+        (click)="onDeleteClick()"
+      >
         <mat-icon> delete </mat-icon>
       </button>
     </div>
