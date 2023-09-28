@@ -19,9 +19,15 @@ export class ElviraGuard {
     protected readonly router: Router,
     private readonly appStateService: AppStateService
   ) {
+    const refreshToken = this.appStateService.getStateSnapshot().refresh_token;
+    if (!refreshToken) {
+      appStateService.logoutResetState();
+      this.router.navigate(['/auth']);
+    }
+
     // NOTE: Refreshing the token on app load - if unauthorized, the user will be redirected to the login page, else the token will be updated
     this.authService
-      .verifyToken()
+      .verifyToken(refreshToken)
       .pipe()
       .subscribe((response?: UserRefreshToken) => {
         this.appStateService.patchState({
@@ -32,7 +38,7 @@ export class ElviraGuard {
     // NOTE: Refreshing the token every 4 minutes (adjust the interval duration as needed)
     interval(4 * 60 * 1000).subscribe(() => {
       this.authService
-        .verifyToken()
+        .verifyToken(refreshToken)
         .pipe()
         .subscribe((response?: UserRefreshToken) => {
           this.appStateService.patchState({

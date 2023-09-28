@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.5 2023-09-28
+
+- **Fixed**: refresh token
+- **Fixed**: mobile navbar search
+- **Changed**: elvira log
+- **Changed**: viewer 0.3.9 -> 0.4.2
+- **Removed**: few useless images
+
 ## 2.0.4 2023-09-23
 
 - **Added**: infinit scroll in library
