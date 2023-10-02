@@ -47,10 +47,13 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
     this.appState$.subscribe((state) => {
       this.theme = state.theme === 'dark' ? true : false;
       this.email = state.username + '@stuba.sk';
-      if (state.username[0].toLocaleLowerCase() === 'x') {
-        this.name = state.username[1] + ' ' + state.username[2];
-      } else {
-        this.name = state.username[0] + ' ' + state.username[1];
+
+      if (state?.username) {
+        if (state.username[0].toLocaleLowerCase() === 'x') {
+          this.name = state.username[1] + ' ' + state.username[2];
+        } else {
+          this.name = state.username[0] + ' ' + state.username[1];
+        }
       }
     });
   }

@@ -7,7 +7,7 @@
 - **Fixed**: Admin document management
 - **Changed**: elvira log
 - **Changed**: admin entry design
-- **Changed**: viewer 0.3.9 -> 0.4.3
+- **Changed**: viewer 0.3.9 -> 0.4.5
 - **Removed**: few useless images
 
 ## 2.0.4 2023-09-23
