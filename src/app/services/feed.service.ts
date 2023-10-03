@@ -8,7 +8,7 @@ import { FeedDetail, FeedNew, FeedQuery, FeedsList } from '../types/feed.types';
   providedIn: 'root',
 })
 export class FeedService {
-  constructor(private readonly httpClient: HttpClient) { }
+  constructor(private readonly httpClient: HttpClient) {}
 
   /**
    * @param query FeedQuery type, specifications of what king od list we want
@@ -17,10 +17,17 @@ export class FeedService {
   getFeedsList(query: FeedQuery): Observable<FeedsList> {
     let params = new HttpParams()
       .set('page', query.page + 1)
-      .set('limit', query.limit);
-    if (query.title) { params = params.set('title', query.title); }
-    if (query.parent_id) { params = params.set('parent_id', query.parent_id); }
-    if (query.kind) { params = params.set('kind', query.kind); }
+      .set('limit', query.limit)
+      .set('catalog_id', environment.catalog_id);
+    if (query.title) {
+      params = params.set('title', query.title);
+    }
+    if (query.parent_id) {
+      params = params.set('parent_id', query.parent_id);
+    }
+    if (query.kind) {
+      params = params.set('kind', query.kind);
+    }
 
     return this.httpClient.get<FeedsList>(
       environment.baseUrl + `/api/v1/feeds`,
@@ -43,10 +50,7 @@ export class FeedService {
    * @returns Answer
    */
   createFeed(feed: FeedNew) {
-    return this.httpClient.post(
-      environment.baseUrl + '/api/v1/feeds',
-      feed
-    );
+    return this.httpClient.post(environment.baseUrl + '/api/v1/feeds', feed);
   }
 
   /**

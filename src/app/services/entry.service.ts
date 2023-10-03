@@ -23,7 +23,8 @@ export class EntryService {
   getEntriesList(query: EntryQuery) {
     let params = new HttpParams()
       .set('page', query.page + 1)
-      .set('limit', query.limit);
+      .set('limit', query.limit)
+      .set('catalog_id', environment.catalog_id);
     if (query.title) {
       params = params.set('title', query.title);
     }
