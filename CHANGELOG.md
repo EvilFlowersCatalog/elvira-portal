@@ -4,11 +4,12 @@
 
 - **Added**: query param to entries and feeds service
 - **Fixed**: refresh token
+- **Fixed**: adding entries in feeds
 - **Fixed**: mobile navbar search
 - **Fixed**: Admin document management
 - **Changed**: elvira log
 - **Changed**: admin entry design
-- **Changed**: viewer 0.3.9 -> 0.4.7
+- **Changed**: viewer 0.3.9 -> 0.4.8
 - **Removed**: few useless images
 
 ## 2.0.4 2023-09-23

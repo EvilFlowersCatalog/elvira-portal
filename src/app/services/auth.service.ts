@@ -33,11 +33,11 @@ export class AuthService {
   /**
    * @returns Refresh token
    */
-  verifyToken(refreshToken: string): Observable<UserRefreshToken> {
+  verifyToken(): Observable<UserRefreshToken> {
     return this.httpClient.post<UserRefreshToken>(
       environment.baseUrl + '/api/v1/token/refresh',
       {
-        refresh: refreshToken,
+        refresh: this.appStateService.getStateSnapshot().refresh_token,
       }
     );
   }

@@ -1,11 +1,8 @@
 <ng-container *transloco="let t">
-
   <!-- Container -->
   <div class="document-form-container">
-
     <!-- Container title -->
     <div fxLayoutAlign="center center" fxFill>
-
       <!-- If it's edit mode -->
       <div class="document-form-title" *ngIf="isInEditMode; else uploadMode">
         <h3>{{ t("lazy.documentForm.headerEdit") }}</h3>
@@ -19,81 +16,134 @@
 
     <!-- Form start -->
     <form [formGroup]="uploadForm" (submit)="createOrUpdateEntry()">
-
       <!-- Top line, document title and back button -->
-      <div fxLayout="row" fxFill fxLayoutAlign="space-between center" class="document-form-top-container">
-
+      <div
+        fxLayout="row"
+        fxFill
+        fxLayoutAlign="space-between center"
+        class="document-form-top-container"
+      >
         <!-- Title field -->
         <mat-form-field style="width: 50%">
           <mat-label>{{ t("lazy.documentForm.titleLabel") }}</mat-label>
-          <input matInput maxlength="50" formControlName="title" />
+          <input matInput maxlength="150" formControlName="title" />
           <mat-error *ngIf="formTitle.errors?.titleExists">
             Not available
           </mat-error>
         </mat-form-field>
 
         <!-- Button back to admin -->
-        <button class="document-form-back-button" mat-raised-button color="primary" routerLink="/elvira/admin"
-          type="button">
+        <button
+          class="document-form-back-button"
+          mat-raised-button
+          color="primary"
+          routerLink="/elvira/admin"
+          type="button"
+        >
           {{ t("lazy.documentForm.backToAdmin") }}
         </button>
       </div>
 
       <!-- Main content -->
-      <div fxFill fxLayout="row" fxLayout.md="column" fxLayout.sm="column" fxLayout.xs="column" fxLayoutGap="16px">
-
+      <div
+        fxFill
+        fxLayout="row"
+        fxLayout.md="column"
+        fxLayout.sm="column"
+        fxLayout.xs="column"
+        fxLayoutGap="16px"
+      >
         <!-- First column -->
         <div fxLayout="column" class="document-form-column" fxLayoutGap="16px">
-
           <!-- Author & feeds container -->
-          <div fxFlex="100%" fxLayout="row" fxLayout.xs="column" fxLayoutGap="16px">
-
+          <div
+            fxFlex="100%"
+            fxLayout="row"
+            fxLayout.xs="column"
+            fxLayoutGap="16px"
+          >
             <!-- Author -->
             <mat-card fxFlex="50%" class="document-form-mat-card-author">
-
               <!-- Autho title -->
-              <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px"
-                class="document-form-section-title-container">
+              <div
+                fxLayout="row"
+                fxLayoutAlign="center center"
+                fxLayoutGap="10px"
+                class="document-form-section-title-container"
+              >
                 <mat-icon>person</mat-icon>
-                <h4 class="document-form-section-title">{{ t("lazy.documentForm.author") }}</h4>
-                <mat-icon (click)="addContributor()" mat-icon-button color="accent" style="cursor: pointer;"> add
+                <h4 class="document-form-section-title">
+                  {{ t("lazy.documentForm.author") }}
+                </h4>
+                <mat-icon
+                  (click)="addContributor()"
+                  mat-icon-button
+                  color="accent"
+                  style="cursor: pointer"
+                >
+                  add
                 </mat-icon>
               </div>
               <mat-card-content>
-
                 <!-- Author input -->
-                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
-
+                <div
+                  fxLayout="row"
+                  fxLayoutAlign="start center"
+                  fxLayoutGap="16px"
+                >
                   <!-- Author name -->
                   <mat-form-field fxFlex="45%">
-                    <mat-label>{{ t("lazy.documentForm.authorName") }}</mat-label>
+                    <mat-label>{{
+                      t("lazy.documentForm.authorName")
+                    }}</mat-label>
                     <input matInput formControlName="authorName" />
                   </mat-form-field>
 
                   <!-- Author surname -->
                   <mat-form-field fxFlex="45%">
-                    <mat-label>{{ t("lazy.documentForm.authorSurname") }}</mat-label>
+                    <mat-label>{{
+                      t("lazy.documentForm.authorSurname")
+                    }}</mat-label>
                     <input matInput formControlName="authorSurname" />
                   </mat-form-field>
                 </div>
 
                 <!-- Coauthors input -->
-                <div formArrayName="contributors"
-                  *ngFor="let item of uploadForm.get('contributors').controls; let i = index" fxLayout="column">
-                  <div [formGroupName]="i" style="width: 100%" fxLayoutAlign="start center" fxLayoutGap="16px">
-
+                <div
+                  formArrayName="contributors"
+                  *ngFor="
+                    let item of uploadForm.get('contributors').controls;
+                    let i = index
+                  "
+                  fxLayout="column"
+                >
+                  <div
+                    [formGroupName]="i"
+                    style="width: 100%"
+                    fxLayoutAlign="start center"
+                    fxLayoutGap="16px"
+                  >
                     <!-- Co name -->
                     <mat-form-field fxFlex="40%">
-                      <mat-label>{{ t("lazy.documentForm.contributorName") }}</mat-label>
+                      <mat-label>{{
+                        t("lazy.documentForm.contributorName")
+                      }}</mat-label>
                       <input matInput formControlName="name" />
                     </mat-form-field>
 
                     <!-- Co surname -->
                     <mat-form-field fxFlex="40%">
-                      <mat-label>{{ t("lazy.documentForm.contributorSurname") }}</mat-label>
+                      <mat-label>{{
+                        t("lazy.documentForm.contributorSurname")
+                      }}</mat-label>
                       <input matInput formControlName="surname" />
                     </mat-form-field>
-                    <button (click)="deleteContributor(i)" type="button" mat-icon-button color="accent">
+                    <button
+                      (click)="deleteContributor(i)"
+                      type="button"
+                      mat-icon-button
+                      color="accent"
+                    >
                       <mat-icon>clear</mat-icon>
                     </button>
                   </div>
@@ -103,20 +153,37 @@
 
             <!-- Feeds -->
             <mat-card fxFlex="50%" class="document-form-mat-card-feeds">
-
               <!-- Feeds title -->
-              <div fxLayout="row" fxLayoutAlign="center center" fxLayoutGap="10px"
-                class="document-form-section-title-container">
-                <h4 class="document-form-section-title">{{ t("lazy.documentForm.feeds") }}</h4>
-                <mat-icon (click)="addFeeds()" mat-icon-button color="accent" style="cursor: pointer;"> add </mat-icon>
+              <div
+                fxLayout="row"
+                fxLayoutAlign="center center"
+                fxLayoutGap="10px"
+                class="document-form-section-title-container"
+              >
+                <h4 class="document-form-section-title">
+                  {{ t("lazy.documentForm.feeds") }}
+                </h4>
+                <mat-icon
+                  (click)="addFeeds()"
+                  mat-icon-button
+                  color="accent"
+                  style="cursor: pointer"
+                >
+                  add
+                </mat-icon>
               </div>
               <mat-card-content>
-
                 <!-- List of used feeds -->
                 <div fxLayout="row" fxLayoutAlign="start" fxLayoutGap="20px">
                   <mat-chip-list>
-                    <mat-chip *ngFor="let feed of feeds" [removable]="true" (removed)="removeFeed(feed)"
-                      [selectable]="false" color="accent" selected>
+                    <mat-chip
+                      *ngFor="let feed of feeds"
+                      [removable]="true"
+                      (removed)="removeFeed(feed)"
+                      [selectable]="false"
+                      color="accent"
+                      selected
+                    >
                       {{ feed.title }}
                       <mat-icon matChipRemove>cancel</mat-icon>
                     </mat-chip>
@@ -129,14 +196,22 @@
           <!-- Identifiers -->
           <div fxFlex="100%">
             <mat-card fxFill>
-              <div fxLayoutAlign="center center" class="document-form-section-title-container">
-                <h4 class="document-form-section-title">{{ t("lazy.documentForm.identifiers") }}</h4>
+              <div
+                fxLayoutAlign="center center"
+                class="document-form-section-title-container"
+              >
+                <h4 class="document-form-section-title">
+                  {{ t("lazy.documentForm.identifiers") }}
+                </h4>
               </div>
 
               <!-- Identifiers content -->
               <mat-card-content>
-                <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
-
+                <div
+                  fxLayout="row"
+                  fxLayoutAlign="start center"
+                  fxLayoutGap="16px"
+                >
                   <!-- ISBN -->
                   <mat-form-field fxFlex="50%">
                     <mat-label>ISBN</mat-label>
@@ -156,16 +231,27 @@
           <!-- Summary -->
           <div>
             <mat-card fxFill>
-              <div fxLayoutAlign="center center" class="document-form-section-title-container">
-                <h4 class="document-form-section-title">{{ t("lazy.documentForm.summary") }}</h4>
+              <div
+                fxLayoutAlign="center center"
+                class="document-form-section-title-container"
+              >
+                <h4 class="document-form-section-title">
+                  {{ t("lazy.documentForm.summary") }}
+                </h4>
               </div>
 
               <!-- Summary input -->
               <mat-card-content>
                 <div fxLayout="row" fxLayoutAlign="start">
                   <mat-form-field fxFlex="100%">
-                    <textarea matInput class="document-form-summary-textfield" formControlName="summary"></textarea>
-                    <mat-hint>{{ t("lazy.documentForm.summaryHint") }}</mat-hint>
+                    <textarea
+                      matInput
+                      class="document-form-summary-textfield"
+                      formControlName="summary"
+                    ></textarea>
+                    <mat-hint>{{
+                      t("lazy.documentForm.summaryHint")
+                    }}</mat-hint>
                   </mat-form-field>
                 </div>
               </mat-card-content>
@@ -175,32 +261,45 @@
 
         <!-- Second column -->
         <div fxLayout="column" class="document-form-column" fxLayoutGap="16px">
-
           <!-- Image & input container -->
           <div fxLayout="row" fxLayout.xs="column" fxLayoutGap="16px">
-
             <!-- Image input -->
             <div fxLayout="column" class="dragonzone-container">
               <mat-card fxFill>
-
                 <!-- title -->
-                <div fxLayoutAlign="center center" class="document-form-section-title-container">
-                  <h4 class="document-form-section-title">{{ t("lazy.documentForm.image") }}*</h4>
+                <div
+                  fxLayoutAlign="center center"
+                  class="document-form-section-title-container"
+                >
+                  <h4 class="document-form-section-title">
+                    {{ t("lazy.documentForm.image") }}*
+                  </h4>
                 </div>
 
                 <!-- Content -->
-                <div mat-dialog-content class="document-form-dropzone" fxLayout="column" fxLayoutAlign="center center"
-                  dragAndDrop (fileDropped)="onImageDropped($event)">
+                <div
+                  mat-dialog-content
+                  class="document-form-dropzone"
+                  fxLayout="column"
+                  fxLayoutAlign="center center"
+                  dragAndDrop
+                  (fileDropped)="onImageDropped($event)"
+                >
                   <ng-template [ngIf]="!imageFile">
-                    <input type="file" class="input-file" accept=".png, .jpeg, .jpg"
-                      (change)="imageSelectedFromBrowse(($event.target?.files)[0])" />
+                    <input
+                      type="file"
+                      class="input-file"
+                      accept=".png, .jpeg, .jpg"
+                      (change)="
+                        imageSelectedFromBrowse(($event.target?.files)[0])
+                      "
+                    />
                     <h5 style="text-align: center">
                       {{ t("lazy.documentForm.imageDropper") }}
                     </h5>
                     <h6><i>(MAX 5MB)</i></h6>
                   </ng-template>
                   <ng-template [ngIf]="imageFile">
-
                     <h5>{{ imageFile?.name }}</h5>
                     <h6 *ngIf="checkImageSize()">
                       {{ formatFileSize(imageFile?.size) }}
@@ -208,7 +307,11 @@
                     <h6 *ngIf="!validSize">
                       {{ t("lazy.documentForm.imageError") }}
                     </h6>
-                    <button mat-icon-button class="btn-remove-file" (click)="removeImage()">
+                    <button
+                      mat-icon-button
+                      class="btn-remove-file"
+                      (click)="removeImage()"
+                    >
                       <mat-icon>clear</mat-icon>
                     </button>
                   </ng-template>
@@ -217,27 +320,51 @@
             </div>
 
             <!-- Pdf input -->
-            <div *ngIf="!isInEditMode" fxLayout="column" class="dragonzone-container">
+            <div
+              *ngIf="!isInEditMode"
+              fxLayout="column"
+              class="dragonzone-container"
+            >
               <mat-card fxFill>
-
                 <!-- Title -->
-                <div fxLayoutAlign="center center" class="document-form-section-title-container">
-                  <h4 class="document-form-section-title">{{ t("lazy.documentForm.document") }}*</h4>
+                <div
+                  fxLayoutAlign="center center"
+                  class="document-form-section-title-container"
+                >
+                  <h4 class="document-form-section-title">
+                    {{ t("lazy.documentForm.document") }}*
+                  </h4>
                 </div>
 
                 <!-- Content -->
-                <div mat-dialog-content class="document-form-dropzone" fxLayout="column" fxLayoutAlign="center center"
-                  dragAndDrop (fileDropped)="onPDFDropped($event)">
+                <div
+                  mat-dialog-content
+                  class="document-form-dropzone"
+                  fxLayout="column"
+                  fxLayoutAlign="center center"
+                  dragAndDrop
+                  (fileDropped)="onPDFDropped($event)"
+                >
                   <ng-template [ngIf]="!pdfFile">
-                    <input type="file" class="input-file" accept=".pdf"
-                      (change)="PDFSelectedFromBrowse(($event.target?.files)[0])" />
+                    <input
+                      type="file"
+                      class="input-file"
+                      accept=".pdf"
+                      (change)="
+                        PDFSelectedFromBrowse(($event.target?.files)[0])
+                      "
+                    />
                     <h5 style="text-align: center">
                       {{ t("lazy.documentForm.documentDropper") }}
                     </h5>
                   </ng-template>
                   <ng-template [ngIf]="pdfFile">
                     <h5>{{ pdfFile?.name }}</h5>
-                    <button mat-icon-button class="btn-remove-file" (click)="removePDF()">
+                    <button
+                      mat-icon-button
+                      class="btn-remove-file"
+                      (click)="removePDF()"
+                    >
                       <mat-icon>clear</mat-icon>
                     </button>
                   </ng-template>
@@ -249,16 +376,27 @@
           <!-- Citation -->
           <div fxFlex="100%">
             <mat-card fxFill>
-              <div fxLayoutAlign="center center" class="document-form-section-title-container">
-                <h4 class="document-form-section-title">{{ t("lazy.documentForm.citation") }}</h4>
+              <div
+                fxLayoutAlign="center center"
+                class="document-form-section-title-container"
+              >
+                <h4 class="document-form-section-title">
+                  {{ t("lazy.documentForm.citation") }}
+                </h4>
               </div>
 
               <!-- Citation input -->
               <mat-card-content>
                 <div fxLayout="row" fxLayoutAlign="start">
                   <mat-form-field fxFlex="100%">
-                    <textarea matInput class="document-form-citation-textfield" formControlName="citation"></textarea>
-                    <mat-hint>{{ t("lazy.documentForm.citationHint") }}</mat-hint>
+                    <textarea
+                      matInput
+                      class="document-form-citation-textfield"
+                      formControlName="citation"
+                    ></textarea>
+                    <mat-hint>{{
+                      t("lazy.documentForm.citationHint")
+                    }}</mat-hint>
                   </mat-form-field>
                 </div>
               </mat-card-content>
@@ -280,10 +418,6 @@
       </div>
     </form>
   </div>
-
-
-
-
 
   <!-- <button class="document-form-back-btn" mat-raised-button color="primary" routerLink="/library/admin" type="button">
     {{ t("lazy.documentForm.backToAdmin") }}

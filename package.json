@@ -24,7 +24,7 @@
     "@angular/platform-browser": "^16.1.2",
     "@angular/platform-browser-dynamic": "^16.1.2",
     "@angular/router": "^16.1.2",
-    "@evilflowers/evilflowersviewer": "^0.4.7",
+    "@evilflowers/evilflowersviewer": "^0.4.8",
     "@ngneat/transloco": "^4.3.0",
     "form-data": "^2.3.3",
     "is-svg": "^4.3.1",
