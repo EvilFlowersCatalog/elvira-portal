@@ -1,5 +1,4 @@
 import { Component, OnInit, HostListener } from '@angular/core';
-import { Observable } from 'rxjs';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { EntryService } from 'src/app/services/entry.service';
 import { FeedService } from 'src/app/services/feed.service';
