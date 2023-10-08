@@ -1,7 +1,6 @@
 stages:
   - build
   - deploy
-  - notify
 
 build dev:
   stage: build
@@ -34,14 +33,33 @@ deploy dev:
   only:
     - dev
 
-#notify dev:
-#  stage: notify
-#  image: dgkanatsios/o365-notify
-#  variables:
-#    GIT_STRATEGY: none
-#    O365_MESSAGE: New deploy to elvira-dev.fiit.stuba.sk
-#  environment:
-#    name: dev
-#    url: https://elvira-dev.fiit.stuba.sk/
-#  only:
-#    - dev
+build production:
+  stage: build
+  image: node:20
+  script:
+    - npm i --save-dev
+    - npm run build:dev
+  artifacts:
+    name: "elvira-$CI_COMMIT_SHORT_SHA"
+    expire_in: 15 minute
+    paths:
+      - dist/elibrary-portal/
+  environment:
+    name: production
+    url: https://elvira.fiit.stuba.sk/
+  only:
+    - master
+
+deploy production:
+  stage: deploy
+  image: registry.gitlab.com/langio/node-deployer:latest
+  variables:
+    GIT_STRATEGY: none
+    BUILD_DIR: dist/elibrary-portal
+  script:
+    - NODE_PATH=/usr/local/lib/node_modules node /opt/node-deployer/deploy.js
+  environment:
+    name: production
+    url: https://elvira.fiit.stuba.sk/
+  only:
+    - master
