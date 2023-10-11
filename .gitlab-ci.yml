@@ -38,7 +38,7 @@ build production:
   image: node:20
   script:
     - npm i --save-dev
-    - npm run build:dev
+    - npm run build:prod
   artifacts:
     name: "elvira-$CI_COMMIT_SHORT_SHA"
     expire_in: 15 minute
