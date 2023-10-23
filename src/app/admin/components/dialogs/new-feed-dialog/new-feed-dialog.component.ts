@@ -1,5 +1,8 @@
 import { Component, OnInit, Inject } from '@angular/core';
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
+import {
+  MatLegacyDialogRef as MatDialogRef,
+  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
+} from '@angular/material/legacy-dialog';
 import {
   UntypedFormBuilder,
   UntypedFormGroup,
@@ -23,38 +26,41 @@ export class NewFeedDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<NewFeedDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { parent_id: string, parent_name: string },
+    @Inject(MAT_DIALOG_DATA)
+    public data: { parent_id: string; parent_name: string },
     private readonly fb: UntypedFormBuilder,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService,
-    private readonly feedService: FeedService,
+    private readonly feedService: FeedService
   ) {
     dialogRef.disableClose = true;
     this.feed_form = this.fb.group({
       feed_title: ['', [Validators.required]],
       feed_kind: [null, [Validators.required]],
       feed_content: ['', [Validators.required]],
-      feed_parents: [this.data.parent_id === "null" ? '' : this.data.parent_id],
+      feed_parents: [this.data.parent_id === 'null' ? '' : this.data.parent_id],
     });
   }
 
   ngOnInit(): void {
     // Get all navigation feeds
-    this.feedService.getFeedsList({
-      page: 0,
-      limit: 100,
-      kind: "navigation"
-    })
-      .subscribe((data) => this.navigation_feeds = data.items);
+    this.feedService
+      .getFeedsList({
+        page: 0,
+        limit: 100,
+        kind: 'navigation',
+        order_by: 'title',
+      })
+      .subscribe((data) => (this.navigation_feeds = data.items));
 
     // Set already used parent, if there is one
-    if (this.data.parent_id !== "null") {
+    if (this.data.parent_id !== 'null') {
       this.addFeed({ title: this.data.parent_name, id: this.data.parent_id });
     }
   }
 
   // add new parents
-  addFeed(feed: { title: string, id: string }) {
+  addFeed(feed: { title: string; id: string }) {
     if (!this.picked_feeds.includes(feed.title)) {
       this.picked_feeds.push(feed.title);
       this.picked_feeds_id.push(feed.id);

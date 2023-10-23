@@ -52,17 +52,5 @@
         </app-admin-entry-detail>
       </div>
     </div>
-
-    <div style="width: 100%; padding-right: 16px">
-      <!-- Paginator -->
-      <mat-paginator
-        (page)="documentPagination()"
-        #paginator
-        [length]="resultsLength"
-        [pageSizeOptions]="[15, 30, 50]"
-        class="paginator-size"
-      >
-      </mat-paginator>
-    </div>
   </div>
 </ng-container>

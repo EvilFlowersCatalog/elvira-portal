@@ -58,6 +58,7 @@ export class HomeComponent extends DisposableComponent implements OnInit {
         page: 0,
         limit: 4,
         parent_id: 'null', // query for main feeds (has no parent)
+        order_by: 'title',
       })
       .subscribe((data) => (this.main_feeds = data.items));
   }

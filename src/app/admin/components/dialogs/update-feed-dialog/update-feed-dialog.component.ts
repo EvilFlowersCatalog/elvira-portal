@@ -1,6 +1,13 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { UntypedFormGroup, UntypedFormBuilder, Validators } from '@angular/forms';
-import { MatLegacyDialogRef as MatDialogRef, MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA } from '@angular/material/legacy-dialog';
+import {
+  UntypedFormGroup,
+  UntypedFormBuilder,
+  Validators,
+} from '@angular/forms';
+import {
+  MatLegacyDialogRef as MatDialogRef,
+  MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
+} from '@angular/material/legacy-dialog';
 import { TranslocoService } from '@ngneat/transloco';
 import { NewFeedDialogComponent } from '../new-feed-dialog/new-feed-dialog.component';
 import { FeedService } from 'src/app/services/feed.service';
@@ -20,7 +27,13 @@ export class UpdateFeedDialogComponent implements OnInit {
 
   constructor(
     public dialogRef: MatDialogRef<NewFeedDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { title: string, parents: string[], kind: string, content: string },
+    @Inject(MAT_DIALOG_DATA)
+    public data: {
+      title: string;
+      parents: string[];
+      kind: string;
+      content: string;
+    },
     private readonly fb: UntypedFormBuilder,
     private readonly notificationService: NotificationService,
     private readonly feedService: FeedService,
@@ -31,28 +44,35 @@ export class UpdateFeedDialogComponent implements OnInit {
       feed_title: [this.data.title, [Validators.required]],
       feed_kind: [this.data.kind, [Validators.required]],
       feed_content: [this.data.content, [Validators.required]],
-      feed_parents: [this.data.parents.length > 0 ? this.data.parents[this.data.parents.length - 1] : '']
+      feed_parents: [
+        this.data.parents.length > 0
+          ? this.data.parents[this.data.parents.length - 1]
+          : '',
+      ],
     });
   }
 
   ngOnInit(): void {
-    this.feedService.getFeedsList({
-      page: 0,
-      limit: 100,
-      kind: "navigation"
-    })
-      .subscribe((data) => this.navigation_feeds = data.items)
+    this.feedService
+      .getFeedsList({
+        page: 0,
+        limit: 100,
+        kind: 'navigation',
+        order_by: 'title',
+      })
+      .subscribe((data) => (this.navigation_feeds = data.items));
 
     for (let i = 0; i < this.data.parents.length; i++) {
       // push id
       this.picked_feeds_id.push(this.data.parents[i]);
-      this.feedService.getFeedDetail(this.data.parents[i])
+      this.feedService
+        .getFeedDetail(this.data.parents[i])
         .subscribe((data) => this.picked_feeds.push(data.response.title)); // push name
     }
   }
 
   // add new parents
-  addFeed(feed: { title: string, id: string }) {
+  addFeed(feed: { title: string; id: string }) {
     if (!this.picked_feeds.includes(feed.title)) {
       this.picked_feeds.push(feed.title);
       this.picked_feeds_id.push(feed.id);

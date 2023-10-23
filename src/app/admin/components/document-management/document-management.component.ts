@@ -1,11 +1,7 @@
-import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
-import {
-  UntypedFormBuilder,
-  UntypedFormControl,
-  UntypedFormGroup,
-} from '@angular/forms';
+import { AfterViewInit, Component, HostListener } from '@angular/core';
+import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
 import { Subject, throwError } from 'rxjs';
 import {
@@ -19,7 +15,6 @@ import {
 } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
 import { DeleteDialogComponent } from '../dialogs/delete-dialog/delete-dialog.component';
-import { MatPaginator } from '@angular/material/paginator';
 import { NotificationService } from 'src/app/services/general/notification.service';
 import { Entry } from 'src/app/types/entry.types';
 import { EntryService } from 'src/app/services/entry.service';
@@ -39,7 +34,12 @@ export class DocumentManagementComponent
   entries: Entry[] = [];
   fetchDocuments$ = new Subject();
   searchForm: UntypedFormGroup;
-  @ViewChild('paginator') paginator: MatPaginator;
+  page: number = 0;
+  refresh: boolean = false;
+  firstScroll: boolean = true;
+  resetEntries: boolean = false; // in fetch entries
+  deleted: boolean = false; // when entrie is deleted
+  lenght: number = 0; // for saving actual entires.lenght, for reaload (used when entry was deleted)
 
   constructor(
     private readonly navigationService: NavigationService,
@@ -55,6 +55,19 @@ export class DocumentManagementComponent
     });
   }
 
+  @HostListener('window:scroll', ['$event'])
+  onScroll(event: Event): void {
+    const windowHeight = window.innerHeight;
+    const scrollPosition = window.scrollY;
+    const pageHeight = document.body.scrollHeight;
+
+    // if we are at bottom and there is possible refresh, fetch entries
+    if (scrollPosition + windowHeight >= pageHeight - 500 && this.refresh) {
+      this.refresh = false;
+      this.fetchDocuments$.next();
+    }
+  }
+
   //Pass info to pagination
   ngAfterViewInit() {
     this.fetchDocuments$
@@ -64,21 +77,34 @@ export class DocumentManagementComponent
         startWith([]),
         concatMap(() =>
           this.entryService.getEntriesList({
-            page: this.paginator.pageIndex ?? 0,
-            limit: this.paginator.pageSize ?? 15,
+            page: this.page,
+            limit: this.deleted ? this.lenght : 25,
             title: this.searchForm?.value.searchInput ?? '',
+            order_by: '-created_at',
           })
         )
       )
       .subscribe((data) => {
-        this.entries = data.items;
-        this.resultsLength = data.metadata.total;
-        this.paginator.pageIndex = data.metadata.page - 1;
-      });
-  }
+        this.deleted = false; // reset deleted
+        if (this.resetEntries) {
+          this.resetEntries = false;
+          this.entries = data.items;
+        } else {
+          this.entries.push(...data.items); // push
+        }
 
-  documentPagination() {
-    this.fetchDocuments$.next();
+        // When user comes to library first time scroll up or entries were reseted (reset funtion)
+        if (this.firstScroll) {
+          this.firstScroll = false;
+          window.scrollTo(0, 0);
+        }
+
+        // Check if actuall page is last or not, if not user can refresh
+        if (this.page !== data.metadata.pages - 1) {
+          this.refresh = true;
+          this.page += 1; // next page
+        }
+      });
   }
 
   //Button, to navigate to the upload formular
@@ -115,6 +141,8 @@ export class DocumentManagementComponent
         })
       )
       .subscribe(() => {
+        this.lenght = this.entries.length;
+        this.deleted = true;
         this.fetchDocuments$.next(); // update
       });
   }
@@ -126,6 +154,9 @@ export class DocumentManagementComponent
 
   //Function for searchbar
   applyFilter() {
+    this.page = 0;
+    this.resetEntries = true;
+    this.firstScroll = true;
     this.fetchDocuments$.next();
   }
 }

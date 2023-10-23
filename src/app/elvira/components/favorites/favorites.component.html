@@ -1,5 +1,33 @@
 <ng-container *transloco="let t">
   <div class="favorities-container" fxLayout="column">
+    <!-- Tools -->
+    <div class="favorities-tools-container">
+      <div
+        class="favorities-tools"
+        fxLayout="column"
+        fxLayout.sm="row"
+        fxLayout.xs="row"
+      >
+        <!-- Tools buttons -->
+        <div
+          class="favorities-tools-buttons-container"
+          *ngFor="let button of buttons"
+        >
+          <mat-icon
+            matTooltip="{{ t(button.toolTip) }}"
+            fxLayout="column"
+            color="accent"
+            class="{{ button.class }}"
+            [ngClass]="{ 'favorities-tools-active-button': button.active }"
+            (click)="button.onClick()"
+          >
+            {{ button.icon }}
+            <span class="favorities-tools-button-span">{{ button.title }}</span>
+          </mat-icon>
+        </div>
+      </div>
+    </div>
+
     <!-- Form for search -->
     <form
       [formGroup]="searchForm"
@@ -57,20 +85,6 @@
           </h1>
         </div>
       </ng-template>
-    </div>
-
-    <!-- Paginator -->
-    <div fxLayoutAlign="center center">
-      <mat-paginator
-        *ngIf="favorities.length > 0"
-        #paginator
-        (page)="favoritePagination()"
-        [length]="resultsLength"
-        [pageSizeOptions]="[15, 30, 50]"
-        class="favorites-paginator"
-        aria-label="Select page"
-      >
-      </mat-paginator>
     </div>
   </div>
 </ng-container>

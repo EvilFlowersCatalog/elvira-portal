@@ -25,4 +25,5 @@ export interface FavoriteQuery {
   page: number;
   limit: number;
   title: string;
+  order_by: string;
 }

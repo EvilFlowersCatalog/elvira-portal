@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { Subject } from 'rxjs';
 import {
   concatMap,
@@ -100,8 +100,9 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
     const windowHeight = window.innerHeight;
     const scrollPosition = window.scrollY;
     const pageHeight = document.body.scrollHeight;
+
     // if we are at bottom and there is possible refresh, fetch entries
-    if (scrollPosition + windowHeight + 10 >= pageHeight && this.refresh) {
+    if (scrollPosition + windowHeight >= pageHeight - 500 && this.refresh) {
       this.refresh = false;
       this.fetchEntries$.next();
     }
@@ -177,11 +178,7 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
   sort(orderBy: string, activeButton: string) {
     // set active button based on given title
     this.buttons = this.buttons.map((button) => {
-      if (button.title === activeButton) {
-        return { ...button, active: true };
-      } else {
-        return { ...button, active: false };
-      }
+      return { ...button, active: button.title === activeButton };
     });
     this.orderBy = orderBy; // set type
     this.reset();

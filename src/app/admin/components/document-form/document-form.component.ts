@@ -57,7 +57,9 @@ export class DocumentFormComponent implements OnInit {
       citation: new UntypedFormControl(''),
       isbn: new UntypedFormControl(''),
       doi: new UntypedFormControl(''),
-      summary: new UntypedFormControl('', Validators.required),
+      year: new UntypedFormControl(''),
+      publisher: new UntypedFormControl(''),
+      summary: new UntypedFormControl(''),
     });
   }
 
@@ -68,6 +70,7 @@ export class DocumentFormComponent implements OnInit {
         page: 0,
         limit: 100,
         kind: 'acquisition',
+        order_by: 'title',
       })
       .subscribe((dataSource) => {
         dataSource.items.forEach((item) => {
@@ -135,6 +138,8 @@ export class DocumentFormComponent implements OnInit {
       doi: data.response.identifiers.doi,
       isbn: data.response.identifiers.isbn,
       citation: data.response.citation,
+      year: data.response.year,
+      publisher: data.response.publisher,
     });
   }
 
@@ -338,6 +343,12 @@ export class DocumentFormComponent implements OnInit {
       },
       citation: this.uploadForm.get('citation').value
         ? this.uploadForm.get('citation').value
+        : null,
+      year: this.uploadForm.get('year').value
+        ? this.uploadForm.get('year').value
+        : null,
+      publisher: this.uploadForm.get('publisher').value
+        ? this.uploadForm.get('publisher').value
         : null,
       image: await this.getBase(this.imageFile),
     };

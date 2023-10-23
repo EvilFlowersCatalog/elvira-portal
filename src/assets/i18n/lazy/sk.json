@@ -8,15 +8,18 @@
     "headerEdit": "Úprava dokumentu",
     "titleLabel": "Názov dokumentu",
     "author": "Autor",
+    "addAuthor": "Pridať spoluautora",
     "authorName": "Meno autora",
     "authorSurname": "Priezvisko autora",
     "contributorName": "Meno spoluautora",
     "contributorSurname": "Priezvisko spoluautora",
     "feeds": "Feedy",
+    "addFeeds": "Pridať feed",
     "identifiers": "Identifikátory",
     "summary": "Zhrnutie",
     "summaryHint": "Krátke zhrnutie dokumentu",
     "citation": "Citácia",
+    "getCitation": "Generovať citáciu",
     "citationHint": "Vložte BibTeX citáciu pre tento dokument",
     "image": "Obrázok",
     "imageDropper": "Presuňte obrázok sem alebo kliknite sem a prehľadávajte",
@@ -29,7 +32,9 @@
     "successMessageEditDocument": "Dokument bol úspešne upravený",
     "errorMessageEditDocument": "Úprava zlyhala",
     "successMessageUploadDocument": "Dokument bol úspešne nahraný",
-    "errorMessageUploadDocument": "Nahrávanie zlyhalo"
+    "errorMessageUploadDocument": "Nahrávanie zlyhalo",
+    "year": "Rok",
+    "publisher": "Vydavateľ"
   },
   "auth": {
     "autoLogout": "Boli ste odhlásený"

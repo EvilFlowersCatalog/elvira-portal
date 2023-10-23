@@ -18,6 +18,7 @@ export class FeedService {
     let params = new HttpParams()
       .set('page', query.page + 1)
       .set('limit', query.limit)
+      .set('order_by', query.order_by)
       .set('catalog_id', environment.catalog_id);
     if (query.title) {
       params = params.set('title', query.title);

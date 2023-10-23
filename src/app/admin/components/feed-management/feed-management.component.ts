@@ -1,8 +1,5 @@
-import { NestedTreeControl } from '@angular/cdk/tree';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
-import { MatTreeNestedDataSource } from '@angular/material/tree';
-import { ActivatedRoute } from '@angular/router';
 import { TranslocoService } from '@ngneat/transloco';
 import { Subject, throwError } from 'rxjs';
 import {
@@ -21,7 +18,6 @@ import { DeleteDialogComponent } from '../dialogs/delete-dialog/delete-dialog.co
 import { NewFeedDialogComponent } from '../dialogs/new-feed-dialog/new-feed-dialog.component';
 import { UpdateFeedDialogComponent } from '../dialogs/update-feed-dialog/update-feed-dialog.component';
 import { Guid } from 'js-guid';
-import { MatPaginator } from '@angular/material/paginator';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import { environment } from 'src/environments/environment';
 import { FeedService } from 'src/app/services/feed.service';
@@ -35,13 +31,19 @@ import { Feed, FeedNew } from 'src/app/types/feed.types';
 })
 export class FeedManagementComponent
   extends DisposableComponent
-  implements OnInit {
+  implements OnInit
+{
   fetchFeeds$ = new Subject();
   data_source: Feed[] = []; // used in html
   search_form: UntypedFormGroup; // used in html
   results_length: number = 0; // used in html
-  feed_path: { title: string, id: string }[] = []; // path of feeds
-  @ViewChild('paginator') paginator: MatPaginator;
+  feed_path: { title: string; id: string }[] = []; // path of feeds
+  page: number = 0;
+  refresh: boolean = false;
+  firstScroll: boolean = true;
+  resetFeeds: boolean = false; // in fetch entries
+  deleted: boolean = false; // when entrie is deleted
+  lenght: number = 0; // for saving actual entires.lenght, for reaload (used when entry was deleted)
 
   constructor(
     public dialog: MatDialog,
@@ -55,6 +57,19 @@ export class FeedManagementComponent
     });
   }
 
+  @HostListener('window:scroll', ['$event'])
+  onScroll(event: Event): void {
+    const windowHeight = window.innerHeight;
+    const scrollPosition = window.scrollY;
+    const pageHeight = document.body.scrollHeight;
+
+    // if we are at bottom and there is possible refresh, fetch entries
+    if (scrollPosition + windowHeight >= pageHeight - 500 && this.refresh) {
+      this.refresh = false;
+      this.fetchFeeds$.next();
+    }
+  }
+
   ngOnInit(): void {
     // Push first parent id as null
     this.feed_path.push({ title: '', id: 'null' });
@@ -64,32 +79,53 @@ export class FeedManagementComponent
       .pipe(
         takeUntil(this.destroySignal$),
         startWith([]),
-        concatMap((title: string = "") => this.feedService.getFeedsList({
-          page: this.paginator?.pageIndex ?? 0,
-          limit: this.paginator?.pageSize ?? 15,
-          parent_id: this.feed_path[this.feed_path.length - 1].id, // whatever is actuall feed id
-          title: title,
-        }))
+        concatMap((title: string = '') =>
+          this.feedService.getFeedsList({
+            page: this.page,
+            limit: this.deleted ? this.lenght : 50,
+            parent_id: this.feed_path[this.feed_path.length - 1].id, // whatever is actuall feed id
+            title: title,
+            order_by: '-created_at',
+          })
+        )
       )
       .subscribe((data) => {
-        this.data_source = data.items;
-        this.results_length = data.metadata.total;
-        this.paginator.pageIndex = data.metadata.page - 1;
+        this.deleted = false; // reset deleted
+        if (this.resetFeeds) {
+          this.resetFeeds = false;
+          this.data_source = data.items;
+        } else {
+          this.data_source.push(...data.items); // push
+        }
+
+        // When user comes to library first time scroll up or feeds were reseted (reset funtion)
+        if (this.firstScroll) {
+          this.firstScroll = false;
+          window.scrollTo(0, 0);
+        }
+
+        // Check if actuall page is last or not, if not user can refresh
+        if (this.page !== data.metadata.pages - 1) {
+          this.refresh = true;
+          this.page += 1; // next page
+        }
       });
   }
 
   // next feeds
   nextFeeds(feed: Feed) {
-    if (feed.kind === "navigation") {
+    if (feed.kind === 'navigation') {
       this.feed_path.push({ title: feed.title, id: feed.id }); // push new parent id
+      this.reset();
       this.fetchFeeds$.next();
     }
   }
 
   // go back in path
   goBack() {
-    if (this.feed_path[this.feed_path.length - 1].id !== "null") {
+    if (this.feed_path[this.feed_path.length - 1].id !== 'null') {
       this.feed_path.pop(); // pop old parent id
+      this.reset();
       this.fetchFeeds$.next();
     }
   }
@@ -99,7 +135,10 @@ export class FeedManagementComponent
     // create dialog
     const dialogRef = this.dialog.open(NewFeedDialogComponent, {
       width: '50%',
-      data: { parent_id: this.feed_path[this.feed_path.length - 1].id, parent_name: this.feed_path[this.feed_path.length - 1].title },
+      data: {
+        parent_id: this.feed_path[this.feed_path.length - 1].id,
+        parent_name: this.feed_path[this.feed_path.length - 1].title,
+      },
     });
 
     // after dialog is closed
@@ -108,8 +147,14 @@ export class FeedManagementComponent
       .pipe(
         take(1),
         filter(
-          (result: 'no' & { feed_title: string; feed_kind: string; feed_content: string, feed_parents: string[] }) =>
-            result !== 'no'
+          (
+            result: 'no' & {
+              feed_title: string;
+              feed_kind: string;
+              feed_content: string;
+              feed_parents: string[];
+            }
+          ) => result !== 'no'
         ),
         map((result) => ({
           // Set new feed
@@ -120,9 +165,7 @@ export class FeedManagementComponent
           content: result.feed_content,
           kind: result.feed_kind,
         })),
-        concatMap((feed: FeedNew) =>
-          this.feedService.createFeed(feed)
-        ),
+        concatMap((feed: FeedNew) => this.feedService.createFeed(feed)),
         tap(() => {
           const message = this.translocoService.translate(
             'lazy.feedManagement.feedPostSuccess'
@@ -139,6 +182,7 @@ export class FeedManagementComponent
         })
       )
       .subscribe(() => {
+        this.reset();
         this.fetchFeeds$.next(); // update new list of feeds
       });
   }
@@ -148,7 +192,12 @@ export class FeedManagementComponent
     // create edit dialog
     const dialogRef = this.dialog.open(UpdateFeedDialogComponent, {
       width: '50%',
-      data: { title: feed.title, parents: feed.parents, kind: feed.kind, content: feed.content },
+      data: {
+        title: feed.title,
+        parents: feed.parents,
+        kind: feed.kind,
+        content: feed.content,
+      },
     });
 
     // after dialog is closed
@@ -157,8 +206,14 @@ export class FeedManagementComponent
       .pipe(
         take(1),
         filter(
-          (result: 'no' & { feed_title: string; feed_kind: string; feed_parents: string[]; feed_content: string }) =>
-            result !== 'no'
+          (
+            result: 'no' & {
+              feed_title: string;
+              feed_kind: string;
+              feed_parents: string[];
+              feed_content: string;
+            }
+          ) => result !== 'no'
         ),
         map((result) => ({
           // set edited data
@@ -188,7 +243,10 @@ export class FeedManagementComponent
         })
       )
       .subscribe(() => {
-        this.fetchFeeds$.next() // reload
+        this.deleted = true;
+        this.reset();
+        this.lenght = this.data_source.length;
+        this.fetchFeeds$.next(); // reload
       });
   }
 
@@ -223,15 +281,20 @@ export class FeedManagementComponent
         })
       )
       .subscribe(() => {
+        this.deleted = true;
+        this.lenght = this.data_source.length;
+        this.reset();
         this.fetchFeeds$.next(); // reload
       });
   }
 
-  applyFilter() {
-    this.fetchFeeds$.next(this.search_form?.value.search_input);
+  reset() {
+    this.page = 0;
+    this.firstScroll = true;
+    this.resetFeeds = true;
   }
-
-  handlePageChange() {
-    this.fetchFeeds$.next();
+  applyFilter() {
+    this.reset();
+    this.fetchFeeds$.next(this.search_form?.value.search_input);
   }
 }

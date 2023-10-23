@@ -1,8 +1,8 @@
-import { Metadata } from "./general.types";
+import { Metadata } from './general.types';
 
 export interface FeedsList {
   items: Feed[];
-  metadata: Metadata
+  metadata: Metadata;
 }
 
 export interface Feed {
@@ -29,7 +29,7 @@ export interface FeedDetail {
     url: string;
     created_at: string;
     updated_at: string;
-  }
+  };
 }
 
 export interface FeedQuery {
@@ -37,7 +37,8 @@ export interface FeedQuery {
   limit: number;
   parent_id?: string;
   title?: string;
-  kind?: string
+  kind?: string;
+  order_by: string;
 }
 
 export interface FeedNew {

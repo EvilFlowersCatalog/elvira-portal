@@ -1,5 +1,9 @@
 <ng-container *transloco="let t">
-  <div fxLayout="row" fxLayoutAlign="space-between center" class="feed-header-box">
+  <div
+    fxLayout="row"
+    fxLayoutAlign="space-between center"
+    class="feed-header-box"
+  >
     <!-- Searchbar -->
     <form [formGroup]="search_form" (submit)="applyFilter()" class="feed-form">
       <div fxLayout="row" fxLayoutAlign="center center">
@@ -28,9 +32,19 @@
   <!-- Feeds list -->
   <div class="feed-container">
     <div>
-      <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutAlign.xs="none" fxLayoutGap="16px grid">
-        <div fxFlex="20%" fxFlex.md="33.3%" fxFlex.sm="50%" fxFlex.xs="100%" (click)="createFeed()">
-
+      <div
+        fxLayout="row wrap"
+        fxLayout.xs="column"
+        fxLayoutAlign.xs="none"
+        fxLayoutGap="16px grid"
+      >
+        <div
+          fxFlex="20%"
+          fxFlex.md="33.3%"
+          fxFlex.sm="50%"
+          fxFlex.xs="100%"
+          (click)="createFeed()"
+        >
           <!-- Add button -->
           <div class="feed-add-feed">
             <mat-icon class="feed-add-icon">add</mat-icon>
@@ -38,15 +52,21 @@
         </div>
 
         <!-- Feeds -->
-        <div fxFlex="20%" fxFlex.md="33.3%" fxFlex.sm="50%" fxFlex.xs="100%" *ngFor="let feed of data_source">
-          <app-admin-feed [feed]="feed" (nextClicked)="nextFeeds($event)" (editClicked)="editFeed($event)"
-            (deleteClicked)="deleteFeed($event)"></app-admin-feed>
+        <div
+          fxFlex="20%"
+          fxFlex.md="33.3%"
+          fxFlex.sm="50%"
+          fxFlex.xs="100%"
+          *ngFor="let feed of data_source"
+        >
+          <app-admin-feed
+            [feed]="feed"
+            (nextClicked)="nextFeeds($event)"
+            (editClicked)="editFeed($event)"
+            (deleteClicked)="deleteFeed($event)"
+          ></app-admin-feed>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- Paginator -->
-  <mat-paginator (page)="handlePageChange()" #paginator [length]="results_length" [pageSizeOptions]="[15, 30, 50]"
-    class="feed-paginator"></mat-paginator>
 </ng-container>

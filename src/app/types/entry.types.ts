@@ -35,6 +35,8 @@ export interface EntryDetail {
     feeds: Feed[];
     language: EntryLanguage;
     title: string;
+    year: string;
+    publisher: string;
     created_at: string;
     updated_at: string;
     summary: string;
@@ -66,6 +68,8 @@ export interface EntryNew {
   contributors: EntryAuthor[];
   identifiers: EntryIdentifiers;
   citation: string;
+  year: string;
+  publisher: string;
   image: any;
 }
 

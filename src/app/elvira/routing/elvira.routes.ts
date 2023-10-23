@@ -6,8 +6,6 @@ import { FavoritesComponent } from '../components/favorites/favorites.component'
 import { ElviraGuard } from './elvira.guard';
 import { HomeComponent } from '../components/home/home.component';
 import { FeedsPageComponent } from '../components/feeds-page/feeds-page.component';
-import { AboutProjectComponent } from '../components/footer-components/about-project/about-project.component';
-import { ReaderSettingsComponent } from '../components/footer-components/reader-settings/reader-settings.component';
 import { ChangeLogComponent } from '../components/footer-components/change-log/change-log.component';
 
 export const ELVIRA_ROUTES: Routes = [

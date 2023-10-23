@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.6 2023-10-13
+
+- **Added**: infinit scroll everywhere
+- **Added**: path in feed page
+- **Added**: year, publisher and generating citation in admin add entry
+- **Changed**: scrolling listener
+- **Changed**: admin -> adding entry
+- **Changed**: viewer 0.4.11 -> 0.4.12
+- **Removed**: paginator everywhere
+
 ## 2.0.5 2023-09-28
 
 - **Added**: query param to entries and feeds service

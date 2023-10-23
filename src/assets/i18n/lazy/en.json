@@ -8,15 +8,18 @@
     "headerEdit": "Document edit",
     "titleLabel": "Document title",
     "author": "Author",
+    "addAuthor": "Add co-author",
     "authorName": "Author's name",
     "authorSurname": "Author's surname",
     "contributorName": "Co-author's name",
     "contributorSurname": "Co-author's surname",
     "feeds": "Feeds",
+    "addFeeds": "Add feed",
     "identifiers": "Identifiers",
     "summary": "Summary",
     "summaryHint": "Short summary about the document",
     "citation": "Citation",
+    "getCitation": "Generate citation",
     "citationHint": "Citate this document in BibTeX",
     "image": "Image",
     "imageDropper": "Drag your image here or click here to browse",
@@ -29,7 +32,9 @@
     "successMessageEditDocument": "Document edited successfully",
     "errorMessageEditDocument": "Edit failed",
     "successMessageUploadDocument": "Document uploaded successfully",
-    "errorMessageUploadDocument": "Upload failed"
+    "errorMessageUploadDocument": "Upload failed",
+    "year": "Year",
+    "publisher": "Publisher"
   },
   "auth": {
     "autoLogout": "You have been logged out"

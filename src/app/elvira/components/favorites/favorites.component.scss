@@ -1,12 +1,71 @@
 .favorities-container {
   background-color: transparent !important;
-  padding: 16px;
+  padding: 16px 82px 16px 16px;
   flex: 1;
 }
 
-.favorites-paginator {
+.favorities-tools-container {
+  width: 50px;
+  position: fixed;
+  top: 116px;
+  right: 16px;
+  bottom: 0;
+}
+
+.favorities-tools {
   width: 100%;
-  margin-top: 16px;
+  height: max(60%, 400px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  background-color: rgba(22, 22, 22, 0.9);
+}
+
+.favorities-tools-buttons-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.favorities-tools-filter-button {
+  width: 100%;
+  display: flex;
+  height: fit-content;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 35px;
+  margin-bottom: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.favorities-tools-button {
+  width: 100%;
+  padding: 10px 0;
+  display: flex;
+  height: fit-content;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  white-space: pre-wrap;
+  border-left: 3px solid rgba(22, 22, 22, 0.9);
+  border-right: 3px solid rgba(22, 22, 22, 0.9);
+}
+
+.favorities-tools-active-button {
+  border-left: 3px solid #ffc107;
+  border-right: 3px solid #ffc107;
+}
+
+.favorities-tools-button-span {
+  font-size: 15px;
 }
 
 .favorites-empty-row {
@@ -17,4 +76,46 @@
 
 .favorites-empty-text {
   font-weight: 300;
+}
+
+@media screen and (max-width: 959px) {
+  .favorities-container {
+    padding: 76px 16px 16px 16px;
+  }
+
+  .favorities-tools-container {
+    height: 60px;
+    top: 100px;
+    width: 100%;
+    right: 0;
+    z-index: 5;
+  }
+
+  .favorities-tools {
+    height: 100%;
+    width: max(100%, 280px);
+    padding: 0 10px;
+    border-radius: 0;
+  }
+
+  .favorities-tools-filter-button {
+    margin-bottom: 0;
+    margin-right: 20px;
+  }
+
+  .favorities-tools-buttons-container {
+    height: 100%;
+    width: fit-content;
+  }
+
+  .favorities-tools-button {
+    height: 100%;
+    padding: 0 10px;
+    border: none;
+    border-bottom: 3px solid rgba(22, 22, 22, 0.9);
+  }
+
+  .favorities-tools-active-button {
+    border-bottom: 3px solid #ffc107;
+  }
 }

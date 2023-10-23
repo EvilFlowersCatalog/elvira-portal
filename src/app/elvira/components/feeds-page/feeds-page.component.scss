@@ -1,7 +1,71 @@
 .feed-page-container {
   background-color: transparent !important;
-  padding: 16px;
+  padding: 16px 82px 16px 16px;
   flex: 1;
+}
+
+.feed-page-tools-container {
+  width: 50px;
+  position: fixed;
+  top: 116px;
+  right: 16px;
+  bottom: 0;
+}
+
+.feed-page-tools {
+  width: 100%;
+  height: max(60%, 400px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 20px;
+  background-color: rgba(22, 22, 22, 0.9);
+}
+
+.feed-page-tools-buttons-container {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feed-page-tools-filter-button {
+  width: 100%;
+  display: flex;
+  height: fit-content;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 35px;
+  margin-bottom: 50px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.feed-page-tools-button {
+  width: 100%;
+  padding: 10px 0;
+  display: flex;
+  height: fit-content;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: white;
+  cursor: pointer;
+  transition: color 0.3s ease;
+  white-space: pre-wrap;
+  border-left: 3px solid rgba(22, 22, 22, 0.9);
+  border-right: 3px solid rgba(22, 22, 22, 0.9);
+}
+
+.feed-page-tools-active-button {
+  border-left: 3px solid #ffc107;
+  border-right: 3px solid #ffc107;
+}
+
+.feed-page-tools-button-span {
+  font-size: 15px;
 }
 
 .feed-page-up-row {
@@ -25,6 +89,21 @@
   font-size: 30;
 }
 
+.path-names-container {
+  display: flex;
+  margin-bottom: 16px;
+  flex-direction: row;
+}
+
+.path-name {
+  font-size: 15px;
+  border-bottom: 1px solid transparent;
+  cursor: pointer;
+}
+.path-name:hover {
+  border-bottom: 1px solid;
+}
+
 .feed-page-feeds-container {
   margin-bottom: 16px;
 }
@@ -44,5 +123,45 @@
 @media screen and (max-width: 959px) {
   .feed-page-search-field {
     width: 80%;
+  }
+
+  .feed-page-container {
+    padding: 76px 16px 16px 16px;
+  }
+
+  .feed-page-tools-container {
+    height: 60px;
+    top: 100px;
+    width: 100%;
+    right: 0;
+    z-index: 5;
+  }
+
+  .feed-page-tools {
+    height: 100%;
+    width: max(100%, 280px);
+    padding: 0 10px;
+    border-radius: 0;
+  }
+
+  .feed-page-tools-filter-button {
+    margin-bottom: 0;
+    margin-right: 20px;
+  }
+
+  .feed-page-tools-buttons-container {
+    height: 100%;
+    width: fit-content;
+  }
+
+  .feed-page-tools-button {
+    height: 100%;
+    padding: 0 10px;
+    border: none;
+    border-bottom: 3px solid rgba(22, 22, 22, 0.9);
+  }
+
+  .feed-page-tools-active-button {
+    border-bottom: 3px solid #ffc107;
   }
 }
