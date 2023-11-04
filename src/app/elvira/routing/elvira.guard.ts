@@ -57,7 +57,7 @@ export class ElviraGuard {
     const token = this.appStateService.getStateSnapshot().token;
     const refreshToken = this.appStateService.getStateSnapshot().refresh_token;
 
-    if (!token && !refreshToken) {
+    if (!token || !refreshToken) {
       this.appStateService.logoutResetState();
       this.router.navigate(['/auth']);
       return false;

@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 import { AdminGuard } from 'src/app/admin/routing/admin.guard';
 import { LibraryComponent } from '../components/library/library.component';
 import { PdfViewerComponent } from '../components/pdf-viewer/pdf-viewer.component';
-import { FavoritesComponent } from '../components/favorites/favorites.component';
+import { MyShelfComponent } from '../components/my-shelf/my-shelf.component';
 import { ElviraGuard } from './elvira.guard';
 import { HomeComponent } from '../components/home/home.component';
 import { FeedsPageComponent } from '../components/feeds-page/feeds-page.component';
@@ -46,9 +46,9 @@ export const ELVIRA_ROUTES: Routes = [
     component: PdfViewerComponent,
   },
   {
-    path: 'favorites',
+    path: 'my-shelf',
     canActivate: [ElviraGuard],
-    component: FavoritesComponent,
+    component: MyShelfComponent,
   },
   // {
   //   path: 'about-project',

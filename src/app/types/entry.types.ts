@@ -56,6 +56,8 @@ export interface EntryQuery {
   title?: string;
   feed_id?: string;
   author?: string;
+  published_at_gte?: string;
+  published_at_lte?: string;
   order_by?: string;
 }
 
@@ -87,4 +89,16 @@ export interface EntryLanguage {
   id: string;
   name: string;
   code: string;
+}
+
+export interface EntryInfo {
+  response: {
+    title: string;
+    publisher: string;
+    doi: string;
+    authors: EntryAuthor[];
+    year: string;
+    language: string;
+    bibtex: string;
+  };
 }

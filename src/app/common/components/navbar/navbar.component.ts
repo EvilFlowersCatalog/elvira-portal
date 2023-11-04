@@ -97,7 +97,7 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
       width: '500px',
       maxWidth: '95%',
     });
-    let filters = new Filters();
+    let filters: Filters;
 
     dialogRef
       .afterClosed()
@@ -108,15 +108,24 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
             result: 'no' & {
               title: string;
               author: string;
-              from: string;
-              to: string;
+              fromYear: string;
+              fromMonth: string;
+              fromDay: string;
+              toYear: string;
+              toMonth: string;
+              toDay: string;
             }
           ) => result !== 'no' && result !== undefined
         ),
         map(
-          (result) => (
-            (filters.title = result.title), (filters.author = result.author)
-          )
+          (result) =>
+            (filters = new Filters(
+              result.title,
+              result.author,
+              '',
+              [result.fromYear, result.fromMonth, result.fromDay],
+              [result.toYear, result.toMonth, result.toDay]
+            ))
         )
       )
       .subscribe(() => {

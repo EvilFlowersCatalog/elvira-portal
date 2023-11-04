@@ -19,7 +19,6 @@
     "summary": "Summary",
     "summaryHint": "Short summary about the document",
     "citation": "Citation",
-    "getCitation": "Generate citation",
     "citationHint": "Citate this document in BibTeX",
     "image": "Image",
     "imageDropper": "Drag your image here or click here to browse",
@@ -33,8 +32,15 @@
     "errorMessageEditDocument": "Edit failed",
     "successMessageUploadDocument": "Document uploaded successfully",
     "errorMessageUploadDocument": "Upload failed",
+    "errorMessageSimilarityDocument": "A record with a similar title, doi or isbn has already been created",
     "year": "Year",
-    "publisher": "Publisher"
+    "publisher": "Publisher",
+    "aditionalData": "Additional data",
+    "getDataISBN": "Get document informations based on ISBN",
+    "getDataDOI": "Get document informations based on DOI",
+    "getDataInvalid": "The {{section}} section is empty",
+    "getDataSuccessful": "Informations about document were successfully added",
+    "getDataUnsuccessful": "Informations about document not found"
   },
   "auth": {
     "autoLogout": "You have been logged out"
@@ -58,8 +64,8 @@
     "name": "Advanced search",
     "title": "Title",
     "author": "Author name",
-    "from": "From (year)",
-    "to": "To (year)",
+    "from": "From",
+    "to": "To",
     "find": "Find",
     "cancel": "Cancel"
   },
@@ -67,13 +73,12 @@
     "edit-tooltip": "Edit document",
     "delete-tooltip": "Delete document",
     "info-pdf-tooltip": "Show info",
-    "favorite-pdf-tooltip": "Add to favorite list",
-    "remove-favorite-pdf-tooltip": "Remove from favorite list",
-    "open-pdf-tooltip": "Open PDF",
-    "addToFavoritesSuccessMessage": "Item was successfully added to favorites",
-    "addToFavoritesErrorMessage": "Failed to add item to favorites",
-    "removeFromFavoritesSuccessMessage": "Item was removed from favorites",
-    "removeFromFavoritesErrorMessage": "Item couldn't be removed from favorites"
+    "myShelf-pdf-tooltip": "Add to my shelf",
+    "remove-MyShelf-pdf-tooltip": "Remove from my shelf",
+    "addToMyShelfsSuccessMessage": "Item was successfully added to your shelf",
+    "addToMyShelfsErrorMessage": "Failed to add item to your shelf",
+    "removeFromMyShelfsSuccessMessage": "Item was removed from your shelf",
+    "removeFromMyShelfsErrorMessage": "Item couldn't be removed from your shelf"
   },
   "entryInfoDialog": {
     "author": "Author:",
@@ -111,9 +116,9 @@
     "next-page": "Next page",
     "previous-page": "Previous page"
   },
-  "favorites": {
+  "myShelf": {
     "search": "Search",
-    "emptyFavorites": "There is no item in this list"
+    "emptyMyShelf": "There is no item in this list"
   },
   "feed": {
     "edit-tooltip": "Edit feed",
@@ -162,15 +167,15 @@
     "filtersToolTip": "Show filters",
     "aZToolTip": "Order by title a-Z",
     "zAToolTip": "Order by title z-A",
-    "ASCToolTip": "Order by creation ascending",
-    "DESCToolTip": "Order by creation descending"
+    "ASCToolTip": "Order by published at, ascending",
+    "DESCToolTip": "Order by published at, descending"
   },
   "filterDialog": {
     "name": "Filters",
     "title": "Title",
     "author": "Author name",
-    "from": "From (year)",
-    "to": "To (year)",
+    "from": "From",
+    "to": "To",
     "feed": "Feed",
     "update": "Update filter",
     "remove": "Remove filter",

@@ -58,27 +58,27 @@
           matTooltip="{{ t('lazy.entryDetail.info-pdf-tooltip') }}"
           (click)="showInfo(entry.id)"
         >
-          <mat-icon> info_outline </mat-icon>
+          <mat-icon> info </mat-icon>
         </button>
 
-        <!-- Favorite button -->
+        <!-- My shelf button -->
         <button
           *ngIf="!entry.shelf_record_id; else liked"
           mat-icon-button
-          matTooltip="{{ t('lazy.entryDetail.favorite-pdf-tooltip') }}"
-          (click)="addToFavorite(entry.id)"
+          matTooltip="{{ t('lazy.entryDetail.myShelf-pdf-tooltip') }}"
+          (click)="addToMyShelf(entry.id)"
         >
-          <mat-icon> favorite_border </mat-icon>
+          <mat-icon> library_add </mat-icon>
         </button>
 
-        <!-- If entry was added to favorite -->
+        <!-- If entry was added to my shelf -->
         <ng-template #liked>
           <button
             mat-icon-button
-            matTooltip="{{ t('lazy.entryDetail.remove-favorite-pdf-tooltip') }}"
-            (click)="removeFromFavorite(entry.shelf_record_id, entry.id)"
+            matTooltip="{{ t('lazy.entryDetail.remove-MyShelf-pdf-tooltip') }}"
+            (click)="removeFromMyShelf(entry.shelf_record_id, entry.id)"
           >
-            <mat-icon> favorite </mat-icon>
+            <mat-icon> remove_circle </mat-icon>
           </button>
         </ng-template>
       </div>

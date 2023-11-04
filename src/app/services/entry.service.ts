@@ -7,6 +7,7 @@ import {
   EntryNew,
   EntryDetail,
   EntryQuery,
+  EntryInfo,
 } from '../types/entry.types';
 import { BYPASS_LOADING } from '../common/interceptors/http-request.interceptor';
 
@@ -33,6 +34,12 @@ export class EntryService {
     }
     if (query.order_by) {
       params = params.set('order_by', query.order_by);
+    }
+    if (query.published_at_gte) {
+      params = params.set('published_at_gte', query.published_at_gte);
+    }
+    if (query.published_at_lte) {
+      params = params.set('published_at_lte', query.published_at_lte);
     }
     if (query.author) {
       params = params.set('author', query.author);
@@ -116,6 +123,17 @@ export class EntryService {
       {
         context: new HttpContext().set(BYPASS_LOADING, true),
       }
+    );
+  }
+
+  getEntryInfo(driver: string, identifier: string): Observable<EntryInfo> {
+    const params = {
+      driver: driver,
+      identifier: encodeURIComponent(identifier),
+    };
+    return this.httpClient.get<EntryInfo>(
+      environment.baseUrl + `/api/v1/entry-introspection`,
+      { params: params }
     );
   }
 }

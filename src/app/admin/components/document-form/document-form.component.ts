@@ -8,16 +8,16 @@ import {
 } from '@angular/forms';
 import { catchError, take, tap } from 'rxjs/operators';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TitleValidators } from '../../validators/title.validator';
 import { TranslocoService } from '@ngneat/transloco';
 import { FeedService } from 'src/app/services/feed.service';
 import { NotificationService } from 'src/app/services/general/notification.service';
 import { EntryService } from 'src/app/services/entry.service';
-import { EntryDetail, EntryNew } from 'src/app/types/entry.types';
+import { EntryDetail, EntryInfo, EntryNew } from 'src/app/types/entry.types';
 import { EntryAuthor } from 'src/app/types/author.types';
 import { MatLegacyDialog as MatDialog } from '@angular/material/legacy-dialog';
 import { Feed } from 'src/app/types/feed.types';
 import { AddFeedDialogComponent } from '../dialogs/add-feed-dialog/add-feed-dialog.component';
+import { IdentifiersType } from 'src/app/types/general.types';
 
 @Component({
   selector: 'app-admin',
@@ -34,6 +34,7 @@ export class DocumentFormComponent implements OnInit {
   entry_id: string = this.route.snapshot.paramMap.get('id') ?? '';
   isInEditMode: boolean = false; // used in html
   dataSource: { title: string; id: string }[] = []; // used in html
+  IdentifiersType = IdentifiersType;
 
   constructor(
     private readonly feedService: FeedService,
@@ -41,16 +42,11 @@ export class DocumentFormComponent implements OnInit {
     public dialog: MatDialog,
     private readonly entryService: EntryService,
     private readonly route: ActivatedRoute,
-    private readonly titleValidator: TitleValidators,
     private readonly notificationService: NotificationService,
     private translocoService: TranslocoService
   ) {
     this.uploadForm = new UntypedFormGroup({
-      title: new UntypedFormControl('', {
-        validators: [Validators.required],
-        asyncValidators: [titleValidator.titleValidator(this.entry_id)],
-        updateOn: 'blur',
-      }),
+      title: new UntypedFormControl('', Validators.required),
       authorName: new UntypedFormControl('', Validators.required),
       authorSurname: new UntypedFormControl('', Validators.required),
       contributors: new UntypedFormArray([]),
@@ -141,6 +137,19 @@ export class DocumentFormComponent implements OnInit {
       year: data.response.year,
       publisher: data.response.publisher,
     });
+  }
+
+  initFormFromIdentifier(data: EntryInfo) {
+    this.uploadForm.patchValue({
+      title: data.response.title,
+      authorName: data.response.authors[0].name,
+      authorSurname: data.response.authors[0].surname,
+      doi: data.response.doi,
+      citation: data.response.bibtex,
+      year: data.response.year,
+      publisher: data.response.publisher,
+    });
+    this.initContributors(data.response.authors.slice(1));
   }
 
   // get title
@@ -243,11 +252,17 @@ export class DocumentFormComponent implements OnInit {
             }),
             take(1),
             catchError((err) => {
-              console.log(err);
-              const message = this.translocoService.translate(
-                'lazy.documentForm.errorMessageEditDocument'
-              );
-              this.notificationService.error(message);
+              if (err.status === 409) {
+                const message = this.translocoService.translate(
+                  'lazy.documentForm.errorMessageSimilarityDocument'
+                );
+                this.notificationService.error(message);
+              } else {
+                const message = this.translocoService.translate(
+                  'lazy.documentForm.errorMessageEditDocument'
+                );
+                this.notificationService.error(message);
+              }
               return throwError(err);
             })
           )
@@ -306,10 +321,17 @@ export class DocumentFormComponent implements OnInit {
             }),
             take(1),
             catchError((err) => {
-              const message = this.translocoService.translate(
-                'lazy.documentForm.errorMessageUploadDocument'
-              );
-              this.notificationService.error(message);
+              if (err.status === 409) {
+                const message = this.translocoService.translate(
+                  'lazy.documentForm.errorMessageSimilarityDocument'
+                );
+                this.notificationService.error(message);
+              } else {
+                const message = this.translocoService.translate(
+                  'lazy.documentForm.errorMessageUploadDocument'
+                );
+                this.notificationService.error(message);
+              }
               return throwError(err);
             })
           )
@@ -426,6 +448,34 @@ export class DocumentFormComponent implements OnInit {
     } else {
       this.validSize = false;
       return false;
+    }
+  }
+
+  getData(type: IdentifiersType) {
+    if (this.uploadForm.get(type).value !== '') {
+      this.entryService
+        .getEntryInfo(type, this.uploadForm.get(type).value)
+        .toPromise()
+        .then((data) => {
+          this.initFormFromIdentifier(data);
+
+          const message = this.translocoService.translate(
+            'lazy.documentForm.getDataSuccessful'
+          );
+          this.notificationService.success(message);
+        })
+        .catch(() => {
+          const message = this.translocoService.translate(
+            'lazy.documentForm.getDataUnsuccessful'
+          );
+          this.notificationService.error(message);
+        });
+    } else {
+      const message = this.translocoService.translate(
+        'lazy.documentForm.getDataInvalid',
+        { section: type.toLocaleUpperCase() }
+      );
+      this.notificationService.error(message);
     }
   }
 }

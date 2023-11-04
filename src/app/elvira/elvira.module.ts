@@ -10,7 +10,7 @@ import { TranslocoRootModule } from '../transloco/transloco-root.module';
 import { TRANSLOCO_SCOPE } from '@ngneat/transloco';
 import { EntryDetailComponent } from './components/entry-detail/entry-detail.component';
 import { EntryInfoDialogComponent } from './components/entry-info-dialog/entry-info-dialog.component';
-import { FavoritesComponent } from './components/favorites/favorites.component';
+import { MyShelfComponent } from './components/my-shelf/my-shelf.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatLegacyPaginatorIntl as MatPaginatorIntl } from '@angular/material/legacy-paginator';
 import { AppWrapperComponent } from './components/wrapper/app-wrapper.component';
@@ -33,7 +33,7 @@ import { FilterDialogComponent } from './components/filter-dialog/filter-dialog.
     PdfViewerComponent,
     EntryDetailComponent,
     EntryInfoDialogComponent,
-    FavoritesComponent,
+    MyShelfComponent,
     AppWrapperComponent,
     SwipperComponent,
     FeedsPageComponent,

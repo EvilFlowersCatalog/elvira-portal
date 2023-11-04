@@ -1,5 +1,4 @@
 import { Component, Inject } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
 import {
   MatLegacyDialogRef as MatDialogRef,
   MAT_LEGACY_DIALOG_DATA as MAT_DIALOG_DATA,
@@ -27,6 +26,8 @@ export class FilterDialogComponent {
     // set info
     this.title = this.data.filters.title ?? '';
     this.author = this.data.filters.author ?? '';
+    this.from = this.data.filters.from ?? '';
+    this.to = this.data.filters.to ?? '';
     if (this.data.filters.feed) {
       this.feedService
         .getFeedDetail(this.data.filters.feed)
@@ -48,7 +49,15 @@ export class FilterDialogComponent {
 
   // update filters
   onUpdate(): void {
-    this.dialogRef.close(new Filters(this.title, this.author, this.feed));
+    this.dialogRef.close(
+      new Filters(
+        this.title,
+        this.author,
+        this.feed,
+        this.splitPublish(this.from),
+        this.splitPublish(this.to)
+      )
+    );
   }
 
   // Remove filter based on type
@@ -61,8 +70,6 @@ export class FilterDialogComponent {
       this.from = '';
     } else if (type === 'to') {
       this.to = '';
-    } else if (type === 'feed') {
-      this.feed = '';
     }
   }
 
@@ -72,5 +79,10 @@ export class FilterDialogComponent {
       return false;
     }
     return true;
+  }
+
+  splitPublish(date: string) {
+    if (!date) return [];
+    return date.split('-');
   }
 }

@@ -40,7 +40,6 @@ export class FeedManagementComponent
   feed_path: { title: string; id: string }[] = []; // path of feeds
   page: number = 0;
   refresh: boolean = false;
-  firstScroll: boolean = true;
   resetFeeds: boolean = false; // in fetch entries
   deleted: boolean = false; // when entrie is deleted
   lenght: number = 0; // for saving actual entires.lenght, for reaload (used when entry was deleted)
@@ -94,14 +93,9 @@ export class FeedManagementComponent
         if (this.resetFeeds) {
           this.resetFeeds = false;
           this.data_source = data.items;
+          window.scrollTo(0, 0);
         } else {
           this.data_source.push(...data.items); // push
-        }
-
-        // When user comes to library first time scroll up or feeds were reseted (reset funtion)
-        if (this.firstScroll) {
-          this.firstScroll = false;
-          window.scrollTo(0, 0);
         }
 
         // Check if actuall page is last or not, if not user can refresh
@@ -290,9 +284,9 @@ export class FeedManagementComponent
 
   reset() {
     this.page = 0;
-    this.firstScroll = true;
     this.resetFeeds = true;
   }
+
   applyFilter() {
     this.reset();
     this.fetchFeeds$.next(this.search_form?.value.search_input);

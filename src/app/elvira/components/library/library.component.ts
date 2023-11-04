@@ -28,7 +28,6 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
   filters = new Filters(); // used in html
   page: number = 0;
   refresh: boolean = false;
-  firstScroll: boolean = true;
   resetEntries: boolean = false; // in fetch entries
   liked: boolean = false; // when liked button is pressed, reload different
   lenght: number = 0; // for saving actual entires.lenght, for reaload (used when entry was liked)
@@ -73,7 +72,7 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
       class: 'library-tools-button',
       toolTip: 'lazy.library.ASCToolTip',
       active: false,
-      onClick: () => this.sort('created_at', this.buttons[3].title),
+      onClick: () => this.sort('published_at', this.buttons[3].title),
     },
     {
       title: 'DE\nSC',
@@ -81,7 +80,7 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
       class: 'library-tools-button',
       toolTip: 'lazy.library.DESCToolTip',
       active: false,
-      onClick: () => this.sort('-created_at', this.buttons[4].title),
+      onClick: () => this.sort('-published_at', this.buttons[4].title),
     },
   ];
 
@@ -129,6 +128,8 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
             title: this.filters.title,
             feed_id: this.filters.feed,
             author: this.filters.author,
+            published_at_gte: this.filters.from,
+            published_at_lte: this.filters.to,
             order_by: this.orderBy,
           })
         )
@@ -138,14 +139,9 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
         if (this.resetEntries) {
           this.resetEntries = false;
           this.entries = data.items;
+          window.scrollTo(0, 0);
         } else {
           this.entries.push(...data.items); // push
-        }
-
-        // When user comes to library first time scroll up or entries were reseted (reset funtion)
-        if (this.firstScroll) {
-          this.firstScroll = false;
-          window.scrollTo(0, 0);
         }
 
         // Check if actuall page is last or not, if not user can refresh
@@ -171,6 +167,8 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
     this.filters.title = extractedValues['title'] ?? '';
     this.filters.feed = extractedValues['feed'] ?? '';
     this.filters.author = extractedValues['author'] ?? '';
+    this.filters.from = extractedValues['from'] ?? '';
+    this.filters.to = extractedValues['to'] ?? '';
     this.fetchEntries$.next();
   }
 
@@ -214,7 +212,9 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
             // set filters
             (this.filters.title = result.title),
             (this.filters.author = result.author),
-            (this.filters.feed = result.feed)
+            (this.filters.feed = result.feed),
+            (this.filters.from = result.from),
+            (this.filters.to = result.to)
           )
         )
       )
@@ -229,8 +229,7 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
   reload() {
     this.liked = true; // set to true
     this.lenght = this.entries.length; // save lenght to set limit
-    this.page = 0; // reset
-    this.resetEntries = true;
+    this.reset();
     this.fetchEntries$.next();
   }
 
@@ -238,15 +237,16 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
   reset() {
     this.page = 0;
     this.resetEntries = true;
-    this.firstScroll = true;
   }
 
   // Clear filters used when there were no results
   clearFilter() {
-    if (this.filters.title || this.filters.author || this.filters.feed) {
+    if (this.filters.isActive()) {
       this.filters.title = '';
       this.filters.feed = '';
       this.filters.author = '';
+      this.filters.from = '';
+      this.filters.to = '';
       this.router.navigateByUrl(`/elvira/library/${this.filters.getFilters()}`);
     }
   }

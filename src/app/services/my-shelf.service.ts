@@ -3,24 +3,24 @@ import { Injectable } from '@angular/core';
 import { AppStateService } from './general/app-state.service';
 import { Observable } from 'rxjs';
 import {
-  FavoriteList,
-  FavoriteNew,
-  FavoritePostResponse,
-  FavoriteQuery,
-} from '../types/favorite.types';
+  MyShelfList,
+  MyShelfNew,
+  MyShelfPostResponse,
+  MyShelfQuery,
+} from '../types/my-shelf.types';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
-export class FavoriteService {
+export class MyShelfService {
   constructor(private readonly httpClient: HttpClient) {}
 
   /**
-   * Function for getting list of favorites
-   * @returns FavoriteList type, list of favorites for actuall user
+   * Function for getting list of MyShelfs
+   * @returns MyShelfList type, list of MyShelfs for actuall user
    */
-  getFavorites(query: FavoriteQuery): Observable<FavoriteList> {
+  getMyShelf(query: MyShelfQuery): Observable<MyShelfList> {
     let params = new HttpParams()
       .set('page', query.page + 1)
       .set('limit', query.limit)
@@ -30,30 +30,30 @@ export class FavoriteService {
       params = params.set('title', query.title);
     }
 
-    return this.httpClient.get<FavoriteList>(
+    return this.httpClient.get<MyShelfList>(
       environment.baseUrl + `/api/v1/shelf-records`,
       { params: params }
     );
   }
 
   /**
-   * Function for adding entry to favorites by given entry id in params
-   * @param params FavoriteNew Type, contains entry_id -> string
-   * @returns FavoritePostRespose type, shelf-record info + entry detail
+   * Function for adding entry to MyShelfs by given entry id in params
+   * @param params MyShelfNew Type, contains entry_id -> string
+   * @returns MyShelfPostRespose type, shelf-record info + entry detail
    */
-  addEntryToFavorites(params: FavoriteNew): Observable<FavoritePostResponse> {
-    return this.httpClient.post<FavoritePostResponse>(
+  addEntryToMyShelf(params: MyShelfNew): Observable<MyShelfPostResponse> {
+    return this.httpClient.post<MyShelfPostResponse>(
       environment.baseUrl + `/api/v1/shelf-records`,
       params
     );
   }
 
   /**
-   * Function for deleting shelf record -> means delete entry from favoritess by given shelf record id
+   * Function for deleting shelf record -> means delete entry from MyShelfss by given shelf record id
    * @param shelfRecordId string, id of shelf record we want delete
    * @returns answer ? ok/bed
    */
-  removeFromFavorites(shelfRecordId: string) {
+  removeFromMyShelf(shelfRecordId: string) {
     return this.httpClient.delete(
       environment.baseUrl + `/api/v1/shelf-records/${shelfRecordId}`
     );

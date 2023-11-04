@@ -7,7 +7,6 @@ export const environment = {
   baseUrl: `https://evilflowers.jakubdubec.me`,
   assetsUrl: `http://localhost:4200/assets`,
   catalog_id: `e7508413-286d-401d-8220-854ff865f538`,
-  httpRequestInterval: 300000, // 300s
 };
 
 /*D

@@ -4,12 +4,12 @@ import { EntryInfoDialogComponent } from '../entry-info-dialog/entry-info-dialog
 import { TranslocoService } from '@ngneat/transloco';
 import { Entry } from 'src/app/types/entry.types';
 import { NavigationService } from 'src/app/services/general/navigation.service';
-import { Filters, State } from 'src/app/types/general.types';
-import { FavoriteService } from 'src/app/services/favorite.service';
+import { Filters } from 'src/app/types/general.types';
+import { MyShelfService } from 'src/app/services/my-shelf.service';
 import { catchError, take, tap } from 'rxjs/operators';
 import { NotificationService } from 'src/app/services/general/notification.service';
 import { throwError } from 'rxjs';
-import { FavoriteCounterService } from 'src/app/services/general/favorite-count.service';
+import { MyShelfCounterService } from 'src/app/services/general/my-shelf-count.service';
 
 @Component({
   selector: 'app-entry-detail',
@@ -27,8 +27,8 @@ export class EntryDetailComponent {
     public dialog: MatDialog,
     private translocoService: TranslocoService,
     private readonly notificationService: NotificationService,
-    private readonly favoriteCounterService: FavoriteCounterService,
-    private readonly favoriteService: FavoriteService
+    private readonly myShelfCounterService: MyShelfCounterService,
+    private readonly myShelfService: MyShelfService
   ) {}
 
   // Open pdf
@@ -48,28 +48,28 @@ export class EntryDetailComponent {
     });
   }
 
-  // Add entry to favorite
-  addToFavorite(entry_id: string) {
-    // Call func for adding to favorite
-    this.favoriteService
-      .addEntryToFavorites({ entry_id: entry_id })
+  // Add entry to MyShelf
+  addToMyShelf(entry_id: string) {
+    // Call func for adding to MyShelf
+    this.myShelfService
+      .addEntryToMyShelf({ entry_id: entry_id })
       .pipe(
         tap(() => {
           // if it was succesfull
           const message = this.translocoService.translate(
-            'lazy.entryDetail.addToFavoritesSuccessMessage'
+            'lazy.entryDetail.addToMyShelfsSuccessMessage'
           );
           this.notificationService.success(message);
 
-          // Patch count for favorites
-          this.favoriteCounterService.increment(entry_id);
+          // Patch count for MyShelfs
+          this.myShelfCounterService.increment(entry_id);
           this.onLikedChange.emit(true);
         }),
         take(1),
         catchError((err) => {
           // if not
           const message = this.translocoService.translate(
-            'lazy.entryDetail.addToFavoritesErrorMessage'
+            'lazy.entryDetail.addToMyShelfsErrorMessage'
           );
           this.notificationService.error(message);
           return throwError(err);
@@ -78,21 +78,21 @@ export class EntryDetailComponent {
       .subscribe();
   }
 
-  // Function for removing from favorite
-  removeFromFavorite(shelfRecordId: string, entry_id: string) {
-    // Function for calling remove from favorites
-    this.favoriteService
-      .removeFromFavorites(shelfRecordId)
+  // Function for removing from MyShelf
+  removeFromMyShelf(shelfRecordId: string, entry_id: string) {
+    // Function for calling remove from MyShelf
+    this.myShelfService
+      .removeFromMyShelf(shelfRecordId)
       .pipe(
         tap(() => {
           // if successfull
           const message = this.translocoService.translate(
-            'lazy.entryDetail.removeFromFavoritesSuccessMessage'
+            'lazy.entryDetail.removeFromMyShelfsSuccessMessage'
           );
           this.notificationService.success(message);
 
-          // Patch count for favorites
-          this.favoriteCounterService.decrement(entry_id);
+          // Patch count for MyShelfs
+          this.myShelfCounterService.decrement(entry_id);
 
           this.onLikedChange.emit(true);
         }),
@@ -100,7 +100,7 @@ export class EntryDetailComponent {
         catchError((err) => {
           // if not
           const message = this.translocoService.translate(
-            'lazy.entryDetail.removeFromFavoritesErrorMessage'
+            'lazy.entryDetail.removeFromMyShelfsErrorMessage'
           );
           this.notificationService.error(message);
           return throwError(err);

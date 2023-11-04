@@ -45,37 +45,28 @@
       >
     </div>
 
-    <div
-      fxLayout="row"
-      style="width: 100%"
-      fxLayoutAlign="space-between center"
-      fxLayoutGap="16px"
-    >
-      <!-- From -->
-      <div *ngIf="from" fxLayout="row" class="filter-dialog-section">
-        <div class="filter-dialog-section-title">
-          {{ t("lazy.filterDialog.from") }} :
-        </div>
-        <span class="filter-dialog-section-span">{{ from }}</span>
-        <mat-icon
-          class="filter-dialog-section-icon"
-          (click)="removeFilter('from')"
-          >close</mat-icon
-        >
+    <!-- From -->
+    <div *ngIf="from" fxLayout="row" class="filter-dialog-section">
+      <div class="filter-dialog-section-title">
+        {{ t("lazy.filterDialog.from") }} :
       </div>
+      <span class="filter-dialog-section-span">{{ from }}</span>
+      <mat-icon
+        class="filter-dialog-section-icon"
+        (click)="removeFilter('from')"
+        >close</mat-icon
+      >
+    </div>
 
-      <!-- To -->
-      <div *ngIf="to" fxLayout="row" class="filter-dialog-section">
-        <div class="filter-dialog-section-title">
-          {{ t("lazy.filterDialog.to") }} :
-        </div>
-        <span class="filter-dialog-section-span">{{ to }}</span>
-        <mat-icon
-          class="filter-dialog-section-icon"
-          (click)="removeFilter('to')"
-          >close</mat-icon
-        >
+    <!-- To -->
+    <div *ngIf="to" fxLayout="row" class="filter-dialog-section">
+      <div class="filter-dialog-section-title">
+        {{ t("lazy.filterDialog.to") }} :
       </div>
+      <span class="filter-dialog-section-span">{{ to }}</span>
+      <mat-icon class="filter-dialog-section-icon" (click)="removeFilter('to')"
+        >close</mat-icon
+      >
     </div>
   </mat-dialog-content>
 

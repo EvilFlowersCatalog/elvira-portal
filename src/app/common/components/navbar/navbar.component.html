@@ -47,14 +47,14 @@
             {{ t("library") }}
           </button>
 
-          <!-- Favorites button -->
+          <!-- My shelf button -->
           <button
-            (elviraclick)="navigate('/elvira/favorites', $event)"
+            (elviraclick)="navigate('/elvira/my-shelf', $event)"
             class="navbar-main-button"
             style="position: relative"
           >
-            <mat-icon class="navbar-icon">favorite</mat-icon>
-            {{ t("favorites") }}
+            <mat-icon class="navbar-icon">my_library_books</mat-icon>
+            {{ t("myShelf") }}
             <div
               class="navbar-library-counter"
               [ngClass]="{

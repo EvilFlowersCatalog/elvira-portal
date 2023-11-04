@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core'
+import { Component, Input, OnInit } from '@angular/core';
 import { Entry } from 'src/app/types/entry.types';
 
 @Component({
@@ -11,7 +11,9 @@ export class SwipperComponent implements OnInit {
   @Input() swiper_entries: Entry[]; // Used in html
 
   ngOnInit(): void {
-    this.swiper_entries === undefined ? this.swiper_entries = [] : this.swiper_entries; // Cuz of poping error that, reading lenght of undefined
+    this.swiper_entries === undefined
+      ? (this.swiper_entries = [])
+      : this.swiper_entries; // Cuz of poping error that, reading lenght of undefined
     this.autoSlideEntries(); // start slider
   }
 
@@ -29,9 +31,8 @@ export class SwipperComponent implements OnInit {
   // Function for changind active entry
   nextEntrie(): void {
     if (this.selected_index === this.swiper_entries.length - 1) {
-      this.selected_index = 0
-    }
-    else {
+      this.selected_index = 0;
+    } else {
       this.selected_index++;
     }
   }

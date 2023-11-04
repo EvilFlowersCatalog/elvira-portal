@@ -1,16 +1,16 @@
 <ng-container *transloco="let t">
-  <div class="favorities-container" fxLayout="column">
+  <div class="my-shelf-container" fxLayout="column">
     <!-- Tools -->
-    <div class="favorities-tools-container">
+    <div class="my-shelf-tools-container">
       <div
-        class="favorities-tools"
+        class="my-shelf-tools"
         fxLayout="column"
         fxLayout.sm="row"
         fxLayout.xs="row"
       >
         <!-- Tools buttons -->
         <div
-          class="favorities-tools-buttons-container"
+          class="my-shelf-tools-buttons-container"
           *ngFor="let button of buttons"
         >
           <mat-icon
@@ -18,11 +18,11 @@
             fxLayout="column"
             color="accent"
             class="{{ button.class }}"
-            [ngClass]="{ 'favorities-tools-active-button': button.active }"
+            [ngClass]="{ 'my-shelf-tools-active-button': button.active }"
             (click)="button.onClick()"
           >
             {{ button.icon }}
-            <span class="favorities-tools-button-span">{{ button.title }}</span>
+            <span class="my-shelf-tools-button-span">{{ button.title }}</span>
           </mat-icon>
         </div>
       </div>
@@ -38,7 +38,7 @@
     >
       <!-- Search form field -->
       <mat-form-field fxFlex.gt-xs="50%" fxFlex.xs="100%" color="accent">
-        <mat-label>{{ t("lazy.favorites.search") }}</mat-label>
+        <mat-label>{{ t("lazy.myShelf.search") }}</mat-label>
 
         <!-- input -->
         <input matInput formControlName="search" />
@@ -57,31 +57,32 @@
       fxLayout.xs="column"
       fxLayoutGap="16px grid"
     >
-      <ng-container *ngIf="favorities.length > 0; else empty">
+      <ng-container *ngIf="myShelf.length > 0; else empty">
         <div
           fxFlex="14.28%"
           fxFlex.md="25%"
           fxFlex.sm="33.3%"
           fxFlex.xs="100%"
-          *ngFor="let favorite of favorities"
+          *ngFor="let shelf of myShelf"
         >
           <app-entry-detail
-            [entry]="favorite.entry"
+            [entry]="shelf.entry"
             [show]="true"
             (onLikedChange)="reload()"
           ></app-entry-detail>
         </div>
       </ng-container>
 
-      <!-- If favorities are empty -->
+      <!-- If my-shelf are empty -->
       <ng-template #empty>
         <div
+          *ngIf="loaded"
           fxLayout="row"
           fxLayoutAlign="center center"
-          class="favorites-empty-row"
+          class="my-shelf-empty-row"
         >
-          <h1 class="favorites-empty-text">
-            {{ t("lazy.favorites.emptyFavorites") }}
+          <h1 class="my-shelf-empty-text">
+            {{ t("lazy.myShelf.emptyMyShelf") }}
           </h1>
         </div>
       </ng-template>

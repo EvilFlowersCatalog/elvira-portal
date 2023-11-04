@@ -19,7 +19,6 @@
     "summary": "Zhrnutie",
     "summaryHint": "Krátke zhrnutie dokumentu",
     "citation": "Citácia",
-    "getCitation": "Generovať citáciu",
     "citationHint": "Vložte BibTeX citáciu pre tento dokument",
     "image": "Obrázok",
     "imageDropper": "Presuňte obrázok sem alebo kliknite sem a prehľadávajte",
@@ -33,8 +32,15 @@
     "errorMessageEditDocument": "Úprava zlyhala",
     "successMessageUploadDocument": "Dokument bol úspešne nahraný",
     "errorMessageUploadDocument": "Nahrávanie zlyhalo",
+    "errorMessageSimilarityDocument": "Záznam s podobným názvom, doi alebo isbn, už bol vytvorený",
     "year": "Rok",
-    "publisher": "Vydavateľ"
+    "publisher": "Vydavateľ",
+    "aditionalData": "Dodatočné údaje",
+    "getDataISBN": "Stiahnúť informácie o dokumente na základe ISBN",
+    "getDataDOI": "Stiahnúť informácie o dokumente na základe DOI",
+    "getDataInvalid": "{{section}} sekcia je prázdna",
+    "getDataSuccessful": "Informácie o dokumente boli úspešné pridané",
+    "getDataUnsuccessful": "Informácie o dokumente neboli nájdené"
   },
   "auth": {
     "autoLogout": "Boli ste odhlásený"
@@ -58,8 +64,8 @@
     "name": "Pokročilé vyhľadávanie",
     "title": "Nadpis",
     "author": "Meno autora",
-    "from": "Od (rok)",
-    "to": "Do (rok)",
+    "from": "Od",
+    "to": "Do",
     "find": "Hľadať",
     "cancel": "Zrušiť"
   },
@@ -67,13 +73,12 @@
     "edit-tooltip": "Upraviť dokument",
     "delete-tooltip": "Vymazať dokument",
     "info-pdf-tooltip": "Zobraziť informácie",
-    "favorite-pdf-tooltip": "Pridať do obľúbených",
-    "remove-favorite-pdf-tooltip": "Odstrániť z obľúbených",
-    "open-pdf-tooltip": "Otvoriť PDF",
-    "addToFavoritesSuccessMessage": "Položka bola pridaná do obľúbených",
-    "addToFavoritesErrorMessage": "Pridanie položky do obľúbených zlyhalo",
-    "removeFromFavoritesSuccessMessage": "Položka bola odstránená z obľúbených",
-    "removeFromFavoritesErrorMessage": "Položku sa nepodarilo odstrániť z obľúbených"
+    "myShelf-pdf-tooltip": "Pridať do mojej poličky",
+    "remove-MyShelf-pdf-tooltip": "Odstrániť z mojej poličky",
+    "addToMyShelfsSuccessMessage": "Položka bola pridaná do vašej poličky",
+    "addToMyShelfsErrorMessage": "Pridanie položky do vašej poličky zlyhalo",
+    "removeFromMyShelfsSuccessMessage": "Položka bola odstránená z vašej poličky",
+    "removeFromMyShelfsErrorMessage": "Položku sa nepodarilo odstrániť z vašej poličky"
   },
   "entryInfoDialog": {
     "author": "Autor:",
@@ -111,9 +116,9 @@
     "next-page": "Ďalšia stránka",
     "previous-page": "Predchádzajúca stránka"
   },
-  "favorites": {
+  "myShelf": {
     "search": "Hľadať",
-    "emptyFavorites": "V tomto zozname sa nenachádza žiadna položka"
+    "emptyMyShelf": "V tomto zozname sa nenachádza žiadna položka"
   },
   "feed": {
     "edit-tooltip": "Upraviť druh",
@@ -165,15 +170,15 @@
     "filtersToolTip": "Ukázať filtre",
     "aZToolTip": "Zoradiť podľa názvu a-Z",
     "zAToolTip": "Zoradiť podľa názvu z-A",
-    "ASCToolTip": "Zoradiť podľa vytvorenia vzostupne",
-    "DESCToolTip": "Zoradiť podľa vytvorenia zostupne"
+    "ASCToolTip": "Zoradiť podľa dátumu publikovania, vzostupne",
+    "DESCToolTip": "Zoradiť podľa dátumu publikovania, zostupne"
   },
   "filterDialog": {
     "name": "Filtre",
     "title": "Nadpis",
     "author": "Meno autora",
-    "from": "Od (rok)",
-    "to": "Do (rok)",
+    "from": "From",
+    "to": "To",
     "feed": "Sekcia",
     "remove": "Remove filter",
     "update": "Aktualizovať filter",

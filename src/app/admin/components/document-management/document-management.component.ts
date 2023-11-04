@@ -36,10 +36,7 @@ export class DocumentManagementComponent
   searchForm: UntypedFormGroup;
   page: number = 0;
   refresh: boolean = false;
-  firstScroll: boolean = true;
   resetEntries: boolean = false; // in fetch entries
-  deleted: boolean = false; // when entrie is deleted
-  lenght: number = 0; // for saving actual entires.lenght, for reaload (used when entry was deleted)
 
   constructor(
     private readonly navigationService: NavigationService,
@@ -78,25 +75,19 @@ export class DocumentManagementComponent
         concatMap(() =>
           this.entryService.getEntriesList({
             page: this.page,
-            limit: this.deleted ? this.lenght : 25,
+            limit: 25,
             title: this.searchForm?.value.searchInput ?? '',
             order_by: '-created_at',
           })
         )
       )
       .subscribe((data) => {
-        this.deleted = false; // reset deleted
         if (this.resetEntries) {
           this.resetEntries = false;
           this.entries = data.items;
+          window.scrollTo(0, 0);
         } else {
           this.entries.push(...data.items); // push
-        }
-
-        // When user comes to library first time scroll up or entries were reseted (reset funtion)
-        if (this.firstScroll) {
-          this.firstScroll = false;
-          window.scrollTo(0, 0);
         }
 
         // Check if actuall page is last or not, if not user can refresh
@@ -141,8 +132,8 @@ export class DocumentManagementComponent
         })
       )
       .subscribe(() => {
-        this.lenght = this.entries.length;
-        this.deleted = true;
+        this.page = 0;
+        this.resetEntries = true;
         this.fetchDocuments$.next(); // update
       });
   }
@@ -156,7 +147,6 @@ export class DocumentManagementComponent
   applyFilter() {
     this.page = 0;
     this.resetEntries = true;
-    this.firstScroll = true;
     this.fetchDocuments$.next();
   }
 }

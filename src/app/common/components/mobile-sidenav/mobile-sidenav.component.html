@@ -1,39 +1,61 @@
 <ng-container *transloco="let t; read: 'navbar'">
   <ng-container *ngIf="appState$ | async as appState">
-    <div fxLayout="column" fxLayoutAlign="start start" class="mobile-sidenav-container">
-
+    <div
+      fxLayout="column"
+      fxLayoutAlign="start start"
+      class="mobile-sidenav-container"
+    >
       <!-- Home button -->
-      <div *ngIf="appState.isLoggedIn" class="mobile-sidenav-button" (click)="navigate('/elvira/home')">
+      <div
+        *ngIf="appState.isLoggedIn"
+        class="mobile-sidenav-button"
+        (click)="navigate('/elvira/home')"
+      >
         <mat-icon class="mobile-sidenav-icon">home</mat-icon>
         <span>{{ t("home") }}</span>
       </div>
 
       <!-- Library button -->
-      <div class="mobile-sidenav-button" *ngIf="appState.isLoggedIn" (click)="navigateToLibrary()">
+      <div
+        class="mobile-sidenav-button"
+        *ngIf="appState.isLoggedIn"
+        (click)="navigateToLibrary()"
+      >
         <mat-icon class="mobile-sidenav-icon">menu_book</mat-icon>
         <span>{{ t("library") }}</span>
       </div>
 
-      <!-- Favorite button -->
-      <div class="mobile-sidenav-button" *ngIf="appState.isLoggedIn" (click)="navigate('/elvira/favorites')">
-        <mat-icon class="mobile-sidenav-icon">favorite</mat-icon>
-        <span>{{ t("favorites") }}</span>
+      <!-- My shelf button -->
+      <div
+        class="mobile-sidenav-button"
+        *ngIf="appState.isLoggedIn"
+        (click)="navigate('/elvira/my-shelf')"
+      >
+        <mat-icon class="mobile-sidenav-icon">my_library_books</mat-icon>
+        <span>{{ t("myShelf") }}</span>
       </div>
 
       <!-- Advanced search button -->
-      <div class="mobile-sidenav-button" *ngIf="appState.isLoggedIn" (click)="openAdvanced()">
+      <div
+        class="mobile-sidenav-button"
+        *ngIf="appState.isLoggedIn"
+        (click)="openAdvanced()"
+      >
         <mat-icon class="mobile-sidenav-icon"> search </mat-icon>
         <span> {{ t("mobileAdvanced") }} </span>
       </div>
 
       <!-- Admin button -->
-      <div class="mobile-sidenav-button" *ngIf="appState.isLoggedIn" (click)="navigate('/elvira/admin')">
+      <div
+        class="mobile-sidenav-button"
+        *ngIf="appState.isLoggedIn"
+        (click)="navigate('/elvira/admin')"
+      >
         <span> admin </span>
       </div>
 
       <!-- down row column -->
       <div fxLayout="column" class="mobile-sidenav-bottom-container">
-
         <!-- Translate button -->
         <div *ngIf="appState.lang === 'en'; else enVersionBtn">
           <!-- svk -->
@@ -69,7 +91,12 @@
         </ng-template>
 
         <!-- Logout button -->
-        <div *ngIf="appState.isLoggedIn" class="mobile-sidenav-button" style="display: flex;" (click)="logout()">
+        <div
+          *ngIf="appState.isLoggedIn"
+          class="mobile-sidenav-button"
+          style="display: flex"
+          (click)="logout()"
+        >
           <mat-icon class="mobile-sidenav-icon">logout</mat-icon>
           <span>{{ t("log-out") }}</span>
         </div>

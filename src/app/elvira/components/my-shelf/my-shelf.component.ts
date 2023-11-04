@@ -1,33 +1,29 @@
-import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { UntypedFormControl, UntypedFormGroup } from '@angular/forms';
-import { MatLegacyPaginator as MatPaginator } from '@angular/material/legacy-paginator';
 import { Subject } from 'rxjs';
 import { concatMap, startWith, takeUntil } from 'rxjs/operators';
 import { DisposableComponent } from 'src/app/common/components/disposable.component';
-import { EntryService } from 'src/app/services/entry.service';
-import { FavoriteService } from 'src/app/services/favorite.service';
-import { AppStateService } from 'src/app/services/general/app-state.service';
-import { FavoriteCounterService } from 'src/app/services/general/favorite-count.service';
-import { Entry } from 'src/app/types/entry.types';
-import { Favorite } from 'src/app/types/favorite.types';
+import { MyShelfService } from 'src/app/services/my-shelf.service';
+import { MyShelfCounterService } from 'src/app/services/general/my-shelf-count.service';
+import { MyShelf } from 'src/app/types/my-shelf.types';
 
 @Component({
-  selector: 'app-favorites',
-  templateUrl: './favorites.component.html',
-  styleUrls: ['./favorites.component.scss'],
+  selector: 'app-my-shelf',
+  templateUrl: './my-shelf.component.html',
+  styleUrls: ['./my-shelf.component.scss'],
 })
-export class FavoritesComponent extends DisposableComponent implements OnInit {
-  favorities: Favorite[] = []; // used in html
-  fetchFavorities$ = new Subject();
+export class MyShelfComponent extends DisposableComponent implements OnInit {
+  myShelf: MyShelf[] = []; // used in html
+  fetchMyShelf$ = new Subject();
   searchForm: UntypedFormGroup;
   wasApplied: boolean = false;
-  orderBy: string = '-created_at';
+  orderBy: string = 'entry__title';
   page: number = 0;
   refresh: boolean = false;
-  firstScroll: boolean = true;
   resetEntries: boolean = false; // in fetch entries
   liked: boolean = false; // when liked button is pressed, reload different
   lenght: number = 0; // for saving actual entires.lenght, for reaload (used when entry was liked)
+  loaded: boolean = false; // when the shelf was loaded set to true // used in html
   // buttons used in html, in tools
   buttons: {
     title: string;
@@ -40,23 +36,23 @@ export class FavoritesComponent extends DisposableComponent implements OnInit {
     {
       title: 'a-Z',
       icon: 'sort',
-      class: 'favorities-tools-button',
+      class: 'my-shelf-tools-button',
       toolTip: 'lazy.library.aZToolTip',
-      active: false,
-      onClick: () => this.sort('title', this.buttons[0].title),
+      active: true,
+      onClick: () => this.sort('entry__title', this.buttons[0].title),
     },
     {
       title: 'z-A',
       icon: 'sort',
-      class: 'favorities-tools-button',
+      class: 'my-shelf-tools-button',
       toolTip: 'lazy.library.zAToolTip',
       active: false,
-      onClick: () => this.sort('-title', this.buttons[1].title),
+      onClick: () => this.sort('-entry__title', this.buttons[1].title),
     },
     {
       title: 'ASC',
       icon: '',
-      class: 'favorities-tools-button',
+      class: 'my-shelf-tools-button',
       toolTip: 'lazy.library.ASCToolTip',
       active: false,
       onClick: () => this.sort('created_at', this.buttons[2].title),
@@ -64,16 +60,16 @@ export class FavoritesComponent extends DisposableComponent implements OnInit {
     {
       title: 'DE\nSC',
       icon: '',
-      class: 'favorities-tools-button',
+      class: 'my-shelf-tools-button',
       toolTip: 'lazy.library.DESCToolTip',
-      active: true,
+      active: false,
       onClick: () => this.sort('-created_at', this.buttons[3].title),
     },
   ];
 
   constructor(
-    private readonly favoriteService: FavoriteService,
-    private readonly favoriteCounterService: FavoriteCounterService
+    private readonly myShelfService: MyShelfService,
+    private readonly myShelfCounterService: MyShelfCounterService
   ) {
     super();
     this.searchForm = new UntypedFormGroup({
@@ -90,20 +86,20 @@ export class FavoritesComponent extends DisposableComponent implements OnInit {
     // if we are at bottom and there is possible refresh, fetch entries
     if (scrollPosition + windowHeight >= pageHeight - 500 && this.refresh) {
       this.refresh = false;
-      this.fetchFavorities$.next();
+      this.fetchMyShelf$.next();
     }
   }
 
   ngOnInit(): void {
-    this.favoriteCounterService.resetCounter(); // reset count
+    this.myShelfCounterService.resetCounter(); // reset count
 
-    this.fetchFavorities$
+    this.fetchMyShelf$
       .asObservable()
       .pipe(
         takeUntil(this.destroySignal$),
         startWith([]),
         concatMap((title: string = '') =>
-          this.favoriteService.getFavorites({
+          this.myShelfService.getMyShelf({
             page: this.page,
             limit: this.liked ? this.lenght : 25,
             title: title,
@@ -112,18 +108,14 @@ export class FavoritesComponent extends DisposableComponent implements OnInit {
         )
       )
       .subscribe((data) => {
+        this.loaded = true;
         this.liked = false; // reset liked
         if (this.resetEntries) {
           this.resetEntries = false;
-          this.favorities = data.items;
-        } else {
-          this.favorities.push(...data.items); // push
-        }
-
-        // When user comes to library first time scroll up or entries were reseted (reset funtion)
-        if (this.firstScroll) {
-          this.firstScroll = false;
+          this.myShelf = data.items;
           window.scrollTo(0, 0);
+        } else {
+          this.myShelf.push(...data.items); // push
         }
 
         // Check if actuall page is last or not, if not user can refresh
@@ -142,19 +134,18 @@ export class FavoritesComponent extends DisposableComponent implements OnInit {
     });
     this.orderBy = orderBy; // set type
     this.reset();
-    this.fetchFavorities$.next(); // fetch
+    this.fetchMyShelf$.next(); // fetch
   }
 
   reload() {
     this.liked = true; // set to true
-    this.lenght = this.favorities.length; // save lenght to set limit
+    this.lenght = this.myShelf.length; // save lenght to set limit
     this.reset();
-    this.fetchFavorities$.next();
+    this.fetchMyShelf$.next();
   }
 
   reset() {
     this.page = 0; // reset
-    this.firstScroll = true;
     this.resetEntries = true;
   }
 
@@ -163,11 +154,11 @@ export class FavoritesComponent extends DisposableComponent implements OnInit {
       this.wasApplied = true;
       const title = this.searchForm.value.search;
       this.reset();
-      this.fetchFavorities$.next(title);
+      this.fetchMyShelf$.next(title);
     } else if (this.wasApplied) {
       this.wasApplied = false;
       this.reset();
-      this.fetchFavorities$.next();
+      this.fetchMyShelf$.next();
     }
   }
 }

@@ -1,15 +1,17 @@
 <ng-container *transloco="let t">
-
   <!-- Title -->
-  <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center" color="accent">{{ t("lazy.advancedSearchDialog.name") }}
+  <h2 mat-dialog-title fxLayout="row" fxLayoutAlign="center" color="accent">
+    {{ t("lazy.advancedSearchDialog.name") }}
   </h2>
 
   <!-- Dialog content -->
-  <mat-dialog-content fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="16px">
-
+  <mat-dialog-content
+    fxLayout="column"
+    fxLayoutAlign="start start"
+    fxLayoutGap="16px"
+  >
     <!-- Form -->
     <form fxFill fxLayout="column" [formGroup]="advanced_form">
-
       <!-- Title -->
       <mat-form-field color="accent">
         <mat-label>{{ t("lazy.advancedSearchDialog.title") }}</mat-label>
@@ -26,21 +28,87 @@
         <input matInput formControlName="author" />
       </mat-form-field>
 
-      <div fxLayout="row" fxLayoutAlign="space-between center">
-        <!-- From -->
-        <mat-form-field fxFlex="48" color="accent">
-          <mat-label>{{ t("lazy.advancedSearchDialog.from") }}</mat-label>
+      <!-- From -->
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <span>{{ t("lazy.advancedSearchDialog.from") }}:</span>
+        <!-- Year -->
+        <mat-form-field style="width: 45px" color="accent">
+          <mat-label>YYYY</mat-label>
 
           <!-- input -->
-          <input matInput formControlName="from" />
+          <input matInput formControlName="fromYear" />
         </mat-form-field>
 
-        <!-- To -->
-        <mat-form-field fxFlex="48" color="accent">
-          <mat-label>{{ t("lazy.advancedSearchDialog.to") }}</mat-label>
+        <!-- Month -->
+        <mat-form-field
+          *ngIf="
+            advanced_form.get('fromYear').value &&
+            advanced_form.get('fromYear').valid
+          "
+          style="width: 31px"
+          color="accent"
+        >
+          <mat-label>MM</mat-label>
 
           <!-- input -->
-          <input matInput formControlName="to" />
+          <input matInput formControlName="fromMonth" />
+        </mat-form-field>
+
+        <!-- Day -->
+        <mat-form-field
+          *ngIf="
+            advanced_form.get('fromMonth').value &&
+            advanced_form.get('fromMonth').valid
+          "
+          style="width: 26px"
+          color="accent"
+        >
+          <mat-label>DD</mat-label>
+
+          <!-- input -->
+          <input matInput formControlName="fromDay" />
+        </mat-form-field>
+      </div>
+
+      <!-- To -->
+      <div fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="16px">
+        <span>{{ t("lazy.advancedSearchDialog.to") }}:</span>
+        <!-- Year -->
+        <mat-form-field style="width: 45px" color="accent">
+          <mat-label>YYYY</mat-label>
+
+          <!-- input -->
+          <input matInput formControlName="toYear" />
+        </mat-form-field>
+
+        <!-- Month -->
+        <mat-form-field
+          *ngIf="
+            advanced_form.get('toYear').value &&
+            advanced_form.get('toYear').valid
+          "
+          style="width: 31px"
+          color="accent"
+        >
+          <mat-label>MM</mat-label>
+
+          <!-- input -->
+          <input matInput formControlName="toMonth" />
+        </mat-form-field>
+
+        <!-- Day -->
+        <mat-form-field
+          *ngIf="
+            advanced_form.get('toMonth').value &&
+            advanced_form.get('toMonth').valid
+          "
+          style="width: 26px"
+          color="accent"
+        >
+          <mat-label>DD</mat-label>
+
+          <!-- input -->
+          <input matInput formControlName="toDay" />
         </mat-form-field>
       </div>
     </form>
@@ -48,14 +116,18 @@
 
   <!-- Action buttons -->
   <mat-dialog-actions fxLayout="row" fxLayoutAlign="space-evenly center">
-
     <!-- Cancel button -->
     <button mat-button mat-dialog-close (click)="onNoClick()" color="accent">
       {{ t("lazy.advancedSearchDialog.cancel") }}
     </button>
 
     <!-- Find button -->
-    <button mat-button mat-dialog-close color="primary" form="advanced_form" (click)="onYesClick()">
+    <button
+      mat-button
+      color="primary"
+      form="advanced_form"
+      (click)="onYesClick()"
+    >
       {{ t("lazy.advancedSearchDialog.find") }}
     </button>
   </mat-dialog-actions>

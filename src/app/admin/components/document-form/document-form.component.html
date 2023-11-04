@@ -195,9 +195,8 @@
             </mat-card>
           </div>
 
-          <!-- Identifiers and YEAR, PUBLISER-->
-          <div fxFlex="100" fxLayoutGap="16px">
-            <mat-card fxFlex="50%" fxLayout="column">
+          <div fxFlex="100%">
+            <mat-card fxFill fxLayout="column">
               <div
                 fxLayoutAlign="center center"
                 class="document-form-section-title-container"
@@ -209,54 +208,54 @@
 
               <!-- Identifiers content -->
               <mat-card-content fxFlex="100%">
-                <div
-                  fxLayout="row"
-                  fxLayoutAlign="start start"
-                  fxLayoutGap="16px"
-                >
+                <div fxLayout="column" fxLayoutAlign="start start">
                   <!-- ISBN -->
-                  <mat-form-field fxFlex="45%">
-                    <mat-label>ISBN</mat-label>
-                    <input matInput formControlName="isbn" />
-                  </mat-form-field>
+                  <div
+                    style="width: 100%"
+                    fxLayoutAlign="start center"
+                    fxLayout="row"
+                    fxLayoutGap="16px"
+                  >
+                    <mat-form-field style="width: 100%">
+                      <mat-label>ISBN</mat-label>
+                      <input matInput formControlName="isbn" />
+                    </mat-form-field>
+                    <mat-icon
+                      color="accent"
+                      matTooltip="{{ t('lazy.documentForm.getDataISBN') }}"
+                      style="cursor: pointer"
+                      (click)="getData(IdentifiersType.ISBN)"
+                    >
+                      download_for_offline
+                    </mat-icon>
+                  </div>
 
                   <!-- DOI -->
-                  <mat-form-field fxFlex="45%">
-                    <mat-label>DOI</mat-label>
-                    <input matInput formControlName="doi" />
-                  </mat-form-field>
-                </div>
-              </mat-card-content>
-            </mat-card>
-
-            <!-- YEAR and PUBLISHER -->
-            <mat-card fxFlex="50%">
-              <!-- YEAR and PUBLISHER content -->
-              <mat-card-content>
-                <div
-                  fxLayout="column"
-                  fxLayoutAlign="start center"
-                  fxLayoutGap="16px"
-                >
-                  <!-- ISBN -->
-                  <mat-form-field style="width: 100%">
-                    <mat-label>{{ t("lazy.documentForm.year") }}</mat-label>
-                    <input matInput formControlName="year" />
-                  </mat-form-field>
-
-                  <!-- ISBN -->
-                  <mat-form-field style="width: 100%">
-                    <mat-label>{{
-                      t("lazy.documentForm.publisher")
-                    }}</mat-label>
-                    <input matInput formControlName="publisher" />
-                  </mat-form-field>
+                  <div
+                    style="width: 100%"
+                    fxLayoutAlign="start center"
+                    fxLayout="row"
+                    fxLayoutGap="16px"
+                  >
+                    <mat-form-field style="width: 100%">
+                      <mat-label>DOI</mat-label>
+                      <input matInput formControlName="doi" />
+                    </mat-form-field>
+                    <mat-icon
+                      matTooltip="{{ t('lazy.documentForm.getDataDOI') }}"
+                      color="accent"
+                      style="cursor: pointer"
+                      (click)="getData(IdentifiersType.DOI)"
+                    >
+                      download_for_offline
+                    </mat-icon>
+                  </div>
                 </div>
               </mat-card-content>
             </mat-card>
           </div>
 
-          <!-- Summary -->
+          <!-- Aditional data -->
           <div>
             <mat-card fxFill>
               <div
@@ -264,14 +263,32 @@
                 class="document-form-section-title-container"
               >
                 <h4 class="document-form-section-title">
-                  {{ t("lazy.documentForm.summary") }}
+                  {{ t("lazy.documentForm.aditionalData") }}
                 </h4>
               </div>
 
-              <!-- Summary input -->
+              <!-- year and publisher input -->
               <mat-card-content>
+                <div fxLayout="column" fxLayoutAlign="start center">
+                  <!-- YEAR -->
+                  <mat-form-field style="width: 100%">
+                    <mat-label>{{ t("lazy.documentForm.year") }}</mat-label>
+                    <input matInput formControlName="year" />
+                  </mat-form-field>
+
+                  <!-- PUBLISHER -->
+                  <mat-form-field style="width: 100%">
+                    <mat-label>{{
+                      t("lazy.documentForm.publisher")
+                    }}</mat-label>
+                    <input matInput formControlName="publisher" />
+                  </mat-form-field>
+                </div>
+
+                <!-- Summary -->
                 <div fxLayout="row" fxLayoutAlign="start">
                   <mat-form-field fxFlex="100%">
+                    <mat-label>{{ t("lazy.documentForm.summary") }}</mat-label>
                     <textarea
                       matInput
                       class="document-form-summary-textfield"

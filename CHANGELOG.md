@@ -5,10 +5,15 @@
 - **Added**: infinit scroll everywhere
 - **Added**: path in feed page
 - **Added**: year, publisher and generating citation in admin add entry
+- **Added**: auto fill in admin, based on DOI/ISBN
+- **Added**: DOI/ISBN validator
 - **Changed**: scrolling listener
-- **Changed**: admin -> adding entry
-- **Changed**: viewer 0.4.11 -> 0.4.12
+- **Changed**: favorite to my shelf
+- **Changed**: admin -> add new entry form
+- **Changed**: viewer 0.4.11 -> 0.4.17
+- **Fixed**: infinit scroll in admin
 - **Removed**: paginator everywhere
+- **Removed**: title validator in admin -> new entry
 
 ## 2.0.5 2023-09-28
 

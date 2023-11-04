@@ -4,33 +4,33 @@ import { AppStateService } from './app-state.service';
 @Injectable({
   providedIn: 'root',
 })
-export class FavoriteCounterService {
+export class MyShelfCounterService {
   private addedEntries: string[] = [];
-  private favoriteCounter: number = 0;
+  private myShelfCounter: number = 0;
 
   constructor(private readonly appStateService: AppStateService) {}
 
   // increment count + add entry id to array
   increment(id: string): void {
     this.addedEntries.push(id);
-    this.favoriteCounter++;
-    this.appStateService.patchState({ count: this.favoriteCounter }); // patch
+    this.myShelfCounter++;
+    this.appStateService.patchState({ count: this.myShelfCounter }); // patch
   }
 
   // decrement only if added entries containes given id
   decrement(id: string): void {
     if (this.contains(id)) {
       this.pop(id); // pop
-      this.favoriteCounter = Math.max(0, this.favoriteCounter - 1);
-      this.appStateService.patchState({ count: this.favoriteCounter }); // patch
+      this.myShelfCounter = Math.max(0, this.myShelfCounter - 1);
+      this.appStateService.patchState({ count: this.myShelfCounter }); // patch
     }
   }
 
   // Reset everything
   resetCounter(): void {
-    this.favoriteCounter = 0;
+    this.myShelfCounter = 0;
     this.addedEntries = [];
-    this.appStateService.patchState({ count: this.favoriteCounter });
+    this.appStateService.patchState({ count: this.myShelfCounter });
   }
 
   private contains(id: string): boolean {
