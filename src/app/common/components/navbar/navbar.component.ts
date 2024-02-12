@@ -24,10 +24,10 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   feed_name: string = ''; // used in html
   routeSubscription: Subscription;
   name: string = '';
+  activeButton: number;
 
   constructor(
     private readonly router: Router,
-    private readonly route: ActivatedRoute,
     private readonly appStateService: AppStateService,
     public dialog: MatDialog,
     private readonly navigationService: NavigationService,
@@ -40,6 +40,25 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    // Set active button
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        if (event.toString().includes('/elvira/home')) {
+          // HOME
+          this.activeButton = 1;
+        } else if (event.toString().includes('/elvira/library')) {
+          // LIBRARY
+          this.activeButton = 2;
+        } else if (event.toString().includes('/elvira/my-shelf')) {
+          // MY SHELF
+          this.activeButton = 3;
+        } else if (event.toString().includes('/elvira/admin')) {
+          // ADMIN
+          this.activeButton = 4;
+        }
+      }
+    });
+
     this.appState$ = this.appStateService
       .getState$()
       .pipe(takeUntil(this.destroySignal$));

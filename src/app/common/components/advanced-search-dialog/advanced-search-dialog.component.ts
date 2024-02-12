@@ -31,29 +31,41 @@ export class AdvancedSearchDialogComponent {
       title: new UntypedFormControl(''),
       author: new UntypedFormControl(''),
       fromYear: new UntypedFormControl('', {
-        asyncValidators: [this.yearValidation()],
+        asyncValidators: [this.yearValidation('from')],
         updateOn: 'blur',
       }),
-      fromMonth: new UntypedFormControl('', {
-        asyncValidators: [this.monthValidation()],
-        updateOn: 'blur',
-      }),
-      fromDay: new UntypedFormControl('', {
-        asyncValidators: [this.dayValidation()],
-        updateOn: 'blur',
-      }),
+      fromMonth: new UntypedFormControl(
+        { value: '', disabled: true },
+        {
+          asyncValidators: [this.monthValidation('from')],
+          updateOn: 'blur',
+        }
+      ),
+      fromDay: new UntypedFormControl(
+        { value: '', disabled: true },
+        {
+          asyncValidators: [this.dayValidation()],
+          updateOn: 'blur',
+        }
+      ),
       toYear: new UntypedFormControl('', {
-        asyncValidators: [this.yearValidation()],
+        asyncValidators: [this.yearValidation('to')],
         updateOn: 'blur',
       }),
-      toMonth: new UntypedFormControl('', {
-        asyncValidators: [this.monthValidation()],
-        updateOn: 'blur',
-      }),
-      toDay: new UntypedFormControl('', {
-        asyncValidators: [this.dayValidation()],
-        updateOn: 'blur',
-      }),
+      toMonth: new UntypedFormControl(
+        { value: '', disabled: true },
+        {
+          asyncValidators: [this.monthValidation('to')],
+          updateOn: 'blur',
+        }
+      ),
+      toDay: new UntypedFormControl(
+        { value: '', disabled: true },
+        {
+          asyncValidators: [this.dayValidation()],
+          updateOn: 'blur',
+        }
+      ),
     });
   }
 
@@ -71,9 +83,16 @@ export class AdvancedSearchDialogComponent {
     }
   }
 
-  yearValidation() {
+  yearValidation(type: string) {
     return (control: AbstractControl): Observable<ValidationErrors | null> => {
       const value = control.value;
+      type === 'from'
+        ? (this.advanced_form?.get('fromMonth')?.disable(),
+          this.advanced_form?.get('fromMonth')?.reset(),
+          this.advanced_form?.get('fromDay')?.reset())
+        : (this.advanced_form?.get('toMonth')?.disable(),
+          this.advanced_form?.get('toMonth')?.reset(),
+          this.advanced_form?.get('toDay')?.reset());
       if (!value) {
         return of(null); // Return null for empty value
       }
@@ -84,14 +103,22 @@ export class AdvancedSearchDialogComponent {
       if (intValue < 1500) {
         return of({ invalidYear: true }); // Return an error object for invalid value
       } else {
+        type === 'from'
+          ? this.advanced_form.get('fromMonth').enable()
+          : this.advanced_form.get('toMonth').enable();
         return of(null); // Return null for valid value
       }
     };
   }
 
-  monthValidation() {
+  monthValidation(type: string) {
     return (control: AbstractControl): Observable<ValidationErrors | null> => {
       const value = control.value;
+      type === 'from'
+        ? (this.advanced_form?.get('fromDay')?.disable(),
+          this.advanced_form?.get('fromDay')?.reset())
+        : (this.advanced_form?.get('toDay')?.disable(),
+          this.advanced_form?.get('toDay')?.reset());
       if (!value) {
         return of(null); // Return null for empty value
       }
@@ -101,6 +128,9 @@ export class AdvancedSearchDialogComponent {
         return of({ invalidMonth: true }); // Return an error object for invalid value
       } else {
         this.selectedMonth = value;
+        type === 'from'
+          ? this.advanced_form.get('fromDay').enable()
+          : this.advanced_form.get('toDay').enable();
         return of(null); // Return null for valid value
       }
     };

@@ -32,6 +32,7 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
   liked: boolean = false; // when liked button is pressed, reload different
   lenght: number = 0; // for saving actual entires.lenght, for reaload (used when entry was liked)
   private orderBy: string = 'title';
+  loaded: boolean = false;
 
   // buttons used in html, in tools
   buttons: {
@@ -135,6 +136,7 @@ export class LibraryComponent extends DisposableComponent implements OnInit {
         )
       )
       .subscribe((data) => {
+        this.loaded = true;
         this.liked = false; // reset liked
         if (this.resetEntries) {
           this.resetEntries = false;

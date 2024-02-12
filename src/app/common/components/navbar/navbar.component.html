@@ -33,6 +33,7 @@
           <button
             (elviraclick)="navigate('/elvira/home', $event)"
             class="navbar-main-button"
+            [ngClass]="{ 'navbar-main-button-active': activeButton === 1 }"
           >
             <mat-icon class="navbar-icon">home</mat-icon>
             {{ t("home") }}
@@ -42,6 +43,7 @@
           <button
             (elviraclick)="navigateToLibrary($event)"
             class="navbar-main-button"
+            [ngClass]="{ 'navbar-main-button-active': activeButton === 2 }"
           >
             <mat-icon class="navbar-icon"> menu_book </mat-icon>
             {{ t("library") }}
@@ -51,10 +53,13 @@
           <button
             (elviraclick)="navigate('/elvira/my-shelf', $event)"
             class="navbar-main-button"
+            [ngClass]="{ 'navbar-main-button-active': activeButton === 3 }"
             style="position: relative"
           >
             <mat-icon class="navbar-icon">my_library_books</mat-icon>
             {{ t("myShelf") }}
+
+            <!-- Counter -->
             <div
               class="navbar-library-counter"
               [ngClass]="{
@@ -70,7 +75,9 @@
             *ngIf="appState.isAdmin"
             (elviraclick)="navigate('/elvira/admin', $event)"
             class="navbar-main-button"
+            [ngClass]="{ 'navbar-main-button-active': activeButton === 4 }"
           >
+            <mat-icon class="navbar-icon">supervised_user_circle</mat-icon>
             Admin
           </button>
         </div>

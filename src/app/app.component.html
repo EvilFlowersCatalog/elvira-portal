@@ -1,21 +1,25 @@
 <div>
-
   <!-- Header -->
   <div [ngClass]="visibility">
     <app-header class="app-header"></app-header>
   </div>
   <mat-sidenav-container>
-
     <!-- Sidenav -->
-    <mat-sidenav mode="over" [opened]="sidenav_state" disableClose="true" class="app-mobile-sidenav">
+    <mat-sidenav
+      mode="over"
+      [opened]="sidenav_state"
+      class="app-mobile-sidenav"
+      (closed)="onSidenavClosed()"
+    >
       <app-mobile-sidenav></app-mobile-sidenav>
     </mat-sidenav>
     <mat-sidenav-content>
-
       <!-- App -->
       <div [ngClass]="background">
-        <div class="app-content" [ngClass]="{'app-content-viewer': pdfViewer}">
-
+        <div
+          class="app-content"
+          [ngClass]="{ 'app-content-viewer': pdfViewer }"
+        >
           <!-- Body -->
           <router-outlet></router-outlet>
         </div>
@@ -25,5 +29,4 @@
       </div>
     </mat-sidenav-content>
   </mat-sidenav-container>
-
 </div>

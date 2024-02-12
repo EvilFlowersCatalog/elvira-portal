@@ -140,8 +140,9 @@ export class DocumentFormComponent implements OnInit {
   }
 
   initFormFromIdentifier(data: EntryInfo) {
+    const actuallTitle: string = this.uploadForm.get('title').value;
     this.uploadForm.patchValue({
-      title: data.response.title,
+      title: actuallTitle ? actuallTitle : data.response.title,
       authorName: data.response.authors[0].name,
       authorSurname: data.response.authors[0].surname,
       doi: data.response.doi,

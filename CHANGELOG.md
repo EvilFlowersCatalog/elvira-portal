@@ -1,5 +1,14 @@
 # Changelog
 
+## 2.0.7 2023-10-15
+
+- **Added**: active buttons in navbar
+- **Added**: few icons
+- **Changed**: sidebar size
+- **Changed**: viewer 0.4.17 -> 0.4.18
+- **Changed**: sidebar closing
+- **Changed**: little advanced search
+
 ## 2.0.6 2023-10-13
 
 - **Added**: infinit scroll everywhere

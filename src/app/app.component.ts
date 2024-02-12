@@ -37,12 +37,13 @@ export class AppComponent extends DisposableComponent {
 
   ngOnInit() {
     // If we are at pdf-viewer hide footer
-    this.router.events.subscribe(event => {
+    this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        if (event.toString().includes("/elvira/pdf-viewer/")) {
+        if (event.toString().includes('/elvira/pdf-viewer/')) {
           this.visibility = 'hide';
           this.pdfViewer = true;
-        } else { // else visible
+        } else {
+          // else visible
           this.visibility = 'visible';
           this.pdfViewer = false;
         }
@@ -60,7 +61,8 @@ export class AppComponent extends DisposableComponent {
     this.loadingService.loadingStatus$
       .pipe(
         tap((status) => {
-          if (status && !this.pdfViewer) { // not for pdfViewer, described in pdf-viewer
+          if (status && !this.pdfViewer) {
+            // not for pdfViewer, described in pdf-viewer
             this.loadingService.onShowLoading();
           } else {
             this.loadingService.onHideLoading();
@@ -76,7 +78,8 @@ export class AppComponent extends DisposableComponent {
   // Set themes dark/light
   setTheme(theme: string) {
     const hostClass = theme === 'dark' ? 'theme-dark' : 'theme-light';
-    this.background = theme === 'dark' ? 'app-background-dark' : 'app-background-light';
+    this.background =
+      theme === 'dark' ? 'app-background-dark' : 'app-background-light';
     this.renderer.setAttribute(this.document.body, 'class', hostClass);
   }
 
@@ -92,5 +95,9 @@ export class AppComponent extends DisposableComponent {
       }
       this.appStateService.setState(JSON.parse(state.newValue));
     });
+  }
+
+  onSidenavClosed() {
+    this.appStateService.patchState({ sidenav: false });
   }
 }

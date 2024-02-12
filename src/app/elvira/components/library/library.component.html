@@ -55,7 +55,7 @@
     <ng-template #nothingFound>
       <!-- If the filter is active / only than show -->
       <div
-        *ngIf="filters.isActive()"
+        *ngIf="filters.isActive() && loaded"
         class="entries-list-empty"
         fxLayout="column"
       >
