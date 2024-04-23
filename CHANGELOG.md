@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.0 2023-04-23
+
+- **Changed**: The whole web app design
+
 ## 2.0.7 2023-10-15
 
 - **Added**: active buttons in navbar
