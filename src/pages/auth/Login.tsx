@@ -51,33 +51,13 @@ const Login = () => {
   // Submit form function to log in user
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // prevent default (reload in form)
+
     setLoading(true); // show loader
 
-    try {
-      const { response: user } = await verifyCredentials(loginForm); // verify given credentials
+    // Login
+    await login(loginForm);
 
-      // Set auth with given values
-      login({
-        userId: user.user.id,
-        username: user.user.username,
-        isSuperUser: user.user.is_superuser,
-        token: user.access_token,
-        refreshToken: user.refresh_token,
-      });
-
-      // Get where the user lastly was / if does not exist, go to home
-      const pathname = location.state?.from?.pathname ?? NAVIGATION_PATHS.home;
-      const params = location.state?.from?.search ?? '';
-
-      const from = pathname + params;
-
-      // Navigate to where was user lastly or to library
-      navigate(from, { replace: true });
-    } catch {
-      toast.error(t('notifications.login.error'));
-    } finally {
-      setLoading(false); // hide loader
-    }
+    setLoading(false); // hide loader
   };
 
   return (

@@ -1,5 +1,9 @@
 import { createContext, useEffect, useState } from 'react';
-import { IAuth, IUpdatedAuth } from '../utils/interfaces/auth';
+import {
+  IAuth,
+  IAuthCredentials,
+  IUpdatedAuth,
+} from '../utils/interfaces/auth';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import {
@@ -8,6 +12,7 @@ import {
 } from '../utils/interfaces/contexts';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { NAVIGATION_PATHS } from '../utils/interfaces/general/general';
+import useVerifyCredentials from '../hooks/api/verify/useVerifyCredentials';
 
 export const AuthContext = createContext<IAuthContext | null>(null);
 // LOCAL SOTRAGE KEY
@@ -27,7 +32,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
   );
   const navigate = useNavigate();
   const location = useLocation();
-
+  const verifyCredentials = useVerifyCredentials();
   const logoutChannel = new BroadcastChannel(BROADCAST_MESSAGE);
 
   // listen to logout message
@@ -44,9 +49,31 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
     if (auth) setAuth({ ...auth, ...newAuth });
   };
 
-  const login = async (auth: IAuth) => {
-    setAuth(auth);
-    toast.success(t('notifications.login.success')); // Notify succes
+  const login = async (loginForm: IAuthCredentials) => {
+    try {
+      const { response: user } = await verifyCredentials(loginForm); // verify given credentials
+
+      // Set auth with given values
+      setAuth({
+        userId: user.user.id,
+        username: user.user.username,
+        isSuperUser: user.user.is_superuser,
+        token: user.access_token,
+        refreshToken: user.refresh_token,
+      });
+
+      // Get where the user lastly was / if does not exist, go to home
+      const pathname = location.state?.from?.pathname ?? NAVIGATION_PATHS.home;
+      const params = location.state?.from?.search ?? '';
+
+      const from = pathname + params;
+
+      // Navigate to where was user lastly or to library
+      toast.success(t('notifications.login.success')); // Notify succes
+      navigate(from, { replace: true });
+    } catch {
+      toast.error(t('notifications.login.error'));
+    }
   };
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 import { ReactNode, MouseEvent, RefObject } from 'react';
-import { IAuth, IUpdatedAuth } from './auth';
+import { IAuth, IAuthCredentials, IUpdatedAuth } from './auth';
 import {
   DATA_TYPE,
   LANG_TYPE,
@@ -22,7 +22,7 @@ export interface IDataProviderParams {
 export interface IAuthContext {
   auth: IAuth | null;
   updateAuth: (auth: IUpdatedAuth) => void;
-  login: (auth: IAuth) => void;
+  login: (loginForm: IAuthCredentials) => Promise<void>;
   logout: () => void;
 }
 
