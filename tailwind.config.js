@@ -17,8 +17,8 @@ export default {
         red: '#ff2129',
         green: '#77dd77',
         darkGray: '#1f1f1f',
+        strongDarkGray: '#141414',
         gray: '#2e2e2e',
-        lightGray: '#e6e6e6',
       },
       flex: {
         2: '2 2 0%',

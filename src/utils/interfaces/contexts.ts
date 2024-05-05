@@ -1,4 +1,4 @@
-import { ReactNode, MouseEvent } from 'react';
+import { ReactNode, MouseEvent, RefObject } from 'react';
 import { IAuth, IUpdatedAuth } from './auth';
 import {
   DATA_TYPE,
@@ -31,20 +31,27 @@ export interface IAppContext {
   updateTheme: (theme: THEME_TYPE) => void;
   lang: LANG_TYPE;
   updateLang: (lang: LANG_TYPE) => void;
-  showLoader: boolean;
-  setShowLoader: (showLoader: boolean) => void;
-  isSearchNeeded: () => boolean;
+  clearFilters: () => void;
   specialNavigation: (
     event: MouseEvent<HTMLButtonElement>,
     path: NAVIGATION_PATHS | string
   ) => void;
+  isSmallDevice: boolean;
+  showMenu: boolean;
+  setShowMenu: (showMenu: boolean) => void;
+  searchParamsEqual: (
+    prevSearchParams: URLSearchParams | null,
+    currentSearchParams: URLSearchParams
+  ) => boolean;
+  handleScroll: (
+    scrollRef: RefObject<HTMLDivElement>,
+    page: number,
+    setPage: (page: number) => void,
+    maxPage: number,
+    loadingNext: boolean,
+    setLoadingNext: (loadingNext: boolean) => void,
+    showScrollUp: boolean,
+    setShowScrollUp: (showScrollUp: boolean) => void
+  ) => void;
   STUColor: string;
-}
-
-export interface IDataPageContext {
-  data: IEntry[] | IFeed[] | null;
-  isLoading: boolean;
-  setIsLoading: (isLoading: boolean) => void;
-  refreshPage: boolean;
-  setRefreshPage: (refreshPage: boolean) => void;
 }

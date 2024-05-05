@@ -27,7 +27,7 @@ const CustomTextArea = ({
         {required ? t('input.required') : t('input.notRequired')}
       </label>
       <textarea
-        className='w-full h-full resize-none p-2 rounded-md bg-lightGray dark:bg-darkGray border border-white dark:border-gray outline-none focus:border-STUColor dark:focus:border-STUColor text-dark dark:text-white'
+        className='w-full h-full resize-none p-2 rounded-md bg-zinc-200 dark:bg-darkGray border border-white dark:border-gray outline-none focus:border-STUColor dark:focus:border-STUColor text-dark dark:text-white'
         placeholder={placeholder}
         required={required}
         value={value}

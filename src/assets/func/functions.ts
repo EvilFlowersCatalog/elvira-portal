@@ -1,15 +1,3 @@
-// Function that wait 0,3s to start given function
-export const debounce = (func: any) => {
-  let timer: any;
-
-  return (...args: any) => {
-    clearTimeout(timer);
-    timer = setTimeout(() => {
-      func.apply(this, args);
-    }, 300);
-  };
-};
-
 export const getFileSize = (bytes: number): string => {
   if (bytes === 0) {
     return '0 Bytes';
@@ -55,8 +43,6 @@ export const uuid = (): string => {
 };
 
 export const updateMetaTag = (name: string, content: string | number) => {
-  const nieco = document.querySelector(`meta[name=${name}]`);
-  console.log(nieco);
   document
     .querySelector(`meta[name=${name}]`)
     ?.setAttribute('content', content.toString());

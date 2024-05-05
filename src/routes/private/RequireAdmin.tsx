@@ -1,6 +1,6 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
-import useAuthContext from '../../hooks/useAuthContext';
+import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { useEffect, useState } from 'react';
 import useVerifyAdmin from '../../hooks/api/verify/useVerifyAdmin';
 

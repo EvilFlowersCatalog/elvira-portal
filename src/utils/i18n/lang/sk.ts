@@ -4,12 +4,12 @@ export const sk = {
     notifications: {
       myShelf: {
         add: {
-          success: 'Kniha bola úspešne pridaná do tvojej poličky.',
-          error: 'Kniha sa nepodarila pridať do tvojej poličky.',
+          success: 'Kniha bola úspešne pridaná do vašej poličky.',
+          error: 'Kniha sa nepodarila pridať do vašej poličky.',
         },
         remove: {
-          success: 'Kniha bola úspešne odstránená z tvojej poličky.',
-          error: 'Knihu sa nepodarilo odstrániť z tvojej poličky.',
+          success: 'Kniha bola úspešne odstránená z vašej poličky.',
+          error: 'Knihu sa nepodarilo odstrániť z vašej poličky.',
         },
       },
       entry: {
@@ -64,6 +64,18 @@ export const sk = {
       loginBtn: 'Prihlásiť sa',
     },
 
+    // ADMINISTRATION PAGE
+    administration: {
+      homePage: {
+        entries: 'Zoznamy',
+        feeds: 'Skupiny',
+      },
+    },
+
+    general: {
+      scrollUp: 'Posunúť Nahor',
+    },
+
     // NOT FOUND PAGE
     notFound: {
       oops: 'Uups',
@@ -75,9 +87,15 @@ export const sk = {
 
     // NAVBAR MENU
     navbarMenu: {
+      portal: 'Portál',
+      personal: 'Osobné',
+      settings: 'Nastavenia',
       home: 'Domov',
+      entries: 'Zoznamy',
+      about: 'O Elvíre',
       library: 'Knižnica',
-      myShelf: 'Moja Polička',
+      myShelf: 'Polička',
+      loan: 'Pôžičky',
       loanHistory: 'História Pôžičiek',
       feeds: 'Skupiny',
       advancedSearch: 'Pokročilé Hľadanie',
@@ -89,10 +107,31 @@ export const sk = {
 
     // PAGE
     page: {
-      search: 'Hľadať',
-      empty: 'Nič nebolo nájdené',
-      error: 'Nastala chyba pri načítavaní dát :/',
+      notFound: 'Nič nebolo nájdené',
+      shelfEmpty: 'Vaša polička je prázdna',
+      error: 'Nastala chyba pri načítavaní dát',
       scrollUp: 'Posunúť nahor',
+      removeFilters: 'Odstrániť filtre',
+    },
+
+    // HOME PAGE
+    home: {
+      popular: 'Populárne',
+      lastAdded: 'Naposledy Pridané',
+      about: 'O Elvíre',
+    },
+
+    // ADVANCED SEARCH PAGE
+    advancedSearch: {
+      advanced: 'Pokročilé Hľadanie',
+      title: 'Názov',
+      author: 'Autorové Meno',
+      category: 'Kategória',
+      year: 'Rok',
+      from: 'Od',
+      to: 'Do',
+      feeds: 'Skupiny',
+      search: 'Hľadať',
     },
 
     // ENTRY COMPONENT
@@ -193,11 +232,14 @@ export const sk = {
       },
     },
 
-    // ADMIN CONTENT
-    admin: {
-      homePage: {
-        entries: 'Zoznamy',
-        feeds: 'Skupiny',
+    // TOOLS
+    tools: {
+      search: 'Hľadať',
+      orderBy: {
+        createdAtDesc: 'Vytvorenie [ZO]',
+        createdAtAsc: 'Vytvorenie [VZO]',
+        titleAsc: 'Názov [a - z]',
+        titleDesc: 'Názov [z - a]',
       },
     },
   },

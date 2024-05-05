@@ -64,6 +64,18 @@ export const en = {
       loginBtn: 'Login',
     },
 
+    // ADMINISTRATION PAGE
+    administration: {
+      homePage: {
+        entries: 'Entries',
+        feeds: 'Feeds',
+      },
+    },
+
+    general: {
+      scrollUp: 'Scroll Up',
+    },
+
     // NOT FOUND PAGE
     notFound: {
       oops: 'Oops',
@@ -75,9 +87,15 @@ export const en = {
 
     // NAVBAR MENU
     navbarMenu: {
+      portal: 'Portal',
+      personal: 'Personal',
+      settings: 'Settings',
+      entries: 'Entries',
+      about: 'About',
       home: 'Home',
       library: 'Library',
-      myShelf: 'My Shelf',
+      myShelf: 'Shelf',
+      loan: 'Loans',
       loanHistory: 'Loans Histroy',
       feeds: 'Feeds',
       advancedSearch: 'Advanced Search',
@@ -89,10 +107,31 @@ export const en = {
 
     // PAGE
     page: {
-      search: 'Search',
-      empty: 'Nothing was found',
-      error: 'An error occurred while loading data :/',
+      notFound: 'Nothing was found',
+      shelfEmpty: 'Your shelf is empty',
+      error: 'An error occurred while loading data',
       scrollUp: 'Scroll up',
+      removeFilters: 'Remove filters',
+    },
+
+    // HOME PAGE
+    home: {
+      popular: 'Popular',
+      lastAdded: 'Last Added',
+      about: 'About',
+    },
+
+    // ADVANCED SEARCH PAGE
+    advancedSearch: {
+      advanced: 'Advanced Search',
+      title: 'Title',
+      author: "Author's Name",
+      category: 'Category',
+      year: 'Year',
+      from: 'From',
+      to: 'To',
+      feeds: 'Feeds',
+      search: 'Seach',
     },
 
     // ENTRY COMPONENT
@@ -200,11 +239,14 @@ export const en = {
       },
     },
 
-    // ADMIN CONTENT
-    admin: {
-      homePage: {
-        entries: 'Entries',
-        feeds: 'Feeds',
+    // TOOLS
+    tools: {
+      search: 'Search',
+      orderBy: {
+        createdAtDesc: 'Creation [DESC]',
+        createdAtAsc: 'Creation [ASC]',
+        titleAsc: 'Title [a - z]',
+        titleDesc: 'Title [z - a]',
       },
     },
   },

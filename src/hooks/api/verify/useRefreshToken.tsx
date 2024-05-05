@@ -1,5 +1,5 @@
 import { IRefreshTokenResponse } from '../../../utils/interfaces/auth';
-import useAuthContext from '../../useAuthContext';
+import useAuthContext from '../../contexts/useAuthContext';
 import useAxios from '../axios/useAxios';
 
 const useRefreshToken = () => {

@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router-dom';
-import useAuthContext from '../../hooks/useAuthContext';
+import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { useEffect, useState } from 'react';
 import useRefreshToken from '../../hooks/api/verify/useRefreshToken';
 

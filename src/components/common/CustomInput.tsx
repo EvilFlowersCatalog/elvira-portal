@@ -30,7 +30,7 @@ const CustomInput = ({
       </label>
 
       <input
-        className='w-full p-2 rounded-md bg-lightGray dark:bg-darkGray border-2 border-white dark:border-gray outline-none focus:border-STUColor dark:focus:border-STUColor text-dark dark:text-white '
+        className='w-full p-2 rounded-md bg-zinc-200 dark:bg-darkGray border-2 border-white dark:border-gray outline-none focus:border-STUColor dark:focus:border-STUColor'
         required={required}
         onChange={onChange}
         onInvalid={onInvalid}

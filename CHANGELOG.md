@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.1 2023-05-05
+
+- **Changed**: Navbar wizard
+- **Fixed**: Home entries
+- **Added**: Advanced Search
+- **Added**: Scroll up button
+- **Added**: Responsivness
+- **Added**: Advanced Search
+- **Change**: Few new things
+
 ## 3.0.0 2023-04-23
 
 - **Changed**: The whole web app design

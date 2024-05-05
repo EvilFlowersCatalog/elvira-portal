@@ -33,8 +33,9 @@ export interface IFeedDetail {
 }
 
 export interface IFeedQuery {
-  page: number;
-  limit: number;
+  page?: number;
+  limit?: number;
+  paginate?: boolean;
   parentId?: string;
   title?: string;
   kind?: string;

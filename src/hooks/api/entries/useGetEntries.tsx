@@ -26,7 +26,7 @@ const useGetEntries = () => {
     if (orderBy) params.set('order_by', orderBy);
     if (publishedAtGte) params.set('published_at_gte', publishedAtGte);
     if (publishedAtLte) params.set('published_at_lte', publishedAtLte);
-    if (authors) params.set('authors', authors);
+    if (authors) params.set('author', authors);
 
     // Get entries by params
     const GET_ENTRIES_URL = '/api/v1/entries';

@@ -41,7 +41,7 @@ const ModalWrapper = ({
       ref={ref}
     >
       <div
-        className='flex flex-col justify-center items-start p-5 bg-lightGray dark:bg-darkGray max-h-[50%] max-w-[50%] rounded-md'
+        className='flex flex-col justify-center items-start p-5 bg-lightGray dark:bg-darkGray w-[90%] h-fit min-h-96 max-h-[50%] md:max-w-[50%]  rounded-md'
         onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
       >
         {/* Header */}
