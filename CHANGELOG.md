@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.4 2023-07-05
+
+- **Added**: README.md file
+
 ## 3.0.3 2023-07-05
 
 - **Added**: Search bar in home
