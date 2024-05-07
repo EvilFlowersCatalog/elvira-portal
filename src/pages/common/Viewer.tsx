@@ -17,7 +17,7 @@ import useGetUserAcquisition from '../../hooks/api/acquisitiions/useGetUserAcqui
 import { renderViewer } from '@evilflowers/evilflowersviewer';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { toast } from 'react-toastify';
-import { updateMetaTag } from '../../assets/func/functions';
+import { updateMetaTag } from '../../utils/func/functions';
 import { CircleLoader } from 'react-spinners';
 import useCustomEffect from '../../hooks/useCustomEffect';
 

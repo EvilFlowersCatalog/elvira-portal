@@ -31,13 +31,11 @@ Ah, the secret sauce behind the scenes! 🌟 Here's a quick rundown of our Elvir
 Feel the urge to customize? You can effortlessly overwrite these variables using bash commands:
 
 ```bash
-
 export  ELVIRA_BASE_URL=base_utl
 export  ELVIRA_CATALOG_ID=catalog_id
 export  ELVIRA_ASSETS_DIR=dir_name
 
 npm  run  build:key
-
 ```
 
 🔔 **_Oh, and a gentle reminder_** 🔔 _It's best to tweak these variables via bash commands rather than directly modifying the env files._

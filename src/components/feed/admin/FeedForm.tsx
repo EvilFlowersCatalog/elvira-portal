@@ -14,7 +14,7 @@ import { CircleLoader } from 'react-spinners';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import { useSearchParams } from 'react-router-dom';
 import useGetFeedDetail from '../../../hooks/api/feeds/useGetFeedDetail';
-import { uuid } from '../../../assets/func/functions';
+import { uuid } from '../../../utils/func/functions';
 import useUploadFeed from '../../../hooks/api/feeds/useUploadFeed';
 import useEditFeed from '../../../hooks/api/feeds/useEditFeed';
 import { toast } from 'react-toastify';

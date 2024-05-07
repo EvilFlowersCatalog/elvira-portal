@@ -1,6 +1,6 @@
 import { ChangeEvent, InvalidEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { uuid } from '../../assets/func/functions';
+import { uuid } from '../../utils/func/functions';
 
 interface ICustomTextAreaParams {
   onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;

@@ -23,7 +23,7 @@ import useGetFeeds from '../../../hooks/api/feeds/useGetFeeds';
 import { toast } from 'react-toastify';
 import FeedMenu from '../../../components/feed/FeedMenu';
 import Dropzone from '../../../components/common/Dropzone';
-import { getBase64 } from '../../../assets/func/functions';
+import { getBase64 } from '../../../utils/func/functions';
 import useUploadEntry from '../../../hooks/api/entries/useUploadEntry';
 import useEditEntry from '../../../hooks/api/entries/useEditEntry';
 import {

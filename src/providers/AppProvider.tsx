@@ -24,22 +24,22 @@ const THEME_KEY = 'elvira-theme';
 const LANG_KEY = 'elvira-lang';
 
 // IMAGES / LOGOS
-const logoDark = `src/assets/images/${
+const logoDark = `/assets/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/elvira/logo-dark.png`;
-const logoLight = `src/assets/images/${
+const logoLight = `/assets/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/elvira/logo-light.png`;
-const titleLogoDark = `src/assets/images/${
+const titleLogoDark = `/assets/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/elvira/title-logo-dark.png`;
-const titleLogoLight = `src/assets/images/${
+const titleLogoLight = `assets/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/elvira/title-logo-light.png`;
-const stuLogoDark = `src/assets/images/${
+const stuLogoDark = `/assets/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/stu/logo-dark.png`;
-const stuLogoLight = `src/assets/images/${
+const stuLogoLight = `/assets/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/stu/logo-light.png`;
 

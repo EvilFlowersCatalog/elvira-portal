@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-toastify';
-import { getFileSize } from '../../assets/func/functions';
+import { getFileSize } from '../../utils/func/functions';
 import { IoMdClose } from 'react-icons/io';
 
 interface IDragzoneParams {

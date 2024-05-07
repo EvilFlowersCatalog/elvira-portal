@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.5 2023-07-05
+
+- **Fixed**: Not showing logos, needed to be moved to public dir
+
 ## 3.0.4 2023-07-05
 
 - **Added**: README.md file
