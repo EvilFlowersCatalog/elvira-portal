@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.0.8 2023-05-07
+
+- **Changed**: Assetes
+- **Changed**: Environment variables
+
 ## 2.0.7 2023-10-15
 
 - **Added**: active buttons in navbar

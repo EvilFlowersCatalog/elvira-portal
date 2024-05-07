@@ -10,6 +10,7 @@ import { AppStateService } from 'src/app/services/general/app-state.service';
 import { AdvancedSearchDialogComponent } from '../advanced-search-dialog/advanced-search-dialog.component';
 import { NavigationService } from 'src/app/services/general/navigation.service';
 import { FeedService } from 'src/app/services/feed.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-navbar',
@@ -25,6 +26,7 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   routeSubscription: Subscription;
   name: string = '';
   activeButton: number;
+  dirName: string = '';
 
   constructor(
     private readonly router: Router,
@@ -40,6 +42,7 @@ export class NavbarComponent extends DisposableComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.dirName = `../../../../assets/${environment.assetDirName}/logo.png`;
     // Set active button
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
