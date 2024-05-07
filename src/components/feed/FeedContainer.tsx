@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { ReactNode, useEffect, useRef, useState } from 'react';
-import EntryInfo from '../entry/EntryInfo';
+import EntryInfo from '../entry/EntryDetail';
 import Breadcrumb from '../common/Breadcrumb';
 import PageLoading from '../page/PageLoading';
 import PageMessage from '../page/PageMessage';
@@ -40,7 +40,7 @@ const FeedContainer = ({
 }: IFeedContainer) => {
   const { handleScroll, searchParamsEqual, clearFilters } = useAppContext();
   const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [showScrollUp, setShowScrollUp] = useState<boolean>(false);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);

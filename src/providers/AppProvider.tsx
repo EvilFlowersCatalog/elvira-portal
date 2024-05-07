@@ -23,6 +23,26 @@ export const AppContext = createContext<IAppContext | null>(null);
 const THEME_KEY = 'elvira-theme';
 const LANG_KEY = 'elvira-lang';
 
+// IMAGES / LOGOS
+const logoDark = `src/assets/images/${
+  import.meta.env.ELVIRA_ASSETS_DIR
+}/elvira/logo-dark.png`;
+const logoLight = `src/assets/images/${
+  import.meta.env.ELVIRA_ASSETS_DIR
+}/elvira/logo-light.png`;
+const titleLogoDark = `src/assets/images/${
+  import.meta.env.ELVIRA_ASSETS_DIR
+}/elvira/title-logo-dark.png`;
+const titleLogoLight = `src/assets/images/${
+  import.meta.env.ELVIRA_ASSETS_DIR
+}/elvira/title-logo-light.png`;
+const stuLogoDark = `src/assets/images/${
+  import.meta.env.ELVIRA_ASSETS_DIR
+}/stu/logo-dark.png`;
+const stuLogoLight = `src/assets/images/${
+  import.meta.env.ELVIRA_ASSETS_DIR
+}/stu/logo-light.png`;
+
 const AppProvider = ({ children }: IContextProviderParams) => {
   // Set initail value from theme and lang
   const getInitialTheme = () => {
@@ -192,6 +212,12 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         setShowMenu,
         searchParamsEqual,
         handleScroll,
+        titleLogoDark,
+        titleLogoLight,
+        stuLogoLight,
+        stuLogoDark,
+        logoDark,
+        logoLight,
         STUColor: (colors as { STUColor: string }).STUColor,
       }}
     >

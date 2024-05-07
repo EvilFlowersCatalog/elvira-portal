@@ -13,7 +13,6 @@ import RequireAuth from './private/RequireAuth';
 import useAuthContext from '../hooks/contexts/useAuthContext';
 import RequireAdmin from './private/RequireAdmin';
 import Viewer from '../pages/common/Viewer';
-import LoansHistroy from '../pages/common/LoansHistroy';
 import Home from '../pages/common/Home';
 import About from '../pages/common/About';
 import Loans from '../pages/common/Loans';
@@ -50,7 +49,6 @@ const BaseRoutes = () => {
           <Route path='library' element={<Library />} />
           <Route path='shelf' element={<Shelf />} />
           <Route path='loans' element={<Loans />} />
-          <Route path='loans-history' element={<LoansHistroy />} />
           <Route path='feeds' element={<Feeds />} />
           <Route path='advanced-search' element={<AdvancedSearch />} />
           <Route path='viewer/:entry-id' element={<Viewer />} />

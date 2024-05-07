@@ -92,13 +92,12 @@ export const sk = {
       settings: 'Nastavenia',
       home: 'Domov',
       entries: 'Zoznamy',
-      about: 'O Elvíre',
+      about: 'O Projekte',
       library: 'Knižnica',
       myShelf: 'Polička',
-      loan: 'Pôžičky',
-      loanHistory: 'História Pôžičiek',
+      loan: 'Výpožičky',
       feeds: 'Skupiny',
-      advancedSearch: 'Pokročilé Hľadanie',
+      advancedSearch: 'Vyhľadávanie',
       administration: 'Administrácia',
       darkMode: 'Tmavý Režim',
       lightMode: 'Svetlý Režim',
@@ -118,12 +117,12 @@ export const sk = {
     home: {
       popular: 'Populárne',
       lastAdded: 'Naposledy Pridané',
-      about: 'O Elvíre',
+      search: 'Hľadať v Elvíre',
     },
 
     // ADVANCED SEARCH PAGE
     advancedSearch: {
-      advanced: 'Pokročilé Hľadanie',
+      advanced: 'Pokročilé Vyhľadávanie',
       title: 'Názov',
       author: 'Autorové Meno',
       category: 'Kategória',
@@ -138,8 +137,8 @@ export const sk = {
     entry: {
       detail: {
         close: 'Zavrieť',
-        add: 'Pridať',
-        remove: 'Odstrániť',
+        add: '+ Pridať do poličky',
+        remove: '- Odstrániť z poličky',
         pages: 'Strany',
         views: 'Zobrazenia',
         contributors: 'Spolu-Autori',
@@ -236,10 +235,10 @@ export const sk = {
     tools: {
       search: 'Hľadať',
       orderBy: {
-        createdAtDesc: 'Vytvorenie [ZO]',
-        createdAtAsc: 'Vytvorenie [VZO]',
-        titleAsc: 'Názov [a - z]',
-        titleDesc: 'Názov [z - a]',
+        createdAtAsc: 'Dátum pridania ↑',
+        createdAtDesc: 'Dátum pridania ↓',
+        titleAsc: 'Názov ↑',
+        titleDesc: 'Názov ↓',
       },
     },
   },

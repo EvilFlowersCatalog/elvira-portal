@@ -54,4 +54,10 @@ export interface IAppContext {
     setShowScrollUp: (showScrollUp: boolean) => void
   ) => void;
   STUColor: string;
+  logoDark: string;
+  logoLight: string;
+  titleLogoDark: string;
+  titleLogoLight: string;
+  stuLogoDark: string;
+  stuLogoLight: string;
 }

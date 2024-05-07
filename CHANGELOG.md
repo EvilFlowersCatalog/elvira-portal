@@ -1,12 +1,20 @@
 # Changelog
 
+## 3.0.3 2023-07-05
+
+- **Added**: Search bar in home
+- **Changed**: Few translates
+- **Changed**: Few icons
+- **Removed**: Loans history page
+- **Fixed**: "Relogin" - bad code order
+
 ## 3.0.2 2023-05-05
 
 - **Changed**: Login function
 
 ## 3.0.1 2023-05-05
 
-- **Changed**: Navbar wizard
+- **Changed**: Navbar design
 - **Fixed**: Home entries
 - **Added**: Advanced Search
 - **Added**: Scroll up button

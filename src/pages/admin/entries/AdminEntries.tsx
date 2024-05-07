@@ -34,7 +34,7 @@ const AdminEntries = () => {
           limit: 30,
           title: searchParams.get('title') ?? '',
           feedId: searchParams.get('feed-id') ?? '',
-          orderBy: searchParams.get('order-by') ?? '-created_at',
+          orderBy: searchParams.get('order-by') ?? '',
         });
 
         setMaxPage(metadata.pages);

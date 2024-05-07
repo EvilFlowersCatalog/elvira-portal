@@ -1,25 +1,22 @@
 import { Outlet } from 'react-router-dom';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import useRefreshToken from '../../hooks/api/verify/useRefreshToken';
+import useCustomEffect from '../../hooks/useCustomEffect';
 
 const RequireAuth = () => {
   const { auth, updateAuth, logout } = useAuthContext();
+  const [verified, setVerified] = useState<boolean>(false);
+
   const refreshToken = useRefreshToken();
-  const [render, setRender] = useState<boolean>(false);
 
-  useEffect(() => {
-    // Skip initail render
-    if (!render) {
-      setRender(true);
-      return;
-    }
-
+  useCustomEffect(() => {
     // Refresh token
     const refresh = async () => {
       try {
-        const newToken = await refreshToken();
-        updateAuth({ token: newToken });
+        const token = await refreshToken();
+        updateAuth({ token });
+        setVerified(true);
       } catch {
         logout();
       }
@@ -29,9 +26,9 @@ const RequireAuth = () => {
     // Then every 4 min
     const intervalId = setInterval(refresh, 4 * 60 * 1000);
     return () => clearInterval(intervalId);
-  }, [render]);
+  }, []);
 
-  return auth && <Outlet />;
+  return auth && verified && <Outlet />;
 };
 
 export default RequireAuth;

@@ -1,9 +1,7 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { IEntry } from '../../utils/interfaces/entry';
 import PageLoading from '../../components/page/PageLoading';
 import useGetEntries from '../../hooks/api/entries/useGetEntries';
-import titleLogoDark from '../../assets/images/elvira-logo/title-logo-dark.png';
-import titleLogoLight from '../../assets/images/elvira-logo/title-logo-light.png';
 import Button from '../../components/common/Button';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import {
@@ -11,28 +9,44 @@ import {
   THEME_TYPE,
 } from '../../utils/interfaces/general/general';
 import SwiperEntry from '../../components/entry/SwiperEntry';
-import EntryInfo from '../../components/entry/EntryInfo';
-import { useSearchParams } from 'react-router-dom';
+import EntryDetail from '../../components/entry/EntryDetail';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import useCustomEffect from '../../hooks/useCustomEffect';
+import { IoSearchOutline } from 'react-icons/io5';
 
 const Home = () => {
   const { t } = useTranslation();
-  const { theme, specialNavigation } = useAppContext();
+  const { theme, titleLogoDark, titleLogoLight } = useAppContext();
   const [popularEntries, setPopularEntries] = useState<IEntry[]>([]);
   const [lastAddedEntries, setLastAddedEntries] = useState<IEntry[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
+  const [searchInput, setSearchInput] = useState<string>('');
   const [searchParams] = useSearchParams();
-  const [render, setRender] = useState<boolean>(false);
 
   const getEntries = useGetEntries();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!render) {
-      setRender(true);
-      return;
+  const handleSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(e.target.value);
+  };
+
+  const submit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const params = new URLSearchParams();
+    if (searchInput) {
+      params.set('title', searchInput);
+
+      navigate({
+        pathname: NAVIGATION_PATHS.library,
+        search: params.toString(),
+      });
     }
+  };
 
+  useCustomEffect(() => {
     (async () => {
       try {
         const { items: popular } = await getEntries({
@@ -52,7 +66,7 @@ const Home = () => {
         setIsLoading(false);
       }
     })();
-  }, [render]);
+  }, []);
 
   useEffect(() => {
     const entryDetailId = searchParams.get('entry-detail-id');
@@ -67,12 +81,27 @@ const Home = () => {
       <div className='flex-1 p-4'>
         <div className='flex items-center flex-col gap-10 px-5 py-20'>
           <img
-            className='w-96'
+            className='w-full md:w-2/3 lg:w-1/2 max-w-[800px]'
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
           />
-          <Button onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.about)}>
-            <span className='text-xl'>{t('home.about')}</span>
-          </Button>
+          <form
+            className='relative flex w-full md:w-1/2 xl:w-1/3 max-w-96 items-center gap-2 text-darkGray dark:text-white'
+            onSubmit={submit}
+          >
+            <input
+              className={
+                'w-full p-2 rounded-md bg-zinc-200 dark:bg-darkGray border-2 border-white dark:border-gray outline-none focus:border-STUColor dark:focus:border-STUColor'
+              }
+              type={'text'}
+              name={'searchTitle'}
+              value={searchInput}
+              placeholder={t('home.search')}
+              onChange={handleSearchInput}
+            />
+            <button type='submit' className={'absolute right-2'}>
+              <IoSearchOutline size={30} />
+            </button>
+          </form>
         </div>
         <h1 className='text-lg mb-2 font-medium'>{t('home.popular')}</h1>
         <div className='overflow-auto'>
@@ -99,7 +128,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-      {activeEntryId && <EntryInfo entryId={activeEntryId} />}
+      {activeEntryId && <EntryDetail entryId={activeEntryId} />}
     </>
   );
 };

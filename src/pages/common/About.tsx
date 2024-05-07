@@ -1,11 +1,9 @@
-import titleLogoDark from '../../assets/images/elvira-logo/title-logo-dark.png';
-import titleLogoLight from '../../assets/images/elvira-logo/title-logo-light.png';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { THEME_TYPE } from '../../utils/interfaces/general/general';
 
 const About = () => {
-  const { theme } = useAppContext();
+  const { theme, titleLogoDark, titleLogoLight } = useAppContext();
 
   return (
     <div className='flex-1'>

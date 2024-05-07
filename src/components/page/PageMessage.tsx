@@ -1,6 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import LogoDark from '../../assets/images/elvira-logo/logo-dark.png';
-import LogoLight from '../../assets/images/elvira-logo/logo-light.png';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { THEME_TYPE } from '../../utils/interfaces/general/general';
 import Button from '../common/Button';
@@ -11,14 +9,14 @@ interface IPageMessageParams {
 }
 
 const PageMessage = ({ message, clearParams = null }: IPageMessageParams) => {
-  const { theme } = useAppContext();
+  const { theme, logoDark, logoLight } = useAppContext();
   const { t } = useTranslation();
 
   return (
     <div className='flex flex-1 flex-col px-4 items-center justify-center text-center p-4'>
       <img
         className='w-20 mb-10'
-        src={theme === THEME_TYPE.dark ? LogoLight : LogoDark}
+        src={theme === THEME_TYPE.dark ? logoLight : logoDark}
       />
       <span className='text-[30px] md:text-[50px] font-extrabold uppercase'>
         {message}

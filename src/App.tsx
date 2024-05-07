@@ -24,7 +24,11 @@ const App = () => {
             <NavbarContainer />
           )}
 
-        <div className='flex flex-1 flex-col overflow-auto'>
+        <div
+          className={`${
+            isSmallDevice ? 'pt-14' : 'pt-0'
+          } flex flex-1 flex-col overflow-auto`}
+        >
           {isSmallDevice && <Header />}
           <Outlet />
         </div>

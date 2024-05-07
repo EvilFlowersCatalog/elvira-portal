@@ -35,7 +35,7 @@ const Library = () => {
           authors: searchParams.get('author') ?? '',
           publishedAtGte: searchParams.get('from') ?? '',
           publishedAtLte: searchParams.get('to') ?? '',
-          orderBy: searchParams.get('order-by') ?? '-created_at',
+          orderBy: searchParams.get('order-by') ?? '',
         });
 
         setMaxPage(metadata.pages);

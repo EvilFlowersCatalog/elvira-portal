@@ -98,7 +98,7 @@ export const en = {
       loan: 'Loans',
       loanHistory: 'Loans Histroy',
       feeds: 'Feeds',
-      advancedSearch: 'Advanced Search',
+      advancedSearch: 'Search',
       administration: 'Administration',
       darkMode: 'Dark Mode',
       lightMode: 'Light Mode',
@@ -118,7 +118,7 @@ export const en = {
     home: {
       popular: 'Popular',
       lastAdded: 'Last Added',
-      about: 'About',
+      search: 'Search in Elvira',
     },
 
     // ADVANCED SEARCH PAGE
@@ -138,8 +138,8 @@ export const en = {
     entry: {
       detail: {
         close: 'Close',
-        add: 'Add',
-        remove: 'Remove',
+        add: '+ Add to shelf',
+        remove: '- Remove from shelf',
         pages: 'Pages',
         views: 'Views',
         contributors: 'Contributors',
@@ -243,10 +243,10 @@ export const en = {
     tools: {
       search: 'Search',
       orderBy: {
-        createdAtDesc: 'Creation [DESC]',
-        createdAtAsc: 'Creation [ASC]',
-        titleAsc: 'Title [a - z]',
-        titleDesc: 'Title [z - a]',
+        createdAtAsc: 'Created at ↑',
+        createdAtDesc: 'Created at ↓',
+        titleAsc: 'Title ↑',
+        titleDesc: 'Title ↓',
       },
     },
   },

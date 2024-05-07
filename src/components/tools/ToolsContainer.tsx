@@ -30,12 +30,13 @@ const ToolsContainer = () => {
   };
 
   const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    searchParams.set('order-by', e.target.value);
+    if (e.target.value === 'none') searchParams.delete('order-by');
+    else searchParams.set('order-by', e.target.value);
     setSearchParams(searchParams);
   };
 
   return (
-    <div className='flex gap-3 px-4 pb-4 items-center flex-col md:flex-row'>
+    <div className='flex gap-3 px-4 pb-4 md:items-center flex-col md:flex-row'>
       <form
         className='relative flex w-full md:w-1/2 xl:w-1/4 items-center gap-2 text-darkGray dark:text-white'
         onSubmit={submit}
@@ -55,7 +56,7 @@ const ToolsContainer = () => {
         </button>
       </form>
 
-      <div className='flex gap-3 items-end text-md'>
+      <div className='flex gap-3 items-end text-[15px]'>
         <select
           className='bg-transparent cursor-pointer outline-none uppercase text-left'
           name='orderBy'
@@ -63,12 +64,12 @@ const ToolsContainer = () => {
           value={selection}
           onChange={handleSelectChange}
         >
-          <option value='created_at'>{t('tools.orderBy.createdAtAsc')}</option>
-          <option value='title'>{t('tools.orderBy.titleAsc')}</option>
           <option value='-created_at'>
             {t('tools.orderBy.createdAtDesc')}
           </option>
+          <option value='created_at'>{t('tools.orderBy.createdAtAsc')}</option>
           <option value='-title'>{t('tools.orderBy.titleDesc')}</option>
+          <option value='title'>{t('tools.orderBy.titleAsc')}</option>
         </select>
       </div>
     </div>

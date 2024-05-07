@@ -1,8 +1,4 @@
 import { MouseEvent } from 'react';
-import titleLogoDark from '../../assets/images/elvira-logo/title-logo-dark.png';
-import titleLogoLight from '../../assets/images/elvira-logo/title-logo-light.png';
-import stuTitleDark from '../../assets/images/stu/title/stu-title-dark.png';
-import stuTitleLight from '../../assets/images/stu/title/stu-title-light.png';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import {
   LANG_TYPE,
@@ -12,23 +8,22 @@ import {
 
 import { ReactElement } from 'react';
 import {
-  IoBookOutline,
   IoDocumentsOutline,
   IoMoonOutline,
-  IoSearchOutline,
+  IoSearchSharp,
   IoSunnyOutline,
 } from 'react-icons/io5';
-import { MdOutlineGroupWork, MdOutlineHistoryToggleOff } from 'react-icons/md';
+import { MdOutlineFeed } from 'react-icons/md';
 import { CiLogout } from 'react-icons/ci';
 import { RiAdminLine, RiArrowLeftDoubleFill } from 'react-icons/ri';
-import { GoHome } from 'react-icons/go';
-import { PiBooksLight } from 'react-icons/pi';
+import { PiBooks } from 'react-icons/pi';
 import { HiOutlineLanguage } from 'react-icons/hi2';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import useVerifyAdmin from '../../hooks/api/verify/useVerifyAdmin';
-import { FiHelpCircle } from 'react-icons/fi';
+import { FiBookOpen, FiHelpCircle } from 'react-icons/fi';
+import { RxHome } from 'react-icons/rx';
 
 interface INavbarButtonParams {
   name: string;
@@ -74,6 +69,10 @@ const Navbar = () => {
     lang,
     isSmallDevice,
     setShowMenu,
+    titleLogoDark,
+    titleLogoLight,
+    stuLogoDark,
+    stuLogoLight,
   } = useAppContext();
   const { auth, updateAuth, logout } = useAuthContext();
   const { t } = useTranslation();
@@ -116,10 +115,10 @@ const Navbar = () => {
   return (
     <div className='flex flex-col gap-2 w-64 min-w-64 h-full bg-zinc-100 dark:bg-darkGray p-4 overflow-auto'>
       {/* Logos */}
-      <div className='flex h-6 mb-5 justify-between'>
+      <div className='flex h-6 mb-5 justify-between items-center'>
         <button onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.home)}>
           <img
-            className='h-full w-auto'
+            className='h-auto w-36'
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
           />
         </button>
@@ -132,8 +131,8 @@ const Navbar = () => {
           </button>
         ) : (
           <img
-            className='h-full w-auto'
-            src={theme === THEME_TYPE.dark ? stuTitleLight : stuTitleDark}
+            className='h-auto w-16'
+            src={theme === THEME_TYPE.dark ? stuLogoLight : stuLogoDark}
           />
         )}
       </div>
@@ -145,25 +144,25 @@ const Navbar = () => {
           <NavbarButton
             name={t('navbarMenu.home')}
             path={NAVIGATION_PATHS.home}
-            icon={<GoHome size={23} />}
+            icon={<RxHome size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.home}
           />
           <NavbarButton
             name={t('navbarMenu.library')}
             path={NAVIGATION_PATHS.library}
-            icon={<IoBookOutline size={23} />}
+            icon={<FiBookOpen size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.library}
           />
           <NavbarButton
             name={t('navbarMenu.feeds')}
             path={NAVIGATION_PATHS.feeds}
-            icon={<MdOutlineGroupWork size={23} />}
+            icon={<MdOutlineFeed size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.feeds}
           />
           <NavbarButton
             name={t('navbarMenu.advancedSearch')}
             path={NAVIGATION_PATHS.advancedSearch}
-            icon={<IoSearchOutline size={23} />}
+            icon={<IoSearchSharp size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.advancedSearch}
           />
           <NavbarButton
@@ -191,7 +190,7 @@ const Navbar = () => {
           <NavbarButton
             name={t('navbarMenu.myShelf')}
             path={NAVIGATION_PATHS.shelf}
-            icon={<PiBooksLight size={23} />}
+            icon={<PiBooks size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.shelf}
           />
           <NavbarButton
@@ -199,12 +198,6 @@ const Navbar = () => {
             path={NAVIGATION_PATHS.loans}
             icon={<IoDocumentsOutline size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.loans}
-          />
-          <NavbarButton
-            name={t('navbarMenu.loanHistory')}
-            path={NAVIGATION_PATHS.loansHistory}
-            icon={<MdOutlineHistoryToggleOff size={23} />}
-            isActive={location.pathname === NAVIGATION_PATHS.loansHistory}
           />
         </div>
       )}

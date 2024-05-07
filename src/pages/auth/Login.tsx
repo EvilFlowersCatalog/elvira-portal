@@ -2,23 +2,15 @@ import { ChangeEvent, FormEvent, InvalidEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Button from '../../components/common/Button';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import titleLogoLight from '../../assets/images/elvira-logo/title-logo-light.png';
-import titleLogoDark from '../../assets/images/elvira-logo/title-logo-dark.png';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { IAuthCredentials } from '../../utils/interfaces/auth';
-import useVerifyCredentials from '../../hooks/api/verify/useVerifyCredentials';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
-import { toast } from 'react-toastify';
-import { useLocation, useNavigate } from 'react-router-dom';
-import {
-  NAVIGATION_PATHS,
-  THEME_TYPE,
-} from '../../utils/interfaces/general/general';
+import { THEME_TYPE } from '../../utils/interfaces/general/general';
 import { CircleLoader } from 'react-spinners';
 
 const Login = () => {
   const { login } = useAuthContext();
-  const { STUColor, theme } = useAppContext();
+  const { STUColor, theme, titleLogoDark, titleLogoLight } = useAppContext();
   const { t } = useTranslation();
   const [loginForm, setLoginForm] = useState<IAuthCredentials>({
     username: '',
@@ -26,9 +18,6 @@ const Login = () => {
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const verifyCredentials = useVerifyCredentials();
-  const location = useLocation();
-  const navigate = useNavigate();
 
   // Handle usernamen input change
   const handleUsername = (event: ChangeEvent<HTMLInputElement>) => {

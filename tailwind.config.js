@@ -12,8 +12,6 @@ export default {
       },
       colors: {
         STUColor: '#00abe1',
-        white: '#ffffff',
-        black: '#000000',
         red: '#ff2129',
         green: '#77dd77',
         darkGray: '#1f1f1f',

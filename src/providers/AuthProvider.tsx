@@ -37,11 +37,10 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
 
   // listen to logout message
   useEffect(() => {
-    const onmessage = () => {
+    logoutChannel.onmessage = () => {
       logout();
       logoutChannel.close();
     };
-    logoutChannel.onmessage = onmessage;
   }, []);
 
   const updateAuth = (newAuth: IUpdatedAuth) => {
@@ -79,15 +78,17 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
   useEffect(() => {
     // Whenever auth is changed, save it to local storage
     if (auth) localStorage.setItem(AUTH_KEY, JSON.stringify(auth));
-    else if (!location.pathname.includes(NAVIGATION_PATHS.login)) {
-      logoutChannel.postMessage('Logout');
+    else {
       localStorage.removeItem(AUTH_KEY);
+      logoutChannel.postMessage(BROADCAST_MESSAGE);
 
-      navigate(NAVIGATION_PATHS.login, {
-        state: { from: location },
-        replace: true,
-      });
-      toast.info(t('notifications.logout'));
+      if (location.pathname !== NAVIGATION_PATHS.login) {
+        navigate(NAVIGATION_PATHS.login, {
+          state: { from: location },
+          replace: true,
+        });
+        toast.info(t('notifications.logout'));
+      }
     }
   }, [auth]);
 

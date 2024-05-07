@@ -1,7 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import titleLogoLight from '../assets/images/elvira-logo/title-logo-light.png';
-import titleLogoDark from '../assets/images/elvira-logo/title-logo-dark.png';
 import {
   NAVIGATION_PATHS,
   THEME_TYPE,
@@ -14,12 +12,16 @@ import useAppContext from '../hooks/contexts/useAppContext';
  * @returns not found page, when user goes somewhere where he should not
  */
 const NotFound = () => {
-  const { theme } = useAppContext();
+  const { theme, titleLogoDark, titleLogoLight } = useAppContext();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   return (
-    <div className={'flex flex-1 flex-col justify-center items-center gap-5'}>
+    <div
+      className={
+        'flex flex-1 flex-col justify-center items-center gap-5 py-20 px-4'
+      }
+    >
       <img
         className={'w-3/5 md:w-2/5'}
         src={theme === THEME_TYPE.light ? titleLogoDark : titleLogoLight}

@@ -1,27 +1,24 @@
-import { useEffect, useState, MouseEvent } from 'react';
+import { useState, MouseEvent } from 'react';
 import { CircleLoader } from 'react-spinners';
 import { RiArrowRightDoubleLine } from 'react-icons/ri';
 import { useTranslation } from 'react-i18next';
 import { FaChevronDown, FaChevronUp } from 'react-icons/fa';
-import { IoAddCircle, IoRemoveCircle } from 'react-icons/io5';
 import Button from '../common/Button';
 import { toast } from 'react-toastify';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { IEntryDetail } from '../../utils/interfaces/entry';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 import useGetEntryDetail from '../../hooks/api/entries/useGetEntryDetail';
 import useAddToShelf from '../../hooks/api/my-shelf/useAddToShelf';
 import useRemoveFromShelf from '../../hooks/api/my-shelf/useRemoveFromShelf';
+import useCustomEffect from '../../hooks/useCustomEffect';
 
-interface IEntryInfoParams {
+interface IEntryDetailParams {
   entryId: string | null;
   triggerReload?: (() => void) | null;
 }
-export default function EntryInfo({
-  entryId,
-  triggerReload,
-}: IEntryInfoParams) {
+const EntryDetail = ({ entryId, triggerReload }: IEntryDetailParams) => {
   const { specialNavigation, STUColor } = useAppContext();
   const { t } = useTranslation();
   const [entry, setEntry] = useState<IEntryDetail | null>(null);
@@ -85,21 +82,19 @@ export default function EntryInfo({
   };
 
   // If entryId is changed
-  useEffect(() => {
+  useCustomEffect(() => {
     // Reset
     setEntry(null);
     if (!entryId) return;
 
-    const setEntryDetail = async () => {
+    (async () => {
       try {
         const entryDetail = await getEntryDetail(entryId);
         setEntry(entryDetail);
       } catch {
         setEntry(null);
       }
-    };
-
-    setEntryDetail();
+    })();
   }, [entryId, update]);
 
   const setFeed = (feedId: string) => {
@@ -162,7 +157,6 @@ export default function EntryInfo({
                     }
                     onClick={handleRemove}
                   >
-                    <IoRemoveCircle size={30} />
                     {t('entry.detail.remove')}
                   </button>
                 ) : (
@@ -172,7 +166,6 @@ export default function EntryInfo({
                     }
                     onClick={handleAdd}
                   >
-                    <IoAddCircle size={30} />
                     {t('entry.detail.add')}
                   </button>
                 )}
@@ -304,4 +297,6 @@ export default function EntryInfo({
       )}
     </div>
   );
-}
+};
+
+export default EntryDetail;

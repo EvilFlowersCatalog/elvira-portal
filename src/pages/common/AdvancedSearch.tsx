@@ -7,8 +7,9 @@ import FeedMenu from '../../components/feed/FeedMenu';
 import { useTranslation } from 'react-i18next';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
+import useCustomEffect from '../../hooks/useCustomEffect';
 
 interface IAdvancedSearchInputParams {
   name: string;
@@ -34,7 +35,6 @@ const AdvancedSearchInput = ({
 
 const AdvancedSearch = () => {
   const { t } = useTranslation();
-  const [render, setRender] = useState<boolean>(false);
   const [feeds, setFeeds] = useState<IFeed[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [activeFeeds, setActiveFeeds] = useState<
@@ -80,12 +80,7 @@ const AdvancedSearch = () => {
     });
   };
 
-  useEffect(() => {
-    if (!render) {
-      setRender(true);
-      return;
-    }
-
+  useCustomEffect(() => {
     (async () => {
       try {
         const { items } = await getFeeds({
@@ -97,7 +92,7 @@ const AdvancedSearch = () => {
         setIsLoading(false);
       }
     })();
-  }, [render]);
+  }, []);
 
   return (
     <div className='flex flex-col flex-1 overflow-auto'>

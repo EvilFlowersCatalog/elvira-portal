@@ -1,6 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { ReactNode, useEffect, useRef, useState } from 'react';
-import EntryInfo from './EntryInfo';
+import EntryDetail from './EntryDetail';
 import Breadcrumb from '../common/Breadcrumb';
 import PageLoading from '../page/PageLoading';
 import PageMessage from '../page/PageMessage';
@@ -46,7 +46,7 @@ const EntryContainer = ({
 }: IEntryContainer) => {
   const { handleScroll, searchParamsEqual, clearFilters } = useAppContext();
   const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const [showScrollUp, setShowScrollUp] = useState<boolean>(false);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -70,6 +70,14 @@ const EntryContainer = ({
       else setActiveEntryId(null);
     }
   }, [searchParams]);
+
+  const isParamsEmpty = () => {
+    // do not count entry-detail-id
+    return Array.from(searchParams.keys()).every(
+      (key) =>
+        key === 'entry-detail-id' || searchParams.getAll(key).length !== 0
+    );
+  };
 
   return (
     <>
@@ -102,7 +110,7 @@ const EntryContainer = ({
         {!isLoading &&
           !isError &&
           entries.length === 0 &&
-          (searchParams.toString() !== '' ? (
+          (isParamsEmpty() ? (
             <PageMessage
               message={t('page.notFound')}
               clearParams={clearFilters}
@@ -114,7 +122,7 @@ const EntryContainer = ({
       </div>
       {showScrollUp && <ScrollUpButton scrollRef={scrollRef} />}
       {activeEntryId && (
-        <EntryInfo triggerReload={triggerReload} entryId={activeEntryId} />
+        <EntryDetail triggerReload={triggerReload} entryId={activeEntryId} />
       )}
     </>
   );

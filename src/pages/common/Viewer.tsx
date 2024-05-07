@@ -19,20 +19,19 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 import { toast } from 'react-toastify';
 import { updateMetaTag } from '../../assets/func/functions';
 import { CircleLoader } from 'react-spinners';
-import titleLogoDark from '../../assets/images/elvira-logo/title-logo-dark.png';
-import titleLogoLight from '../../assets/images/elvira-logo/title-logo-light.png';
+import useCustomEffect from '../../hooks/useCustomEffect';
 
 const rootId = 'pdf-viewer-page';
 
 const Viewer = () => {
-  const { lang, theme, STUColor } = useAppContext();
+  const { lang, theme, STUColor, titleLogoDark, titleLogoLight } =
+    useAppContext();
   const { 'entry-id': id } = useParams();
   const { t } = useTranslation();
   const navigate = useNavigate();
   const createUserAcquisition = useCreateUserAcquisition();
   const getEntryDetail = useGetEntryDetail();
   const getUserAcquisition = useGetUserAcquisition();
-  const [rendered, setRendered] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   let acquisition_id = '';
@@ -64,13 +63,7 @@ const Viewer = () => {
     navigate(NAVIGATION_PATHS.home);
   };
 
-  useEffect(() => {
-    // Skip initial render
-    if (!rendered) {
-      setRendered(true);
-      return;
-    }
-
+  useCustomEffect(() => {
     const readPdf = async () => {
       try {
         const { response: entryDetail } = await getEntryDetail(id!);
@@ -164,7 +157,7 @@ const Viewer = () => {
         updateMetaTag(name, '');
       });
     };
-  }, [rendered, id]);
+  }, [id]);
 
   return (
     <>
