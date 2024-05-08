@@ -104,22 +104,26 @@ const SearchBar = () => {
     <div
       className={`${
         isSmallDevice ? 'w-full' : 'w-64'
-      } flex flex-col gap-2 min-w-64 h-full bg-zinc-100 dark:bg-darkGray p-4 overflow-auto`}
+      } flex flex-col gap-2 min-w-64 h-full bg-zinc-100 dark:bg-darkGray p-4 pb-14 overflow-auto`}
     >
-      <div className='flex h-6 justify-between items-center'>
+      <div className='flex flex-col justify-between text-center gap-4'>
         <button
-          className='bg-STUColor h-full flex items-center text-white w-fit rounded-md px-1'
+          className='bg-STUColor text-white h-fit w-fit rounded-md p-2'
           onClick={() => setShowSearchBar(false)}
         >
           <RiArrowRightDoubleFill size={18} />
         </button>
+
+        <h1 className='text-xl font-extrabold'>
+          {t('searchBar.advancedSearch')}
+        </h1>
       </div>
 
       <form
         onSubmit={onSubmit}
-        className='flex-1 bg-zinc-100 dark:bg-darkGray py-4 flex flex-col gap-5 rounded-md'
+        className='flex-1 bg-zinc-100 dark:bg-darkGray py-4 flex flex-col gap-5 rounded-md items-center'
       >
-        <div>
+        <div className='w-full'>
           <SearchBarInput
             placeholder={t('searchBar.title')}
             name='title'
@@ -128,7 +132,7 @@ const SearchBar = () => {
           />
         </div>
 
-        <div>
+        <div className='w-full'>
           <SearchBarInput
             placeholder={t('searchBar.author')}
             name='author'
@@ -137,7 +141,7 @@ const SearchBar = () => {
           />
         </div>
 
-        <div>
+        <div className='w-full'>
           <SearchBarInput
             placeholder={t('searchBar.category')}
             name='category'
@@ -146,7 +150,7 @@ const SearchBar = () => {
           />
         </div>
 
-        <div className='px-3'>
+        <div className='px-3 w-full'>
           <span>{t('searchBar.year')}</span>
           <Box
             sx={{
@@ -177,7 +181,7 @@ const SearchBar = () => {
 
         <div className=''>
           <span>{t('searchBar.feeds')}</span>
-          <div className='max-h-80 overflow-auto p-2 mt-2'>
+          <div className='overflow-auto p-2 mt-2'>
             <FeedMenu
               isLoading={isLoading}
               activeFeeds={activeFeeds}
@@ -188,9 +192,7 @@ const SearchBar = () => {
           </div>
         </div>
 
-        <span className='flex-1'></span>
-
-        <div className='flex justify-center mt-5'>
+        <div className='fixed bottom-5'>
           <Button type='submit'>
             <span>{t('searchBar.search')}</span>
           </Button>

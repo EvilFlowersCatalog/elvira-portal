@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.7 2023-08-05
+
+- **Changed**: Entry detail
+- **Changed**: Advanced search
+- **Added**: Breadcrumbs translation
+- **Added**: Swiper in home
+- **Fixed**: Select in swipers
+
 ## 3.0.6 2023-08-05
 
 - **Added**: new params

@@ -64,7 +64,9 @@ const Viewer = () => {
   };
 
   useCustomEffect(() => {
-    const readPdf = async () => {
+    if (!id) return;
+
+    (async () => {
       try {
         const { response: entryDetail } = await getEntryDetail(id!);
         const responseAcquisitionId = entryDetail.acquisitions[0].id;
@@ -134,9 +136,7 @@ const Viewer = () => {
       } finally {
         setLoading(false);
       }
-    };
-
-    if (id) readPdf();
+    })();
 
     return () => {
       const metaTags = [

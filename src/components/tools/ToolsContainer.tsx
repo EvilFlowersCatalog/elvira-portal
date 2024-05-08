@@ -6,7 +6,12 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 import { FaFilterCircleXmark } from 'react-icons/fa6';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 
-const ToolsContainer = () => {
+interface IToolsContainerParams {
+  advancedSearch?: boolean;
+  param: string;
+}
+
+const ToolsContainer = ({ advancedSearch, param }: IToolsContainerParams) => {
   const { t } = useTranslation();
   const { showSearchBar, setShowSearchBar, clearFilters, isParamsEmpty } =
     useAppContext();
@@ -21,13 +26,10 @@ const ToolsContainer = () => {
     e.preventDefault();
 
     // If there is input set it to params else delete it
-    if (location.pathname.includes(NAVIGATION_PATHS.feeds)) {
-      if (input) searchParams.set('title', input);
-      else searchParams.delete('title');
-    } else {
-      if (input) searchParams.set('query', input);
-      else searchParams.delete('query');
-    }
+
+    if (input) searchParams.set(param, input);
+    else searchParams.delete(param);
+
     setSearchParams(searchParams);
   };
 
@@ -62,7 +64,7 @@ const ToolsContainer = () => {
           >
             <input
               className={
-                'w-full p-2 rounded-md bg-zinc-200 dark:bg-darkGray border-2 border-white dark:border-gray outline-none focus:border-STUColor dark:focus:border-STUColor'
+                'w-full p-2 rounded-md bg-zinc-200 dark:bg-darkGray border-2 border-zinc-200 dark:border-darkGray outline-none focus:border-STUColor dark:focus:border-STUColor'
               }
               type={'text'}
               name={'searchTitle'}
@@ -84,9 +86,7 @@ const ToolsContainer = () => {
         </div>
 
         {/* Only for entries */}
-        {(location.pathname === NAVIGATION_PATHS.library ||
-          location.pathname === NAVIGATION_PATHS.shelf ||
-          location.pathname === NAVIGATION_PATHS.adminEntries) && (
+        {advancedSearch && (
           <button
             className='text-sm ml-1 hover:underline mt-2'
             onClick={() => setShowSearchBar(!showSearchBar)}

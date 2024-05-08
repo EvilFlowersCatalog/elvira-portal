@@ -67,7 +67,7 @@ export const sk = {
     // ADMINISTRATION PAGE
     administration: {
       homePage: {
-        entries: 'Zoznamy',
+        entries: 'Dokumenty',
         feeds: 'Skupiny',
       },
     },
@@ -91,7 +91,6 @@ export const sk = {
       personal: 'Osobné',
       settings: 'Nastavenia',
       home: 'Domov',
-      entries: 'Zoznamy',
       about: 'O Projekte',
       library: 'Knižnica',
       myShelf: 'Polička',
@@ -121,6 +120,7 @@ export const sk = {
 
     // SEARCH BAR COMPONENT
     searchBar: {
+      advancedSearch: 'Pokročilé Vyhľadávanie',
       title: 'Názov',
       author: 'Autorové Meno',
       category: 'Kategória',

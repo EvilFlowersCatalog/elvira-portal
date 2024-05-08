@@ -33,7 +33,7 @@ const logoLight = `/assets/${
 const titleLogoDark = `/assets/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/elvira/title-logo-dark.png`;
-const titleLogoLight = `assets/${
+const titleLogoLight = `/assets/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/elvira/title-logo-light.png`;
 const stuLogoDark = `/assets/${
@@ -84,11 +84,12 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     path: NAVIGATION_PATHS | string
   ) => {
     const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    event.preventDefault();
+
     // If ctrl or meta && is on mac open new tab
-    if (event.ctrlKey || (event.metaKey && isMac)) {
-      event.preventDefault();
+    if (event.ctrlKey || (event.metaKey && isMac) || event.button === 1)
       window.open(path, '_blank');
-    } else navigate(path);
+    else navigate(path);
   };
 
   const clearFilters = () => {
@@ -201,7 +202,8 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   useEffect(() => {
     // handle resizeing window and set height/width
     const handleResize = () => {
-      setIsSmallDevice(window.innerWidth < 959);
+      const newWidth: number = window.innerWidth;
+      setIsSmallDevice(newWidth < 959);
     };
 
     // Attach the event listener when the component mounts

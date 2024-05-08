@@ -90,7 +90,6 @@ export const en = {
       portal: 'Portal',
       personal: 'Personal',
       settings: 'Settings',
-      entries: 'Entries',
       about: 'About',
       home: 'Home',
       library: 'Library',
@@ -122,6 +121,7 @@ export const en = {
 
     // SEARCH BAR COMPONENT
     searchBar: {
+      advancedSearch: 'Advanced Search',
       title: 'Title',
       author: "Author's Name",
       category: 'Category',

@@ -7,6 +7,7 @@ import AppProvider from './providers/AppProvider';
 import 'react-toastify/dist/ReactToastify.css';
 import './main.css';
 import '../node_modules/@evilflowers/evilflowersviewer/dist/styles.css';
+import 'swiper/swiper-bundle.css';
 
 // For zotero to update
 document.dispatchEvent(

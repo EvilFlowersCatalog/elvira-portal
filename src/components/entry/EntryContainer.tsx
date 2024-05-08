@@ -91,7 +91,7 @@ const EntryContainer = ({
         }
       >
         <Breadcrumb />
-        <ToolsContainer />
+        <ToolsContainer param='query' advancedSearch />
         {isLoading && <PageLoading />}
         {!isLoading && isError && <PageMessage message={t('page.error')} />}
         {!isLoading && !isError && entries.length > 0 && (
@@ -114,9 +114,7 @@ const EntryContainer = ({
           ))}
       </div>
       {showScrollUp && <ScrollUpButton scrollRef={scrollRef} />}
-      {activeEntryId && (
-        <EntryDetail triggerReload={triggerReload} entryId={activeEntryId} />
-      )}
+      {activeEntryId && <EntryDetail triggerReload={triggerReload} />}
     </>
   );
 };

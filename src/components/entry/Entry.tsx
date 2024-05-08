@@ -24,7 +24,7 @@ const Entry = ({ entry, isActive }: IEntryParams) => {
     setIsUnderLine(false);
   };
 
-  const openEntryInfo = () => {
+  const openEntryDetail = () => {
     const params = new URLSearchParams(searchParams);
     const id = searchParams.get('entry-detail-id');
 
@@ -48,7 +48,7 @@ const Entry = ({ entry, isActive }: IEntryParams) => {
         }`}
         onMouseEnter={handelMouseEnter}
         onMouseLeave={handelMouseLeave}
-        onClick={openEntryInfo}
+        onClick={openEntryDetail}
       >
         <div
           className={

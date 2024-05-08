@@ -1,13 +1,22 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { IEntry } from '../../utils/interfaces/entry';
 
 interface ISwiperEntryParams {
   entry: IEntry;
   isActive: boolean;
+  setClickedEntry: (clickedEntry: 'popular' | 'lastAdded' | '') => void;
+  clickedEntry: 'popular' | 'lastAdded' | '';
+  type: 'popular' | 'lastAdded';
 }
 
-const SwiperEntry = ({ entry, isActive }: ISwiperEntryParams) => {
+const SwiperEntry = ({
+  entry,
+  isActive,
+  setClickedEntry,
+  type,
+  clickedEntry,
+}: ISwiperEntryParams) => {
   const [isScale, setIsScale] = useState<boolean>(false);
   const [isUnderLine, setIsUnderLine] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -22,11 +31,13 @@ const SwiperEntry = ({ entry, isActive }: ISwiperEntryParams) => {
     setIsUnderLine(false);
   };
 
-  const openSwiperEntryInfo = () => {
+  const openEntryDetail = () => {
+    setClickedEntry(type);
     const params = new URLSearchParams(searchParams);
     const id = searchParams.get('entry-detail-id');
 
-    if (id === entry.id) params.delete('entry-detail-id');
+    if (id === entry.id && type === clickedEntry)
+      params.delete('entry-detail-id');
     else params.set('entry-detail-id', entry.id);
 
     setSearchParams(params);
@@ -40,7 +51,7 @@ const SwiperEntry = ({ entry, isActive }: ISwiperEntryParams) => {
         }`}
         onMouseEnter={handelMouseEnter}
         onMouseLeave={handelMouseLeave}
-        onClick={openSwiperEntryInfo}
+        onClick={openEntryDetail}
       >
         <div
           className={

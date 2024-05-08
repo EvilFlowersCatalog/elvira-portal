@@ -19,7 +19,7 @@ const ScrollUpButton = ({ scrollRef }: IScrollUpButtonParams) => {
 
   return (
     <button
-      className='fixed flex items-center gap-2 bottom-20 right-0 z-10 p-2 text-xl rounded-l-md bg-darkGray dark:bg-white text-STUColor'
+      className='fixed flex items-center gap-2 bottom-20 right-5 z-10 p-2 text-xl rounded-md bg-darkGray dark:bg-white text-STUColor'
       onClick={handleScrollUp}
     >
       <MdKeyboardDoubleArrowUp size={30} />

@@ -77,7 +77,7 @@ const FeedContainer = ({
         }
       >
         <Breadcrumb />
-        <ToolsContainer />
+        <ToolsContainer param='title' />
         {isLoading && <PageLoading />}
         {!isLoading && isError && <PageMessage message={t('page.error')} />}
         {!isLoading && !isError && feeds.length > 0 && (

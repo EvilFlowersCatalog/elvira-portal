@@ -2,7 +2,6 @@ import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { IEntry } from '../../utils/interfaces/entry';
 import PageLoading from '../../components/page/PageLoading';
 import useGetEntries from '../../hooks/api/entries/useGetEntries';
-import Button from '../../components/common/Button';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import {
   NAVIGATION_PATHS,
@@ -14,11 +13,16 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useCustomEffect from '../../hooks/useCustomEffect';
 import { IoSearchOutline } from 'react-icons/io5';
+import { Autoplay } from 'swiper/modules';
+import { Swiper, SwiperSlide } from 'swiper/react';
 
 const Home = () => {
   const { t } = useTranslation();
   const { theme, titleLogoDark, titleLogoLight } = useAppContext();
   const [popularEntries, setPopularEntries] = useState<IEntry[]>([]);
+  const [clickedEntry, setClickedEntry] = useState<
+    'popular' | 'lastAdded' | ''
+  >('');
   const [lastAddedEntries, setLastAddedEntries] = useState<IEntry[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
@@ -37,7 +41,7 @@ const Home = () => {
 
     const params = new URLSearchParams();
     if (searchInput) {
-      params.set('title', searchInput);
+      params.set('query', searchInput);
 
       navigate({
         pathname: NAVIGATION_PATHS.library,
@@ -103,32 +107,59 @@ const Home = () => {
             </button>
           </form>
         </div>
+
         <h1 className='text-lg mb-2 font-medium'>{t('home.popular')}</h1>
-        <div className='overflow-auto'>
-          <div className='flex w-fit pb-3'>
-            {popularEntries.map((entry, index) => (
+        <Swiper
+          slidesPerView='auto'
+          loop
+          autoplay={{
+            delay: 2000,
+            disableOnInteraction: false,
+          }}
+          modules={[Autoplay]}
+        >
+          {popularEntries.map((entry, index) => (
+            <SwiperSlide className='max-w-52' key={index}>
               <SwiperEntry
-                key={index}
+                clickedEntry={clickedEntry}
+                setClickedEntry={setClickedEntry}
+                type='popular'
                 entry={entry}
-                isActive={activeEntryId === entry.id}
+                isActive={
+                  clickedEntry === 'popular' && activeEntryId === entry.id
+                }
               />
-            ))}
-          </div>
-        </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
+
         <h1 className='text-lg mb-2 font-medium'>{t('home.lastAdded')}</h1>
-        <div className='overflow-auto pb-7'>
-          <div className='flex w-fit'>
-            {lastAddedEntries.map((entry, index) => (
+        <Swiper
+          slidesPerView='auto'
+          loop
+          autoplay={{
+            delay: 2000,
+            reverseDirection: true,
+            disableOnInteraction: false,
+          }}
+          modules={[Autoplay]}
+        >
+          {popularEntries.map((entry, index) => (
+            <SwiperSlide className='max-w-52' key={index}>
               <SwiperEntry
-                key={index}
+                clickedEntry={clickedEntry}
+                setClickedEntry={setClickedEntry}
+                type='lastAdded'
                 entry={entry}
-                isActive={activeEntryId === entry.id}
+                isActive={
+                  clickedEntry === 'lastAdded' && activeEntryId === entry.id
+                }
               />
-            ))}
-          </div>
-        </div>
+            </SwiperSlide>
+          ))}
+        </Swiper>
       </div>
-      {activeEntryId && <EntryDetail entryId={activeEntryId} />}
+      {activeEntryId && <EntryDetail />}
     </>
   );
 };
