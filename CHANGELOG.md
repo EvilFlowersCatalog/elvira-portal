@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.11 2023-08-05
+
+- **Chnaged**: translation for entries from 'Dokumenty' to 'Publikácie'
+- **Changed**: Swiper interval to 5s
+
 ## 3.0.10 2023-08-05
 
 - **Fixed**: Header showing

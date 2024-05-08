@@ -15,10 +15,10 @@ const RequireAdmin = () => {
     // Verify admin
     const verify = async () => {
       try {
-        const isSuperUser = await verifyAdmin();
-        setIsSuperUser(isSuperUser);
+        const isAdmin = await verifyAdmin();
+        setIsSuperUser(isAdmin);
         // Also update auth
-        updateAuth({ isSuperUser });
+        updateAuth({ isSuperUser: isAdmin });
         setVerified(true);
       } catch {
         // If somethign went wrong logout
@@ -28,9 +28,10 @@ const RequireAdmin = () => {
 
     // If user is not admin but he tries urls, just ignore it
     if (auth?.isSuperUser) verify();
-    // Just set false
     else {
+      // Just set false
       setIsSuperUser(false);
+      //loaded
       setVerified(true);
     }
   }, []);

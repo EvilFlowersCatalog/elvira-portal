@@ -16,6 +16,8 @@ import { IoSearchOutline } from 'react-icons/io5';
 import { Autoplay } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 
+const delay = 5000;
+
 const Home = () => {
   const { t } = useTranslation();
   const { theme, titleLogoDark, titleLogoLight } = useAppContext();
@@ -113,7 +115,7 @@ const Home = () => {
           slidesPerView='auto'
           loop
           autoplay={{
-            delay: 1000,
+            delay,
             disableOnInteraction: false,
           }}
           modules={[Autoplay]}
@@ -138,7 +140,7 @@ const Home = () => {
           slidesPerView='auto'
           loop
           autoplay={{
-            delay: 1000,
+            delay,
             reverseDirection: true,
             disableOnInteraction: false,
           }}

@@ -67,7 +67,7 @@ export const sk = {
     // ADMINISTRATION PAGE
     administration: {
       homePage: {
-        entries: 'Dokumenty',
+        entries: 'Publikácie',
         feeds: 'Skupiny',
       },
     },
