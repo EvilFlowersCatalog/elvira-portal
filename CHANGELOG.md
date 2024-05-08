@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.6 2023-08-05
+
+- **Added**: new params
+- **Changed**: README.md
+- **Changed**: Advanced search
+- **Changed**: Entry detail contributors
+- **Fixed**: Entries responzivness
+
 ## 3.0.5 2023-07-05
 
 - **Fixed**: Not showing logos, needed to be moved to public dir

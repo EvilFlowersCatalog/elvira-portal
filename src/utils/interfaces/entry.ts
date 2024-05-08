@@ -57,6 +57,7 @@ export interface IEntryQuery {
   publishedAtGte?: string;
   publishedAtLte?: string;
   orderBy?: string;
+  query?: string;
 }
 
 export interface IEntryNew {

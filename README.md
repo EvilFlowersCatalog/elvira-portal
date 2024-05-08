@@ -31,7 +31,7 @@ Ah, the secret sauce behind the scenes! 🌟 Here's a quick rundown of our Elvir
 Feel the urge to customize? You can effortlessly overwrite these variables using bash commands:
 
 ```bash
-export  ELVIRA_BASE_URL=base_utl
+export  ELVIRA_BASE_URL=base_url
 export  ELVIRA_CATALOG_ID=catalog_id
 export  ELVIRA_ASSETS_DIR=dir_name
 
@@ -39,6 +39,32 @@ npm  run  build:key
 ```
 
 🔔 **_Oh, and a gentle reminder_** 🔔 _It's best to tweak these variables via bash commands rather than directly modifying the env files._
+
+And remember, it's the golden rule to clean up afterward:
+
+```bash
+unset  ELVIRA_BASE_URL
+unset  ELVIRA_CATALOG_ID
+unset  ELVIRA_ASSETS_DIR
+```
+
+## Customizing Elvira's Color
+
+Feel like giving Elvira a fresh coat of paint? 🎨 Let's do it with style!
+
+Just head to tailwind.config.js, find extends, there go to colors and here you find STUColor. Just swap out the hex code for your color you fancy. It's like giving Elvira a brand-new dress for the ball! 💃
+
+```ts
+theme: {
+  extend: {
+    colors: {
+      STUColor: '#hex_code',
+    },
+  },
+}
+```
+
+And there you have it! Your very own Elvira, personalized to perfection. 🤌
 
 ## Preview your build
 

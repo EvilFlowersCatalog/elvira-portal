@@ -44,7 +44,8 @@ const EntryContainer = ({
   setPage,
   maxPage,
 }: IEntryContainer) => {
-  const { handleScroll, searchParamsEqual, clearFilters } = useAppContext();
+  const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty } =
+    useAppContext();
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [showScrollUp, setShowScrollUp] = useState<boolean>(false);
@@ -71,14 +72,6 @@ const EntryContainer = ({
     }
   }, [searchParams]);
 
-  const isParamsEmpty = () => {
-    // do not count entry-detail-id
-    return Array.from(searchParams.keys()).every(
-      (key) =>
-        key === 'entry-detail-id' || searchParams.getAll(key).length !== 0
-    );
-  };
-
   return (
     <>
       <div
@@ -98,11 +91,11 @@ const EntryContainer = ({
         }
       >
         <Breadcrumb />
+        <ToolsContainer />
         {isLoading && <PageLoading />}
         {!isLoading && isError && <PageMessage message={t('page.error')} />}
         {!isLoading && !isError && entries.length > 0 && (
           <>
-            <ToolsContainer />
             {children}
             {loadingNext && <LoadNext />}
           </>

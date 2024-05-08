@@ -37,8 +37,11 @@ export interface IAppContext {
     path: NAVIGATION_PATHS | string
   ) => void;
   isSmallDevice: boolean;
-  showMenu: boolean;
-  setShowMenu: (showMenu: boolean) => void;
+  showNavbar: boolean;
+  setShowNavbar: (showNavbar: boolean) => void;
+  showSearchBar: boolean;
+  setShowSearchBar: (showSearchBar: boolean) => void;
+  isParamsEmpty: () => boolean;
   searchParamsEqual: (
     prevSearchParams: URLSearchParams | null,
     currentSearchParams: URLSearchParams

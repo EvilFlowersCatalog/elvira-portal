@@ -8,12 +8,14 @@ import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
 import ModalWrapper from '../../modal/ModalWrapper';
 import ConfirmationDialog from '../../dialogs/ConfirmationDialog';
+import useAppContext from '../../../hooks/contexts/useAppContext';
 
 interface IEntryParams {
   entry: IEntry;
 }
 
 const AdminEntry = ({ entry }: IEntryParams) => {
+  const { showSearchBar } = useAppContext();
   const [showDeleteMenu, setShowDeleteMenu] = useState<boolean>(false);
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -40,16 +42,18 @@ const AdminEntry = ({ entry }: IEntryParams) => {
         />
       )}
       <div
-        className={
-          'flex p-2.5 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/6 xxl:w-[14.28%]'
-        }
+        className={`flex p-2.5 w-full sm:w-1/2 md:w-1/4 ${
+          showSearchBar
+            ? 'lg:w-1/3 xl:w-1/4 xxl:w-1/6'
+            : 'xl:w-1/5 xxl:w-[14.28%]'
+        }`}
       >
         <div
           className={`flex flex-col justify-center p-2 w-full gap-2 rounded-md text-left bg-zinc-100 dark:bg-darkGray`}
         >
           <div
             className={
-              'w-full h-[120vw] sm:h-[58vw] md:h-[38.33vw] lg:h-[22vw] xl:h-[15.66vw] xxl:h-[15vw] rounded-md border border-gray overflow-hidden'
+              'w-full h-auto rounded-md border border-gray overflow-hidden'
             }
           >
             <img

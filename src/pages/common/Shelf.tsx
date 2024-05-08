@@ -32,7 +32,11 @@ const Shelf = () => {
           limit: 30,
           title: searchParams.get('title') ?? '',
           feedId: searchParams.get('feed-id') ?? '',
+          authors: searchParams.get('author') ?? '',
+          publishedAtGte: searchParams.get('from') ?? '',
+          publishedAtLte: searchParams.get('to') ?? '',
           orderBy: searchParams.get('order-by') ?? '',
+          query: searchParams.get('query') ?? '',
         });
 
         setMaxPage(metadata.pages);
@@ -73,7 +77,7 @@ const Shelf = () => {
       setLoadingNext={setLoadingNext}
       triggerReload={triggerReload}
     >
-      <div className='flex flex-wrap px-4'>
+      <div className='flex flex-wrap px-4 pb-4'>
         {entries.map((entry, index) => (
           <Entry
             key={index}

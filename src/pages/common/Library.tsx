@@ -36,6 +36,7 @@ const Library = () => {
           publishedAtGte: searchParams.get('from') ?? '',
           publishedAtLte: searchParams.get('to') ?? '',
           orderBy: searchParams.get('order-by') ?? '',
+          query: searchParams.get('query') ?? '',
         });
 
         setMaxPage(metadata.pages);
@@ -66,7 +67,7 @@ const Library = () => {
       loadingNext={loadingNext}
       setLoadingNext={setLoadingNext}
     >
-      <div className='flex flex-wrap px-4'>
+      <div className='flex flex-wrap px-4 pb-4'>
         {entries.map((entry, index) => (
           <Entry
             key={index}

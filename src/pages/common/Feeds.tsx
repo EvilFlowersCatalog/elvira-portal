@@ -65,7 +65,7 @@ const Feeds = () => {
       loadingNext={loadingNext}
       setLoadingNext={setLoadingNext}
     >
-      <div className='flex flex-wrap px-3'>
+      <div className='flex flex-wrap px-3 pb-4'>
         {feeds.map((feed, index) => (
           <Feed key={index} feed={feed} />
         ))}

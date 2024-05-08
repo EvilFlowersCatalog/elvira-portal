@@ -13,6 +13,7 @@ const useGetEntries = () => {
     publishedAtGte,
     publishedAtLte,
     authors,
+    query,
   }: IEntryQuery): Promise<IEntriesList> => {
     // Set params
     const params = new URLSearchParams();
@@ -29,6 +30,7 @@ const useGetEntries = () => {
     if (publishedAtGte) params.set('published_at_gte', publishedAtGte);
     if (publishedAtLte) params.set('published_at_lte', publishedAtLte);
     if (authors) params.set('author', authors);
+    if (query) params.set('query', query);
 
     // Get entries by params
     const GET_ENTRIES_URL = '/api/v1/entries';

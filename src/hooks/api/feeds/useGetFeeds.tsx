@@ -17,13 +17,15 @@ const useGetFeeds = () => {
     const params = new URLSearchParams();
     params.set('catalog_id', import.meta.env.ELVIRA_CATALOG_ID);
 
+    if (orderBy) params.set('order_by', orderBy);
+    else params.set('order_by', '-created_at');
+
     // Check if there is param, if yes set it
     if (paginate === false) params.set('paginate', 'false');
     if (page) params.set('page', page.toString());
     if (limit) params.set('limit', limit.toString());
     if (title) params.set('title', title);
     if (parentId) params.set('parent_id', parentId);
-    if (orderBy) params.set('order_by', orderBy);
     if (kind) params.set('kind', kind);
 
     // Get feeds by params

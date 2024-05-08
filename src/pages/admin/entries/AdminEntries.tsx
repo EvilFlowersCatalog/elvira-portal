@@ -6,8 +6,10 @@ import EntryContainer from '../../../components/entry/EntryContainer';
 import AdminEntry from '../../../components/entry/admin/AdminEntry';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import { MdAdd } from 'react-icons/md';
+import useAppContext from '../../../hooks/contexts/useAppContext';
 
 const AdminEntries = () => {
+  const { showSearchBar } = useAppContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingNext, setLoadingNext] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
@@ -34,7 +36,11 @@ const AdminEntries = () => {
           limit: 30,
           title: searchParams.get('title') ?? '',
           feedId: searchParams.get('feed-id') ?? '',
+          authors: searchParams.get('author') ?? '',
+          publishedAtGte: searchParams.get('from') ?? '',
+          publishedAtLte: searchParams.get('to') ?? '',
           orderBy: searchParams.get('order-by') ?? '',
+          query: searchParams.get('query') ?? '',
         });
 
         setMaxPage(metadata.pages);
@@ -63,11 +69,13 @@ const AdminEntries = () => {
       loadingNext={loadingNext}
       setLoadingNext={setLoadingNext}
     >
-      <div className='flex flex-wrap px-3'>
+      <div className='flex flex-wrap px-3 pb-4'>
         <div
-          className={
-            'flex p-2 w-full sm:w-1/2 md:w-1/3 lg:w-1/5 xl:w-1/6 xxl:w-[14.28%]'
-          }
+          className={`flex p-2 w-full sm:w-1/2 md:w-1/4 ${
+            showSearchBar
+              ? 'lg:w-1/3 xl:w-1/4 xxl:w-1/6'
+              : 'xl:w-1/5 xxl:w-[14.28%]'
+          }`}
         >
           <button
             className={`flex flex-col justify-center min-h-72 dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 border-STUColor bg-STUColor bg-opacity-40 hover:bg-opacity-20 duration-200`}

@@ -98,7 +98,6 @@ export const en = {
       loan: 'Loans',
       loanHistory: 'Loans Histroy',
       feeds: 'Feeds',
-      advancedSearch: 'Search',
       administration: 'Administration',
       darkMode: 'Dark Mode',
       lightMode: 'Light Mode',
@@ -121,9 +120,8 @@ export const en = {
       search: 'Search in Elvira',
     },
 
-    // ADVANCED SEARCH PAGE
-    advancedSearch: {
-      advanced: 'Advanced Search',
+    // SEARCH BAR COMPONENT
+    searchBar: {
       title: 'Title',
       author: "Author's Name",
       category: 'Category',
@@ -142,7 +140,6 @@ export const en = {
         remove: '- Remove from shelf',
         pages: 'Pages',
         views: 'Views',
-        contributors: 'Contributors',
         lang: 'Language',
         feeds: 'Feeds',
         summary: 'Summary',
@@ -242,6 +239,7 @@ export const en = {
     // TOOLS
     tools: {
       search: 'Search',
+      advancedSearch: 'Advanced Search',
       orderBy: {
         createdAtAsc: 'Created at ↑',
         createdAtDesc: 'Created at ↓',

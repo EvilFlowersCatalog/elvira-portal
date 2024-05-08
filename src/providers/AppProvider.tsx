@@ -10,7 +10,7 @@ import {
   NAVIGATION_PATHS,
   THEME_TYPE,
 } from '../utils/interfaces/general/general';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import {
   IAppContext,
   IContextProviderParams,
@@ -56,13 +56,15 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const { colors } = tailwindConfig.theme?.extend!;
   const [theme, setTheme] = useState<THEME_TYPE>(getInitialTheme);
   const [lang, setLang] = useState<LANG_TYPE>(getInitialLang);
-  const [showMenu, setShowMenu] = useState<boolean>(false);
+  const [showNavbar, setShowNavbar] = useState<boolean>(false);
+  const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
   const [isSmallDevice, setIsSmallDevice] = useState<boolean>(
     window.innerWidth < 959
   );
   const [searchParams, setSearchParams] = useSearchParams();
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Update theme and localstorage
   const updateTheme = (theme: THEME_TYPE) => {
@@ -86,20 +88,26 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     if (event.ctrlKey || (event.metaKey && isMac)) {
       event.preventDefault();
       window.open(path, '_blank');
-    } else {
-      setShowMenu(false);
-      navigate(path);
-    }
+    } else navigate(path);
   };
 
   const clearFilters = () => {
     const params = new URLSearchParams();
-    const parentId = searchParams.get('parent-id');
-    if (parentId) params.set('parent-id', parentId);
+
     const entryDetailId = searchParams.get('entry-detail-id');
     if (entryDetailId) params.set('entry-detail-id', entryDetailId);
 
     setSearchParams(params);
+  };
+
+  const isParamsEmpty = () => {
+    // do not count entry-detail-id
+    for (let [key] of searchParams.entries()) {
+      if (key !== 'entry-detail-id') {
+        return true;
+      }
+    }
+    return false;
   };
 
   // Function for ignoring entry-detail-id
@@ -184,6 +192,12 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     }
   }, [lang]);
 
+  // Each page change reset
+  useEffect(() => {
+    setShowNavbar(false);
+    setShowSearchBar(false);
+  }, [location.pathname]);
+
   useEffect(() => {
     // handle resizeing window and set height/width
     const handleResize = () => {
@@ -205,12 +219,15 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         updateTheme,
         lang,
         updateLang,
+        showNavbar,
+        setShowNavbar,
+        showSearchBar,
+        setShowSearchBar,
         specialNavigation,
         clearFilters,
         isSmallDevice,
-        showMenu,
-        setShowMenu,
         searchParamsEqual,
+        isParamsEmpty,
         handleScroll,
         titleLogoDark,
         titleLogoLight,

@@ -90,7 +90,7 @@ const AdminFeeds = () => {
       {!isLoading && !isError && feeds.length > 0 && (
         <>
           <ToolsContainer />
-          <div className='flex flex-row flex-wrap px-2'>
+          <div className='flex flex-row flex-wrap px-2 pb-4'>
             {/* Add button */}
             <div className={'flex p-2.5 w-full lg:w-1/2 xl:w-1/3 xxl:w-1/4'}>
               <button

@@ -177,40 +177,20 @@ const EntryDetail = ({ entryId, triggerReload }: IEntryDetailParams) => {
                   <img className={'w-full'} src={entry.response.thumbnail} />
                 </div>
               </div>
-              <span className={'text-white text-center'}>
+              <span className={'text-white text-center font-bold'}>
                 {entry.response.authors[0].name}{' '}
                 {entry.response.authors[0].surname}
               </span>
               {entry.response.authors.slice(1).length > 0 && (
-                <>
-                  <button
-                    className={
-                      'text-zinc-300 flex justify-center items-center gap-2'
-                    }
-                    onClick={() =>
-                      setIsContributorsOpen((prevIsOpen) => !prevIsOpen)
-                    }
-                  >
-                    {t('entry.detail.contributors')}
-                    {isContributorsOpen ? (
-                      <FaChevronUp color='white' />
-                    ) : (
-                      <FaChevronDown color='white' />
-                    )}
-                  </button>
-
-                  <div
-                    className={`flex flex-col items-center text-zinc-300 text-center ${
-                      isContributorsOpen ? '' : 'h-0'
-                    } overflow-hidden`}
-                  >
-                    {entry.response.authors.slice(1).map((author, index) => (
-                      <span key={index}>
-                        {author.name} {author.surname}
-                      </span>
-                    ))}
-                  </div>
-                </>
+                <div
+                  className={`flex flex-col items-center text-zinc-300 text-center overflow-hidden`}
+                >
+                  {entry.response.authors.slice(1).map((author, index) => (
+                    <span key={index}>
+                      {author.name} {author.surname}
+                    </span>
+                  ))}
+                </div>
               )}
               <div
                 className={

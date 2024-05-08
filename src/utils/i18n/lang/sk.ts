@@ -97,7 +97,6 @@ export const sk = {
       myShelf: 'Polička',
       loan: 'Výpožičky',
       feeds: 'Skupiny',
-      advancedSearch: 'Vyhľadávanie',
       administration: 'Administrácia',
       darkMode: 'Tmavý Režim',
       lightMode: 'Svetlý Režim',
@@ -120,9 +119,8 @@ export const sk = {
       search: 'Hľadať v Elvíre',
     },
 
-    // ADVANCED SEARCH PAGE
-    advancedSearch: {
-      advanced: 'Pokročilé Vyhľadávanie',
+    // SEARCH BAR COMPONENT
+    searchBar: {
       title: 'Názov',
       author: 'Autorové Meno',
       category: 'Kategória',
@@ -141,7 +139,6 @@ export const sk = {
         remove: '- Odstrániť z poličky',
         pages: 'Strany',
         views: 'Zobrazenia',
-        contributors: 'Spolu-Autori',
         lang: 'Jazyk',
         feeds: 'Skupiny',
         summary: 'Zhrnutie',
@@ -234,6 +231,7 @@ export const sk = {
     // TOOLS
     tools: {
       search: 'Hľadať',
+      advancedSearch: 'Pokročilé Vyhľadávanie',
       orderBy: {
         createdAtAsc: 'Dátum pridania ↑',
         createdAtDesc: 'Dátum pridania ↓',

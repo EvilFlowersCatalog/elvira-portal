@@ -4,7 +4,6 @@ import Login from '../pages/auth/Login';
 import Library from '../pages/common/Library';
 import Shelf from '../pages/common/Shelf';
 import Feeds from '../pages/common/Feeds';
-import AdvancedSearch from '../pages/common/AdvancedSearch';
 import AdminHome from '../pages/admin/AdminHome';
 import AdminFeeds from '../pages/admin/AdminFeeds';
 import NotFound from '../pages/NotFound';
@@ -50,7 +49,6 @@ const BaseRoutes = () => {
           <Route path='shelf' element={<Shelf />} />
           <Route path='loans' element={<Loans />} />
           <Route path='feeds' element={<Feeds />} />
-          <Route path='advanced-search' element={<AdvancedSearch />} />
           <Route path='viewer/:entry-id' element={<Viewer />} />
 
           {/* Only with admin role */}

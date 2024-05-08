@@ -1,6 +1,5 @@
 import { useSearchParams } from 'react-router-dom';
 import { ReactNode, useEffect, useRef, useState } from 'react';
-import EntryInfo from '../entry/EntryDetail';
 import Breadcrumb from '../common/Breadcrumb';
 import PageLoading from '../page/PageLoading';
 import PageMessage from '../page/PageMessage';
@@ -78,11 +77,11 @@ const FeedContainer = ({
         }
       >
         <Breadcrumb />
+        <ToolsContainer />
         {isLoading && <PageLoading />}
         {!isLoading && isError && <PageMessage message={t('page.error')} />}
         {!isLoading && !isError && feeds.length > 0 && (
           <>
-            <ToolsContainer />
             {children}
             {loadingNext && <LoadNext />}
           </>

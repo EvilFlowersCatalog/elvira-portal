@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { IEntry } from '../../utils/interfaces/entry';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface IEntryParams {
   entry: IEntry;
@@ -8,6 +9,7 @@ interface IEntryParams {
 }
 
 const Entry = ({ entry, isActive }: IEntryParams) => {
+  const { showSearchBar } = useAppContext();
   const [isScale, setIsScale] = useState<boolean>(false);
   const [isUnderLine, setIsUnderLine] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -34,9 +36,11 @@ const Entry = ({ entry, isActive }: IEntryParams) => {
 
   return (
     <div
-      className={
-        'flex w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 xxl:w-[14.28%]'
-      }
+      className={`flex w-full sm:w-1/2 md:w-1/4 ${
+        showSearchBar
+          ? 'lg:w-1/3 xl:w-1/4 xxl:w-1/6'
+          : 'xl:w-1/5 xxl:w-[14.28%]'
+      }`}
     >
       <button
         className={`flex flex-col justify-center p-4 w-full gap-2 rounded-md text-left ${
@@ -48,7 +52,7 @@ const Entry = ({ entry, isActive }: IEntryParams) => {
       >
         <div
           className={
-            'w-full min-h-64 h-[120vw] sm:h-[57vw] md:h-[38vw] lg:h-[20vw] xl:h-[17vw] xxl:h-[14.28vw] rounded-md border border-gray dark:border-zinc-200 overflow-hidden'
+            'w-full h-auto rounded-md border border-gray dark:border-zinc-200 overflow-hidden'
           }
         >
           <img

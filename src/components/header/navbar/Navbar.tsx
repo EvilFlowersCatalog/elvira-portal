@@ -1,16 +1,15 @@
 import { MouseEvent } from 'react';
-import useAppContext from '../../hooks/contexts/useAppContext';
+import useAppContext from '../../../hooks/contexts/useAppContext';
 import {
   LANG_TYPE,
   NAVIGATION_PATHS,
   THEME_TYPE,
-} from '../../utils/interfaces/general/general';
+} from '../../../utils/interfaces/general/general';
 
 import { ReactElement } from 'react';
 import {
   IoDocumentsOutline,
   IoMoonOutline,
-  IoSearchSharp,
   IoSunnyOutline,
 } from 'react-icons/io5';
 import { MdOutlineFeed } from 'react-icons/md';
@@ -18,10 +17,10 @@ import { CiLogout } from 'react-icons/ci';
 import { RiAdminLine, RiArrowLeftDoubleFill } from 'react-icons/ri';
 import { PiBooks } from 'react-icons/pi';
 import { HiOutlineLanguage } from 'react-icons/hi2';
-import useAuthContext from '../../hooks/contexts/useAuthContext';
+import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import useVerifyAdmin from '../../hooks/api/verify/useVerifyAdmin';
+import useVerifyAdmin from '../../../hooks/api/verify/useVerifyAdmin';
 import { FiBookOpen, FiHelpCircle } from 'react-icons/fi';
 import { RxHome } from 'react-icons/rx';
 
@@ -68,9 +67,9 @@ const Navbar = () => {
     theme,
     lang,
     isSmallDevice,
-    setShowMenu,
     titleLogoDark,
     titleLogoLight,
+    setShowNavbar,
     stuLogoDark,
     stuLogoLight,
   } = useAppContext();
@@ -124,8 +123,8 @@ const Navbar = () => {
         </button>
         {isSmallDevice ? (
           <button
-            className='bg-STUColor h-full flex items-center text-white w-fit rounded-md p-1 mb-2'
-            onClick={() => setShowMenu(false)}
+            className='bg-STUColor h-full flex items-center text-white w-fit rounded-md px-1'
+            onClick={() => setShowNavbar(false)}
           >
             <RiArrowLeftDoubleFill size={18} />
           </button>
@@ -158,12 +157,6 @@ const Navbar = () => {
             path={NAVIGATION_PATHS.feeds}
             icon={<MdOutlineFeed size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.feeds}
-          />
-          <NavbarButton
-            name={t('navbarMenu.advancedSearch')}
-            path={NAVIGATION_PATHS.advancedSearch}
-            icon={<IoSearchSharp size={23} />}
-            isActive={location.pathname === NAVIGATION_PATHS.advancedSearch}
           />
           <NavbarButton
             name={t('navbarMenu.about')}
