@@ -144,7 +144,7 @@ const Home = () => {
           }}
           modules={[Autoplay]}
         >
-          {popularEntries.map((entry, index) => (
+          {lastAddedEntries.map((entry, index) => (
             <SwiperSlide className='max-w-52' key={index}>
               <SwiperEntry
                 clickedEntry={clickedEntry}

@@ -1,11 +1,16 @@
 # Changelog
 
+## 3.0.8 2023-08-05
+
+- **Changed**: Last added entries back from populars (little mistake)
+
 ## 3.0.7 2023-08-05
 
 - **Changed**: Entry detail
 - **Changed**: Advanced search
 - **Added**: Breadcrumbs translation
 - **Added**: Swiper in home
+- **Fixed**: image
 - **Fixed**: Select in swipers
 
 ## 3.0.6 2023-08-05
