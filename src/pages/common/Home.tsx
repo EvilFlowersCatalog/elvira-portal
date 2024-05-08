@@ -113,7 +113,7 @@ const Home = () => {
           slidesPerView='auto'
           loop
           autoplay={{
-            delay: 2000,
+            delay: 1000,
             disableOnInteraction: false,
           }}
           modules={[Autoplay]}
@@ -138,7 +138,7 @@ const Home = () => {
           slidesPerView='auto'
           loop
           autoplay={{
-            delay: 2000,
+            delay: 1000,
             reverseDirection: true,
             disableOnInteraction: false,
           }}

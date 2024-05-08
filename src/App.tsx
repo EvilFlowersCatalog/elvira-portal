@@ -10,6 +10,13 @@ const App = () => {
   const { isSmallDevice } = useAppContext();
   const location = useLocation();
 
+  const show = (): boolean => {
+    return (
+      !location.pathname.includes(NAVIGATION_PATHS.notFound) &&
+      !location.pathname.includes(NAVIGATION_PATHS.viewer)
+    );
+  };
+
   return (
     <div className='min-h-screen h-screen flex w-screen bg-white dark:bg-gray text-black dark:text-white overflow-auto'>
       <div className='min-w-64 flex flex-1'>
@@ -20,16 +27,16 @@ const App = () => {
           theme={'dark'}
         />
 
-        {!location.pathname.includes(NAVIGATION_PATHS.notFound) &&
-          !location.pathname.includes(NAVIGATION_PATHS.viewer) && (
+        {show() && (
+          <>
             <NavbarContainer />
-          )}
-
-        {isSmallDevice && <Header />}
+            {isSmallDevice && <Header />}
+          </>
+        )}
 
         <div
           className={`${
-            isSmallDevice ? 'pt-14' : 'pt-0'
+            isSmallDevice && show() ? 'pt-14' : 'pt-0'
           } flex flex-1 flex-col overflow-auto`}
         >
           <Outlet />

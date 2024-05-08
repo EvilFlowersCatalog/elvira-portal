@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.10 2023-08-05
+
+- **Fixed**: Header showing
+- **Changed**: Swiper interval
+
 ## 3.0.9 2023-08-05
 
 - **Fixed**: Error with param
