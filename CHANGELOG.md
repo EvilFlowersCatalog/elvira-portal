@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.9 2023-08-05
+
+- **Fixed**: Error with param
+
 ## 3.0.8 2023-08-05
 
 - **Changed**: Last added entries back from populars (little mistake)
