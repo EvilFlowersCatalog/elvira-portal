@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.0.12 2023-09-05
+
+- **Added**: Logos for MTF in assets
+- **Added**: Gravatar and login user
+- **Added**: Logos in administration button
+- **Changed**: Padding in pages
+- **Fixed**: Design mismash
+
 ## 3.0.11 2023-08-05
 
 - **Chnaged**: translation for entries from 'Dokumenty' to 'Publikácie'

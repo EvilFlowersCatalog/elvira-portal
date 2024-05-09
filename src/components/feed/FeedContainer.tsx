@@ -62,7 +62,7 @@ const FeedContainer = ({
     <>
       <div
         ref={scrollRef}
-        className='flex flex-col flex-1 overflow-auto'
+        className='flex flex-col flex-1 overflow-auto pt-14 lg:pt-0'
         onScroll={() =>
           handleScroll(
             scrollRef,

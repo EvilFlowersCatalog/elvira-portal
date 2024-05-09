@@ -34,11 +34,7 @@ const App = () => {
           </>
         )}
 
-        <div
-          className={`${
-            isSmallDevice && show() ? 'pt-14' : 'pt-0'
-          } flex flex-1 flex-col overflow-auto`}
-        >
+        <div className={`flex flex-1 flex-col overflow-auto`}>
           <Outlet />
         </div>
 

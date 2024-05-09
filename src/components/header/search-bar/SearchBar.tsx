@@ -150,25 +150,27 @@ const SearchBar = () => {
           />
         </div>
 
-        <div className='px-3 w-full'>
+        <div className='w-full'>
           <span>{t('searchBar.year')}</span>
-          <Box
-            sx={{
-              width: '100%',
-              '& .MuiSlider-thumb': {
-                borderRadius: '3px',
-              },
-            }}
-          >
-            <Slider
-              max={2024}
-              min={1950}
-              step={1}
-              value={year}
-              disableSwap
-              onChange={handleYearChange}
-            />
-          </Box>
+          <div className='w-full px-2'>
+            <Box
+              sx={{
+                width: '100%',
+                '& .MuiSlider-thumb': {
+                  borderRadius: '3px',
+                },
+              }}
+            >
+              <Slider
+                max={2024}
+                min={1950}
+                step={1}
+                value={year}
+                disableSwap
+                onChange={handleYearChange}
+              />
+            </Box>
+          </div>
           <div className={'flex w-full justify-between'}>
             <span>
               {t('searchBar.from')}: {year[0]}
@@ -179,9 +181,9 @@ const SearchBar = () => {
           </div>
         </div>
 
-        <div className=''>
+        <div className='w-full'>
           <span>{t('searchBar.feeds')}</span>
-          <div className='overflow-auto p-2 mt-2'>
+          <div className='overflow-auto mt-2 w-full'>
             <FeedMenu
               isLoading={isLoading}
               activeFeeds={activeFeeds}

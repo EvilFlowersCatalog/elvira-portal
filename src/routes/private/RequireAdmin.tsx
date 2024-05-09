@@ -31,6 +31,7 @@ const RequireAdmin = () => {
     else {
       // Just set false
       setIsSuperUser(false);
+
       //loaded
       setVerified(true);
     }

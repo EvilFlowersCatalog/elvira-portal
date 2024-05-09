@@ -23,6 +23,7 @@ import { useLocation } from 'react-router-dom';
 import useVerifyAdmin from '../../../hooks/api/verify/useVerifyAdmin';
 import { FiBookOpen, FiHelpCircle } from 'react-icons/fi';
 import { RxHome } from 'react-icons/rx';
+import Gravatar from 'react-gravatar';
 
 interface INavbarButtonParams {
   name: string;
@@ -221,17 +222,28 @@ const Navbar = () => {
       </div>
 
       {/* Spacer */}
-      <span className='flex-1'></span>
+      <span className='flex-1 min-h-10'></span>
 
       {/* Logout */}
       {auth && (
-        <button
-          className={`flex w-full gap-2 items-center pl-2 py-1 rounded-md bg-zinc-100 dark:dark:bg-darkGray hover:bg-zinc-200 dark:hover:bg-strongDarkGray`}
-          onClick={logout}
-        >
-          <CiLogout size={23} />
-          {t('navbarMenu.logout')}
-        </button>
+        <>
+          <div className='flex flex-col pl-2 items-center justify-center gap-3 text-xl font-extrabold'>
+            <Gravatar
+              email={`${auth.username}@stuba.sk`}
+              size={80}
+              className='rounded-full'
+              default='monsterid'
+            />
+            {auth.username}
+          </div>
+          <button
+            className={`flex w-full justify-center py-2 rounded-md bg-zinc-100 dark:dark:bg-darkGray hover:bg-zinc-200 dark:hover:bg-strongDarkGray`}
+            onClick={logout}
+          >
+            {/* <CiLogout size={23} /> */}
+            {t('navbarMenu.logout')}
+          </button>
+        </>
       )}
     </div>
   );

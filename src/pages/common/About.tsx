@@ -6,10 +6,9 @@ const About = () => {
   const { theme, titleLogoDark, titleLogoLight } = useAppContext();
 
   return (
-    <div className='flex-1'>
+    <div className='flex-1 pt-14 lg:pt-0'>
       <Breadcrumb />
-      <div className='flex flex-col flex-1 justify-start p-4 items-center'>
-        <h1 className='text-xl font-bold'>About Elvíra</h1>
+      <div className='flex flex-col flex-1 p-4 justify-start items-center py-20'>
         <img
           className='w-1/2'
           src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}

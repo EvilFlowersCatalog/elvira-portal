@@ -84,8 +84,8 @@ const Home = () => {
     <PageLoading />
   ) : (
     <>
-      <div className='flex-1 p-4'>
-        <div className='flex items-center flex-col gap-10 px-5 py-20'>
+      <div className='flex-1 p-4 pt-14 lg:pt-4'>
+        <div className='flex items-center flex-col gap-10 py-20'>
           <img
             className='w-full md:w-2/3 lg:w-1/2 max-w-[800px]'
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
@@ -96,7 +96,7 @@ const Home = () => {
           >
             <input
               className={
-                'w-full p-2 rounded-md bg-zinc-200 dark:bg-darkGray border-2 border-white dark:border-gray outline-none focus:border-STUColor dark:focus:border-STUColor'
+                'w-full p-2 rounded-md bg-zinc-200 dark:bg-darkGray border-2 border-zinc-200 dark:border-darkGray outline-none focus:border-STUColor dark:focus:border-STUColor'
               }
               type={'text'}
               name={'searchTitle'}

@@ -19,7 +19,7 @@ const NotFound = () => {
   return (
     <div
       className={
-        'flex flex-1 flex-col justify-center items-center gap-5 py-20 px-4'
+        'flex flex-1 flex-col justify-center items-center gap-5 p-4 pt-14 lg:pt-4'
       }
     >
       <img

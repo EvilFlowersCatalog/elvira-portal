@@ -408,7 +408,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
   return (
     <>
       <Breadcrumb />
-      <div className='flex flex-col flex-1 items-center overflow-auto p-4'>
+      <div className='flex flex-col flex-1 items-center overflow-auto p-4 pt-14 lg:pt-4 '>
         <div className='flex-1 flex w-full justify-center'>
           <div className='w-full md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 flex flex-col justify-center items-center gap-5'>
             <span className='text-3xl text-darkGray dark:text-white font-extrabold '>

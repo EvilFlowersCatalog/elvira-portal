@@ -50,8 +50,8 @@ const Login = () => {
   };
 
   return (
-    <div className='flex flex-1 flex-col justify-center items-center p-4'>
-      <div className='flex flex-col p-5 h-3/6 min-h-96 w-full lg:w-4/6 xl:w-3/5 xxl:w-2/5 bg-zinc-100 dark:bg-darkGray justify-evenly items-center rounded-md'>
+    <div className='flex flex-1 flex-col justify-center items-center p-4 pt-16 lg:pt-4'>
+      <div className='flex flex-col p-5 h-1/2 min-h-96 w-full md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 bg-zinc-100 dark:bg-darkGray justify-evenly items-center rounded-md'>
         <div className='flex flex-col h-1/2 items-center justify-center gap-2'>
           <img
             className='w-96'
@@ -87,7 +87,7 @@ const Login = () => {
               <div className='relative w-3/4 lg:w-2/4 flex items-center'>
                 <input
                   name='password'
-                  className='w-full border-2 border-zinc-100 dark:border-darkGray focus:border-STUColor dark:focus:border-STUColor  py-2 px-5 outline-none bg-white dark:bg-gray rounded-md'
+                  className='w-full border-2 border-zinc-100 dark:border-darkGray focus:border-STUColor dark:focus:border-STUColor p-2 outline-none bg-white dark:bg-gray rounded-md'
                   value={loginForm.password}
                   type={showPassword ? 'text' : 'password'}
                   placeholder={t('login.password')}
