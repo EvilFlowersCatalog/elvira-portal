@@ -103,7 +103,7 @@ const EntryContainer = ({
         {!isLoading &&
           !isError &&
           entries.length === 0 &&
-          (isParamsEmpty() ? (
+          (!isParamsEmpty() ? (
             <PageMessage
               message={t('page.notFound')}
               clearParams={clearFilters}

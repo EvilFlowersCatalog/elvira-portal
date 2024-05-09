@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.15 2023-09-05
+
+- **Fixed**: Scroll up button position when search bar is open
+- **Changed**: Few code changing
+
 ## 3.0.14 2023-09-05
 
 - **Added**: Mouse scroll button new tab click

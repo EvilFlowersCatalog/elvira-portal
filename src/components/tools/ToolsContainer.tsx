@@ -78,8 +78,8 @@ const ToolsContainer = ({ advancedSearch, param }: IToolsContainerParams) => {
             </button>
           </form>
 
-          {isParamsEmpty() && (
-            <button onClick={handleClear}>
+          {!isParamsEmpty() && (
+            <button className='text-red' onClick={handleClear}>
               <FaFilterCircleXmark size={25} />
             </button>
           )}

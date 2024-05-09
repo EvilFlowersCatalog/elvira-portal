@@ -8,29 +8,29 @@ import useCustomEffect from '../../hooks/useCustomEffect';
 const RequireAdmin = () => {
   const { auth, updateAuth, logout } = useAuthContext();
   const verifyAdmin = useVerifyAdmin();
-  const [isSuperUser, setIsSuperUser] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [verified, setVerified] = useState<boolean>(false);
 
   useCustomEffect(() => {
-    // Verify admin
-    const verify = async () => {
-      try {
-        const isAdmin = await verifyAdmin();
-        setIsSuperUser(isAdmin);
-        // Also update auth
-        updateAuth({ isSuperUser: isAdmin });
-        setVerified(true);
-      } catch {
-        // If somethign went wrong logout
-        logout();
-      }
-    };
-
     // If user is not admin but he tries urls, just ignore it
-    if (auth?.isSuperUser) verify();
-    else {
+    if (auth?.isSuperUser) {
+      // Verify admin
+      (async () => {
+        try {
+          const isSuperUser = await verifyAdmin();
+          setIsAdmin(isSuperUser);
+
+          // Also update auth
+          updateAuth({ isSuperUser });
+          setVerified(true);
+        } catch {
+          // If somethign went wrong logout
+          logout();
+        }
+      })();
+    } else {
       // Just set false
-      setIsSuperUser(false);
+      setIsAdmin(false);
 
       //loaded
       setVerified(true);
@@ -39,11 +39,7 @@ const RequireAdmin = () => {
 
   return (
     verified &&
-    (isSuperUser ? (
-      <Outlet />
-    ) : (
-      <Navigate to={NAVIGATION_PATHS.notFound} replace />
-    ))
+    (isAdmin ? <Outlet /> : <Navigate to={NAVIGATION_PATHS.notFound} replace />)
   );
 };
 

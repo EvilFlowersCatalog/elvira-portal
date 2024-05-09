@@ -105,10 +105,10 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     // do not count entry-detail-id
     for (let [key] of searchParams.entries()) {
       if (key !== 'entry-detail-id') {
-        return true;
+        return false;
       }
     }
-    return false;
+    return true;
   };
 
   // Function for ignoring entry-detail-id
