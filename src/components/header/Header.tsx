@@ -1,6 +1,9 @@
 import { FiMenu } from 'react-icons/fi';
 import useAppContext from '../../hooks/contexts/useAppContext';
-import { THEME_TYPE } from '../../utils/interfaces/general/general';
+import {
+  NAVIGATION_PATHS,
+  THEME_TYPE,
+} from '../../utils/interfaces/general/general';
 
 const Header = () => {
   const {
@@ -10,6 +13,7 @@ const Header = () => {
     titleLogoLight,
     stuLogoDark,
     stuLogoLight,
+    specialNavigation,
   } = useAppContext();
 
   return (
@@ -18,10 +22,12 @@ const Header = () => {
         <FiMenu size={30} />
       </button>
 
-      <img
-        className='h-auto w-32 min-w-24'
-        src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
-      />
+      <button onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.home)}>
+        <img
+          className='h-auto w-32 min-w-24'
+          src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
+        />
+      </button>
 
       {/* Spacer */}
       <span className='flex-1' />

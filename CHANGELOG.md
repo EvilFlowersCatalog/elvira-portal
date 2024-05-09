@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.14 2023-09-05
+
+- **Added**: Mouse scroll button new tab click
+- **Changed**: Elvira logo in header clickable -> return to home
+
 ## 3.0.13 2023-09-05
 
 - **Changed**: Padding putted back (did not help fixed the bug on mobile in feeds)
