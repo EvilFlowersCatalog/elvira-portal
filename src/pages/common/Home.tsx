@@ -84,7 +84,7 @@ const Home = () => {
     <PageLoading />
   ) : (
     <>
-      <div className='flex-1 p-4 pt-14 lg:pt-4'>
+      <div className='flex-1 p-4'>
         <div className='flex items-center flex-col gap-10 py-20'>
           <img
             className='w-full md:w-2/3 lg:w-1/2 max-w-[800px]'

@@ -6,7 +6,7 @@ const About = () => {
   const { theme, titleLogoDark, titleLogoLight } = useAppContext();
 
   return (
-    <div className='flex-1 pt-14 lg:pt-0'>
+    <div className='flex-1'>
       <Breadcrumb />
       <div className='flex flex-col flex-1 p-4 justify-start items-center py-20'>
         <img

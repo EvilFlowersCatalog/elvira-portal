@@ -30,7 +30,7 @@ const AdminHome = () => {
   };
 
   return (
-    <div className='flex-1 pt-14 lg:pt-0'>
+    <div className='flex-1'>
       <Breadcrumb />
       <div className='flex flex-wrap px-2'>
         <AdminButton

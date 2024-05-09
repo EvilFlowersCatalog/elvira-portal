@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.13 2023-09-05
+
+- **Changed**: Padding putted back (did not help fixed the bug on mobile in feeds)
+
 ## 3.0.12 2023-09-05
 
 - **Added**: Gravatar and login user

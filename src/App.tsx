@@ -34,7 +34,7 @@ const App = () => {
           </>
         )}
 
-        <div className={`flex flex-1 flex-col overflow-auto`}>
+        <div className={`flex flex-1 flex-col overflow-auto pt-14 lg:pt-0`}>
           <Outlet />
         </div>
 
