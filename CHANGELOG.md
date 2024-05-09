@@ -2,7 +2,6 @@
 
 ## 3.0.12 2023-09-05
 
-- **Added**: Logos for MTF in assets
 - **Added**: Gravatar and login user
 - **Added**: Logos in administration button
 - **Changed**: Padding in pages
