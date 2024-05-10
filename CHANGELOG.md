@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.18 2023-10-05
+
+- **Fixed**: Top padding in viewer page
+- **Changed**: Zotero metadata pdf url tag
+
 ## 3.0.17 2023-10-05
 
 - **Fixed**: Favicon

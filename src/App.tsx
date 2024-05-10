@@ -19,7 +19,7 @@ const App = () => {
 
   return (
     <div className='min-h-screen h-screen flex w-screen bg-white dark:bg-gray text-black dark:text-white overflow-auto'>
-      <div className='min-w-64 flex flex-1 pt-14 lg:pt-0'>
+      <div className={`min-w-64 flex flex-1 ${show() ? 'pt-14 lg:pt-0' : ''}`}>
         <ToastContainer
           position='top-right'
           autoClose={2500}

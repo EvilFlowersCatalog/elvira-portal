@@ -20,12 +20,14 @@ import { toast } from 'react-toastify';
 import { updateMetaTag } from '../../utils/func/functions';
 import { CircleLoader } from 'react-spinners';
 import useCustomEffect from '../../hooks/useCustomEffect';
+import useAuthContext from '../../hooks/contexts/useAuthContext';
 
 const rootId = 'pdf-viewer-page';
 
 const Viewer = () => {
   const { lang, theme, STUColor, titleLogoDark, titleLogoLight } =
     useAppContext();
+  const { auth } = useAuthContext();
   const { 'entry-id': id } = useParams();
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -119,7 +121,10 @@ const Viewer = () => {
         if (zotero.abstract)
           updateMetaTag('citation_abstract', zotero.abstract);
         updateMetaTag('citation_authors', zotero.authors);
-        updateMetaTag('citation_pdf_url', zotero.pdfUrl);
+        updateMetaTag(
+          'citation_pdf_url',
+          zotero.pdfUrl + `?access_token=${auth?.token}`
+        );
 
         // Render viewer and set options
         renderViewer(rootId, pdf.data, {
