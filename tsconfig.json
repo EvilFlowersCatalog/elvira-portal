@@ -19,6 +19,6 @@
     "strict": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "src/components/path/.tsx", "public/assets", "public"],
+  "include": ["src", "src/components/path/.tsx", "public/assets"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

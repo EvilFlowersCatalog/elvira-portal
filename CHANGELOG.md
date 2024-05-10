@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.0.17 2023-10-05
+
+- **Fixed**: Favicon
+
 ## 3.0.16 2023-10-05
 
 - **Fixed**: Breadcrumbs typo
