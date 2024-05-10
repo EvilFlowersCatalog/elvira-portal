@@ -1,5 +1,10 @@
 # Changelog
 
+## 3.0.16 2023-10-05
+
+- **Fixed**: Breadcrumbs typo
+- **Changed**: Favicon size to 16x16
+
 ## 3.0.15 2023-09-05
 
 - **Fixed**: Scroll up button position when search bar is open

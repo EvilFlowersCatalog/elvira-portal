@@ -20,7 +20,7 @@ const Breadcrumb = () => {
   };
 
   const breadcrumbsTranslator: { [key: string]: string } = {
-    ['library']: isEn() ? 'Library' : 'Kničnica',
+    ['library']: isEn() ? 'Library' : 'Knižnica',
     ['feeds']: isEn() ? 'Feeds' : 'Skupiny',
     ['about']: isEn() ? 'About' : 'O Projekte',
     ['administration']: isEn() ? 'Administration' : 'Administrácia',
