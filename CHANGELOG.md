@@ -1,68 +1,72 @@
 # Changelog
 
-## 3.0.18 2023-10-05
+## 3.1.0 : TBD
 
-- **Fixed**: Top padding in viewer page
+- **Changed**: `Entry.thumbnail` now contains URL path instead of base64
+
+## 3.0.18 : 2024-05-10
+
 - **Changed**: Zotero metadata pdf url tag
+- **Fixed**: Top padding in viewer page
 
-## 3.0.17 2023-10-05
+## 3.0.17 : 2024-05-10
 
 - **Fixed**: Favicon
 
-## 3.0.16 2023-10-05
+## 3.0.16 : 2024-05-10
 
-- **Fixed**: Breadcrumbs typo
 - **Changed**: Favicon size to 16x16
+- **Fixed**: Breadcrumbs typo
 
-## 3.0.15 2023-09-05
+## 3.0.15 : 2024-05-09
 
-- **Fixed**: Scroll up button position when search bar is open
 - **Changed**: Few code changing
+- **Fixed**: Scroll up button position when search bar is open
 
-## 3.0.14 2023-09-05
+## 3.0.14 : 2024-05-09
 
 - **Added**: Mouse scroll button new tab click
 - **Changed**: Elvira logo in header clickable -> return to home
 
-## 3.0.13 2023-09-05
+## 3.0.13 : 2024-05-09
 
 - **Changed**: Padding putted back (did not help fixed the bug on mobile in feeds)
 
-## 3.0.12 2023-09-05
+## 3.0.12 : 2024-05-08
 
 - **Added**: Gravatar and login user
 - **Added**: Logos in administration button
 - **Changed**: Padding in pages
 - **Fixed**: Design mismash
 
-## 3.0.11 2023-08-05
+## 3.0.11 : 2024-05-08
 
 - **Chnaged**: translation for entries from 'Dokumenty' to 'Publikácie'
 - **Changed**: Swiper interval to 5s
 
-## 3.0.10 2023-08-05
+## 3.0.10 : 2024-05-08
 
-- **Fixed**: Header showing
 - **Changed**: Swiper interval
+- **Fixed**: Header showing
 
-## 3.0.9 2023-08-05
+## 3.0.9 : 2024-05-08
 
 - **Fixed**: Error with param
 
-## 3.0.8 2023-08-05
+## 3.0.8 : 2024-05-08
 
 - **Changed**: Last added entries back from populars (little mistake)
 
-## 3.0.7 2023-08-05
+## 3.0.7 : 2024-05-08
 
-- **Changed**: Entry detail
-- **Changed**: Advanced search
 - **Added**: Breadcrumbs translation
 - **Added**: Swiper in home
+- **Changed**: Entry detail
+- **Changed**: Advanced search
 - **Fixed**: image
 - **Fixed**: Select in swipers
 
-## 3.0.6 2023-08-05
+## 3.0.6 : 2024-05-08
 
 - **Added**: new params
 - **Changed**: README.md
@@ -70,15 +74,15 @@
 - **Changed**: Entry detail contributors
 - **Fixed**: Entries responzivness
 
-## 3.0.5 2023-07-05
+## 3.0.5 : 2024-05-07
 
 - **Fixed**: Not showing logos, needed to be moved to public dir
 
-## 3.0.4 2023-07-05
+## 3.0.4 : 2024-05-07
 
 - **Added**: README.md file
 
-## 3.0.3 2023-07-05
+## 3.0.3 : 2024-05-07
 
 - **Added**: Search bar in home
 - **Changed**: Few translates
@@ -86,11 +90,11 @@
 - **Removed**: Loans history page
 - **Fixed**: "Relogin" - bad code order
 
-## 3.0.2 2023-05-05
+## 3.0.2 : 2024-05-05
 
 - **Changed**: Login function
 
-## 3.0.1 2023-05-05
+## 3.0.1 : 2024-05-05
 
 - **Changed**: Navbar design
 - **Fixed**: Home entries
@@ -100,11 +104,11 @@
 - **Added**: Advanced Search
 - **Change**: Few new things
 
-## 3.0.0 2023-04-23
+## 3.0.0 : 2024-04-23
 
 - **Changed**: The whole web app design
 
-## 2.0.7 2023-10-15
+## 2.0.7 : 2023-10-15
 
 - **Added**: active buttons in navbar
 - **Added**: few icons
@@ -113,7 +117,7 @@
 - **Changed**: sidebar closing
 - **Changed**: little advanced search
 
-## 2.0.6 2023-10-13
+## 2.0.6 : 2023-10-13
 
 - **Added**: infinit scroll everywhere
 - **Added**: path in feed page
@@ -128,7 +132,7 @@
 - **Removed**: paginator everywhere
 - **Removed**: title validator in admin -> new entry
 
-## 2.0.5 2023-09-28
+## 2.0.5 : 2023-09-28
 
 - **Added**: query param to entries and feeds service
 - **Fixed**: refresh token
@@ -140,7 +144,7 @@
 - **Changed**: viewer 0.3.9 -> 0.4.11
 - **Removed**: few useless images
 
-## 2.0.4 2023-09-23
+## 2.0.4 : 2023-09-23
 
 - **Added**: infinit scroll in library
 - **Fixed**: auto logout
@@ -151,13 +155,13 @@
 - **Changed**: `o projekte` and `nastavenie čítačky` in footer were hidden
 - **Changed**: viewer 0.3.6 -> 0.3.9
 
-## 2.0.3 2023-09-16
+## 2.0.3 : 2023-09-16
 
 - **Added**: interval interceptor
 - **Added**: observer on request interval
 - **Fixed**: detection of slow internet
 
-## 2.0.2 2023-09-15
+## 2.0.2 : 2023-09-15
 
 - **Added**: tools in library
 - **Added**: sorting in library

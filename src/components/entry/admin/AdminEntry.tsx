@@ -9,12 +9,14 @@ import { useState } from 'react';
 import ModalWrapper from '../../modal/ModalWrapper';
 import ConfirmationDialog from '../../dialogs/ConfirmationDialog';
 import useAppContext from '../../../hooks/contexts/useAppContext';
+import useAuthContext from "../../../hooks/contexts/useAuthContext.tsx";
 
 interface IEntryParams {
   entry: IEntry;
 }
 
 const AdminEntry = ({ entry }: IEntryParams) => {
+  const { auth } = useAuthContext();
   const { showSearchBar } = useAppContext();
   const [showDeleteMenu, setShowDeleteMenu] = useState<boolean>(false);
   const { t } = useTranslation();
@@ -58,7 +60,7 @@ const AdminEntry = ({ entry }: IEntryParams) => {
           >
             <img
               className={`w-full h-full duration-1000`}
-              src={entry.thumbnail}
+              src={entry.thumbnail + `?access_token=${auth?.token}`}
             />
           </div>
           <span

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { IEntry } from '../../utils/interfaces/entry';
+import useAuthContext from "../../hooks/contexts/useAuthContext.tsx";
 
 interface ISwiperEntryParams {
   entry: IEntry;
@@ -17,6 +18,7 @@ const SwiperEntry = ({
   type,
   clickedEntry,
 }: ISwiperEntryParams) => {
+  const { auth } = useAuthContext();
   const [isScale, setIsScale] = useState<boolean>(false);
   const [isUnderLine, setIsUnderLine] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -62,7 +64,7 @@ const SwiperEntry = ({
             className={`w-full h-full ${
               isScale ? 'scale-110' : ''
             } duration-1000`}
-            src={entry.thumbnail}
+            src={entry.thumbnail + `?access_token=${auth?.token}`}
           />
         </div>
         <span
