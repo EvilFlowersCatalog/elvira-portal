@@ -56,7 +56,7 @@ const Login = () => {
           <img
             className='w-96'
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
-            alt='Elvira-title-logo'
+            alt='Elvira Logo'
           />
           <span className='text-lg'>{t('login.digitalLibrary')}</span>
         </div>

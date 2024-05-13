@@ -89,6 +89,7 @@ const Home = () => {
           <img
             className='w-full md:w-2/3 lg:w-1/2 max-w-[800px]'
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
+            alt='Elvira Logo'
           />
           <form
             className='relative flex w-full md:w-1/2 xl:w-1/3 max-w-96 items-center gap-2 text-darkGray dark:text-white'

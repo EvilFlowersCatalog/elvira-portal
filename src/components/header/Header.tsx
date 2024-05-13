@@ -26,6 +26,7 @@ const Header = () => {
         <img
           className='h-auto w-32 min-w-24'
           src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
+          alt='Elvira Logo'
         />
       </button>
 
@@ -35,6 +36,7 @@ const Header = () => {
       <img
         className='h-auto w-16 min-w-12'
         src={theme === THEME_TYPE.dark ? stuLogoLight : stuLogoDark}
+        alt='STU Logo'
       />
     </div>
   );

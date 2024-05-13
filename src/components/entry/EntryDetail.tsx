@@ -12,12 +12,14 @@ import useGetEntryDetail from '../../hooks/api/entries/useGetEntryDetail';
 import useAddToShelf from '../../hooks/api/my-shelf/useAddToShelf';
 import useRemoveFromShelf from '../../hooks/api/my-shelf/useRemoveFromShelf';
 import useCustomEffect from '../../hooks/useCustomEffect';
+import useAuthContext from '../../hooks/contexts/useAuthContext';
 
 interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
 }
 const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const { specialNavigation, STUColor } = useAppContext();
+  const { auth } = useAuthContext();
   const { t } = useTranslation();
   const [entry, setEntry] = useState<IEntryDetail | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -162,7 +164,13 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                   'w-1/2 flex justify-center border border-white rounded-md overflow-hidden'
                 }
               >
-                <img className={'w-full'} src={entry.response.thumbnail} />
+                <img
+                  className={'w-full'}
+                  src={
+                    entry.response.thumbnail + `?access_token=${auth?.token}`
+                  }
+                  alt='Entry Thumbnail'
+                />
               </div>
             </div>
             <span className={'text-white text-center font-bold'}>

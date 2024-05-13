@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { IEntry } from '../../utils/interfaces/entry';
 import useAppContext from '../../hooks/contexts/useAppContext';
-import useAuthContext from "../../hooks/contexts/useAuthContext.tsx";
+import useAuthContext from '../../hooks/contexts/useAuthContext.tsx';
 
 interface IEntryParams {
   entry: IEntry;
@@ -62,6 +62,7 @@ const Entry = ({ entry, isActive }: IEntryParams) => {
               isScale ? 'scale-110' : ''
             } duration-1000`}
             src={entry.thumbnail + `?access_token=${auth?.token}`}
+            alt='Entry Thumbnail'
           />
         </div>
         <span

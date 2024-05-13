@@ -17,6 +17,7 @@ const PageMessage = ({ message, clearParams = null }: IPageMessageParams) => {
       <img
         className='w-20 mb-10'
         src={theme === THEME_TYPE.dark ? logoLight : logoDark}
+        alt='Elvira Small Logo'
       />
       <span className='text-[30px] md:text-[50px] font-extrabold uppercase'>
         {message}

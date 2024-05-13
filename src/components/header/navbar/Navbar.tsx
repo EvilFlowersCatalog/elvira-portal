@@ -120,6 +120,7 @@ const Navbar = () => {
           <img
             className='h-auto w-36'
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
+            alt='Elvira Logo'
           />
         </button>
         {isSmallDevice ? (
@@ -133,6 +134,7 @@ const Navbar = () => {
           <img
             className='h-auto w-16'
             src={theme === THEME_TYPE.dark ? stuLogoLight : stuLogoDark}
+            alt='STU Logo'
           />
         )}
       </div>

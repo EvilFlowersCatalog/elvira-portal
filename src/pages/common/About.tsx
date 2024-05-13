@@ -12,6 +12,7 @@ const About = () => {
         <img
           className='w-1/2'
           src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
+          alt='Elvira Logo'
         />
         <p className='mt-20'>Elvíra je portál kde je veľa knížok</p>
       </div>

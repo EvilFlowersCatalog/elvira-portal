@@ -9,7 +9,7 @@ import { useState } from 'react';
 import ModalWrapper from '../../modal/ModalWrapper';
 import ConfirmationDialog from '../../dialogs/ConfirmationDialog';
 import useAppContext from '../../../hooks/contexts/useAppContext';
-import useAuthContext from "../../../hooks/contexts/useAuthContext.tsx";
+import useAuthContext from '../../../hooks/contexts/useAuthContext.tsx';
 
 interface IEntryParams {
   entry: IEntry;
@@ -61,6 +61,7 @@ const AdminEntry = ({ entry }: IEntryParams) => {
             <img
               className={`w-full h-full duration-1000`}
               src={entry.thumbnail + `?access_token=${auth?.token}`}
+              alt='Entry Thumbnail'
             />
           </div>
           <span

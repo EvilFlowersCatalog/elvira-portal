@@ -23,6 +23,7 @@ const NotFound = () => {
       <img
         className={'w-3/5 md:w-2/5'}
         src={theme === THEME_TYPE.light ? titleLogoDark : titleLogoLight}
+        alt='Elvira Logo'
       />
       <h1 className={'text-[100px] md:text-[200px] font-bold text-STUColor'}>
         {t('notFound.oops')}

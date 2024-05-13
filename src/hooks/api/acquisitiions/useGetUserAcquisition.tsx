@@ -1,21 +1,25 @@
-import { IUserAcquisitionData } from '../../../utils/interfaces/acquisition';
+import { AxiosResponse } from 'axios';
 import useAxios from '../axios/useAxios';
 
 const useGetUserAcquisition = () => {
   const axios = useAxios();
 
   const getUserAcquisition = async (
-    userAcquisitionId: string,
-    format: string = ''
-  ): Promise<IUserAcquisitionData> => {
+    userAcquisitionId: string
+  ): Promise<AxiosResponse<Promise<any>>> => {
     // Get user acquistion
     const USER_ACQUISITION_URL = `/data/v1/user-acquisitions/${userAcquisitionId}`;
-    const { data: userAcquistion } = await axios.get<IUserAcquisitionData>(
-      USER_ACQUISITION_URL,
-      { params: { format } }
-    );
+    return await axios.get(USER_ACQUISITION_URL, {
+      responseType: 'arraybuffer',
+      transformResponse: [
+        async function (data): Promise<any> {
+          const blob = new Blob([data], { type: 'application/pdf' });
 
-    return userAcquistion;
+          const typedArray = new Uint8Array(await blob.arrayBuffer());
+          return typedArray;
+        },
+      ],
+    });
   };
 
   return getUserAcquisition;

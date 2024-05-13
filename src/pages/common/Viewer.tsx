@@ -101,10 +101,8 @@ const Viewer = () => {
         };
 
         // Get pdf
-        const { response: pdf } = await getUserAcquisition(
-          userAcquisition.id,
-          'base64'
-        );
+        const { data } = await getUserAcquisition(userAcquisition.id);
+        const pdf = await data;
 
         updateMetaTag('citation_title', zotero.title);
         if (zotero.year) updateMetaTag('citation_year', zotero.year);
@@ -127,13 +125,12 @@ const Viewer = () => {
         );
 
         // Render viewer and set options
-        renderViewer(rootId, pdf.data, {
+        renderViewer(rootId, pdf, {
           citationBib: entryDetail.citation,
           lang,
           theme,
           homeFunction,
           shareFunction,
-          zotero: zotero,
         });
       } catch {
         navigate(NAVIGATION_PATHS.home, { replace: true });
@@ -175,6 +172,7 @@ const Viewer = () => {
           <img
             className='w-96'
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
+            alt='Elvira Logo'
           />
           <CircleLoader color={STUColor} size={100} />
         </div>

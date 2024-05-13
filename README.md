@@ -52,7 +52,7 @@ unset  ELVIRA_ASSETS_DIR
 
 Feel like giving Elvira a fresh coat of paint? 🎨 Let's do it with style!
 
-Just head to tailwind.config.js, find extend, then colors and here you find STUColor. Just swap out the hex code for your color you fancy. It's like giving Elvira a brand-new dress for the ball! 💃
+Just head to `tailwind.config.js`, find extend, then colors and here you find STUColor. Just swap out the hex code for your color you fancy. It's like giving Elvira a brand-new dress for the ball! 💃
 
 ```ts
 theme: {

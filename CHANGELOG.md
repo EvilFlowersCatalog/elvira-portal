@@ -1,8 +1,13 @@
 # Changelog
 
-## 3.1.0 : TBD
+## 3.1.0 : 2024-05-13
 
+- **Added**: ALT in every img entity
+- **Changed**: Viewer version from 0.4.21 to 0.4.24
+- **Changed**: Favicon to transparent and size 32x32
+- **Changed**: README.md
 - **Changed**: `Entry.thumbnail` now contains URL path instead of base64
+- **Removed**: In `useUserAcquistion` format
 
 ## 3.0.18 : 2024-05-10
 
