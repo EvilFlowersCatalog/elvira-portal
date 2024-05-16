@@ -4,6 +4,8 @@ import { IEntry } from '../../utils/interfaces/entry';
 import { useSearchParams } from 'react-router-dom';
 import EntryContainer from '../../components/entry/EntryContainer';
 import Entry from '../../components/entry/Entry';
+import EntriesLoading from '../../components/entry/EntryLoading';
+import EntryLoading from '../../components/entry/EntryLoading';
 
 const Library = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -75,6 +77,10 @@ const Library = () => {
             isActive={activeEntryId === entry.id}
           />
         ))}
+        {loadingNext &&
+          Array.from({ length: 30 }).map((_, index) => (
+            <EntryLoading key={index} />
+          ))}
       </div>
     </EntryContainer>
   );

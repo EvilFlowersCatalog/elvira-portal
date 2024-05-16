@@ -22,15 +22,12 @@ const CustomInput = ({
 
   return (
     <div className='w-full text-left'>
-      <label
-        className='w-full text-gray dark:text-lightGray italic text-xs pl-2'
-        htmlFor={id}
-      >
+      <label className='w-full italic text-xs pl-1' htmlFor={id}>
         {required ? t('input.required') : t('input.notRequired')}
       </label>
 
       <input
-        className='w-full p-2 rounded-md bg-zinc-200 dark:bg-darkGray border-2 border-white dark:border-gray outline-none focus:border-STUColor dark:focus:border-STUColor'
+        className='w-full p-2 rounded-md bg-white dark:bg-gray border-2 border-white dark:border-darkGray outline-none focus:border-STUColor dark:focus:border-STUColor'
         required={required}
         onChange={onChange}
         onInvalid={onInvalid}

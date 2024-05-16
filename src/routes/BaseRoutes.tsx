@@ -57,7 +57,7 @@ const BaseRoutes = () => {
             <Route path='entries'>
               <Route index element={<AdminEntries />} />
               <Route path='add' element={<AdminAddEntry />} />
-              <Route path='edit/:id' element={<AdminEditEntry />} />
+              <Route path='edit/:entry-id' element={<AdminEditEntry />} />
             </Route>
             <Route path='feeds' element={<AdminFeeds />} />
           </Route>

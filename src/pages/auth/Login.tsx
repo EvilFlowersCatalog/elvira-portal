@@ -72,7 +72,7 @@ const Login = () => {
             >
               <input
                 name='username'
-                className='w-3/4 lg:w-2/4 p-2 rounded-md bg-zinc-white dark:bg-gray border-2 border-zinc-100 dark:border-darkGray outline-none focus:border-STUColor dark:focus:border-STUColor'
+                className='w-3/4 lg:w-2/4 p-2 rounded-md bg-white dark:bg-gray border-2 border-white dark:border-darkGray outline-none focus:border-STUColor dark:focus:border-STUColor'
                 value={loginForm.username}
                 type='text'
                 placeholder={t('login.username')}
@@ -87,7 +87,7 @@ const Login = () => {
               <div className='relative w-3/4 lg:w-2/4 flex items-center'>
                 <input
                   name='password'
-                  className='w-full border-2 border-zinc-100 dark:border-darkGray focus:border-STUColor dark:focus:border-STUColor p-2 outline-none bg-white dark:bg-gray rounded-md'
+                  className='w-full border-2 border-white dark:border-darkGray focus:border-STUColor dark:focus:border-STUColor p-2 outline-none bg-white dark:bg-gray rounded-md'
                   value={loginForm.password}
                   type={showPassword ? 'text' : 'password'}
                   placeholder={t('login.password')}

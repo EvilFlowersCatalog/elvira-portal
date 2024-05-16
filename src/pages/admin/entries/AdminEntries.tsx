@@ -7,6 +7,8 @@ import AdminEntry from '../../../components/entry/admin/AdminEntry';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import { MdAdd } from 'react-icons/md';
 import useAppContext from '../../../hooks/contexts/useAppContext';
+import EntriesLoading from '../../../components/entry/EntryLoading';
+import EntryLoading from '../../../components/entry/EntryLoading';
 
 const AdminEntries = () => {
   const { showSearchBar } = useAppContext();
@@ -88,6 +90,10 @@ const AdminEntries = () => {
         {entries.map((entry, index) => (
           <AdminEntry key={index} entry={entry} />
         ))}
+        {loadingNext &&
+          Array.from({ length: 30 }).map((_, index) => (
+            <EntryLoading key={index} />
+          ))}
       </div>
     </EntryContainer>
   );

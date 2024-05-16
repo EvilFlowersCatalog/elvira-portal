@@ -5,17 +5,20 @@ import { IEntryInfo } from '../../../utils/interfaces/entry';
 const useGetData = () => {
   const axios = useAxios();
 
-  const getData = async (driver: IDENTIFIERS_TYPE, identifier: string) => {
+  const getData = async (
+    driver: IDENTIFIERS_TYPE,
+    identifier: string
+  ): Promise<IEntryInfo> => {
+    const encodedIdentifier = encodeURIComponent(identifier);
     const params = {
       driver,
-      identifier: encodeURIComponent(identifier),
+      identifier: encodedIdentifier,
     };
-    const entryInfo: IEntryInfo = await axios.get(
-      '/api/v1/entry-introspection',
-      { params }
-    );
+    const { data: entryInfo } = await axios.get('/api/v1/entry-introspection', {
+      params,
+    });
 
-    return entryInfo;
+    return entryInfo as IEntryInfo;
   };
 
   return getData;

@@ -4,7 +4,7 @@ import { ToastContainer } from 'react-toastify';
 import NavbarContainer from './components/header/navbar/NavbarContainer';
 import Header from './components/header/Header';
 import useAppContext from './hooks/contexts/useAppContext';
-import SearchBarContainer from './components/header/search-bar/SearchBarContainer';
+import SearchBarContainer from './components/search-bar/SearchBarContainer';
 
 const App = () => {
   const { isSmallDevice } = useAppContext();

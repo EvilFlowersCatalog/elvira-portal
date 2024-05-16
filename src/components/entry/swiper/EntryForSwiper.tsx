@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { IEntry } from '../../utils/interfaces/entry';
-import useAuthContext from '../../hooks/contexts/useAuthContext.tsx';
+import { IEntry } from '../../../utils/interfaces/entry.ts';
+import useAuthContext from '../../../hooks/contexts/useAuthContext.tsx';
 
-interface ISwiperEntryParams {
+interface IEntryForSwiperParams {
   entry: IEntry;
   isActive: boolean;
   setClickedEntry: (clickedEntry: 'popular' | 'lastAdded' | '') => void;
@@ -11,13 +11,13 @@ interface ISwiperEntryParams {
   type: 'popular' | 'lastAdded';
 }
 
-const SwiperEntry = ({
+const EntryForSwiper = ({
   entry,
   isActive,
   setClickedEntry,
   type,
   clickedEntry,
-}: ISwiperEntryParams) => {
+}: IEntryForSwiperParams) => {
   const { auth } = useAuthContext();
   const [isScale, setIsScale] = useState<boolean>(false);
   const [isUnderLine, setIsUnderLine] = useState<boolean>(false);
@@ -34,7 +34,7 @@ const SwiperEntry = ({
   };
 
   const openEntryDetail = () => {
-    setClickedEntry(type);
+    console.log(type, clickedEntry);
     const params = new URLSearchParams(searchParams);
     const id = searchParams.get('entry-detail-id');
 
@@ -42,6 +42,7 @@ const SwiperEntry = ({
       params.delete('entry-detail-id');
     else params.set('entry-detail-id', entry.id);
 
+    setClickedEntry(type);
     setSearchParams(params);
   };
 
@@ -78,16 +79,18 @@ const SwiperEntry = ({
           {entry.title}
         </span>
         <span className={'flex-1'}></span>
-        <span
-          className={`text-xs ${
-            isActive ? 'text-zinc-200' : 'text-gray dark:text-zinc-200'
-          }`}
-        >
-          {entry.authors[0].name} {entry.authors[0].surname}
-        </span>
+        {entry.authors.length > 0 && (
+          <span
+            className={`text-xs ${
+              isActive ? 'text-zinc-200' : 'text-gray dark:text-zinc-200'
+            }`}
+          >
+            {entry.authors[0].name} {entry.authors[0].surname}
+          </span>
+        )}
       </button>
     </div>
   );
 };
 
-export default SwiperEntry;
+export default EntryForSwiper;

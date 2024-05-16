@@ -11,10 +11,11 @@ interface IEntryParams {
 
 const Entry = ({ entry, isActive }: IEntryParams) => {
   const { auth } = useAuthContext();
-  const { showSearchBar } = useAppContext();
+  const { showSearchBar, isSmallDevice } = useAppContext();
   const [isScale, setIsScale] = useState<boolean>(false);
   const [isUnderLine, setIsUnderLine] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
+  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
 
   const handelMouseEnter = () => {
     setIsScale(true);
@@ -39,7 +40,7 @@ const Entry = ({ entry, isActive }: IEntryParams) => {
   return (
     <div
       className={`flex w-full sm:w-1/2 md:w-1/4 ${
-        showSearchBar
+        !isSmallDevice && showSearchBar
           ? 'lg:w-1/3 xl:w-1/4 xxl:w-1/6'
           : 'xl:w-1/5 xxl:w-[14.28%]'
       }`}
@@ -53,9 +54,9 @@ const Entry = ({ entry, isActive }: IEntryParams) => {
         onClick={openEntryDetail}
       >
         <div
-          className={
-            'w-full h-auto rounded-md border border-gray dark:border-zinc-200 overflow-hidden'
-          }
+          className={`w-full ${
+            imageLoaded ? 'h-auto' : 'h-64'
+          } rounded-md border border-gray dark:border-zinc-200 overflow-hidden`}
         >
           <img
             className={`w-full h-full ${
@@ -63,6 +64,7 @@ const Entry = ({ entry, isActive }: IEntryParams) => {
             } duration-1000`}
             src={entry.thumbnail + `?access_token=${auth?.token}`}
             alt='Entry Thumbnail'
+            onLoad={() => setImageLoaded(true)}
           />
         </div>
         <span
@@ -75,13 +77,15 @@ const Entry = ({ entry, isActive }: IEntryParams) => {
           {entry.title}
         </span>
         <span className={'flex-1'}></span>
-        <span
-          className={`text-xs ${
-            isActive ? 'text-zinc-200' : 'text-gray dark:text-zinc-200'
-          }`}
-        >
-          {entry.authors[0].name} {entry.authors[0].surname}
-        </span>
+        {entry.authors.length > 0 && (
+          <span
+            className={`text-xs ${
+              isActive ? 'text-zinc-200' : 'text-gray dark:text-zinc-200'
+            }`}
+          >
+            {entry.authors[0].name} {entry.authors[0].surname}
+          </span>
+        )}
       </button>
     </div>
   );

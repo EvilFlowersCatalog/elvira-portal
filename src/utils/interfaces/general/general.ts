@@ -43,16 +43,7 @@ export interface IMetadata {
   total: number;
 }
 
-export interface IZotero {
-  title: string;
-  year?: string;
-  journalTitle?: string;
-  firstPage?: number;
-  lastPage?: number;
-  publisher?: string;
-  doi?: string;
-  isbn?: string;
-  abstract?: string;
-  authors: string;
-  pdfUrl: string;
+export interface IModalParams {
+  close: (open: boolean) => void;
+  yes: () => void;
 }

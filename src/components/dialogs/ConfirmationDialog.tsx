@@ -1,27 +1,34 @@
 import { useTranslation } from 'react-i18next';
 import ModalWrapper from '../modal/ModalWrapper';
+import { IModalParams } from '../../utils/interfaces/general/general';
 
-interface IConfirmationDialogParams {
+interface IConfirmationDialogParams extends IModalParams {
   name: string;
-  setOpen: (open: boolean) => void;
-  handleDelete: () => Promise<void>;
+  type: 'feed' | 'entry';
 }
 const ConfirmationDialog = ({
   name,
-  setOpen,
-  handleDelete,
+  close,
+  yes,
+  type,
 }: IConfirmationDialogParams) => {
   const { t } = useTranslation();
 
   return (
     <ModalWrapper
-      setOpen={setOpen}
+      close={close}
       title={t('modal.confirmation.title')}
       buttonLabel={t('modal.confirmation.label')}
-      onClick={handleDelete}
+      yes={yes}
     >
-      <span className='text-xl text-black dark:text-white'>
-        {t('modal.confirmation.dialog', { x: name })}
+      <span className='text-xl text-black dark:text-white text-center'>
+        {t('modal.confirmation.dialog', {
+          x: name,
+          y:
+            type === 'feed'
+              ? t('modal.confirmation.feed')
+              : t('modal.confirmation.entry'),
+        })}
       </span>
     </ModalWrapper>
   );

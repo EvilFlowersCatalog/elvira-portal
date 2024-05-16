@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import AdminFeed from '../../components/feed/admin/AdminFeed';
 import { MdAdd } from 'react-icons/md';
 import FeedContainer from '../../components/feed/FeedContainer';
+import FeedForm from '../../components/feed/admin/FeedForm';
 
 const AdminFeeds = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -14,16 +15,17 @@ const AdminFeeds = () => {
   const [maxPage, setMaxPage] = useState<number>(0);
   const [feeds, setFeeds] = useState<IFeed[]>([]);
   const [showForm, setShowForm] = useState<boolean>(false);
+  const [reloadPage, setReloadPage] = useState<boolean>(false);
 
   const [searchParams] = useSearchParams();
   const getFeeds = useGetFeeds();
 
-  // When searchParams change, reset
+  // When searchParams change or is triggered reload -> Reset page
   useEffect(() => {
     setPage(0);
     setFeeds([]);
     setIsLoading(true);
-  }, [searchParams]);
+  }, [searchParams, reloadPage]);
 
   useEffect(() => {
     if (page === 0) {
@@ -56,35 +58,49 @@ const AdminFeeds = () => {
   }, [page]);
 
   return (
-    <FeedContainer
-      isLoading={isLoading}
-      setIsLoading={setIsLoading}
-      isError={isError}
-      feeds={feeds}
-      setFeeds={setFeeds}
-      page={page}
-      setPage={setPage}
-      maxPage={maxPage}
-      loadingNext={loadingNext}
-      setLoadingNext={setLoadingNext}
-    >
-      <div className='flex flex-row flex-wrap px-2 pb-4'>
-        {/* Add button */}
-        <div className={'flex p-2.5 w-full lg:w-1/2 xl:w-1/3 xxl:w-1/4'}>
-          <button
-            onClick={() => setShowForm(true)}
-            className={`flex flex-col justify-center dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 border-STUColor bg-STUColor bg-opacity-40 hover:bg-opacity-20 duration-200`}
-          >
-            <MdAdd size={50} />
-          </button>
-        </div>
-        {/* FEEDS */}
+    <>
+      <FeedContainer
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
+        isError={isError}
+        feeds={feeds}
+        setFeeds={setFeeds}
+        page={page}
+        setPage={setPage}
+        maxPage={maxPage}
+        loadingNext={loadingNext}
+        setLoadingNext={setLoadingNext}
+      >
+        <div className='flex flex-row flex-wrap px-2 pb-4'>
+          {/* Add button */}
+          <div className={'flex p-2.5 w-full lg:w-1/2 xl:w-1/3 xxl:w-1/4'}>
+            <button
+              onClick={() => setShowForm(true)}
+              className={`flex flex-col justify-center dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 border-STUColor bg-STUColor bg-opacity-40 hover:bg-opacity-20 duration-200`}
+            >
+              <MdAdd size={50} />
+            </button>
+          </div>
+          {/* FEEDS */}
 
-        {feeds.map((feed, index) => (
-          <AdminFeed key={index} feed={feed} />
-        ))}
-      </div>
-    </FeedContainer>
+          {feeds.map((feed, index) => (
+            <AdminFeed
+              key={index}
+              feed={feed}
+              reloadPage={reloadPage}
+              setReloadPage={setReloadPage}
+            />
+          ))}
+        </div>
+      </FeedContainer>
+      {showForm && (
+        <FeedForm
+          setOpen={setShowForm}
+          reloadPage={reloadPage}
+          setReloadPage={setReloadPage}
+        />
+      )}
+    </>
   );
 };
 

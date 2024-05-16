@@ -4,6 +4,8 @@ import { useSearchParams } from 'react-router-dom';
 import EntryContainer from '../../components/entry/EntryContainer';
 import Entry from '../../components/entry/Entry';
 import useGetShelf from '../../hooks/api/my-shelf/useGetShelf';
+import EntriesLoading from '../../components/entry/EntryLoading';
+import EntryLoading from '../../components/entry/EntryLoading';
 
 const Shelf = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -85,6 +87,10 @@ const Shelf = () => {
             isActive={activeEntryId === entry.id}
           />
         ))}
+        {loadingNext &&
+          Array.from({ length: 30 }).map((_, index) => (
+            <EntryLoading key={index} />
+          ))}
       </div>
     </EntryContainer>
   );

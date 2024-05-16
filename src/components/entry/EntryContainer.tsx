@@ -7,7 +7,6 @@ import PageMessage from '../page/PageMessage';
 import { useTranslation } from 'react-i18next';
 import { IEntry } from '../../utils/interfaces/entry';
 import useAppContext from '../../hooks/contexts/useAppContext';
-import LoadNext from '../common/LoadNext';
 import ScrollUpButton from '../common/ScrollUpButton';
 import ToolsContainer from '../tools/ToolsContainer';
 
@@ -92,14 +91,9 @@ const EntryContainer = ({
       >
         <Breadcrumb />
         <ToolsContainer param='query' advancedSearch />
-        {isLoading && <PageLoading />}
+        {isLoading && <PageLoading entries />}
         {!isLoading && isError && <PageMessage message={t('page.error')} />}
-        {!isLoading && !isError && entries.length > 0 && (
-          <>
-            {children}
-            {loadingNext && <LoadNext />}
-          </>
-        )}
+        {!isLoading && !isError && entries.length > 0 && <>{children}</>}
         {!isLoading &&
           !isError &&
           entries.length === 0 &&

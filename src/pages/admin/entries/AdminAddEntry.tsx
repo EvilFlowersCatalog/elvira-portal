@@ -1,10 +1,4 @@
-import {
-  ChangeEvent,
-  FormEvent,
-  InvalidEvent,
-  useEffect,
-  useState,
-} from 'react';
+import { ChangeEvent, FormEvent, InvalidEvent, useState } from 'react';
 import {
   IEntryDetail,
   IEntryInfo,
@@ -12,20 +6,16 @@ import {
   IEntryNewForm,
 } from '../../../utils/interfaces/entry';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { IoAddCircle } from 'react-icons/io5';
 import { MdRemoveCircle } from 'react-icons/md';
 import CustomInput from '../../../components/common/CustomInput';
 import CustomTextArea from '../../../components/common/CustomTextArea';
-import ModalWrapper from '../../../components/modal/ModalWrapper';
-import { IFeed } from '../../../utils/interfaces/feed';
-import useGetFeeds from '../../../hooks/api/feeds/useGetFeeds';
 import { toast } from 'react-toastify';
 import FeedMenu from '../../../components/feed/FeedMenu';
 import Dropzone from '../../../components/common/Dropzone';
 import { getBase64 } from '../../../utils/func/functions';
 import useUploadEntry from '../../../hooks/api/entries/useUploadEntry';
-import useEditEntry from '../../../hooks/api/entries/useEditEntry';
 import {
   IDENTIFIERS_TYPE,
   NAVIGATION_PATHS,
@@ -33,6 +23,8 @@ import {
 import useGetData from '../../../hooks/api/identifiers/useGetData';
 import PageLoading from '../../../components/page/PageLoading';
 import Breadcrumb from '../../../components/common/Breadcrumb';
+import ApplyInfoDialog from '../../../components/dialogs/ApplyInfoDialog';
+import useCustomEffect from '../../../hooks/useCustomEffect';
 
 interface IEntryWizardParams {
   form?: IEntryDetail;
@@ -40,12 +32,13 @@ interface IEntryWizardParams {
 const AdminAddEntry = ({ form }: IEntryWizardParams) => {
   const { t } = useTranslation();
   const [stepIndex, setStepIndex] = useState<number>(0);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [openFeeds, setOpenFeeds] = useState<boolean>(false);
   const [openApplyInfo, setOpenApplyInfo] = useState<boolean>(false);
   const [entryInfo, setEntryInfo] = useState<IEntryInfo | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [feeds, setFeeds] = useState<IFeed[]>([]);
+  const [identifier, setIdentifier] = useState<string>('');
+  const [identifierType, setIdentifierType] = useState<IDENTIFIERS_TYPE | null>(
+    null
+  );
   const [activeFeeds, setActiveFeeds] = useState<
     { title: string; id: string }[]
   >(
@@ -54,16 +47,14 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
       id: feed.id,
     }))
   );
-  const getFeeds = useGetFeeds();
   const uploadEntry = useUploadEntry();
-  const editEntry = useEditEntry();
   const navigate = useNavigate();
   const getData = useGetData();
 
   const NextButton = ({ end = false }) => {
     return (
       <button
-        className='py-2 px-5 font-bold hover:text-STUColor bg-STUColor hover:bg-opacity-0 text-white rounded-md duration-200'
+        className='py-2 px-5 font-bold hover:text-black dark:hover:text-white bg-STUColor hover:bg-opacity-50 text-white rounded-md duration-200'
         type='submit'
       >
         {end ? t('entry.wizard.upload') : t('entry.wizard.next')}
@@ -73,11 +64,8 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
   const PreviousButton = () => {
     return (
       <button
-        className='text-lightGray dark:text-darkGray hover:text-black dark:hover:text-white hover:underline'
-        onClick={() => {
-          searchParams.set('step', `${stepIndex - 1}`);
-          setSearchParams(searchParams);
-        }}
+        className='hover:underline'
+        onClick={() => setStepIndex((prevIndex) => prevIndex - 1)}
       >
         {t('entry.wizard.previous')}
       </button>
@@ -138,20 +126,13 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
     pdf: null,
   });
 
-  // at begin set stepindex to 0
-  useEffect(() => {
-    searchParams.set('step', '0');
-    setSearchParams(searchParams);
-  }, []);
-
-  // When searchParams changed set new stepIndex
-  useEffect(() => {
-    const index = searchParams.get('step'); // get index
-    if (index) {
-      const intIndex = parseInt(index);
-      setStepIndex(intIndex);
-    } else setStepIndex(0);
-  }, [searchParams]);
+  // feed add/remove handlers
+  useCustomEffect(() => {
+    setEntryForm({
+      ...entryForm,
+      feeds: activeFeeds.map((feed) => ({ title: feed.title, id: feed.id })),
+    });
+  }, [activeFeeds]);
 
   // Handlers for submiting in steps
   const handleSubmitStepOne = async (e: FormEvent<HTMLFormElement>) => {
@@ -159,16 +140,34 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
 
     try {
       // if there is some identifier
-      if (entryForm.identifiers.doi || entryForm.identifiers.isbn) {
+      if (identifier) {
         // set loading
         setIsLoading(true);
+        let identifierTypeHolder: IDENTIFIERS_TYPE | null = null;
+        if (identifier.startsWith('10')) {
+          identifierTypeHolder = IDENTIFIERS_TYPE.doi;
+          setEntryForm((prevForm) => ({
+            ...prevForm, // Preserve existing properties of entryForm
+            identifiers: {
+              ...prevForm.identifiers, // Preserve existing properties of identifiers
+              doi: identifier, // Update the isbn property
+            },
+          }));
+        } else {
+          identifierTypeHolder = IDENTIFIERS_TYPE.isbn;
+          setEntryForm((prevForm) => ({
+            ...prevForm, // Preserve existing properties of entryForm
+            identifiers: {
+              ...prevForm.identifiers, // Preserve existing properties of identifiers
+              isbn: identifier, // Update the isbn property
+            },
+          }));
+        }
 
         // get info from endpoint
-        const givenEntryInfo = await getData(
-          IDENTIFIERS_TYPE.doi,
-          entryForm.identifiers.doi
-        );
+        const givenEntryInfo = await getData(identifierTypeHolder, identifier);
 
+        setIdentifierType(identifierTypeHolder);
         // If succes save
         setEntryInfo(givenEntryInfo);
 
@@ -177,29 +176,26 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
         setOpenApplyInfo(true);
       }
     } catch {
+      setOpenApplyInfo(false);
       // Notify about error
       toast.error(t('notifications.dataFromIdentifiers.error'));
     } finally {
       // Whatever happens go to next step and set loading to false
       setIsLoading(false);
-      searchParams.set('step', '1');
-      setSearchParams(searchParams);
+      setStepIndex((prevIndex) => prevIndex + 1);
     }
   };
   const handleSubmitStepTwo = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    searchParams.set('step', '2');
-    setSearchParams(searchParams);
+    setStepIndex((prevIndex) => prevIndex + 1);
   };
   const handleSubmitStepThree = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    searchParams.set('step', '3');
-    setSearchParams(searchParams);
+    setStepIndex((prevIndex) => prevIndex + 1);
   };
   const handleSubmitStepFour = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    searchParams.set('step', '4');
-    setSearchParams(searchParams);
+    setStepIndex((prevIndex) => prevIndex + 1);
   };
   const handleSubmitStepFive = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -224,14 +220,10 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
     if (!entry.image) {
       // If there is no image notify that it is needed
       toast.warning(t('entry.wizard.requiredMessages.image'));
-    }
-    // UPLOAD
-    else {
-      if (!pdf) {
-        // If there is no pdf notify that it is needed
-        toast.warning(t('entry.wizard.requiredMessages.pdf'));
-        return;
-      }
+    } else if (!pdf) {
+      // If there is no pdf notify that it is needed
+      toast.warning(t('entry.wizard.requiredMessages.pdf'));
+    } else {
       // Upload
       try {
         await uploadEntry(entry);
@@ -245,23 +237,21 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
   };
 
   // Handlers for inputs in steps
-  const handleDOIChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setEntryForm((prevForm) => ({
-      ...prevForm, // Preserve existing properties of entryForm
-      identifiers: {
-        ...prevForm.identifiers, // Preserve existing properties of identifiers
-        doi: event.target.value, // Update the doi property
-      },
-    }));
+  const handleIndentifierChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setIdentifier(event.target.value);
   };
-  const handleISBNChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleApplyInfo = () => {
     setEntryForm((prevForm) => ({
-      ...prevForm, // Preserve existing properties of entryForm
-      identifiers: {
-        ...prevForm.identifiers, // Preserve existing properties of identifiers
-        isbn: event.target.value, // Update the isbn property
-      },
+      ...prevForm,
+      title: entryInfo?.response.title ?? '',
+      authors: entryInfo?.response.authors ?? [],
+      publisher: entryInfo?.response.publisher ?? '',
+      year: entryInfo?.response.year ?? '',
+      language_code: entryInfo?.response.language ?? '',
+      citation: entryInfo?.response.bibtex ?? '',
     }));
+
+    setOpenApplyInfo(false);
   };
   const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
     event.target.setCustomValidity(''); // reset invalidity
@@ -301,7 +291,6 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
     index: number,
     event: ChangeEvent<HTMLInputElement>
   ) => {
-    console.log(index);
     event.target.setCustomValidity('');
     const updatedAuthors = entryForm.authors;
     updatedAuthors[index].name = event.target.value;
@@ -310,6 +299,12 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
       ...prevForm, // Preserve existing properties of entryForm
       authors: updatedAuthors,
     }));
+  };
+  const handleAuthorNameInvalid = (e: InvalidEvent<HTMLInputElement>) => {
+    e.target.setCustomValidity(t('entry.wizard.requiredMessages.authorName'));
+  };
+  const handleContributorNameInvalid = (e: InvalidEvent<HTMLInputElement>) => {
+    e.target.setCustomValidity(t('entry.wizard.requiredMessages.coName'));
   };
   const handleAuthorSurnameChange = (
     index: number,
@@ -324,23 +319,16 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
       authors: updatedAuthors,
     }));
   };
-  const handleAuthorNameInvalid = (e: InvalidEvent<HTMLInputElement>) => {
-    e.target.setCustomValidity(t('entry.wizard.requiredMessages.authorName'));
-  };
   const handleAuthorSurnameInvalid = (e: InvalidEvent<HTMLInputElement>) => {
     e.target.setCustomValidity(
       t('entry.wizard.requiredMessages.authorSurname')
     );
-  };
-  const handleContributorNameInvalid = (e: InvalidEvent<HTMLInputElement>) => {
-    e.target.setCustomValidity(t('entry.wizard.requiredMessages.coName'));
   };
   const handleContributorSurnameInvalid = (
     e: InvalidEvent<HTMLInputElement>
   ) => {
     e.target.setCustomValidity(t('entry.wizard.requiredMessages.coSurname'));
   };
-
   // Contribtors add/remove handlers
   const handleAddContributor = () => {
     setEntryForm({
@@ -352,42 +340,6 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
     const updatedAuthors = [...entryForm.authors];
     updatedAuthors.splice(index, 1);
     setEntryForm({ ...entryForm, authors: updatedAuthors });
-  };
-
-  const handleOpenFeedWrapper = async () => {
-    setOpenFeeds(true);
-    setIsLoading(true);
-
-    try {
-      const { items: acquistionFeeds } = await getFeeds({
-        page: 1,
-        limit: 500,
-        kind: 'acquisition',
-      });
-
-      setFeeds(acquistionFeeds);
-    } catch {
-      setOpenFeeds(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  // feed add/remove handlers
-  const handleAddFeeds = () => {
-    setEntryForm({
-      ...entryForm,
-      feeds: activeFeeds.map((feed) => ({ title: feed.title, id: feed.id })),
-    });
-    setOpenFeeds(false);
-  };
-  const handleApplyInfo = () => {
-    setOpenApplyInfo(false);
-  };
-  const handleRemoveFeed = (index: number) => {
-    const updatedFeeds = [...entryForm.feeds];
-    updatedFeeds.splice(index, 1);
-    setEntryForm({ ...entryForm, feeds: updatedFeeds });
-    setActiveFeeds(updatedFeeds);
   };
 
   // Handler for files
@@ -409,47 +361,44 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
     <>
       <Breadcrumb />
       <div className='flex flex-col flex-1 items-center overflow-auto p-4'>
-        <div className='flex-1 flex w-full justify-center'>
-          <div className='w-full md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 flex flex-col justify-center items-center gap-5'>
-            <span className='text-3xl text-darkGray dark:text-white font-extrabold '>
-              {stepIndex === 0 && t('entry.wizard.identifiers')}
-              {stepIndex === 1 && t('entry.wizard.additionalData')}
-              {stepIndex === 2 && t('entry.wizard.AuthorsAndFeeds')}
-              {stepIndex === 3 && t('entry.wizard.citation')}
-              {stepIndex === 4 && t('entry.wizard.imageAndFile')}
-            </span>
-
+        <div className='flex-1 flex w-full justify-center items-center'>
+          <div className='w-full h-full md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 flex flex-col justify-center items-center gap-4'>
             {/* Step 1: DOI & ISBN */}
-            {stepIndex === 0 &&
-              (isLoading ? (
-                <PageLoading />
-              ) : (
-                <form
-                  className='w-full h-full py-5 flex flex-col justify-start items-center rounded-md gap-5'
-                  onSubmit={handleSubmitStepOne}
-                >
-                  <CustomInput
-                    onChange={handleDOIChange}
-                    placeholder='DOI'
-                    value={entryForm.identifiers.doi}
-                  />
-                  <CustomInput
-                    onChange={handleISBNChange}
-                    placeholder='ISBN'
-                    value={entryForm.identifiers.isbn}
-                  />
-                  <div className='w-full flex justify-end'>
-                    <NextButton />
+            {stepIndex === 0 && (
+              <form
+                className='w-full h-fit bg-zinc-100 dark:bg-darkGray p-4 flex flex-col justify-start items-center rounded-md gap-4'
+                onSubmit={handleSubmitStepOne}
+              >
+                {isLoading ? (
+                  <div className='w-full h-96 flex'>
+                    <PageLoading />
                   </div>
-                </form>
-              ))}
-
+                ) : (
+                  <>
+                    <span className='text-3xl font-extrabold '>
+                      {t('entry.wizard.identifiers')}
+                    </span>
+                    <CustomInput
+                      onChange={handleIndentifierChange}
+                      placeholder='DOI / ISBN'
+                      value={identifier}
+                    />
+                    <div className='w-full flex justify-end'>
+                      <NextButton />
+                    </div>
+                  </>
+                )}
+              </form>
+            )}
             {/* Step 2: ADDITIONAL DATA */}
             {stepIndex === 1 && (
               <form
-                className='w-full h-full py-5 flex flex-col justify-start items-center rounded-md gap-5'
+                className='w-full h-fit bg-zinc-100 dark:bg-darkGray p-4 flex flex-col justify-start items-center rounded-md gap-4'
                 onSubmit={handleSubmitStepTwo}
               >
+                <span className='text-3xl font-extrabold '>
+                  {t('entry.wizard.additionalData')}
+                </span>
                 <CustomInput
                   onChange={handleTitleChange}
                   onInvalid={handleTitleInvalid}
@@ -472,7 +421,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                   placeholder={t('entry.wizard.summary')}
                   value={entryForm.summary}
                 />
-                <div className='w-full flex justify-end gap-5 pt-7'>
+                <div className='w-full flex justify-end gap-4 pt-7'>
                   <PreviousButton />
                   <NextButton />
                 </div>
@@ -482,14 +431,17 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
             {/* Step 3: AUTHORS & FEEDS */}
             {stepIndex === 2 && (
               <form
-                className='w-full h-full py-5 flex flex-col justify-start items-center gap-5'
+                className='w-full h-full bg-zinc-100 dark:bg-darkGray p-4 flex flex-col justify-start items-center gap-4'
                 onSubmit={handleSubmitStepThree}
               >
-                <div className='flex flex-col justify-between w-full h-full gap-5'>
+                <span className='text-3xl font-extrabold '>
+                  {t('entry.wizard.AuthorsAndFeeds')}
+                </span>
+                <div className='flex flex-col justify-between w-full h-full gap-4'>
                   {/* Authors */}
-                  <div className='flex flex-2 flex-col justify-start items-center gap-5 overflow-auto'>
+                  <div className='flex flex-2 flex-col justify-start items-center gap-4'>
                     {/* Authors header */}
-                    <div className='flex w-full justify-center items-center gap-5 text-STUColor'>
+                    <div className='flex w-full justify-center items-center gap-4 text-STUColor'>
                       <span className='text-xl font-bold'>
                         {t('entry.wizard.author')}
                       </span>
@@ -503,7 +455,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                     </div>
 
                     {/* Author */}
-                    <div className='flex w-full gap-5'>
+                    <div className='flex w-full gap-4'>
                       <CustomInput
                         onChange={(e) => handleAuthorNameChange(0, e)}
                         onInvalid={handleAuthorNameInvalid}
@@ -526,7 +478,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                       {entryForm.authors.slice(1).map((_, index) => (
                         <div
                           key={index}
-                          className='flex w-full items-end gap-5'
+                          className='flex w-full items-end gap-4'
                         >
                           <CustomInput
                             required
@@ -561,40 +513,24 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                   </div>
 
                   {/* Feeds */}
-                  <div className='flex flex-col flex-1 justify-start items-center gap-5 bg-lightGray dark:bg-darkGray p-2 overflow-auto rounded-md'>
+                  <div className='flex flex-col flex-1 justify-start items-center gap-4 bg-lightGray dark:bg-darkGray p-2 rounded-md'>
                     {/* Feeds header */}
-                    <div className='flex w-full justify-center items-center gap-5 text-STUColor'>
+                    <div className='flex w-full justify-center items-center gap-4 text-STUColor'>
                       <span className='text-xl font-bold'>
                         {t('entry.wizard.feeds')}
                       </span>
-                      <button
-                        className='hover:text-darkGray dark:hover:text-white'
-                        onClick={handleOpenFeedWrapper}
-                        type='button'
-                      >
-                        <IoAddCircle size={30} />
-                      </button>
                     </div>
 
                     {/* Feeds contianer*/}
-                    <div className='flex w-full flex-wrap'>
-                      {entryForm.feeds.map((feed, index) => (
-                        <div key={index} className='w-1/3 p-2'>
-                          <button
-                            type='button'
-                            key={index}
-                            className='bg-STUColor w-full h-full p-2 rounded-md hover:bg-red flex justify-between items-center text-white gap-5 font-bold'
-                            onClick={() => handleRemoveFeed(index)}
-                          >
-                            {feed.title}
-                            <MdRemoveCircle size={20} />
-                          </button>
-                        </div>
-                      ))}
+                    <div className='flex flex-col w-full min-h-72'>
+                      <FeedMenu
+                        activeFeeds={activeFeeds}
+                        setActiveFeeds={setActiveFeeds}
+                      />
                     </div>
                   </div>
                 </div>
-                <div className='w-full flex justify-end gap-5'>
+                <div className='w-full flex justify-end gap-4'>
                   <PreviousButton />
                   <NextButton />
                 </div>
@@ -604,16 +540,19 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
             {/* Step 4: CITATION */}
             {stepIndex === 3 && (
               <form
-                className='w-full h-full py-5 flex flex-col justify-start items-center rounded-md gap-5'
+                className='w-full h-full bg-zinc-100 dark:bg-darkGray p-4 flex flex-col justify-start items-center rounded-md gap-4'
                 onSubmit={handleSubmitStepFour}
               >
+                <span className='text-3xl font-extrabold '>
+                  {t('entry.wizard.citation')}
+                </span>
                 <CustomTextArea
                   onChange={handleCitationChange}
                   placeholder={t('entry.wizard.citation')}
                   value={entryForm.citation}
                 />
 
-                <div className='w-full flex justify-end gap-5 pt-7'>
+                <div className='w-full flex justify-end gap-4 pt-7'>
                   <PreviousButton />
                   <NextButton />
                 </div>
@@ -623,10 +562,13 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
             {/* Step 5: IMAGE & PDF */}
             {stepIndex === 4 && (
               <form
-                className='w-full h-full py-5 flex flex-col justify-start items-center rounded-md gap-5'
+                className='w-full h-full bg-zinc-100 dark:bg-darkGray p-4 flex flex-col justify-start items-center rounded-md gap-4'
                 onSubmit={handleSubmitStepFive}
               >
-                <div className='w-full h-full flex flex-col bg-lightGray dark:bg-darkGray rounded-md p-5 gap-5'>
+                <span className='text-3xl font-extrabold '>
+                  {t('entry.wizard.imageAndFile')}
+                </span>
+                <div className='w-full h-full flex flex-col bg-lightGray dark:bg-darkGray rounded-md p-4 gap-4'>
                   {/* IMAGE */}
                   <Dropzone
                     title={t('entry.wizard.image')}
@@ -646,7 +588,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                     hint={t('entry.wizard.pdfHint')}
                   />
                 </div>
-                <div className='w-full flex justify-end gap-5'>
+                <div className='w-full flex justify-end gap-4'>
                   <PreviousButton />
                   <NextButton end />
                 </div>
@@ -655,20 +597,13 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
           </div>
         </div>
       </div>
-      {openFeeds && (
-        <ModalWrapper
-          onClick={handleAddFeeds}
-          buttonLabel={t('modal.feedMenu.label')}
-          setOpen={setOpenFeeds}
-          title={t('modal.feedMenu.title')}
-        >
-          <FeedMenu
-            isLoading={isLoading}
-            activeFeeds={activeFeeds}
-            setActiveFeeds={setActiveFeeds}
-            feeds={feeds}
-          />
-        </ModalWrapper>
+      {openApplyInfo && identifierType && (
+        <ApplyInfoDialog
+          type={identifierType}
+          identifier={identifier}
+          close={setOpenApplyInfo}
+          yes={handleApplyInfo}
+        />
       )}
     </>
   );

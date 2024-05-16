@@ -1,22 +1,17 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { IEntry } from '../../utils/interfaces/entry';
-import PageLoading from '../../components/page/PageLoading';
 import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import {
   NAVIGATION_PATHS,
   THEME_TYPE,
 } from '../../utils/interfaces/general/general';
-import SwiperEntry from '../../components/entry/SwiperEntry';
 import EntryDetail from '../../components/entry/EntryDetail';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useCustomEffect from '../../hooks/useCustomEffect';
 import { IoSearchOutline } from 'react-icons/io5';
-import { Autoplay } from 'swiper/modules';
-import { Swiper, SwiperSlide } from 'swiper/react';
-
-const delay = 5000;
+import EntrySwiper from '../../components/entry/swiper/EntrySwiper';
 
 const Home = () => {
   const { t } = useTranslation();
@@ -80,9 +75,7 @@ const Home = () => {
     else setActiveEntryId(null);
   }, [searchParams]);
 
-  return isLoading ? (
-    <PageLoading />
-  ) : (
+  return (
     <>
       <div className='flex-1 p-4'>
         <div className='flex items-center flex-col gap-10 py-20'>
@@ -112,55 +105,25 @@ const Home = () => {
         </div>
 
         <h1 className='text-lg mb-2 font-medium'>{t('home.popular')}</h1>
-        <Swiper
-          slidesPerView='auto'
-          loop
-          autoplay={{
-            delay,
-            disableOnInteraction: false,
-          }}
-          modules={[Autoplay]}
-        >
-          {popularEntries.map((entry, index) => (
-            <SwiperSlide className='max-w-52' key={index}>
-              <SwiperEntry
-                clickedEntry={clickedEntry}
-                setClickedEntry={setClickedEntry}
-                type='popular'
-                entry={entry}
-                isActive={
-                  clickedEntry === 'popular' && activeEntryId === entry.id
-                }
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        <EntrySwiper
+          isLoading={isLoading}
+          entries={popularEntries}
+          setClickedEntry={setClickedEntry}
+          clickedEntry={clickedEntry}
+          activeEntryId={activeEntryId}
+          type='popular'
+        />
 
         <h1 className='text-lg mb-2 font-medium'>{t('home.lastAdded')}</h1>
-        <Swiper
-          slidesPerView='auto'
-          loop
-          autoplay={{
-            delay,
-            reverseDirection: true,
-            disableOnInteraction: false,
-          }}
-          modules={[Autoplay]}
-        >
-          {lastAddedEntries.map((entry, index) => (
-            <SwiperSlide className='max-w-52' key={index}>
-              <SwiperEntry
-                clickedEntry={clickedEntry}
-                setClickedEntry={setClickedEntry}
-                type='lastAdded'
-                entry={entry}
-                isActive={
-                  clickedEntry === 'lastAdded' && activeEntryId === entry.id
-                }
-              />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+        <EntrySwiper
+          isLoading={isLoading}
+          entries={lastAddedEntries}
+          setClickedEntry={setClickedEntry}
+          clickedEntry={clickedEntry}
+          activeEntryId={activeEntryId}
+          type='lastAdded'
+          reverseDirection
+        />
       </div>
       {activeEntryId && <EntryDetail />}
     </>

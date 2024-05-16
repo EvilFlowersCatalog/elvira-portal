@@ -111,7 +111,7 @@ export interface IEntryInfo {
     title: string;
     publisher: string;
     doi: string;
-    authorss: IEntryAuthor[];
+    authors: IEntryAuthor[];
     year: string;
     language: string;
     bibtex: string;

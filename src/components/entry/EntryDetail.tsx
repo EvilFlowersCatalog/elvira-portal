@@ -108,7 +108,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
 
   return (
     <div
-      className={`fixed top-0 right-0 z-50 h-full w-full md:w-2/4 lg:w-2/5 xl:w-1/4 bg-darkGray bg-opacity-95 flex flex-col p-4`}
+      className={`fixed top-0 right-0 z-50 h-full w-full md:w-2/4 lg:w-2/5 xl:w-1/4 bg-darkGray bg-opacity-95 flex flex-col p-4 overflow-auto`}
     >
       <button
         className='bg-STUColor text-white h-fit w-fit rounded-md p-2 mb-4'
@@ -124,7 +124,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
           <CircleLoader color={STUColor} size={50} />
         </div>
       ) : (
-        <div className={'flex-1 flex flex-col overflow-auto'}>
+        <div className={'flex-1 flex flex-col'}>
           <div className={'flex flex-col gap-2 justify-center items-center'}>
             <div
               className={
@@ -173,20 +173,22 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                 />
               </div>
             </div>
-            <span className={'text-white text-center font-bold'}>
-              {entry.response.authors[0].name}{' '}
-              {entry.response.authors[0].surname}
-            </span>
-            {entry.response.authors.slice(1).length > 0 && (
-              <div
-                className={`flex flex-col items-center text-zinc-300 text-center overflow-hidden`}
-              >
-                {entry.response.authors.slice(1).map((author, index) => (
-                  <span key={index}>
-                    {author.name} {author.surname}
-                  </span>
-                ))}
-              </div>
+            {entry.response.authors.length > 0 && (
+              <>
+                <span className={'text-white text-center font-bold'}>
+                  {entry.response.authors[0].name}{' '}
+                  {entry.response.authors[0].surname}
+                </span>
+                <div
+                  className={`flex flex-col items-center text-zinc-300 text-center`}
+                >
+                  {entry.response.authors.slice(1).map((author, index) => (
+                    <span key={index}>
+                      {author.name} {author.surname}
+                    </span>
+                  ))}
+                </div>
+              </>
             )}
             <div
               className={

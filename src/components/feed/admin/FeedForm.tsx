@@ -1,11 +1,4 @@
-import {
-  ChangeEvent,
-  FormEvent,
-  InvalidEvent,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import { ChangeEvent, FormEvent, InvalidEvent, useRef, useState } from 'react';
 import CustomInput from '../../common/CustomInput';
 import ModalWrapper from '../../modal/ModalWrapper';
 import useGetFeeds from '../../../hooks/api/feeds/useGetFeeds';
@@ -19,12 +12,20 @@ import useUploadFeed from '../../../hooks/api/feeds/useUploadFeed';
 import useEditFeed from '../../../hooks/api/feeds/useEditFeed';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
+import useCustomEffect from '../../../hooks/useCustomEffect';
 
 interface IFeedForm {
   setOpen: (open: boolean) => void;
   feedId?: string | null;
+  reloadPage: boolean;
+  setReloadPage: (reloadPage: boolean) => void;
 }
-const FeedForm = ({ setOpen, feedId = null }: IFeedForm) => {
+const FeedForm = ({
+  setOpen,
+  feedId = null,
+  reloadPage,
+  setReloadPage,
+}: IFeedForm) => {
   const { STUColor } = useAppContext();
   const { t } = useTranslation();
   const [form, setForm] = useState<IFeedNew>({
@@ -72,7 +73,7 @@ const FeedForm = ({ setOpen, feedId = null }: IFeedForm) => {
   const handleParentChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setForm((prevForm) => ({
       ...prevForm, // Preserve existing properties of feedForm
-      parents: e.target.value === 'none' ? undefined : [e.target.value],
+      parents: e.target.value === 'none' ? [] : [e.target.value],
     }));
   };
 
@@ -84,7 +85,7 @@ const FeedForm = ({ setOpen, feedId = null }: IFeedForm) => {
     e.target.setCustomValidity(t('modal.feedForm.requiredMessages.content'));
   };
 
-  useEffect(() => {
+  useCustomEffect(() => {
     const parentId = searchParams.get('parent-id') ?? '';
     if (parentId) {
       setParentFeedId(parentId);
@@ -94,33 +95,34 @@ const FeedForm = ({ setOpen, feedId = null }: IFeedForm) => {
       }));
     }
 
-    const loadFeeds = async () => {
-      setIsLoading(true);
-      const parentFeeds = await getFeeds({
-        page: 1,
-        limit: 100,
-        parentId: 'null',
-      });
-      setFeeds(parentFeeds);
-      setIsLoading(false);
-    };
+    try {
+      (async () => {
+        setIsLoading(true);
+        const parentFeeds = await getFeeds({
+          paginate: false,
+          parentId: 'null',
+        });
+        setFeeds(parentFeeds);
+        setIsLoading(false);
+      })();
 
-    const loadFeedDetail = async () => {
-      const { response } = await getFeedDetail(feedId!);
+      const loadFeedDetail = async () => {
+        const { response } = await getFeedDetail(feedId!);
 
-      setForm({
-        catalog_id: response.catalog_id,
-        url_name: response.url_name,
-        title: response.title,
-        content: response.content,
-        parents: response.parents,
-        kind: response.kind,
-      });
-    };
+        setForm({
+          catalog_id: response.catalog_id,
+          url_name: response.url_name,
+          title: response.title,
+          content: response.content,
+          parents: response.parents,
+          kind: response.kind,
+        });
+      };
 
-    if (feedId) loadFeedDetail();
-
-    loadFeeds();
+      if (feedId) loadFeedDetail();
+    } catch {
+      setOpen(false);
+    }
   }, []);
 
   const uploadOReditFeed = async (e: FormEvent<HTMLFormElement>) => {
@@ -133,11 +135,13 @@ const FeedForm = ({ setOpen, feedId = null }: IFeedForm) => {
         await uploadFeed(form);
         toast.success(t('notifications.feed.add.success'));
       }
+
+      setReloadPage(!reloadPage); // trigger refresh
     } catch {
       if (feedId) toast.error(t('notifications.feed.edit.error'));
-      else console.log(t('notifications.feed.add.error'));
+      else toast.error(t('notifications.feed.add.error'));
     } finally {
-      // setRefreshPage(!refreshPage); // trigger refresh
+      setOpen(false);
     }
   };
 
@@ -146,15 +150,15 @@ const FeedForm = ({ setOpen, feedId = null }: IFeedForm) => {
       title={
         feedId ? t('modal.feedForm.editFeed') : t('modal.feedForm.addFeed')
       }
-      setOpen={setOpen}
+      close={setOpen}
       buttonLabel={feedId ? t('modal.feedForm.edit') : t('modal.feedForm.add')}
-      onClick={() => {
+      yes={() => {
         buttonRef.current?.click();
       }}
     >
       <form
         onSubmit={uploadOReditFeed}
-        className='w-[30vw] flex flex-col gap-5 items-start justify-start'
+        className='w-full h-full flex flex-col gap-5 items-start justify-start'
       >
         {/* Title */}
         <CustomInput
@@ -173,14 +177,14 @@ const FeedForm = ({ setOpen, feedId = null }: IFeedForm) => {
           onInvalid={handleContentInvalid}
         />
         {/* Kind */}
-        <div className='flex w-full flex-col text-left text-white'>
-          <label htmlFor='selection-kind' className='text-sm pl-2'>
+        <div className='flex w-full flex-col text-left'>
+          <label htmlFor='selection-kind' className='text-sm pl-1'>
             {t('modal.feedForm.kind')}
           </label>
           <select
             id='selection-kind'
             defaultValue='acquistion'
-            className='w-full border-gray border-2 bg-darkGray rounded-md outline-none p-2 cursor-pointer'
+            className='w-full bg-white dark:bg-gray rounded-md outline-none p-2 cursor-pointer'
             onChange={handleKindChange}
           >
             <option value='acquisition'>
@@ -195,14 +199,14 @@ const FeedForm = ({ setOpen, feedId = null }: IFeedForm) => {
             <CircleLoader color={STUColor} size={50} />
           </div>
         ) : (
-          <div className='flex w-full flex-col text-left text-white cursor-pointer'>
-            <label htmlFor='selection-parent' className='text-sm pl-2'>
-              {t('parent')}
+          <div className='flex w-full flex-col text-left cursor-pointer'>
+            <label htmlFor='selection-parent' className='text-sm pl-1'>
+              {t('modal.feedForm.parent')}
             </label>
             <select
               id='selection-parent'
-              defaultValue={parentFeedId ? parentFeedId : undefined}
-              className='w-full border-gray border-2 bg-darkGray rounded-md outline-none p-2 cursor-pointer'
+              defaultValue={parentFeedId ? parentFeedId : 'none'}
+              className='w-full bg-white dark:bg-gray rounded-md outline-none p-2 cursor-pointer'
               onChange={handleParentChange}
             >
               <option value='none'>{t('modal.feedForm.none')}</option>

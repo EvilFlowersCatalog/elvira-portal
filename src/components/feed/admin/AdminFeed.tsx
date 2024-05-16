@@ -11,9 +11,11 @@ import { useTranslation } from 'react-i18next';
 
 interface IFeedParams {
   feed: IFeed;
+  reloadPage: boolean;
+  setReloadPage: (reloadPage: boolean) => void;
 }
 
-const AdminFeed = ({ feed }: IFeedParams) => {
+const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isHovering, setIsHovering] = useState<boolean>(false);
@@ -28,10 +30,11 @@ const AdminFeed = ({ feed }: IFeedParams) => {
   const handleDelete = async () => {
     try {
       await deleteFeed(feed.id);
-      // setRefreshPage(!refreshPage); // trigger refresh
-      toast.success(t('notifications.feed.delete.success'));
+      setReloadPage(!reloadPage); // trigger refresh
+
+      toast.success(t('notifications.feed.remove.success'));
     } catch {
-      toast.error(t('notifications.feed.delete.error'));
+      toast.error(t('notifications.feed.remove.error'));
     } finally {
       setShowDeleteMenu(false);
     }
@@ -48,12 +51,20 @@ const AdminFeed = ({ feed }: IFeedParams) => {
 
   return (
     <>
-      {showForm && <FeedForm setOpen={setShowForm} feedId={feed.id} />}
+      {showForm && (
+        <FeedForm
+          setOpen={setShowForm}
+          feedId={feed.id}
+          reloadPage={reloadPage}
+          setReloadPage={setReloadPage}
+        />
+      )}
       {showDeleteMenu && (
         <Confirmation
           name={feed.title}
-          setOpen={setShowDeleteMenu}
-          handleDelete={handleDelete}
+          close={setShowDeleteMenu}
+          yes={handleDelete}
+          type='feed'
         />
       )}
       <div

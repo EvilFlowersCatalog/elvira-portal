@@ -208,12 +208,14 @@ export const en = {
         label: 'Apply',
         title: 'Information',
         dialog:
-          'Do you wish to apply the information obtained from the identifier?',
+          'Do you wish to apply the information obtained from your {{x}} identifier: {{y}}?',
       },
       confirmation: {
         label: 'Delete',
         title: 'Confirmation for delete',
-        dialog: 'Are you sure you want to delete {{x}}?',
+        dialog: 'Are you sure you want to delete "{{x}}" {{y}}?',
+        entry: 'entry',
+        feed: 'feed',
       },
       feedForm: {
         edit: 'edit',

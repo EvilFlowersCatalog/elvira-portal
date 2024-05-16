@@ -7,7 +7,6 @@ import {
 } from '../../utils/interfaces/acquisition';
 import useCreateUserAcquisition from '../../hooks/api/acquisitiions/useCreateUserAcquisition';
 import {
-  IZotero,
   NAVIGATION_PATHS,
   THEME_TYPE,
 } from '../../utils/interfaces/general/general';
@@ -25,8 +24,7 @@ import useAuthContext from '../../hooks/contexts/useAuthContext';
 const rootId = 'pdf-viewer-page';
 
 const Viewer = () => {
-  const { lang, theme, STUColor, titleLogoDark, titleLogoLight } =
-    useAppContext();
+  const { lang, theme, titleLogoDark, titleLogoLight } = useAppContext();
   const { auth } = useAuthContext();
   const { 'entry-id': id } = useParams();
   const { t } = useTranslation();
@@ -35,6 +33,7 @@ const Viewer = () => {
   const getEntryDetail = useGetEntryDetail();
   const getUserAcquisition = useGetUserAcquisition();
   const [loading, setLoading] = useState<boolean>(true);
+  const [progressBar, setProgressBar] = useState<number>(0);
 
   let acquisition_id = '';
 
@@ -70,8 +69,11 @@ const Viewer = () => {
 
     (async () => {
       try {
+        setProgressBar(30);
         const { response: entryDetail } = await getEntryDetail(id!);
         const responseAcquisitionId = entryDetail.acquisitions[0].id;
+
+        setProgressBar(50);
 
         // Set acquistion id for usage in share
         acquisition_id = responseAcquisitionId;
@@ -87,42 +89,36 @@ const Viewer = () => {
           acquisition
         );
 
-        const zotero: IZotero = {
-          title: entryDetail.title,
-          authors: entryDetail.authors
-            .map((author) => author.name + ', ' + author.surname)
-            .join('; '),
-          firstPage: 1,
-          publisher: entryDetail.publisher,
-          doi: entryDetail.identifiers.doi,
-          isbn: entryDetail.identifiers.isbn,
-          year: entryDetail.year,
-          pdfUrl: userAcquisition.url,
-        };
+        // Update metatags
+        if (entryDetail.year) updateMetaTag('citation_year', entryDetail.year);
+        if (entryDetail.publisher)
+          updateMetaTag('citation_publisher', entryDetail.publisher);
+        if (entryDetail.identifiers.doi)
+          updateMetaTag('citation_doi', entryDetail.identifiers.doi);
+        if (entryDetail.identifiers.isbn)
+          updateMetaTag('citation_isbn', entryDetail.identifiers.isbn);
+        if (entryDetail.authors.length > 0)
+          updateMetaTag(
+            'citation_authors',
+            entryDetail.authors
+              .map((author) => author.name + ', ' + author.surname)
+              .join('; ')
+          );
+
+        updateMetaTag('citation_title', entryDetail.title);
+        updateMetaTag('citation_first_page', '1');
+        updateMetaTag(
+          'citation_pdf_url',
+          userAcquisition.url + `?access_token=${auth?.token}`
+        );
+
+        setProgressBar(70);
 
         // Get pdf
         const { data } = await getUserAcquisition(userAcquisition.id);
-        const pdf = await data;
+        setProgressBar(90);
 
-        updateMetaTag('citation_title', zotero.title);
-        if (zotero.year) updateMetaTag('citation_year', zotero.year);
-        if (zotero.journalTitle)
-          updateMetaTag('citation_journal_title', zotero.journalTitle);
-        if (zotero.firstPage)
-          updateMetaTag('citation_first_page', zotero.firstPage.toString());
-        if (zotero.lastPage)
-          updateMetaTag('citation_last_page', zotero.lastPage.toString());
-        if (zotero.publisher)
-          updateMetaTag('citation_publisher', zotero.publisher);
-        if (zotero.doi) updateMetaTag('citation_doi', zotero.doi);
-        if (zotero.isbn) updateMetaTag('citation_isbn', zotero.isbn);
-        if (zotero.abstract)
-          updateMetaTag('citation_abstract', zotero.abstract);
-        updateMetaTag('citation_authors', zotero.authors);
-        updateMetaTag(
-          'citation_pdf_url',
-          zotero.pdfUrl + `?access_token=${auth?.token}`
-        );
+        const pdf = await data;
 
         // Render viewer and set options
         renderViewer(rootId, pdf, {
@@ -136,7 +132,7 @@ const Viewer = () => {
         navigate(NAVIGATION_PATHS.home, { replace: true });
         toast.error(t('notifications.fileFailed'));
       } finally {
-        setLoading(false);
+        setProgressBar(100);
       }
     })();
 
@@ -161,12 +157,19 @@ const Viewer = () => {
     };
   }, [id]);
 
+  // If everything loaded set to false
+  useCustomEffect(() => {
+    if (progressBar === 100) {
+      setTimeout(() => setLoading(false), 500);
+    }
+  }, [progressBar]);
+
   return (
     <>
       {loading && (
         <div
           className={
-            'fixed top-0 bottom-0 left-0 right-0 bg-gray bg-opacity-80 z-50 flex flex-col gap-10 justify-center items-center'
+            'fixed top-0 bottom-0 left-0 right-0 bg-white dark:bg-gray bg-opacity-80 dark:bg-opacity-80 z-50 flex flex-col gap-10 justify-center items-center'
           }
         >
           <img
@@ -174,7 +177,12 @@ const Viewer = () => {
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
             alt='Elvira Logo'
           />
-          <CircleLoader color={STUColor} size={100} />
+          <div className='w-[90%] max-w-96 h-4 bg-zinc-300 dark:bg-strongDarkGray rounded-md overflow-hidden'>
+            <div
+              className='h-full bg-STUColor duration-500 rounded-md'
+              style={{ width: `${progressBar}%` }}
+            ></div>
+          </div>
         </div>
       )}
       <div id={rootId}></div>

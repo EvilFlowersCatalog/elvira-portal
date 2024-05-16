@@ -1,12 +1,22 @@
 # Changelog
 
-## 3.1.0 : 2024-05-13
+## 3.1.0 : TBD
 
 - **Added**: ALT in every img entity
+- **Added**: Loading progress bar in viewer
+- **Added**: Edit page for entries
+- **Added**: Confiration dialog for appling identifier info
+- **Added**: Edit and add for feeds
 - **Changed**: Viewer version from 0.4.21 to 0.4.24
+- **Changed**: In `AdminAddEntry` page in step one (identifiers) 2 inputs to 1
+- **Changed**: Entries loading
+- **Changed**: Modal
 - **Changed**: Favicon to transparent and size 32x32
 - **Changed**: README.md
 - **Changed**: `Entry.thumbnail` now contains URL path instead of base64
+- **Fixed**: Scroll in `EntryDetail`
+- **Fixed**: API for getting data from identifier
+- **Fixed**: Checking if `entry.authors.lenght` is > 0 befor accesing it
 - **Removed**: In `useUserAcquistion` format
 
 ## 3.0.18 : 2024-05-10

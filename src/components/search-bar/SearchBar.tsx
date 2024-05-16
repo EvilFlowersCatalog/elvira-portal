@@ -1,15 +1,13 @@
 import { RiArrowRightDoubleFill } from 'react-icons/ri';
-import useAppContext from '../../../hooks/contexts/useAppContext';
+import useAppContext from '../../hooks/contexts/useAppContext';
 import { useTranslation } from 'react-i18next';
 import { ChangeEvent, FormEvent, useState } from 'react';
-import useGetFeeds from '../../../hooks/api/feeds/useGetFeeds';
+import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
 import { useSearchParams } from 'react-router-dom';
-import useCustomEffect from '../../../hooks/useCustomEffect';
-import { IFeed } from '../../../utils/interfaces/feed';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
-import FeedMenu from '../../feed/FeedMenu';
-import Button from '../../common/Button';
+import FeedMenu from '../feed/FeedMenu';
+import Button from '../common/Button';
 
 interface ISearchBarInputParams {
   name: string;
@@ -39,8 +37,6 @@ const SearchBarInput = ({
 const SearchBar = () => {
   const { setShowSearchBar, isSmallDevice } = useAppContext();
   const { t } = useTranslation();
-  const [feeds, setFeeds] = useState<IFeed[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [activeFeeds, setActiveFeeds] = useState<
     { title: string; id: string }[]
   >([]);
@@ -85,20 +81,6 @@ const SearchBar = () => {
 
     setSearchParams(searchParams);
   };
-
-  useCustomEffect(() => {
-    (async () => {
-      try {
-        const { items } = await getFeeds({
-          paginate: false,
-          kind: 'acquisition',
-        });
-        setFeeds(items);
-      } finally {
-        setIsLoading(false);
-      }
-    })();
-  }, []);
 
   return (
     <div
@@ -185,10 +167,8 @@ const SearchBar = () => {
           <span>{t('searchBar.feeds')}</span>
           <div className='overflow-auto mt-2 w-full'>
             <FeedMenu
-              isLoading={isLoading}
               activeFeeds={activeFeeds}
               setActiveFeeds={setActiveFeeds}
-              feeds={feeds}
               searchBar
             />
           </div>

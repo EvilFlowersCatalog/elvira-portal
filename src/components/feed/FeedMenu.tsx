@@ -3,26 +3,43 @@ import { IFeed } from '../../utils/interfaces/feed';
 import { useTranslation } from 'react-i18next';
 import { CircleLoader } from 'react-spinners';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import useCustomEffect from '../../hooks/useCustomEffect';
+import { useState } from 'react';
+import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
 
 interface IFeedMenuParams {
-  isLoading: boolean;
   activeFeeds: { title: string; id: string }[];
   setActiveFeeds: (activeFeeds: { title: string; id: string }[]) => void;
-  feeds: IFeed[];
   searchBar?: boolean;
 }
 const FeedMenu = ({
-  isLoading,
   activeFeeds,
   setActiveFeeds,
-  feeds,
   searchBar = false,
 }: IFeedMenuParams) => {
   const { t } = useTranslation();
   const { STUColor } = useAppContext();
+  const [feeds, setFeeds] = useState<IFeed[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  const getFeeds = useGetFeeds();
+
+  useCustomEffect(() => {
+    (async () => {
+      try {
+        const { items } = await getFeeds({
+          paginate: false,
+          kind: 'acquisition',
+        });
+        setFeeds(items);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, []);
 
   return isLoading ? (
-    <div className='flex justify-center'>
+    <div className='flex flex-1 justify-center items-center'>
       <CircleLoader color={STUColor} size={50} />
     </div>
   ) : feeds.length === 0 ? (
@@ -35,9 +52,9 @@ const FeedMenu = ({
         {activeFeeds.map((feeds, index) => (
           <div
             key={index}
-            className={
+            className={`${
               searchBar ? 'w-full' : 'w-full sm:w-1/2 md:w-1/3 lg:w-1/4'
-            }
+            } p-1`}
           >
             <button
               type='button'

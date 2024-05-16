@@ -28,15 +28,15 @@ export const sk = {
       },
       feed: {
         add: {
-          success: 'Skupina bola úspešne pridaný.',
+          success: 'Skupina bola úspešne pridaná.',
           error: 'Skupinu sa nepodarilo pridať.',
         },
         edit: {
-          success: 'Skupina bola úspešne upravený.',
+          success: 'Skupina bola úspešne upravená.',
           error: 'Skupinu sa nepodarilo upraviť.',
         },
         remove: {
-          success: 'Skupina bola úspešne odstránený.',
+          success: 'Skupina bola úspešne odstránená.',
           error: 'Skupinu sa nepodarilo odstrániť.',
         },
       },
@@ -165,7 +165,7 @@ export const sk = {
         year: 'Rok',
         publisher: 'Vydavateľ',
         summary: 'Zhrnutie',
-        AuthorsAndFeeds: 'Autori & Skupiny',
+        AuthorsAndFeeds: 'Autori a Skupiny',
         author: 'Autor',
         authorName: 'Autorové meno',
         authorSurname: 'Autorové priezvisko',
@@ -173,7 +173,7 @@ export const sk = {
         coSurname: 'Spolu-Autorové priezvisko',
         feeds: 'Skupiny',
         citation: 'Citácia',
-        imageAndFile: 'Obrázok & PDF',
+        imageAndFile: 'Obrázok a PDF',
         image: 'Obrázok',
         imageHint: 'Presuňte sem váš obrázok alebo kliknite na prehľadávanie',
         pdfHint: 'Presuňte sem váš PDF súbor alebo kliknite na prehľadávanie',
@@ -201,12 +201,15 @@ export const sk = {
       applyInfo: {
         label: 'Aplikovať',
         title: 'Informácie',
-        dialog: 'Želáte si aplikovať získané informácie z identifikátora?',
+        dialog:
+          'Želáte si aplikovať získané informácie z vášho {{x}} identifikátora: {{y}}?',
       },
       confirmation: {
         label: 'Vymazať',
         title: 'Potvdenie o vymazaní',
-        dialog: 'Ste si istý, že chcete odstrániť {{x}}?',
+        dialog: 'Ste si istý, že chcete odstrániť "{{x}}" {{y}}?',
+        entry: 'publikáciu',
+        feed: 'skupinu',
       },
       feedForm: {
         edit: 'Upraviť',

@@ -1,21 +1,20 @@
 import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import Button from '../common/Button';
+import { IModalParams } from '../../utils/interfaces/general/general';
 
-interface IModalWrapperParams {
-  setOpen: (open: boolean) => void;
+interface IModalWrapperParams extends IModalParams {
   title: string;
   children: ReactNode;
   buttonLabel: string;
-  onClick: (any: any) => any;
 }
 
 const ModalWrapper = ({
-  setOpen,
+  close,
   title,
   children,
   buttonLabel,
-  onClick,
+  yes,
 }: IModalWrapperParams) => {
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -25,11 +24,11 @@ const ModalWrapper = ({
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.code.toLocaleLowerCase() === 'escape') {
-      setOpen(false);
+      close(false);
     }
   };
-  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
-    setOpen(false);
+  const handleClick = () => {
+    close(false);
   };
 
   return (
@@ -40,29 +39,31 @@ const ModalWrapper = ({
       tabIndex={-1}
       ref={ref}
     >
-      <div
-        className='flex flex-col justify-center items-start p-5 bg-lightGray dark:bg-darkGray w-[90%] h-fit min-h-96 max-h-[50%] md:max-w-[50%]  rounded-md'
-        onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
-      >
-        {/* Header */}
-        <div className='relative flex w-full justify-center items-center gap-5'>
-          <span className='text-xl font-bold text-STUColor uppercase'>
-            {title}
-          </span>
-          <button
-            className='absolute -top-3 -right-3 text-darkGray dark:text-white hover:text-STUColor dark:hover:text-STUColor'
-            onClick={() => setOpen(false)}
-          >
-            <IoMdClose size={30} />
-          </button>
-        </div>
-        <div className='py-5 overflow-auto text-center h-full w-full'>
-          {children}
-        </div>
-        <div className='w-full flex justify-center'>
-          <Button onClick={onClick}>
-            <span>{buttonLabel}</span>
-          </Button>
+      <div className='w-full h-full p-4 overflow-auto flex justify-start sm:justify-center items-center'>
+        <div
+          className='flex flex-col justify-start p-5 bg-zinc-100 dark:bg-darkGray min-w-64 h-fit w-fit lg:max-w-[50%] rounded-md'
+          onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
+        >
+          {/* Header */}
+          <div className='relative flex w-full justify-center items-center gap-5'>
+            <span className='text-xl font-bold text-STUColor uppercase text-center'>
+              {title}
+            </span>
+            <button
+              className='absolute -top-3 -right-3 hover:text-STUColor'
+              onClick={handleClick}
+            >
+              <IoMdClose size={30} />
+            </button>
+          </div>
+          <div className='py-5 overflow-auto text-center justify-center items-center flex flex-1'>
+            {children}
+          </div>
+          <div className='flex justify-center'>
+            <Button onClick={yes}>
+              <span>{buttonLabel}</span>
+            </Button>
+          </div>
         </div>
       </div>
     </div>

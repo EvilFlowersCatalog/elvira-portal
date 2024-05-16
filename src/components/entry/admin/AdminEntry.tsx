@@ -17,9 +17,11 @@ interface IEntryParams {
 
 const AdminEntry = ({ entry }: IEntryParams) => {
   const { auth } = useAuthContext();
-  const { showSearchBar } = useAppContext();
-  const [showDeleteMenu, setShowDeleteMenu] = useState<boolean>(false);
   const { t } = useTranslation();
+  const { showSearchBar, isSmallDevice } = useAppContext();
+  const [showDeleteMenu, setShowDeleteMenu] = useState<boolean>(false);
+  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
+
   const navigate = useNavigate();
   const deleteEntry = useDeleteEntry();
 
@@ -31,6 +33,8 @@ const AdminEntry = ({ entry }: IEntryParams) => {
       toast.success(t('notifications.entry.remove.success')); // notify success
     } catch {
       toast.error(t('notifications.entry.remove.error')); // notify error
+    } finally {
+      setShowDeleteMenu(false);
     }
   };
 
@@ -39,13 +43,14 @@ const AdminEntry = ({ entry }: IEntryParams) => {
       {showDeleteMenu && (
         <ConfirmationDialog
           name={entry.title}
-          setOpen={setShowDeleteMenu}
-          handleDelete={handleDelete}
+          close={setShowDeleteMenu}
+          yes={handleDelete}
+          type='entry'
         />
       )}
       <div
         className={`flex p-2.5 w-full sm:w-1/2 md:w-1/4 ${
-          showSearchBar
+          !isSmallDevice && showSearchBar
             ? 'lg:w-1/3 xl:w-1/4 xxl:w-1/6'
             : 'xl:w-1/5 xxl:w-[14.28%]'
         }`}
@@ -54,14 +59,15 @@ const AdminEntry = ({ entry }: IEntryParams) => {
           className={`flex flex-col justify-center p-2 w-full gap-2 rounded-md text-left bg-zinc-100 dark:bg-darkGray`}
         >
           <div
-            className={
-              'w-full h-auto rounded-md border border-gray overflow-hidden'
-            }
+            className={`w-full ${
+              imageLoaded ? 'h-auto' : 'h-64'
+            } rounded-md border border-gray overflow-hidden`}
           >
             <img
               className={`w-full h-full duration-1000`}
               src={entry.thumbnail + `?access_token=${auth?.token}`}
               alt='Entry Thumbnail'
+              onLoad={() => setImageLoaded(true)}
             />
           </div>
           <span
@@ -70,9 +76,11 @@ const AdminEntry = ({ entry }: IEntryParams) => {
             {entry.title}
           </span>
           <span className={'flex-1'}></span>
-          <span className={`text-xs text-zinc-400 `}>
-            {entry.authors[0].name} {entry.authors[0].surname}
-          </span>
+          {entry.authors.length > 0 && (
+            <span className={`text-xs text-zinc-400 `}>
+              {entry.authors[0].name} {entry.authors[0].surname}
+            </span>
+          )}
           <div className='flex gap-2'>
             <button
               className='flex flex-1 justify-center py-2 bg-green text-white rounded-md hover:bg-zinc-100 dark:hover:bg-darkGray hover:text-green duration-200'
