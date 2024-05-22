@@ -34,7 +34,7 @@ export interface IEntryDetail {
     feeds: IFeed[];
     language: IEntryLanguage;
     title: string;
-    year: string;
+    published_at: string;
     publisher: string;
     created_at: string;
     updated_at: string;
@@ -68,7 +68,7 @@ export interface IEntryNew {
   language_code: string;
   identifiers: IEntryIdentifiers;
   citation: string;
-  year: string;
+  published_at: string;
   publisher: string;
   image: any;
 }
@@ -84,7 +84,7 @@ export interface IEntryNewForm {
   language_code: string;
   identifiers: IEntryIdentifiers;
   citation: string;
-  year: string;
+  published_at: string;
   publisher: string;
   image: File | null;
   pdf: File | null;
@@ -112,7 +112,7 @@ export interface IEntryInfo {
     publisher: string;
     doi: string;
     authors: IEntryAuthor[];
-    year: string;
+    published_at: string;
     language: string;
     bibtex: string;
   };

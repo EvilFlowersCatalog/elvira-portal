@@ -120,7 +120,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
       isbn: form?.response.identifiers.isbn ?? '',
     },
     citation: form?.response.citation ?? '',
-    year: form?.response.year ?? '',
+    published_at: form?.response.published_at ?? '',
     publisher: form?.response.publisher ?? '',
     image: convertToImageFile(form?.response.thumbnail),
     pdf: null,
@@ -212,7 +212,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
         isbn: entryForm.identifiers.isbn,
       },
       citation: entryForm.citation,
-      year: entryForm.year,
+      published_at: entryForm.published_at,
       publisher: entryForm.publisher,
       image: await getBase64(entryForm.image),
     };
@@ -246,7 +246,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
       title: entryInfo?.response.title ?? '',
       authors: entryInfo?.response.authors ?? [],
       publisher: entryInfo?.response.publisher ?? '',
-      year: entryInfo?.response.year ?? '',
+      published_at: entryInfo?.response.published_at ?? '',
       language_code: entryInfo?.response.language ?? '',
       citation: entryInfo?.response.bibtex ?? '',
     }));
@@ -266,7 +266,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
   const handleYearChange = (event: ChangeEvent<HTMLInputElement>) => {
     setEntryForm((prevForm) => ({
       ...prevForm, // Preserve existing properties of entryForm
-      year: event.target.value, // Update the year property
+      published_at: event.target.value, // Update the published_at property
     }));
   };
   const handlePublisherChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -408,8 +408,8 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                 />
                 <CustomInput
                   onChange={handleYearChange}
-                  placeholder={t('entry.wizard.year')}
-                  value={entryForm.year}
+                  placeholder={t('entry.wizard.published_at')}
+                  value={entryForm.published_at}
                 />
                 <CustomInput
                   onChange={handlePublisherChange}

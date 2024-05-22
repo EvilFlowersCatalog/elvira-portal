@@ -27,7 +27,7 @@ const AdminEditEntry = () => {
             language_code: entryDetail.response.language?.code ?? '',
             identifiers: entryDetail.response.identifiers,
             citation: entryDetail.response.citation,
-            year: entryDetail.response.year,
+            published_at: entryDetail.response.published_at,
             publisher: entryDetail.response.publisher,
             image: entryDetail.response.thumbnail,
           });

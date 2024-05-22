@@ -90,7 +90,8 @@ const Viewer = () => {
         );
 
         // Update metatags
-        if (entryDetail.year) updateMetaTag('citation_year', entryDetail.year);
+        if (entryDetail.published_at)
+          updateMetaTag('citation_year', entryDetail.published_at);
         if (entryDetail.publisher)
           updateMetaTag('citation_publisher', entryDetail.publisher);
         if (entryDetail.identifiers.doi)
