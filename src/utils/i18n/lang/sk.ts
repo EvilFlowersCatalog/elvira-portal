@@ -236,5 +236,29 @@ export const sk = {
         titleDesc: 'Názov ↓',
       },
     },
+
+    // ABOUT PAGE
+    about: {
+      title: 'Digitálna akademická knižnica',
+      subTitle:
+        'Otvorené a jednoducho použiteľné nástroje pre distribúciu dokumentov',
+      readMore: 'Čítať viac',
+      read: {
+        title: 'Čítanie',
+        descriptionPart1: 'Vytvorili sme open-source čítačku PDF s názvom',
+        descriptionPart2:
+          'pre jednoduché prezeranie dokumentov s základnými nástrojmi na vytváranie poznámok, exportovanie citácií a zdieľanie dokumentov.',
+      },
+      organize: {
+        title: 'Organizovanie',
+        description:
+          'Svoje dokumenty môžete jednoducho organizovať vytvorením viacerých katalógov s RBAC, ktorý je konfigurovateľný pomocou webového rozhrania alebo REST API.',
+      },
+      distribute: {
+        title: 'Distribuovanie',
+        description:
+          'Naše projekty sú navrhnuté tak, aby boli interoperabilné a podporovali mnoho rôznych komunikačných protokolov, ako sú OPDS, REST API, OAI a Z39.50 (momentálne v pokroku). Podporujeme tiež viaceré úložiská pre jednoduchú implementáciu.',
+      },
+    },
   },
 };

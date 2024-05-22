@@ -244,5 +244,29 @@ export const en = {
         titleDesc: 'Title ↓',
       },
     },
+
+    // ABOUT PAGE
+    about: {
+      title: 'Digital academic library',
+      subTitle: 'Open and easy to use tools for document distribution',
+      readMore: 'Read more',
+      read: {
+        title: 'Read',
+        descriptionPart1:
+          'We have created an open-source PDF reader on top of pdf.js called',
+        descriptionPart2:
+          'for easy document browsing with basic tools for taking notes, exporting citations and document sharing.',
+      },
+      organize: {
+        title: 'Organize',
+        description:
+          'You can easily organize your document be creating multiple catalogs with RBAC which is configurable using web interface or REST API.',
+      },
+      distribute: {
+        title: 'Distribute',
+        description:
+          'Our projects are designed to be interopable and support many different communication protocols such as OPDS, REST API, OAI and Z39.50 (currently in progress). We support also multiple storage backends for easy deployment.',
+      },
+    },
   },
 };

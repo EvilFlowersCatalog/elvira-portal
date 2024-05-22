@@ -131,11 +131,15 @@ const Navbar = () => {
             <RiArrowLeftDoubleFill size={18} />
           </button>
         ) : (
-          <img
-            className='h-auto w-16'
-            src={theme === THEME_TYPE.dark ? stuLogoLight : stuLogoDark}
-            alt='STU Logo'
-          />
+          <button
+            onClick={(e) => window.open('https://www.fiit.stuba.sk/', '_blank')}
+          >
+            <img
+              className='h-auto w-16'
+              src={theme === THEME_TYPE.dark ? stuLogoLight : stuLogoDark}
+              alt='STU Logo'
+            />
+          </button>
         )}
       </div>
 
