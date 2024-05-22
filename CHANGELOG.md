@@ -1,9 +1,10 @@
 # Changelog
 
-## 2.0.8 2023-05-07
+## 2.0.8 2023-05-22
 
 - **Changed**: Assetes
 - **Changed**: Environment variables
+- **Changed**: year to published_at
 
 ## 2.0.7 2023-10-15
 

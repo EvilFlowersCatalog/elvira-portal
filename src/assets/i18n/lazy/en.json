@@ -33,7 +33,7 @@
     "successMessageUploadDocument": "Document uploaded successfully",
     "errorMessageUploadDocument": "Upload failed",
     "errorMessageSimilarityDocument": "A record with a similar title, doi or isbn has already been created",
-    "year": "Year",
+    "year": "Date of publication (YYYY, YYYY-MM, YYYY-MM-DD)",
     "publisher": "Publisher",
     "aditionalData": "Additional data",
     "getDataISBN": "Get document informations based on ISBN",
