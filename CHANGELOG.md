@@ -21,6 +21,7 @@
 - **Fixed**: Scroll in `EntryDetail`
 - **Fixed**: API for getting data from identifier
 - **Fixed**: Checking if `entry.authors.lenght` is > 0 befor accesing it
+- **Fixed**: Importing
 - **Removed**: In `useUserAcquistion` format
 
 ## 3.0.18 : 2024-05-10

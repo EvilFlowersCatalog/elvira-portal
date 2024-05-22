@@ -1,5 +1,4 @@
 import { ChangeEvent, FormEvent, InvalidEvent, useRef, useState } from 'react';
-import CustomInput from '../../common/CustomInput';
 import ModalWrapper from '../../modal/ModalWrapper';
 import useGetFeeds from '../../../hooks/api/feeds/useGetFeeds';
 import { IFeedNew, IFeedsList } from '../../../utils/interfaces/feed';
