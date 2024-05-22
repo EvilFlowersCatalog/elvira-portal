@@ -33,7 +33,7 @@
     "successMessageUploadDocument": "Dokument bol úspešne nahraný",
     "errorMessageUploadDocument": "Nahrávanie zlyhalo",
     "errorMessageSimilarityDocument": "Záznam s podobným názvom, doi alebo isbn, už bol vytvorený",
-    "year": "Rok",
+    "year": "Dátum publikovania (YYYY, YYYY-MM, YYYY-MM-DD)",
     "publisher": "Vydavateľ",
     "aditionalData": "Dodatočné údaje",
     "getDataISBN": "Stiahnúť informácie o dokumente na základe ISBN",

@@ -6,7 +6,6 @@ import { DisposableComponent } from './common/components/disposable.component';
 import { TranslocoService } from '@ngneat/transloco';
 import { AppStateService } from './services/general/app-state.service';
 import { LoadingService } from './services/general/loading.service';
-import { IconLoaderService } from './services/general/icon-loader.service';
 import { State } from './types/general.types';
 import { Router, NavigationEnd } from '@angular/router';
 
@@ -27,7 +26,6 @@ export class AppComponent extends DisposableComponent {
     private readonly appStateService: AppStateService,
     private readonly langService: TranslocoService,
     private readonly loadingService: LoadingService,
-    private readonly iconLoaderService: IconLoaderService,
     private readonly router: Router,
     private renderer: Renderer2,
     @Inject(DOCUMENT) private document: Document
@@ -71,7 +69,6 @@ export class AppComponent extends DisposableComponent {
         takeUntil(this.destroySignal$)
       )
       .subscribe();
-    this.iconLoaderService.loadIcons();
     this.initWindowStorageListener();
   }
 
