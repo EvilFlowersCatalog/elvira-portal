@@ -260,9 +260,6 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
       title: event.target.value, // Update the title property
     }));
   };
-  const handleTitleInvalid = (e: InvalidEvent<HTMLInputElement>) => {
-    e.target.setCustomValidity(t('entry.wizard.requiredMessages.title'));
-  };
   const handleYearChange = (event: ChangeEvent<HTMLInputElement>) => {
     setEntryForm((prevForm) => ({
       ...prevForm, // Preserve existing properties of entryForm
@@ -300,12 +297,6 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
       authors: updatedAuthors,
     }));
   };
-  const handleAuthorNameInvalid = (e: InvalidEvent<HTMLInputElement>) => {
-    e.target.setCustomValidity(t('entry.wizard.requiredMessages.authorName'));
-  };
-  const handleContributorNameInvalid = (e: InvalidEvent<HTMLInputElement>) => {
-    e.target.setCustomValidity(t('entry.wizard.requiredMessages.coName'));
-  };
   const handleAuthorSurnameChange = (
     index: number,
     event: ChangeEvent<HTMLInputElement>
@@ -318,16 +309,6 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
       ...prevForm, // Preserve existing properties of entryForm
       authors: updatedAuthors,
     }));
-  };
-  const handleAuthorSurnameInvalid = (e: InvalidEvent<HTMLInputElement>) => {
-    e.target.setCustomValidity(
-      t('entry.wizard.requiredMessages.authorSurname')
-    );
-  };
-  const handleContributorSurnameInvalid = (
-    e: InvalidEvent<HTMLInputElement>
-  ) => {
-    e.target.setCustomValidity(t('entry.wizard.requiredMessages.coSurname'));
   };
   // Contribtors add/remove handlers
   const handleAddContributor = () => {
@@ -401,7 +382,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                 </span>
                 <ElviraInput
                   onChange={handleTitleChange}
-                  onInvalid={handleTitleInvalid}
+                  invalidMessage={t('entry.wizard.requiredMessages.title')}
                   required
                   placeholder={t('entry.wizard.title')}
                   value={entryForm.title}
@@ -458,7 +439,9 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                     <div className='flex w-full gap-4'>
                       <ElviraInput
                         onChange={(e) => handleAuthorNameChange(0, e)}
-                        onInvalid={handleAuthorNameInvalid}
+                        invalidMessage={t(
+                          'entry.wizard.requiredMessages.authorName'
+                        )}
                         placeholder={t('entry.wizard.authorName')}
                         required
                         value={entryForm.authors[0]?.name}
@@ -468,7 +451,9 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
 
                       <ElviraInput
                         onChange={(e) => handleAuthorSurnameChange(0, e)}
-                        onInvalid={handleAuthorSurnameInvalid}
+                        invalidMessage={t(
+                          'entry.wizard.requiredMessages.authorSurname'
+                        )}
                         placeholder={t('entry.wizard.authorSurname')}
                         required
                         value={entryForm.authors[0]?.surname}
@@ -480,7 +465,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                       {entryForm.authors.slice(1).map((_, index) => (
                         <div
                           key={index}
-                          className='flex w-full items-end gap-4'
+                          className='flex w-full items-start gap-4'
                         >
                           <ElviraInput
                             required
@@ -488,7 +473,9 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                             onChange={(e) =>
                               handleAuthorNameChange(index + 1, e)
                             }
-                            onInvalid={handleContributorNameInvalid}
+                            invalidMessage={t(
+                              'entry.wizard.requiredMessages.coName'
+                            )}
                             value={entryForm.authors[index + 1].name}
                           />
 
@@ -500,12 +487,14 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                             onChange={(e) =>
                               handleAuthorSurnameChange(index + 1, e)
                             }
-                            onInvalid={handleContributorSurnameInvalid}
+                            invalidMessage={t(
+                              'entry.wizard.requiredMessages.coSurname'
+                            )}
                             value={entryForm.authors[index + 1].surname}
                           />
 
                           <button
-                            className='text-red h-fit'
+                            className='text-red h-fit mt-2'
                             onClick={() => handleRemoveContributor(index + 1)}
                             type='button'
                           >

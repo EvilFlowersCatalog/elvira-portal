@@ -75,11 +75,7 @@ const Login = () => {
                 value={loginForm.username}
                 onChange={handleUsername}
                 placeholder={t('login.username')}
-                onInvalid={(e: InvalidEvent<HTMLInputElement>) => {
-                  e.target.setCustomValidity(
-                    t('login.requiredMessage.username')
-                  );
-                }}
+                invalidMessage={t('login.requiredMessage.username')}
                 required
               />
               <div className='relative w-full flex'>
@@ -88,15 +84,11 @@ const Login = () => {
                   onChange={handlePassword}
                   type={showPassword ? 'text' : 'password'}
                   placeholder={t('login.password')}
-                  onInvalid={(e: InvalidEvent<HTMLInputElement>) =>
-                    e.target.setCustomValidity(
-                      t('login.requiredMessage.password')
-                    )
-                  }
+                  invalidMessage={t('login.requiredMessage.password')}
                   required
                 />
                 <button
-                  className='absolute bottom-2.5 -right-7'
+                  className='absolute top-3 -right-7'
                   type='button'
                   onClick={() => setShowPassword((prevShow) => !prevShow)}
                 >

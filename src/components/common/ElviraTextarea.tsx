@@ -23,7 +23,7 @@ const ElviraTextarea = ({
         className={`absolute duration-200 z-10 select-none pointer-events-none ${
           focus || value
             ? '-top-6 left-0 text-sm text-STUColor'
-            : 'top-2 left-2 text-md'
+            : 'top-2 left-2 text-md text-zinc-400'
         }`}
       >
         {placeholder}

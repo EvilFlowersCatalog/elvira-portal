@@ -16,7 +16,8 @@ import ElviraInput from '../../components/common/ElviraInput';
 
 const Home = () => {
   const { t } = useTranslation();
-  const { theme, titleLogoDark, titleLogoLight } = useAppContext();
+  const { theme, titleLogoDark, titleLogoLight, stuLogoDark, stuLogoLight } =
+    useAppContext();
   const [popularEntries, setPopularEntries] = useState<IEntry[]>([]);
   const [clickedEntry, setClickedEntry] = useState<
     'popular' | 'lastAdded' | ''
@@ -85,6 +86,11 @@ const Home = () => {
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
             alt='Elvira Logo'
           />
+          <img
+            className='w-28'
+            src={theme === THEME_TYPE.dark ? stuLogoLight : stuLogoDark}
+            alt='STU Logo'
+          />
           <form
             className='relative flex w-full md:w-1/2 xl:w-1/3 max-w-96 items-center gap-2 text-darkGray dark:text-white'
             onSubmit={submit}
@@ -94,8 +100,9 @@ const Home = () => {
               value={searchInput}
               placeholder={t('home.search')}
               onChange={handleSearchInput}
+              backgroundTailwind='bg-zinc-200 dark:bg-darkGray'
             />
-            <button type='submit' className={'absolute right-0 bottom-2'}>
+            <button type='submit' className={'absolute right-2 top-2.5'}>
               <IoSearchOutline size={25} />
             </button>
           </form>

@@ -56,13 +56,9 @@ const ToolsContainer = ({ advancedSearch, param }: IToolsContainerParams) => {
   };
 
   return (
-    <div
-      className={`flex gap-4 px-4 pb-4 ${
-        advancedSearch ? 'md:items-center' : 'md:items-end'
-      } flex-col md:flex-row`}
-    >
+    <div className={`flex gap-4 px-4 pb-4 item-start flex-col md:flex-row`}>
       <div className='w-full md:w-1/2 xl:w-1/4'>
-        <div className='flex gap-4 items-end'>
+        <div className='flex gap-4'>
           <form
             className='relative flex w-full items-center gap-2 text-darkGray dark:text-white'
             onSubmit={submit}
@@ -72,9 +68,10 @@ const ToolsContainer = ({ advancedSearch, param }: IToolsContainerParams) => {
               value={input}
               placeholder={t('tools.search')}
               onChange={handleSearchInput}
+              backgroundTailwind='bg-zinc-200 dark:bg-darkGray'
             />
 
-            <button type='submit' className={'absolute right-0 bottom-2'}>
+            <button type='submit' className={'absolute right-2 top-2.5'}>
               <IoSearchOutline size={25} />
             </button>
           </form>

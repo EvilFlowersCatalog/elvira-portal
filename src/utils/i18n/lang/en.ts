@@ -186,11 +186,6 @@ export const en = {
       },
     },
 
-    input: {
-      required: 'Required*',
-      notRequired: 'Not required',
-    },
-
     dropzone: {
       errorMessage: {
         image: 'Image was bigger than max size (5 MB).',

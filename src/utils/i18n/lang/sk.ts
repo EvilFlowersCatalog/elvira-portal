@@ -158,7 +158,6 @@ export const sk = {
         upload: 'Uložiť',
         edit: 'Upraviť',
         previous: 'Predošlý',
-
         identifiers: 'Identifikátory',
         additionalData: 'Dodatočné dáta',
         title: 'Názov',
@@ -178,11 +177,6 @@ export const sk = {
         imageHint: 'Presuňte sem váš obrázok alebo kliknite na prehľadávanie',
         pdfHint: 'Presuňte sem váš PDF súbor alebo kliknite na prehľadávanie',
       },
-    },
-
-    input: {
-      required: 'Povinné*',
-      notRequired: 'Nepovinné',
     },
 
     dropzone: {

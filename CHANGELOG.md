@@ -7,6 +7,7 @@
 - **Added**: Edit page for entries
 - **Added**: Confiration dialog for appling identifier info
 - **Added**: Edit and add for feeds
+- **Added**: FIIT logo in home page
 - **Changed**: Design of `ElviraInput`
 - **Changed**: Design of `ElviraTextarea`
 - **Changed**: Viewer version from 0.4.21 to 0.4.24
@@ -22,7 +23,7 @@
 - **Fixed**: API for getting data from identifier
 - **Fixed**: Checking if `entry.authors.lenght` is > 0 befor accesing it
 - **Fixed**: Importing
-- **Removed**: In `useUserAcquistion` format
+- **Removed**: In `useUserAcquistion` `format` param
 
 ## 3.0.18 : 2024-05-10
 

@@ -11,7 +11,7 @@ export default {
         xxl: '1440px',
       },
       colors: {
-        STUColor: '#00abe1',
+        STUColor: '#01a9e0',
         red: '#ff2129',
         green: '#77dd77',
         darkGray: '#1f1f1f',

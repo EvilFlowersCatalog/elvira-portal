@@ -77,14 +77,6 @@ const FeedForm = ({
     }));
   };
 
-  // Validation
-  const handleTitleInvalid = (e: InvalidEvent<HTMLInputElement>) => {
-    e.target.setCustomValidity(t('modal.feedForm.requiredMessages.title'));
-  };
-  const handleContentInvalid = (e: InvalidEvent<HTMLInputElement>) => {
-    e.target.setCustomValidity(t('modal.feedForm.requiredMessages.content'));
-  };
-
   useCustomEffect(() => {
     const parentId = searchParams.get('parent-id') ?? '';
     if (parentId) {
@@ -165,7 +157,7 @@ const FeedForm = ({
           onChange={handleTitleChange}
           placeholder={t('modal.feedForm.title')}
           value={form.title}
-          onInvalid={handleTitleInvalid}
+          invalidMessage={t('modal.feedForm.requiredMessages.title')}
           required
         />
         {/* Content */}
@@ -174,7 +166,7 @@ const FeedForm = ({
           placeholder={t('modal.feedForm.content')}
           value={form.content}
           required
-          onInvalid={handleContentInvalid}
+          invalidMessage={t('modal.feedForm.requiredMessages.content')}
         />
         {/* Kind */}
         <div className='flex w-full flex-col text-left'>
@@ -184,7 +176,7 @@ const FeedForm = ({
           <select
             id='selection-kind'
             defaultValue='acquistion'
-            className='w-full rounded-md outline-none bg-transparent mt-2 cursor-pointer'
+            className='w-full rounded-md outline-none bg-transparent mt-2 cursor-pointer border p-2'
             onChange={handleKindChange}
           >
             <option value='acquisition'>
@@ -206,7 +198,7 @@ const FeedForm = ({
             <select
               id='selection-parent'
               defaultValue={parentFeedId ? parentFeedId : 'none'}
-              className='w-full bg-transparent rounded-md outline-none mt-2 cursor-pointer'
+              className='w-full bg-transparent rounded-md outline-none mt-2 cursor-pointer border p-2'
               onChange={handleParentChange}
             >
               <option value='none'>{t('modal.feedForm.none')}</option>
