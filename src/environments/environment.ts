@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   baseUrl: `https://evilflowers.jakubdubec.me`,
-  assetsUrl: `http://localhost:4200/assets`,
+  assetDirName: 'fiit',
   catalog_id: `e7508413-286d-401d-8220-854ff865f538`,
 };
 

@@ -53,7 +53,7 @@ export class DocumentFormComponent implements OnInit {
       citation: new UntypedFormControl(''),
       isbn: new UntypedFormControl(''),
       doi: new UntypedFormControl(''),
-      year: new UntypedFormControl(''),
+      published_at: new UntypedFormControl(''),
       publisher: new UntypedFormControl(''),
       summary: new UntypedFormControl(''),
     });
@@ -134,7 +134,7 @@ export class DocumentFormComponent implements OnInit {
       doi: data.response.identifiers.doi,
       isbn: data.response.identifiers.isbn,
       citation: data.response.citation,
-      year: data.response.year,
+      published_at: data.response.published_at,
       publisher: data.response.publisher,
     });
   }
@@ -147,7 +147,7 @@ export class DocumentFormComponent implements OnInit {
       authorSurname: data.response.authors[0].surname,
       doi: data.response.doi,
       citation: data.response.bibtex,
-      year: data.response.year,
+      published_at: data.response.published_at,
       publisher: data.response.publisher,
     });
     this.initContributors(data.response.authors.slice(1));
@@ -367,8 +367,8 @@ export class DocumentFormComponent implements OnInit {
       citation: this.uploadForm.get('citation').value
         ? this.uploadForm.get('citation').value
         : null,
-      year: this.uploadForm.get('year').value
-        ? this.uploadForm.get('year').value
+      published_at: this.uploadForm.get('published_at').value
+        ? this.uploadForm.get('published_at').value
         : null,
       publisher: this.uploadForm.get('publisher').value
         ? this.uploadForm.get('publisher').value

@@ -35,7 +35,7 @@ export interface EntryDetail {
     feeds: Feed[];
     language: EntryLanguage;
     title: string;
-    year: string;
+    published_at: string;
     publisher: string;
     created_at: string;
     updated_at: string;
@@ -70,7 +70,7 @@ export interface EntryNew {
   contributors: EntryAuthor[];
   identifiers: EntryIdentifiers;
   citation: string;
-  year: string;
+  published_at: string;
   publisher: string;
   image: any;
 }
@@ -97,7 +97,7 @@ export interface EntryInfo {
     publisher: string;
     doi: string;
     authors: EntryAuthor[];
-    year: string;
+    published_at: string;
     language: string;
     bibtex: string;
   };
