@@ -162,7 +162,7 @@ export const sk = {
         identifiers: 'Identifikátory',
         additionalData: 'Dodatočné dáta',
         title: 'Názov',
-        year: 'Rok',
+        year: 'Dátum pridania (YYYY, YYYY-MM, YYYY-MM-DD)',
         publisher: 'Vydavateľ',
         summary: 'Zhrnutie',
         AuthorsAndFeeds: 'Autori a Skupiny',

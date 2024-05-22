@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import useCustomEffect from '../../hooks/useCustomEffect';
 import { IoSearchOutline } from 'react-icons/io5';
 import EntrySwiper from '../../components/entry/swiper/EntrySwiper';
+import ElviraInput from '../../components/common/ElviraInput';
 
 const Home = () => {
   const { t } = useTranslation();
@@ -88,18 +89,14 @@ const Home = () => {
             className='relative flex w-full md:w-1/2 xl:w-1/3 max-w-96 items-center gap-2 text-darkGray dark:text-white'
             onSubmit={submit}
           >
-            <input
-              className={
-                'w-full p-2 rounded-md bg-zinc-200 dark:bg-darkGray border-2 border-zinc-200 dark:border-darkGray outline-none focus:border-STUColor dark:focus:border-STUColor'
-              }
+            <ElviraInput
               type={'text'}
-              name={'searchTitle'}
               value={searchInput}
               placeholder={t('home.search')}
               onChange={handleSearchInput}
             />
-            <button type='submit' className={'absolute right-2'}>
-              <IoSearchOutline size={30} />
+            <button type='submit' className={'absolute right-0 bottom-2'}>
+              <IoSearchOutline size={25} />
             </button>
           </form>
         </div>

@@ -5,6 +5,7 @@ import { useLocation, useSearchParams } from 'react-router-dom';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { FaFilterCircleXmark } from 'react-icons/fa6';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
+import ElviraInput from '../common/ElviraInput';
 
 interface IToolsContainerParams {
   advancedSearch?: boolean;
@@ -55,26 +56,26 @@ const ToolsContainer = ({ advancedSearch, param }: IToolsContainerParams) => {
   };
 
   return (
-    <div className='flex gap-4 px-4 pb-4 md:items-start flex-col md:flex-row'>
+    <div
+      className={`flex gap-4 px-4 pb-4 ${
+        advancedSearch ? 'md:items-center' : 'md:items-end'
+      } flex-col md:flex-row`}
+    >
       <div className='w-full md:w-1/2 xl:w-1/4'>
-        <div className='flex gap-4'>
+        <div className='flex gap-4 items-end'>
           <form
             className='relative flex w-full items-center gap-2 text-darkGray dark:text-white'
             onSubmit={submit}
           >
-            <input
-              className={
-                'w-full p-2 rounded-md bg-zinc-200 dark:bg-darkGray border-2 border-zinc-200 dark:border-darkGray outline-none focus:border-STUColor dark:focus:border-STUColor'
-              }
+            <ElviraInput
               type={'text'}
-              name={'searchTitle'}
               value={input}
               placeholder={t('tools.search')}
               onChange={handleSearchInput}
             />
 
-            <button type='submit' className={'absolute right-2'}>
-              <IoSearchOutline size={30} />
+            <button type='submit' className={'absolute right-0 bottom-2'}>
+              <IoSearchOutline size={25} />
             </button>
           </form>
 
@@ -88,7 +89,7 @@ const ToolsContainer = ({ advancedSearch, param }: IToolsContainerParams) => {
         {/* Only for entries */}
         {advancedSearch && (
           <button
-            className='text-sm ml-1 hover:underline mt-2'
+            className='text-sm hover:underline mt-2'
             onClick={() => setShowSearchBar(!showSearchBar)}
           >
             {t('tools.advancedSearch')}

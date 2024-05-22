@@ -8,31 +8,7 @@ import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
 import FeedMenu from '../feed/FeedMenu';
 import Button from '../common/Button';
-
-interface ISearchBarInputParams {
-  name: string;
-  placeholder: string;
-  value: any;
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
-}
-
-const SearchBarInput = ({
-  name,
-  value,
-  onChange,
-  placeholder,
-}: ISearchBarInputParams) => {
-  return (
-    <input
-      name={name}
-      placeholder={placeholder}
-      className='w-full p-2 rounded-md bg-zinc-200 dark:bg-gray border-2 border-zinc-100 dark:border-darkGray outline-none focus:border-STUColor dark:focus:border-STUColor'
-      value={value}
-      type='text'
-      onChange={onChange}
-    />
-  );
-};
+import ElviraInput from '../common/ElviraInput';
 
 const SearchBar = () => {
   const { setShowSearchBar, isSmallDevice } = useAppContext();
@@ -103,30 +79,27 @@ const SearchBar = () => {
 
       <form
         onSubmit={onSubmit}
-        className='flex-1 bg-zinc-100 dark:bg-darkGray py-4 flex flex-col gap-5 rounded-md items-center'
+        className='flex-1 bg-zinc-100 dark:bg-darkGray py-4 flex flex-col gap-4 rounded-md items-center'
       >
         <div className='w-full'>
-          <SearchBarInput
+          <ElviraInput
             placeholder={t('searchBar.title')}
-            name='title'
             value={title}
             onChange={handleTitleChange}
           />
         </div>
 
         <div className='w-full'>
-          <SearchBarInput
+          <ElviraInput
             placeholder={t('searchBar.author')}
-            name='author'
             value={author}
             onChange={handleAuthorChange}
           />
         </div>
 
         <div className='w-full'>
-          <SearchBarInput
+          <ElviraInput
             placeholder={t('searchBar.category')}
-            name='category'
             value={category}
             onChange={handleCategoryChange}
           />

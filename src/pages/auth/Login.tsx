@@ -7,6 +7,7 @@ import { IAuthCredentials } from '../../utils/interfaces/auth';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { THEME_TYPE } from '../../utils/interfaces/general/general';
 import { CircleLoader } from 'react-spinners';
+import ElviraInput from '../../components/common/ElviraInput';
 
 const Login = () => {
   const { login } = useAuthContext();
@@ -67,40 +68,35 @@ const Login = () => {
             </div>
           ) : (
             <form
-              className='flex flex-col gap-5 w-full items-center'
+              className='flex flex-col gap-5 w-3/4 items-center'
               onSubmit={submit}
             >
-              <input
-                name='username'
-                className='w-3/4 lg:w-2/4 p-2 rounded-md bg-white dark:bg-gray border-2 border-white dark:border-darkGray outline-none focus:border-STUColor dark:focus:border-STUColor'
+              <ElviraInput
                 value={loginForm.username}
-                type='text'
-                placeholder={t('login.username')}
                 onChange={handleUsername}
-                required
+                placeholder={t('login.username')}
                 onInvalid={(e: InvalidEvent<HTMLInputElement>) => {
                   e.target.setCustomValidity(
                     t('login.requiredMessage.username')
                   );
                 }}
+                required
               />
-              <div className='relative w-3/4 lg:w-2/4 flex items-center'>
-                <input
-                  name='password'
-                  className='w-full border-2 border-white dark:border-darkGray focus:border-STUColor dark:focus:border-STUColor p-2 outline-none bg-white dark:bg-gray rounded-md'
+              <div className='relative w-full flex'>
+                <ElviraInput
                   value={loginForm.password}
+                  onChange={handlePassword}
                   type={showPassword ? 'text' : 'password'}
                   placeholder={t('login.password')}
-                  onChange={handlePassword}
-                  required
                   onInvalid={(e: InvalidEvent<HTMLInputElement>) =>
                     e.target.setCustomValidity(
                       t('login.requiredMessage.password')
                     )
                   }
+                  required
                 />
                 <button
-                  className='absolute right-3 '
+                  className='absolute bottom-2.5 -right-7'
                   type='button'
                   onClick={() => setShowPassword((prevShow) => !prevShow)}
                 >

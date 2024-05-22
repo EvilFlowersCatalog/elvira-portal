@@ -9,8 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { IoAddCircle } from 'react-icons/io5';
 import { MdRemoveCircle } from 'react-icons/md';
-import CustomInput from '../../../components/common/CustomInput';
-import CustomTextArea from '../../../components/common/CustomTextArea';
+import ElviraTextarea from '../../../components/common/ElviraTextarea';
 import { toast } from 'react-toastify';
 import FeedMenu from '../../../components/feed/FeedMenu';
 import Dropzone from '../../../components/common/Dropzone';
@@ -25,6 +24,7 @@ import PageLoading from '../../../components/page/PageLoading';
 import Breadcrumb from '../../../components/common/Breadcrumb';
 import ApplyInfoDialog from '../../../components/dialogs/ApplyInfoDialog';
 import useCustomEffect from '../../../hooks/useCustomEffect';
+import ElviraInput from '../../../components/common/ElviraInput';
 
 interface IEntryWizardParams {
   form?: IEntryDetail;
@@ -362,11 +362,11 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
       <Breadcrumb />
       <div className='flex flex-col flex-1 items-center overflow-auto p-4'>
         <div className='flex-1 flex w-full justify-center items-center'>
-          <div className='w-full h-full md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 flex flex-col justify-center items-center gap-4'>
+          <div className='w-full h-fit md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 flex flex-col justify-center items-center gap-4 bg-zinc-100 dark:bg-darkGray p-11 rounded-md'>
             {/* Step 1: DOI & ISBN */}
             {stepIndex === 0 && (
               <form
-                className='w-full h-fit bg-zinc-100 dark:bg-darkGray p-4 flex flex-col justify-start items-center rounded-md gap-4'
+                className='w-full h-fit flex flex-col justify-start items-center gap-4'
                 onSubmit={handleSubmitStepOne}
               >
                 {isLoading ? (
@@ -378,12 +378,12 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                     <span className='text-3xl font-extrabold '>
                       {t('entry.wizard.identifiers')}
                     </span>
-                    <CustomInput
+                    <ElviraInput
                       onChange={handleIndentifierChange}
                       placeholder='DOI / ISBN'
                       value={identifier}
                     />
-                    <div className='w-full flex justify-end'>
+                    <div className='w-full flex justify-end pt-7'>
                       <NextButton />
                     </div>
                   </>
@@ -393,30 +393,30 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
             {/* Step 2: ADDITIONAL DATA */}
             {stepIndex === 1 && (
               <form
-                className='w-full h-fit bg-zinc-100 dark:bg-darkGray p-4 flex flex-col justify-start items-center rounded-md gap-4'
+                className='w-full h-full flex flex-col justify-start items-center gap-4'
                 onSubmit={handleSubmitStepTwo}
               >
                 <span className='text-3xl font-extrabold '>
                   {t('entry.wizard.additionalData')}
                 </span>
-                <CustomInput
+                <ElviraInput
                   onChange={handleTitleChange}
                   onInvalid={handleTitleInvalid}
                   required
                   placeholder={t('entry.wizard.title')}
                   value={entryForm.title}
                 />
-                <CustomInput
+                <ElviraInput
                   onChange={handleYearChange}
-                  placeholder={t('entry.wizard.published_at')}
+                  placeholder={t('entry.wizard.year')}
                   value={entryForm.published_at}
                 />
-                <CustomInput
+                <ElviraInput
                   onChange={handlePublisherChange}
                   placeholder={t('entry.wizard.publisher')}
                   value={entryForm.publisher}
                 />
-                <CustomTextArea
+                <ElviraTextarea
                   onChange={handleSummaryChange}
                   placeholder={t('entry.wizard.summary')}
                   value={entryForm.summary}
@@ -431,7 +431,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
             {/* Step 3: AUTHORS & FEEDS */}
             {stepIndex === 2 && (
               <form
-                className='w-full h-full bg-zinc-100 dark:bg-darkGray p-4 flex flex-col justify-start items-center gap-4'
+                className='w-full h-full flex flex-col justify-start items-center gap-4'
                 onSubmit={handleSubmitStepThree}
               >
                 <span className='text-3xl font-extrabold '>
@@ -456,7 +456,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
 
                     {/* Author */}
                     <div className='flex w-full gap-4'>
-                      <CustomInput
+                      <ElviraInput
                         onChange={(e) => handleAuthorNameChange(0, e)}
                         onInvalid={handleAuthorNameInvalid}
                         placeholder={t('entry.wizard.authorName')}
@@ -464,7 +464,9 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                         value={entryForm.authors[0]?.name}
                       />
 
-                      <CustomInput
+                      <span className='w-6'></span>
+
+                      <ElviraInput
                         onChange={(e) => handleAuthorSurnameChange(0, e)}
                         onInvalid={handleAuthorSurnameInvalid}
                         placeholder={t('entry.wizard.authorSurname')}
@@ -480,7 +482,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                           key={index}
                           className='flex w-full items-end gap-4'
                         >
-                          <CustomInput
+                          <ElviraInput
                             required
                             placeholder={t('entry.wizard.coName')}
                             onChange={(e) =>
@@ -490,7 +492,9 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                             value={entryForm.authors[index + 1].name}
                           />
 
-                          <CustomInput
+                          <span className='w-6'></span>
+
+                          <ElviraInput
                             required
                             placeholder={t('entry.wizard.coSurname')}
                             onChange={(e) =>
@@ -501,7 +505,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                           />
 
                           <button
-                            className='text-red hover:text-darkGray dark:hover:text-white h-fit mb-2'
+                            className='text-red h-fit'
                             onClick={() => handleRemoveContributor(index + 1)}
                             type='button'
                           >
@@ -513,7 +517,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                   </div>
 
                   {/* Feeds */}
-                  <div className='flex flex-col flex-1 justify-start items-center gap-4 bg-lightGray dark:bg-darkGray p-2 rounded-md'>
+                  <div className='flex flex-col flex-1 justify-start items-center gap-4 mt-4 rounded-md'>
                     {/* Feeds header */}
                     <div className='flex w-full justify-center items-center gap-4 text-STUColor'>
                       <span className='text-xl font-bold'>
@@ -530,7 +534,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                     </div>
                   </div>
                 </div>
-                <div className='w-full flex justify-end gap-4'>
+                <div className='w-full flex justify-end gap-4 pt-7'>
                   <PreviousButton />
                   <NextButton />
                 </div>
@@ -540,13 +544,13 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
             {/* Step 4: CITATION */}
             {stepIndex === 3 && (
               <form
-                className='w-full h-full bg-zinc-100 dark:bg-darkGray p-4 flex flex-col justify-start items-center rounded-md gap-4'
+                className='w-full h-full flex flex-col justify-start items-center gap-4'
                 onSubmit={handleSubmitStepFour}
               >
                 <span className='text-3xl font-extrabold '>
                   {t('entry.wizard.citation')}
                 </span>
-                <CustomTextArea
+                <ElviraTextarea
                   onChange={handleCitationChange}
                   placeholder={t('entry.wizard.citation')}
                   value={entryForm.citation}
@@ -562,7 +566,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
             {/* Step 5: IMAGE & PDF */}
             {stepIndex === 4 && (
               <form
-                className='w-full h-full bg-zinc-100 dark:bg-darkGray p-4 flex flex-col justify-start items-center rounded-md gap-4'
+                className='w-full h-full flex flex-col justify-start items-center gap-4'
                 onSubmit={handleSubmitStepFive}
               >
                 <span className='text-3xl font-extrabold '>
@@ -588,7 +592,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
                     hint={t('entry.wizard.pdfHint')}
                   />
                 </div>
-                <div className='w-full flex justify-end gap-4'>
+                <div className='w-full flex justify-end gap-4 pt-7'>
                   <PreviousButton />
                   <NextButton end />
                 </div>

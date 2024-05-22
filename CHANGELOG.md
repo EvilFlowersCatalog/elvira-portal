@@ -7,8 +7,11 @@
 - **Added**: Edit page for entries
 - **Added**: Confiration dialog for appling identifier info
 - **Added**: Edit and add for feeds
+- **Changed**: Design of `ElviraInput`
+- **Changed**: Design of `ElviraTextarea`
 - **Changed**: Viewer version from 0.4.21 to 0.4.24
-- **Changed**: Year to published_at
+- **Changed**: `year` to `published_at`
+- **Changed**: Translation of year
 - **Changed**: In `AdminAddEntry` page in step one (identifiers) 2 inputs to 1
 - **Changed**: Entries loading
 - **Changed**: Modal

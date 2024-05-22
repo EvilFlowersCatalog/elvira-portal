@@ -13,6 +13,7 @@ import useEditFeed from '../../../hooks/api/feeds/useEditFeed';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import useCustomEffect from '../../../hooks/useCustomEffect';
+import ElviraInput from '../../common/ElviraInput';
 
 interface IFeedForm {
   setOpen: (open: boolean) => void;
@@ -161,7 +162,7 @@ const FeedForm = ({
         className='w-full h-full flex flex-col gap-5 items-start justify-start'
       >
         {/* Title */}
-        <CustomInput
+        <ElviraInput
           onChange={handleTitleChange}
           placeholder={t('modal.feedForm.title')}
           value={form.title}
@@ -169,7 +170,7 @@ const FeedForm = ({
           required
         />
         {/* Content */}
-        <CustomInput
+        <ElviraInput
           onChange={handleContentChange}
           placeholder={t('modal.feedForm.content')}
           value={form.content}
@@ -184,7 +185,7 @@ const FeedForm = ({
           <select
             id='selection-kind'
             defaultValue='acquistion'
-            className='w-full bg-white dark:bg-gray rounded-md outline-none p-2 cursor-pointer'
+            className='w-full rounded-md outline-none bg-transparent mt-2 cursor-pointer'
             onChange={handleKindChange}
           >
             <option value='acquisition'>
@@ -206,7 +207,7 @@ const FeedForm = ({
             <select
               id='selection-parent'
               defaultValue={parentFeedId ? parentFeedId : 'none'}
-              className='w-full bg-white dark:bg-gray rounded-md outline-none p-2 cursor-pointer'
+              className='w-full bg-transparent rounded-md outline-none mt-2 cursor-pointer'
               onChange={handleParentChange}
             >
               <option value='none'>{t('modal.feedForm.none')}</option>

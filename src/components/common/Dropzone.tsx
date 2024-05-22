@@ -73,7 +73,7 @@ const Dropzone = ({
     >
       <input {...getInputProps()} />
       {fileName && fileSize ? (
-        <div className='w-full h-full flex flex-col justify-center items-center relative p-5'>
+        <div className='w-full h-64 flex flex-col justify-center items-center relative p-5'>
           <button
             className='absolute z-30 top-2 right-2 p-2 hover:bg-white dark:hover:bg-darkGray text-black dark:text-white rounded-md'
             onClick={handleRemoveFile}
@@ -88,7 +88,7 @@ const Dropzone = ({
           </span>
         </div>
       ) : (
-        <div className='w-full h-full flex flex-col justify-center items-center p-5'>
+        <div className='w-full h-64 flex flex-col justify-center items-center p-5'>
           <span className='uppercase text-2xl text-center font-extrabold text-black dark:text-white'>
             {title}
           </span>

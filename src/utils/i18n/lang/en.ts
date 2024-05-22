@@ -168,7 +168,7 @@ export const en = {
         identifiers: 'Identifiers',
         additionalData: 'Additional Data',
         title: 'Title',
-        year: 'Year',
+        year: 'Date of publication (YYYY, YYYY-MM, YYYY-MM-DD)',
         publisher: 'Publisher',
         summary: 'Summary',
         AuthorsAndFeeds: 'Authors & Feeds',
