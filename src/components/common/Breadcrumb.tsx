@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 
 const Breadcrumb = () => {
-  const { specialNavigation, lang } = useAppContext();
+  const { specialNavigation, lang, editingEntryTitle } = useAppContext();
   const [breadcrumbs, setBreadcrumbs] = useState<
     { path: string; label: string }[]
   >([]);
@@ -28,7 +28,7 @@ const Breadcrumb = () => {
     ['loans']: isEn() ? 'Loans' : 'Výpožičky',
     ['entries']: isEn() ? 'Entries' : 'Publikácie',
     ['add']: isEn() ? 'Add' : 'Pridanie',
-    ['edit']: isEn() ? 'Edit' : 'Úprava',
+    ['edit']: editingEntryTitle,
   };
 
   const location = useLocation();
@@ -66,16 +66,16 @@ const Breadcrumb = () => {
       });
 
     setBreadcrumbs(newBreadcrumbs);
-  }, [location, lang]);
+  }, [location, lang, editingEntryTitle]);
 
   return (
-    <div className='flex gap-3 flex-wrap text-right items-center p-4'>
+    <div className='flex gap-3 flex-wrap items-center p-4'>
       <button onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.home)}>
         <FaHome size={20} />
       </button>
       {breadcrumbs.map((breadcrumb, index) => (
         <button
-          className={`flex gap-3 w-fit h-full items-center text-sm ${
+          className={`flex gap-3 w-fit items-center text-sm text-left ${
             index === breadcrumbs.length - 1
               ? 'cursor-default'
               : 'cursor-pointer'

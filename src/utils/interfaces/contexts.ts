@@ -63,4 +63,6 @@ export interface IAppContext {
   titleLogoLight: string;
   stuLogoDark: string;
   stuLogoLight: string;
+  editingEntryTitle: string;
+  setEditingEntryTitle: (editingEntryTitle: string) => void;
 }

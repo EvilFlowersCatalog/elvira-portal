@@ -16,8 +16,7 @@ import ElviraInput from '../../components/common/ElviraInput';
 
 const Home = () => {
   const { t } = useTranslation();
-  const { theme, titleLogoDark, titleLogoLight, stuLogoDark, stuLogoLight } =
-    useAppContext();
+  const { theme, titleLogoDark, titleLogoLight } = useAppContext();
   const [popularEntries, setPopularEntries] = useState<IEntry[]>([]);
   const [clickedEntry, setClickedEntry] = useState<
     'popular' | 'lastAdded' | ''
@@ -85,11 +84,6 @@ const Home = () => {
             className='w-full md:w-2/3 lg:w-1/2 max-w-[800px]'
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
             alt='Elvira Logo'
-          />
-          <img
-            className='w-28'
-            src={theme === THEME_TYPE.dark ? stuLogoLight : stuLogoDark}
-            alt='STU Logo'
           />
           <form
             className='relative flex w-full md:w-1/2 xl:w-1/3 max-w-96 items-center gap-2 text-darkGray dark:text-white'

@@ -57,6 +57,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const [theme, setTheme] = useState<THEME_TYPE>(getInitialTheme);
   const [lang, setLang] = useState<LANG_TYPE>(getInitialLang);
   const [showNavbar, setShowNavbar] = useState<boolean>(false);
+  const [editingEntryTitle, setEditingEntryTitle] = useState<string>('');
   const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
   const [isSmallDevice, setIsSmallDevice] = useState<boolean>(
     window.innerWidth < 959
@@ -197,6 +198,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   useEffect(() => {
     setShowNavbar(false);
     setShowSearchBar(false);
+    setEditingEntryTitle('');
   }, [location.pathname]);
 
   useEffect(() => {
@@ -237,6 +239,8 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         stuLogoDark,
         logoDark,
         logoLight,
+        editingEntryTitle,
+        setEditingEntryTitle,
         STUColor: (colors as { STUColor: string }).STUColor,
       }}
     >

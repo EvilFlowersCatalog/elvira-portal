@@ -26,10 +26,7 @@ import ApplyInfoDialog from '../../../components/dialogs/ApplyInfoDialog';
 import useCustomEffect from '../../../hooks/useCustomEffect';
 import ElviraInput from '../../../components/common/ElviraInput';
 
-interface IEntryWizardParams {
-  form?: IEntryDetail;
-}
-const AdminAddEntry = ({ form }: IEntryWizardParams) => {
+const AdminAddEntry = () => {
   const { t } = useTranslation();
   const [stepIndex, setStepIndex] = useState<number>(0);
   const [openApplyInfo, setOpenApplyInfo] = useState<boolean>(false);
@@ -41,12 +38,7 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
   );
   const [activeFeeds, setActiveFeeds] = useState<
     { title: string; id: string }[]
-  >(
-    (form?.response.feeds ?? []).map((feed) => ({
-      title: feed.title,
-      id: feed.id,
-    }))
-  );
+  >([]);
   const uploadEntry = useUploadEntry();
   const navigate = useNavigate();
   const getData = useGetData();
@@ -107,22 +99,19 @@ const AdminAddEntry = ({ form }: IEntryWizardParams) => {
   };
 
   const [entryForm, setEntryForm] = useState<IEntryNewForm>({
-    title: form?.response.title ?? '',
-    authors: form?.response.authors ?? [{ name: '', surname: '' }],
-    feeds: (form?.response.feeds ?? []).map((feed) => ({
-      id: feed.id,
-      title: feed.title,
-    })),
-    summary: form?.response.summary ?? '',
+    title: '',
+    authors: [],
+    feeds: [],
+    summary: '',
     language_code: 'sk',
     identifiers: {
-      doi: form?.response.identifiers.doi ?? '',
-      isbn: form?.response.identifiers.isbn ?? '',
+      doi: '',
+      isbn: '',
     },
-    citation: form?.response.citation ?? '',
-    published_at: form?.response.published_at ?? '',
-    publisher: form?.response.publisher ?? '',
-    image: convertToImageFile(form?.response.thumbnail),
+    citation: '',
+    published_at: '',
+    publisher: '',
+    image: null,
     pdf: null,
   });
 

@@ -6,9 +6,11 @@ import { useState } from 'react';
 import { IEntryNew } from '../../../utils/interfaces/entry';
 import PageLoading from '../../../components/page/PageLoading';
 import { useTranslation } from 'react-i18next';
+import useAppContext from '../../../hooks/contexts/useAppContext';
 
 const AdminEditEntry = () => {
   const { t } = useTranslation();
+  const { setEditingEntryTitle } = useAppContext();
   const { 'entry-id': id } = useParams();
   const [entry, setEntry] = useState<IEntryNew | null>(null);
 
@@ -18,18 +20,20 @@ const AdminEditEntry = () => {
     try {
       (async () => {
         if (id) {
-          const entryDetail = await getEntryDetail(id);
+          const { response: entryDetail } = await getEntryDetail(id);
+          setEditingEntryTitle(entryDetail.title);
+
           setEntry({
-            title: entryDetail.response.title,
-            authors: entryDetail.response.authors,
-            feeds: entryDetail.response.feeds.map((feed) => feed.id),
-            summary: entryDetail.response.summary,
-            language_code: entryDetail.response.language?.code ?? '',
-            identifiers: entryDetail.response.identifiers,
-            citation: entryDetail.response.citation,
-            published_at: entryDetail.response.published_at,
-            publisher: entryDetail.response.publisher,
-            image: entryDetail.response.thumbnail,
+            title: entryDetail.title,
+            authors: entryDetail.authors,
+            feeds: entryDetail.feeds.map((feed) => feed.id),
+            summary: entryDetail.summary,
+            language_code: entryDetail.language?.code ?? '',
+            identifiers: entryDetail.identifiers,
+            citation: entryDetail.citation,
+            published_at: entryDetail.published_at,
+            publisher: entryDetail.publisher,
+            image: entryDetail.thumbnail,
           });
         }
       })();

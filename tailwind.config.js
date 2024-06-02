@@ -11,6 +11,10 @@ export default {
         xxl: '1440px',
       },
       colors: {
+        /**
+         * FIIT: #01a9e0
+         * MTF: #e62b1e
+         */
         STUColor: '#01a9e0',
         red: '#ff2129',
         green: '#77dd77',

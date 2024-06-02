@@ -7,11 +7,12 @@
 - **Added**: Edit page for entries
 - **Added**: Confiration dialog for appling identifier info
 - **Added**: Edit and add for feeds
-- **Added**: FIIT logo in home page
 - **Added**: Link to stu logo in navbar
-- **Added**: Static folder in `assets` for about page
+- **Added**: Images in `static` folder in `assets` for about page
+- **Added**: Assets for MTF
 - **Changed**: Design of `ElviraInput`
 - **Changed**: Design of `ElviraTextarea`
+- **Changed**: In breadcrumbs `Edit` to actual name of editing entry
 - **Changed**: Viewer version from 0.4.21 to 0.4.24
 - **Changed**: About page
 - **Changed**: `year` to `published_at`

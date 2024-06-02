@@ -13,7 +13,6 @@ import {
   IoSunnyOutline,
 } from 'react-icons/io5';
 import { MdOutlineFeed } from 'react-icons/md';
-import { CiLogout } from 'react-icons/ci';
 import { RiAdminLine, RiArrowLeftDoubleFill } from 'react-icons/ri';
 import { PiBooks } from 'react-icons/pi';
 import { HiOutlineLanguage } from 'react-icons/hi2';
@@ -78,6 +77,10 @@ const Navbar = () => {
   const { t } = useTranslation();
   const location = useLocation();
   const verifyAdmin = useVerifyAdmin();
+  const stuLinks: { [key: string]: string } = {
+    ['fiit']: 'https://www.fiit.stuba.sk/',
+    ['mtf']: 'https://www.mtf.stuba.sk/',
+  };
 
   // Function for returning if theme is dark cuz of lot of usage
   const isDark = () => {
@@ -132,7 +135,9 @@ const Navbar = () => {
           </button>
         ) : (
           <button
-            onClick={(e) => window.open('https://www.fiit.stuba.sk/', '_blank')}
+            onClick={(e) =>
+              window.open(stuLinks[import.meta.env.ELVIRA_ASSETS_DIR], '_blank')
+            }
           >
             <img
               className='h-auto w-16'
