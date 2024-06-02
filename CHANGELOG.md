@@ -10,6 +10,7 @@
 - **Added**: Link to stu logo in navbar
 - **Added**: Images in `static` folder in `assets` for about page
 - **Added**: Assets for MTF
+- **Added**: Scripts for analysis
 - **Changed**: Design of `ElviraInput`
 - **Changed**: Design of `ElviraTextarea`
 - **Changed**: In breadcrumbs `Edit` to actual name of editing entry
