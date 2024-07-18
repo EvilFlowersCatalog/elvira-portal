@@ -2,7 +2,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import { IEntry } from '../../../utils/interfaces/entry';
 import EntryForSwiper from './EntryForSwiper';
-import EntryLoading from '../EntryLoading';
+import EntryBoxLoading from '../loading/EntryBoxLoading';
 
 interface IEntrySwiperParams {
   isLoading: boolean;
@@ -37,7 +37,7 @@ const EntrySwiper = ({
       {isLoading
         ? Array.from({ length: 30 }).map((_, index) => (
             <SwiperSlide className='max-w-52' key={index}>
-              <EntryLoading fixedSize />
+              <EntryBoxLoading fixedSize />
             </SwiperSlide>
           ))
         : entries.map((entry, index) => (

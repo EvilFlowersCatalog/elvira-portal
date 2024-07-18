@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { IEntry } from '../../utils/interfaces/entry';
-import useAppContext from '../../hooks/contexts/useAppContext';
+import { IEntry } from '../../utils/interfaces/entry.ts';
+import useAppContext from '../../hooks/contexts/useAppContext.tsx';
 import useAuthContext from '../../hooks/contexts/useAuthContext.tsx';
 
-interface IEntryParams {
+interface IEntryBoxParams {
   entry: IEntry;
   isActive: boolean;
 }
 
-const Entry = ({ entry, isActive }: IEntryParams) => {
+const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
   const { auth } = useAuthContext();
   const { showSearchBar, isSmallDevice } = useAppContext();
   const [isScale, setIsScale] = useState<boolean>(false);
@@ -91,4 +91,4 @@ const Entry = ({ entry, isActive }: IEntryParams) => {
   );
 };
 
-export default Entry;
+export default EntryBox;

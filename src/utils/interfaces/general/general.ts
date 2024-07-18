@@ -13,6 +13,7 @@ export enum NAVIGATION_PATHS {
   adminAddEntries = '/administration/entries/add',
   adminEditEntries = '/administration/entries/edit/',
   adminFeeds = '/administration/feeds',
+  adminCategories = '/administration/categories',
 }
 
 export enum THEME_TYPE {
@@ -23,6 +24,11 @@ export enum THEME_TYPE {
 export enum LANG_TYPE {
   sk = 'sk',
   en = 'en',
+}
+
+export enum LAYOUT_TYPE {
+  list = 'list',
+  box = 'box',
 }
 
 export enum IDENTIFIERS_TYPE {

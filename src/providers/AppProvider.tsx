@@ -7,6 +7,7 @@ import {
 } from 'react';
 import {
   LANG_TYPE,
+  LAYOUT_TYPE,
   NAVIGATION_PATHS,
   THEME_TYPE,
 } from '../utils/interfaces/general/general';
@@ -22,6 +23,7 @@ export const AppContext = createContext<IAppContext | null>(null);
 // LOCAL SOTRAGE KEY
 const THEME_KEY = 'elvira-theme';
 const LANG_KEY = 'elvira-lang';
+const LAYOUT_KEY = 'elvira-layout';
 
 // IMAGES / LOGOS
 const logoDark = `/assets/${
@@ -53,9 +55,14 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     const lang = localStorage.getItem(LANG_KEY);
     return lang ? JSON.parse(lang) : LANG_TYPE.sk;
   };
+  const getInitialLayout = () => {
+    const layout = localStorage.getItem(LAYOUT_KEY);
+    return layout ? JSON.parse(layout) : LAYOUT_TYPE.box;
+  };
   const { colors } = tailwindConfig.theme?.extend!;
   const [theme, setTheme] = useState<THEME_TYPE>(getInitialTheme);
   const [lang, setLang] = useState<LANG_TYPE>(getInitialLang);
+  const [layout, setLayout] = useState<LAYOUT_TYPE>(getInitialLayout);
   const [showNavbar, setShowNavbar] = useState<boolean>(false);
   const [editingEntryTitle, setEditingEntryTitle] = useState<string>('');
   const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
@@ -77,6 +84,12 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const updateLang = (lang: LANG_TYPE) => {
     setLang(lang);
     localStorage.setItem(LANG_KEY, JSON.stringify(lang));
+  };
+
+  // Update layout and localstorage
+  const updateLayout = (layout: LAYOUT_TYPE) => {
+    setLayout(layout);
+    localStorage.setItem(LAYOUT_KEY, JSON.stringify(layout));
   };
 
   // Special navigation stands for navigation that can open new window tab with holding ctr/cmd
@@ -205,6 +218,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     // handle resizeing window and set height/width
     const handleResize = () => {
       const newWidth: number = window.innerWidth;
+      if (newWidth < 959) updateLayout(LAYOUT_TYPE.box);
       setIsSmallDevice(newWidth < 959);
     };
 
@@ -223,6 +237,8 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         updateTheme,
         lang,
         updateLang,
+        layout,
+        updateLayout,
         showNavbar,
         setShowNavbar,
         showSearchBar,

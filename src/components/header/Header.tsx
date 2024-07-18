@@ -17,7 +17,7 @@ const Header = () => {
   } = useAppContext();
 
   return (
-    <div className='fixed z-20 top-0 w-full min-w-32 flex px-5 gap-5 items-center h-14 bg-zinc-200 dark:bg-darkGray overflow-x-auto'>
+    <div className='fixed z-20 top-0 w-full flex px-5 gap-4 items-center h-14 bg-zinc-200 dark:bg-darkGray'>
       <button className='' onClick={() => setShowNavbar(true)}>
         <FiMenu size={30} />
       </button>

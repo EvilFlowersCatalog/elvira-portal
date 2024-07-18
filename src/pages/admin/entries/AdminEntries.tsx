@@ -2,13 +2,12 @@ import { useEffect, useState } from 'react';
 import { IEntry } from '../../../utils/interfaces/entry';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import useGetEntries from '../../../hooks/api/entries/useGetEntries';
-import EntryContainer from '../../../components/entry/EntryContainer';
+import ItemContainer from '../../../components/items-container/ItemContainer';
 import AdminEntry from '../../../components/entry/admin/AdminEntry';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import { MdAdd } from 'react-icons/md';
 import useAppContext from '../../../hooks/contexts/useAppContext';
-import EntriesLoading from '../../../components/entry/EntryLoading';
-import EntryLoading from '../../../components/entry/EntryLoading';
+import EntryBoxLoading from '../../../components/entry/loading/EntryBoxLoading';
 
 const AdminEntries = () => {
   const { showSearchBar } = useAppContext();
@@ -59,17 +58,19 @@ const AdminEntries = () => {
   }, [page]);
 
   return (
-    <EntryContainer
+    <ItemContainer
       isLoading={isLoading}
       setIsLoading={setIsLoading}
       isError={isError}
-      entries={entries}
-      setEntries={setEntries}
+      items={entries}
+      setItems={setEntries}
       page={page}
       setPage={setPage}
       maxPage={maxPage}
       loadingNext={loadingNext}
       setLoadingNext={setLoadingNext}
+      showEmpty={false}
+      searchSpecifier={'query'}
     >
       <div className='flex flex-wrap px-3 pb-4'>
         <div
@@ -92,10 +93,10 @@ const AdminEntries = () => {
         ))}
         {loadingNext &&
           Array.from({ length: 30 }).map((_, index) => (
-            <EntryLoading key={index} />
+            <EntryBoxLoading key={index} />
           ))}
       </div>
-    </EntryContainer>
+    </ItemContainer>
   );
 };
 

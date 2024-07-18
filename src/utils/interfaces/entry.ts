@@ -15,6 +15,8 @@ export interface IEntry {
   language: IEntryLanguage;
   popularity: number;
   category: IEntryCategory;
+  summary: string;
+  feeds: IFeed[];
   creator_id: string;
   catalog_id: string;
   created_at: string;

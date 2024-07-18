@@ -1,29 +1,28 @@
 import { useEffect, useState } from 'react';
-import { IFeed } from '../../utils/interfaces/feed';
-import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
-import { useSearchParams } from 'react-router-dom';
-import AdminFeed from '../../components/feed/admin/AdminFeed';
+import useGetCategories from '../../hooks/api/categories/useGetCategories';
 import { MdAdd } from 'react-icons/md';
-import FeedForm from '../../components/feed/admin/FeedForm';
+import { useSearchParams } from 'react-router-dom';
+import Category from '../../components/category/Category';
 import ItemContainer from '../../components/items-container/ItemContainer';
+import CategoryForm from '../../components/category/CategoryForm';
 
-const AdminFeeds = () => {
+const AdminCategories = () => {
+  const [categories, setCategories] = useState<any[]>([]);
+  const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingNext, setLoadingNext] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
   const [page, setPage] = useState<number>(0);
   const [maxPage, setMaxPage] = useState<number>(0);
-  const [feeds, setFeeds] = useState<IFeed[]>([]);
-  const [showForm, setShowForm] = useState<boolean>(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [reloadPage, setReloadPage] = useState<boolean>(false);
 
-  const [searchParams] = useSearchParams();
-  const getFeeds = useGetFeeds();
+  const getCategories = useGetCategories();
 
   // When searchParams change or is triggered reload -> Reset page
   useEffect(() => {
     setPage(0);
-    setFeeds([]);
+    setCategories([]);
     setIsLoading(true);
   }, [reloadPage]);
 
@@ -35,17 +34,15 @@ const AdminFeeds = () => {
 
     (async () => {
       try {
-        const { items, metadata } = await getFeeds({
-          page: page,
+        const { items, metadata } = await getCategories({
+          page,
           limit: 50,
-          title: searchParams.get('title') ?? '',
-          parentId: searchParams.get('parent-id') ?? 'null',
-          orderBy: searchParams.get('order-by') ?? '',
+          query: searchParams.get('query') ?? '',
+          orderBy: searchParams.get('order-by') ?? '-created_at',
         });
-
         // Set items and metadata
         setMaxPage(metadata.pages);
-        setFeeds([...(feeds ?? []), ...items]);
+        setCategories([...(categories ?? []), ...items]);
       } catch {
         // if there was error set to true
         setIsError(true);
@@ -63,8 +60,8 @@ const AdminFeeds = () => {
         isLoading={isLoading}
         setIsLoading={setIsLoading}
         isError={isError}
-        items={feeds}
-        setItems={setFeeds}
+        items={categories}
+        setItems={setCategories}
         page={page}
         setPage={setPage}
         maxPage={maxPage}
@@ -72,33 +69,34 @@ const AdminFeeds = () => {
         setLoadingNext={setLoadingNext}
         isEntries={false}
         showEmpty={false}
-        searchSpecifier={'title'}
+        searchSpecifier={'query'}
       >
-        <div className='flex flex-row flex-wrap px-2 pb-4'>
+        <div className='flex flex-wrap px-3 pb-4'>
           {/* Add button */}
-          <div className={'flex p-2.5 w-full lg:w-1/2 xl:w-1/3 xxl:w-1/4'}>
+          <div
+            className={'w-full p-2 flex md:w-1/2 lg:w-1/4 xl:w-1/5 xxl:w-1/6'}
+          >
             <button
-              onClick={() => setShowForm(true)}
+              onClick={() => setIsOpen(true)}
               className={`flex flex-col justify-center dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 border-STUColor bg-STUColor bg-opacity-40 hover:bg-opacity-20 duration-200`}
             >
               <MdAdd size={50} />
             </button>
           </div>
-          {/* FEEDS */}
 
-          {feeds.map((feed, index) => (
-            <AdminFeed
+          {categories.map((category, index) => (
+            <Category
               key={index}
-              feed={feed}
+              category={category}
               reloadPage={reloadPage}
               setReloadPage={setReloadPage}
             />
           ))}
         </div>
       </ItemContainer>
-      {showForm && (
-        <FeedForm
-          setOpen={setShowForm}
+      {isOpen && (
+        <CategoryForm
+          setOpen={setIsOpen}
           reloadPage={reloadPage}
           setReloadPage={setReloadPage}
         />
@@ -107,4 +105,4 @@ const AdminFeeds = () => {
   );
 };
 
-export default AdminFeeds;
+export default AdminCategories;

@@ -40,6 +40,50 @@ export const en = {
           error: 'Feed failed to by removed.',
         },
       },
+      category: {
+        add: {
+          success: 'Category was successfully added.',
+          error: 'Category failed to be added.',
+        },
+        edit: {
+          success: 'Category was successfully edited.',
+          error: 'Category failed to by edited.',
+        },
+        remove: {
+          success: 'Category was successfully removed.',
+          error: 'Category failed to by removed.',
+        },
+      },
+      editPage: {
+        layer: {
+          save: {
+            success: 'Layer was successfully saved.',
+            error: 'Layer failed to be saved.',
+          },
+          edit: {
+            success: 'Layer was successfully edited.',
+            error: 'Layer failed to be edited.',
+          },
+          delete: {
+            success: 'Layer was successfully deleted.',
+            error: 'Layer failed to be deleted.',
+          },
+        },
+        group: {
+          add: {
+            success: 'Group was successfully added.',
+            error: 'Group failed to be added.',
+          },
+          edit: {
+            success: 'Group was successfully edited.',
+            error: 'Group failed to be edited.',
+          },
+          remove: {
+            success: 'Group was successfully removed.',
+            error: 'Group failed to be removed.',
+          },
+        },
+      },
       login: {
         success: 'You have been successfully logged in.',
         error: 'Wrong credentials.',
@@ -69,6 +113,7 @@ export const en = {
       homePage: {
         entries: 'Entries',
         feeds: 'Feeds',
+        categories: 'Categories',
       },
     },
 
@@ -211,6 +256,7 @@ export const en = {
         dialog: 'Are you sure you want to delete "{{x}}" {{y}}?',
         entry: 'entry',
         feed: 'feed',
+        category: 'category',
       },
       feedForm: {
         edit: 'edit',
@@ -229,6 +275,22 @@ export const en = {
             'Title field is required. It must be filled out before proceeding.',
           content:
             'Content field is required. It must be filled out before proceeding.',
+        },
+      },
+      categoryForm: {
+        edit: 'Edit',
+        editCategory: 'Edit Category',
+        add: 'Add',
+        addCategory: 'Add Category',
+        term: 'Term',
+        label: 'Label',
+        scheme: 'Scheme',
+        requiredMessages: {
+          term: 'Term field is required. It must be filled out before proceeding.',
+          label:
+            'Label field is required. It must be filled out before proceeding.',
+          scheme:
+            'Scheme field is required. It must be filled out before proceeding.',
         },
       },
     },

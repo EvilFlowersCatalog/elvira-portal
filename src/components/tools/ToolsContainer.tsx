@@ -1,26 +1,37 @@
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IoSearchOutline } from 'react-icons/io5';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import useAppContext from '../../hooks/contexts/useAppContext';
-import { FaFilterCircleXmark } from 'react-icons/fa6';
-import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
+import { FaFilterCircleXmark, FaList } from 'react-icons/fa6';
+import { LAYOUT_TYPE } from '../../utils/interfaces/general/general';
 import ElviraInput from '../common/ElviraInput';
+import { HiMiniSquares2X2 } from 'react-icons/hi2';
 
 interface IToolsContainerParams {
   advancedSearch?: boolean;
+  showLayout?: boolean;
   param: string;
 }
 
-const ToolsContainer = ({ advancedSearch, param }: IToolsContainerParams) => {
+const ToolsContainer = ({
+  advancedSearch,
+  param,
+  showLayout = false,
+}: IToolsContainerParams) => {
   const { t } = useTranslation();
-  const { showSearchBar, setShowSearchBar, clearFilters, isParamsEmpty } =
-    useAppContext();
+  const {
+    showSearchBar,
+    setShowSearchBar,
+    clearFilters,
+    isParamsEmpty,
+    updateLayout,
+    layout,
+    isSmallDevice,
+  } = useAppContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const [input, setInput] = useState<string>('');
   const [selection, setSelection] = useState('-created_at');
-
-  const location = useLocation();
 
   // submit input (search title)
   const submit = (e: FormEvent<HTMLFormElement>) => {
@@ -58,9 +69,24 @@ const ToolsContainer = ({ advancedSearch, param }: IToolsContainerParams) => {
   return (
     <div className={`flex gap-4 px-4 pb-4 item-start flex-col md:flex-row`}>
       <div className='w-full md:w-1/2 xl:w-1/4'>
-        <div className='flex gap-4'>
+        <div className='flex gap-4 items-center'>
+          {!isSmallDevice &&
+            showLayout &&
+            (layout === LAYOUT_TYPE.list ? (
+              <FaList
+                size={30}
+                className='cursor-pointer'
+                onClick={() => updateLayout(LAYOUT_TYPE.box)}
+              />
+            ) : (
+              <HiMiniSquares2X2
+                size={30}
+                className='cursor-pointer'
+                onClick={() => updateLayout(LAYOUT_TYPE.list)}
+              />
+            ))}
           <form
-            className='relative flex w-full items-center gap-2 text-darkGray dark:text-white'
+            className='relative flex flex-1 items-center gap-2 text-darkGray dark:text-white'
             onSubmit={submit}
           >
             <ElviraInput

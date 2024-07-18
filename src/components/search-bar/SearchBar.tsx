@@ -62,7 +62,7 @@ const SearchBar = () => {
     <div
       className={`${
         isSmallDevice ? 'w-full' : 'w-64'
-      } flex flex-col gap-2 min-w-64 h-full bg-zinc-100 dark:bg-darkGray p-4 pb-14 overflow-auto`}
+      } flex flex-col gap-2 h-full bg-zinc-100 dark:bg-darkGray p-4 pb-14 overflow-auto`}
     >
       <div className='flex flex-col justify-between text-center gap-4'>
         <button

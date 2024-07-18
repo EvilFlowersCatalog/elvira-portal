@@ -6,7 +6,7 @@ import AuthProvider from './providers/AuthProvider';
 import AppProvider from './providers/AppProvider';
 import 'react-toastify/dist/ReactToastify.css';
 import './main.css';
-import '../node_modules/@evilflowers/evilflowersviewer/dist/styles.css';
+import '@evilflowers/evilflowersviewer/dist/style.css';
 import 'swiper/swiper-bundle.css';
 
 // For zotero to update

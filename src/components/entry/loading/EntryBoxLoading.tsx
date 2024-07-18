@@ -1,10 +1,10 @@
-import useAppContext from '../../hooks/contexts/useAppContext';
+import useAppContext from '../../../hooks/contexts/useAppContext';
 
-interface IEntryLoading {
+interface IEntryBoxLoading {
   fixedSize?: boolean;
 }
 
-const EntryLoading = ({ fixedSize = false }: IEntryLoading) => {
+const EntryBoxLoading = ({ fixedSize = false }: IEntryBoxLoading) => {
   const { showSearchBar, isSmallDevice } = useAppContext();
 
   return (
@@ -30,4 +30,4 @@ const EntryLoading = ({ fixedSize = false }: IEntryLoading) => {
   );
 };
 
-export default EntryLoading;
+export default EntryBoxLoading;

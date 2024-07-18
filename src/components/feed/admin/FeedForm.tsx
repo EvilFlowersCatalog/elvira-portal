@@ -117,7 +117,7 @@ const FeedForm = ({
     }
   }, []);
 
-  const uploadOReditFeed = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       if (feedId) {
@@ -149,7 +149,7 @@ const FeedForm = ({
       }}
     >
       <form
-        onSubmit={uploadOReditFeed}
+        onSubmit={handleSubmit}
         className='w-full h-full flex flex-col gap-5 items-start justify-start'
       >
         {/* Title */}

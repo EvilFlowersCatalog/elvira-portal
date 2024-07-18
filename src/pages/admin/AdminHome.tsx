@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import Breadcrumb from '../../components/common/Breadcrumb';
 import { FaBook } from 'react-icons/fa';
-import { MdFeed } from 'react-icons/md';
+import { MdCategory, MdFeed } from 'react-icons/md';
 
 const AdminHome = () => {
   const { specialNavigation } = useAppContext();
@@ -45,6 +45,13 @@ const AdminHome = () => {
           text={t('administration.homePage.feeds')}
           onClick={(event) =>
             specialNavigation(event, NAVIGATION_PATHS.adminFeeds)
+          }
+        />
+        <AdminButton
+          icon={<MdCategory size={30} />}
+          text={t('administration.homePage.categories')}
+          onClick={(event) =>
+            specialNavigation(event, NAVIGATION_PATHS.adminCategories)
           }
         />
       </div>

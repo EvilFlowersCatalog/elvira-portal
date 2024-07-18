@@ -2,12 +2,16 @@ import { useEffect, useState } from 'react';
 import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import { IEntry } from '../../utils/interfaces/entry';
 import { useSearchParams } from 'react-router-dom';
-import EntryContainer from '../../components/entry/EntryContainer';
-import Entry from '../../components/entry/Entry';
-import EntriesLoading from '../../components/entry/EntryLoading';
-import EntryLoading from '../../components/entry/EntryLoading';
+import ItemContainer from '../../components/items-container/ItemContainer';
+import EntryBox from '../../components/entry/EntryBox';
+import useAppContext from '../../hooks/contexts/useAppContext';
+import { LAYOUT_TYPE } from '../../utils/interfaces/general/general';
+import EntryList from '../../components/entry/EntryList';
+import EntryListLoading from '../../components/entry/loading/EntryListLoading';
+import EntryBoxLoading from '../../components/entry/loading/EntryBoxLoading';
 
 const Library = () => {
+  const { layout } = useAppContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingNext, setLoadingNext] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
@@ -55,34 +59,44 @@ const Library = () => {
   }, [page]);
 
   return (
-    <EntryContainer
+    <ItemContainer
       activeEntryId={activeEntryId}
       setActiveEntryId={setActiveEntryId}
       isLoading={isLoading}
       setIsLoading={setIsLoading}
       isError={isError}
-      entries={entries}
-      setEntries={setEntries}
+      items={entries}
+      setItems={setEntries}
       page={page}
       setPage={setPage}
       maxPage={maxPage}
       loadingNext={loadingNext}
       setLoadingNext={setLoadingNext}
+      showLayout
+      searchSpecifier={'query'}
     >
-      <div className='flex flex-wrap px-4 pb-4'>
-        {entries.map((entry, index) => (
-          <Entry
-            key={index}
-            entry={entry}
-            isActive={activeEntryId === entry.id}
-          />
-        ))}
+      <div className='flex flex-wrap p-4 pt-0'>
+        {layout === LAYOUT_TYPE.list
+          ? entries.map((entry, index) => (
+              <EntryList key={index} entry={entry} />
+            ))
+          : entries.map((entry, index) => (
+              <EntryBox
+                key={index}
+                entry={entry}
+                isActive={activeEntryId === entry.id}
+              />
+            ))}
         {loadingNext &&
-          Array.from({ length: 30 }).map((_, index) => (
-            <EntryLoading key={index} />
-          ))}
+          (layout === LAYOUT_TYPE.list
+            ? Array.from({ length: 30 }).map((_, index) => (
+                <EntryListLoading key={index} />
+              ))
+            : Array.from({ length: 30 }).map((_, index) => (
+                <EntryBoxLoading key={index} />
+              )))}
       </div>
-    </EntryContainer>
+    </ItemContainer>
   );
 };
 

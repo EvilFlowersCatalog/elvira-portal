@@ -1,40 +1,43 @@
 import { useSearchParams } from 'react-router-dom';
 import { ReactNode, useEffect, useRef, useState } from 'react';
-import EntryDetail from './EntryDetail';
+import EntryDetail from '../entry/EntryDetail';
 import Breadcrumb from '../common/Breadcrumb';
 import PageLoading from '../page/PageLoading';
 import PageMessage from '../page/PageMessage';
 import { useTranslation } from 'react-i18next';
-import { IEntry } from '../../utils/interfaces/entry';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import ScrollUpButton from '../common/ScrollUpButton';
 import ToolsContainer from '../tools/ToolsContainer';
 
-interface IEntryContainer {
+interface IItemContainer {
   children: ReactNode;
   activeEntryId?: string | null;
   setActiveEntryId?: ((activeEntryId: string | null) => void) | null;
   isLoading: boolean;
+  showLayout?: boolean;
   setIsLoading: (isLoading: boolean) => void;
   isError: boolean;
-  entries: IEntry[];
-  setEntries: (entries: IEntry[]) => void;
+  items: any[];
+  isEntries?: boolean;
+  setItems: (entries: any[]) => void;
   triggerReload?: (() => void) | null;
   page: number;
   setPage: (page: number) => void;
   maxPage: number;
   loadingNext: boolean;
   setLoadingNext: (loadingNext: boolean) => void;
+  searchSpecifier: string;
+  showEmpty?: boolean;
 }
 
-const EntryContainer = ({
+const ItemContainer = ({
   children,
   activeEntryId = null,
   setActiveEntryId = null,
   isLoading,
   isError,
-  entries,
-  setEntries,
+  items,
+  setItems,
   triggerReload = null,
   setIsLoading,
   page,
@@ -42,7 +45,11 @@ const EntryContainer = ({
   setLoadingNext,
   setPage,
   maxPage,
-}: IEntryContainer) => {
+  showLayout = false,
+  isEntries = true,
+  searchSpecifier,
+  showEmpty = true,
+}: IItemContainer) => {
   const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty } =
     useAppContext();
   const { t } = useTranslation();
@@ -57,7 +64,7 @@ const EntryContainer = ({
     // If they are not equal reset
     if (!searchParamsEqual(previousSearchParamsRef.current, searchParams)) {
       setPage(0);
-      setEntries([]);
+      setItems([]);
       setIsLoading(true);
     }
 
@@ -90,22 +97,49 @@ const EntryContainer = ({
         }
       >
         <Breadcrumb />
-        <ToolsContainer param='query' advancedSearch />
-        {isLoading && <PageLoading entries />}
+
+        <ToolsContainer
+          param={searchSpecifier}
+          advancedSearch={isEntries}
+          showLayout={showLayout}
+        />
+
+        {isLoading && (
+          <PageLoading entries={isEntries} showLayout={showLayout} />
+        )}
+
         {!isLoading && isError && <PageMessage message={t('page.error')} />}
-        {!isLoading && !isError && entries.length > 0 && <>{children}</>}
-        {!isLoading &&
-          !isError &&
-          entries.length === 0 &&
-          (!isParamsEmpty() ? (
-            <PageMessage
-              message={t('page.notFound')}
-              clearParams={clearFilters}
-            />
-          ) : (
-            // Possible only in shelf
-            <PageMessage message={t('page.shelfEmpty')} />
-          ))}
+
+        {!isLoading && !isError && (
+          <>
+            {showEmpty ? (
+              <>
+                {items.length > 0 && children}
+                {items.length === 0 && (
+                  <PageMessage
+                    message={
+                      isParamsEmpty()
+                        ? t('page.shelfEmpty')
+                        : t('page.notFound')
+                    }
+                    clearParams={!isParamsEmpty() ? clearFilters : undefined}
+                  />
+                )}
+              </>
+            ) : (
+              <>
+                {(items.length === 0 && isParamsEmpty()) || items.length > 0 ? (
+                  children
+                ) : (
+                  <PageMessage
+                    message={t('page.notFound')}
+                    clearParams={clearFilters}
+                  />
+                )}
+              </>
+            )}
+          </>
+        )}
       </div>
       {showScrollUp && <ScrollUpButton scrollRef={scrollRef} />}
       {activeEntryId && <EntryDetail triggerReload={triggerReload} />}
@@ -113,4 +147,4 @@ const EntryContainer = ({
   );
 };
 
-export default EntryContainer;
+export default ItemContainer;

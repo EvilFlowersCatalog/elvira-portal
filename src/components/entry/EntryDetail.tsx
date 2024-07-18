@@ -165,7 +165,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                 }
               >
                 <img
-                  className={'w-full'}
+                  className={'w-full min-h-52'}
                   src={
                     entry.response.thumbnail + `?access_token=${auth?.token}`
                   }
@@ -176,7 +176,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
             {entry.response.authors.length > 0 && (
               <>
                 <span className={'text-white text-center font-bold'}>
-                  {entry.response.authors[0].name}{' '}
+                  {entry.response.authors[0].name}
                   {entry.response.authors[0].surname}
                 </span>
                 <div

@@ -4,7 +4,7 @@ import { IModalParams } from '../../utils/interfaces/general/general';
 
 interface IConfirmationDialogParams extends IModalParams {
   name: string;
-  type: 'feed' | 'entry';
+  type: 'feed' | 'entry' | 'category';
 }
 const ConfirmationDialog = ({
   name,
@@ -27,7 +27,9 @@ const ConfirmationDialog = ({
           y:
             type === 'feed'
               ? t('modal.confirmation.feed')
-              : t('modal.confirmation.entry'),
+              : type === 'entry'
+              ? t('modal.confirmation.entry')
+              : t('modal.confirmation.category'),
         })}
       </span>
     </ModalWrapper>

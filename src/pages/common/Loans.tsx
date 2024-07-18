@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IEntry } from '../../utils/interfaces/entry';
-import EntryContainer from '../../components/entry/EntryContainer';
+import ItemContainer from '../../components/items-container/ItemContainer';
 
 const Loans = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -12,22 +12,23 @@ const Loans = () => {
   const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
 
   return (
-    <EntryContainer
+    <ItemContainer
       activeEntryId={activeEntryId}
       setActiveEntryId={setActiveEntryId}
       isLoading={isLoading}
       setIsLoading={setIsLoading}
       isError={isError}
-      entries={entries}
-      setEntries={setEntries}
+      items={entries}
+      setItems={setEntries}
       page={page}
       setPage={setPage}
       maxPage={maxPage}
       loadingNext={loadingNext}
       setLoadingNext={setLoadingNext}
+      searchSpecifier={'query'}
     >
       <div className='flex flex-wrap px-4 pb-4'>Loans</div>
-    </EntryContainer>
+    </ItemContainer>
   );
 };
 

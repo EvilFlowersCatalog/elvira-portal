@@ -28,6 +28,7 @@ const Breadcrumb = () => {
     ['loans']: isEn() ? 'Loans' : 'Výpožičky',
     ['entries']: isEn() ? 'Entries' : 'Publikácie',
     ['add']: isEn() ? 'Add' : 'Pridanie',
+    ['categories']: isEn() ? 'Categories' : 'Kategórie',
     ['edit']: editingEntryTitle,
   };
 

@@ -116,7 +116,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className='flex flex-col gap-2 w-64 min-w-64 h-full bg-zinc-100 dark:bg-darkGray p-4 overflow-auto'>
+    <div className='flex flex-col gap-2 w-64 h-full bg-zinc-100 dark:bg-darkGray p-4 overflow-auto'>
       {/* Logos */}
       <div className='flex h-6 mb-5 justify-between items-center'>
         <button onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.home)}>

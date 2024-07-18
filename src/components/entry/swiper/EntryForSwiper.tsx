@@ -34,7 +34,6 @@ const EntryForSwiper = ({
   };
 
   const openEntryDetail = () => {
-    console.log(type, clickedEntry);
     const params = new URLSearchParams(searchParams);
     const id = searchParams.get('entry-detail-id');
 

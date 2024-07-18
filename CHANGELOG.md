@@ -11,10 +11,12 @@
 - **Added**: Images in `static` folder in `assets` for about page
 - **Added**: Assets for MTF
 - **Added**: Scripts for analysis
+- **Added**: Layout for entries
+- **Added**: Catalogs
 - **Changed**: Design of `ElviraInput`
 - **Changed**: Design of `ElviraTextarea`
 - **Changed**: In breadcrumbs `Edit` to actual name of editing entry
-- **Changed**: Viewer version from 0.4.21 to 0.4.24
+- **Changed**: Viewer version from 0.4.21 to 0.5.5
 - **Changed**: About page
 - **Changed**: `year` to `published_at`
 - **Changed**: Translation of year

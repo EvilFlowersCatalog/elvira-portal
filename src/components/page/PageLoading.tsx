@@ -1,20 +1,38 @@
 import { CircleLoader } from 'react-spinners';
-import EntryLoading from '../entry/EntryLoading';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import { LAYOUT_TYPE } from '../../utils/interfaces/general/general';
+import EntryListLoading from '../entry/loading/EntryListLoading';
+import EntryBoxLoading from '../entry/loading/EntryBoxLoading';
 
 interface IPageLoadingParams {
   entries?: boolean;
+  showLayout?: boolean;
 }
 
-const PageLoading = ({ entries = false }: IPageLoadingParams) => {
-  const { STUColor } = useAppContext();
+const PageLoading = ({
+  entries = false,
+  showLayout = false,
+}: IPageLoadingParams) => {
+  const { STUColor, layout } = useAppContext();
 
   return (
     <div className={'flex flex-1 flex-wrap px-4 pb-4'}>
       {entries ? (
-        Array.from({ length: 30 }).map((_, index) => (
-          <EntryLoading key={index} />
-        ))
+        showLayout ? (
+          layout === LAYOUT_TYPE.list ? (
+            Array.from({ length: 30 }).map((_, index) => (
+              <EntryListLoading key={index} />
+            ))
+          ) : (
+            Array.from({ length: 30 }).map((_, index) => (
+              <EntryBoxLoading key={index} />
+            ))
+          )
+        ) : (
+          Array.from({ length: 30 }).map((_, index) => (
+            <EntryBoxLoading key={index} />
+          ))
+        )
       ) : (
         <div className={'flex flex-1 justify-center items-center'}>
           <CircleLoader color={STUColor} size={100} />

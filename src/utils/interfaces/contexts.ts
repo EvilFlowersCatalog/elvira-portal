@@ -3,6 +3,7 @@ import { IAuth, IAuthCredentials, IUpdatedAuth } from './auth';
 import {
   DATA_TYPE,
   LANG_TYPE,
+  LAYOUT_TYPE,
   NAVIGATION_PATHS,
   THEME_TYPE,
 } from './general/general';
@@ -31,6 +32,8 @@ export interface IAppContext {
   updateTheme: (theme: THEME_TYPE) => void;
   lang: LANG_TYPE;
   updateLang: (lang: LANG_TYPE) => void;
+  layout: LAYOUT_TYPE;
+  updateLayout: (layout: LAYOUT_TYPE) => void;
   clearFilters: () => void;
   specialNavigation: (
     event: MouseEvent<HTMLButtonElement>,

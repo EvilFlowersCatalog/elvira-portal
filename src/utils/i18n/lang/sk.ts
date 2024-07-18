@@ -40,6 +40,50 @@ export const sk = {
           error: 'Skupinu sa nepodarilo odstrániť.',
         },
       },
+      category: {
+        add: {
+          success: 'Kategória bola úspešne pridaná.',
+          error: 'Kategóriu sa nepodarilo pridať.',
+        },
+        edit: {
+          success: 'Kategória bola úspešne upravená.',
+          error: 'Kategóriu sa nepodarilo upraviť.',
+        },
+        remove: {
+          success: 'Kategória bola úspešne odstránená.',
+          error: 'Kategóriu sa nepodarilo odstrániť.',
+        },
+      },
+      editPage: {
+        layer: {
+          save: {
+            success: 'Vrstva bola úspešne uložená.',
+            error: 'Vrstvu sa nepodarilo uložiť.',
+          },
+          edit: {
+            success: 'Vrstva bola úspešne upravená.',
+            error: 'Vrstvu sa nepodarilo upraviť.',
+          },
+          delete: {
+            success: 'Vrstva bola úspešne vymazaná.',
+            error: 'Vrstvu sa nepodarilo vymazať.',
+          },
+        },
+        group: {
+          add: {
+            success: 'Skupina vrstiev bola úspešne pridaná.',
+            error: 'Skupinu vrstiev sa nepodarilo pridať.',
+          },
+          edit: {
+            success: 'Skupina vrstiev vola úspešne upravená.',
+            error: 'Skupinu vrstiev sa nepodarilo upraviť.',
+          },
+          remove: {
+            success: 'Skupina vrstiev bola úspešne odstránená.',
+            error: 'Skupinu vrstiev sa nepodarilo odstrániť.',
+          },
+        },
+      },
       login: {
         success: 'Boli ste úspešne prihlásený.',
         error: 'Nesprávne prihlasovacie údaje.',
@@ -69,6 +113,7 @@ export const sk = {
       homePage: {
         entries: 'Publikácie',
         feeds: 'Skupiny',
+        categories: 'Kategórie',
       },
     },
 
@@ -204,6 +249,7 @@ export const sk = {
         dialog: 'Ste si istý, že chcete odstrániť "{{x}}" {{y}}?',
         entry: 'publikáciu',
         feed: 'skupinu',
+        category: 'kategóriu',
       },
       feedForm: {
         edit: 'Upraviť',
@@ -221,6 +267,21 @@ export const sk = {
           title: 'Názov je povinný. Pred pokračovaním je potrebné ho vyplniť.',
           content:
             'Kontent je povinný. Pred pokračovaním je potrebné ho vyplniť.',
+        },
+      },
+      categoryForm: {
+        edit: 'Upraviť',
+        editCategory: 'Upraviť Kategóriu',
+        add: 'Pridať',
+        addCategory: 'Pridať Kategóriu',
+        term: 'Termín',
+        label: 'Štítok',
+        scheme: 'Schéma',
+        requiredMessages: {
+          term: 'Termín je povinný. Pred pokračovaním je potrebné ho vyplniť.',
+          label: 'Štítok je povinný. Pred pokračovaním je potrebné ho vyplniť.',
+          scheme:
+            'Schéma je povinná. Pred pokračovaním je potrebné ju vyplniť.',
         },
       },
     },

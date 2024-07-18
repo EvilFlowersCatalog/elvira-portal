@@ -17,9 +17,16 @@ import { renderViewer } from '@evilflowers/evilflowersviewer';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { toast } from 'react-toastify';
 import { updateMetaTag } from '../../utils/func/functions';
-import { CircleLoader } from 'react-spinners';
 import useCustomEffect from '../../hooks/useCustomEffect';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
+import useGetAnotations from '../../hooks/api/anotations/useGetAnotations';
+import useGetAnotationItem from '../../hooks/api/anotations/anotation-items/useGetAnotationItem';
+import useCreateAnotation from '../../hooks/api/anotations/useCreateAnotation';
+import useDeleteAnotation from '../../hooks/api/anotations/useDeleteAnotation';
+import useUpdateAnotation from '../../hooks/api/anotations/useUpdateAnotation';
+import useUpdateAnotationItem from '../../hooks/api/anotations/anotation-items/useUpdateAnotationItem';
+import useCreateAnotationItem from '../../hooks/api/anotations/anotation-items/useCreateAnotationItem';
+import useDeleteAnotationItem from '../../hooks/api/anotations/anotation-items/useDeleteAnotationItem';
 
 const rootId = 'pdf-viewer-page';
 
@@ -28,14 +35,24 @@ const Viewer = () => {
   const { auth } = useAuthContext();
   const { 'entry-id': id } = useParams();
   const { t } = useTranslation();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [progressBar, setProgressBar] = useState<number>(0);
+
   const navigate = useNavigate();
   const createUserAcquisition = useCreateUserAcquisition();
   const getEntryDetail = useGetEntryDetail();
   const getUserAcquisition = useGetUserAcquisition();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [progressBar, setProgressBar] = useState<number>(0);
+  const getAnotations = useGetAnotations();
+  const updateAnotation = useUpdateAnotation();
+  const createAnotation = useCreateAnotation();
+  const deleteAnotation = useDeleteAnotation();
+  const getAnotationsItem = useGetAnotationItem();
+  const updateAnotationItem = useUpdateAnotationItem();
+  const createAnotationItem = useCreateAnotationItem();
+  const deleteAnotationItem = useDeleteAnotationItem();
 
   let acquisition_id = '';
+  let user_acquisition_id = '';
 
   const shareFunction = async (pages: string | null, expireDate: string) => {
     // creat share user acquistion object
@@ -58,10 +75,106 @@ const Viewer = () => {
       return '';
     }
   };
-
   // Home function for viewer to navigate home
   const homeFunction = () => {
     navigate(NAVIGATION_PATHS.home);
+  };
+  const saveLayerFunc = async (
+    svg: string,
+    groupId: string,
+    page: number
+  ): Promise<{ id: string; svg: string } | null> => {
+    console.log('nieco');
+    try {
+      const { response } = await createAnotationItem({
+        annotation_id: groupId,
+        page,
+        content: svg,
+      });
+      toast.success(t('notifications.editPage.layer.save.success'));
+      return { id: response.id, svg: response.content };
+    } catch {
+      toast.success(t('notifications.editPage.layer.save.error'));
+      return null;
+    }
+  };
+  const saveGroupFunc = async (name: string) => {
+    try {
+      console.log(acquisition_id);
+      await createAnotation({
+        user_acquisition_id,
+        title: name,
+      });
+      toast.success(t('notifications.editPage.group.add.success'));
+    } catch {
+      toast.success(t('notifications.editPage.group.add.error'));
+    }
+  };
+  const updateLayerFunc = async (
+    id: string,
+    svg: string,
+    groupId: string,
+    page: number
+  ) => {
+    try {
+      await updateAnotationItem(id, {
+        annotation_id: groupId,
+        page,
+        content: svg,
+      });
+      toast.success(t('notifications.editPage.layer.edit.success'));
+    } catch {
+      toast.success(t('notifications.editPage.layer.edit.error'));
+    }
+  };
+  const updateGroupFunc = async (id: string, name: string) => {
+    try {
+      await updateAnotation(id, { title: name });
+      toast.success(t('notifications.editPage.group.edit.success'));
+    } catch {
+      toast.success(t('notifications.editPage.group.edit.error'));
+    }
+  };
+  const deleteLayerFunc = async (id: string) => {
+    try {
+      await deleteAnotationItem(id);
+      toast.success(t('notifications.editPage.layer.delete.success'));
+    } catch {
+      toast.success(t('notifications.editPage.layer.delete.error'));
+    }
+  };
+  const deleteGroupFunc = async (id: string) => {
+    try {
+      await deleteAnotation(id);
+      toast.success(t('notifications.editPage.group.remove.success'));
+    } catch {
+      toast.success(t('notifications.editPage.group.remove.error'));
+    }
+  };
+  const getLayerFunc = async (
+    page: number,
+    groupId: string
+  ): Promise<{ id: string; svg: string } | null> => {
+    try {
+      const { items } = await getAnotationsItem(groupId, page);
+
+      if (items) return { id: items[0].id, svg: items[0].content };
+      return null;
+    } catch {
+      return null;
+    }
+  };
+  const getGroupsFunc = async (): Promise<{ id: string; name: string }[]> => {
+    try {
+      const { items } = await getAnotations(user_acquisition_id);
+      if (items.length > 0)
+        return items.map((item) => {
+          return { id: item.id, name: item.title };
+        });
+      return [];
+    } catch {
+      return [];
+    }
   };
 
   useCustomEffect(() => {
@@ -88,6 +201,10 @@ const Viewer = () => {
         const { response: userAcquisition } = await createUserAcquisition(
           acquisition
         );
+
+        console.log(userAcquisition.id);
+
+        user_acquisition_id = userAcquisition.id;
 
         // Update metatags
         if (entryDetail.published_at)
@@ -122,12 +239,26 @@ const Viewer = () => {
         const pdf = await data;
 
         // Render viewer and set options
-        renderViewer(rootId, pdf, {
-          citationBib: entryDetail.citation,
-          lang,
-          theme,
-          homeFunction,
-          shareFunction,
+        renderViewer({
+          rootId,
+          data: pdf,
+          options: {
+            theme,
+            lang,
+            citationBib: entryDetail.citation,
+            homeFunction,
+            shareFunction,
+            editPackage: {
+              saveLayerFunc,
+              saveGroupFunc,
+              updateLayerFunc,
+              updateGroupFunc,
+              deleteLayerFunc,
+              deleteGroupFunc,
+              getLayerFunc,
+              getGroupsFunc,
+            },
+          },
         });
       } catch {
         navigate(NAVIGATION_PATHS.home, { replace: true });

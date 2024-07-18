@@ -3,7 +3,7 @@ import { IFeed } from '../../utils/interfaces/feed';
 import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
 import { useSearchParams } from 'react-router-dom';
 import Feed from '../../components/feed/Feed';
-import FeedContainer from '../../components/feed/FeedContainer';
+import ItemContainer from '../../components/items-container/ItemContainer';
 
 const Feeds = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -15,13 +15,6 @@ const Feeds = () => {
 
   const [searchParams] = useSearchParams();
   const getFeeds = useGetFeeds();
-
-  // When searchParams change, reset
-  useEffect(() => {
-    setPage(0);
-    setFeeds([]);
-    setIsLoading(true);
-  }, [searchParams]);
 
   useEffect(() => {
     if (page === 0) {
@@ -53,24 +46,26 @@ const Feeds = () => {
   }, [page]);
 
   return (
-    <FeedContainer
+    <ItemContainer
       isLoading={isLoading}
       setIsLoading={setIsLoading}
       isError={isError}
-      feeds={feeds}
-      setFeeds={setFeeds}
+      items={feeds}
+      setItems={setFeeds}
       page={page}
       setPage={setPage}
       maxPage={maxPage}
       loadingNext={loadingNext}
       setLoadingNext={setLoadingNext}
+      isEntries={false}
+      searchSpecifier={'title'}
     >
       <div className='flex flex-wrap px-3 pb-4'>
         {feeds.map((feed, index) => (
           <Feed key={index} feed={feed} />
         ))}
       </div>
-    </FeedContainer>
+    </ItemContainer>
   );
 };
 
