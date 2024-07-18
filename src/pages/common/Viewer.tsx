@@ -84,7 +84,6 @@ const Viewer = () => {
     groupId: string,
     page: number
   ): Promise<{ id: string; svg: string } | null> => {
-    console.log('nieco');
     try {
       const { response } = await createAnotationItem({
         annotation_id: groupId,
@@ -100,7 +99,6 @@ const Viewer = () => {
   };
   const saveGroupFunc = async (name: string) => {
     try {
-      console.log(acquisition_id);
       await createAnotation({
         user_acquisition_id,
         title: name,
@@ -201,8 +199,6 @@ const Viewer = () => {
         const { response: userAcquisition } = await createUserAcquisition(
           acquisition
         );
-
-        console.log(userAcquisition.id);
 
         user_acquisition_id = userAcquisition.id;
 
