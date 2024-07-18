@@ -94,7 +94,7 @@ const Viewer = () => {
       toast.success(t('notifications.editPage.layer.save.success'));
       return { id: response.id, svg: response.content };
     } catch {
-      toast.success(t('notifications.editPage.layer.save.error'));
+      toast.error(t('notifications.editPage.layer.save.error'));
       return null;
     }
   };
@@ -107,7 +107,7 @@ const Viewer = () => {
       });
       toast.success(t('notifications.editPage.group.add.success'));
     } catch {
-      toast.success(t('notifications.editPage.group.add.error'));
+      toast.error(t('notifications.editPage.group.add.error'));
     }
   };
   const updateLayerFunc = async (
@@ -124,7 +124,7 @@ const Viewer = () => {
       });
       toast.success(t('notifications.editPage.layer.edit.success'));
     } catch {
-      toast.success(t('notifications.editPage.layer.edit.error'));
+      toast.error(t('notifications.editPage.layer.edit.error'));
     }
   };
   const updateGroupFunc = async (id: string, name: string) => {
@@ -132,7 +132,7 @@ const Viewer = () => {
       await updateAnotation(id, { title: name });
       toast.success(t('notifications.editPage.group.edit.success'));
     } catch {
-      toast.success(t('notifications.editPage.group.edit.error'));
+      toast.error(t('notifications.editPage.group.edit.error'));
     }
   };
   const deleteLayerFunc = async (id: string) => {
@@ -140,7 +140,7 @@ const Viewer = () => {
       await deleteAnotationItem(id);
       toast.success(t('notifications.editPage.layer.delete.success'));
     } catch {
-      toast.success(t('notifications.editPage.layer.delete.error'));
+      toast.error(t('notifications.editPage.layer.delete.error'));
     }
   };
   const deleteGroupFunc = async (id: string) => {
@@ -148,7 +148,7 @@ const Viewer = () => {
       await deleteAnotation(id);
       toast.success(t('notifications.editPage.group.remove.success'));
     } catch {
-      toast.success(t('notifications.editPage.group.remove.error'));
+      toast.error(t('notifications.editPage.group.remove.error'));
     }
   };
   const getLayerFunc = async (
