@@ -16,7 +16,7 @@
 - **Changed**: Design of `ElviraInput`
 - **Changed**: Design of `ElviraTextarea`
 - **Changed**: In breadcrumbs `Edit` to actual name of editing entry
-- **Changed**: Viewer version from 0.4.21 to 0.5.5
+- **Changed**: Viewer version from 0.4.21 to 0.5.6
 - **Changed**: About page
 - **Changed**: `year` to `published_at`
 - **Changed**: Translation of year
