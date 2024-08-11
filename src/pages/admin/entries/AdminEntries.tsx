@@ -57,6 +57,11 @@ const AdminEntries = () => {
     })();
   }, [page]);
 
+  const reload = () => {
+    setEntries([]);
+    setPage(0);
+  };
+
   return (
     <ItemContainer
       isLoading={isLoading}
@@ -89,7 +94,7 @@ const AdminEntries = () => {
         </div>
 
         {entries.map((entry, index) => (
-          <AdminEntry key={index} entry={entry} />
+          <AdminEntry key={index} entry={entry} reload={reload} />
         ))}
         {loadingNext &&
           Array.from({ length: 30 }).map((_, index) => (

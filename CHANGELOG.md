@@ -25,6 +25,7 @@
 - **Changed**: Modal
 - **Changed**: Favicon to transparent and size 32x32
 - **Changed**: README.md
+- **Changed**: Edit page
 - **Changed**: `Entry.thumbnail` now contains URL path instead of base64
 - **Fixed**: Scroll in `EntryDetail`
 - **Fixed**: API for getting data from identifier

@@ -1,7 +1,7 @@
 import { IEntryAcquisition } from './acquisition';
 import { IEntryAuthor } from './author';
 import { IFeed } from './feed';
-import { IMetadata } from './general/general';
+import { IConfig, IMetadata } from './general/general';
 
 export interface IEntriesList {
   items: IEntry[];
@@ -36,6 +36,7 @@ export interface IEntryDetail {
     feeds: IFeed[];
     language: IEntryLanguage;
     title: string;
+    config: IConfig;
     published_at: string;
     publisher: string;
     created_at: string;
@@ -69,10 +70,11 @@ export interface IEntryNew {
   summary: string;
   language_code: string;
   identifiers: IEntryIdentifiers;
+  config?: IConfig;
   citation: string;
-  published_at: string;
+  published_at?: string;
   publisher: string;
-  image: any;
+  image?: any;
 }
 
 export interface IEntryNewForm {
@@ -85,11 +87,29 @@ export interface IEntryNewForm {
   summary: string;
   language_code: string;
   identifiers: IEntryIdentifiers;
+  config?: IConfig;
   citation: string;
   published_at: string;
   publisher: string;
   image: File | null;
   pdf: File | null;
+}
+
+export interface IEntryEdit {
+  title: string;
+  authors: IEntryAuthor[];
+  feeds: {
+    id: string;
+    title: string;
+  }[];
+  summary: string;
+  language_code?: string;
+  identifiers?: IEntryIdentifiers;
+  config: IConfig;
+  citation?: string;
+  published_at: string;
+  publisher: string;
+  thumbnail: string;
 }
 
 export interface IEntryCategory {

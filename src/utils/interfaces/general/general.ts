@@ -49,6 +49,15 @@ export interface IMetadata {
   total: number;
 }
 
+export interface IConfig {
+  evilflowers_ocr_enabled: boolean;
+  evilflowers_viewer_print: boolean;
+  evilflowers_share_enabled: boolean;
+  evilflowres_metadata_fetch: boolean;
+  evilflowers_annotations_create: boolean;
+  evilflowers_ocr_rewrite: boolean;
+}
+
 export interface IModalParams {
   close: (open: boolean) => void;
   yes: () => void;

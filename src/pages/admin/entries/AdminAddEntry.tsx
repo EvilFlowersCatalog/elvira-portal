@@ -64,43 +64,9 @@ const AdminAddEntry = () => {
     );
   };
 
-  // Get image type
-  const getImageType = (base64Image: string): string => {
-    const matches = base64Image.match(/^data:image\/([a-zA-Z]+);base64,/);
-    if (matches && matches.length === 2) {
-      return matches[1]; // The image type (e.g., 'jpeg' or 'png')
-    } else {
-      // Default to 'jpeg' if the image type can't be determined
-      return 'jpeg';
-    }
-  };
-
-  // Convert base64 to image file
-  const convertToImageFile = (base64?: string): File | null => {
-    if (!base64) return null;
-    const imageType = getImageType(base64); // get image type
-    // replace first info, (cuz it will pass the atob func)
-    const base64WithoutPrefix = base64.replace(
-      /^data:image\/[a-zA-Z]+;base64,/,
-      ''
-    );
-    // encode
-    const byteCharacters = atob(base64WithoutPrefix);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], { type: `image/${imageType}` }); // create Blob
-    // Return image
-    return new File([blob], 'Picture', {
-      type: `image/${imageType}`,
-    });
-  };
-
   const [entryForm, setEntryForm] = useState<IEntryNewForm>({
     title: '',
-    authors: [],
+    authors: [{ name: '', surname: '' }],
     feeds: [],
     summary: '',
     language_code: 'sk',
@@ -201,10 +167,11 @@ const AdminAddEntry = () => {
         isbn: entryForm.identifiers.isbn,
       },
       citation: entryForm.citation,
-      published_at: entryForm.published_at,
       publisher: entryForm.publisher,
       image: await getBase64(entryForm.image),
     };
+    if (entryForm.published_at) entry.published_at = entryForm.published_at;
+
     const pdf = await getBase64(entryForm.pdf);
     if (!entry.image) {
       // If there is no image notify that it is needed

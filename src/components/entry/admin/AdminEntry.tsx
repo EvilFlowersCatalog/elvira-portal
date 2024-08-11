@@ -6,16 +6,16 @@ import useDeleteEntry from '../../../hooks/api/entries/useDeleteEntry';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { useState } from 'react';
-import ModalWrapper from '../../modal/ModalWrapper';
 import ConfirmationDialog from '../../dialogs/ConfirmationDialog';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import useAuthContext from '../../../hooks/contexts/useAuthContext.tsx';
 
 interface IEntryParams {
   entry: IEntry;
+  reload: () => void;
 }
 
-const AdminEntry = ({ entry }: IEntryParams) => {
+const AdminEntry = ({ entry, reload }: IEntryParams) => {
   const { auth } = useAuthContext();
   const { t } = useTranslation();
   const { showSearchBar, isSmallDevice } = useAppContext();
@@ -31,6 +31,7 @@ const AdminEntry = ({ entry }: IEntryParams) => {
       // remove entry by id
       await deleteEntry(entry.id);
       toast.success(t('notifications.entry.remove.success')); // notify success
+      reload();
     } catch {
       toast.error(t('notifications.entry.remove.error')); // notify error
     } finally {

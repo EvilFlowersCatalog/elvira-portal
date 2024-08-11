@@ -118,7 +118,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const isParamsEmpty = () => {
     // do not count entry-detail-id
     for (let [key] of searchParams.entries()) {
-      if (key !== 'entry-detail-id') {
+      if (key !== 'entry-detail-id' && key !== 'parent-id') {
         return false;
       }
     }

@@ -1,4 +1,4 @@
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { ReactNode, useEffect, useRef, useState } from 'react';
 import EntryDetail from '../entry/EntryDetail';
 import Breadcrumb from '../common/Breadcrumb';
@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import ScrollUpButton from '../common/ScrollUpButton';
 import ToolsContainer from '../tools/ToolsContainer';
+import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 
 interface IItemContainer {
   children: ReactNode;
@@ -55,6 +56,8 @@ const ItemContainer = ({
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [showScrollUp, setShowScrollUp] = useState<boolean>(false);
+
+  const location = useLocation();
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const previousSearchParamsRef = useRef<URLSearchParams | null>(null);
@@ -119,7 +122,9 @@ const ItemContainer = ({
                   <PageMessage
                     message={
                       isParamsEmpty()
-                        ? t('page.shelfEmpty')
+                        ? location.pathname === NAVIGATION_PATHS.shelf
+                          ? t('page.shelfEmpty')
+                          : t('page.notFound')
                         : t('page.notFound')
                     }
                     clearParams={!isParamsEmpty() ? clearFilters : undefined}
