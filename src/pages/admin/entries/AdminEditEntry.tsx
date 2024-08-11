@@ -218,7 +218,7 @@ const AdminEditEntry = () => {
             {/* First column */}
             <div className='flex flex-col flex-2 gap-4'>
               {/* First row, first column */}
-              <div className='bg-darkGray rounded-md p-4 flex flex-col gap-2'>
+              <div className='bg-zinc-100 dark:bg-darkGray rounded-md p-4 flex flex-col gap-2'>
                 <span>{t('entry.wizard.titleNamespace')}</span>
                 <ElviraInput
                   onChange={handleTitleChange}
@@ -230,7 +230,7 @@ const AdminEditEntry = () => {
               </div>
 
               {/* Second row, first column */}
-              <div className='flex flex-col md:flex-row bg-darkGray gap-4 rounded-md p-4'>
+              <div className='flex flex-col md:flex-row bg-zinc-100 dark:bg-darkGray gap-4 rounded-md p-4'>
                 {/* Image */}
                 <img
                   className='bg-gray border border-white w-40 md:h-full h-auto rounded-md'
@@ -266,7 +266,7 @@ const AdminEditEntry = () => {
                 </div>
               </div>
               {/* Third row, first column */}
-              <div className='flex flex-col xxl:flex-row bg-darkGray p-4 rounded-md gap-4'>
+              <div className='flex flex-col xxl:flex-row bg-zinc-100 dark:bg-darkGray p-4 rounded-md gap-4'>
                 {/* Identifiers */}
                 <div className='flex flex-1 flex-col gap-2'>
                   <span>{t('entry.wizard.identifiers')}</span>
@@ -285,7 +285,7 @@ const AdminEditEntry = () => {
                 </div>
                 <div className='flex flex-col flex-2 gap-2'>
                   <span>{t('entry.wizard.configuration')}</span>
-                  <div className='bg-gray flex-1 rounded-md grid grid-cols-2 xxl:grid-cols-3 gap-4'>
+                  <div className='bg-white dark:bg-gray flex-1 rounded-md grid grid-cols-2 xxl:grid-cols-3 gap-4'>
                     <ConfigItem
                       name={t('entry.wizard.download')}
                       checked={
@@ -374,7 +374,7 @@ const AdminEditEntry = () => {
               {/* Forth row, first column */}
               <div className='flex flex-col md:flex-row gap-4'>
                 {/* Authors */}
-                <div className='min-h-96 flex flex-col flex-1 bg-darkGray rounded-md p-4 gap-2'>
+                <div className='min-h-96 flex flex-col flex-1 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
                   <div
                     className='w-full flex justify-center items-center gap-2 cursor-pointer'
                     onClick={addAuthor}
@@ -382,7 +382,7 @@ const AdminEditEntry = () => {
                     <span>{t('entry.wizard.authors')}</span>
                     <IoMdAdd size={20} />
                   </div>
-                  <div className='flex-1 bg-gray rounded-md'>
+                  <div className='flex-1 bg-white dark:bg-gray rounded-md'>
                     <div className='flex flex-col flex-1 p-4 gap-4'>
                       {entry.authors?.map((author, index) => (
                         <div
@@ -392,7 +392,7 @@ const AdminEditEntry = () => {
                           <input
                             type='text'
                             onChange={(e) => handleAuthorNameChange(index, e)}
-                            className='w-1/2 bg-transparent border-b-2 outline-none'
+                            className='w-1/2 bg-transparent border-b-2 border-black dark:border-white outline-none'
                             value={author.name}
                           />
                           <input
@@ -400,7 +400,7 @@ const AdminEditEntry = () => {
                               handleAuthorSurnameChange(index, e)
                             }
                             type='text'
-                            className='w-1/2 bg-transparent border-b-2 outline-none'
+                            className='w-1/2 bg-transparent border-b-2 border-black dark:border-white outline-none'
                             value={author.surname}
                           />
                           <IoRemoveCircle
@@ -415,7 +415,7 @@ const AdminEditEntry = () => {
                   </div>
                 </div>
                 {/* Feeds */}
-                <div className='min-h-96 flex flex-col flex-1 bg-darkGray rounded-md p-4 gap-2'>
+                <div className='min-h-96 flex flex-col flex-1 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
                   <div className='w-full flex justify-center items-center gap-2'>
                     <span>{t('entry.wizard.feeds')}</span>
                   </div>
@@ -427,7 +427,7 @@ const AdminEditEntry = () => {
                   </div>
                 </div>
                 {/* Categories */}
-                <div className='min-h-96 flex flex-col flex-1 bg-darkGray rounded-md p-4 gap-2'>
+                <div className='min-h-96 flex flex-col flex-1 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
                   <div
                     className='w-full flex justify-center items-center gap-2 cursor-pointer'
                     onClick={addAuthor}
@@ -435,29 +435,29 @@ const AdminEditEntry = () => {
                     <span>{t('entry.wizard.categories')}</span>
                     <IoMdAdd size={20} />
                   </div>
-                  <div className='flex-1 bg-gray rounded-md'></div>
+                  <div className='flex-1 rounded-md'></div>
                 </div>
               </div>
             </div>
             {/* Second column */}
             <div className='flex flex-col flex-1 gap-4'>
-              <div className='flex-1 min-h-60 bg-darkGray rounded-md p-4'>
+              <div className='flex-1 min-h-60 bg-zinc-100 dark:bg-darkGray rounded-md p-4'>
                 <span>{t('entry.wizard.files')}</span>
               </div>
-              <div className='flex flex-col flex-1 min-h-60 bg-darkGray rounded-md p-4 gap-2'>
+              <div className='flex flex-col flex-1 min-h-60 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
                 <span>{t('entry.wizard.summary')}</span>
                 <textarea
                   onChange={handleSummaryChange}
-                  className='bg-gray outline-none resize-none flex-1 p-2 rounded-md'
+                  className='bg-white dark:bg-gray outline-none resize-none flex-1 p-2 rounded-md'
                   placeholder={t('entry.wizard.summary')}
                   value={entry.summary}
                 />
               </div>
-              <div className='flex flex-col min-h-96 flex-3 bg-darkGray rounded-md p-4 gap-2'>
+              <div className='flex flex-col min-h-96 flex-3 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
                 <span>{t('entry.wizard.citation')}</span>
                 <textarea
                   onChange={handleCitationChange}
-                  className='bg-gray outline-none resize-none flex-1 p-2 rounded-md'
+                  className='bg-white dark:bg-gray outline-none resize-none flex-1 p-2 rounded-md'
                   placeholder={t('entry.wizard.citation')}
                   value={entry.citation ?? ''}
                 />
