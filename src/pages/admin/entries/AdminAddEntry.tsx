@@ -25,6 +25,8 @@ import Breadcrumb from '../../../components/common/Breadcrumb';
 import ApplyInfoDialog from '../../../components/dialogs/ApplyInfoDialog';
 import useCustomEffect from '../../../hooks/useCustomEffect';
 import ElviraInput from '../../../components/common/ElviraInput';
+import useCreateEntryAcquistion from '../../../hooks/api/acquisitiions/useCreateEntryAcquistion';
+import useDeleteEntry from '../../../hooks/api/entries/useDeleteEntry';
 
 const AdminAddEntry = () => {
   const { t } = useTranslation();
@@ -39,9 +41,12 @@ const AdminAddEntry = () => {
   const [activeFeeds, setActiveFeeds] = useState<
     { title: string; id: string }[]
   >([]);
+
   const uploadEntry = useUploadEntry();
+  const deleteEntry = useDeleteEntry();
   const navigate = useNavigate();
   const getData = useGetData();
+  const createEntryAcquisition = useCreateEntryAcquistion();
 
   const NextButton = ({ end = false }) => {
     return (
@@ -154,6 +159,7 @@ const AdminAddEntry = () => {
   };
   const handleSubmitStepFive = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
     const entry: IEntryNew = {
       title: entryForm.title,
       authors: entryForm.authors,
@@ -172,22 +178,35 @@ const AdminAddEntry = () => {
     };
     if (entryForm.published_at) entry.published_at = entryForm.published_at;
 
-    const pdf = await getBase64(entryForm.pdf);
     if (!entry.image) {
       // If there is no image notify that it is needed
       toast.warning(t('entry.wizard.requiredMessages.image'));
-    } else if (!pdf) {
+    } else if (!entryForm.pdf) {
       // If there is no pdf notify that it is needed
       toast.warning(t('entry.wizard.requiredMessages.pdf'));
     } else {
       // Upload
       try {
-        await uploadEntry(entry);
-        toast.success(t('notifications.entry.add.success'));
+        const { response: res } = await uploadEntry(entry);
+        const acquisitionData = new FormData();
+        const metadata = {
+          relation: 'open-access',
+        };
+        acquisitionData.append('content', entryForm.pdf);
+        acquisitionData.append('metadata', JSON.stringify(metadata));
+
+        try {
+          await createEntryAcquisition(acquisitionData, res.id);
+          toast.success(t('notifications.entry.add.success'));
+        } catch {
+          await deleteEntry(res.id);
+          toast.error(t('notifications.entry.add.error'));
+        }
       } catch {
         toast.error(t('notifications.entry.add.error'));
       } finally {
         navigate(NAVIGATION_PATHS.adminEntries, { replace: true });
+        setIsLoading(false);
       }
     }
   };
@@ -514,33 +533,41 @@ const AdminAddEntry = () => {
                 className='w-full h-full flex flex-col justify-start items-center gap-4'
                 onSubmit={handleSubmitStepFive}
               >
-                <span className='text-3xl font-extrabold '>
-                  {t('entry.wizard.imageAndFile')}
-                </span>
-                <div className='w-full h-full flex flex-col bg-lightGray dark:bg-darkGray rounded-md p-4 gap-4'>
-                  {/* IMAGE */}
-                  <Dropzone
-                    title={t('entry.wizard.image')}
-                    maxSizeDescription='(MAX 5 MB)'
-                    value={entryForm.image}
-                    maxSize={1024 * 1024 * 5}
-                    setFile={handleSetImage}
-                    errorMessage={t('dropzone.errorMessage.image')}
-                    hint={t('entry.wizard.imageHint')}
-                  />
-                  {/* PDF */}
-                  <Dropzone
-                    pdf
-                    title='pdf'
-                    setFile={handleSetPDF}
-                    errorMessage={t('dropzone.errorMessage.pdf')}
-                    hint={t('entry.wizard.pdfHint')}
-                  />
-                </div>
-                <div className='w-full flex justify-end gap-4 pt-7'>
-                  <PreviousButton />
-                  <NextButton end />
-                </div>
+                {isLoading ? (
+                  <div className='w-full h-96 flex'>
+                    <PageLoading />
+                  </div>
+                ) : (
+                  <>
+                    <span className='text-3xl font-extrabold '>
+                      {t('entry.wizard.imageAndFile')}
+                    </span>
+                    <div className='w-full h-full flex flex-col bg-lightGray dark:bg-darkGray rounded-md p-4 gap-4'>
+                      {/* IMAGE */}
+                      <Dropzone
+                        title={t('entry.wizard.image')}
+                        maxSizeDescription='(MAX 5 MB)'
+                        value={entryForm.image}
+                        maxSize={1024 * 1024 * 5}
+                        setFile={handleSetImage}
+                        errorMessage={t('dropzone.errorMessage.image')}
+                        hint={t('entry.wizard.imageHint')}
+                      />
+                      {/* PDF */}
+                      <Dropzone
+                        pdf
+                        title='pdf'
+                        setFile={handleSetPDF}
+                        errorMessage={t('dropzone.errorMessage.pdf')}
+                        hint={t('entry.wizard.pdfHint')}
+                      />
+                    </div>
+                    <div className='w-full flex justify-end gap-4 pt-7'>
+                      <PreviousButton />
+                      <NextButton end />
+                    </div>
+                  </>
+                )}
               </form>
             )}
           </div>

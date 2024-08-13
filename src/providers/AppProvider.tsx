@@ -101,7 +101,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     event.preventDefault();
 
     // If ctrl or meta && is on mac open new tab
-    if (event.ctrlKey || (event.metaKey && isMac) || event.button === 1)
+    if (event.ctrlKey || (event.metaKey && isMac) || event.button === 2)
       window.open(path, '_blank');
     else navigate(path);
   };
