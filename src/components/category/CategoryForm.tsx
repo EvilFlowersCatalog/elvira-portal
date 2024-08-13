@@ -110,15 +110,11 @@ const CategoryForm = ({
           onChange={handleLabelChange}
           placeholder={t('modal.categoryForm.label')}
           value={form.label}
-          invalidMessage={t('modal.categoryForm.requiredMessages.label')}
-          required
         />
         <ElviraInput
           onChange={handleSchemeChange}
           placeholder={t('modal.categoryForm.scheme')}
           value={form.scheme}
-          invalidMessage={t('modal.categoryForm.requiredMessages.scheme')}
-          required
         />
         <button ref={buttonRef} type='submit' className='hidden'></button>
       </form>

@@ -299,10 +299,6 @@ export const en = {
         scheme: 'Scheme',
         requiredMessages: {
           term: 'Term field is required. It must be filled out before proceeding.',
-          label:
-            'Label field is required. It must be filled out before proceeding.',
-          scheme:
-            'Scheme field is required. It must be filled out before proceeding.',
         },
       },
     },

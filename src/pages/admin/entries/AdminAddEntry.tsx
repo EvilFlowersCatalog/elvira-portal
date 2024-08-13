@@ -187,18 +187,24 @@ const AdminAddEntry = () => {
     } else {
       // Upload
       try {
+        // upload entry and get it's info
         const { response: res } = await uploadEntry(entry);
-        const acquisitionData = new FormData();
+
+        // create entry acquisition
+        const entryAcquisition = new FormData();
         const metadata = {
           relation: 'open-access',
         };
-        acquisitionData.append('content', entryForm.pdf);
-        acquisitionData.append('metadata', JSON.stringify(metadata));
+        // Append needed variables
+        entryAcquisition.append('content', entryForm.pdf);
+        entryAcquisition.append('metadata', JSON.stringify(metadata));
 
         try {
-          await createEntryAcquisition(acquisitionData, res.id);
+          // try to create acquistiion
+          await createEntryAcquisition(entryAcquisition, res.id);
           toast.success(t('notifications.entry.add.success'));
         } catch {
+          // if fails remove created entry
           await deleteEntry(res.id);
           toast.error(t('notifications.entry.add.error'));
         }

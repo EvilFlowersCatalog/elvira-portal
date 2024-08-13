@@ -19,7 +19,6 @@ import { HiOutlineLanguage } from 'react-icons/hi2';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import useVerifyAdmin from '../../../hooks/api/verify/useVerifyAdmin';
 import { FiBookOpen, FiHelpCircle } from 'react-icons/fi';
 import { RxHome } from 'react-icons/rx';
 import Gravatar from 'react-gravatar';
@@ -73,10 +72,9 @@ const Navbar = () => {
     stuLogoDark,
     stuLogoLight,
   } = useAppContext();
-  const { auth, updateAuth, logout } = useAuthContext();
+  const { auth, logout } = useAuthContext();
   const { t } = useTranslation();
   const location = useLocation();
-  const verifyAdmin = useVerifyAdmin();
   const stuLinks: { [key: string]: string } = {
     ['fiit']: 'https://www.fiit.stuba.sk/',
     ['mtf']: 'https://www.mtf.stuba.sk/',
@@ -95,24 +93,6 @@ const Navbar = () => {
   // Function for switching lang and pathing the app state
   const switchLang = () => {
     updateLang(lang === LANG_TYPE.sk ? LANG_TYPE.en : LANG_TYPE.sk);
-  };
-
-  const handleAdminButton = async (
-    event: MouseEvent<HTMLButtonElement>,
-    path: NAVIGATION_PATHS
-  ) => {
-    try {
-      // Get verification
-      const isSuperUser = await verifyAdmin();
-
-      // Update auth
-      updateAuth({ isSuperUser });
-
-      // If admin navigate
-      if (isSuperUser) specialNavigation(event, path);
-    } catch {
-      logout();
-    }
   };
 
   return (
@@ -182,7 +162,7 @@ const Navbar = () => {
               path={NAVIGATION_PATHS.adminHome}
               icon={<RiAdminLine size={23} />}
               isActive={location.pathname.includes('administration')}
-              onClick={(e) => handleAdminButton(e, NAVIGATION_PATHS.adminHome)}
+              onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.adminHome)}
             />
           )}
         </div>

@@ -24,6 +24,7 @@ const AdminEditEntry = () => {
   const { setEditingEntryTitle } = useAppContext();
   const { 'entry-id': id } = useParams();
   const [entry, setEntry] = useState<IEntryEdit | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [activeFeeds, setActiveFeeds] = useState<
     { title: string; id: string }[]
   >([]);
@@ -35,6 +36,7 @@ const AdminEditEntry = () => {
   useCustomEffect(() => {
     try {
       (async () => {
+        setIsLoading(true);
         if (id) {
           const { response: entryDetail } = await getEntryDetail(id);
           setEditingEntryTitle(entryDetail.title);
@@ -61,6 +63,8 @@ const AdminEditEntry = () => {
     } catch {
       setEntry(null);
       navigate(NAVIGATION_PATHS.adminHome, { replace: true });
+    } finally {
+      setIsLoading(false);
     }
   }, [id]);
 
@@ -196,18 +200,21 @@ const AdminEditEntry = () => {
 
     // Upload
     try {
+      setIsLoading(true);
       await editEntry(id!, newEntry);
       toast.success(t('notifications.entry.edit.success'));
       navigate(NAVIGATION_PATHS.adminEntries, { replace: true });
     } catch {
       toast.error(t('notifications.entry.edit.error'));
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
     <div className='flex flex-col flex-1'>
       <Breadcrumb />
-      {!entry ? (
+      {!entry || isLoading ? (
         <PageLoading />
       ) : (
         <form

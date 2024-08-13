@@ -286,14 +286,11 @@ export const sk = {
         editCategory: 'Upraviť Kategóriu',
         add: 'Pridať',
         addCategory: 'Pridať Kategóriu',
-        term: 'Termín',
-        label: 'Štítok',
+        term: 'Názov',
+        label: 'Popis',
         scheme: 'Schéma',
         requiredMessages: {
           term: 'Termín je povinný. Pred pokračovaním je potrebné ho vyplniť.',
-          label: 'Štítok je povinný. Pred pokračovaním je potrebné ho vyplniť.',
-          scheme:
-            'Schéma je povinná. Pred pokračovaním je potrebné ju vyplniť.',
         },
       },
     },

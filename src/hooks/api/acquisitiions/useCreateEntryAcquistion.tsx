@@ -15,7 +15,7 @@ const useCreateEntryAcquistion = () => {
 
     await axios.post(CREATE_ENTRY_ACQUISITION_URL, acquisition, {
       headers: {
-        'Content-Type': undefined,
+        'Content-Type': 'multipart/form-data',
       },
     });
   };

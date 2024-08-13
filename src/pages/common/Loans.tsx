@@ -25,6 +25,7 @@ const Loans = () => {
       maxPage={maxPage}
       loadingNext={loadingNext}
       setLoadingNext={setLoadingNext}
+      showLayout
       searchSpecifier={'query'}
     >
       <div className='flex flex-wrap px-4 pb-4'>Loans</div>

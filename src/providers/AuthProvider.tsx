@@ -13,6 +13,7 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 import { NAVIGATION_PATHS } from '../utils/interfaces/general/general';
 import useVerifyCredentials from '../hooks/api/verify/useVerifyCredentials';
+import useCustomEffect from '../hooks/useCustomEffect';
 
 export const AuthContext = createContext<IAuthContext | null>(null);
 // LOCAL SOTRAGE KEY
@@ -23,22 +24,29 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
   const { t } = useTranslation();
 
   const [auth, setAuth] = useState<IAuth | null>(
-    (() => {
-      // Get auth from storage
-      const auth = localStorage.getItem(AUTH_KEY);
-      // If it exists parse it and return else return null
-      return auth ? JSON.parse(auth) : null;
-    })()
+    JSON.parse(localStorage.getItem(AUTH_KEY) as string) || null
   );
   const navigate = useNavigate();
   const location = useLocation();
   const verifyCredentials = useVerifyCredentials();
   const logoutChannel = new BroadcastChannel(BROADCAST_MESSAGE);
 
-  // listen to logout message
+  // listen to all tabs
   useEffect(() => {
-    logoutChannel.onmessage = () => {
+    const handleLogout = () => {
       logout();
+    };
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === AUTH_KEY) {
+        setAuth(event.newValue ? JSON.parse(event.newValue) : null);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    logoutChannel.onmessage = handleLogout;
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
       logoutChannel.close();
     };
   }, []);
@@ -75,7 +83,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
     }
   };
 
-  useEffect(() => {
+  useCustomEffect(() => {
     // Whenever auth is changed, save it to local storage
     if (auth) localStorage.setItem(AUTH_KEY, JSON.stringify(auth));
     else {
