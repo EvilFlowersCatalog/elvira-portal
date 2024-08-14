@@ -25,7 +25,7 @@ const RequireAuth = () => {
     refresh(); // Call first
 
     // Then every 4 min
-    const intervalId = setInterval(refresh, 4 * 60 * 1000);
+    const intervalId = setInterval(refresh, 5000);
     return () => {
       clearInterval(intervalId);
     };

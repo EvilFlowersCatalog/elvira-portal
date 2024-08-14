@@ -73,9 +73,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
   const updateAuth = (newAuth: IUpdatedAuth) => {
     // Update auth
     if (auth) {
-      const data: IAuth = { ...auth, ...newAuth };
-      setAuth(data);
-      localStorage.setItem(AUTH_KEY, JSON.stringify(data));
+      setAuth({ ...auth, ...newAuth });
     }
   };
 
@@ -83,16 +81,14 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
     try {
       const { response: user } = await verifyCredentials(loginForm); // verify given credentials
 
-      const userData: IAuth = {
+      // Set auth with given values
+      setAuth({
         userId: user.user.id,
         username: user.user.username,
         isSuperUser: user.user.is_superuser,
         token: user.access_token,
         refreshToken: user.refresh_token,
-      };
-      // Set auth with given values
-      setAuth(userData);
-      localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
+      });
 
       // Get where the user lastly was / if does not exist, go to home
       const pathname = location.state?.from?.pathname ?? NAVIGATION_PATHS.home;
@@ -109,7 +105,9 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
   };
 
   useCustomEffect(() => {
-    if (!auth) {
+    if (auth) {
+      localStorage.setItem(AUTH_KEY, JSON.stringify(auth));
+    } else {
       localStorage.removeItem(AUTH_KEY);
       logoutChannel.postMessage(BROADCAST_MESSAGE);
 
