@@ -315,9 +315,9 @@ export const sk = {
       readMore: 'Čítať viac',
       read: {
         title: 'Čítanie',
-        descriptionPart1: 'Vytvorili sme open-source čítačku PDF s názvom',
+        descriptionPart1: 'Vytvorili sme open-source čítačku PDF s názvom ',
         descriptionPart2:
-          'pre jednoduché prezeranie dokumentov s základnými nástrojmi na vytváranie poznámok, exportovanie citácií a zdieľanie dokumentov.',
+          ' pre jednoduché prezeranie dokumentov so základnými nástrojmi na vytváranie poznámok, exportovanie citácií a zdieľanie dokumentov.',
       },
       organize: {
         title: 'Organizovanie',

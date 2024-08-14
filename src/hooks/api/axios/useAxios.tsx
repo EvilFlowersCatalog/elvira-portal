@@ -11,12 +11,15 @@ export const baseAxios = axios.create({
 });
 
 const useAxios = () => {
-  const { auth, logout } = useAuth();
+  const { auth, logout, cancelTokenSource } = useAuth();
 
   useCustomEffect(() => {
     // Setting request interceptor
     const requestIntercept = baseAxios.interceptors.request.use(
       (config) => {
+        // When called, cancel all requests
+        config.cancelToken = cancelTokenSource.current.token;
+
         // If auth token exist set it as authorization
         if (auth?.token) {
           config.headers['Authorization'] = `Bearer ${auth.token}`;

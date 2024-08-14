@@ -1,3 +1,5 @@
+import { IEntryNewForm } from '../entry';
+
 export enum NAVIGATION_PATHS {
   login = '/login',
   notFound = '/404',
@@ -61,4 +63,11 @@ export interface IConfig {
 export interface IModalParams {
   close: (open: boolean) => void;
   yes: () => void;
+}
+
+export interface IWizardParams {
+  entryForm: IEntryNewForm;
+  setEntryForm: (entryForm: IEntryNewForm) => void;
+  stepIndex: number;
+  setStepIndex: (stepIndex: number) => void;
 }

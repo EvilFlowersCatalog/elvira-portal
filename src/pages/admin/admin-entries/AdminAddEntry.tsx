@@ -1,0 +1,594 @@
+import { ChangeEvent, FormEvent, InvalidEvent, useState } from 'react';
+import {
+  IEntryDetail,
+  IEntryInfo,
+  IEntryNew,
+  IEntryNewForm,
+} from '../../../utils/interfaces/entry';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { IoAddCircle } from 'react-icons/io5';
+import { MdRemoveCircle } from 'react-icons/md';
+import ElviraTextarea from '../../../components/common/ElviraTextarea';
+import { toast } from 'react-toastify';
+import FeedMenu from '../../../components/feeds/FeedMenu';
+import Dropzone from '../../../components/common/Dropzone';
+import { getBase64 } from '../../../utils/func/functions';
+import useUploadEntry from '../../../hooks/api/entries/useUploadEntry';
+import {
+  IDENTIFIERS_TYPE,
+  NAVIGATION_PATHS,
+} from '../../../utils/interfaces/general/general';
+import useGetData from '../../../hooks/api/identifiers/useGetData';
+import PageLoading from '../../../components/page/PageLoading';
+import Breadcrumb from '../../../components/common/Breadcrumb';
+import ApplyInfoDialog from '../../../components/dialogs/ApplyInfoDialog';
+import useCustomEffect from '../../../hooks/useCustomEffect';
+import ElviraInput from '../../../components/common/ElviraInput';
+import useCreateEntryAcquistion from '../../../hooks/api/acquisitiions/useCreateEntryAcquistion';
+import useDeleteEntry from '../../../hooks/api/entries/useDeleteEntry';
+
+const AdminAddEntry = () => {
+  const { t } = useTranslation();
+  const [stepIndex, setStepIndex] = useState<number>(0);
+  const [openApplyInfo, setOpenApplyInfo] = useState<boolean>(false);
+  const [entryInfo, setEntryInfo] = useState<IEntryInfo | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [identifier, setIdentifier] = useState<string>('');
+  const [identifierType, setIdentifierType] = useState<IDENTIFIERS_TYPE | null>(
+    null
+  );
+  const [activeFeeds, setActiveFeeds] = useState<
+    { title: string; id: string }[]
+  >([]);
+
+  const uploadEntry = useUploadEntry();
+  const deleteEntry = useDeleteEntry();
+  const navigate = useNavigate();
+  const getData = useGetData();
+  const createEntryAcquisition = useCreateEntryAcquistion();
+
+  const NextButton = ({ end = false }) => {
+    return (
+      <button
+        className='py-2 px-5 font-bold hover:text-black dark:hover:text-white bg-STUColor hover:bg-opacity-50 text-white rounded-md duration-200'
+        type='submit'
+      >
+        {end ? t('entry.wizard.upload') : t('entry.wizard.next')}
+      </button>
+    );
+  };
+  const PreviousButton = () => {
+    return (
+      <button
+        className='hover:underline'
+        onClick={() => setStepIndex((prevIndex) => prevIndex - 1)}
+      >
+        {t('entry.wizard.previous')}
+      </button>
+    );
+  };
+
+  const [entryForm, setEntryForm] = useState<IEntryNewForm>({
+    title: '',
+    authors: [{ name: '', surname: '' }],
+    feeds: [],
+    summary: '',
+    language_code: 'sk',
+    identifiers: {
+      doi: '',
+      isbn: '',
+    },
+    citation: '',
+    published_at: '',
+    publisher: '',
+    image: null,
+    pdf: null,
+  });
+
+  // feed add/remove handlers
+  useCustomEffect(() => {
+    setEntryForm({
+      ...entryForm,
+      feeds: activeFeeds.map((feed) => ({ title: feed.title, id: feed.id })),
+    });
+  }, [activeFeeds]);
+
+  // Handlers for submiting in steps
+  const handleSubmitStepOne = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    try {
+      // if there is some identifier
+      if (identifier) {
+        // set loading
+        setIsLoading(true);
+        let identifierTypeHolder: IDENTIFIERS_TYPE | null = null;
+        if (identifier.startsWith('10')) {
+          identifierTypeHolder = IDENTIFIERS_TYPE.doi;
+          setEntryForm((prevForm) => ({
+            ...prevForm, // Preserve existing properties of entryForm
+            identifiers: {
+              ...prevForm.identifiers, // Preserve existing properties of identifiers
+              doi: identifier, // Update the isbn property
+            },
+          }));
+        } else {
+          identifierTypeHolder = IDENTIFIERS_TYPE.isbn;
+          setEntryForm((prevForm) => ({
+            ...prevForm, // Preserve existing properties of entryForm
+            identifiers: {
+              ...prevForm.identifiers, // Preserve existing properties of identifiers
+              isbn: identifier, // Update the isbn property
+            },
+          }));
+        }
+
+        // get info from endpoint
+        const givenEntryInfo = await getData(identifierTypeHolder, identifier);
+
+        setIdentifierType(identifierTypeHolder);
+        // If succes save
+        setEntryInfo(givenEntryInfo);
+
+        // Notify and open apply info dialog
+        toast.success(t('notifications.dataFromIdentifiers.success'));
+        setOpenApplyInfo(true);
+      }
+    } catch {
+      setOpenApplyInfo(false);
+      // Notify about error
+      toast.error(t('notifications.dataFromIdentifiers.error'));
+    } finally {
+      // Whatever happens go to next step and set loading to false
+      setIsLoading(false);
+      setStepIndex((prevIndex) => prevIndex + 1);
+    }
+  };
+  const handleSubmitStepTwo = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setStepIndex((prevIndex) => prevIndex + 1);
+  };
+  const handleSubmitStepThree = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setStepIndex((prevIndex) => prevIndex + 1);
+  };
+  const handleSubmitStepFour = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setStepIndex((prevIndex) => prevIndex + 1);
+  };
+  const handleSubmitStepFive = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsLoading(true);
+    const entry: IEntryNew = {
+      title: entryForm.title,
+      authors: entryForm.authors,
+      feeds: entryForm.feeds.map((feed) => {
+        return feed.id;
+      }),
+      summary: entryForm.summary,
+      language_code: 'sk',
+      identifiers: {
+        doi: entryForm.identifiers.doi,
+        isbn: entryForm.identifiers.isbn,
+      },
+      citation: entryForm.citation,
+      publisher: entryForm.publisher,
+      image: await getBase64(entryForm.image),
+    };
+    if (entryForm.published_at) entry.published_at = entryForm.published_at;
+
+    if (!entry.image) {
+      // If there is no image notify that it is needed
+      toast.warning(t('entry.wizard.requiredMessages.image'));
+    } else if (!entryForm.pdf) {
+      // If there is no pdf notify that it is needed
+      toast.warning(t('entry.wizard.requiredMessages.pdf'));
+    } else {
+      // Upload
+      try {
+        // upload entry and get it's info
+        const { response: res } = await uploadEntry(entry);
+
+        // create entry acquisition
+        const entryAcquisition = new FormData();
+        const metadata = {
+          relation: 'open-access',
+        };
+        // Append needed variables
+        entryAcquisition.append('content', entryForm.pdf);
+        entryAcquisition.append('metadata', JSON.stringify(metadata));
+
+        try {
+          // try to create acquistiion
+          await createEntryAcquisition(entryAcquisition, res.id);
+          toast.success(t('notifications.entry.add.success'));
+        } catch {
+          // if fails remove created entry
+          await deleteEntry(res.id);
+          toast.error(t('notifications.entry.add.error'));
+        }
+      } catch {
+        toast.error(t('notifications.entry.add.error'));
+      } finally {
+        navigate(NAVIGATION_PATHS.adminEntries, { replace: true });
+        setIsLoading(false);
+      }
+    }
+  };
+
+  // Handlers for inputs in steps
+  const handleIndentifierChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setIdentifier(event.target.value);
+  };
+  const handleApplyInfo = () => {
+    setEntryForm((prevForm) => ({
+      ...prevForm,
+      title: entryInfo?.response.title ?? '',
+      authors: entryInfo?.response.authors ?? [],
+      publisher: entryInfo?.response.publisher ?? '',
+      published_at: entryInfo?.response.published_at ?? '',
+      language_code: entryInfo?.response.language ?? '',
+      citation: entryInfo?.response.bibtex ?? '',
+    }));
+
+    setOpenApplyInfo(false);
+  };
+  const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    event.target.setCustomValidity(''); // reset invalidity
+    setEntryForm((prevForm) => ({
+      ...prevForm, // Preserve existing properties of entryForm
+      title: event.target.value, // Update the title property
+    }));
+  };
+  const handleYearChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setEntryForm((prevForm) => ({
+      ...prevForm, // Preserve existing properties of entryForm
+      published_at: event.target.value, // Update the published_at property
+    }));
+  };
+  const handlePublisherChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setEntryForm((prevForm) => ({
+      ...prevForm, // Preserve existing properties of entryForm
+      publisher: event.target.value, // Update the publisher property
+    }));
+  };
+  const handleSummaryChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setEntryForm((prevForm) => ({
+      ...prevForm, // Preserve existing properties of entryForm
+      summary: event.target.value, // Update the summary property
+    }));
+  };
+  const handleCitationChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setEntryForm((prevForm) => ({
+      ...prevForm, // Preserve existing properties of entryForm
+      citation: event.target.value, // Update the citation property
+    }));
+  };
+  const handleAuthorNameChange = (
+    index: number,
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    event.target.setCustomValidity('');
+    const updatedAuthors = entryForm.authors;
+    updatedAuthors[index].name = event.target.value;
+
+    setEntryForm((prevForm) => ({
+      ...prevForm, // Preserve existing properties of entryForm
+      authors: updatedAuthors,
+    }));
+  };
+  const handleAuthorSurnameChange = (
+    index: number,
+    event: ChangeEvent<HTMLInputElement>
+  ) => {
+    event.target.setCustomValidity('');
+    const updatedAuthors = entryForm.authors;
+    updatedAuthors[index].surname = event.target.value;
+
+    setEntryForm((prevForm) => ({
+      ...prevForm, // Preserve existing properties of entryForm
+      authors: updatedAuthors,
+    }));
+  };
+  // Contribtors add/remove handlers
+  const handleAddContributor = () => {
+    setEntryForm({
+      ...entryForm,
+      authors: [...entryForm.authors, { name: '', surname: '' }],
+    });
+  };
+  const handleRemoveContributor = (index: number) => {
+    const updatedAuthors = [...entryForm.authors];
+    updatedAuthors.splice(index, 1);
+    setEntryForm({ ...entryForm, authors: updatedAuthors });
+  };
+
+  // Handler for files
+  const handleSetImage = (file: File | null) => {
+    setEntryForm((prevForm) => ({
+      ...prevForm,
+      image: file,
+    }));
+  };
+
+  const handleSetPDF = (file: File | null) => {
+    setEntryForm((prevForm) => ({
+      ...prevForm,
+      pdf: file,
+    }));
+  };
+
+  return (
+    <>
+      <Breadcrumb />
+      <div className='flex flex-col flex-1 items-center overflow-auto p-4'>
+        <div className='flex-1 flex w-full justify-center items-center'>
+          <div className='w-full h-fit md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 flex flex-col justify-center items-center gap-4 bg-zinc-100 dark:bg-darkGray p-11 rounded-md'>
+            {/* Step 1: DOI & ISBN */}
+            {stepIndex === 0 && (
+              <form
+                className='w-full h-fit flex flex-col justify-start items-center gap-4'
+                onSubmit={handleSubmitStepOne}
+              >
+                {isLoading ? (
+                  <div className='w-full h-96 flex'>
+                    <PageLoading />
+                  </div>
+                ) : (
+                  <>
+                    <span className='text-3xl font-extrabold '>
+                      {t('entry.wizard.identifiers')}
+                    </span>
+                    <ElviraInput
+                      onChange={handleIndentifierChange}
+                      placeholder='DOI / ISBN'
+                      value={identifier}
+                    />
+                    <div className='w-full flex justify-end pt-7'>
+                      <NextButton />
+                    </div>
+                  </>
+                )}
+              </form>
+            )}
+            {/* Step 2: ADDITIONAL DATA */}
+            {stepIndex === 1 && (
+              <form
+                className='w-full h-full flex flex-col justify-start items-center gap-4'
+                onSubmit={handleSubmitStepTwo}
+              >
+                <span className='text-3xl font-extrabold '>
+                  {t('entry.wizard.additionalData')}
+                </span>
+                <ElviraInput
+                  onChange={handleTitleChange}
+                  invalidMessage={t('entry.wizard.requiredMessages.title')}
+                  required
+                  placeholder={t('entry.wizard.title')}
+                  value={entryForm.title}
+                />
+                <ElviraInput
+                  onChange={handleYearChange}
+                  placeholder={t('entry.wizard.year')}
+                  value={entryForm.published_at}
+                />
+                <ElviraInput
+                  onChange={handlePublisherChange}
+                  placeholder={t('entry.wizard.publisher')}
+                  value={entryForm.publisher}
+                />
+                <ElviraTextarea
+                  onChange={handleSummaryChange}
+                  placeholder={t('entry.wizard.summary')}
+                  value={entryForm.summary}
+                />
+                <div className='w-full flex justify-end gap-4 pt-7'>
+                  <PreviousButton />
+                  <NextButton />
+                </div>
+              </form>
+            )}
+
+            {/* Step 3: AUTHORS & FEEDS */}
+            {stepIndex === 2 && (
+              <form
+                className='w-full h-full flex flex-col justify-start items-center gap-4'
+                onSubmit={handleSubmitStepThree}
+              >
+                <span className='text-3xl font-extrabold '>
+                  {t('entry.wizard.AuthorsAndFeeds')}
+                </span>
+                <div className='flex flex-col justify-between w-full h-full gap-4'>
+                  {/* Authors */}
+                  <div className='flex flex-2 flex-col justify-start items-center gap-4'>
+                    {/* Authors header */}
+                    <div className='flex w-full justify-center items-center gap-4 text-STUColor'>
+                      <span className='text-xl font-bold'>
+                        {t('entry.wizard.author')}
+                      </span>
+                      <button
+                        className='hover:text-darkGray dark:hover:text-white'
+                        onClick={handleAddContributor}
+                        type='button'
+                      >
+                        <IoAddCircle size={30} />
+                      </button>
+                    </div>
+
+                    {/* Author */}
+                    <div className='flex w-full gap-4'>
+                      <ElviraInput
+                        onChange={(e) => handleAuthorNameChange(0, e)}
+                        invalidMessage={t(
+                          'entry.wizard.requiredMessages.authorName'
+                        )}
+                        placeholder={t('entry.wizard.authorName')}
+                        required
+                        value={entryForm.authors[0]?.name}
+                      />
+
+                      <span className='w-6'></span>
+
+                      <ElviraInput
+                        onChange={(e) => handleAuthorSurnameChange(0, e)}
+                        invalidMessage={t(
+                          'entry.wizard.requiredMessages.authorSurname'
+                        )}
+                        placeholder={t('entry.wizard.authorSurname')}
+                        required
+                        value={entryForm.authors[0]?.surname}
+                      />
+                    </div>
+
+                    {/* Contributors */}
+                    <div className='flex flex-col gap-2 w-full'>
+                      {entryForm.authors.slice(1).map((_, index) => (
+                        <div
+                          key={index}
+                          className='flex w-full items-start gap-4'
+                        >
+                          <ElviraInput
+                            required
+                            placeholder={t('entry.wizard.coName')}
+                            onChange={(e) =>
+                              handleAuthorNameChange(index + 1, e)
+                            }
+                            invalidMessage={t(
+                              'entry.wizard.requiredMessages.coName'
+                            )}
+                            value={entryForm.authors[index + 1].name}
+                          />
+
+                          <span className='w-6'></span>
+
+                          <ElviraInput
+                            required
+                            placeholder={t('entry.wizard.coSurname')}
+                            onChange={(e) =>
+                              handleAuthorSurnameChange(index + 1, e)
+                            }
+                            invalidMessage={t(
+                              'entry.wizard.requiredMessages.coSurname'
+                            )}
+                            value={entryForm.authors[index + 1].surname}
+                          />
+
+                          <button
+                            className='text-red h-fit mt-2'
+                            onClick={() => handleRemoveContributor(index + 1)}
+                            type='button'
+                          >
+                            <MdRemoveCircle size={30} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Feeds */}
+                  <div className='flex flex-col flex-1 justify-start items-center gap-4 mt-4 rounded-md'>
+                    {/* Feeds header */}
+                    <div className='flex w-full justify-center items-center gap-4 text-STUColor'>
+                      <span className='text-xl font-bold'>
+                        {t('entry.wizard.feeds')}
+                      </span>
+                    </div>
+
+                    {/* Feeds contianer*/}
+                    <div className='flex flex-col w-full min-h-72'>
+                      <FeedMenu
+                        activeFeeds={activeFeeds}
+                        setActiveFeeds={setActiveFeeds}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className='w-full flex justify-end gap-4 pt-7'>
+                  <PreviousButton />
+                  <NextButton />
+                </div>
+              </form>
+            )}
+
+            {/* Step 4: CITATION */}
+            {stepIndex === 3 && (
+              <form
+                className='w-full h-full flex flex-col justify-start items-center gap-4'
+                onSubmit={handleSubmitStepFour}
+              >
+                <span className='text-3xl font-extrabold '>
+                  {t('entry.wizard.citation')}
+                </span>
+                <ElviraTextarea
+                  onChange={handleCitationChange}
+                  placeholder={t('entry.wizard.citation')}
+                  value={entryForm.citation}
+                />
+
+                <div className='w-full flex justify-end gap-4 pt-7'>
+                  <PreviousButton />
+                  <NextButton />
+                </div>
+              </form>
+            )}
+
+            {/* Step 5: IMAGE & PDF */}
+            {stepIndex === 4 && (
+              <form
+                className='w-full h-full flex flex-col justify-start items-center gap-4'
+                onSubmit={handleSubmitStepFive}
+              >
+                {isLoading ? (
+                  <div className='w-full h-96 flex'>
+                    <PageLoading />
+                  </div>
+                ) : (
+                  <>
+                    <span className='text-3xl font-extrabold '>
+                      {t('entry.wizard.imageAndFile')}
+                    </span>
+                    <div className='w-full h-full flex flex-col bg-lightGray dark:bg-darkGray rounded-md p-4 gap-4'>
+                      {/* IMAGE */}
+                      <Dropzone
+                        title={t('entry.wizard.image')}
+                        maxSizeDescription='(MAX 5 MB)'
+                        value={entryForm.image}
+                        maxSize={1024 * 1024 * 5}
+                        setFile={handleSetImage}
+                        errorMessage={t('dropzone.errorMessage.image')}
+                        hint={t('entry.wizard.imageHint')}
+                      />
+                      {/* PDF */}
+                      <Dropzone
+                        pdf
+                        title='pdf'
+                        setFile={handleSetPDF}
+                        errorMessage={t('dropzone.errorMessage.pdf')}
+                        hint={t('entry.wizard.pdfHint')}
+                      />
+                    </div>
+                    <div className='w-full flex justify-end gap-4 pt-7'>
+                      <PreviousButton />
+                      <NextButton end />
+                    </div>
+                  </>
+                )}
+              </form>
+            )}
+          </div>
+        </div>
+      </div>
+      {openApplyInfo && identifierType && (
+        <ApplyInfoDialog
+          type={identifierType}
+          identifier={identifier}
+          close={setOpenApplyInfo}
+          yes={handleApplyInfo}
+        />
+      )}
+    </>
+  );
+};
+
+export default AdminAddEntry;

@@ -5,7 +5,7 @@ const LoadNext = () => {
   const { STUColor } = useAppContext();
 
   return (
-    <div className='flex justify-center h-20'>
+    <div className='flex w-full justify-center h-20'>
       <div className='h-20 w-fit flex justify-center items-center'>
         <CircleLoader color={STUColor} size={50} />
       </div>

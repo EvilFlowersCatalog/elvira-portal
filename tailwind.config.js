@@ -3,6 +3,20 @@ export default {
   content: ['./index.html', './src/**/*.{ts,js,jsx,tsx}'],
   theme: {
     extend: {
+      keyframes: {
+        flyRight: {
+          '0%': { transform: 'translateX(100%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
+        flyLeft: {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
+      },
+      animation: {
+        'fly-right': 'flyRight 0.5s ease-out forwards',
+        'fly-left': 'flyLeft 0.5s ease-out forwards',
+      },
       screens: {
         sm: '321px',
         md: '599px',

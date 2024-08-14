@@ -3,7 +3,7 @@ import { IEntry } from '../../../utils/interfaces/entry';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import useGetEntries from '../../../hooks/api/entries/useGetEntries';
 import ItemContainer from '../../../components/items-container/ItemContainer';
-import AdminEntry from '../../../components/entry/admin/AdminEntry';
+import AdminEntry from './components/AdminEntry';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import { MdAdd } from 'react-icons/md';
 import useAppContext from '../../../hooks/contexts/useAppContext';

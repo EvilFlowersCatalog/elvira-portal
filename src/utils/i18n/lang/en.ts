@@ -323,9 +323,9 @@ export const en = {
       read: {
         title: 'Read',
         descriptionPart1:
-          'We have created an open-source PDF reader on top of pdf.js called',
+          'We have created an open-source PDF reader on top of pdf.js called ',
         descriptionPart2:
-          'for easy document browsing with basic tools for taking notes, exporting citations and document sharing.',
+          ' for easy document browsing with basic tools for taking notes, exporting citations and document sharing.',
       },
       organize: {
         title: 'Organize',

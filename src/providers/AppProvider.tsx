@@ -12,12 +12,52 @@ import {
   THEME_TYPE,
 } from '../utils/interfaces/general/general';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import {
-  IAppContext,
-  IContextProviderParams,
-} from '../utils/interfaces/contexts';
+import { IContextProviderParams } from '../utils/interfaces/contexts';
 import tailwindConfig from '../../tailwind.config';
 import i18next from '../utils/i18n/i18next';
+
+export interface IAppContext {
+  theme: THEME_TYPE;
+  updateTheme: (theme: THEME_TYPE) => void;
+  lang: LANG_TYPE;
+  updateLang: (lang: LANG_TYPE) => void;
+  layout: LAYOUT_TYPE;
+  updateLayout: (layout: LAYOUT_TYPE) => void;
+  clearFilters: () => void;
+  specialNavigation: (
+    event: MouseEvent<HTMLButtonElement>,
+    path: NAVIGATION_PATHS | string
+  ) => void;
+  isSmallDevice: boolean;
+  showNavbar: boolean;
+  setShowNavbar: (showNavbar: boolean) => void;
+  showSearchBar: boolean;
+  setShowSearchBar: (showSearchBar: boolean) => void;
+  isParamsEmpty: () => boolean;
+  searchParamsEqual: (
+    prevSearchParams: URLSearchParams | null,
+    currentSearchParams: URLSearchParams
+  ) => boolean;
+  handleScroll: (
+    scrollRef: RefObject<HTMLDivElement>,
+    page: number,
+    setPage: (page: number) => void,
+    maxPage: number,
+    loadingNext: boolean,
+    setLoadingNext: (loadingNext: boolean) => void,
+    showScrollUp: boolean,
+    setShowScrollUp: (showScrollUp: boolean) => void
+  ) => void;
+  STUColor: string;
+  logoDark: string;
+  logoLight: string;
+  titleLogoDark: string;
+  titleLogoLight: string;
+  stuLogoDark: string;
+  stuLogoLight: string;
+  editingEntryTitle: string;
+  setEditingEntryTitle: (editingEntryTitle: string) => void;
+}
 
 export const AppContext = createContext<IAppContext | null>(null);
 // LOCAL SOTRAGE KEY

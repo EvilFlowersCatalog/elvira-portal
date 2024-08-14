@@ -6,7 +6,7 @@ import PageLoading from '../page/PageLoading';
 import PageMessage from '../page/PageMessage';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../hooks/contexts/useAppContext';
-import ScrollUpButton from '../common/ScrollUpButton';
+import ScrollUpButton from './ScrollUpButton';
 import ToolsContainer from '../tools/ToolsContainer';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 

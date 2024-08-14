@@ -6,7 +6,7 @@ import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
 import { useSearchParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
-import FeedMenu from '../feed/FeedMenu';
+import FeedMenu from '../feeds/FeedMenu';
 import Button from '../common/Button';
 import ElviraInput from '../common/ElviraInput';
 

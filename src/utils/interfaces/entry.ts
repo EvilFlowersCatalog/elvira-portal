@@ -85,31 +85,13 @@ export interface IEntryNewForm {
     title: string;
   }[];
   summary: string;
-  language_code: string;
+  language_code?: string;
   identifiers: IEntryIdentifiers;
   config?: IConfig;
-  citation: string;
-  published_at: string;
-  publisher: string;
-  image: File | null;
-  pdf: File | null;
-}
-
-export interface IEntryEdit {
-  title: string;
-  authors: IEntryAuthor[];
-  feeds: {
-    id: string;
-    title: string;
-  }[];
-  summary: string;
-  language_code?: string;
-  identifiers?: IEntryIdentifiers;
-  config: IConfig;
   citation?: string;
   published_at: string;
   publisher: string;
-  thumbnail: string;
+  thumbnail?: string;
 }
 
 export interface IEntryCategory {

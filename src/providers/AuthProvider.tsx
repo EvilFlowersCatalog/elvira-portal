@@ -1,4 +1,10 @@
-import { createContext, useEffect, useState } from 'react';
+import {
+  createContext,
+  MutableRefObject,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   IAuth,
   IAuthCredentials,
@@ -6,14 +12,21 @@ import {
 } from '../utils/interfaces/auth';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import {
-  IAuthContext,
-  IContextProviderParams,
-} from '../utils/interfaces/contexts';
+import { IContextProviderParams } from '../utils/interfaces/contexts';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { NAVIGATION_PATHS } from '../utils/interfaces/general/general';
 import useVerifyCredentials from '../hooks/api/verify/useVerifyCredentials';
 import useCustomEffect from '../hooks/useCustomEffect';
+import useAxios from '../hooks/api/axios/useAxios';
+import axios, { CancelTokenSource } from 'axios';
+
+export interface IAuthContext {
+  auth: IAuth | null;
+  updateAuth: (auth: IUpdatedAuth) => void;
+  login: (loginForm: IAuthCredentials) => Promise<void>;
+  logout: () => void;
+  cancelTokenSource: MutableRefObject<CancelTokenSource>;
+}
 
 export const AuthContext = createContext<IAuthContext | null>(null);
 // LOCAL SOTRAGE KEY
@@ -26,10 +39,16 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
   const [auth, setAuth] = useState<IAuth | null>(
     JSON.parse(localStorage.getItem(AUTH_KEY) as string) || null
   );
+
+  const logoutChannel = new BroadcastChannel(BROADCAST_MESSAGE);
+
+  const verifyCredentials = useVerifyCredentials();
   const navigate = useNavigate();
   const location = useLocation();
-  const verifyCredentials = useVerifyCredentials();
-  const logoutChannel = new BroadcastChannel(BROADCAST_MESSAGE);
+
+  const cancelTokenSource = useRef<CancelTokenSource>(
+    axios.CancelToken.source()
+  );
 
   // listen to all tabs
   useEffect(() => {
@@ -53,21 +72,27 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
 
   const updateAuth = (newAuth: IUpdatedAuth) => {
     // Update auth
-    if (auth) setAuth({ ...auth, ...newAuth });
+    if (auth) {
+      const data: IAuth = { ...auth, ...newAuth };
+      setAuth(data);
+      localStorage.setItem(AUTH_KEY, JSON.stringify(data));
+    }
   };
 
   const login = async (loginForm: IAuthCredentials) => {
     try {
       const { response: user } = await verifyCredentials(loginForm); // verify given credentials
 
-      // Set auth with given values
-      setAuth({
+      const userData: IAuth = {
         userId: user.user.id,
         username: user.user.username,
         isSuperUser: user.user.is_superuser,
         token: user.access_token,
         refreshToken: user.refresh_token,
-      });
+      };
+      // Set auth with given values
+      setAuth(userData);
+      localStorage.setItem(AUTH_KEY, JSON.stringify(userData));
 
       // Get where the user lastly was / if does not exist, go to home
       const pathname = location.state?.from?.pathname ?? NAVIGATION_PATHS.home;
@@ -84,9 +109,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
   };
 
   useCustomEffect(() => {
-    // Whenever auth is changed, save it to local storage
-    if (auth) localStorage.setItem(AUTH_KEY, JSON.stringify(auth));
-    else {
+    if (!auth) {
       localStorage.removeItem(AUTH_KEY);
       logoutChannel.postMessage(BROADCAST_MESSAGE);
 
@@ -101,11 +124,18 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
   }, [auth]);
 
   const logout = () => {
+    // Cancel all ongoing requests
+    cancelTokenSource.current.cancel();
+
+    // Reset the cancel token source
+    cancelTokenSource.current = axios.CancelToken.source();
     setAuth(null); // set to null
   };
 
   return (
-    <AuthContext.Provider value={{ auth, updateAuth, login, logout }}>
+    <AuthContext.Provider
+      value={{ auth, updateAuth, login, logout, cancelTokenSource }}
+    >
       {children}
     </AuthContext.Provider>
   );

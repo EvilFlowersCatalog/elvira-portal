@@ -26,7 +26,9 @@ const RequireAuth = () => {
 
     // Then every 4 min
     const intervalId = setInterval(refresh, 4 * 60 * 1000);
-    return () => clearInterval(intervalId);
+    return () => {
+      clearInterval(intervalId);
+    };
   }, []);
 
   return auth && verified && <Outlet />;
