@@ -21,7 +21,7 @@ build dev:
 
 deploy dev:
   stage: deploy
-  image: registry.gitlab.com/langio/node-deployer:latest
+  image: ghcr.io/backbonesk/node-deployer:master
   variables:
     GIT_STRATEGY: none
     BUILD_DIR: dist/
@@ -52,7 +52,7 @@ build production:
 
 deploy production:
   stage: deploy
-  image: registry.gitlab.com/langio/node-deployer:latest
+  image: ghcr.io/backbonesk/node-deployer:master
   variables:
     GIT_STRATEGY: none
     BUILD_DIR: dist/elibrary-portal
