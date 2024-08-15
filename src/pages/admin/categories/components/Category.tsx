@@ -35,12 +35,14 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
 
   return (
     <>
-      <div className='w-full flex flex-col md:w-1/2 lg:w-1/4 xl:w-1/5 xxl:w-1/6 p-2'>
-        <div className='w-full h-full flex flex-col justify-center uppercase font-bold items-center select-none bg-STUColor rounded-t-md p-4'>
-          <span className='text-lg uppercase font-extrabold'>
+      <div className='w-full flex flex-col md:w-1/2 lg:w-1/4 xl:w-1/5 p-2'>
+        <div className='w-full h-full flex flex-col gap-4 justify-center select-none bg-STUColor rounded-t-md p-4'>
+          <span className='text-lg uppercase font-extrabold text-left w-full'>
             {category.term}
           </span>
-          <span className='text-sm'>{category.label}</span>
+          {category.label && (
+            <span className='text-sm w-full text-right'>{category.label}</span>
+          )}
         </div>
         <div className='flex rounded-b-md'>
           <button
