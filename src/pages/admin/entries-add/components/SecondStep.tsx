@@ -65,6 +65,11 @@ const SecondStep = ({
         ...entryForm,
         published_at: `${selectedYear}`,
       });
+    } else {
+      setEntryForm({
+        ...entryForm,
+        published_at: '',
+      });
     }
   }, [selectedDay, selectedMonth, selectedYear]);
 

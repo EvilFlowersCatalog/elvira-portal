@@ -132,6 +132,11 @@ const AdminEditEntry = () => {
         ...prev!,
         published_at: `${selectedYear}`,
       }));
+    } else {
+      setEntry((prev) => ({
+        ...prev!,
+        published_at: '',
+      }));
     }
   }, [selectedDay, selectedMonth, selectedYear]);
 
