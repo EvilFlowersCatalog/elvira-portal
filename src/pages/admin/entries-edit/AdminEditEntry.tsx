@@ -17,6 +17,7 @@ import FeedMenu from '../../../components/feeds/FeedMenu';
 import { toast } from 'react-toastify';
 import useEditEntry from '../../../hooks/api/entries/useEditEntry';
 import ConfigItem from './components/ConfigItem';
+import ElviraSelect from '../../../components/common/ElviraSelect';
 
 const AdminEditEntry = () => {
   const { t } = useTranslation();
@@ -28,6 +29,12 @@ const AdminEditEntry = () => {
   const [activeFeeds, setActiveFeeds] = useState<
     { title: string; id: string }[]
   >([]);
+  const year = new Date().getFullYear();
+
+  const [selectedYear, setSelectedYear] = useState<string>('YYYY');
+  const [selectedMonth, setSelectedMonth] = useState<string>('MM');
+  const [selectedDay, setSelectedDay] = useState<string>('DD');
+  const [maxDay, setMaxDay] = useState<number>(31);
 
   const getEntryDetail = useGetEntryDetail();
   const navigate = useNavigate();
@@ -54,10 +61,14 @@ const AdminEditEntry = () => {
             identifiers: entryDetail.identifiers,
             config: entryDetail.config,
             citation: entryDetail.citation,
-            published_at: entryDetail.published_at,
+            published_at: '',
             publisher: entryDetail.publisher,
             thumbnail: entryDetail.thumbnail,
           });
+          const [y, m, d] = entryDetail.published_at?.split('-');
+          if (y) setSelectedYear(y);
+          if (m) setSelectedMonth(parseInt(m).toString()); // remove the '0'2 to just 2...
+          if (d) setSelectedDay(parseInt(d).toString()); // same
         }
       })();
     } catch {
@@ -78,6 +89,51 @@ const AdminEditEntry = () => {
       })),
     }));
   }, [activeFeeds]);
+
+  // when month change change possible day (30;31;28/29)
+  useCustomEffect(() => {
+    if (selectedMonth !== 'MM') {
+      if (['1', '3', '5', '7', '8', '10', '12'].includes(selectedMonth)) {
+        setMaxDay(31);
+      } else if (selectedMonth == '2') {
+        // when its february
+        if (selectedYear !== 'YYYY') {
+          const numYear = parseInt(selectedYear);
+          if (
+            (numYear % 4 === 0 && numYear % 100 !== 0) ||
+            numYear % 400 === 0
+          ) {
+            setMaxDay(29); // Leap year, February has 29 days
+          } else {
+            setMaxDay(28); // Non-leap year, February has 28 days
+          }
+        }
+      } else setMaxDay(30);
+    }
+  }, [selectedMonth, selectedYear]);
+
+  useCustomEffect(() => {
+    if (
+      selectedYear !== 'YYYY' &&
+      selectedMonth !== 'MM' &&
+      selectedDay !== 'DD'
+    ) {
+      setEntry((prev) => ({
+        ...prev!,
+        published_at: `${selectedYear}-${selectedMonth}-${selectedDay}`,
+      }));
+    } else if (selectedYear !== 'YYYY' && selectedMonth !== 'MM') {
+      setEntry((prev) => ({
+        ...prev!,
+        published_at: `${selectedYear}-${selectedMonth}`,
+      }));
+    } else if (selectedYear !== 'YYYY') {
+      setEntry((prev) => ({
+        ...prev!,
+        published_at: `${selectedYear}`,
+      }));
+    }
+  }, [selectedDay, selectedMonth, selectedYear]);
 
   const addAuthor = () => {
     const authors = entry!.authors;
@@ -131,12 +187,6 @@ const AdminEditEntry = () => {
     setEntry((prevEntry) => ({
       ...prevEntry!, // Preserve existing properties of entryForm
       publisher: event.target.value, // Update the publisher property
-    }));
-  };
-  const handlePublishedAtChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setEntry((prevEntry) => ({
-      ...prevEntry!, // Preserve existing properties of entryForm
-      published_at: event.target.value, // Update the published at property
     }));
   };
   const handleLangChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -254,11 +304,57 @@ const AdminEditEntry = () => {
                       placeholder={t('entry.wizard.publisher')}
                       value={entry.publisher ?? ''}
                     />
-                    <ElviraInput
-                      onChange={handlePublishedAtChange}
-                      placeholder={t('entry.wizard.publishedAt')}
-                      value={entry.published_at ?? ''}
-                    />
+                    <div className='flex flex-col gap-4'>
+                      <span>{t('entry.wizard.year')}</span>
+                      <div className='w-fit flex gap-4'>
+                        <ElviraSelect
+                          name='date-year'
+                          value={selectedYear}
+                          onChange={(e) => setSelectedYear(e.target.value)}
+                        >
+                          <option value='YYYY'>YYYY</option>
+                          {Array.from({
+                            length: year - 1900,
+                          }).map((_, i) => (
+                            <option key={i} value={(year - i).toString()}>
+                              {year - i}
+                            </option>
+                          ))}
+                        </ElviraSelect>
+                        {selectedYear !== 'YYYY' && (
+                          <ElviraSelect
+                            name='date-month'
+                            value={selectedMonth}
+                            onChange={(e) => setSelectedMonth(e.target.value)}
+                          >
+                            <option value='MM'>MM</option>
+                            {Array.from({
+                              length: 12,
+                            }).map((_, i) => (
+                              <option key={i} value={(i + 1).toString()}>
+                                {i + 1}
+                              </option>
+                            ))}
+                          </ElviraSelect>
+                        )}
+                        {selectedMonth !== 'MM' && selectedYear !== 'YYYY' && (
+                          <ElviraSelect
+                            name='date-day'
+                            value={selectedDay}
+                            onChange={(e) => setSelectedDay(e.target.value)}
+                          >
+                            <option value='DD'>DD</option>
+                            {Array.from({
+                              length: maxDay,
+                            }).map((_, i) => (
+                              <option key={i} value={(i + 1).toString()}>
+                                {i + 1}
+                              </option>
+                            ))}
+                          </ElviraSelect>
+                        )}
+                      </div>
+                    </div>
                     <ElviraInput
                       onChange={handleLangChange}
                       placeholder={t('entry.wizard.lang')}
