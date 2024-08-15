@@ -73,9 +73,7 @@ const AdminCategories = () => {
       >
         <div className='flex flex-wrap px-3 pb-4'>
           {/* Add button */}
-          <div
-            className={'w-full p-2 flex md:w-1/2 lg:w-1/4 xl:w-1/5 xxl:w-1/6'}
-          >
+          <div className={'w-full p-2 flex md:w-1/2 lg:w-1/4 xl:w-1/5'}>
             <button
               onClick={() => setIsOpen(true)}
               className={`flex flex-col justify-center dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 border-STUColor bg-STUColor bg-opacity-40 hover:bg-opacity-20 duration-200`}
