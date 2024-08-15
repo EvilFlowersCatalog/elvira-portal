@@ -1,5 +1,5 @@
 import { IEntryDetail, IEntryNew } from '../../../utils/interfaces/entry';
-import useAxios from '../axios/useAxios';
+import useAxios from '../useAxios';
 
 const useUploadEntry = () => {
   const axios = useAxios();

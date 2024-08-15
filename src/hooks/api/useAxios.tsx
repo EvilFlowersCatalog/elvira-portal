@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
-import useAuth from '../../contexts/useAuthContext';
+import useAuth from '../contexts/useAuthContext';
 import axios from 'axios';
-import useCustomEffect from '../../useCustomEffect';
+import useCustomEffect from '../useCustomEffect';
 
 // Used in login
 export const baseAxios = axios.create({

@@ -2,7 +2,7 @@ import {
   ICategoryQuery,
   IListCategory,
 } from '../../../utils/interfaces/category';
-import useAxios from '../axios/useAxios';
+import useAxios from '../useAxios';
 
 const useGetCategories = () => {
   const axios = useAxios();

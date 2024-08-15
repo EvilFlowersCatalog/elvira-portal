@@ -1,5 +1,5 @@
 import { ICategoryNew } from '../../../utils/interfaces/category';
-import useAxios from '../axios/useAxios';
+import useAxios from '../useAxios';
 
 const useCreateCategory = () => {
   const axios = useAxios();

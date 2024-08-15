@@ -1,6 +1,6 @@
 import { IVerifyAdminResponse } from '../../../utils/interfaces/auth';
 import useAuth from '../../contexts/useAuthContext';
-import useAxios from '../axios/useAxios';
+import useAxios from '../useAxios';
 
 const useVerifyAdmin = () => {
   const { auth } = useAuth();

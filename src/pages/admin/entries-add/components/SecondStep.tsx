@@ -90,6 +90,12 @@ const SecondStep = ({
       publisher: event.target.value, // Update the publisher property
     });
   };
+  const handleLanguageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setEntryForm({
+      ...entryForm, // Preserve existing properties of entryForm
+      language_code: event.target.value.toLocaleUpperCase(), // Update the publisher property
+    });
+  };
   const handleSummaryChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setEntryForm({
       ...entryForm, // Preserve existing properties of entryForm
@@ -111,6 +117,16 @@ const SecondStep = ({
         required
         placeholder={t('entry.wizard.title')}
         value={entryForm.title}
+      />
+      <ElviraInput
+        onChange={handlePublisherChange}
+        placeholder={t('entry.wizard.publisher')}
+        value={entryForm.publisher}
+      />
+      <ElviraInput
+        onChange={handleLanguageChange}
+        placeholder={t('entry.wizard.lang')}
+        value={entryForm.language_code ?? ''}
       />
       <div className='flex flex-col gap-4 w-full'>
         <span>{t('entry.wizard.year')}</span>
@@ -163,11 +179,6 @@ const SecondStep = ({
           )}
         </div>
       </div>
-      <ElviraInput
-        onChange={handlePublisherChange}
-        placeholder={t('entry.wizard.publisher')}
-        value={entryForm.publisher}
-      />
       <ElviraTextarea
         onChange={handleSummaryChange}
         placeholder={t('entry.wizard.summary')}

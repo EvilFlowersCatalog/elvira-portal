@@ -1,5 +1,5 @@
 import { IAcquisitionDetail } from '../../../utils/interfaces/acquisition';
-import useAxios from '../axios/useAxios';
+import useAxios from '../useAxios';
 
 const useGetAcquisitionDetail = () => {
   const axios = useAxios();

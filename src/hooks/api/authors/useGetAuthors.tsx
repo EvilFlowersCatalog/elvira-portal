@@ -1,5 +1,5 @@
 import { IAuthorsList } from '../../../utils/interfaces/author';
-import useAxios from '../axios/useAxios';
+import useAxios from '../useAxios';
 
 const useGetAuthors = () => {
   const axios = useAxios();

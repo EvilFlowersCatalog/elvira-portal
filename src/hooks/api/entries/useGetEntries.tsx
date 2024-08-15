@@ -1,5 +1,5 @@
 import { IEntriesList, IEntryQuery } from '../../../utils/interfaces/entry';
-import useAxios from '../axios/useAxios';
+import useAxios from '../useAxios';
 
 const useGetEntries = () => {
   const axios = useAxios();

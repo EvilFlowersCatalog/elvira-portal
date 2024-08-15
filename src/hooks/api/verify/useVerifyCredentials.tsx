@@ -2,7 +2,7 @@ import {
   IAuthCredentials,
   ILoginResponse,
 } from '../../../utils/interfaces/auth';
-import { baseAxios } from '../axios/useAxios';
+import { baseAxios } from '../useAxios';
 
 const useVerifyCredentials = () => {
   const verifyCredentials = async (

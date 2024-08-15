@@ -1,4 +1,4 @@
-import useAxios from '../../axios/useAxios';
+import useAxios from '../../useAxios';
 
 const useDeleteAnotationItem = () => {
   const axios = useAxios();

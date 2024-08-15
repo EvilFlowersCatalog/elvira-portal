@@ -20,7 +20,7 @@ const initialState: IEntryNewForm = {
   authors: [{ name: '', surname: '' }],
   feeds: [],
   summary: '',
-  language_code: 'sk',
+  language_code: '',
   identifiers: {
     doi: '',
     isbn: '',

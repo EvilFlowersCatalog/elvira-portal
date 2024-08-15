@@ -1,5 +1,5 @@
 import { IFeedNew } from '../../../utils/interfaces/feed';
-import useAxios from '../axios/useAxios';
+import useAxios from '../useAxios';
 
 const useUploadFeed = () => {
   const axios = useAxios();

@@ -1,5 +1,5 @@
 import { IDENTIFIERS_TYPE } from '../../../utils/interfaces/general/general';
-import useAxios from '../axios/useAxios';
+import useAxios from '../useAxios';
 import { IEntryInfo } from '../../../utils/interfaces/entry';
 
 const useGetData = () => {

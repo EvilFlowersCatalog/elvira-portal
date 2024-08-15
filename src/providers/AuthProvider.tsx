@@ -17,7 +17,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { NAVIGATION_PATHS } from '../utils/interfaces/general/general';
 import useVerifyCredentials from '../hooks/api/verify/useVerifyCredentials';
 import useCustomEffect from '../hooks/useCustomEffect';
-import useAxios from '../hooks/api/axios/useAxios';
+import useAxios from '../hooks/api/useAxios';
 import axios, { CancelTokenSource } from 'axios';
 
 export interface IAuthContext {

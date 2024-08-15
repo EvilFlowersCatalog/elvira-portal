@@ -1,5 +1,5 @@
 import { IAnotationItemBody } from '../../../../utils/interfaces/anotations';
-import useAxios from '../../axios/useAxios';
+import useAxios from '../../useAxios';
 
 const useUpdateAnotationItem = () => {
   const axios = useAxios();

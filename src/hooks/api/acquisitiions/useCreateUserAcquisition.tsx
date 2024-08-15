@@ -3,7 +3,7 @@ import {
   IUserAcquisitionResponse,
   IUserAcquisitionShare,
 } from '../../../utils/interfaces/acquisition';
-import useAxios from '../axios/useAxios';
+import useAxios from '../useAxios';
 
 const useCreateUserAcquisition = () => {
   const axios = useAxios();

@@ -1,6 +1,6 @@
 import { IEntryQuery } from '../../../utils/interfaces/entry';
 import { IMyShelfList } from '../../../utils/interfaces/my-shelf';
-import useAxios from '../axios/useAxios';
+import useAxios from '../useAxios';
 
 const useGetShelf = () => {
   const axios = useAxios();

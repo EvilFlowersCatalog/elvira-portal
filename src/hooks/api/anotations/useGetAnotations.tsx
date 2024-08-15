@@ -1,5 +1,5 @@
 import { IListAnitation } from '../../../utils/interfaces/anotations';
-import useAxios from '../axios/useAxios';
+import useAxios from '../useAxios';
 
 const useGetAnotations = () => {
   const axios = useAxios();

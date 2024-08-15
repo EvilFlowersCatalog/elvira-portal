@@ -1,5 +1,5 @@
 import { IMyShelfPostResponse } from '../../../utils/interfaces/my-shelf';
-import useAxios from '../axios/useAxios';
+import useAxios from '../useAxios';
 
 const useAddToShelf = () => {
   const axios = useAxios();

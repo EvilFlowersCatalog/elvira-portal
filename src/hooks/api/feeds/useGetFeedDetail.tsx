@@ -1,5 +1,5 @@
 import { IFeedDetail } from '../../../utils/interfaces/feed';
-import useAxios from '../axios/useAxios';
+import useAxios from '../useAxios';
 
 const useGetFeedDetail = () => {
   const axios = useAxios();
