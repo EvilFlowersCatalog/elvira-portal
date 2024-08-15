@@ -1,13 +1,13 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IoAddCircle } from 'react-icons/io5';
-import ElviraInput from '../../../../components/common/ElviraInput';
+import ElviraInput from '../../../../../components/common/ElviraInput';
 import { MdRemoveCircle } from 'react-icons/md';
-import FeedMenu from '../../../../components/feeds/FeedMenu';
-import NextButton from './NextButton';
-import PreviousButton from './PreviousButton';
-import useCustomEffect from '../../../../hooks/useCustomEffect';
-import { IWizardParams } from '../../../../utils/interfaces/general/general';
+import FeedMenu from '../../../../../components/feeds/FeedMenu';
+import NextButton from '../NextButton';
+import PreviousButton from '../PreviousButton';
+import useCustomEffect from '../../../../../hooks/useCustomEffect';
+import { IWizardParams } from '../../../../../utils/interfaces/general/general';
 
 const ThirdStep = ({
   entryForm,

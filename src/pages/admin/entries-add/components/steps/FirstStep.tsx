@@ -1,16 +1,19 @@
 import { FormEvent, useState } from 'react';
-import ElviraInput from '../../../../components/common/ElviraInput';
-import PageLoading from '../../../../components/page/PageLoading';
-import NextButton from './NextButton';
+import ElviraInput from '../../../../../components/common/ElviraInput';
+import PageLoading from '../../../../../components/page/PageLoading';
+import NextButton from '../NextButton';
 import {
   IDENTIFIERS_TYPE,
   IWizardParams,
-} from '../../../../utils/interfaces/general/general';
-import { IEntryInfo, IEntryNewForm } from '../../../../utils/interfaces/entry';
-import useGetData from '../../../../hooks/api/identifiers/useGetData';
+} from '../../../../../utils/interfaces/general/general';
+import {
+  IEntryInfo,
+  IEntryNewForm,
+} from '../../../../../utils/interfaces/entry';
+import useGetData from '../../../../../hooks/api/identifiers/useGetData';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import ApplyInfoDialog from '../../../../components/dialogs/ApplyInfoDialog';
+import ApplyInfoDialog from '../../../../../components/dialogs/ApplyInfoDialog';
 
 const FirstStep = ({
   entryForm,

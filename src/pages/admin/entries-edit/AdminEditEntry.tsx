@@ -197,7 +197,7 @@ const AdminEditEntry = () => {
   const handleLangChange = (event: ChangeEvent<HTMLInputElement>) => {
     setEntry((prevEntry) => ({
       ...prevEntry!, // Preserve existing properties of entryForm
-      language_code: event.target.value, // Update the lang property
+      language_code: event.target.value.toLocaleUpperCase(), // Update the lang property
     }));
   };
   // const handleCopiesChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -309,6 +309,16 @@ const AdminEditEntry = () => {
                       placeholder={t('entry.wizard.publisher')}
                       value={entry.publisher ?? ''}
                     />
+                    <ElviraInput
+                      onChange={handleLangChange}
+                      placeholder={t('entry.wizard.lang')}
+                      value={entry.language_code ?? ''}
+                    />
+                    <ElviraInput
+                      onChange={() => {}}
+                      placeholder={t('entry.wizard.copies')}
+                      value={''}
+                    />
                     <div className='flex flex-col gap-4'>
                       <span>{t('entry.wizard.year')}</span>
                       <div className='w-fit flex gap-4'>
@@ -360,16 +370,6 @@ const AdminEditEntry = () => {
                         )}
                       </div>
                     </div>
-                    <ElviraInput
-                      onChange={handleLangChange}
-                      placeholder={t('entry.wizard.lang')}
-                      value={entry.language_code ?? ''}
-                    />
-                    <ElviraInput
-                      onChange={() => {}}
-                      placeholder={t('entry.wizard.copies')}
-                      value={''}
-                    />
                   </div>
                 </div>
               </div>

@@ -1,20 +1,20 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import PageLoading from '../../../../components/page/PageLoading';
-import useUploadEntry from '../../../../hooks/api/entries/useUploadEntry';
-import useDeleteEntry from '../../../../hooks/api/entries/useDeleteEntry';
+import PageLoading from '../../../../../components/page/PageLoading';
+import useUploadEntry from '../../../../../hooks/api/entries/useUploadEntry';
+import useDeleteEntry from '../../../../../hooks/api/entries/useDeleteEntry';
 import { useNavigate } from 'react-router-dom';
-import useCreateEntryAcquistion from '../../../../hooks/api/acquisitiions/useCreateEntryAcquistion';
-import { IEntryNew } from '../../../../utils/interfaces/entry';
-import { getBase64 } from '../../../../utils/func/functions';
+import useCreateEntryAcquistion from '../../../../../hooks/api/acquisitiions/useCreateEntryAcquistion';
+import { IEntryNew } from '../../../../../utils/interfaces/entry';
+import { getBase64 } from '../../../../../utils/func/functions';
 import { toast } from 'react-toastify';
 import {
   IWizardParams,
   NAVIGATION_PATHS,
-} from '../../../../utils/interfaces/general/general';
-import PreviousButton from './PreviousButton';
-import NextButton from './NextButton';
-import Dropzone from '../../../../components/common/Dropzone';
+} from '../../../../../utils/interfaces/general/general';
+import PreviousButton from '../PreviousButton';
+import NextButton from '../NextButton';
+import Dropzone from '../../../../../components/common/Dropzone';
 
 const FifthStep = ({ entryForm, stepIndex, setStepIndex }: IWizardParams) => {
   const { t } = useTranslation();
@@ -37,7 +37,7 @@ const FifthStep = ({ entryForm, stepIndex, setStepIndex }: IWizardParams) => {
         return feed.id;
       }),
       summary: entryForm.summary,
-      language_code: 'sk',
+      language_code: entryForm.language_code ?? '',
       identifiers: {
         doi: entryForm.identifiers?.doi ?? '',
         isbn: entryForm.identifiers?.isbn ?? '',

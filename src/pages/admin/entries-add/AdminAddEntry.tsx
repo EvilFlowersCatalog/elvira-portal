@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { IEntryNewForm } from '../../../utils/interfaces/entry';
 import Breadcrumb from '../../../components/common/Breadcrumb';
-import FirstStep from './components/FirstStep';
-import SecondStep from './components/SecondStep';
-import ThirdStep from './components/ThirdStep';
-import FourthStep from './components/FourthStep';
-import FifthStep from './components/FifthStep';
+import FirstStep from './components/steps/FirstStep';
+import SecondStep from './components/steps/SecondStep';
+import ThirdStep from './components/steps/ThirdStep';
+import FourthStep from './components/steps/FourthStep';
+import FifthStep from './components/steps/FifthStep';
 
 const steps = [
   FirstStep, // Step 1: DOI & ISBN

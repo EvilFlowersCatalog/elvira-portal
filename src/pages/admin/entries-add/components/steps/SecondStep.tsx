@@ -1,12 +1,12 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ElviraInput from '../../../../components/common/ElviraInput';
-import ElviraTextarea from '../../../../components/common/ElviraTextarea';
-import PreviousButton from './PreviousButton';
-import NextButton from './NextButton';
-import { IWizardParams } from '../../../../utils/interfaces/general/general';
-import useCustomEffect from '../../../../hooks/useCustomEffect';
-import ElviraSelect from '../../../../components/common/ElviraSelect';
+import ElviraInput from '../../../../../components/common/ElviraInput';
+import ElviraTextarea from '../../../../../components/common/ElviraTextarea';
+import PreviousButton from '../PreviousButton';
+import NextButton from '../NextButton';
+import { IWizardParams } from '../../../../../utils/interfaces/general/general';
+import useCustomEffect from '../../../../../hooks/useCustomEffect';
+import ElviraSelect from '../../../../../components/common/ElviraSelect';
 
 const SecondStep = ({
   entryForm,

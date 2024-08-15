@@ -1,9 +1,9 @@
 import { ChangeEvent, FormEvent } from 'react';
-import ElviraTextarea from '../../../../components/common/ElviraTextarea';
+import ElviraTextarea from '../../../../../components/common/ElviraTextarea';
 import { useTranslation } from 'react-i18next';
-import NextButton from './NextButton';
-import PreviousButton from './PreviousButton';
-import { IWizardParams } from '../../../../utils/interfaces/general/general';
+import NextButton from '../NextButton';
+import PreviousButton from '../PreviousButton';
+import { IWizardParams } from '../../../../../utils/interfaces/general/general';
 
 const FourthStep = ({
   entryForm,
