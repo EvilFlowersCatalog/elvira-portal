@@ -194,6 +194,7 @@ export const en = {
         requiredMessages: {
           title:
             'Title field is required. It must be filled out before proceeding.',
+          lang: 'Language field is required. It must be filled out before proceeding.',
           authorName:
             "Author's name field is required. It must be filled out before proceeding.",
           authorSurname:

@@ -7,6 +7,7 @@ import NextButton from '../NextButton';
 import { IWizardParams } from '../../../../../utils/interfaces/general/general';
 import useCustomEffect from '../../../../../hooks/useCustomEffect';
 import ElviraSelect from '../../../../../components/common/ElviraSelect';
+import LanguageAutofill from '../../../../../components/common/LanguageAutofill';
 
 const SecondStep = ({
   entryForm,
@@ -22,6 +23,13 @@ const SecondStep = ({
   const [selectedMonth, setSelectedMonth] = useState<string>('MM');
   const [selectedDay, setSelectedDay] = useState<string>('DD');
   const [maxDay, setMaxDay] = useState<number>(31);
+
+  useCustomEffect(() => {
+    const [y, m, d] = entryForm.published_at?.split('-');
+    if (y) setSelectedYear(y);
+    if (m) setSelectedMonth(parseInt(m).toString()); // remove the '0'2 to just 2...
+    if (d) setSelectedDay(parseInt(d).toString()); // same
+  }, []);
 
   // when month change change possible day (30;31;28/29)
   useCustomEffect(() => {
@@ -90,12 +98,6 @@ const SecondStep = ({
       publisher: event.target.value, // Update the publisher property
     });
   };
-  const handleLanguageChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setEntryForm({
-      ...entryForm, // Preserve existing properties of entryForm
-      language_code: event.target.value.toLocaleUpperCase(), // Update the publisher property
-    });
-  };
   const handleSummaryChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setEntryForm({
       ...entryForm, // Preserve existing properties of entryForm
@@ -118,15 +120,11 @@ const SecondStep = ({
         placeholder={t('entry.wizard.title')}
         value={entryForm.title}
       />
+      <LanguageAutofill entryForm={entryForm} setEntryForm={setEntryForm} />
       <ElviraInput
         onChange={handlePublisherChange}
         placeholder={t('entry.wizard.publisher')}
         value={entryForm.publisher}
-      />
-      <ElviraInput
-        onChange={handleLanguageChange}
-        placeholder={t('entry.wizard.lang')}
-        value={entryForm.language_code ?? ''}
       />
       <div className='flex flex-col gap-4 w-full'>
         <span>{t('entry.wizard.year')}</span>

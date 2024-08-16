@@ -18,6 +18,7 @@ import { toast } from 'react-toastify';
 import useEditEntry from '../../../hooks/api/entries/useEditEntry';
 import ConfigItem from './components/ConfigItem';
 import ElviraSelect from '../../../components/common/ElviraSelect';
+import LanguageAutofill from '../../../components/common/LanguageAutofill';
 
 const AdminEditEntry = () => {
   const { t } = useTranslation();
@@ -57,7 +58,8 @@ const AdminEditEntry = () => {
               id: feed.id,
             })),
             summary: entryDetail.summary,
-            language_code: entryDetail.language?.code ?? '',
+            language_code:
+              entryDetail.language?.alpha3 ?? entryDetail.language?.alpha2,
             identifiers: entryDetail.identifiers,
             config: entryDetail.config,
             citation: entryDetail.citation,
@@ -194,12 +196,6 @@ const AdminEditEntry = () => {
       publisher: event.target.value, // Update the publisher property
     }));
   };
-  const handleLangChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setEntry((prevEntry) => ({
-      ...prevEntry!, // Preserve existing properties of entryForm
-      language_code: event.target.value.toLocaleUpperCase(), // Update the lang property
-    }));
-  };
   // const handleCopiesChange = (event: ChangeEvent<HTMLInputElement>) => {
   //   setEntry((prevEntry) => ({
   //     ...prevEntry!, // Preserve existing properties of entryForm
@@ -242,7 +238,7 @@ const AdminEditEntry = () => {
         return feed.id;
       }),
       summary: entry!.summary,
-      language_code: 'sk',
+      language_code: entry!.language_code,
       config: entry!.config,
       identifiers: {
         doi: entry!.identifiers?.doi ?? '',
@@ -295,7 +291,7 @@ const AdminEditEntry = () => {
               <div className='flex flex-col md:flex-row bg-zinc-100 dark:bg-darkGray gap-4 rounded-md p-4'>
                 {/* Image */}
                 <img
-                  className='bg-gray border border-white w-40 md:h-full h-auto rounded-md'
+                  className='bg-gray border border-white w-48 h-min rounded-md'
                   alt='thumbnail'
                   src={entry.thumbnail + `?access_token=${auth?.token}`}
                 ></img>
@@ -309,10 +305,9 @@ const AdminEditEntry = () => {
                       placeholder={t('entry.wizard.publisher')}
                       value={entry.publisher ?? ''}
                     />
-                    <ElviraInput
-                      onChange={handleLangChange}
-                      placeholder={t('entry.wizard.lang')}
-                      value={entry.language_code ?? ''}
+                    <LanguageAutofill
+                      entryForm={entry}
+                      setEntryForm={setEntry}
                     />
                     <ElviraInput
                       onChange={() => {}}

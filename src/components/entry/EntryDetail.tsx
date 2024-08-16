@@ -210,7 +210,9 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               <span className={'h-3/6 border-l border-white'}></span>
               <div className={'flex flex-col items-center'}>
                 <span className={'text-STUColor font-extrabold'}>
-                  {entry.response.language?.code ?? 'SK'}
+                  {entry.response.language?.alpha3 ??
+                    entry.response.language?.alpha2 ??
+                    '-'}
                 </span>
                 <span className={'text-white'}>{t('entry.detail.lang')}</span>
               </div>

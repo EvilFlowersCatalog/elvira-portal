@@ -6,10 +6,7 @@ import {
   IDENTIFIERS_TYPE,
   IWizardParams,
 } from '../../../../../utils/interfaces/general/general';
-import {
-  IEntryInfo,
-  IEntryNewForm,
-} from '../../../../../utils/interfaces/entry';
+import { IEntryInfo } from '../../../../../utils/interfaces/entry';
 import useGetData from '../../../../../hooks/api/identifiers/useGetData';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
@@ -24,7 +21,11 @@ const FirstStep = ({
   const { t } = useTranslation();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [identifier, setIdentifier] = useState<string>('');
+  const [identifier, setIdentifier] = useState<string>(
+    entryForm.identifiers.doi
+      ? entryForm.identifiers.doi
+      : entryForm.identifiers.isbn
+  );
   const [identifierType, setIdentifierType] = useState<IDENTIFIERS_TYPE | null>(
     null
   );
@@ -72,6 +73,8 @@ const FirstStep = ({
         // Notify and open apply info dialog
         toast.success(t('notifications.dataFromIdentifiers.success'));
         setOpenApplyInfo(true);
+      } else {
+        setStepIndex(stepIndex + 1);
       }
     } catch {
       setOpenApplyInfo(false);
@@ -80,22 +83,27 @@ const FirstStep = ({
     } finally {
       // Whatever happens go to next step and set loading to false
       setIsLoading(false);
-      setStepIndex(stepIndex + 1);
     }
   };
 
-  const handleApplyInfo = () => {
+  const handleYes = () => {
     setEntryForm({
       ...entryForm,
       title: entryInfo?.response.title ?? '',
       authors: entryInfo?.response.authors ?? [],
       publisher: entryInfo?.response.publisher ?? '',
       published_at: entryInfo?.response.published_at ?? '',
-      language_code: entryInfo?.response.language ?? '',
+      language_code: entryInfo?.response.language_code,
       citation: entryInfo?.response.bibtex ?? '',
     });
 
+    setStepIndex(stepIndex + 1);
     setOpenApplyInfo(false);
+  };
+
+  const handleClose = () => {
+    setOpenApplyInfo(false);
+    setStepIndex(stepIndex + 1);
   };
 
   return (
@@ -128,8 +136,8 @@ const FirstStep = ({
         <ApplyInfoDialog
           type={identifierType}
           identifier={identifier}
-          close={setOpenApplyInfo}
-          yes={handleApplyInfo}
+          close={handleClose}
+          yes={handleYes}
         />
       )}
     </>

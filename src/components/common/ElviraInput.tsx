@@ -3,6 +3,7 @@ import { uuid } from '../../utils/func/functions';
 
 interface IElviraInputParams {
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onBlur?: () => void;
   invalidMessage?: string;
   required?: boolean;
   placeholder: string;
@@ -19,6 +20,7 @@ const ElviraInput = ({
   value,
   type = 'text',
   backgroundTailwind = '',
+  onBlur,
 }: IElviraInputParams) => {
   const id = uuid();
   const [isInvalid, setIsInvalid] = useState<boolean>(false);
@@ -40,6 +42,7 @@ const ElviraInput = ({
             onChange(e);
             setIsInvalid(false);
           }}
+          onBlur={onBlur}
           onInvalid={(e: ChangeEvent<HTMLInputElement>) => {
             e.preventDefault();
             ref.current?.focus();

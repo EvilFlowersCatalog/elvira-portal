@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import {
   NAVIGATION_PATHS,
   THEME_TYPE,
-} from '../utils/interfaces/general/general';
-import Button from '../components/common/Button';
-import useAppContext from '../hooks/contexts/useAppContext';
+} from '../../utils/interfaces/general/general';
+import Button from '../../components/common/Button';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 /**
  * Returns NotFoundPage

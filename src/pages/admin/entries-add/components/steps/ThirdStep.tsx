@@ -19,7 +19,7 @@ const ThirdStep = ({
 
   const [activeFeeds, setActiveFeeds] = useState<
     { title: string; id: string }[]
-  >([]);
+  >(entryForm.feeds ?? []);
 
   // feed add/remove handlers
   useCustomEffect(() => {

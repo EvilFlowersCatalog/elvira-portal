@@ -6,7 +6,7 @@ import Shelf from '../pages/common/Shelf';
 import Feeds from '../pages/common/feed-page/Feeds';
 import AdminHome from '../pages/admin/admin-home/AdminHome';
 import AdminFeeds from '../pages/admin/feeds/AdminFeeds';
-import NotFound from '../pages/NotFound';
+import NotFound from '../pages/common/NotFound';
 import { NAVIGATION_PATHS } from '../utils/interfaces/general/general';
 import RequireAuth from './private/RequireAuth';
 import useAuthContext from '../hooks/contexts/useAuthContext';

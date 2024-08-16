@@ -192,6 +192,7 @@ export const sk = {
       wizard: {
         requiredMessages: {
           title: 'Názov je povinný. Pred pokračovaním je potrebné ho vyplniť.',
+          lang: 'Jazyk je povinný. Pred pokračovaním je potrebné ho vyplniť.',
           authorName:
             'Pole s menom autora je povinné. Pred pokračovaním je potrebné ho vyplniť.',
           authorSurname:

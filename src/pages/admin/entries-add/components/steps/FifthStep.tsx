@@ -37,7 +37,7 @@ const FifthStep = ({ entryForm, stepIndex, setStepIndex }: IWizardParams) => {
         return feed.id;
       }),
       summary: entryForm.summary,
-      language_code: entryForm.language_code ?? '',
+      language_code: entryForm.language_code,
       identifiers: {
         doi: entryForm.identifiers?.doi ?? '',
         isbn: entryForm.identifiers?.isbn ?? '',

@@ -2,6 +2,7 @@ import { IEntryAcquisition } from './acquisition';
 import { IEntryAuthor } from './author';
 import { IFeed } from './feed';
 import { IConfig, IMetadata } from './general/general';
+import { ILanguage } from './language';
 
 export interface IEntriesList {
   items: IEntry[];
@@ -12,7 +13,7 @@ export interface IEntry {
   id: string;
   title: string;
   authors: IEntryAuthor[];
-  language: IEntryLanguage;
+  language_code?: string;
   popularity: number;
   category: IEntryCategory;
   summary: string;
@@ -34,7 +35,7 @@ export interface IEntryDetail {
     category: IEntryCategory;
     popularity: string;
     feeds: IFeed[];
-    language: IEntryLanguage;
+    language?: ILanguage;
     title: string;
     config: IConfig;
     published_at: string;
@@ -68,7 +69,7 @@ export interface IEntryNew {
   authors: IEntryAuthor[];
   feeds: string[];
   summary: string;
-  language_code: string;
+  language_code?: string;
   identifiers: IEntryIdentifiers;
   config?: IConfig;
   citation: string;
@@ -104,12 +105,6 @@ export interface IEntryIdentifiers {
   isbn: string;
 }
 
-export interface IEntryLanguage {
-  id: string;
-  name: string;
-  code: string;
-}
-
 export interface IEntryInfo {
   response: {
     title: string;
@@ -117,7 +112,7 @@ export interface IEntryInfo {
     doi: string;
     authors: IEntryAuthor[];
     published_at: string;
-    language: string;
+    language_code: string;
     bibtex: string;
   };
 }
