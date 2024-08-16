@@ -103,7 +103,8 @@ const LanguageAutofill = ({
         invalidMessage={t('entry.wizard.requiredMessages.lang')}
         onBlur={() => {
           const lang = languages.filter(
-            (lang) => lang.name.toLocaleLowerCase() === inputValue
+            (lang) =>
+              lang.name.toLocaleLowerCase() === inputValue.toLocaleLowerCase()
           );
           if (lang.length === 0) {
             setInputValue('');
