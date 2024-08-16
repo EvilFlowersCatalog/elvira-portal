@@ -80,6 +80,7 @@ const FirstStep = ({
       setOpenApplyInfo(false);
       // Notify about error
       toast.error(t('notifications.dataFromIdentifiers.error'));
+      setStepIndex(stepIndex + 1);
     } finally {
       // Whatever happens go to next step and set loading to false
       setIsLoading(false);
