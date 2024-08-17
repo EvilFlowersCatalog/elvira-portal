@@ -26,7 +26,11 @@ const CookiesInformation = () => {
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
             alt='Elvira Logo'
           />
-          <img className='w-16' src='/assets/static/cookies.png' alt='cookie' />
+          <img
+            className='w-16'
+            src='/assets/static/cookies.png'
+            alt='cookies'
+          />
         </div>
         <span className='text-sm'>{t('cookies.information')}</span>
         <div className='w-full flex justify-center'>
