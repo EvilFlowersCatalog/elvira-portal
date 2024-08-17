@@ -330,5 +330,12 @@ export const sk = {
           'Naše projekty sú navrhnuté tak, aby boli interoperabilné a podporovali mnoho rôznych komunikačných protokolov, ako sú OPDS, REST API, OAI a Z39.50 (momentálne v pokroku). Podporujeme tiež viaceré úložiská pre jednoduchú implementáciu.',
       },
     },
+
+    // COOKIES
+    cookies: {
+      information:
+        'Táto webová stránka používa cookies na zlepšenie vášho zážitku. Používame cookies na zapamätanie si vašich preferencií rozloženia, vybraného režimu alebo jazyka, aby sme vám poskytli lepší zážitok.',
+      accept: 'Rozumiem',
+    },
   },
 };

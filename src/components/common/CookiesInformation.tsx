@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import useCookiesContext from '../../hooks/contexts/useCookiesContext';
 import {
@@ -7,6 +8,7 @@ import {
 import Button from './Button';
 
 const CookiesInformation = () => {
+  const { t } = useTranslation();
   const { theme, titleLogoLight, titleLogoDark } = useAppContext();
   const { setCookie, setInformed } = useCookiesContext();
 
@@ -26,14 +28,10 @@ const CookiesInformation = () => {
           />
           <img className='w-16' src='/assets/static/cookies.png' alt='cookie' />
         </div>
-        <span className='text-sm'>
-          This website uses cookies to enhance your experience. We use cookies
-          to remember your layout preferences, selected theme and language to
-          provide a better experience.
-        </span>
+        <span className='text-sm'>{t('cookies.information')}</span>
         <div className='w-full flex justify-center'>
           <Button onClick={handleAccept}>
-            <>I understand</>
+            <>{t('cookies.accept')}</>
           </Button>
         </div>
       </div>

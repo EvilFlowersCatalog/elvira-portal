@@ -338,5 +338,12 @@ export const en = {
           'Our projects are designed to be interopable and support many different communication protocols such as OPDS, REST API, OAI and Z39.50 (currently in progress). We support also multiple storage backends for easy deployment.',
       },
     },
+
+    // COOKIES
+    cookies: {
+      information:
+        'This website uses cookies to enhance your experience. We use cookies to remember your layout preferences, selected theme and language to provide a better experience.',
+      accept: 'I understand',
+    },
   },
 };
