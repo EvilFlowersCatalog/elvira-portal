@@ -8,6 +8,8 @@ import { IWizardParams } from '../../../../../utils/interfaces/general/general';
 import useCustomEffect from '../../../../../hooks/useCustomEffect';
 import ElviraSelect from '../../../../../components/common/ElviraSelect';
 import LanguageAutofill from '../../../../../components/common/LanguageAutofill';
+import WYSIWYG from '../../../../../components/common/WYSIWYG';
+import { ContentEditableEvent } from 'react-simple-wysiwyg';
 
 const SecondStep = ({
   entryForm,
@@ -98,7 +100,7 @@ const SecondStep = ({
       publisher: event.target.value, // Update the publisher property
     });
   };
-  const handleSummaryChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleSummaryChange = (event: ContentEditableEvent) => {
     setEntryForm({
       ...entryForm, // Preserve existing properties of entryForm
       summary: event.target.value, // Update the summary property
@@ -177,11 +179,11 @@ const SecondStep = ({
           )}
         </div>
       </div>
-      <ElviraTextarea
-        onChange={handleSummaryChange}
-        placeholder={t('entry.wizard.summary')}
-        value={entryForm.summary}
-      />
+      <div className='w-full h-96'>
+        <span>{t('entry.wizard.summary')}</span>
+        <WYSIWYG value={entryForm.summary} onChange={handleSummaryChange} />
+      </div>
+
       <div className='w-full flex justify-end gap-4 pt-7'>
         <PreviousButton stepIndex={stepIndex} setStepIndex={setStepIndex} />
         <NextButton />

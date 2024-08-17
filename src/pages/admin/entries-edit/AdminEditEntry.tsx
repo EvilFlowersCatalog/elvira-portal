@@ -19,6 +19,8 @@ import useEditEntry from '../../../hooks/api/entries/useEditEntry';
 import ConfigItem from './components/ConfigItem';
 import ElviraSelect from '../../../components/common/ElviraSelect';
 import LanguageAutofill from '../../../components/common/LanguageAutofill';
+import { ContentEditableEvent } from 'react-simple-wysiwyg';
+import WYSIWYG from '../../../components/common/WYSIWYG';
 
 const AdminEditEntry = () => {
   const { t } = useTranslation();
@@ -178,7 +180,7 @@ const AdminEditEntry = () => {
       identifiers: { ...prevEntry?.identifiers!, isbn: event.target.value }, // Update the isbn property
     }));
   };
-  const handleSummaryChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+  const handleSummaryChange = (event: ContentEditableEvent) => {
     setEntry((prevEntry) => ({
       ...prevEntry!, // Preserve existing properties of entryForm
       summary: event.target.value, // Update the summary property
@@ -547,16 +549,11 @@ const AdminEditEntry = () => {
               <div className='flex-1 min-h-60 bg-zinc-100 dark:bg-darkGray rounded-md p-4'>
                 <span>{t('entry.wizard.files')}</span>
               </div>
-              <div className='flex flex-col flex-1 min-h-60 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
+              <div className='flex flex-col flex-3 min-h-60 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
                 <span>{t('entry.wizard.summary')}</span>
-                <textarea
-                  onChange={handleSummaryChange}
-                  className='bg-white dark:bg-gray outline-none resize-none flex-1 p-2 rounded-md'
-                  placeholder={t('entry.wizard.summary')}
-                  value={entry.summary}
-                />
+                <WYSIWYG value={entry.summary} onChange={handleSummaryChange} />
               </div>
-              <div className='flex flex-col min-h-96 flex-3 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
+              <div className='flex flex-col min-h-96 md:min-h-0 flex-3 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
                 <span>{t('entry.wizard.citation')}</span>
                 <textarea
                   onChange={handleCitationChange}

@@ -14,11 +14,14 @@ import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { IContextProviderParams } from '../utils/interfaces/contexts';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { NAVIGATION_PATHS } from '../utils/interfaces/general/general';
+import {
+  COOKIES_TYPE,
+  NAVIGATION_PATHS,
+} from '../utils/interfaces/general/general';
 import useVerifyCredentials from '../hooks/api/verify/useVerifyCredentials';
 import useCustomEffect from '../hooks/useCustomEffect';
-import useAxios from '../hooks/api/useAxios';
 import axios, { CancelTokenSource } from 'axios';
+import useCookiesContext from '../hooks/contexts/useCookiesContext';
 
 export interface IAuthContext {
   auth: IAuth | null;
@@ -30,16 +33,15 @@ export interface IAuthContext {
 
 export const AuthContext = createContext<IAuthContext | null>(null);
 // LOCAL SOTRAGE KEY
-const AUTH_KEY = 'elvira-auth';
 const BROADCAST_MESSAGE = 'logout';
 
 const AuthProvider = ({ children }: IContextProviderParams) => {
   const { t } = useTranslation();
+  const { cookies, setCookie, removeCookie } = useCookiesContext();
 
   const [auth, setAuth] = useState<IAuth | null>(
-    JSON.parse(localStorage.getItem(AUTH_KEY) as string) || null
+    cookies[COOKIES_TYPE.AUTH_KEY] ?? null
   );
-
   const logoutChannel = new BroadcastChannel(BROADCAST_MESSAGE);
 
   const verifyCredentials = useVerifyCredentials();
@@ -55,17 +57,10 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
     const handleLogout = () => {
       logout();
     };
-    const handleStorageChange = (event: StorageEvent) => {
-      if (event.key === AUTH_KEY) {
-        setAuth(event.newValue ? JSON.parse(event.newValue) : null);
-      }
-    };
 
-    window.addEventListener('storage', handleStorageChange);
     logoutChannel.onmessage = handleLogout;
 
     return () => {
-      window.removeEventListener('storage', handleStorageChange);
       logoutChannel.close();
     };
   }, []);
@@ -106,9 +101,11 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
 
   useCustomEffect(() => {
     if (auth) {
-      localStorage.setItem(AUTH_KEY, JSON.stringify(auth));
+      setCookie(COOKIES_TYPE.AUTH_KEY, auth, {
+        maxAge: 60 * 60 * 24, // 1 day
+      });
     } else {
-      localStorage.removeItem(AUTH_KEY);
+      removeCookie(COOKIES_TYPE.AUTH_KEY);
       logoutChannel.postMessage(BROADCAST_MESSAGE);
 
       if (location.pathname !== NAVIGATION_PATHS.login) {

@@ -157,7 +157,12 @@ const EntryList = ({ entry, triggerReload = null }: IEntryListParams) => {
             </button>
           ))}
         </div>
-        <span className='text-[12px]'>{entry.summary ?? '-'}</span>
+        <span
+          className={'text-sm'}
+          dangerouslySetInnerHTML={{
+            __html: entry.summary ?? '-',
+          }}
+        ></span>
       </div>
     </div>
   );

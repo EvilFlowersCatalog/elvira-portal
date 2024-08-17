@@ -13,8 +13,10 @@
 - **Added**: Scripts for analysis
 - **Added**: Layout for entries
 - **Added**: Catalogs
+- **Added**: WYSIWYG
 - **Added**: `ElviraSelect`
 - **Changed**: Design of `ElviraInput`
+- **Changed**: `Local Storage` to `Cookies` saving
 - **Changed**: Design of `ElviraTextarea`
 - **Changed**: In breadcrumbs `Edit` to actual name of editing entry
 - **Changed**: Viewer version from 0.4.21 to 0.5.8

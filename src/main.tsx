@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import './main.css';
 import '@evilflowers/evilflowersviewer/dist/style.css';
 import 'swiper/swiper-bundle.css';
+import CookiesProvider from './providers/CookiesProvider';
 
 // For zotero to update
 document.dispatchEvent(
@@ -20,11 +21,13 @@ document.dispatchEvent(
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
-      <AppProvider>
-        <AuthProvider>
-          <BaseRoutes />
-        </AuthProvider>
-      </AppProvider>
+      <CookiesProvider>
+        <AppProvider>
+          <AuthProvider>
+            <BaseRoutes />
+          </AuthProvider>
+        </AppProvider>
+      </CookiesProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

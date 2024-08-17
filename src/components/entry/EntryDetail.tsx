@@ -250,9 +250,12 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                 {t('entry.detail.summary')}
               </span>
             </div>
-            <span className={'text-white text-left w-full'}>
-              {entry.response.summary ? entry.response.summary : '-'}
-            </span>
+            <span
+              className={'text-white text-left w-full'}
+              dangerouslySetInnerHTML={{
+                __html: entry.response.summary ?? '-',
+              }}
+            ></span>
           </div>
         </div>
       )}

@@ -44,6 +44,14 @@ export enum DATA_TYPE {
   myShelf,
 }
 
+export enum COOKIES_TYPE {
+  AUTH_KEY = 'elvira-auth',
+  THEME_KEY = 'elvira-theme',
+  LANG_KEY = 'elvira-lang',
+  LAYOUT_KEY = 'elvira-layout',
+  INFOMED_KEY = 'elvira-cookie-informed',
+}
+
 export interface IMetadata {
   page: number;
   limit: number;

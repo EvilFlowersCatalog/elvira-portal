@@ -1,14 +1,22 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import { NAVIGATION_PATHS } from './utils/interfaces/general/general';
+import {
+  COOKIES_TYPE,
+  NAVIGATION_PATHS,
+  THEME_TYPE,
+} from './utils/interfaces/general/general';
 import { ToastContainer } from 'react-toastify';
 import NavbarContainer from './components/header/navbar/NavbarContainer';
 import Header from './components/header/Header';
 import useAppContext from './hooks/contexts/useAppContext';
 import SearchBarContainer from './components/search-bar/SearchBarContainer';
 import useCustomEffect from './hooks/useCustomEffect';
+import useCookiesContext from './hooks/contexts/useCookiesContext';
+import CookiesInformation from './components/common/CookiesInformation';
 
 const App = () => {
   const { isSmallDevice } = useAppContext();
+  const { informed } = useCookiesContext();
+
   const location = useLocation();
 
   const show = (): boolean => {
@@ -45,29 +53,35 @@ const App = () => {
   }, []);
 
   return (
-    <div className='min-h-screen h-screen flex w-screen bg-white dark:bg-gray text-black dark:text-white overflow-auto'>
-      <div className={`min-w-64 flex flex-1 ${show() ? 'pt-14 lg:pt-0' : ''}`}>
-        <ToastContainer
-          position='top-right'
-          autoClose={2500}
-          pauseOnHover={false}
-          theme={'dark'}
-        />
+    <>
+      {/* COOKIE */}
+      {!informed && <CookiesInformation />}
+      <div className='min-h-screen h-screen flex w-screen bg-white dark:bg-gray text-black dark:text-white overflow-auto'>
+        <div
+          className={`min-w-64 flex flex-1 ${show() ? 'pt-14 lg:pt-0' : ''}`}
+        >
+          <ToastContainer
+            position='top-right'
+            autoClose={2500}
+            pauseOnHover={false}
+            theme={'dark'}
+          />
 
-        {show() && (
-          <>
-            <NavbarContainer />
-            {isSmallDevice && <Header />}
-          </>
-        )}
+          {show() && (
+            <>
+              <NavbarContainer />
+              {isSmallDevice && <Header />}
+            </>
+          )}
 
-        <div className={`flex flex-1 flex-col overflow-auto`}>
-          <Outlet />
+          <div className={`flex flex-1 flex-col overflow-auto`}>
+            <Outlet />
+          </div>
+
+          <SearchBarContainer />
         </div>
-
-        <SearchBarContainer />
       </div>
-    </div>
+    </>
   );
 };
 
