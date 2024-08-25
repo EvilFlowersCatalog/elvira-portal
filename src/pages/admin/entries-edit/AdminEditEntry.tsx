@@ -38,6 +38,8 @@ import CategoryMenu from '../../../components/common/CategoryMenu';
 import useGetData from '../../../hooks/api/identifiers/useGetData';
 import ApplyInfoDialog from '../../../components/dialogs/ApplyInfoDialog';
 import { CircleLoader } from 'react-spinners';
+import Dropzone from '../../../components/inputs/Dropzone';
+import { getBase64 } from '../../../utils/func/functions';
 
 const AdminEditEntry = () => {
   const { t } = useTranslation();
@@ -65,6 +67,7 @@ const AdminEditEntry = () => {
   const [selectedMonth, setSelectedMonth] = useState<string>('MM');
   const [selectedDay, setSelectedDay] = useState<string>('DD');
   const [maxDay, setMaxDay] = useState<number>(31);
+  const [stringImage, setStringImage] = useState<string>('');
 
   const getEntryDetail = useGetEntryDetail();
   const navigate = useNavigate();
@@ -279,6 +282,7 @@ const AdminEditEntry = () => {
       publisher: entry!.publisher,
     };
     if (entry!.published_at) newEntry.published_at = entry!.published_at;
+    if (stringImage !== '') newEntry.image = stringImage;
 
     // Upload
     try {
@@ -322,11 +326,32 @@ const AdminEditEntry = () => {
                 {/* Second row, first column */}
                 <div className='flex flex-col md:flex-row bg-zinc-100 dark:bg-darkGray gap-4 rounded-md p-4'>
                   {/* Image */}
-                  <img
-                    className='bg-gray border border-white w-48 h-min rounded-md'
-                    alt='thumbnail'
-                    src={entry.thumbnail + `?access_token=${auth?.token}`}
-                  ></img>
+                  <div className='relative w-48'>
+                    <img
+                      className='bg-gray border border-white w-full rounded-md'
+                      alt='thumbnail'
+                      src={
+                        stringImage
+                          ? stringImage
+                          : entry?.thumbnail + `?access_token=${auth?.token}`
+                      }
+                    ></img>
+                    <div className='absolute top-0 left-0 w-full h-full z-50 bg-black bg-opacity-80'>
+                      <Dropzone
+                        title={t('entry.wizard.image')}
+                        maxSizeDescription='(MAX 5 MB)'
+                        maxSize={1024 * 1024 * 5}
+                        setFile={async (file) => {
+                          if (file) {
+                            const sf = await getBase64(file);
+                            setStringImage(sf as string);
+                          } else setStringImage('');
+                        }}
+                        errorMessage={t('dropzone.errorMessage.image')}
+                        hint={t('entry.wizard.imageHint')}
+                      />
+                    </div>
+                  </div>
 
                   {/* Information */}
                   <div className='flex flex-col flex-2'>
