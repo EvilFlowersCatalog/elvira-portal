@@ -1,13 +1,11 @@
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IoAddCircle, IoRemoveCircle } from 'react-icons/io5';
-import { MdRemoveCircle } from 'react-icons/md';
 import FeedMenu from '../../../../../components/common/FeedMenu';
 import NextButton from '../NextButton';
 import PreviousButton from '../PreviousButton';
 import useCustomEffect from '../../../../../hooks/useCustomEffect';
 import { IWizardParams } from '../../../../../utils/interfaces/general/general';
-import ElviraInput from '../../../../../components/inputs/ElviraInput';
 import AuthorsAutofill from '../../../../../components/inputs/AuthorsAutofill';
 import useGetAuthors from '../../../../../hooks/api/authors/useGetAuthors';
 import { IEntryAuthor } from '../../../../../utils/interfaces/author';

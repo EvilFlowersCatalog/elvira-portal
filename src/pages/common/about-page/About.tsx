@@ -47,7 +47,7 @@ const About = () => {
       <Breadcrumb />
       <div className='flex flex-col flex-1 p-4 justify-start items-center text-center'>
         <img
-          className='w-full md:w-1/3'
+          className='w-full md:w-1/4'
           src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
           alt='Elvira Logo'
         />

@@ -23,7 +23,7 @@ const SwiperContainer = ({
 }: ISwiperContainerParams) => {
   return (
     <Swiper
-      slidesPerView='auto'
+      slidesPerView={entries.length > 10 ? 'auto' : undefined}
       loop
       autoplay={{
         delay: 5000,

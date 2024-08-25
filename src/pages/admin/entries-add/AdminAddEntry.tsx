@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IEntryNewForm } from '../../../utils/interfaces/entry';
 import Breadcrumb from '../../../components/common/Breadcrumb';
 import FirstStep from './components/steps/FirstStep';
@@ -15,26 +15,28 @@ const steps = [
   FifthStep, // Step 5: IMAGE & PDF
 ];
 
-const initialState: IEntryNewForm = {
-  title: '',
-  authors: [{ name: '', surname: '' }],
-  feeds: [],
-  summary: '',
-  identifiers: {
-    doi: '',
-    isbn: '',
-  },
-  categories: [],
-  citation: '',
-  published_at: '',
-  publisher: '',
-};
-
 const AdminAddEntry = () => {
   const [stepIndex, setStepIndex] = useState<number>(0);
-  const [entryForm, setEntryForm] = useState<IEntryNewForm>(initialState);
+  const [entryForm, setEntryForm] = useState<IEntryNewForm>({
+    title: '',
+    authors: [{ name: '', surname: '' }],
+    feeds: [],
+    summary: '',
+    identifiers: {
+      doi: '',
+      isbn: '',
+    },
+    categories: [],
+    citation: '',
+    published_at: '',
+    publisher: '',
+  });
 
   const StepComponent = steps[stepIndex];
+
+  useEffect(() => {
+    console.log(entryForm);
+  }, [entryForm]);
 
   return (
     <>

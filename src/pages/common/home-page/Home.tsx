@@ -79,14 +79,17 @@ const Home = () => {
   return (
     <>
       <div className='flex-1 p-4'>
-        <div className='flex items-center flex-col gap-10 py-20'>
+        <div className='flex items-center flex-col gap-2 py-14'>
           <img
-            className='w-full md:w-2/3 lg:w-1/2 max-w-[800px]'
+            className='w-full md:w-1/4'
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
             alt='Elvira Logo'
           />
+          <p className='text-2xl font-extrabold'>{t('about.title')}</p>
+          <p>{t('about.subTitle')}</p>
+
           <form
-            className='relative flex w-full md:w-1/2 xl:w-1/3 max-w-96 items-center gap-2 text-darkGray dark:text-white'
+            className='relative flex w-full md:w-1/2 xl:w-1/3 max-w-96 items-center gap-2 text-darkGray dark:text-white mt-5'
             onSubmit={submit}
           >
             <ElviraInput
