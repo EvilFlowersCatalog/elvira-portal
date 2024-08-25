@@ -26,6 +26,20 @@ export const sk = {
           error: 'Záznam sa nepodarilo odstrániť.',
         },
       },
+      acquisition: {
+        add: {
+          success: "Akvizícia '{{x}}' bola úspešne pridaná.",
+          error: "Akvizíciu '{{x}}' sa nepodarilo pridať.",
+        },
+        edit: {
+          success: "Akvizícia '{{x}}' bola úspešne upravená.",
+          error: "Akvizíciu '{{x}}' sa nepodarilo upraviť.",
+        },
+        remove: {
+          success: "Akvizícia '{{x}}' bola úspešne odstránená.",
+          error: "Akvizíciu '{{x}}' sa nepodarilo odstrániť.",
+        },
+      },
       feed: {
         add: {
           success: 'Skupina bola úspešne pridaná.',

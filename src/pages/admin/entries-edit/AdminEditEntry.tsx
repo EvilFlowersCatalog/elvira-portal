@@ -40,6 +40,7 @@ import ApplyInfoDialog from '../../../components/dialogs/ApplyInfoDialog';
 import { CircleLoader } from 'react-spinners';
 import Dropzone from '../../../components/inputs/Dropzone';
 import { getBase64 } from '../../../utils/func/functions';
+import FilesDropzone from './components/FilesDropzone';
 
 const AdminEditEntry = () => {
   const { t } = useTranslation();
@@ -68,6 +69,7 @@ const AdminEditEntry = () => {
   const [selectedDay, setSelectedDay] = useState<string>('DD');
   const [maxDay, setMaxDay] = useState<number>(31);
   const [stringImage, setStringImage] = useState<string>('');
+  const [isFilesLoading, setIsFilesLoading] = useState<boolean>(false);
 
   const getEntryDetail = useGetEntryDetail();
   const navigate = useNavigate();
@@ -103,14 +105,16 @@ const AdminEditEntry = () => {
             thumbnail: entryDetail.thumbnail,
             categories: entryDetail.categories,
           });
-          const [y, m, d] = entryDetail.published_at?.split('-');
-          if (y) setSelectedYear(y);
-          if (m) setSelectedMonth(parseInt(m).toString()); // remove the '0'2 to just 2...
-          if (d) setSelectedDay(parseInt(d).toString()); // same
-        }
+          if (entryDetail.published_at) {
+            const [y, m, d] = entryDetail.published_at.split('-');
+            if (y) setSelectedYear(y);
+            if (m) setSelectedMonth(parseInt(m).toString()); // remove the '0'2 to just 2...
+            if (d) setSelectedDay(parseInt(d).toString()); // same
+          }
 
-        const { items: a } = await getAuthors({ paginate: false });
-        setAuthors(a);
+          const { items: a } = await getAuthors({ paginate: false });
+          setAuthors(a);
+        }
       })();
     } catch {
       setEntry(null);
@@ -310,7 +314,7 @@ const AdminEditEntry = () => {
           >
             <div className='flex flex-1 flex-col xl:flex-row gap-4'>
               {/* First column */}
-              <div className='flex flex-col flex-2 gap-4'>
+              <div className='flex flex-col flex-1 gap-4'>
                 {/* First row, first column */}
                 <div className='bg-zinc-100 dark:bg-darkGray rounded-md p-4 flex flex-col gap-2'>
                   <span>{t('entry.wizard.titleNamespace')}</span>
@@ -326,7 +330,7 @@ const AdminEditEntry = () => {
                 {/* Second row, first column */}
                 <div className='flex flex-col md:flex-row bg-zinc-100 dark:bg-darkGray gap-4 rounded-md p-4'>
                   {/* Image */}
-                  <div className='relative w-48'>
+                  <div className='relative w-48 mx-auto'>
                     <img
                       className='bg-gray border border-white w-full rounded-md'
                       alt='thumbnail'
@@ -422,7 +426,7 @@ const AdminEditEntry = () => {
                   </div>
                 </div>
                 {/* Third row, first column */}
-                <div className='flex flex-col xxl:flex-row bg-zinc-100 dark:bg-darkGray p-4 rounded-md gap-4'>
+                <div className='flex flex-col bg-zinc-100 dark:bg-darkGray p-4 rounded-md gap-4'>
                   {/* Identifiers */}
                   <div className='flex flex-1 flex-col gap-2'>
                     <span>{t('entry.wizard.identifiers')}</span>
@@ -553,9 +557,9 @@ const AdminEditEntry = () => {
                   </div>
                 </div>
                 {/* Forth row, first column */}
-                <div className='flex flex-col md:flex-row gap-4'>
+                <div className='flex flex-col gap-4'>
                   {/* Authors */}
-                  <div className='min-h-96 flex flex-col flex-2 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
+                  <div className='h-64 overflow-auto flex flex-col bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
                     <div
                       className='w-full flex justify-center items-center gap-2 cursor-pointer'
                       onClick={addAuthor}
@@ -597,95 +601,102 @@ const AdminEditEntry = () => {
                       </div>
                     </div>
                   </div>
-                  {/* Feeds */}
-                  <div className='min-h-96 flex flex-col flex-1 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
-                    <div
-                      className='w-full flex justify-center items-center gap-2 cursor-pointer'
-                      onClick={() => setOpenFeeds(true)}
-                    >
-                      <span>{t('entry.wizard.feeds')}</span>
-                      <IoMdAdd size={20} />
+                  <div className='flex flex-col md:flex-row gap-4'>
+                    {/* Feeds */}
+                    <div className='h-64 flex flex-1 flex-col bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2 overflow-auto'>
+                      <div
+                        className='w-full flex justify-center items-center gap-2 cursor-pointer'
+                        onClick={() => setOpenFeeds(true)}
+                      >
+                        <span>{t('entry.wizard.feeds')}</span>
+                        <IoMdAdd size={20} />
+                      </div>
+                      <div className='flex flex-1 flex-col gap-2 w-full rounded-md pt-1'>
+                        {entry?.feeds?.map((item, index) => (
+                          <div key={index} className={`h-fit`}>
+                            <button
+                              type='button'
+                              className='bg-STUColor p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md'
+                              onClick={() => {
+                                setActiveFeeds(
+                                  // Return only those which id does not equal
+                                  activeFeeds.filter(
+                                    (activeFeeds) => activeFeeds.id !== item.id
+                                  )
+                                );
+                                setEntry((prev) => ({
+                                  ...prev!,
+                                  feeds: prev!.feeds.filter(
+                                    (prevFeed) => prevFeed.id !== item.id
+                                  ),
+                                }));
+                              }}
+                            >
+                              {item.title}
+                              <MdRemoveCircle size={15} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                    <div className='flex flex-1 flex-col gap-2 flex-wrap w-full min-h-72 rounded-md pt-1'>
-                      {entry?.feeds?.map((item, index) => (
-                        <div key={index} className={`h-fit`}>
-                          <button
-                            type='button'
-                            className='bg-STUColor p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md'
-                            onClick={() => {
-                              setActiveFeeds(
-                                // Return only those which id does not equal
-                                activeFeeds.filter(
-                                  (activeFeeds) => activeFeeds.id !== item.id
-                                )
-                              );
-                              setEntry((prev) => ({
-                                ...prev!,
-                                feeds: prev!.feeds.filter(
-                                  (prevFeed) => prevFeed.id !== item.id
-                                ),
-                              }));
-                            }}
-                          >
-                            {item.title}
-                            <MdRemoveCircle size={15} />
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  {/* Categories */}
-                  <div className='min-h-96 flex flex-col flex-1 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
-                    <div
-                      className='w-full flex justify-center items-center gap-2 cursor-pointer'
-                      onClick={() => setOpenCategories(true)}
-                    >
-                      <span>{t('entry.wizard.categories')}</span>
-                      <IoMdAdd size={20} />
-                    </div>
-                    <div className='flex flex-1 flex-col gap-2 flex-wrap w-full min-h-72 rounded-md pt-1'>
-                      {entry?.categories?.map((item, index) => (
-                        <div key={index} className={`h-fit`}>
-                          <button
-                            type='button'
-                            className='bg-STUColor p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md'
-                            onClick={() => {
-                              setActiveCategories(
-                                // Return only those which id does not equal
-                                activeCategories.filter(
-                                  (ac) => ac.id !== item.id
-                                )
-                              );
-                              setEntry((prev) => ({
-                                ...prev!,
-                                categories: prev!.categories.filter(
-                                  (pc) => pc.id !== item.id
-                                ),
-                              }));
-                            }}
-                          >
-                            {item.term}
-                            <MdRemoveCircle size={15} />
-                          </button>
-                        </div>
-                      ))}
+                    {/* Categories */}
+                    <div className='h-64 flex flex-1 flex-col bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2 overflow-auto'>
+                      <div
+                        className='w-full flex justify-center items-center gap-2 cursor-pointer'
+                        onClick={() => setOpenCategories(true)}
+                      >
+                        <span>{t('entry.wizard.categories')}</span>
+                        <IoMdAdd size={20} />
+                      </div>
+                      <div className='flex flex-1 flex-col gap-2 w-full rounded-md pt-1'>
+                        {entry?.categories?.map((item, index) => (
+                          <div key={index} className={`h-fit`}>
+                            <button
+                              type='button'
+                              className='bg-STUColor p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md'
+                              onClick={() => {
+                                setActiveCategories(
+                                  // Return only those which id does not equal
+                                  activeCategories.filter(
+                                    (ac) => ac.id !== item.id
+                                  )
+                                );
+                                setEntry((prev) => ({
+                                  ...prev!,
+                                  categories: prev!.categories.filter(
+                                    (pc) => pc.id !== item.id
+                                  ),
+                                }));
+                              }}
+                            >
+                              {item.term}
+                              <MdRemoveCircle size={15} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
               {/* Second column */}
-              <div className='flex flex-col flex-1 gap-4'>
-                <div className='flex-1 min-h-60 bg-zinc-100 dark:bg-darkGray rounded-md p-4'>
-                  <span>{t('entry.wizard.files')}</span>
-                </div>
-                <div className='flex flex-col flex-3 min-h-60 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
+              <div className='flex flex-col flex-2 gap-4'>
+                {/* FILES */}
+                <FilesDropzone
+                  entryId={id!}
+                  isLoading={isFilesLoading}
+                  setIsLoading={setIsFilesLoading}
+                />
+                {/* SUMMARY */}
+                <div className='flex flex-col flex-1 min-h-60 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
                   <span>{t('entry.wizard.summary')}</span>
                   <WYSIWYG
                     value={entry.summary}
                     onChange={handleSummaryChange}
                   />
                 </div>
-                <div className='flex flex-col min-h-96 md:min-h-0 flex-3 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
+                {/* CITATION */}
+                <div className='flex flex-col min-h-96 md:min-h-0 flex-2 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
                   <span>{t('entry.wizard.citation')}</span>
                   <textarea
                     onChange={handleCitationChange}
@@ -696,11 +707,13 @@ const AdminEditEntry = () => {
                 </div>
               </div>
             </div>
-            <div className='flex justify-center'>
-              <Button type='submit'>
-                <span>{t('entry.wizard.edit')}</span>
-              </Button>
-            </div>
+            {!isFilesLoading && (
+              <div className='flex justify-center'>
+                <Button type='submit'>
+                  <span>{t('entry.wizard.edit')}</span>
+                </Button>
+              </div>
+            )}
           </form>
         )}
       </div>

@@ -5,13 +5,13 @@ import {
   IUserAcquisition,
   IUserAcquisitionShare,
 } from '../../utils/interfaces/acquisition';
-import useCreateUserAcquisition from '../../hooks/api/acquisitiions/useCreateUserAcquisition';
+import useCreateUserAcquisition from '../../hooks/api/acquisitiions/user-acquistions/useCreateUserAcquisition';
 import {
   NAVIGATION_PATHS,
   THEME_TYPE,
 } from '../../utils/interfaces/general/general';
 import useGetEntryDetail from '../../hooks/api/entries/useGetEntryDetail';
-import useGetUserAcquisition from '../../hooks/api/acquisitiions/useGetUserAcquisition';
+import useGetUserAcquisition from '../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisition';
 // @ts-ignore
 import { renderViewer } from '@evilflowers/evilflowersviewer';
 import useAppContext from '../../hooks/contexts/useAppContext';

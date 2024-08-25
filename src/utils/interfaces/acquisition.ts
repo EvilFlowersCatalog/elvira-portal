@@ -1,3 +1,5 @@
+import { IMetadata } from './general/general';
+
 export interface IAcquisitionDetail {
   response: {
     relation: string;
@@ -6,6 +8,24 @@ export interface IAcquisitionDetail {
     id: string;
     content: string;
   };
+}
+
+export interface IAcquisitionQuery {
+  entry_id?: string;
+  relation?: 'acquisition' | 'open-access';
+  mime?: string;
+}
+
+export interface IAcquisition {
+  id: string;
+  relation: string;
+  mime: string;
+  url: string;
+}
+
+export interface IAcquisitionList {
+  items: IAcquisition[];
+  metadata: IMetadata;
 }
 
 export interface IUserAcquisition {

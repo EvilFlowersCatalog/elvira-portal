@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import useAxios from '../useAxios';
+import useAxios from '../../useAxios';
 
 const useGetUserAcquisition = () => {
   const axios = useAxios();

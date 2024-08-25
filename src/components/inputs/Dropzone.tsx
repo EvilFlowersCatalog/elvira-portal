@@ -49,7 +49,7 @@ const Dropzone = ({
       setFileName(value.name);
       setFileSize(getFileSize(value.size));
     }
-  });
+  }, []);
 
   const { getRootProps, getInputProps } = useDropzone({
     onDropAccepted,

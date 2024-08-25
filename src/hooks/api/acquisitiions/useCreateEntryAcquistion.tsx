@@ -7,7 +7,6 @@ const useCreateEntryAcquistion = () => {
     acquisition: FormData,
     entryId: string
   ) => {
-    console.log(acquisition.get('content'));
     // Create user acquistion
     const CREATE_ENTRY_ACQUISITION_URL = `/api/v1/catalogs/${
       import.meta.env.ELVIRA_CATALOG_ID

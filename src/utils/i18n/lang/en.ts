@@ -26,6 +26,20 @@ export const en = {
           error: 'Entry failed to by removed.',
         },
       },
+      acquisition: {
+        add: {
+          success: "Acquisition '{{x}}' was successfully added.",
+          error: "Acquisition '{{x}}' failed to be added.",
+        },
+        edit: {
+          success: "Acquisition '{{x}}' was successfully edited.",
+          error: "Acquisition '{{x}}' failed to by edited.",
+        },
+        remove: {
+          success: "Acquisition '{{x}}' was successfully removed.",
+          error: "Acquisition '{{x}}' failed to by removed.",
+        },
+      },
       feed: {
         add: {
           success: 'Feed was successfully added.',

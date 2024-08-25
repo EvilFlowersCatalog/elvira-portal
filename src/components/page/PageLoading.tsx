@@ -16,7 +16,7 @@ const PageLoading = ({
   const { STUColor, layout } = useAppContext();
 
   return (
-    <div className={'flex flex-1 flex-wrap px-4 pb-4'}>
+    <div className={'flex flex-1 h-full flex-wrap px-4 pb-4'}>
       {entries ? (
         showLayout ? (
           layout === LAYOUT_TYPE.list ? (
