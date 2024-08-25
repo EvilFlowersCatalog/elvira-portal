@@ -16,10 +16,11 @@ export interface ICategoryNew {
 }
 
 export interface ICategoryQuery {
-  page: number;
-  limit: number;
+  page?: number;
+  limit?: number;
   query?: string;
-  orderBy: string;
+  orderBy?: string;
+  paginate?: boolean;
 }
 
 export interface IListCategory {

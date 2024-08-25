@@ -11,7 +11,7 @@ import useGetFeedDetail from '../../../../hooks/api/feeds/useGetFeedDetail';
 import useCustomEffect from '../../../../hooks/useCustomEffect';
 import { toast } from 'react-toastify';
 import ModalWrapper from '../../../../components/modal/ModalWrapper';
-import ElviraInput from '../../../../components/common/ElviraInput';
+import ElviraInput from '../../../../components/inputs/ElviraInput';
 import { CircleLoader } from 'react-spinners';
 
 interface IFeedForm {

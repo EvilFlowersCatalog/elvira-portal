@@ -14,7 +14,7 @@ import {
 } from '../../../../../utils/interfaces/general/general';
 import PreviousButton from '../PreviousButton';
 import NextButton from '../NextButton';
-import Dropzone from '../../../../../components/common/Dropzone';
+import Dropzone from '../../../../../components/inputs/Dropzone';
 
 const FifthStep = ({ entryForm, stepIndex, setStepIndex }: IWizardParams) => {
   const { t } = useTranslation();
@@ -42,6 +42,7 @@ const FifthStep = ({ entryForm, stepIndex, setStepIndex }: IWizardParams) => {
         doi: entryForm.identifiers?.doi ?? '',
         isbn: entryForm.identifiers?.isbn ?? '',
       },
+      categories: entryForm.categories,
       citation: entryForm.citation ?? '',
       publisher: entryForm.publisher,
       image: await getBase64(image),

@@ -2,13 +2,12 @@ import { RiArrowRightDoubleFill } from 'react-icons/ri';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { useTranslation } from 'react-i18next';
 import { ChangeEvent, FormEvent, useState } from 'react';
-import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
 import { useSearchParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
-import FeedMenu from '../feeds/FeedMenu';
+import FeedMenu from '../common/FeedMenu';
 import Button from '../common/Button';
-import ElviraInput from '../common/ElviraInput';
+import ElviraInput from '../inputs/ElviraInput';
 
 const SearchBar = () => {
   const { setShowSearchBar, isSmallDevice } = useAppContext();
@@ -21,8 +20,6 @@ const SearchBar = () => {
   const [category, setCategory] = useState<string>('');
   const [year, setYear] = useState<number[]>([1950, new Date().getFullYear()]);
   const [searchParams, setSearchParams] = useSearchParams();
-
-  const getFeeds = useGetFeeds();
 
   const handleYearChange = (_: Event, newValue: number | number[]) => {
     setYear(newValue as number[]);

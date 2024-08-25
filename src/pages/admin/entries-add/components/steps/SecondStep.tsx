@@ -1,13 +1,13 @@
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ElviraInput from '../../../../../components/common/ElviraInput';
-import ElviraTextarea from '../../../../../components/common/ElviraTextarea';
+import ElviraInput from '../../../../../components/inputs/ElviraInput';
+import ElviraTextarea from '../../../../../components/inputs/ElviraTextarea';
 import PreviousButton from '../PreviousButton';
 import NextButton from '../NextButton';
 import { IWizardParams } from '../../../../../utils/interfaces/general/general';
 import useCustomEffect from '../../../../../hooks/useCustomEffect';
-import ElviraSelect from '../../../../../components/common/ElviraSelect';
-import LanguageAutofill from '../../../../../components/common/LanguageAutofill';
+import ElviraSelect from '../../../../../components/inputs/ElviraSelect';
+import LanguageAutofill from '../../../../../components/inputs/LanguageAutofill';
 import WYSIWYG from '../../../../../components/common/WYSIWYG';
 import { ContentEditableEvent } from 'react-simple-wysiwyg';
 

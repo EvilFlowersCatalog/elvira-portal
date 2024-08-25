@@ -5,7 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { FaFilterCircleXmark, FaList } from 'react-icons/fa6';
 import { LAYOUT_TYPE } from '../../utils/interfaces/general/general';
-import ElviraInput from '../common/ElviraInput';
+import ElviraInput from '../inputs/ElviraInput';
 import { HiMiniSquares2X2 } from 'react-icons/hi2';
 
 interface IToolsContainerParams {

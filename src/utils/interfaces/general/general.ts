@@ -60,7 +60,6 @@ export interface IMetadata {
 }
 
 export interface IConfig {
-  evilflowers_ocr_enabled: boolean;
   evilflowers_viewer_print: boolean;
   evilflowers_share_enabled: boolean;
   evilflowres_metadata_fetch: boolean;

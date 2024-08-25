@@ -5,7 +5,7 @@ import { ICategory, ICategoryNew } from '../../../../utils/interfaces/category';
 import useEditCategory from '../../../../hooks/api/categories/useEditCategory';
 import useCreateCategory from '../../../../hooks/api/categories/useCreateCategory';
 import ModalWrapper from '../../../../components/modal/ModalWrapper';
-import ElviraInput from '../../../../components/common/ElviraInput';
+import ElviraInput from '../../../../components/inputs/ElviraInput';
 
 interface ICategoryFormParam {
   category?: ICategory | null;

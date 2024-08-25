@@ -24,6 +24,7 @@ const initialState: IEntryNewForm = {
     doi: '',
     isbn: '',
   },
+  categories: [],
   citation: '',
   published_at: '',
   publisher: '',

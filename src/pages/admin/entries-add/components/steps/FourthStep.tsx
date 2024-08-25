@@ -1,5 +1,5 @@
 import { ChangeEvent, FormEvent } from 'react';
-import ElviraTextarea from '../../../../../components/common/ElviraTextarea';
+import ElviraTextarea from '../../../../../components/inputs/ElviraTextarea';
 import { useTranslation } from 'react-i18next';
 import NextButton from '../NextButton';
 import PreviousButton from '../PreviousButton';

@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react';
-import ElviraInput from '../../../../../components/common/ElviraInput';
+import ElviraInput from '../../../../../components/inputs/ElviraInput';
 import PageLoading from '../../../../../components/page/PageLoading';
 import NextButton from '../NextButton';
 import {
@@ -93,8 +93,8 @@ const FirstStep = ({
       title: entryInfo?.response.title ?? '',
       authors: entryInfo?.response.authors ?? [],
       publisher: entryInfo?.response.publisher ?? '',
-      published_at: entryInfo?.response.published_at ?? '',
-      language_code: entryInfo?.response.language_code,
+      published_at: entryInfo?.response.year ?? '',
+      language_code: entryInfo?.response.language,
       citation: entryInfo?.response.bibtex ?? '',
     });
 

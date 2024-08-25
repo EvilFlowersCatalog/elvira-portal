@@ -11,7 +11,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useCustomEffect from '../../../hooks/useCustomEffect';
 import { IoSearchOutline } from 'react-icons/io5';
-import ElviraInput from '../../../components/common/ElviraInput';
+import ElviraInput from '../../../components/inputs/ElviraInput';
 import SwiperContainer from './components/SwiperContainer';
 
 const Home = () => {

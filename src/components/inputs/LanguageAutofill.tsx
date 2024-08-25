@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ILanguage } from '../../utils/interfaces/language';
 import { useTranslation } from 'react-i18next';
 import { IEntryNewForm } from '../../utils/interfaces/entry';
@@ -76,7 +76,7 @@ const LanguageAutofill = ({
       language.name.toLowerCase().startsWith(value.toLowerCase())
     );
 
-    setSuggestions(value === '' ? [] : filteredSuggestions);
+    setSuggestions(filteredSuggestions);
   };
 
   const handleSuggestionClick = (language: ILanguage) => {
@@ -101,6 +101,17 @@ const LanguageAutofill = ({
         placeholder={t('entry.wizard.lang')}
         required
         invalidMessage={t('entry.wizard.requiredMessages.lang')}
+        onFocus={() => {
+          const filteredSuggestions = languages.filter(
+            (language) =>
+              language.name
+                .toLowerCase()
+                .startsWith(inputValue.toLowerCase()) &&
+              language.name !== inputValue
+          );
+
+          setSuggestions(filteredSuggestions);
+        }}
         onBlur={() => {
           const lang = languages.filter(
             (lang) =>

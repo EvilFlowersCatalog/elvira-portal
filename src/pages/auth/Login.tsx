@@ -7,7 +7,7 @@ import { IAuthCredentials } from '../../utils/interfaces/auth';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { THEME_TYPE } from '../../utils/interfaces/general/general';
 import { CircleLoader } from 'react-spinners';
-import ElviraInput from '../../components/common/ElviraInput';
+import ElviraInput from '../../components/inputs/ElviraInput';
 
 const Login = () => {
   const { login } = useAuthContext();

@@ -255,6 +255,15 @@ export const en = {
         label: 'Apply',
         title: 'Feeds',
         empty: 'Feeds are empty',
+        selected: 'Selected',
+        options: 'Options',
+      },
+      categoryMenu: {
+        label: 'Apply',
+        title: 'Categories',
+        empty: 'Categories are empty',
+        selected: 'Selected',
+        options: 'Options',
       },
       applyInfo: {
         label: 'Apply',

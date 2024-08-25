@@ -248,6 +248,15 @@ export const sk = {
         label: 'Aplikovať',
         title: 'Skupiny',
         empty: 'Skupiny sú prázdne',
+        selected: 'Vybrané',
+        options: 'Možnosti',
+      },
+      categoryMenu: {
+        label: 'Aplikovať',
+        title: 'Kategórie',
+        empty: 'Kategóre sú prázdne',
+        selected: 'Vybrané',
+        options: 'Možnosti',
       },
       applyInfo: {
         label: 'Aplikovať',

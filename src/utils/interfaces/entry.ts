@@ -1,5 +1,6 @@
 import { IEntryAcquisition } from './acquisition';
 import { IEntryAuthor } from './author';
+import { ICategory } from './category';
 import { IFeed } from './feed';
 import { IConfig, IMetadata } from './general/general';
 import { ILanguage } from './language';
@@ -15,7 +16,7 @@ export interface IEntry {
   authors: IEntryAuthor[];
   language_code?: string;
   popularity: number;
-  category: IEntryCategory;
+  categories: ICategory[];
   summary: string;
   feeds: IFeed[];
   creator_id: string;
@@ -32,7 +33,7 @@ export interface IEntryDetail {
     creator_id: string;
     catalog_id: string;
     authors: IEntryAuthor[];
-    category: IEntryCategory;
+    categories: ICategory[];
     popularity: string;
     feeds: IFeed[];
     language?: ILanguage;
@@ -71,6 +72,7 @@ export interface IEntryNew {
   summary: string;
   language_code?: string;
   identifiers: IEntryIdentifiers;
+  categories: ICategory[];
   config?: IConfig;
   citation: string;
   published_at?: string;
@@ -85,6 +87,7 @@ export interface IEntryNewForm {
     id: string;
     title: string;
   }[];
+  categories: ICategory[];
   summary: string;
   language_code?: string;
   identifiers: IEntryIdentifiers;
@@ -93,11 +96,6 @@ export interface IEntryNewForm {
   published_at: string;
   publisher: string;
   thumbnail?: string;
-}
-
-export interface IEntryCategory {
-  id: string;
-  term: string;
 }
 
 export interface IEntryIdentifiers {
@@ -111,8 +109,8 @@ export interface IEntryInfo {
     publisher: string;
     doi: string;
     authors: IEntryAuthor[];
-    published_at: string;
-    language_code: string;
+    year: string;
+    language: string;
     bibtex: string;
   };
 }
