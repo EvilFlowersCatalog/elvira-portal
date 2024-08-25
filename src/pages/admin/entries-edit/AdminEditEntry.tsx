@@ -340,7 +340,7 @@ const AdminEditEntry = () => {
                           : entry?.thumbnail + `?access_token=${auth?.token}`
                       }
                     ></img>
-                    <div className='absolute top-0 left-0 w-full h-full z-50 bg-black bg-opacity-80'>
+                    <div className='absolute top-0 left-0 w-full h-full z-50 bg-white dark:bg-black bg-opacity-80 dark:bg-opacity-80'>
                       <Dropzone
                         title={t('entry.wizard.image')}
                         maxSizeDescription='(MAX 5 MB)'
