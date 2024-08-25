@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { IEntryNewForm } from '../../../utils/interfaces/entry';
 import Breadcrumb from '../../../components/common/Breadcrumb';
 import FirstStep from './components/steps/FirstStep';
@@ -33,10 +33,6 @@ const AdminAddEntry = () => {
   });
 
   const StepComponent = steps[stepIndex];
-
-  useEffect(() => {
-    console.log(entryForm);
-  }, [entryForm]);
 
   return (
     <>
