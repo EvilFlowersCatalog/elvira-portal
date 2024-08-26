@@ -33,12 +33,16 @@ const Feed = ({ feed }: IFeedParams) => {
   return (
     <div className={'relative flex p-2 w-full md:w-1/2 xl:w-1/4'}>
       <button
-        className={
-          'p-5 py-10 gap-5 w-full flex text-center justify-between items-center bg-STUColor text-white rounded-md duration-200'
-        }
+        className={`p-5 py-10 gap-5 w-full flex text-center justify-between items-center bg-STUColor text-white rounded-md duration-200 border-2 border-STUColor ${
+          feed.kind === 'navigation' ? '' : 'hover:border-white'
+        }`}
         onClick={setParent}
-        onMouseEnter={() => setIsHovering(true)}
-        onMouseOut={() => setIsHovering(false)}
+        onMouseEnter={
+          feed.kind === 'navigation' ? () => setIsHovering(true) : undefined
+        }
+        onMouseOut={
+          feed.kind === 'navigation' ? () => setIsHovering(false) : undefined
+        }
       >
         <div
           className={

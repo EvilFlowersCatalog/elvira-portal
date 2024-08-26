@@ -9,6 +9,7 @@ import PageLoading from '../../../../components/page/PageLoading';
 import { toast } from 'react-toastify';
 import useCreateEntryAcquistion from '../../../../hooks/api/acquisitiions/useCreateEntryAcquistion';
 import useRemoveAcquisition from '../../../../hooks/api/acquisitiions/useRemoveAcquisition';
+import { GoPlus } from 'react-icons/go';
 
 interface IFilesDropzoneParams {
   entryId: string;
@@ -97,6 +98,7 @@ const FilesDropzone = ({
     onDropAccepted,
     accept: { 'application/pdf': [] },
     multiple: true,
+    noClick: true,
   });
 
   return (
@@ -108,7 +110,7 @@ const FilesDropzone = ({
       ) : (
         <div
           {...getRootProps({
-            className: `flex-2 min-h-60 max-h-[500px] overflow-auto rounded-md p-4 border-4 border-dashed cursor-pointer ${
+            className: `relative flex-2 min-h-60 max-h-[500px] overflow-auto rounded-md p-4 border-4 border-dashed duration-200 ${
               isDragActive
                 ? 'bg-STUColor bg-opacity-50 border-white'
                 : 'bg-zinc-100 dark:bg-darkGray border-transparent'
@@ -116,12 +118,16 @@ const FilesDropzone = ({
           })}
         >
           <input {...getInputProps()} />
+          {isDragActive && (
+            <div className='absolute top-0 left-0 w-full h-full flex justify-center items-center'>
+              <GoPlus color='white' size={100} />
+            </div>
+          )}
           <span>{t('entry.wizard.files')}</span>
           <table className='w-full table-auto'>
             <thead>
               <tr>
-                <th className='px-4 py-2 text-center'>No.</th>
-                <th className='px-4 py-2 text-center'>ID</th>
+                <th className='px-4 py-2 text-left'>ID</th>
                 <th className='px-4 py-2 text-center'>Relation</th>
                 <th className='px-4 py-2 text-center'>Mime</th>
                 <th className='px-4 py-2 text-center'>Action</th>
@@ -130,8 +136,7 @@ const FilesDropzone = ({
             <tbody>
               {acquisitions.map((item, index) => (
                 <tr key={index}>
-                  <td className='px-4 py-2 text-center'>{index + 1}</td>
-                  <td className='px-4 py-2 text-center'>{item.id}</td>
+                  <td className='px-4 py-2 text-left'>{item.id}</td>
                   <td className='px-4 py-2 text-center'>{item.relation}</td>
                   <td className='px-4 py-2 text-center'>{item.mime}</td>
                   <td className='px-4 py-2 text-center'>

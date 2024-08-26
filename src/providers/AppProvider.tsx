@@ -256,11 +256,22 @@ const AppProvider = ({ children }: IContextProviderParams) => {
       setIsSmallDevice(newWidth < 959);
     };
 
+    // handle esc
+    const handleESC = (e: KeyboardEvent) => {
+      if (e.code.toLocaleLowerCase() === 'escape') {
+        searchParams.delete('entry-detail-id');
+        setSearchParams(searchParams);
+        setShowSearchBar(false);
+      }
+    };
+
     // Attach the event listener when the component mounts
     window.addEventListener('resize', handleResize);
+    window.addEventListener('keydown', handleESC);
     // Clean up the event listener when the component unmounts
     return () => {
       window.removeEventListener('resize', handleResize);
+      window.removeEventListener('keydown', handleESC);
     };
   }, []);
 
