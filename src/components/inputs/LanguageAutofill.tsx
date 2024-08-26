@@ -57,6 +57,7 @@ const LanguageAutofill = ({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
+    e.target.setCustomValidity('');
     setInputValue(value);
 
     // Filter languages based on input
