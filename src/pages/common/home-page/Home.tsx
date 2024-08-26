@@ -65,6 +65,8 @@ const Home = () => {
           type='popular'
         />
 
+        <div className='h-10'></div>
+
         {/* LAST ADDED */}
         <h1 className='text-lg mb-2 font-medium'>{t('home.lastAdded')}</h1>
         <SwiperContainer

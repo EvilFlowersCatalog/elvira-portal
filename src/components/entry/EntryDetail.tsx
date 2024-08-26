@@ -26,6 +26,8 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [entryId, setEntryId] = useState<string | null>(null);
   const [update, setUpdate] = useState<boolean>(false);
+  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
+
   const getEntryDetail = useGetEntryDetail();
   const addToShelf = useAddToShelf();
   const removeFromShelf = useRemoveFromShelf();
@@ -49,7 +51,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     } catch {
       toast.error(t('notifications.myShelf.add.error')); // notify user
     } finally {
-      setIsLoading(false); // whatever happen, set to false to stop loading
+      setIsLoading(false); // whatever happens, set to false to stop loading
     }
   };
 
@@ -62,13 +64,13 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     try {
       await removeFromShelf(entry.response.shelf_record_id);
 
-      // If user is in 'my shelf' reset page to trigger reload
+      // If user is in 'my shelf' trigger reload
       if (location.pathname === NAVIGATION_PATHS.shelf && triggerReload)
         triggerReload();
 
       setUpdate((prevUpdate) => !prevUpdate); // trigger update
 
-      toast.success(t('notifications.myShelf.remove.success')); // Norify user
+      toast.success(t('notifications.myShelf.remove.success')); // Notify user
     } catch {
       toast.error(t('notifications.myShelf.remove.error'));
     } finally {
@@ -160,23 +162,24 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                 </button>
               )}
               <div
-                className={
-                  'w-1/2 flex justify-center border border-white rounded-md overflow-hidden'
-                }
+                className={`w-1/2 flex justify-center border border-white rounded-md ${
+                  imageLoaded ? 'h-auto' : 'h-64'
+                } overflow-hidden`}
               >
                 <img
-                  className={'w-full min-h-52'}
+                  className={'w-full h-full'}
                   src={
                     entry.response.thumbnail + `?access_token=${auth?.token}`
                   }
                   alt='Entry Thumbnail'
+                  onLoad={() => setImageLoaded(true)}
                 />
               </div>
             </div>
             {entry.response.authors.length > 0 && (
               <>
                 <span className={'text-white text-center font-bold'}>
-                  {entry.response.authors[0].name}
+                  {entry.response.authors[0].name}{' '}
                   {entry.response.authors[0].surname}
                 </span>
                 <div
@@ -210,8 +213,8 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               <span className={'h-3/6 border-l border-white'}></span>
               <div className={'flex flex-col items-center'}>
                 <span className={'text-STUColor font-extrabold'}>
-                  {entry.response.language?.alpha3 ??
-                    entry.response.language?.alpha2 ??
+                  {entry.response.language?.alpha2?.toLocaleUpperCase() ??
+                    entry.response.language?.alpha3?.toLocaleUpperCase() ??
                     '-'}
                 </span>
                 <span className={'text-white'}>{t('entry.detail.lang')}</span>
