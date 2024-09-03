@@ -20,7 +20,6 @@ import {
 } from '../../../utils/interfaces/general/general';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import { IoMdAdd, IoMdDownload } from 'react-icons/io';
-import FeedMenu from '../../../components/common/FeedMenu';
 import { toast } from 'react-toastify';
 import useEditEntry from '../../../hooks/api/entries/useEditEntry';
 import ConfigItem from './components/ConfigItem';
@@ -28,19 +27,18 @@ import ElviraSelect from '../../../components/inputs/ElviraSelect';
 import LanguageAutofill from '../../../components/inputs/LanguageAutofill';
 import { ContentEditableEvent } from 'react-simple-wysiwyg';
 import WYSIWYG from '../../../components/common/WYSIWYG';
-import ModalWrapper from '../../../components/modal/ModalWrapper';
 import { MdRemoveCircle } from 'react-icons/md';
 import AuthorsAutofill from '../../../components/inputs/AuthorsAutofill';
 import { IEntryAuthor } from '../../../utils/interfaces/author';
 import useGetAuthors from '../../../hooks/api/authors/useGetAuthors';
-import { ICategory } from '../../../utils/interfaces/category';
-import CategoryMenu from '../../../components/common/CategoryMenu';
 import useGetData from '../../../hooks/api/identifiers/useGetData';
 import ApplyInfoDialog from '../../../components/dialogs/ApplyInfoDialog';
 import { CircleLoader } from 'react-spinners';
 import Dropzone from '../../../components/inputs/Dropzone';
 import { getBase64 } from '../../../utils/func/functions';
 import FilesDropzone from './components/FilesDropzone';
+import FeedAutofill from '../../../components/inputs/FeedAutofill';
+import CategoryAutofill from '../../../components/inputs/CategoryAutofill';
 
 const AdminEditEntry = () => {
   const { t } = useTranslation();
@@ -50,13 +48,7 @@ const AdminEditEntry = () => {
   const [entry, setEntry] = useState<IEntryNewForm | null>(null);
   const [authors, setAuthors] = useState<IEntryAuthor[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [openFeeds, setOpenFeeds] = useState<boolean>(false);
   const [openApplyInfo, setOpenApplyInfo] = useState<boolean>(false);
-  const [activeFeeds, setActiveFeeds] = useState<
-    { title: string; id: string }[]
-  >([]);
-  const [activeCategories, setActiveCategories] = useState<ICategory[]>([]);
-  const [openCategories, setOpenCategories] = useState<boolean>(false);
   const year = new Date().getFullYear();
   const [identifier, setIdentifier] = useState<string>('');
   const [identifierType, setIdentifierType] = useState<IDENTIFIERS_TYPE | null>(
@@ -84,8 +76,6 @@ const AdminEditEntry = () => {
         if (id) {
           const { response: entryDetail } = await getEntryDetail(id);
           setEditingEntryTitle(entryDetail.title);
-          setActiveFeeds(entryDetail.feeds);
-          setActiveCategories(entryDetail.categories);
 
           setEntry({
             title: entryDetail.title,
@@ -248,22 +238,6 @@ const AdminEditEntry = () => {
       ...prevEntry!, // Preserve existing properties of entryForm
       publisher: event.target.value, // Update the publisher property
     }));
-  };
-
-  const handleApplyFeeds = () => {
-    setEntry((prev) => ({
-      ...prev!,
-      feeds: activeFeeds,
-    }));
-    setOpenFeeds(false);
-  };
-
-  const handleApplyCategories = () => {
-    setEntry((prev) => ({
-      ...prev!,
-      categories: activeCategories,
-    }));
-    setOpenCategories(false);
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -604,26 +578,20 @@ const AdminEditEntry = () => {
                   <div className='flex flex-col md:flex-row gap-4'>
                     {/* Feeds */}
                     <div className='h-64 flex flex-1 flex-col bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2 overflow-auto'>
-                      <div
-                        className='w-full flex justify-center items-center gap-2 cursor-pointer'
-                        onClick={() => setOpenFeeds(true)}
-                      >
+                      <div className='w-full flex justify-center items-center gap-2 cursor-pointer'>
                         <span>{t('entry.wizard.feeds')}</span>
-                        <IoMdAdd size={20} />
                       </div>
                       <div className='flex flex-1 flex-col gap-2 w-full rounded-md pt-1'>
+                        <FeedAutofill
+                          entryForm={entry}
+                          setEntryForm={setEntry}
+                        />
                         {entry?.feeds?.map((item, index) => (
                           <div key={index} className={`h-fit`}>
                             <button
                               type='button'
                               className='bg-STUColor p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md'
                               onClick={() => {
-                                setActiveFeeds(
-                                  // Return only those which id does not equal
-                                  activeFeeds.filter(
-                                    (activeFeeds) => activeFeeds.id !== item.id
-                                  )
-                                );
                                 setEntry((prev) => ({
                                   ...prev!,
                                   feeds: prev!.feeds.filter(
@@ -641,26 +609,20 @@ const AdminEditEntry = () => {
                     </div>
                     {/* Categories */}
                     <div className='h-64 flex flex-1 flex-col bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2 overflow-auto'>
-                      <div
-                        className='w-full flex justify-center items-center gap-2 cursor-pointer'
-                        onClick={() => setOpenCategories(true)}
-                      >
+                      <div className='w-full flex justify-center items-center gap-2 cursor-pointer'>
                         <span>{t('entry.wizard.categories')}</span>
-                        <IoMdAdd size={20} />
                       </div>
                       <div className='flex flex-1 flex-col gap-2 w-full rounded-md pt-1'>
+                        <CategoryAutofill
+                          entryForm={entry}
+                          setEntryForm={setEntry}
+                        />
                         {entry?.categories?.map((item, index) => (
                           <div key={index} className={`h-fit`}>
                             <button
                               type='button'
                               className='bg-STUColor p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md'
                               onClick={() => {
-                                setActiveCategories(
-                                  // Return only those which id does not equal
-                                  activeCategories.filter(
-                                    (ac) => ac.id !== item.id
-                                  )
-                                );
                                 setEntry((prev) => ({
                                   ...prev!,
                                   categories: prev!.categories.filter(
@@ -717,35 +679,6 @@ const AdminEditEntry = () => {
           </form>
         )}
       </div>
-      {openFeeds && (
-        <ModalWrapper
-          title={t('modal.feedMenu.title')}
-          buttonLabel={t('modal.feedMenu.label')}
-          close={() => {
-            setActiveFeeds(entry!.feeds);
-            setOpenFeeds(false);
-          }}
-          yes={handleApplyFeeds}
-        >
-          <FeedMenu activeFeeds={activeFeeds} setActiveFeeds={setActiveFeeds} />
-        </ModalWrapper>
-      )}
-      {openCategories && (
-        <ModalWrapper
-          title={t('modal.categoryMenu.title')}
-          buttonLabel={t('modal.categoryMenu.label')}
-          close={() => {
-            setActiveCategories(entry!.categories);
-            setOpenCategories(false);
-          }}
-          yes={handleApplyCategories}
-        >
-          <CategoryMenu
-            activeCategories={activeCategories}
-            setActiveCategories={setActiveCategories}
-          />
-        </ModalWrapper>
-      )}
       {openApplyInfo && (
         <ApplyInfoDialog
           type={identifierType!}

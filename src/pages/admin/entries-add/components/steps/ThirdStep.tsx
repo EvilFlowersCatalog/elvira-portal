@@ -1,7 +1,6 @@
 import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IoAddCircle, IoRemoveCircle } from 'react-icons/io5';
-import FeedMenu from '../../../../../components/common/FeedMenu';
 import NextButton from '../NextButton';
 import PreviousButton from '../PreviousButton';
 import useCustomEffect from '../../../../../hooks/useCustomEffect';
@@ -10,6 +9,9 @@ import AuthorsAutofill from '../../../../../components/inputs/AuthorsAutofill';
 import useGetAuthors from '../../../../../hooks/api/authors/useGetAuthors';
 import { IEntryAuthor } from '../../../../../utils/interfaces/author';
 import PageLoading from '../../../../../components/page/PageLoading';
+import FeedAutofill from '../../../../../components/inputs/FeedAutofill';
+import { MdRemoveCircle } from 'react-icons/md';
+import { IEntryNewForm } from '../../../../../utils/interfaces/entry';
 
 const ThirdStep = ({
   entryForm,
@@ -24,6 +26,7 @@ const ThirdStep = ({
   >(entryForm.feeds ?? []);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [authors, setAuthors] = useState<IEntryAuthor[]>([]);
+  const [entryFormTemp, setEntryFormTemp] = useState<IEntryNewForm>(entryForm);
 
   const getAuthors = useGetAuthors();
 
@@ -141,11 +144,30 @@ const ThirdStep = ({
               </div>
 
               {/* Feeds contianer*/}
-              <div className='flex flex-col w-full min-h-72'>
-                <FeedMenu
-                  activeFeeds={activeFeeds}
-                  setActiveFeeds={setActiveFeeds}
+              <div className='flex flex-col w-full min-h-72 gap-2'>
+                <FeedAutofill
+                  entryForm={entryForm}
+                  setEntryForm={setEntryForm}
                 />
+                {entryForm?.feeds?.map((item, index) => (
+                  <div key={index} className={`h-fit`}>
+                    <button
+                      type='button'
+                      className='bg-STUColor p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md'
+                      onClick={() => {
+                        setEntryForm({
+                          ...entryForm,
+                          feeds: entryForm!.feeds.filter(
+                            (prevFeed) => prevFeed.id !== item.id
+                          ),
+                        });
+                      }}
+                    >
+                      {item.title}
+                      <MdRemoveCircle size={15} />
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           </div>

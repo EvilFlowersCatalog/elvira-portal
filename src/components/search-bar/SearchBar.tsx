@@ -5,16 +5,18 @@ import { ChangeEvent, FormEvent, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
-import FeedMenu from '../common/FeedMenu';
 import Button from '../common/Button';
 import ElviraInput from '../inputs/ElviraInput';
+import FeedAutofill from '../inputs/FeedAutofill';
+import { IEntryNewForm } from '../../utils/interfaces/entry';
+import { MdRemoveCircle } from 'react-icons/md';
 
 const SearchBar = () => {
   const { setShowSearchBar, isSmallDevice } = useAppContext();
   const { t } = useTranslation();
-  const [activeFeeds, setActiveFeeds] = useState<
-    { title: string; id: string }[]
-  >([]);
+  const [activeFeeds, setActiveFeeds] = useState<{
+    feeds: { title: string; id: string }[];
+  }>({ feeds: [] });
   const [title, setTitle] = useState<string>('');
   const [author, setAuthor] = useState<string>('');
   const [category, setCategory] = useState<string>('');
@@ -46,7 +48,8 @@ const SearchBar = () => {
     if (author) searchParams.set('author', author);
     else searchParams.delete('author');
 
-    if (activeFeeds.length > 0) searchParams.set('feed-id', activeFeeds[0].id);
+    if (activeFeeds.feeds.length > 0)
+      searchParams.set('feed-id', activeFeeds.feeds[0].id);
     else searchParams.delete('feed-id');
 
     searchParams.set('publishedAtGte', year[0].toString());
@@ -135,12 +138,31 @@ const SearchBar = () => {
 
         <div className='w-full'>
           <span>{t('searchBar.feeds')}</span>
-          <div className='overflow-auto mt-2 w-full'>
-            <FeedMenu
-              activeFeeds={activeFeeds}
-              setActiveFeeds={setActiveFeeds}
-              searchBar
+          <div className='flex flex-col gap-2 mt-2 w-full'>
+            <FeedAutofill
+              entryForm={activeFeeds}
+              setEntryForm={setActiveFeeds}
+              single
             />
+            {activeFeeds?.feeds?.map((item, index) => (
+              <div key={index} className={`h-fit`}>
+                <button
+                  type='button'
+                  className='bg-STUColor p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md'
+                  onClick={() => {
+                    setActiveFeeds((prev) => ({
+                      ...prev!,
+                      feeds: prev!.feeds.filter(
+                        (prevFeed) => prevFeed.id !== item.id
+                      ),
+                    }));
+                  }}
+                >
+                  {item.title}
+                  <MdRemoveCircle size={15} />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
 
