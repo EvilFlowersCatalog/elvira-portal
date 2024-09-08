@@ -22,6 +22,7 @@ import { useLocation } from 'react-router-dom';
 import { FiBookOpen, FiHelpCircle } from 'react-icons/fi';
 import { RxHome } from 'react-icons/rx';
 import Gravatar from 'react-gravatar';
+import Button from '../../buttons/Button';
 
 interface INavbarButtonParams {
   name: string;
@@ -98,34 +99,41 @@ const Navbar = () => {
   return (
     <div className='flex flex-col gap-2 w-64 h-full bg-zinc-100 dark:bg-darkGray p-4 overflow-auto'>
       {/* Logos */}
-      <div className='flex h-6 mb-5 justify-between items-center'>
+      <div className='flex mb-5 justify-between items-center'>
         <button onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.home)}>
           <img
-            className='h-auto w-36'
+            className={`h-auto ${isSmallDevice ? 'w-36' : 'w-full'}`}
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
             alt='Elvira Logo'
           />
         </button>
-        {isSmallDevice ? (
+        {isSmallDevice && (
           <button
             className='bg-STUColor h-full flex items-center text-white w-fit rounded-md px-1'
             onClick={() => setShowNavbar(false)}
           >
             <RiArrowLeftDoubleFill size={18} />
           </button>
-        ) : (
-          <button
-            onClick={(e) =>
-              window.open(stuLinks[import.meta.env.ELVIRA_ASSETS_DIR], '_blank')
-            }
-          >
+        )}
+      </div>
+
+      <div className='flex flex-col items-start'>
+        <h1 className='font-bold'>{t('navbarMenu.catalog')}</h1>
+        {/* STU Logo */}
+        <NavbarButton
+          name={''}
+          onClick={() =>
+            window.open(stuLinks[import.meta.env.ELVIRA_ASSETS_DIR], '_blank')
+          }
+          icon={
             <img
-              className='h-auto w-16'
+              className='h-auto w-[70px]'
               src={theme === THEME_TYPE.dark ? stuLogoLight : stuLogoDark}
               alt='STU Logo'
             />
-          </button>
-        )}
+          }
+          isActive={false}
+        />
       </div>
 
       {/* Portal container */}
@@ -178,12 +186,12 @@ const Navbar = () => {
             icon={<PiBooks size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.shelf}
           />
-          <NavbarButton
+          {/* <NavbarButton
             name={t('navbarMenu.loan')}
             path={NAVIGATION_PATHS.loans}
             icon={<IoDocumentsOutline size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.loans}
-          />
+          /> */}
         </div>
       )}
 
@@ -218,7 +226,7 @@ const Navbar = () => {
       {/* Logout */}
       {auth && (
         <>
-          <div className='flex flex-col pl-2 items-center justify-center gap-3 text-xl font-extrabold'>
+          <div className='flex flex-col pl-2 items-center justify-center gap-3 text-lg font-extrabold'>
             <Gravatar
               email={`${auth.username}@stuba.sk`}
               size={80}
@@ -226,14 +234,8 @@ const Navbar = () => {
               default='monsterid'
             />
             {auth.username}
+            <Button onClick={logout} title={t('navbarMenu.logout')} />
           </div>
-          <button
-            className={`flex w-full justify-center py-2 rounded-md bg-zinc-100 dark:dark:bg-darkGray hover:bg-zinc-200 dark:hover:bg-strongDarkGray`}
-            onClick={logout}
-          >
-            {/* <CiLogout size={23} /> */}
-            {t('navbarMenu.logout')}
-          </button>
         </>
       )}
     </div>

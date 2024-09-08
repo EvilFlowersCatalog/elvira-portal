@@ -5,11 +5,12 @@ import { ChangeEvent, FormEvent, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Slider from '@mui/material/Slider';
-import Button from '../common/Button';
+import Button from '../buttons/Button';
 import ElviraInput from '../inputs/ElviraInput';
-import FeedAutofill from '../inputs/FeedAutofill';
-import { IEntryNewForm } from '../../utils/interfaces/entry';
 import { MdRemoveCircle } from 'react-icons/md';
+import FeedAutofill from '../autofills/FeedAutofill';
+import CategoryAutofill from '../autofills/CategoryAutofill';
+import { ICategory } from '../../utils/interfaces/category';
 
 const SearchBar = () => {
   const { setShowSearchBar, isSmallDevice } = useAppContext();
@@ -17,9 +18,11 @@ const SearchBar = () => {
   const [activeFeeds, setActiveFeeds] = useState<{
     feeds: { title: string; id: string }[];
   }>({ feeds: [] });
+  const [activeCategory, setActiveCategory] = useState<{
+    categories: ICategory[];
+  }>({ categories: [] });
   const [title, setTitle] = useState<string>('');
   const [author, setAuthor] = useState<string>('');
-  const [category, setCategory] = useState<string>('');
   const [year, setYear] = useState<number[]>([1950, new Date().getFullYear()]);
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -35,10 +38,6 @@ const SearchBar = () => {
     setAuthor(e.target.value);
   };
 
-  const handleCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setCategory(e.target.value);
-  };
-
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -47,6 +46,10 @@ const SearchBar = () => {
 
     if (author) searchParams.set('author', author);
     else searchParams.delete('author');
+
+    if (activeCategory.categories.length > 0)
+      searchParams.set('category-id', activeCategory.categories[0].id);
+    else searchParams.delete('category-id');
 
     if (activeFeeds.feeds.length > 0)
       searchParams.set('feed-id', activeFeeds.feeds[0].id);
@@ -82,30 +85,6 @@ const SearchBar = () => {
         className='flex-1 bg-zinc-100 dark:bg-darkGray py-4 flex flex-col gap-4 rounded-md items-center'
       >
         <div className='w-full'>
-          <ElviraInput
-            placeholder={t('searchBar.title')}
-            value={title}
-            onChange={handleTitleChange}
-          />
-        </div>
-
-        <div className='w-full'>
-          <ElviraInput
-            placeholder={t('searchBar.author')}
-            value={author}
-            onChange={handleAuthorChange}
-          />
-        </div>
-
-        <div className='w-full'>
-          <ElviraInput
-            placeholder={t('searchBar.category')}
-            value={category}
-            onChange={handleCategoryChange}
-          />
-        </div>
-
-        <div className='w-full'>
           <span>{t('searchBar.year')}</span>
           <div className='w-full px-2'>
             <Box
@@ -137,39 +116,39 @@ const SearchBar = () => {
         </div>
 
         <div className='w-full'>
-          <span>{t('searchBar.feeds')}</span>
-          <div className='flex flex-col gap-2 mt-2 w-full'>
-            <FeedAutofill
-              entryForm={activeFeeds}
-              setEntryForm={setActiveFeeds}
-              single
-            />
-            {activeFeeds?.feeds?.map((item, index) => (
-              <div key={index} className={`h-fit`}>
-                <button
-                  type='button'
-                  className='bg-STUColor p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md'
-                  onClick={() => {
-                    setActiveFeeds((prev) => ({
-                      ...prev!,
-                      feeds: prev!.feeds.filter(
-                        (prevFeed) => prevFeed.id !== item.id
-                      ),
-                    }));
-                  }}
-                >
-                  {item.title}
-                  <MdRemoveCircle size={15} />
-                </button>
-              </div>
-            ))}
-          </div>
+          <ElviraInput
+            placeholder={t('searchBar.title')}
+            value={title}
+            onChange={handleTitleChange}
+          />
+        </div>
+
+        <div className='w-full'>
+          <ElviraInput
+            placeholder={t('searchBar.author')}
+            value={author}
+            onChange={handleAuthorChange}
+          />
+        </div>
+
+        <div className='w-full'>
+          <CategoryAutofill
+            entryForm={activeCategory}
+            setEntryForm={setActiveCategory}
+            single
+          />
+        </div>
+
+        <div className='w-full'>
+          <FeedAutofill
+            entryForm={activeFeeds}
+            setEntryForm={setActiveFeeds}
+            single
+          />
         </div>
 
         <div className='fixed bottom-5'>
-          <Button type='submit'>
-            <span>{t('searchBar.search')}</span>
-          </Button>
+          <Button type='submit' title={t('searchBar.search')} />
         </div>
       </form>
     </div>

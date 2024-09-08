@@ -13,6 +13,7 @@ const useGetEntries = () => {
     publishedAtGte,
     publishedAtLte,
     authors,
+    categoryId,
     query,
   }: IEntryQuery): Promise<IEntriesList> => {
     // Set params
@@ -30,6 +31,7 @@ const useGetEntries = () => {
     if (publishedAtGte) params.set('published_at_gte', publishedAtGte);
     if (publishedAtLte) params.set('published_at_lte', publishedAtLte);
     if (authors) params.set('author', authors);
+    if (categoryId) params.set('category_id', categoryId);
     if (query) params.set('query', query);
 
     // Get entries by params

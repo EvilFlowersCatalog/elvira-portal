@@ -1,9 +1,5 @@
 import { Outlet, useLocation } from 'react-router-dom';
-import {
-  COOKIES_TYPE,
-  NAVIGATION_PATHS,
-  THEME_TYPE,
-} from './utils/interfaces/general/general';
+import { NAVIGATION_PATHS } from './utils/interfaces/general/general';
 import { ToastContainer } from 'react-toastify';
 import NavbarContainer from './components/header/navbar/NavbarContainer';
 import Header from './components/header/Header';
@@ -11,7 +7,7 @@ import useAppContext from './hooks/contexts/useAppContext';
 import SearchBarContainer from './components/search-bar/SearchBarContainer';
 import useCustomEffect from './hooks/useCustomEffect';
 import useCookiesContext from './hooks/contexts/useCookiesContext';
-import CookiesInformation from './components/common/CookiesInformation';
+import CookiesInformation from './components/dialogs/CookiesInformation';
 
 const App = () => {
   const { isSmallDevice } = useAppContext();
@@ -57,9 +53,7 @@ const App = () => {
       {/* COOKIE */}
       {!informed && <CookiesInformation />}
       <div className='min-h-screen h-screen flex w-screen bg-white dark:bg-gray text-black dark:text-white overflow-auto'>
-        <div
-          className={`min-w-64 flex flex-1 ${show() ? 'pt-14 lg:pt-0' : ''}`}
-        >
+        <div className={`min-w-64 flex flex-1`}>
           <ToastContainer
             position='top-right'
             autoClose={2500}
@@ -74,7 +68,11 @@ const App = () => {
             </>
           )}
 
-          <div className={`flex flex-1 flex-col overflow-auto`}>
+          <div
+            className={`flex flex-1 flex-col overflow-auto ${
+              show() ? 'pt-14 lg:pt-0' : ''
+            }`}
+          >
             <Outlet />
           </div>
 

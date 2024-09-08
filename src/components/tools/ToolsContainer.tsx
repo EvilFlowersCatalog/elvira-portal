@@ -68,20 +68,20 @@ const ToolsContainer = ({
 
   return (
     <div className={`flex gap-4 px-4 pb-4 item-start flex-col md:flex-row`}>
-      <div className='w-full md:w-1/2 xl:w-1/4'>
+      <div className='w-full md:w-1/2 xl:w-1/4 pl-1'>
         <div className='flex gap-4 items-center'>
           {!isSmallDevice &&
             showLayout &&
             (layout === LAYOUT_TYPE.list ? (
               <FaList
                 size={30}
-                className='cursor-pointer'
+                className='cursor-pointer mt-4'
                 onClick={() => updateLayout(LAYOUT_TYPE.box)}
               />
             ) : (
               <HiMiniSquares2X2
                 size={30}
-                className='cursor-pointer'
+                className='cursor-pointer mt-4'
                 onClick={() => updateLayout(LAYOUT_TYPE.list)}
               />
             ))}
@@ -94,16 +94,16 @@ const ToolsContainer = ({
               value={input}
               placeholder={t('tools.search')}
               onChange={handleSearchInput}
-              backgroundTailwind='bg-zinc-200 dark:bg-darkGray'
+              className='bg-zinc-200 dark:bg-darkGray'
             />
 
-            <button type='submit' className={'absolute right-2 top-2.5'}>
+            <button type='submit' className={'absolute right-2 top-[29px]'}>
               <IoSearchOutline size={25} />
             </button>
           </form>
 
           {!isParamsEmpty() && (
-            <button className='text-red' onClick={handleClear}>
+            <button className='text-red pt-6' onClick={handleClear}>
               <FaFilterCircleXmark size={25} />
             </button>
           )}
@@ -120,9 +120,9 @@ const ToolsContainer = ({
         )}
       </div>
 
-      <div className='flex gap-3 items-start text-[15px] md:mt-2.5'>
+      <div className='flex gap-3 justify-end md:items-start text-[15px]'>
         <select
-          className='bg-transparent cursor-pointer outline-none uppercase text-left'
+          className='bg-transparent cursor-pointer outline-none uppercase text-left mt-0 md:mt-[30px]'
           name='orderBy'
           id='orderBy'
           value={selection}

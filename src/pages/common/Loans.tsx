@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IEntry } from '../../utils/interfaces/entry';
-import ItemContainer from '../../components/items-container/ItemContainer';
+import ItemContainer from '../../components/items/container/ItemContainer';
 
 const Loans = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);

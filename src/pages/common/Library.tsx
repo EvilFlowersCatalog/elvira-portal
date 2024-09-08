@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import { IEntry } from '../../utils/interfaces/entry';
 import { useSearchParams } from 'react-router-dom';
-import ItemContainer from '../../components/items-container/ItemContainer';
-import EntryBox from '../../components/entry/EntryBox';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { LAYOUT_TYPE } from '../../utils/interfaces/general/general';
-import EntryList from '../../components/entry/EntryList';
-import EntryListLoading from '../../components/entry/loading/EntryListLoading';
-import EntryBoxLoading from '../../components/entry/loading/EntryBoxLoading';
+import ItemContainer from '../../components/items/container/ItemContainer';
+import EntryList from '../../components/items/entry/EntryList';
+import EntryBox from '../../components/items/entry/EntryBox';
+import EntryListLoading from '../../components/items/entry/loading/EntryListLoading';
+import EntryBoxLoading from '../../components/items/entry/loading/EntryBoxLoading';
 
 const Library = () => {
   const { layout } = useAppContext();
@@ -37,6 +37,7 @@ const Library = () => {
           page,
           limit: 30,
           title: searchParams.get('title') ?? '',
+          categoryId: searchParams.get('category-id') ?? '',
           feedId: searchParams.get('feed-id') ?? '',
           authors: searchParams.get('author') ?? '',
           publishedAtGte: searchParams.get('from') ?? '',

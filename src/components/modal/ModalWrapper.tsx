@@ -1,6 +1,6 @@
 import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import { IoMdClose } from 'react-icons/io';
-import Button from '../common/Button';
+import Button from '../buttons/Button';
 import { IModalParams } from '../../utils/interfaces/general/general';
 
 interface IModalWrapperParams extends IModalParams {
@@ -60,9 +60,7 @@ const ModalWrapper = ({
             {children}
           </div>
           <div className='flex justify-center'>
-            <Button onClick={yes}>
-              <span>{buttonLabel}</span>
-            </Button>
+            <Button onClick={yes} title={buttonLabel} />
           </div>
         </div>
       </div>

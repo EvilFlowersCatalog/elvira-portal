@@ -1,8 +1,8 @@
 import { CircleLoader } from 'react-spinners';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { LAYOUT_TYPE } from '../../utils/interfaces/general/general';
-import EntryListLoading from '../entry/loading/EntryListLoading';
-import EntryBoxLoading from '../entry/loading/EntryBoxLoading';
+import EntryListLoading from '../items/entry/loading/EntryListLoading';
+import EntryBoxLoading from '../items/entry/loading/EntryBoxLoading';
 
 interface IPageLoadingParams {
   entries?: boolean;

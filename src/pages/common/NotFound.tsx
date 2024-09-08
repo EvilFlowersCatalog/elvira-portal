@@ -4,7 +4,7 @@ import {
   NAVIGATION_PATHS,
   THEME_TYPE,
 } from '../../utils/interfaces/general/general';
-import Button from '../../components/common/Button';
+import Button from '../../components/buttons/Button';
 import useAppContext from '../../hooks/contexts/useAppContext';
 
 /**
@@ -35,9 +35,10 @@ const NotFound = () => {
         <span>{t('notFound.infoPart1')}</span>
         <span>{t('notFound.infoPart2')}</span>
       </div>
-      <Button onClick={() => navigate(NAVIGATION_PATHS.home)}>
-        <span>{t('notFound.goBack')}</span>
-      </Button>
+      <Button
+        onClick={() => navigate(NAVIGATION_PATHS.home)}
+        title={t('notFound.goBack')}
+      />
     </div>
   );
 };

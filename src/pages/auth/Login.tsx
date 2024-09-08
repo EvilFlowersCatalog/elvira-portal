@@ -1,6 +1,6 @@
 import { ChangeEvent, FormEvent, InvalidEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Button from '../../components/common/Button';
+import Button from '../../components/buttons/Button';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { IAuthCredentials } from '../../utils/interfaces/auth';
@@ -52,8 +52,8 @@ const Login = () => {
 
   return (
     <div className='flex flex-1 flex-col justify-center items-center p-4'>
-      <div className='flex flex-col p-5 h-1/2 min-h-96 w-full md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 bg-zinc-100 dark:bg-darkGray justify-evenly items-center rounded-md'>
-        <div className='flex flex-col h-1/2 items-center justify-center gap-2'>
+      <div className='flex flex-col p-5 h-[500px] w-full md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 bg-zinc-100 dark:bg-darkGray justify-evenly items-center rounded-md'>
+        <div className='flex flex-col items-center justify-center gap-2'>
           <img
             className='w-96'
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
@@ -61,14 +61,14 @@ const Login = () => {
           />
           <span className='text-lg'>{t('login.digitalLibrary')}</span>
         </div>
-        <div className='flex w-full h-1/2 justify-center items-start'>
+        <div className='flex w-full h-fit justify-center items-start'>
           {loading ? (
             <div className='flex h-full justify-center items-center'>
               <CircleLoader color={STUColor} size={50} />
             </div>
           ) : (
             <form
-              className='flex flex-col gap-5 w-3/4 items-center'
+              className='flex flex-col gap-4 w-3/4 items-center'
               onSubmit={submit}
             >
               <ElviraInput
@@ -88,7 +88,7 @@ const Login = () => {
                   required
                 />
                 <button
-                  className='absolute top-3 -right-7'
+                  className='absolute top-[31px] -right-7'
                   type='button'
                   onClick={() => setShowPassword((prevShow) => !prevShow)}
                 >
@@ -99,9 +99,7 @@ const Login = () => {
                   )}
                 </button>
               </div>
-              <Button type='submit'>
-                <span>{t('login.loginBtn')}</span>
-              </Button>
+              <Button type='submit' title={t('login.loginBtn')} />
             </form>
           )}
         </div>

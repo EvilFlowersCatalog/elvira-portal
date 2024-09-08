@@ -33,7 +33,7 @@ const rootId = 'pdf-viewer-page';
 const Viewer = () => {
   const { lang, theme, titleLogoDark, titleLogoLight } = useAppContext();
   const { auth } = useAuthContext();
-  const { 'entry-id': id } = useParams();
+  const { 'entry-id': id, index } = useParams();
   const { t } = useTranslation();
   const [loading, setLoading] = useState<boolean>(true);
   const [progressBar, setProgressBar] = useState<number>(0);
@@ -182,7 +182,8 @@ const Viewer = () => {
       try {
         setProgressBar(30);
         const { response: entryDetail } = await getEntryDetail(id!);
-        const responseAcquisitionId = entryDetail.acquisitions[0].id;
+        const responseAcquisitionId =
+          entryDetail.acquisitions[parseInt(index || '0')].id;
 
         setProgressBar(50);
 
@@ -254,6 +255,12 @@ const Viewer = () => {
               getLayerFunc,
               getGroupsFunc,
             },
+          },
+          config: {
+            download: entryDetail.config.evilflowres_metadata_fetch,
+            share: entryDetail.config.evilflowers_share_enabled,
+            print: entryDetail.config.evilflowers_viewer_print,
+            edit: entryDetail.config.evilflowers_annotations_create,
           },
         });
       } catch {

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
 import { IEntry } from '../../utils/interfaces/entry';
 import { useSearchParams } from 'react-router-dom';
-import ItemContainer from '../../components/items-container/ItemContainer';
-import EntryBox from '../../components/entry/EntryBox';
 import useGetShelf from '../../hooks/api/my-shelf/useGetShelf';
-import EntryBoxLoading from '../../components/entry/loading/EntryBoxLoading';
 import { LAYOUT_TYPE } from '../../utils/interfaces/general/general';
-import EntryList from '../../components/entry/EntryList';
 import useAppContext from '../../hooks/contexts/useAppContext';
-import EntryListLoading from '../../components/entry/loading/EntryListLoading';
+import ItemContainer from '../../components/items/container/ItemContainer';
+import EntryList from '../../components/items/entry/EntryList';
+import EntryBox from '../../components/items/entry/EntryBox';
+import EntryListLoading from '../../components/items/entry/loading/EntryListLoading';
+import EntryBoxLoading from '../../components/items/entry/loading/EntryBoxLoading';
 
 const Shelf = () => {
   const { layout } = useAppContext();
@@ -38,6 +38,7 @@ const Shelf = () => {
           limit: 30,
           title: searchParams.get('title') ?? '',
           feedId: searchParams.get('feed-id') ?? '',
+          categoryId: searchParams.get('category-id') ?? '',
           authors: searchParams.get('author') ?? '',
           publishedAtGte: searchParams.get('from') ?? '',
           publishedAtLte: searchParams.get('to') ?? '',

@@ -1,43 +1,45 @@
-import { ChangeEvent, InvalidEvent, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { forwardRef, TextareaHTMLAttributes, useState } from 'react';
 import { uuid } from '../../utils/func/functions';
 
-interface IElviraTextareaParams {
-  onChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
-  placeholder: string;
-  value: string;
+interface CustomTextareaProps
+  extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+  invalidMessage?: string;
 }
-// Custom textarea used in steps in AMDIN
-const ElviraTextarea = ({
-  onChange,
-  placeholder,
-  value,
-}: IElviraTextareaParams) => {
-  const { t } = useTranslation();
-  const [focus, setFocus] = useState<boolean>(false);
-  const id = uuid();
+// Custom input used in step forms in ADMIN
+const ElviraTextarea = forwardRef<HTMLTextAreaElement, CustomTextareaProps>(
+  ({ invalidMessage, ...props }, ref) => {
+    const [focus, setFocus] = useState<boolean>(false);
+    const id = uuid();
 
-  return (
-    <div className='relative w-full h-full mt-6'>
-      <span
-        className={`absolute duration-200 z-10 select-none pointer-events-none ${
-          focus || value
-            ? '-top-6 left-0 text-sm text-STUColor'
-            : 'top-2 left-2 text-md text-zinc-400'
-        }`}
-      >
-        {placeholder}
-      </span>
-      <textarea
-        className='w-full h-full min-h-72 p-2 rounded-md bg-white dark:bg-gray border border-white dark:border-gray outline-none focus:border-STUColor dark:focus:border-STUColor'
-        value={value}
-        id={id}
-        onChange={onChange}
-        onFocus={() => setFocus(true)}
-        onBlur={() => setFocus(false)}
-      />
-    </div>
-  );
-};
+    const { placeholder, value } = props;
+
+    return (
+      <div className='relative w-full h-full mt-6'>
+        <span
+          className={`absolute duration-200 z-10 select-none pointer-events-none ${
+            focus || value
+              ? '-top-6 left-0 text-sm text-STUColor'
+              : 'top-2 left-2'
+          }`}
+        >
+          {placeholder}
+        </span>
+        <textarea
+          ref={ref}
+          {...props}
+          className={`w-full h-full min-h-72 p-2 rounded-md bg-transparent border-2 ${
+            value
+              ? 'border-STUColor dark:border-STUColor'
+              : 'focus:border-STUColor dark:focus:border-STUColor border-black dark:border-white'
+          } outline-none`}
+          id={id}
+          placeholder=''
+          onFocus={() => setFocus(true)}
+          onBlur={() => setFocus(false)}
+        />
+      </div>
+    );
+  }
+);
 
 export default ElviraTextarea;

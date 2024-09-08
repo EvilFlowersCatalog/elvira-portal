@@ -257,8 +257,8 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     };
 
     // handle esc
-    const handleESC = (e: KeyboardEvent) => {
-      if (e.code.toLocaleLowerCase() === 'escape') {
+    const handleESC = (e?: KeyboardEvent) => {
+      if (e?.code?.toLocaleLowerCase() === 'escape') {
         searchParams.delete('entry-detail-id');
         setSearchParams(searchParams);
         setShowSearchBar(false);

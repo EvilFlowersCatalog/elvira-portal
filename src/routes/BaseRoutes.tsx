@@ -3,22 +3,22 @@ import App from '../App';
 import Login from '../pages/auth/Login';
 import Library from '../pages/common/Library';
 import Shelf from '../pages/common/Shelf';
-import Feeds from '../pages/common/feed-page/Feeds';
-import AdminHome from '../pages/admin/admin-home/AdminHome';
-import AdminFeeds from '../pages/admin/feeds/AdminFeeds';
+import AdminFeeds from '../pages/admin/AdminFeeds';
 import NotFound from '../pages/common/NotFound';
 import { NAVIGATION_PATHS } from '../utils/interfaces/general/general';
 import RequireAuth from './private/RequireAuth';
 import useAuthContext from '../hooks/contexts/useAuthContext';
 import RequireAdmin from './private/RequireAdmin';
 import Viewer from '../pages/common/Viewer';
-import Home from '../pages/common/home-page/Home';
-import About from '../pages/common/about-page/About';
+import Home from '../pages/common/Home';
+import About from '../pages/common/About';
 import Loans from '../pages/common/Loans';
-import AdminAddEntry from '../pages/admin/entries-add/AdminAddEntry';
-import AdminEditEntry from '../pages/admin/entries-edit/AdminEditEntry';
-import AdminEntries from '../pages/admin/entries/AdminEntries';
-import AdminCategories from '../pages/admin/categories/AdminCategories';
+import AdminEditEntry from '../pages/admin/AdminEditEntry';
+import AdminEntries from '../pages/admin/AdminEntries';
+import AdminCategories from '../pages/admin/AdminCategories';
+import Feeds from '../pages/common/Feeds';
+import AdminHome from '../pages/admin/AdminHome';
+import AdminAddEntry from '../pages/admin/AdminAddEntry';
 
 const BaseRoutes = () => {
   const { auth } = useAuthContext();
@@ -48,9 +48,9 @@ const BaseRoutes = () => {
           <Route path='about' element={<About />} />
           <Route path='library' element={<Library />} />
           <Route path='shelf' element={<Shelf />} />
-          <Route path='loans' element={<Loans />} />
+          {/* <Route path='loans' element={<Loans />} /> */}
           <Route path='feeds' element={<Feeds />} />
-          <Route path='viewer/:entry-id' element={<Viewer />} />
+          <Route path='viewer/:entry-id/:index' element={<Viewer />} />
 
           {/* Only with admin role */}
           <Route path='administration' element={<RequireAdmin />}>

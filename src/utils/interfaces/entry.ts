@@ -17,6 +17,7 @@ export interface IEntry {
   language_code?: string;
   popularity: number;
   categories: ICategory[];
+  acquisitions: IEntryAcquisition[];
   summary: string;
   feeds: IFeed[];
   creator_id: string;
@@ -57,6 +58,7 @@ export interface IEntryQuery {
   page: number;
   limit: number;
   title?: string;
+  categoryId?: string;
   feedId?: string;
   authors?: string;
   publishedAtGte?: string;

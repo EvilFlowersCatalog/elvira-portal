@@ -4,11 +4,11 @@ import { BrowserRouter } from 'react-router-dom';
 import BaseRoutes from './routes/BaseRoutes';
 import AuthProvider from './providers/AuthProvider';
 import AppProvider from './providers/AppProvider';
+import CookiesProvider from './providers/CookiesProvider';
 import 'react-toastify/dist/ReactToastify.css';
 import './main.css';
 import '@evilflowers/evilflowersviewer/dist/style.css';
 import 'swiper/swiper-bundle.css';
-import CookiesProvider from './providers/CookiesProvider';
 
 // For zotero to update
 document.dispatchEvent(

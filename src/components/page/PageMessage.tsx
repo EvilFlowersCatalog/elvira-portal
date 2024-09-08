@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { THEME_TYPE } from '../../utils/interfaces/general/general';
-import Button from '../common/Button';
+import Button from '../buttons/Button';
 
 interface IPageMessageParams {
   message: string;
@@ -23,9 +23,7 @@ const PageMessage = ({ message, clearParams = null }: IPageMessageParams) => {
         {message}
       </span>
       {clearParams && (
-        <Button onClick={clearParams}>
-          <span>{t('page.removeFilters')}</span>
-        </Button>
+        <Button onClick={clearParams} title={t('page.removeFilters')} />
       )}
     </div>
   );

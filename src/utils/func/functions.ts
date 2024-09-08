@@ -47,3 +47,20 @@ export const updateMetaTag = (name: string, content: string | number) => {
     .querySelector(`meta[name=${name}]`)
     ?.setAttribute('content', content.toString());
 };
+
+export const imageUrlToFile = async (url: string, filename: string) => {
+  try {
+    const response = await fetch(url);
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const blob = await response.blob(); // Get the image as a blob
+    const fileType = blob.type; // Get the MIME type of the file
+    const file = new File([blob], filename, { type: fileType });
+    return file;
+  } catch {
+    return null;
+  }
+};
