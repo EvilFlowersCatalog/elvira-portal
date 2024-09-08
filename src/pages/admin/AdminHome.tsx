@@ -29,7 +29,7 @@ const AdminHome = () => {
   const { t } = useTranslation();
 
   return (
-    <div className='flex-1'>
+    <div className='flex-1 pt-14 lg:pt-0'>
       <Breadcrumb />
       <div className='flex flex-wrap px-2'>
         {buttonConfig.map(({ icon, textKey, path }, index) => (

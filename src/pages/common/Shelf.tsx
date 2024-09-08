@@ -86,7 +86,7 @@ const Shelf = () => {
       showLayout
       searchSpecifier={'query'}
     >
-      <div className='flex flex-wrap p-4 pt-0'>
+      <div className='flex flex-wrap p-4 pt-14 lg:pt-0'>
         {layout === LAYOUT_TYPE.list
           ? entries.map((entry, index) => (
               <EntryList

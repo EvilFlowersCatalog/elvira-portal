@@ -44,7 +44,7 @@ const About = () => {
   ];
 
   return (
-    <div className='flex flex-1 flex-col'>
+    <div className='flex flex-1 flex-col pt-14 lg:pt-0'>
       <Breadcrumb />
       <div className='flex flex-col flex-1 p-4 justify-start items-center text-center'>
         <img

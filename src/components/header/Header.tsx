@@ -24,7 +24,7 @@ const Header = () => {
 
       <button onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.home)}>
         <img
-          className='h-auto w-32 min-w-24'
+          className='h-auto w-32'
           src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
           alt='Elvira Logo'
         />
@@ -34,7 +34,7 @@ const Header = () => {
       <span className='flex-1' />
 
       <img
-        className='h-auto w-16 min-w-12'
+        className='h-auto w-16'
         src={theme === THEME_TYPE.dark ? stuLogoLight : stuLogoDark}
         alt='STU Logo'
       />

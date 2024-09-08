@@ -293,7 +293,7 @@ const AdminAddEntry = () => {
 
   return (
     <>
-      <div className='flex flex-col flex-1'>
+      <div className='flex flex-col flex-1 pt-14 lg:pt-0'>
         <Breadcrumb />
         {entry === null || isLoading ? (
           <PageLoading />
