@@ -85,7 +85,7 @@ const ItemContainer = ({
     <>
       <div
         ref={scrollRef}
-        className='flex flex-col flex-1 overflow-auto'
+        className='flex flex-col flex-1'
         onScroll={() =>
           handleScroll(
             scrollRef,

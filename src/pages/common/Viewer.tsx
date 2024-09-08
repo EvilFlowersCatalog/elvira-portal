@@ -308,11 +308,11 @@ const Viewer = () => {
           }
         >
           <img
-            className='w-96'
+            className='w-52 md:w-96'
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
             alt='Elvira Logo'
           />
-          <div className='w-[90%] max-w-96 h-4 bg-zinc-300 dark:bg-strongDarkGray rounded-md overflow-hidden'>
+          <div className='w-[80%] max-w-96 h-4 bg-zinc-300 dark:bg-strongDarkGray rounded-md overflow-hidden'>
             <div
               className='h-full bg-STUColor duration-500 rounded-md'
               style={{ width: `${progressBar}%` }}
