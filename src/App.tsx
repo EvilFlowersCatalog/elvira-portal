@@ -52,8 +52,10 @@ const App = () => {
     <>
       {/* COOKIE */}
       {!informed && <CookiesInformation />}
-      <div className='min-h-screen h-screen flex w-screen bg-white dark:bg-gray text-black dark:text-white'>
-        <div className={`flex w-full h-full`}>
+      <div className='min-h-screen h-screen flex w-screen bg-white dark:bg-gray text-black dark:text-white overflow-hidden'>
+        <div
+          className={`flex flex-col lg:flex-row w-full h-full overflow-hidden`}
+        >
           <ToastContainer
             position='top-right'
             autoClose={2500}

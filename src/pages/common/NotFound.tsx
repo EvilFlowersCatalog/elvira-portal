@@ -18,7 +18,7 @@ const NotFound = () => {
 
   return (
     <div
-      className={'flex flex-1 flex-col justify-center items-center gap-5 p-4'}
+      className={'flex w-full flex-col justify-center items-center gap-5 p-4'}
     >
       <img
         className={'w-3/5 md:w-2/5'}

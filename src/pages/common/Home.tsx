@@ -51,7 +51,7 @@ const Home = () => {
 
   return (
     <>
-      <div className='w-full h-full p-4 pt-14 lg:pt-4'>
+      <div className='w-full h-full p-4'>
         <HomeHeader />
 
         {/* POPULAR */}

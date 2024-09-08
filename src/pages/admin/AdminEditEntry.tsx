@@ -293,7 +293,7 @@ const AdminEditEntry = () => {
 
   return (
     <>
-      <div className='flex flex-col flex-1 pt-14 lg:pt-0'>
+      <div className='flex flex-col w-full'>
         <Breadcrumb />
         {entry === null || isLoading ? (
           <PageLoading />
@@ -669,7 +669,7 @@ const AdminEditEntry = () => {
                   />
                 </div>
                 {/* CITATION */}
-                <div className='flex flex-col min-h-96 md:min-h-0 flex-2 bg-zinc-100 dark:bg-darkGray rounded-md p-4 pt-2 gap-2'>
+                <div className='flex flex-col min-h-96 xl:min-h-0 flex-2 bg-zinc-100 dark:bg-darkGray rounded-md p-4 pt-2 gap-2'>
                   <ElviraTextarea
                     onChange={handleCitationChange}
                     className='bg-white dark:bg-gray outline-none resize-none flex-1 p-2 rounded-md'

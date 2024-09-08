@@ -51,7 +51,7 @@ const Login = () => {
   };
 
   return (
-    <div className='flex flex-1 flex-col justify-center items-center p-4 pt-14 lg:pt-4'>
+    <div className='flex w-full flex-col justify-center items-center p-4'>
       <div className='flex flex-col p-5 h-[500px] w-full md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 bg-zinc-100 dark:bg-darkGray justify-evenly items-center rounded-md'>
         <div className='flex flex-col items-center justify-center gap-2'>
           <img
