@@ -215,7 +215,9 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               </span>
             </div>
             <div className={'flex gap-2 w-full'}>
-              {entry.response.feeds.length === 0 && <span>-</span>}
+              {entry.response.feeds.length === 0 && (
+                <span className='text-white'>-</span>
+              )}
               {entry.response.feeds.map((feed, index) => (
                 <button
                   key={index}
@@ -236,7 +238,9 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               </span>
             </div>
             <div className={'flex gap-2 w-full'}>
-              {entry.response.categories.length === 0 && <span>-</span>}
+              {entry.response.categories.length === 0 && (
+                <span className='text-white'>-</span>
+              )}
               {entry.response.categories.map((category, index) => (
                 <button
                   key={index}
