@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@evilflowers/evilflowersviewer": "^0.5.9",
+    "@mui/material": "^6.0.2",
     "axios": "^1.6.7",
     "broadcast-channel": "^7.0.0",
     "react": "^18.2.0",
