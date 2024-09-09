@@ -16,7 +16,6 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { IContextProviderParams } from '../utils/interfaces/contexts';
 import tailwindConfig from '../../tailwind.config';
 import i18next from '../utils/i18n/i18next';
-import { useCookies } from 'react-cookie';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
 
 export interface IAppContext {
