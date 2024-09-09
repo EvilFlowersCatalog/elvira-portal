@@ -1,9 +1,9 @@
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { THEME_TYPE } from '../../utils/interfaces/general/general';
-import readSvg from '/assets/static/read.svg';
-import organizeSvg from '/assets/static/organize.svg';
-import distributeSvg from '/assets/static/distribute.svg';
+import readSvg from '/images/static/read.svg';
+import organizeSvg from '/images/static/organize.svg';
+import distributeSvg from '/images/static/distribute.svg';
 import { useTranslation } from 'react-i18next';
 import Feature, {
   IFeatureParams,

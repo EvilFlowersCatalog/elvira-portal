@@ -251,7 +251,7 @@ export const en = {
         imageAndFile: 'Image & PDF',
         image: 'Image',
         imageHint: 'Drag your image here or click here to browse',
-        pdfHint: 'Drag your PDF file here',
+        pdfHint: 'Drag your PDF files here',
         download: 'Download',
         share: 'Share',
         print: 'Print',

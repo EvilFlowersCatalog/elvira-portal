@@ -244,7 +244,7 @@ export const sk = {
         imageAndFile: 'Obrázok a PDF',
         image: 'Obrázok',
         imageHint: 'Presuňte sem váš obrázok alebo kliknite na prehľadávanie',
-        pdfHint: 'Presuňte sem Váš PDF súbor',
+        pdfHint: 'Presuňte sem Vaše PDF súbory',
         download: 'Stiahnutie',
         share: 'Zdielanie',
         print: 'Tlač',

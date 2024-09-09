@@ -9,7 +9,7 @@
 - **Added**: Edit and add for feeds
 - **Added**: Link to stu logo in navbar
 - **Added**: Images in `static` folder in `assets` for about page
-- **Added**: Assets for MTF
+- **Added**: Assets for all STU faculties
 - **Added**: Scripts for analysis
 - **Added**: Layout for entries
 - **Added**: Catalogs

@@ -440,9 +440,9 @@ const AdminAddEntry = () => {
                 {/* Second row, first column */}
                 <div className='flex flex-col md:flex-row bg-zinc-100 dark:bg-darkGray gap-4 rounded-md p-4'>
                   <div
-                    className={`relative w-48 ${
-                      stringImage ? 'h-fit' : 'h-full'
-                    } p-2 my-auto`}
+                    className={`relative w-48 m-auto ${
+                      stringImage ? 'h-fit' : 'h-72 md:h-full'
+                    } p-2`}
                   >
                     {stringImage && (
                       <img
@@ -490,7 +490,7 @@ const AdminAddEntry = () => {
                         placeholder={t('entry.wizard.publisher')}
                         value={entry.publisher ?? ''}
                       />
-                      <div className='flex flex-col gap-4'>
+                      <div className='flex flex-col gap-4 min-w-64'>
                         <span>{t('entry.wizard.year')}</span>
                         <div className='w-fit flex gap-4'>
                           <ElviraSelect

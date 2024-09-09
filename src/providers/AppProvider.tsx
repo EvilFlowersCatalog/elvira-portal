@@ -65,22 +65,22 @@ export interface IAppContext {
 export const AppContext = createContext<IAppContext | null>(null);
 
 // IMAGES / LOGOS
-const logoDark = `/assets/${
+const logoDark = `/images/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/elvira/logo-dark.png`;
-const logoLight = `/assets/${
+const logoLight = `/images/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/elvira/logo-light.png`;
-const titleLogoDark = `/assets/${
+const titleLogoDark = `/images/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/elvira/title-logo-dark.png`;
-const titleLogoLight = `/assets/${
+const titleLogoLight = `/images/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/elvira/title-logo-light.png`;
-const stuLogoDark = `/assets/${
+const stuLogoDark = `/images/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/stu/logo-dark.png`;
-const stuLogoLight = `/assets/${
+const stuLogoLight = `/images/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/stu/logo-light.png`;
 

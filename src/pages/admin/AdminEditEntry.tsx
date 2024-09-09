@@ -440,9 +440,9 @@ const AdminEditEntry = () => {
                 {/* Second row, first column */}
                 <div className='flex flex-col md:flex-row bg-zinc-100 dark:bg-darkGray gap-4 rounded-md p-4'>
                   <div
-                    className={`relative w-48 ${
-                      stringImage ? 'h-fit' : 'h-full'
-                    } p-2 my-auto`}
+                    className={`relative w-48 m-auto ${
+                      stringImage ? 'h-fit' : 'h-72 md:h-full'
+                    } p-2`}
                   >
                     {stringImage && (
                       <img

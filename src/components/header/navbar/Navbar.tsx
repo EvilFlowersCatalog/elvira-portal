@@ -79,6 +79,11 @@ const Navbar = () => {
   const stuLinks: { [key: string]: string } = {
     ['fiit']: 'https://www.fiit.stuba.sk/',
     ['mtf']: 'https://www.mtf.stuba.sk/',
+    ['fad']: 'https://www.fad.stuba.sk/',
+    ['fchpt']: 'https://www.fchpt.stuba.sk/',
+    ['fei']: 'https://www.fei.stuba.sk/',
+    ['sjf']: 'https://www.sjf.stuba.sk/',
+    ['svf']: 'https://www.svf.stuba.sk/',
   };
 
   // Function for returning if theme is dark cuz of lot of usage

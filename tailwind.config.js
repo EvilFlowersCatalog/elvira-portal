@@ -40,6 +40,11 @@ export default {
         /**
          * FIIT: #01a9e0
          * MTF: #e62b1e
+         * SvF: #e5722a
+         * SjF: #4c5b60
+         * FEI: #0c4a8e
+         * FCHPT: #ffda1c
+         * FAD: #009d4a
          */
         STUColor: '#01a9e0',
         red: '#ff2129',

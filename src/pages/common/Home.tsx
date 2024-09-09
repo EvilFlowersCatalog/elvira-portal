@@ -77,6 +77,8 @@ const Home = () => {
           activeEntryId={activeEntryId}
           type='lastAdded'
         />
+
+        <div className='h-4'></div>
       </div>
       {activeEntryId && <EntryDetail />}
     </>
