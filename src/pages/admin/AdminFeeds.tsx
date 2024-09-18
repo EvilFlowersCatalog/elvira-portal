@@ -34,12 +34,15 @@ const AdminFeeds = () => {
     }
 
     (async () => {
+      const fp = searchParams.get('parent-id')?.split('&') ?? [];
+
       try {
         const { items, metadata } = await getFeeds({
           page: page,
           limit: 50,
           title: searchParams.get('title') ?? '',
-          parentId: searchParams.get('parent-id') ?? 'null',
+          parentId: fp.length > 0 ? fp[fp.length - 1] : 'null',
+
           orderBy: searchParams.get('order-by') ?? '',
         });
 

@@ -13,12 +13,12 @@ import Viewer from '../pages/common/Viewer';
 import Home from '../pages/common/Home';
 import About from '../pages/common/About';
 import Loans from '../pages/common/Loans';
-import AdminEditEntry from '../pages/admin/AdminEditEntry';
-import AdminEntries from '../pages/admin/AdminEntries';
+import AdminEditEntry from '../pages/admin/entries/AdminEditEntry';
+import AdminEntries from '../pages/admin/entries/AdminEntries';
 import AdminCategories from '../pages/admin/AdminCategories';
 import Feeds from '../pages/common/Feeds';
 import AdminHome from '../pages/admin/AdminHome';
-import AdminAddEntry from '../pages/admin/AdminAddEntry';
+import AdminAddEntry from '../pages/admin/entries/AdminAddEntry';
 
 const BaseRoutes = () => {
   const { auth } = useAuthContext();

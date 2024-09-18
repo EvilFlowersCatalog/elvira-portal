@@ -1,6 +1,15 @@
 # Changelog
 
-## 3.1.0 : TBD
+## 3.1.1 : 2024-08-09
+
+- **Added**: New analytics
+- **Fixed**: Links from `EntryDetail` in home page
+- **Fixed**: Navbar image link after logout
+- **Fixed**: Loading next items
+- **Fixed**: `Breadcrumb` feed titles
+- **Changed**: Edit/Add entry to components
+
+## 3.1.0 : 2024-07-17
 
 - **Added**: ALT in every img entity
 - **Added**: Loading progress bar in viewer

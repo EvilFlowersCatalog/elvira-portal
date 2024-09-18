@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useState,
-  MouseEvent,
-  useEffect,
-  RefObject,
-} from 'react';
+import { createContext, useState, MouseEvent, RefObject } from 'react';
 import {
   COOKIES_TYPE,
   LANG_TYPE,
@@ -17,6 +11,7 @@ import { IContextProviderParams } from '../utils/interfaces/contexts';
 import tailwindConfig from '../../tailwind.config';
 import i18next from '../utils/i18n/i18next';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
+import useCustomEffect from '../hooks/useCustomEffect';
 
 export interface IAppContext {
   theme: THEME_TYPE;
@@ -58,28 +53,30 @@ export interface IAppContext {
   stuLogoDark: string;
   stuLogoLight: string;
   editingEntryTitle: string;
+  feedParents: { id: string; title: string }[];
+  setFeedParents: (feedParents: { id: string; title: string }[]) => void;
   setEditingEntryTitle: (editingEntryTitle: string) => void;
 }
 
 export const AppContext = createContext<IAppContext | null>(null);
 
-// IMAGES / LOGOS
-const logoDark = `/images/${
+// assets / LOGOS
+const logoDark = `/assets/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/elvira/logo-dark.png`;
-const logoLight = `/images/${
+const logoLight = `/assets/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/elvira/logo-light.png`;
-const titleLogoDark = `/images/${
+const titleLogoDark = `/assets/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/elvira/title-logo-dark.png`;
-const titleLogoLight = `/images/${
+const titleLogoLight = `/assets/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/elvira/title-logo-light.png`;
-const stuLogoDark = `/images/${
+const stuLogoDark = `/assets/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/stu/logo-dark.png`;
-const stuLogoLight = `/images/${
+const stuLogoLight = `/assets/${
   import.meta.env.ELVIRA_ASSETS_DIR
 }/stu/logo-light.png`;
 
@@ -103,6 +100,9 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     window.innerWidth < 959
   );
   const [searchParams, setSearchParams] = useSearchParams();
+  const [feedParents, setFeedParents] = useState<
+    { id: string; title: string }[]
+  >([]);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -204,7 +204,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   ) => {
     if (scrollRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
-
       // if we are at buttom load next data
       if (
         scrollTop + clientHeight > scrollHeight - 50 &&
@@ -224,12 +223,12 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     }
   };
 
-  useEffect(() => {
+  useCustomEffect(() => {
     document.body.classList.remove('light', 'dark');
     document.body.classList.add(theme);
   }, [theme]);
 
-  useEffect(() => {
+  useCustomEffect(() => {
     // Set languege based on given language
     if (lang === LANG_TYPE.sk) {
       i18next.changeLanguage('sk');
@@ -241,13 +240,13 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   }, [lang]);
 
   // Each page change reset
-  useEffect(() => {
+  useCustomEffect(() => {
     setShowNavbar(false);
     setShowSearchBar(false);
     setEditingEntryTitle('');
   }, [location.pathname]);
 
-  useEffect(() => {
+  useCustomEffect(() => {
     // handle resizeing window and set height/width
     const handleResize = () => {
       const newWidth: number = window.innerWidth;
@@ -301,6 +300,8 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         logoLight,
         editingEntryTitle,
         setEditingEntryTitle,
+        feedParents,
+        setFeedParents,
         STUColor: (colors as { STUColor: string }).STUColor,
       }}
     >

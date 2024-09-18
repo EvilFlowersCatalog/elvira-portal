@@ -3,7 +3,7 @@ import { CircleLoader } from 'react-spinners';
 import { RiArrowRightDoubleFill } from 'react-icons/ri';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import { IEntryDetail } from '../../../utils/interfaces/entry';
@@ -29,6 +29,9 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const [entryId, setEntryId] = useState<string | null>(null);
   const [update, setUpdate] = useState<boolean>(false);
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
+
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const getEntryDetail = useGetEntryDetail();
   const addToShelf = useAddToShelf();
@@ -80,6 +83,20 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     }
   };
 
+  const handleParamClick = (name: string, value: string) => {
+    if (location.pathname === NAVIGATION_PATHS.library) {
+      searchParams.set(name, value);
+      setSearchParams(searchParams);
+    } else {
+      const params = new URLSearchParams();
+      params.set(name, value);
+      navigate({
+        pathname: NAVIGATION_PATHS.library,
+        search: params.toString(),
+      });
+    }
+  };
+
   useEffect(() => {
     const paramEntryId = searchParams.get('entry-detail-id');
     setEntryId(paramEntryId);
@@ -100,11 +117,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       }
     })();
   }, [entryId, update]);
-
-  const setParam = (name: string, value: string) => {
-    searchParams.set(name, value);
-    setSearchParams(searchParams);
-  };
 
   return (
     <div
@@ -224,7 +236,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                   className={
                     'px-2 py-1 border border-darkGray text-white border-opacity-0 bg-STUColor hover:bg-opacity-50 rounded-md duration-200'
                   }
-                  onClick={() => setParam('feed-id', feed.id)}
+                  onClick={() => handleParamClick('feed-id', feed.id)}
                 >
                   {feed.title}
                 </button>
@@ -247,7 +259,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                   className={
                     'px-2 py-1 border border-darkGray text-white border-opacity-0 bg-STUColor hover:bg-opacity-50 rounded-md duration-200'
                   }
-                  onClick={() => setParam('category-id', category.id)}
+                  onClick={() => handleParamClick('category-id', category.id)}
                 >
                   {category.term}
                 </button>

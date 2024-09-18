@@ -1,7 +1,7 @@
 import { Checkbox } from '@mui/material';
 import { ChangeEvent } from 'react';
 import { IoHelpCircleOutline } from 'react-icons/io5';
-import useAppContext from '../../../hooks/contexts/useAppContext';
+import useAppContext from '../../../../hooks/contexts/useAppContext';
 
 interface IConfigItemProps {
   name: string;

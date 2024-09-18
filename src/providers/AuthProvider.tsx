@@ -42,6 +42,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
   const [auth, setAuth] = useState<IAuth | null>(
     cookies[COOKIES_TYPE.AUTH_KEY] ?? null
   );
+  const [check, setCheck] = useState<boolean>(true);
   const logoutChannel = new BroadcastChannel(BROADCAST_MESSAGE);
 
   const verifyCredentials = useVerifyCredentials();
@@ -116,7 +117,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
         toast.info(t('notifications.logout'));
       }
     }
-  }, [auth]);
+  }, [auth, check]);
 
   const logout = () => {
     // Cancel all ongoing requests
@@ -125,6 +126,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
     // Reset the cancel token source
     cancelTokenSource.current = axios.CancelToken.source();
     setAuth(null); // set to null
+    setCheck((prev) => !prev); // if auth was already null
   };
 
   return (

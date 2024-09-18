@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
-import { IEntry } from '../../utils/interfaces/entry';
+import { IEntry } from '../../../utils/interfaces/entry';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import useGetEntries from '../../hooks/api/entries/useGetEntries';
-import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
+import useGetEntries from '../../../hooks/api/entries/useGetEntries';
+import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import { MdAdd } from 'react-icons/md';
-import useAppContext from '../../hooks/contexts/useAppContext';
-import ItemContainer from '../../components/items/container/ItemContainer';
-import AdminEntry from '../../components/items/entry/admin/AdminEntry';
-import EntryBoxLoading from '../../components/items/entry/loading/EntryBoxLoading';
+import useAppContext from '../../../hooks/contexts/useAppContext';
+import ItemContainer from '../../../components/items/container/ItemContainer';
+import AdminEntry from '../../../components/items/entry/admin/AdminEntry';
+import EntryBoxLoading from '../../../components/items/entry/loading/EntryBoxLoading';
 
 const AdminEntries = () => {
   const { showSearchBar } = useAppContext();
@@ -61,6 +61,7 @@ const AdminEntries = () => {
   const reload = () => {
     setEntries([]);
     setPage(0);
+    setIsLoading(true);
   };
 
   return (

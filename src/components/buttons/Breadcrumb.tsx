@@ -9,7 +9,8 @@ import { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 
 const Breadcrumb = () => {
-  const { specialNavigation, lang, editingEntryTitle } = useAppContext();
+  const { specialNavigation, lang, editingEntryTitle, feedParents } =
+    useAppContext();
   const [breadcrumbs, setBreadcrumbs] = useState<
     { path: string; label: string }[]
   >([]);
@@ -59,15 +60,19 @@ const Breadcrumb = () => {
     });
 
     // if there is parent feed in feed page
-    const feedParent = searchParams.get('parent-id');
-    if (feedParent)
-      newBreadcrumbs.push({
-        path: '',
-        label: isEn() ? 'Sub Feeds' : 'Pod Skupiny',
-      });
+    if (feedParents.length > 0) {
+      feedParents.map((feed, index) => {
+        const part = index === 0 ? `?parent-id=${feed.id}` : `&${feed.id}`;
+        const path = pathParts.join('/') + part;
 
+        newBreadcrumbs.push({
+          path,
+          label: feed.title,
+        });
+      });
+    }
     setBreadcrumbs(newBreadcrumbs);
-  }, [location, lang, editingEntryTitle]);
+  }, [location, lang, editingEntryTitle, feedParents]);
 
   return (
     <div className='flex gap-3 flex-wrap items-center p-4 pl-5'>

@@ -105,7 +105,14 @@ const Navbar = () => {
     <div className='flex flex-col gap-2 w-64 h-full bg-zinc-100 dark:bg-darkGray p-4 overflow-auto'>
       {/* Logos */}
       <div className='flex mb-5 justify-between items-center'>
-        <button onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.home)}>
+        <button
+          className={auth ? 'cursor-pointer' : 'cursor-default'}
+          onClick={
+            auth
+              ? (e) => specialNavigation(e, NAVIGATION_PATHS.home)
+              : undefined
+          }
+        >
           <img
             className={`h-auto ${isSmallDevice ? 'w-36' : 'w-full'}`}
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
@@ -204,20 +211,20 @@ const Navbar = () => {
       <div className='flex flex-col items-start'>
         <h1 className='font-bold'>{t('navbarMenu.settings')}</h1>
         <NavbarButton
-          name={isDark() ? t('navbarMenu.darkMode') : t('navbarMenu.lightMode')}
+          name={isDark() ? t('navbarMenu.lightMode') : t('navbarMenu.darkMode')}
           path=''
           onClick={() => switchTheme()}
           icon={
             isDark() ? (
-              <IoMoonOutline size={23} />
-            ) : (
               <IoSunnyOutline size={23} />
+            ) : (
+              <IoMoonOutline size={23} />
             )
           }
           isActive={false}
         />
         <NavbarButton
-          name={lang === LANG_TYPE.sk ? 'SK' : 'EN'}
+          name={lang === LANG_TYPE.sk ? 'EN' : 'SK'}
           onClick={() => switchLang()}
           path=''
           icon={<HiOutlineLanguage size={23} />}

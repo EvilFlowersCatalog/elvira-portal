@@ -18,7 +18,13 @@ const Feed = ({ feed }: IFeedParams) => {
     if (feed.kind === 'navigation') {
       const params = new URLSearchParams(searchParams);
       params.delete('title');
-      params.set('parent-id', feed.id);
+      const previous = params.get('parent-id');
+
+      let path = '';
+      if (previous) path = previous + '&' + feed.id;
+      else path = feed.id;
+
+      params.set('parent-id', path);
       setSearchParams(params);
     } else {
       const params = new URLSearchParams();
@@ -33,7 +39,7 @@ const Feed = ({ feed }: IFeedParams) => {
   return (
     <div className={'relative flex p-2 w-full md:w-1/2 xl:w-1/4'}>
       <button
-        className={`p-5 py-10 gap-5 w-full flex text-center justify-between items-center bg-STUColor text-white rounded-md duration-200`}
+        className={`p-5 py-10 gap-5 w-full h-full flex text-center justify-between items-center bg-STUColor text-white rounded-md duration-200`}
         onClick={setParent}
         onMouseEnter={() => setIsHovering(true)}
         onMouseOut={() => setIsHovering(false)}
@@ -67,7 +73,5 @@ const Feed = ({ feed }: IFeedParams) => {
     </div>
   );
 };
-
-//feed.kind === 'navigation'
 
 export default Feed;

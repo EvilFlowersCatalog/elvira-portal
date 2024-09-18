@@ -1,10 +1,10 @@
 {
   "name": "elvira-client",
   "private": true,
-  "version": "3.1.0",
+  "version": "3.1.1",
   "type": "module",
   "scripts": {
-    "start": "vite --mode loc",
+    "start": "vite",
     "build:dev": "tsc && vite build --mode development",
     "build:prod": "tsc && vite build",
     "preview": "vite preview",
@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "@types/jwt-encode": "^1.0.3",
+    "@types/node": "^22.5.5",
     "@types/react": "^18.2.56",
     "@types/react-dom": "^18.2.19",
     "@types/react-gravatar": "^2.6.14",

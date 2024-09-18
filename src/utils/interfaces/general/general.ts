@@ -78,3 +78,8 @@ export interface IWizardParams {
   stepIndex: number;
   setStepIndex: (stepIndex: number) => void;
 }
+
+export interface IPartParams {
+  entry: IEntryNewForm;
+  setEntry: (entry: IEntryNewForm) => void;
+}

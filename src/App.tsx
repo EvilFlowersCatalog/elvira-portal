@@ -22,29 +22,20 @@ const App = () => {
     );
   };
 
-  // Scripts for analysis
+  // Scripts for analytics
   useCustomEffect(() => {
     // Development
-    if (import.meta.env.ELVIRA_DEV === 'true') {
-      const script = document.createElement('script');
-      script.async = true;
-      script.src = 'https://analytics.elvira.fiit.stuba.sk/script.js';
-      script.setAttribute(
-        'data-website-id',
-        'afe12559-da42-4f71-99f0-18fffc15ba67'
-      );
-      document.head.appendChild(script);
-    }
-    // Production
-    else if (import.meta.env.ELVIRA_PROD === 'true') {
-      const script = document.createElement('script');
-      script.async = true;
-      script.src = 'https://analytics.elvira.fiit.stuba.sk/script.js';
-      script.setAttribute(
-        'data-website-id',
-        '2fb837fb-1927-404a-8154-32df4945927c'
-      );
-      document.head.appendChild(script);
+    const UMAMI_SERVER = import.meta.env.ELVIRA_UMAMI_SERVER;
+    const UMAMI_WEBSITE = import.meta.env.ELVIRA_UMAMI_WEBSITE;
+
+    if (UMAMI_SERVER && UMAMI_WEBSITE) {
+      if (import.meta.env.ELVIRA_DEV === 'true') {
+        const script = document.createElement('script');
+        script.defer = true;
+        script.setAttribute('src', `${UMAMI_SERVER}/script.js`);
+        script.setAttribute('data-website-id', UMAMI_WEBSITE);
+        document.head.appendChild(script);
+      }
     }
   }, []);
 

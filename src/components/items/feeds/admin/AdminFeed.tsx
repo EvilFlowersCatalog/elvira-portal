@@ -45,7 +45,13 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
     if (isNavigationFeed()) {
       const params = new URLSearchParams(searchParams);
       params.delete('title');
-      params.set('parent-id', feed.id);
+      const previous = params.get('parent-id');
+
+      let path = '';
+      if (previous) path = previous + '&' + feed.id;
+      else path = feed.id;
+
+      params.set('parent-id', path);
       setSearchParams(params);
     }
   };
@@ -58,7 +64,7 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
         }
       >
         <button
-          className={`p-5 py-10 gap-5 w-full flex text-center justify-between items-center bg-STUColor text-white rounded-t-md ${
+          className={`p-5 py-10 gap-5 w-full h-full flex text-center justify-between items-center bg-STUColor text-white rounded-t-md ${
             isNavigationFeed() ? '' : 'cursor-default'
           }`}
           onClick={setParent}
