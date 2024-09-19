@@ -1,37 +1,43 @@
 stages:
+  - dependencies
   - build
   - deploy
 
-build:
-  stage: build
+install dependencies:
+  stage: dependencies
   image: node:22
   script:
     - npm i --save-dev
-    - npm run build:dev
   artifacts:
-    name: "$ENVIRONMENT-$CI_COMMIT_SHORT_SHA"
-    expire_in: 15 minute
     paths:
-      - dist/
-  environment:
-    name: ${ENVIRONMENT}
+      - node_modules
   only:
     - dev
-    - master
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
-      variables:
-        - ENVIRONMENT: ["elvira.fiit.stuba.sk"]
-    - if: '$CI_COMMIT_REF_NAME == "develop"'
-      variables:
-        - ENVIRONMENT: ["dev.elvira.fiit.stuba.sk"]
+
+build dev:
+  stage: build
+  image: node:22
+  script:
+    - mkdir -p _build
+    - npm run build:prod
+    - mv dist _build/$ENVIRONMENT
+  artifacts:
+    name: "$ENVIRONMENT-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - _build/$ENVIRONMENT
+  environment: $ENVIRONMENT
+  parallel:
+    matrix:
+      - ENVIRONMENT: [ fiit, fiit-dev, mtf, svf, fei ]
+  only:
+    - dev
 
 deploy:
   stage: deploy
   image: ghcr.io/backbonesk/node-deployer:master
   variables:
     GIT_STRATEGY: none
-    BUILD_DIR: dist/
+    BUILD_DIR: _build/$ENVIRONMENT
   script:
     - NODE_PATH=/usr/local/lib/node_modules node /opt/node-deployer/deploy.js
   environment:
@@ -39,11 +45,3 @@ deploy:
     url: https://elvira-dev.fiit.stuba.sk/
   only:
     - dev
-    - master
-  rules:
-    - if: '$CI_COMMIT_REF_NAME == "master"'
-      variables:
-        - ENVIRONMENT: ["elvira.fiit.stuba.sk"]
-    - if: '$CI_COMMIT_REF_NAME == "develop"'
-      variables:
-        - ENVIRONMENT: ["dev.elvira.fiit.stuba.sk"]
