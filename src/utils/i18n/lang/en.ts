@@ -224,6 +224,7 @@ export const en = {
           pdf: 'PDF file is required. You must insert an PDF before proceeding.',
         },
         next: 'Next',
+        new: 'Create new',
         upload: 'Upload',
         edit: 'Edit',
         previous: 'Previous',

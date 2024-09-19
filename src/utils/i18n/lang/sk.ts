@@ -217,6 +217,7 @@ export const sk = {
           pdf: 'PDF súbor je povinný. Pred pokračovaním musíte vložiť PDF súbor.',
         },
         next: 'Ďaľší',
+        new: 'Vytvoriť nový',
         upload: 'Uložiť',
         edit: 'Upraviť',
         previous: 'Predošlý',

@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.1.2 : TBD
+
+- **Added**: Possibility to create feed/category in entry add/edit
+
 ## 3.1.1 : 2024-08-09
 
 - **Added**: New analytics

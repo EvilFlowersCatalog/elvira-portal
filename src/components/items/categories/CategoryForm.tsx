@@ -10,8 +10,8 @@ import ElviraInput from '../../inputs/ElviraInput';
 interface ICategoryFormParam {
   category?: ICategory | null;
   setOpen: (open: boolean) => void;
-  reloadPage: boolean;
-  setReloadPage: (reloadPage: boolean) => void;
+  reloadPage?: boolean;
+  setReloadPage?: (reloadPage: boolean) => void;
 }
 
 const CategoryForm = ({
@@ -71,7 +71,7 @@ const CategoryForm = ({
         toast.success(t('notifications.category.add.success'));
       }
 
-      setReloadPage(!reloadPage); // trigger refresh
+      setReloadPage && setReloadPage(!reloadPage); // trigger refresh
     } catch {
       if (category) toast.error(t('notifications.category.edit.error'));
       else toast.error(t('notifications.category.add.error'));

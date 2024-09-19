@@ -170,8 +170,8 @@ const AdditionalDataPart = ({
             placeholder={t('entry.wizard.publisher')}
             value={entry.publisher ?? ''}
           />
-          <div className='flex flex-col gap-4'>
-            <span>{t('entry.wizard.year')}</span>
+          <div className='flex flex-col'>
+            <span className='text-STUColor pl-1'>{t('entry.wizard.year')}</span>
             <div className='w-fit flex gap-4'>
               <ElviraSelect
                 name='date-year'

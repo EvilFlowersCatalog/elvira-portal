@@ -13,12 +13,13 @@ import { toast } from 'react-toastify';
 import ModalWrapper from '../../../../components/modal/ModalWrapper';
 import ElviraInput from '../../../../components/inputs/ElviraInput';
 import { CircleLoader } from 'react-spinners';
+import ElviraSelect from '../../../inputs/ElviraSelect';
 
 interface IFeedForm {
   setOpen: (open: boolean) => void;
   feedId?: string | null;
-  reloadPage: boolean;
-  setReloadPage: (reloadPage: boolean) => void;
+  reloadPage?: boolean;
+  setReloadPage?: (reloadPage: boolean) => void;
 }
 const FeedForm = ({
   setOpen,
@@ -128,7 +129,7 @@ const FeedForm = ({
         toast.success(t('notifications.feed.add.success'));
       }
 
-      setReloadPage(!reloadPage); // trigger refresh
+      setReloadPage && setReloadPage(!reloadPage); // trigger refresh
     } catch {
       if (feedId) toast.error(t('notifications.feed.edit.error'));
       else toast.error(t('notifications.feed.add.error'));
@@ -170,20 +171,22 @@ const FeedForm = ({
         />
         {/* Kind */}
         <div className='flex w-full flex-col text-left'>
-          <label htmlFor='selection-kind' className='text-sm pl-1'>
+          <label
+            htmlFor='selection-kind'
+            className='text-sm pl-1 text-STUColor'
+          >
             {t('modal.feedForm.kind')}
           </label>
-          <select
-            id='selection-kind'
-            defaultValue='acquistion'
-            className='w-full rounded-md outline-none bg-transparent mt-2 cursor-pointer border p-2'
+          <ElviraSelect
+            name='selection-kind'
+            value={form.kind}
             onChange={handleKindChange}
           >
             <option value='acquisition'>
               {t('modal.feedForm.acquistion')}
             </option>
             <option value='navigation'>{t('modal.feedForm.navigation')}</option>
-          </select>
+          </ElviraSelect>
         </div>
         {/* Parent */}
         {isLoading ? (
@@ -192,13 +195,15 @@ const FeedForm = ({
           </div>
         ) : (
           <div className='flex w-full flex-col text-left cursor-pointer'>
-            <label htmlFor='selection-parent' className='text-sm pl-1'>
+            <label
+              htmlFor='selection-parent'
+              className='text-sm pl-1 text-STUColor'
+            >
               {t('modal.feedForm.parent')}
             </label>
-            <select
-              id='selection-parent'
-              defaultValue={parentFeedId ? parentFeedId : 'none'}
-              className='w-full bg-transparent rounded-md outline-none mt-2 cursor-pointer border p-2'
+            <ElviraSelect
+              name='selection-parent'
+              value={parentFeedId ? parentFeedId : 'none'}
               onChange={handleParentChange}
             >
               <option value='none'>{t('modal.feedForm.none')}</option>
@@ -208,7 +213,7 @@ const FeedForm = ({
                     {feed.title}
                   </option>
                 ))}
-            </select>
+            </ElviraSelect>
           </div>
         )}
         <button ref={buttonRef} type='submit' className='hidden'></button>

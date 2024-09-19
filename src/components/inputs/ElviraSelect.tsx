@@ -16,7 +16,7 @@ const ElviraSelect = ({
   return (
     <select
       name={name}
-      className='bg-transparent outline-none'
+      className='bg-transparent outline-none p-2 pl-0'
       value={value}
       onChange={onChange}
     >
