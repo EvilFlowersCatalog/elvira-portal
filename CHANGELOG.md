@@ -3,6 +3,7 @@
 ## 3.1.2 : TBD
 
 - **Added**: Possibility to create feed/category in entry add/edit
+- **Added**: Possibility for multiple parents for feed
 
 ## 3.1.1 : 2024-08-09
 

@@ -1,10 +1,9 @@
 import { ChangeEvent, FormEvent, useRef, useState } from 'react';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
 import { useTranslation } from 'react-i18next';
-import { IFeedNew, IFeedsList } from '../../../../utils/interfaces/feed';
+import { IFeedNew } from '../../../../utils/interfaces/feed';
 import { uuid } from '../../../../utils/func/functions';
 import { useSearchParams } from 'react-router-dom';
-import useGetFeeds from '../../../../hooks/api/feeds/useGetFeeds';
 import useUploadFeed from '../../../../hooks/api/feeds/useUploadFeed';
 import useEditFeed from '../../../../hooks/api/feeds/useEditFeed';
 import useGetFeedDetail from '../../../../hooks/api/feeds/useGetFeedDetail';
@@ -14,6 +13,8 @@ import ModalWrapper from '../../../../components/modal/ModalWrapper';
 import ElviraInput from '../../../../components/inputs/ElviraInput';
 import { CircleLoader } from 'react-spinners';
 import ElviraSelect from '../../../inputs/ElviraSelect';
+import FeedAutofill from '../../../autofills/FeedAutofill';
+import { MdRemoveCircle } from 'react-icons/md';
 
 interface IFeedForm {
   setOpen: (open: boolean) => void;
@@ -27,7 +28,6 @@ const FeedForm = ({
   reloadPage,
   setReloadPage,
 }: IFeedForm) => {
-  const { STUColor } = useAppContext();
   const { t } = useTranslation();
   const [form, setForm] = useState<IFeedNew>({
     catalog_id: import.meta.env.ELVIRA_CATALOG_ID,
@@ -36,13 +36,12 @@ const FeedForm = ({
     content: '',
     kind: 'acquisition',
   });
-  const [feeds, setFeeds] = useState<IFeedsList | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [parentFeedId, setParentFeedId] = useState<string>('');
   const [searchParams] = useSearchParams();
   const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const [parentFeeds, setParentFeeds] = useState<{
+    feeds: { title: string; id: string }[];
+  }>({ feeds: [] });
 
-  const getFeeds = useGetFeeds();
   const uploadFeed = useUploadFeed();
   const editFeed = useEditFeed();
   const getFeedDetail = useGetFeedDetail();
@@ -70,49 +69,45 @@ const FeedForm = ({
       kind: e.target.value,
     }));
   };
-  // set parent
-  const handleParentChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    setForm((prevForm) => ({
-      ...prevForm, // Preserve existing properties of feedForm
-      parents: e.target.value === 'none' ? [] : [e.target.value],
+
+  // set parent feed
+  useCustomEffect(() => {
+    setForm((prev) => ({
+      ...prev,
+      parents: parentFeeds.feeds.map((feed) => feed.id),
     }));
-  };
+  }, [parentFeeds]);
 
   useCustomEffect(() => {
     const parentId = searchParams.get('parent-id') ?? '';
     if (parentId) {
-      setParentFeedId(parentId);
-      setForm((prevForm) => ({
-        ...prevForm,
-        parents: [parentId],
-      }));
+      (async () => {
+        try {
+          const { response } = await getFeedDetail(parentId);
+          setParentFeeds({
+            feeds: [{ id: response.id, title: response.title }],
+          });
+        } catch {
+          setParentFeeds({ feeds: [] });
+        }
+      })();
     }
 
     try {
-      (async () => {
-        setIsLoading(true);
-        const parentFeeds = await getFeeds({
-          paginate: false,
-          parentId: 'null',
-        });
-        setFeeds(parentFeeds);
-        setIsLoading(false);
-      })();
+      if (feedId) {
+        (async () => {
+          const { response } = await getFeedDetail(feedId);
 
-      const loadFeedDetail = async () => {
-        const { response } = await getFeedDetail(feedId!);
-
-        setForm({
-          catalog_id: response.catalog_id,
-          url_name: response.url_name,
-          title: response.title,
-          content: response.content,
-          parents: response.parents,
-          kind: response.kind,
-        });
-      };
-
-      if (feedId) loadFeedDetail();
+          setForm({
+            catalog_id: response.catalog_id,
+            url_name: response.url_name,
+            title: response.title,
+            content: response.content,
+            parents: response.parents,
+            kind: response.kind,
+          });
+        })();
+      }
     } catch {
       setOpen(false);
     }
@@ -151,7 +146,7 @@ const FeedForm = ({
     >
       <form
         onSubmit={handleSubmit}
-        className='w-full h-full flex flex-col gap-5 items-start justify-start'
+        className='w-full h-full min-h-80 flex flex-col gap-5 items-start justify-start'
       >
         {/* Title */}
         <ElviraInput
@@ -161,6 +156,7 @@ const FeedForm = ({
           invalidMessage={t('modal.feedForm.requiredMessages.title')}
           required
         />
+
         {/* Content */}
         <ElviraInput
           onChange={handleContentChange}
@@ -169,6 +165,35 @@ const FeedForm = ({
           required
           invalidMessage={t('modal.feedForm.requiredMessages.content')}
         />
+
+        {/* Parent */}
+        <FeedAutofill
+          entryForm={parentFeeds}
+          setEntryForm={setParentFeeds}
+          placeholder='Parent feeds'
+          kind='navigation'
+        />
+        <div className={`flex flex-wrap w-full`}>
+          {parentFeeds.feeds.map((feed, index) => (
+            <div className='w-full md:w-1/2 lg:w-1/3 flex p-1' key={index}>
+              <button
+                type='button'
+                className='bg-STUColor p-2 text-sm hover:bg-red flex w-full gap-2 justify-between items-center text-white rounded-md'
+                onClick={() => {
+                  setParentFeeds((prev) => ({
+                    feeds: prev.feeds.filter(
+                      (prevFeed) => prevFeed.id !== feed.id
+                    ),
+                  }));
+                }}
+              >
+                {feed.title}
+                <MdRemoveCircle size={15} />
+              </button>
+            </div>
+          ))}
+        </div>
+
         {/* Kind */}
         <div className='flex w-full flex-col text-left'>
           <label
@@ -188,34 +213,6 @@ const FeedForm = ({
             <option value='navigation'>{t('modal.feedForm.navigation')}</option>
           </ElviraSelect>
         </div>
-        {/* Parent */}
-        {isLoading ? (
-          <div className='w-full flex justify-center'>
-            <CircleLoader color={STUColor} size={50} />
-          </div>
-        ) : (
-          <div className='flex w-full flex-col text-left cursor-pointer'>
-            <label
-              htmlFor='selection-parent'
-              className='text-sm pl-1 text-STUColor'
-            >
-              {t('modal.feedForm.parent')}
-            </label>
-            <ElviraSelect
-              name='selection-parent'
-              value={parentFeedId ? parentFeedId : 'none'}
-              onChange={handleParentChange}
-            >
-              <option value='none'>{t('modal.feedForm.none')}</option>
-              {feeds &&
-                feeds.items.map((feed, index) => (
-                  <option key={index} value={feed.id}>
-                    {feed.title}
-                  </option>
-                ))}
-            </ElviraSelect>
-          </div>
-        )}
         <button ref={buttonRef} type='submit' className='hidden'></button>
       </form>
     </ModalWrapper>

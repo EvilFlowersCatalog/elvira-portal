@@ -56,7 +56,7 @@ const ModalWrapper = ({
               <IoMdClose size={30} />
             </button>
           </div>
-          <div className='py-5 overflow-auto text-center justify-center items-center flex flex-1 flex-col'>
+          <div className='py-5 text-center justify-center items-center flex flex-1 flex-col'>
             {children}
           </div>
           <div className='flex justify-center'>

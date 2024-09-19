@@ -9,12 +9,16 @@ interface IFeedAutofillParams {
   entryForm: any;
   setEntryForm: (entryForm: any) => void;
   single?: boolean;
+  kind?: 'acquisition' | 'navigation';
+  placeholder?: string;
 }
 
 const FeedAutofill = ({
   entryForm,
   setEntryForm,
   single = false,
+  kind = 'acquisition',
+  placeholder,
 }: IFeedAutofillParams) => {
   const { t } = useTranslation();
 
@@ -30,7 +34,7 @@ const FeedAutofill = ({
       try {
         const { items } = await getFeeds({
           paginate: false,
-          kind: 'acquisition',
+          kind,
         });
         setFeeds(items);
       } catch {
@@ -95,7 +99,7 @@ const FeedAutofill = ({
         type='text'
         value={inputValue}
         onChange={handleInputChange}
-        placeholder={t('entry.wizard.feed')}
+        placeholder={placeholder ?? t('entry.wizard.feed')}
         invalidMessage={t('entry.wizard.requiredMessages.lang')}
         onFocus={() => {
           const filteredSuggestions = feeds.filter(
@@ -129,7 +133,7 @@ const FeedAutofill = ({
           {suggestions.map((feed, index) => (
             <li
               key={index}
-              className='bg-white dark:bg-gray hover:bg-zinc-200 dark:hover:bg-darkGray'
+              className='bg-white dark:bg-gray hover:bg-zinc-200 dark:hover:bg-darkGray text-left'
               onClick={() => handleSuggestionClick(feed)}
               style={{ padding: '5px', cursor: 'pointer' }}
             >
