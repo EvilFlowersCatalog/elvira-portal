@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { IEntry } from '../../utils/interfaces/entry';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import useCustomEffect from '../../hooks/useCustomEffect';
 import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import HomeHeader from '../../components/specific-page/home-page/HomeHeader';
 import SwiperContainer from '../../components/specific-page/home-page/swiper/SwiperContainer';
@@ -21,7 +20,7 @@ const Home = () => {
 
   const getEntries = useGetEntries();
 
-  useCustomEffect(() => {
+  useEffect(() => {
     (async () => {
       try {
         const { items: popular } = await getEntries({

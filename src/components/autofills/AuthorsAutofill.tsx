@@ -1,7 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IEntryNewForm } from '../../utils/interfaces/entry';
-import useCustomEffect from '../../hooks/useCustomEffect';
 import { IEntryAuthor } from '../../utils/interfaces/author';
 import ElviraInput from '../inputs/ElviraInput';
 
@@ -28,7 +27,7 @@ const AuthorsAutofill = ({
 
   const ref = useRef<HTMLInputElement>();
 
-  useCustomEffect(() => {
+  useEffect(() => {
     if (entryForm.authors) {
       if (type === 'name') {
         const author = entryForm.authors[index].name;

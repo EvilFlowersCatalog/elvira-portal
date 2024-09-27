@@ -7,7 +7,6 @@ import { useSearchParams } from 'react-router-dom';
 import useUploadFeed from '../../../../hooks/api/feeds/useUploadFeed';
 import useEditFeed from '../../../../hooks/api/feeds/useEditFeed';
 import useGetFeedDetail from '../../../../hooks/api/feeds/useGetFeedDetail';
-import useCustomEffect from '../../../../hooks/useCustomEffect';
 import { toast } from 'react-toastify';
 import ModalWrapper from '../../../../components/modal/ModalWrapper';
 import ElviraInput from '../../../../components/inputs/ElviraInput';
@@ -220,3 +219,9 @@ const FeedForm = ({
 };
 
 export default FeedForm;
+function useCustomEffect(
+  arg0: () => void,
+  arg1: { feeds: { title: string; id: string }[] }[]
+) {
+  throw new Error('Function not implemented.');
+}

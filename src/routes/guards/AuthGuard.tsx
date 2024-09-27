@@ -1,16 +1,15 @@
 import { Outlet } from 'react-router-dom';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useRefreshToken from '../../hooks/api/verify/useRefreshToken';
-import useCustomEffect from '../../hooks/useCustomEffect';
 
-const RequireAuth = () => {
+const AuthGuard = () => {
   const { auth, updateAuth, logout } = useAuthContext();
   const [verified, setVerified] = useState<boolean>(false);
 
   const refreshToken = useRefreshToken();
 
-  useCustomEffect(() => {
+  useEffect(() => {
     // Refresh token
     const refresh = async () => {
       try {
@@ -34,4 +33,4 @@ const RequireAuth = () => {
   return auth && verified && <Outlet />;
 };
 
-export default RequireAuth;
+export default AuthGuard;

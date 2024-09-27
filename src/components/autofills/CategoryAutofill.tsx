@@ -1,7 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { IEntryNewForm } from '../../utils/interfaces/entry';
-import useCustomEffect from '../../hooks/useCustomEffect';
 import { ICategory } from '../../utils/interfaces/category';
 import useGetCategories from '../../hooks/api/categories/useGetCategories';
 import ElviraInput from '../inputs/ElviraInput';
@@ -26,7 +24,7 @@ const CategoryAutofill = ({
 
   const getCategories = useGetCategories();
 
-  useCustomEffect(() => {
+  useEffect(() => {
     (async () => {
       try {
         const { items } = await getCategories({

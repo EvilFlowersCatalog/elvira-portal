@@ -7,7 +7,6 @@ import Feed from '../../components/items/feeds/Feed';
 import LoadNext from '../../components/items/loadings/LoadNext';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import useGetFeedDetail from '../../hooks/api/feeds/useGetFeedDetail';
-import useCustomEffect from '../../hooks/useCustomEffect';
 
 const Feeds = () => {
   const { feedParents, setFeedParents } = useAppContext();
@@ -26,7 +25,7 @@ const Feeds = () => {
   const getFeeds = useGetFeeds();
   const getFeedDetail = useGetFeedDetail();
 
-  useCustomEffect(() => {
+  useEffect(() => {
     const fp = searchParams.get('parent-id')?.split('&');
     setTmp([]);
 
@@ -50,7 +49,7 @@ const Feeds = () => {
     })();
   }, [location.search]);
 
-  useCustomEffect(() => {
+  useEffect(() => {
     setFeedParents(tmp);
   }, [tmp]);
 

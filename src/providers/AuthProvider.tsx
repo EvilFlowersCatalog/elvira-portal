@@ -19,7 +19,6 @@ import {
   NAVIGATION_PATHS,
 } from '../utils/interfaces/general/general';
 import useVerifyCredentials from '../hooks/api/verify/useVerifyCredentials';
-import useCustomEffect from '../hooks/useCustomEffect';
 import axios, { CancelTokenSource } from 'axios';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
 
@@ -100,7 +99,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
     }
   };
 
-  useCustomEffect(() => {
+  useEffect(() => {
     if (auth) {
       setCookie(COOKIES_TYPE.AUTH_KEY, auth, {
         maxAge: 60 * 60 * 24, // 1 day

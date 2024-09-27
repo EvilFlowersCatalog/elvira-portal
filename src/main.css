@@ -8,27 +8,28 @@
   box-sizing: border-box !important;
   padding: 0;
   margin: 0;
-  font-family: sans-serif !important;
   scrollbar-width: thin !important; /* For Firefox */
-  scrollbar-color: black transparent !important; /* For Firefox */
+  scrollbar-color: #555 transparent !important; /* For Firefox */
 }
 
 /* Custom Scrollbar for WebKit Browsers */
 ::-webkit-scrollbar {
   width: 2px !important;
 }
-
 ::-webkit-scrollbar-button {
   display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }
-
 ::-webkit-scrollbar-thumb {
-  background-color: black !important;
+  background-color: #888 !important;
   border-radius: 20px !important;
 }
-
 ::-webkit-scrollbar-track {
   background-color: transparent !important;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 /* Full-Height and Full-Width for Root Elements */
@@ -37,4 +38,20 @@ body,
 #root {
   height: 100vh !important;
   width: 100vw !important;
+}
+
+#loader div:nth-child(1) {
+  animation-delay: -0.32s;
+}
+#loader div:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+@layer components {
+  button:focus {
+    outline: none;
+  }
+  input:focus {
+    outline: none;
+  }
 }

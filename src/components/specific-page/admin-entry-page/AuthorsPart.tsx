@@ -2,9 +2,8 @@ import { IoMdAdd } from 'react-icons/io';
 import { IPartParams } from '../../../utils/interfaces/general/general';
 import { useTranslation } from 'react-i18next';
 import AuthorsAutofill from '../../autofills/AuthorsAutofill';
-import useCustomEffect from '../../../hooks/useCustomEffect';
 import useGetAuthors from '../../../hooks/api/authors/useGetAuthors';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IEntryAuthor } from '../../../utils/interfaces/author';
 import { IoRemoveCircle } from 'react-icons/io5';
 
@@ -16,7 +15,7 @@ const AuthorsPart = ({ entry, setEntry }: IPartParams) => {
   const getAuthors = useGetAuthors();
 
   // get authors
-  useCustomEffect(() => {
+  useEffect(() => {
     (async () => {
       try {
         const { items: a } = await getAuthors({ paginate: false });

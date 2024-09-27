@@ -9,7 +9,7 @@ import { THEME_TYPE } from '../../utils/interfaces/general/general';
 import { CircleLoader } from 'react-spinners';
 import ElviraInput from '../../components/inputs/ElviraInput';
 
-const Login = () => {
+const Auth = () => {
   const { login } = useAuthContext();
   const { STUColor, theme, titleLogoDark, titleLogoLight } = useAppContext();
   const { t } = useTranslation();
@@ -108,4 +108,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Auth;

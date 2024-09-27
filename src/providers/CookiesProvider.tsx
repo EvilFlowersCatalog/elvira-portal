@@ -3,7 +3,6 @@ import { useCookies } from 'react-cookie';
 import { CookieSetOptions } from 'universal-cookie';
 import { IContextProviderParams } from '../utils/interfaces/contexts';
 import { COOKIES_TYPE } from '../utils/interfaces/general/general';
-import useCustomEffect from '../hooks/useCustomEffect';
 
 export interface ICookieContext {
   cookies: any;

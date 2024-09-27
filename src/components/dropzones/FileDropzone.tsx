@@ -1,4 +1,4 @@
-import { useCallback, MouseEvent, useState } from 'react';
+import { useCallback, MouseEvent, useState, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { MdDelete, MdEdit } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
@@ -8,7 +8,6 @@ import useGetAcquisitions from '../../hooks/api/acquisitiions/useGetAcquisitions
 import { IAcquisition } from '../../utils/interfaces/acquisition';
 import useCreateEntryAcquistion from '../../hooks/api/acquisitiions/useCreateEntryAcquistion';
 import useRemoveAcquisition from '../../hooks/api/acquisitiions/useRemoveAcquisition';
-import useCustomEffect from '../../hooks/useCustomEffect';
 import PageLoading from '../page/PageLoading';
 import { uuid } from '../../utils/func/functions';
 
@@ -36,7 +35,7 @@ const FileDropzone = ({
   const createEntryAcquisition = useCreateEntryAcquistion();
   const removeAcquisition = useRemoveAcquisition();
 
-  useCustomEffect(() => {
+  useEffect(() => {
     if (entryId) {
       (async () => {
         try {

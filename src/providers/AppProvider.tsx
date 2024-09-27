@@ -1,4 +1,10 @@
-import { createContext, useState, MouseEvent, RefObject } from 'react';
+import {
+  createContext,
+  useState,
+  MouseEvent,
+  RefObject,
+  useEffect,
+} from 'react';
 import {
   COOKIES_TYPE,
   LANG_TYPE,
@@ -11,7 +17,6 @@ import { IContextProviderParams } from '../utils/interfaces/contexts';
 import tailwindConfig from '../../tailwind.config';
 import i18next from '../utils/i18n/i18next';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
-import useCustomEffect from '../hooks/useCustomEffect';
 
 export interface IAppContext {
   theme: THEME_TYPE;
@@ -62,22 +67,22 @@ export const AppContext = createContext<IAppContext | null>(null);
 
 // assets / LOGOS
 const logoDark = `/assets/${
-  import.meta.env.ELVIRA_ASSETS_DIR
+  import.meta.env.ELVIRA_FACULTY
 }/elvira/logo-dark.png`;
 const logoLight = `/assets/${
-  import.meta.env.ELVIRA_ASSETS_DIR
+  import.meta.env.ELVIRA_FACULTY
 }/elvira/logo-light.png`;
 const titleLogoDark = `/assets/${
-  import.meta.env.ELVIRA_ASSETS_DIR
+  import.meta.env.ELVIRA_FACULTY
 }/elvira/title-logo-dark.png`;
 const titleLogoLight = `/assets/${
-  import.meta.env.ELVIRA_ASSETS_DIR
+  import.meta.env.ELVIRA_FACULTY
 }/elvira/title-logo-light.png`;
 const stuLogoDark = `/assets/${
-  import.meta.env.ELVIRA_ASSETS_DIR
+  import.meta.env.ELVIRA_FACULTY
 }/stu/logo-dark.png`;
 const stuLogoLight = `/assets/${
-  import.meta.env.ELVIRA_ASSETS_DIR
+  import.meta.env.ELVIRA_FACULTY
 }/stu/logo-light.png`;
 
 const AppProvider = ({ children }: IContextProviderParams) => {
@@ -223,12 +228,12 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     }
   };
 
-  useCustomEffect(() => {
+  useEffect(() => {
     document.body.classList.remove('light', 'dark');
     document.body.classList.add(theme);
   }, [theme]);
 
-  useCustomEffect(() => {
+  useEffect(() => {
     // Set languege based on given language
     if (lang === LANG_TYPE.sk) {
       i18next.changeLanguage('sk');
@@ -240,13 +245,13 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   }, [lang]);
 
   // Each page change reset
-  useCustomEffect(() => {
+  useEffect(() => {
     setShowNavbar(false);
     setShowSearchBar(false);
     setEditingEntryTitle('');
   }, [location.pathname]);
 
-  useCustomEffect(() => {
+  useEffect(() => {
     // handle resizeing window and set height/width
     const handleResize = () => {
       const newWidth: number = window.innerWidth;

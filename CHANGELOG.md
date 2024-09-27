@@ -4,6 +4,10 @@
 
 - **Added**: Possibility to create feed/category in entry add/edit
 - **Added**: Possibility for multiple parents for feed
+- **Added**: Few base styles
+- **Changed**: `Required Auth/Admin` to `Auth/Admin Guard`
+- **Changed**: `Login.tsx` to `Auth.tsx`
+- **Removed**: useCustomEffect
 
 ## 3.1.1 : 2024-08-09
 

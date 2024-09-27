@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ILanguage } from '../../utils/interfaces/language';
 import { useTranslation } from 'react-i18next';
 import { IEntryNewForm } from '../../utils/interfaces/entry';
-import useCustomEffect from '../../hooks/useCustomEffect';
 import ElviraInput from '../inputs/ElviraInput';
 
 export const languages: ILanguage[] = [
@@ -43,7 +42,7 @@ const LanguageAutofill = ({
   const [suggestions, setSuggestions] = useState<ILanguage[]>([]);
   const [isHovering, setIsHovering] = useState<boolean>(false);
 
-  useCustomEffect(() => {
+  useEffect(() => {
     if (entryForm.language_code) {
       const lang = languages.filter(
         (l) =>

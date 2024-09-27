@@ -1,8 +1,7 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import Breadcrumb from '../../../components/buttons/Breadcrumb';
-import useCustomEffect from '../../../hooks/useCustomEffect';
 import useGetEntryDetail from '../../../hooks/api/entries/useGetEntryDetail';
-import { ChangeEvent, FormEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { IEntryNew, IEntryNewForm } from '../../../utils/interfaces/entry';
 import PageLoading from '../../../components/page/PageLoading';
 import { useTranslation } from 'react-i18next';
@@ -35,7 +34,7 @@ const AdminEditEntry = () => {
   const navigate = useNavigate();
   const editEntry = useEditEntry();
 
-  useCustomEffect(() => {
+  useEffect(() => {
     try {
       (async () => {
         setIsLoading(true);

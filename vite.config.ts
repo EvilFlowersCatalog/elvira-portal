@@ -7,4 +7,7 @@ export default defineConfig({
   clearScreen: false,
   envPrefix: 'ELVIRA_',
   envDir: 'env',
+  server: {
+    port: 3000,
+  },
 });

@@ -1,17 +1,16 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import useVerifyAdmin from '../../hooks/api/verify/useVerifyAdmin';
-import useCustomEffect from '../../hooks/useCustomEffect';
 
-const RequireAdmin = () => {
+const AdminGuard = () => {
   const { auth, updateAuth, logout } = useAuthContext();
   const verifyAdmin = useVerifyAdmin();
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const [verified, setVerified] = useState<boolean>(false);
 
-  useCustomEffect(() => {
+  useEffect(() => {
     // If user is not admin but he tries urls, just ignore it
     if (auth?.isSuperUser) {
       // Verify admin
@@ -43,4 +42,4 @@ const RequireAdmin = () => {
   );
 };
 
-export default RequireAdmin;
+export default AdminGuard;

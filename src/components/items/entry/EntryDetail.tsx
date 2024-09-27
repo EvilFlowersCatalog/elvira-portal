@@ -11,7 +11,6 @@ import useGetEntryDetail from '../../../hooks/api/entries/useGetEntryDetail';
 import useAddToShelf from '../../../hooks/api/my-shelf/useAddToShelf';
 import useRemoveFromShelf from '../../../hooks/api/my-shelf/useRemoveFromShelf';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
-import useCustomEffect from '../../../hooks/useCustomEffect';
 import Button from '../../buttons/Button';
 import ShelfButton from '../../buttons/ShelfButton';
 import PDFButtons from '../../buttons/PDFButtons';
@@ -103,7 +102,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   }, [searchParams]);
 
   // If entryId is changed
-  useCustomEffect(() => {
+  useEffect(() => {
     // Reset
     setEntry(null);
     if (!entryId) return;

@@ -1,6 +1,6 @@
+import { useEffect } from 'react';
 import useAuth from '../contexts/useAuthContext';
 import axios from 'axios';
-import useCustomEffect from '../useCustomEffect';
 
 // Used in login
 export const baseAxios = axios.create({
@@ -12,7 +12,7 @@ export const baseAxios = axios.create({
 const useAxios = () => {
   const { auth, logout, cancelTokenSource } = useAuth();
 
-  useCustomEffect(() => {
+  useEffect(() => {
     // Setting request interceptor
     const requestIntercept = baseAxios.interceptors.request.use(
       (config) => {

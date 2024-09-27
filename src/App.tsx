@@ -5,9 +5,9 @@ import NavbarContainer from './components/header/navbar/NavbarContainer';
 import Header from './components/header/Header';
 import useAppContext from './hooks/contexts/useAppContext';
 import SearchBarContainer from './components/search-bar/SearchBarContainer';
-import useCustomEffect from './hooks/useCustomEffect';
 import useCookiesContext from './hooks/contexts/useCookiesContext';
 import CookiesInformation from './components/dialogs/CookiesInformation';
+import { useEffect } from 'react';
 
 const App = () => {
   const { isSmallDevice } = useAppContext();
@@ -23,7 +23,7 @@ const App = () => {
   };
 
   // Scripts for analytics
-  useCustomEffect(() => {
+  useEffect(() => {
     // Development
     const UMAMI_SERVER = import.meta.env.ELVIRA_UMAMI_SERVER;
     const UMAMI_WEBSITE = import.meta.env.ELVIRA_UMAMI_WEBSITE;
@@ -42,18 +42,17 @@ const App = () => {
   return (
     <>
       {/* COOKIE */}
+      <ToastContainer
+        position='top-right'
+        autoClose={2500}
+        pauseOnHover={false}
+        theme={'dark'}
+      />
       {!informed && <CookiesInformation />}
       <div className='min-h-screen h-screen flex w-screen bg-white dark:bg-gray text-black dark:text-white overflow-hidden'>
         <div
           className={`flex flex-col lg:flex-row w-full h-full overflow-hidden`}
         >
-          <ToastContainer
-            position='top-right'
-            autoClose={2500}
-            pauseOnHover={false}
-            theme={'dark'}
-          />
-
           {show() && (
             <>
               <NavbarContainer />

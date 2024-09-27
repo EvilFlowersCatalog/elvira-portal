@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useCustomEffect from '../../hooks/useCustomEffect';
 import { IFeed } from '../../utils/interfaces/feed';
 import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
 import ElviraInput from '../inputs/ElviraInput';
@@ -29,7 +28,7 @@ const FeedAutofill = ({
 
   const getFeeds = useGetFeeds();
 
-  useCustomEffect(() => {
+  useEffect(() => {
     (async () => {
       try {
         const { items } = await getFeeds({

@@ -44,7 +44,7 @@ const About = () => {
   ];
 
   return (
-    <div className='flex w-full flex-col'>
+    <div className='flex w-full flex-col overflow-x-hidden'>
       <Breadcrumb />
       <div className='flex flex-col w-full p-4 justify-start items-center text-center'>
         <img

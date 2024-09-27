@@ -1,6 +1,6 @@
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   IUserAcquisition,
   IUserAcquisitionShare,
@@ -17,7 +17,6 @@ import { renderViewer } from '@evilflowers/evilflowersviewer';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { toast } from 'react-toastify';
 import { updateMetaTag } from '../../utils/func/functions';
-import useCustomEffect from '../../hooks/useCustomEffect';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import useGetAnotations from '../../hooks/api/anotations/useGetAnotations';
 import useGetAnotationItem from '../../hooks/api/anotations/anotation-items/useGetAnotationItem';
@@ -175,7 +174,7 @@ const Viewer = () => {
     }
   };
 
-  useCustomEffect(() => {
+  useEffect(() => {
     if (!id) return;
 
     (async () => {
@@ -293,7 +292,7 @@ const Viewer = () => {
   }, [id]);
 
   // If everything loaded set to false
-  useCustomEffect(() => {
+  useEffect(() => {
     if (progressBar === 100) {
       setTimeout(() => setLoading(false), 500);
     }

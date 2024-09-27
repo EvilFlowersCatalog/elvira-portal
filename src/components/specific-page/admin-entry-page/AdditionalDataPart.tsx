@@ -5,8 +5,7 @@ import ImageDropzone from '../../dropzones/ImageDropzone';
 import ElviraInput from '../../inputs/ElviraInput';
 import LanguageAutofill from '../../autofills/LanguageAutofill';
 import ElviraSelect from '../../inputs/ElviraSelect';
-import { ChangeEvent, useState } from 'react';
-import useCustomEffect from '../../../hooks/useCustomEffect';
+import { ChangeEvent, useEffect, useState } from 'react';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
 
 interface IAdditionalDataPartParams extends IPartParams {
@@ -31,7 +30,7 @@ const AdditionalDataPart = ({
   const [selectedDay, setSelectedDay] = useState<string>('DD');
 
   // set image
-  useCustomEffect(() => {
+  useEffect(() => {
     (async () => {
       if (entry.thumbnail) {
         try {
@@ -51,7 +50,7 @@ const AdditionalDataPart = ({
   }, []);
 
   // set date values
-  useCustomEffect(() => {
+  useEffect(() => {
     if (entry.published_at) {
       const [y, m, d] = entry.published_at.split('-');
       if (y) setSelectedYear(y);
@@ -61,7 +60,7 @@ const AdditionalDataPart = ({
   }, []);
 
   // when month change change possible day (30;31;28/29)
-  useCustomEffect(() => {
+  useEffect(() => {
     if (selectedMonth !== 'MM') {
       if (['1', '3', '5', '7', '8', '10', '12'].includes(selectedMonth)) {
         setMaxDay(31);
@@ -82,7 +81,7 @@ const AdditionalDataPart = ({
     }
   }, [selectedMonth, selectedYear]);
 
-  useCustomEffect(() => {
+  useEffect(() => {
     if (
       selectedYear !== 'YYYY' &&
       selectedMonth !== 'MM' &&
