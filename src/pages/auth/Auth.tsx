@@ -41,6 +41,7 @@ const Auth = () => {
   // Submit form function to log in user
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // prevent default (reload in form)
+    umami.track('Login Button');
 
     setLoading(true); // show loader
 

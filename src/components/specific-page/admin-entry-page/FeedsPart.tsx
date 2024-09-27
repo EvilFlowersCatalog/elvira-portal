@@ -17,7 +17,10 @@ const FeedsPart = ({ entry, setEntry }: IPartParams) => {
           <button
             type='button'
             className='text-STUColor text-sm text-right hover:underline w-fit'
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              umami.track('Entry Create Feed Button');
+              setOpen(true);
+            }}
           >
             {t('entry.wizard.new')}
           </button>
@@ -30,6 +33,9 @@ const FeedsPart = ({ entry, setEntry }: IPartParams) => {
                 type='button'
                 className='bg-STUColor p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md'
                 onClick={() => {
+                  umami.track('Entry Remove Feed Button', {
+                    feedId: item.id,
+                  });
                   setEntry({
                     ...entry,
                     feeds: entry.feeds.filter(

@@ -103,6 +103,7 @@ const EntryList = ({ entry, triggerReload = null }: IEntryListParams) => {
           isLoading={isLoading}
           handleAdd={handleAdd}
           handleRemove={handleRemove}
+          entryId={entry.id}
           shelfId={entry.shelf_record_id}
         />
         <PDFButtons acquisitions={entry.acquisitions} entryId={entry.id} />

@@ -62,6 +62,7 @@ const ToolsContainer = ({
   };
 
   const handleClear = () => {
+    umami.track('Clear Filters Button');
     setInput('');
     clearFilters();
   };
@@ -113,7 +114,10 @@ const ToolsContainer = ({
         {advancedSearch && (
           <button
             className='text-sm hover:underline mt-2'
-            onClick={() => setShowSearchBar(!showSearchBar)}
+            onClick={() => {
+              umami.track('Advanced Search Button');
+              setShowSearchBar(!showSearchBar);
+            }}
           >
             {t('tools.advancedSearch')}
           </button>

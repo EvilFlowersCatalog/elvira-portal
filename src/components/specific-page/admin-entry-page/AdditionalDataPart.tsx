@@ -175,7 +175,12 @@ const AdditionalDataPart = ({
               <ElviraSelect
                 name='date-year'
                 value={selectedYear}
-                onChange={(e) => setSelectedYear(e.target.value)}
+                onChange={(e) => {
+                  umami.track('Year Selection', {
+                    year: e.target.value,
+                  });
+                  setSelectedYear(e.target.value);
+                }}
               >
                 <option value='YYYY'>YYYY</option>
                 {Array.from({
@@ -190,7 +195,12 @@ const AdditionalDataPart = ({
                 <ElviraSelect
                   name='date-month'
                   value={selectedMonth}
-                  onChange={(e) => setSelectedMonth(e.target.value)}
+                  onChange={(e) => {
+                    umami.track('Month Selection', {
+                      month: e.target.value,
+                    });
+                    setSelectedMonth(e.target.value);
+                  }}
                 >
                   <option value='MM'>MM</option>
                   {Array.from({
@@ -206,7 +216,12 @@ const AdditionalDataPart = ({
                 <ElviraSelect
                   name='date-day'
                   value={selectedDay}
-                  onChange={(e) => setSelectedDay(e.target.value)}
+                  onChange={(e) => {
+                    umami.track('Day Selection', {
+                      day: e.target.value,
+                    });
+                    setSelectedDay(e.target.value);
+                  }}
                 >
                   <option value='DD'>DD</option>
                   {Array.from({

@@ -1,4 +1,4 @@
-import { useState, MouseEvent, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { CircleLoader } from 'react-spinners';
 import { RiArrowRightDoubleFill } from 'react-icons/ri';
 import { useTranslation } from 'react-i18next';
@@ -11,7 +11,6 @@ import useGetEntryDetail from '../../../hooks/api/entries/useGetEntryDetail';
 import useAddToShelf from '../../../hooks/api/my-shelf/useAddToShelf';
 import useRemoveFromShelf from '../../../hooks/api/my-shelf/useRemoveFromShelf';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
-import Button from '../../buttons/Button';
 import ShelfButton from '../../buttons/ShelfButton';
 import PDFButtons from '../../buttons/PDFButtons';
 
@@ -19,7 +18,7 @@ interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
 }
 const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
-  const { specialNavigation, STUColor } = useAppContext();
+  const { STUColor } = useAppContext();
   const { auth } = useAuthContext();
   const { t } = useTranslation();
   const [entry, setEntry] = useState<IEntryDetail | null>(null);
@@ -124,6 +123,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       <button
         className='bg-STUColor text-white h-fit w-fit rounded-md p-2 mb-4'
         onClick={() => {
+          umami.track('Close Entry Detail Button');
           searchParams.delete('entry-detail-id');
           setSearchParams(searchParams);
         }}
@@ -209,6 +209,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
 
             <ShelfButton
               isLoading={isLoading}
+              entryId={entryId!}
               handleAdd={handleAdd}
               handleRemove={handleRemove}
               shelfId={entry.response.shelf_record_id}
@@ -235,7 +236,13 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                   className={
                     'px-2 py-1 border border-darkGray text-white border-opacity-0 bg-STUColor hover:bg-opacity-50 rounded-md duration-200'
                   }
-                  onClick={() => handleParamClick('feed-id', feed.id)}
+                  onClick={() => {
+                    umami.track('Entry Detail Feed Button Param', {
+                      feedId: feed.id,
+                      entryId: entryId,
+                    });
+                    handleParamClick('feed-id', feed.id);
+                  }}
                 >
                   {feed.title}
                 </button>
@@ -258,7 +265,13 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                   className={
                     'px-2 py-1 border border-darkGray text-white border-opacity-0 bg-STUColor hover:bg-opacity-50 rounded-md duration-200'
                   }
-                  onClick={() => handleParamClick('category-id', category.id)}
+                  onClick={() => {
+                    umami.track('Entry Detail Category Button Param', {
+                      feedId: category.id,
+                      entryId: entryId,
+                    });
+                    handleParamClick('category-id', category.id);
+                  }}
                 >
                   {category.term}
                 </button>

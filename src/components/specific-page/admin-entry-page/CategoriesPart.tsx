@@ -16,7 +16,11 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
           <button
             type='button'
             className='text-STUColor text-sm text-right hover:underline w-fit'
-            onClick={() => setOpen(true)}
+            onClick={() => {
+              umami.track('Entry Create Category Button');
+
+              setOpen(true);
+            }}
           >
             {t('entry.wizard.new')}
           </button>
@@ -29,6 +33,9 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
                 type='button'
                 className='bg-STUColor p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md'
                 onClick={() => {
+                  umami.track('Entry Remove Category Button', {
+                    categoryId: item.id,
+                  });
                   setEntry({
                     ...entry,
                     categories: entry.categories.filter(

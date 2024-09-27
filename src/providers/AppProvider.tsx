@@ -17,6 +17,7 @@ import { IContextProviderParams } from '../utils/interfaces/contexts';
 import tailwindConfig from '../../tailwind.config';
 import i18next from '../utils/i18n/i18next';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
+import EntryDetail from '../components/items/entry/EntryDetail';
 
 export interface IAppContext {
   theme: THEME_TYPE;
@@ -108,6 +109,16 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const [feedParents, setFeedParents] = useState<
     { id: string; title: string }[]
   >([]);
+
+  // umami
+  const [entryDetailId, setEntryDetailId] = useState<string | null>(null);
+  const [parentId, setParentId] = useState<string | null>(null);
+  const [query, setQuery] = useState<string | null>(null);
+  const [title, setTitle] = useState<string | null>(null);
+  const [feedId, setFeedId] = useState<string | null>(null);
+  const [orderBy, setOrderBy] = useState<string | null>(null);
+  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [author, setAuthor] = useState<string | null>(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -277,6 +288,58 @@ const AppProvider = ({ children }: IContextProviderParams) => {
       window.removeEventListener('keydown', handleESC);
     };
   }, []);
+
+  // track searchParam for umami
+  useEffect(() => {
+    setEntryDetailId(searchParams.get('entry-detail-id'));
+    setParentId(searchParams.get('parent-id'));
+    setQuery(searchParams.get('query'));
+    setTitle(searchParams.get('title'));
+    setFeedId(searchParams.get('feed-id'));
+    setOrderBy(searchParams.get('order-by'));
+    setCategoryId(searchParams.get('category-id'));
+    setAuthor(searchParams.get('author'));
+  }, [searchParams]);
+  useEffect(() => {
+    if (entryDetailId !== null) {
+      umami.track('Entry Detail Param', { entryId: entryDetailId });
+    }
+  }, [entryDetailId]);
+  useEffect(() => {
+    if (parentId !== null) {
+      umami.track('Parent Param', { parentId });
+    }
+  }, [parentId]);
+  useEffect(() => {
+    if (query !== null) {
+      umami.track('Query Param', { query });
+    }
+  }, [query]);
+  useEffect(() => {
+    if (title !== null) {
+      umami.track('Title Param', { title });
+    }
+  }, [title]);
+  useEffect(() => {
+    if (feedId !== null) {
+      umami.track('Feed Param', { feedId });
+    }
+  }, [feedId]);
+  useEffect(() => {
+    if (orderBy !== null) {
+      umami.track('Order By Param', { orderBy });
+    }
+  }, [orderBy]);
+  useEffect(() => {
+    if (categoryId !== null) {
+      umami.track('Category Param', { categoryId });
+    }
+  }, [categoryId]);
+  useEffect(() => {
+    if (author !== null) {
+      umami.track('Author Param', { author: author });
+    }
+  }, [author]);
 
   return (
     <AppContext.Provider

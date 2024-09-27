@@ -35,6 +35,15 @@ const EntrySwiper = ({
   };
 
   const openEntryDetail = () => {
+    if (type === 'popular')
+      umami.track('Popular Entry Button', {
+        entryId: entry.id,
+      });
+    else
+      umami.track('Last Added Entry Button', {
+        entryId: entry.id,
+      });
+
     const params = new URLSearchParams(searchParams);
     const id = searchParams.get('entry-detail-id');
 

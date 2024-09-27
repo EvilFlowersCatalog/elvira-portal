@@ -99,13 +99,23 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
         <div className='flex'>
           <button
             className='flex flex-1 justify-center py-2 bg-green text-white rounded-bl-md hover:bg-STUColor'
-            onClick={() => setShowForm(true)}
+            onClick={() => {
+              umami.track('Edit Feed Button', {
+                feedId: feed.id,
+              });
+              setShowForm(true);
+            }}
           >
             <MdEdit size={20} />
           </button>
           <button
             className='flex flex-1 justify-center py-2 bg-red text-white rounded-br-md hover:bg-STUColor'
-            onClick={() => setShowDeleteMenu(true)}
+            onClick={() => {
+              umami.track('Delete Feed Button', {
+                feedId: feed.id,
+              });
+              setShowDeleteMenu(true);
+            }}
           >
             <MdDelete size={20} />
           </button>

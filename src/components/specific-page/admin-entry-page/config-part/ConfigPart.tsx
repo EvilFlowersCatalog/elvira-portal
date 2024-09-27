@@ -14,6 +14,9 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
           name={t('entry.wizard.download')}
           checked={entry.config?.evilflowres_metadata_fetch ?? false}
           onChange={(e) => {
+            umami.track('Download Config Button', {
+              checked: e.target.checked,
+            });
             setEntry({
               ...entry,
               config: {
@@ -27,6 +30,9 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
           name={t('entry.wizard.share')}
           checked={entry.config?.evilflowers_share_enabled ?? false}
           onChange={(e) => {
+            umami.track('Share Config Button', {
+              checked: e.target.checked,
+            });
             setEntry({
               ...entry,
               config: {
@@ -40,6 +46,9 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
           name={t('entry.wizard.print')}
           checked={entry.config?.evilflowers_viewer_print ?? false}
           onChange={(e) => {
+            umami.track('Print Config Button', {
+              checked: e.target.checked,
+            });
             setEntry({
               ...entry,
               config: {
@@ -53,6 +62,9 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
           name={t('entry.wizard.annotations')}
           checked={entry.config?.evilflowers_annotations_create ?? false}
           onChange={(e) => {
+            umami.track('Annotation Config Button', {
+              checked: e.target.checked,
+            });
             setEntry({
               ...entry,
               config: {
@@ -66,6 +78,9 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
           name={'DRM'}
           checked={entry.config?.evilflowers_ocr_rewrite ?? false}
           onChange={(e) => {
+            umami.track('DRM Config Button', {
+              checked: e.target.checked,
+            });
             setEntry({
               ...entry,
               config: {

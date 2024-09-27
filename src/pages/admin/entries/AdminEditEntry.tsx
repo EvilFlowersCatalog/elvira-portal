@@ -85,6 +85,11 @@ const AdminEditEntry = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    umami.track('Upload Edited Entry Button', {
+      entryId: id,
+    });
+
     const newEntry: IEntryNew = {
       title: entry!.title,
       authors: entry!.authors,

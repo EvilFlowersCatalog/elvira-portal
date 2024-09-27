@@ -15,6 +15,10 @@ const PDFButtons = ({ acquisitions, entryId }: IPDFButtonsParams) => {
   const { t } = useTranslation();
 
   const handleRead = (e: MouseEvent<HTMLButtonElement>, index: number) => {
+    umami.track('PDF Read Button', {
+      pdf: acquisitions[index].id,
+      entryId,
+    });
     specialNavigation(e, NAVIGATION_PATHS.viewer + entryId + `/${index}`);
   };
 

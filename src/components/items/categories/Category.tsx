@@ -53,13 +53,23 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
         <div className='flex rounded-b-md'>
           <button
             className='flex flex-1 justify-center py-2 bg-green text-white rounded-bl-md hover:bg-STUColor'
-            onClick={() => setIsOpen(true)}
+            onClick={() => {
+              umami.track('Edit Category Button', {
+                categoryId: category.id,
+              });
+              setIsOpen(true);
+            }}
           >
             <MdEdit size={20} />
           </button>
           <button
             className='flex flex-1 justify-center py-2 bg-red text-white rounded-br-md hover:bg-STUColor'
-            onClick={() => setShowDeleteMenu(true)}
+            onClick={() => {
+              umami.track('Delete Category Button', {
+                categoryId: category.id,
+              });
+              setShowDeleteMenu(true);
+            }}
           >
             <MdDelete size={20} />
           </button>

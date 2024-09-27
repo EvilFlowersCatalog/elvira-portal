@@ -80,9 +80,17 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
               <IoMdDownload
                 className='absolute right-2 top-8 z-50 cursor-pointer'
                 size={20}
-                onClick={() =>
-                  handleIdentifier(IDENTIFIERS_TYPE.doi, entry.identifiers?.doi)
-                }
+                onClick={() => {
+                  if (entry.identifiers.doi) {
+                    umami.track('DOI Identifier Download Button', {
+                      identifier: entry.identifiers.doi,
+                    });
+                    handleIdentifier(
+                      IDENTIFIERS_TYPE.doi,
+                      entry.identifiers.doi
+                    );
+                  }
+                }}
                 color={STUColor}
               />
             </div>
@@ -95,12 +103,17 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
               <IoMdDownload
                 className='absolute right-2 top-8 z-50 cursor-pointer'
                 size={20}
-                onClick={() =>
-                  handleIdentifier(
-                    IDENTIFIERS_TYPE.isbn,
-                    entry.identifiers?.isbn
-                  )
-                }
+                onClick={() => {
+                  if (entry.identifiers.isbn) {
+                    umami.track('ISBN Identifier Download Button', {
+                      identifier: entry.identifiers.isbn,
+                    });
+                    handleIdentifier(
+                      IDENTIFIERS_TYPE.isbn,
+                      entry.identifiers.isbn
+                    );
+                  }
+                }}
                 color={STUColor}
               />
             </div>

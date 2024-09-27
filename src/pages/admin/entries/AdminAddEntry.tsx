@@ -70,6 +70,9 @@ const AdminAddEntry = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    umami.track('Upload Created Entry Button');
+
     const newEntry: IEntryNew = {
       title: entry.title,
       authors: entry.authors,

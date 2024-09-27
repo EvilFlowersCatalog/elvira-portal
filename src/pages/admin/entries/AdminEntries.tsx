@@ -89,7 +89,10 @@ const AdminEntries = () => {
         >
           <button
             className={`flex flex-col justify-center min-h-72 dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 border-STUColor bg-STUColor bg-opacity-40 hover:bg-opacity-20 duration-200`}
-            onClick={() => navigate(NAVIGATION_PATHS.adminAddEntries)}
+            onClick={() => {
+              umami.track('Add Entry Button');
+              navigate(NAVIGATION_PATHS.adminAddEntries);
+            }}
           >
             <MdAdd size={50} />
           </button>

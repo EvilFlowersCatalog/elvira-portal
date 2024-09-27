@@ -87,15 +87,23 @@ const AdminEntry = ({ entry, reload }: IEntryParams) => {
           <div className='flex gap-2'>
             <button
               className='flex flex-1 justify-center py-2 bg-green text-white rounded-md hover:bg-zinc-100 dark:hover:bg-darkGray hover:text-green duration-200'
-              onClick={() =>
-                navigate(NAVIGATION_PATHS.adminEditEntries + entry.id)
-              }
+              onClick={() => {
+                umami.track('Edit Entry Button', {
+                  entryId: entry.id,
+                });
+                navigate(NAVIGATION_PATHS.adminEditEntries + entry.id);
+              }}
             >
               <MdEdit size={20} />
             </button>
             <button
               className='flex flex-1 justify-center py-2 bg-red text-white rounded-md hover:bg-zinc-100 dark:hover:bg-darkGray hover:text-red duration-200'
-              onClick={() => setShowDeleteMenu(true)}
+              onClick={() => {
+                umami.track('Delete Entry Button', {
+                  entryId: entry.id,
+                });
+                setShowDeleteMenu(true);
+              }}
             >
               <MdDelete size={20} />
             </button>

@@ -14,8 +14,11 @@ const Feed = ({ feed }: IFeedParams) => {
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const setParent = () => {
+  const handleFeedClick = () => {
     if (feed.kind === 'navigation') {
+      umami.track('Feed Parent Button', {
+        feedId: feed.id,
+      });
       const params = new URLSearchParams(searchParams);
       params.delete('title');
       const previous = params.get('parent-id');
@@ -27,6 +30,9 @@ const Feed = ({ feed }: IFeedParams) => {
       params.set('parent-id', path);
       setSearchParams(params);
     } else {
+      umami.track('Feed Button', {
+        feedId: feed.id,
+      });
       const params = new URLSearchParams();
       params.set('feed-id', feed.id);
       navigate({
@@ -40,7 +46,7 @@ const Feed = ({ feed }: IFeedParams) => {
     <div className={'relative flex p-2 w-full md:w-1/2 xl:w-1/4'}>
       <button
         className={`p-5 py-10 gap-5 w-full h-full flex text-center justify-between items-center bg-STUColor text-white rounded-md duration-200`}
-        onClick={setParent}
+        onClick={handleFeedClick}
         onMouseEnter={() => setIsHovering(true)}
         onMouseOut={() => setIsHovering(false)}
       >

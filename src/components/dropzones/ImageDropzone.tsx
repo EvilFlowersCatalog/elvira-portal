@@ -26,6 +26,7 @@ const ImageDropzone = ({
   const [fileSize, setFileSize] = useState<string>('');
 
   const onDropAccepted = useCallback((acceptedFiles: File[]) => {
+    umami.track('Image Dropdown');
     const file = acceptedFiles[0];
     setFileName(file.name ?? 'Image File');
     setFileSize(getFileSize(file.size));
@@ -37,6 +38,7 @@ const ImageDropzone = ({
   }, []);
 
   const handleRemoveFile = () => {
+    umami.track('Remove Dropdown Image Button');
     setFileName('');
     setFileSize('');
     setFile(null);

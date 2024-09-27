@@ -46,7 +46,14 @@ const NavbarButton = ({
           ? 'bg-zinc-200 dark:bg-strongDarkGray'
           : 'bg-zinc-100 dark:dark:bg-darkGray'
       } hover:bg-zinc-200 dark:hover:bg-strongDarkGray`}
-      onClick={onClick ? (e) => onClick(e) : (e) => specialNavigation(e, path)}
+      onClick={
+        onClick
+          ? (e) => onClick(e)
+          : (e) => {
+              umami.track('Navbar Navigation Button', { path });
+              specialNavigation(e, path);
+            }
+      }
     >
       <span
         className={`border-2 h-5/6 ${
@@ -93,12 +100,20 @@ const Navbar = () => {
 
   // Function for switching theme and patching the app state
   const switchTheme = () => {
-    updateTheme(isDark() ? THEME_TYPE.light : THEME_TYPE.dark);
+    const wantedTheme = isDark() ? THEME_TYPE.light : THEME_TYPE.dark;
+    umami.track('Theme Button', {
+      theme: wantedTheme,
+    });
+    updateTheme(wantedTheme);
   };
 
   // Function for switching lang and pathing the app state
   const switchLang = () => {
-    updateLang(lang === LANG_TYPE.sk ? LANG_TYPE.en : LANG_TYPE.sk);
+    const wantedLang = lang === LANG_TYPE.sk ? LANG_TYPE.en : LANG_TYPE.sk;
+    umami.track('Language Button', {
+      lang: wantedLang,
+    });
+    updateLang(wantedLang);
   };
 
   return (
@@ -109,7 +124,10 @@ const Navbar = () => {
           className={auth ? 'cursor-pointer' : 'cursor-default'}
           onClick={
             auth
-              ? (e) => specialNavigation(e, NAVIGATION_PATHS.home)
+              ? (e) => {
+                  umami.track('Logo Home Button');
+                  specialNavigation(e, NAVIGATION_PATHS.home);
+                }
               : undefined
           }
         >
@@ -134,9 +152,12 @@ const Navbar = () => {
         {/* STU Logo */}
         <NavbarButton
           name={''}
-          onClick={() =>
-            window.open(stuLinks[import.meta.env.ELVIRA_ASSETS_DIR], '_blank')
-          }
+          onClick={() => {
+            umami.track('STU Button', {
+              url: stuLinks[import.meta.env.ELVIRA_FACULTY],
+            });
+            window.open(stuLinks[import.meta.env.ELVIRA_FACULTY], '_blank');
+          }}
           icon={
             <img
               className='h-auto w-[70px]'
@@ -182,7 +203,13 @@ const Navbar = () => {
               path={NAVIGATION_PATHS.adminHome}
               icon={<RiAdminLine size={23} />}
               isActive={location.pathname.includes('administration')}
-              onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.adminHome)}
+              onClick={(e) => {
+                const path = NAVIGATION_PATHS.adminHome;
+                umami.track('Navbar Navigation Button', {
+                  path,
+                });
+                specialNavigation(e, path);
+              }}
             />
           )}
         </div>
@@ -213,7 +240,7 @@ const Navbar = () => {
         <NavbarButton
           name={isDark() ? t('navbarMenu.lightMode') : t('navbarMenu.darkMode')}
           path=''
-          onClick={() => switchTheme()}
+          onClick={switchTheme}
           icon={
             isDark() ? (
               <IoSunnyOutline size={23} />
@@ -225,7 +252,7 @@ const Navbar = () => {
         />
         <NavbarButton
           name={lang === LANG_TYPE.sk ? 'EN' : 'SK'}
-          onClick={() => switchLang()}
+          onClick={switchLang}
           path=''
           icon={<HiOutlineLanguage size={23} />}
           isActive={false}
@@ -246,7 +273,13 @@ const Navbar = () => {
               default='monsterid'
             />
             {auth.username}
-            <Button onClick={logout} title={t('navbarMenu.logout')} />
+            <Button
+              onClick={() => {
+                umami.track('Logout Button');
+                logout();
+              }}
+              title={t('navbarMenu.logout')}
+            />
           </div>
         </>
       )}

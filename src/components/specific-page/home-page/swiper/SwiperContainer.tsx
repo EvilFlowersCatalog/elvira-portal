@@ -47,7 +47,6 @@ const SwiperContainer = ({
               />
             </SwiperSlide>
           ))}
-      {/* Custom CSS styling using JSX */}
       <style>{`
         .swiper-scrollbar {
           background: rgba(0, 0, 0, 0.1) !important;

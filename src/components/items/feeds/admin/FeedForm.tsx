@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
 import { useTranslation } from 'react-i18next';
 import { IFeedNew } from '../../../../utils/interfaces/feed';
@@ -70,14 +70,14 @@ const FeedForm = ({
   };
 
   // set parent feed
-  useCustomEffect(() => {
+  useEffect(() => {
     setForm((prev) => ({
       ...prev,
       parents: parentFeeds.feeds.map((feed) => feed.id),
     }));
   }, [parentFeeds]);
 
-  useCustomEffect(() => {
+  useEffect(() => {
     const parentId = searchParams.get('parent-id') ?? '';
     if (parentId) {
       (async () => {
@@ -116,9 +116,13 @@ const FeedForm = ({
     e.preventDefault();
     try {
       if (feedId) {
+        umami.track('Upload Edited Feed Button', {
+          feedId,
+        });
         await editFeed(feedId, form);
         toast.success(t('notifications.feed.edit.success'));
       } else {
+        umami.track('Upload Created Feed Button');
         await uploadFeed(form);
         toast.success(t('notifications.feed.add.success'));
       }
@@ -219,9 +223,3 @@ const FeedForm = ({
 };
 
 export default FeedForm;
-function useCustomEffect(
-  arg0: () => void,
-  arg1: { feeds: { title: string; id: string }[] }[]
-) {
-  throw new Error('Function not implemented.');
-}

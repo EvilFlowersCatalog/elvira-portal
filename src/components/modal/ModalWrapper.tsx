@@ -28,6 +28,7 @@ const ModalWrapper = ({
     }
   };
   const handleClick = () => {
+    umami.track('Close Modal Button');
     close(false);
   };
 

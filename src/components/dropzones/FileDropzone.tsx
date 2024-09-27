@@ -55,6 +55,7 @@ const FileDropzone = ({
 
   const onDropAccepted = useCallback(
     async (acceptedFiles: File[]) => {
+      umami.track('File Dropdown');
       const newFiles = acceptedFiles;
       const metadata = {
         relation: 'open-access',
@@ -101,6 +102,7 @@ const FileDropzone = ({
   );
 
   const handleRemoveFile = async (e: MouseEvent<SVGElement>, id: string) => {
+    umami.track('Remove File Dropdown Button');
     e.stopPropagation();
 
     if (entryId) {

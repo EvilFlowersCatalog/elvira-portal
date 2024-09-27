@@ -81,7 +81,10 @@ const AdminFeeds = () => {
           {/* Add button */}
           <div className={'flex p-2.5 w-full lg:w-1/2 xl:w-1/3 xxl:w-1/4'}>
             <button
-              onClick={() => setShowForm(true)}
+              onClick={() => {
+                umami.track('Add Feed Button');
+                setShowForm(true);
+              }}
               className={`flex flex-col justify-center dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 border-STUColor bg-STUColor bg-opacity-40 hover:bg-opacity-20 duration-200`}
             >
               <MdAdd size={50} />

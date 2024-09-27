@@ -27,6 +27,7 @@ const AuthorsPart = ({ entry, setEntry }: IPartParams) => {
   }, []);
 
   const addAuthor = () => {
+    umami.track('Entry Add Author Button');
     const authors = entry!.authors;
     authors.push({ name: '', surname: '' });
 
@@ -36,6 +37,7 @@ const AuthorsPart = ({ entry, setEntry }: IPartParams) => {
     });
   };
   const removeAuthor = (i: number) => {
+    umami.track('Entry Remove Author Button');
     let a: IEntryAuthor[] = [];
 
     if (entry.authors.length === 1) a = [{ name: '', surname: '' }];

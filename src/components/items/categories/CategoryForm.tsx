@@ -64,9 +64,13 @@ const CategoryForm = ({
     e.preventDefault();
     try {
       if (category) {
+        umami.track('Upload Edited Category Button', {
+          categoryId: category.id,
+        });
         await editCategory(category.id, form);
         toast.success(t('notifications.category.edit.success'));
       } else {
+        umami.track('Upload Created Category Button');
         await createCategory(form);
         toast.success(t('notifications.category.add.success'));
       }

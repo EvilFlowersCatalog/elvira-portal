@@ -37,7 +37,12 @@ const AdminHome = () => {
             key={index}
             icon={icon}
             text={t(textKey)}
-            onClick={(event) => specialNavigation(event, path)}
+            onClick={(event) => {
+              umami.track('Admin Home Button', {
+                path,
+              });
+              specialNavigation(event, path);
+            }}
           />
         ))}
       </div>

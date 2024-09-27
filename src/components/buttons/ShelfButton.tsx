@@ -5,6 +5,7 @@ import { IEntry } from '../../utils/interfaces/entry';
 interface IShelfButtonParams {
   isLoading: boolean;
   shelfId?: string;
+  entryId: string;
   handleAdd: () => void;
   handleRemove: () => void;
 }
@@ -14,8 +15,22 @@ const ShelfButton = ({
   handleAdd,
   handleRemove,
   shelfId,
+  entryId,
 }: IShelfButtonParams) => {
   const { t } = useTranslation();
+
+  const onClickRemove = () => {
+    umami.track('Remove from Shelf Button', {
+      entryId,
+    });
+    handleRemove();
+  };
+  const onClickAdd = () => {
+    umami.track('Add to Shelf Button', {
+      entryId,
+    });
+    handleAdd();
+  };
 
   return (
     <>
@@ -26,7 +41,7 @@ const ShelfButton = ({
           className={
             'flex gap-2 items-center px-2 py-1 text-red mb-2 border border-darkGray border-opacity-0 hover:border-red rounded-md'
           }
-          onClick={handleRemove}
+          onClick={onClickRemove}
         >
           {t('entry.detail.remove')}
         </button>
@@ -35,7 +50,7 @@ const ShelfButton = ({
           className={
             'flex gap-2 items-center px-2 py-1 text-green mb-2 border border-darkGray border-opacity-0 hover:border-green rounded-md'
           }
-          onClick={handleAdd}
+          onClick={onClickAdd}
         >
           {t('entry.detail.add')}
         </button>
