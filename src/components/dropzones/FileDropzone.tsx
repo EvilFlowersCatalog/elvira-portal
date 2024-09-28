@@ -10,6 +10,7 @@ import useCreateEntryAcquistion from '../../hooks/api/acquisitiions/useCreateEnt
 import useRemoveAcquisition from '../../hooks/api/acquisitiions/useRemoveAcquisition';
 import PageLoading from '../page/PageLoading';
 import { uuid } from '../../utils/func/functions';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface IFilesDropzoneParams {
   entryId?: string;
@@ -28,6 +29,8 @@ const FileDropzone = ({
   setFiles = null,
 }: IFilesDropzoneParams) => {
   const { t } = useTranslation();
+  const { stuBg } = useAppContext();
+
   const [acquisitions, setAcquisitions] = useState<IAcquisition[]>([]);
   const [reload, setReload] = useState<boolean>(false);
 
@@ -141,7 +144,7 @@ const FileDropzone = ({
           {...getRootProps({
             className: `relative flex-2 min-h-60 max-h-[500px] overflow-auto rounded-md p-4 border-4 border-dashed duration-200 ${
               isDragActive
-                ? 'bg-STUColor bg-opacity-50 border-white'
+                ? `${stuBg} bg-opacity-50 border-white`
                 : 'bg-zinc-100 dark:bg-darkGray border-transparent'
             }`,
           })}

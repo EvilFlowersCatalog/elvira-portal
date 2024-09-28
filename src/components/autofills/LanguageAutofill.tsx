@@ -3,6 +3,7 @@ import { ILanguage } from '../../utils/interfaces/language';
 import { useTranslation } from 'react-i18next';
 import { IEntryNewForm } from '../../utils/interfaces/entry';
 import ElviraInput from '../inputs/ElviraInput';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 export const languages: ILanguage[] = [
   { name: 'English', alpha2: 'eng', alpha3: 'en' },
@@ -36,6 +37,7 @@ const LanguageAutofill = ({
   entryForm,
   setEntryForm,
 }: ILanguageAutofillParams) => {
+  const { stuBorder } = useAppContext();
   const { t } = useTranslation();
 
   const [inputValue, setInputValue] = useState<string>('');
@@ -116,7 +118,7 @@ const LanguageAutofill = ({
       />
       {suggestions.length > 0 && (
         <ul
-          className='absolute top-[60px] border-2 rounded-md rounded-t-none border-STUColor list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full'
+          className={`absolute top-[60px] border-2 rounded-md rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full`}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ICategory } from '../../utils/interfaces/category';
 import useGetCategories from '../../hooks/api/categories/useGetCategories';
 import ElviraInput from '../inputs/ElviraInput';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface ICategoryAutofillParams {
   entryForm: any;
@@ -15,6 +16,7 @@ const CategoryAutofill = ({
   setEntryForm,
   single = false,
 }: ICategoryAutofillParams) => {
+  const { stuBorder } = useAppContext();
   const { t } = useTranslation();
 
   const [inputValue, setInputValue] = useState<string>('');
@@ -121,7 +123,7 @@ const CategoryAutofill = ({
       />
       {suggestions.length > 0 && (
         <ul
-          className='absolute top-[60px] border-2 rounded-md rounded-t-none border-STUColor list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full'
+          className={`absolute top-[60px] border-2 rounded-md rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full`}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >

@@ -42,7 +42,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
     cookies[COOKIES_TYPE.AUTH_KEY] ?? null
   );
   const [check, setCheck] = useState<boolean>(true);
-  const logoutChannel = new BroadcastChannel(BROADCAST_MESSAGE);
+  let logoutChannel: BroadcastChannel | null;
 
   const verifyCredentials = useVerifyCredentials();
   const navigate = useNavigate();
@@ -58,10 +58,12 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
       logout();
     };
 
+    logoutChannel = new BroadcastChannel(BROADCAST_MESSAGE);
     logoutChannel.onmessage = handleLogout;
 
     return () => {
-      logoutChannel.close();
+      logoutChannel?.close();
+      logoutChannel = null;
     };
   }, []);
 
@@ -106,7 +108,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
       });
     } else {
       removeCookie(COOKIES_TYPE.AUTH_KEY);
-      logoutChannel.postMessage(BROADCAST_MESSAGE);
+      logoutChannel?.postMessage(BROADCAST_MESSAGE);
 
       if (location.pathname !== NAVIGATION_PATHS.login) {
         navigate(NAVIGATION_PATHS.login, {

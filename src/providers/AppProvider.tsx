@@ -14,10 +14,8 @@ import {
 } from '../utils/interfaces/general/general';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { IContextProviderParams } from '../utils/interfaces/contexts';
-import tailwindConfig from '../../tailwind.config';
 import i18next from '../utils/i18n/i18next';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
-import EntryDetail from '../components/items/entry/EntryDetail';
 
 export interface IAppContext {
   theme: THEME_TYPE;
@@ -62,6 +60,11 @@ export interface IAppContext {
   feedParents: { id: string; title: string }[];
   setFeedParents: (feedParents: { id: string; title: string }[]) => void;
   setEditingEntryTitle: (editingEntryTitle: string) => void;
+  stuBorder: string;
+  stuBorderFocus: string;
+  stuBg: string;
+  stuBgHover: string;
+  stuText: string;
 }
 
 export const AppContext = createContext<IAppContext | null>(null);
@@ -87,7 +90,6 @@ const stuLogoLight = `/assets/${
 }/stu/logo-light.png`;
 
 const AppProvider = ({ children }: IContextProviderParams) => {
-  const { colors } = tailwindConfig.theme?.extend!;
   const { cookies, setCookie } = useCookiesContext();
 
   const [theme, setTheme] = useState<THEME_TYPE>(
@@ -119,6 +121,69 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const [orderBy, setOrderBy] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [author, setAuthor] = useState<string | null>(null);
+  const [stuColors] = useState<{ [key: string]: string }[]>([
+    // backgournd 0
+    {
+      fiit: 'fiit-bg',
+      fchpt: 'fchpt-bg',
+      fei: 'fei-bg',
+      mtf: 'mtf-bg',
+      fad: 'fad-bg',
+      svf: 'svf-bg',
+      sjf: 'sjf-bg',
+    },
+    // border 1
+    {
+      fiit: 'fiit-border',
+      fchpt: 'fchpt-border',
+      fei: 'fei-border',
+      mtf: 'mtf-border',
+      fad: 'fad-border',
+      svf: 'svf-border',
+      sjf: 'sjf-border',
+    },
+    // background hover 2
+    {
+      fiit: 'fiit-bg-hover',
+      fchpt: 'fchpt-bg-hover',
+      fei: 'fei-bg-hover',
+      mtf: 'mtf-bg-hover',
+      fad: 'fad-bg-hover',
+      svf: 'svf-bg-hover',
+      sjf: 'sjf-bg-hover',
+    },
+    // border focus 3
+    {
+      fiit: 'fiit-border-focus',
+      fchpt: 'fchpt-border-focus',
+      fei: 'fei-border-focus',
+      mtf: 'mtf-border-focus',
+      fad: 'fad-border-focus',
+      svf: 'svf-border-focus',
+      sjf: 'sjf-border-focus',
+    },
+    // text 4
+    {
+      fiit: 'fiit-text',
+      fchpt: 'fchpt-text',
+      fei: 'fei-text',
+      mtf: 'mtf-text',
+      fad: 'fad-text',
+      svf: 'svf-text',
+      sjf: 'sjf-text',
+    },
+    // hash colors 5
+    {
+      fiit: '#01a9e0',
+      mtf: '#e62b1e',
+      svf: '#e5722a',
+      sjf: '#4c5b60',
+      fei: '#0c4a8e',
+      fchpt: '#ffda1c',
+      fad: '#009d4a',
+    },
+  ]);
+  const faculty = import.meta.env.ELVIRA_FACULTY;
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -370,7 +435,12 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         setEditingEntryTitle,
         feedParents,
         setFeedParents,
-        STUColor: (colors as { STUColor: string }).STUColor,
+        stuBg: stuColors[0][faculty],
+        stuBorder: stuColors[1][faculty],
+        stuBgHover: stuColors[2][faculty],
+        stuBorderFocus: stuColors[3][faculty],
+        stuText: stuColors[4][faculty],
+        STUColor: stuColors[5][faculty],
       }}
     >
       {children}

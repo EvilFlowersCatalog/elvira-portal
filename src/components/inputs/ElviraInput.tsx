@@ -6,6 +6,7 @@ import {
   useState,
 } from 'react';
 import { uuid } from '../../utils/func/functions';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface CustomInputProps extends InputHTMLAttributes<HTMLInputElement> {
   invalidMessage?: string;
@@ -13,6 +14,8 @@ interface CustomInputProps extends InputHTMLAttributes<HTMLInputElement> {
 // Custom input used in step forms in ADMIN
 const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
   ({ invalidMessage, ...props }, ref) => {
+    const { stuText, stuBorderFocus, stuBorder } = useAppContext();
+
     const id = uuid();
     const [isInvalid, setIsInvalid] = useState<boolean>(false);
     const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -48,7 +51,7 @@ const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
             className={`absolute ${
               isFocused || value
                 ? `left-0 top-0 text-[12px] ${
-                    isInvalid ? 'text-red' : 'text-STUColor'
+                    isInvalid ? 'text-red' : `${stuText}`
                   }`
                 : 'left-3 top-[30px]'
             } duration-200 pointer-events-none select-none`}
@@ -62,10 +65,10 @@ const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
             className={`w-full p-2 border-2
               ${
                 value
-                  ? 'border-STUColor dark:border-STUColor'
+                  ? `${stuBorder}`
                   : isInvalid
                   ? 'border-red dark:border-red'
-                  : 'focus:border-STUColor dark:focus:border-STUColor border-black dark:border-white'
+                  : `${stuBorderFocus} border-black dark:border-white`
               }
               bg-transparent outline-none rounded-md`}
             required={required}

@@ -1,5 +1,6 @@
 import { forwardRef, TextareaHTMLAttributes, useState } from 'react';
 import { uuid } from '../../utils/func/functions';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface CustomTextareaProps
   extends TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -8,6 +9,8 @@ interface CustomTextareaProps
 // Custom input used in step forms in ADMIN
 const ElviraTextarea = forwardRef<HTMLTextAreaElement, CustomTextareaProps>(
   ({ invalidMessage, ...props }, ref) => {
+    const { stuText, stuBorderFocus, stuBorder } = useAppContext();
+
     const [focus, setFocus] = useState<boolean>(false);
     const id = uuid();
 
@@ -17,9 +20,7 @@ const ElviraTextarea = forwardRef<HTMLTextAreaElement, CustomTextareaProps>(
       <div className='relative w-full h-full mt-6'>
         <span
           className={`absolute duration-200 z-10 select-none pointer-events-none ${
-            focus || value
-              ? '-top-6 left-0 text-sm text-STUColor'
-              : 'top-2 left-2'
+            focus || value ? `-top-6 left-0 text-sm ${stuText}` : 'top-2 left-2'
           }`}
         >
           {placeholder}
@@ -29,8 +30,8 @@ const ElviraTextarea = forwardRef<HTMLTextAreaElement, CustomTextareaProps>(
           {...props}
           className={`w-full h-full p-2 rounded-md bg-transparent border-2 ${
             value
-              ? 'border-STUColor dark:border-STUColor'
-              : 'focus:border-STUColor dark:focus:border-STUColor border-black dark:border-white'
+              ? `${stuBorder}`
+              : `${stuBorderFocus} border-black dark:border-white`
           } outline-none`}
           id={id}
           placeholder=''

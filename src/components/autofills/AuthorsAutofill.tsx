@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { IEntryNewForm } from '../../utils/interfaces/entry';
 import { IEntryAuthor } from '../../utils/interfaces/author';
 import ElviraInput from '../inputs/ElviraInput';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface IAuthorsAutofillParams {
   entryForm: IEntryNewForm;
@@ -20,6 +21,7 @@ const AuthorsAutofill = ({
   type,
 }: IAuthorsAutofillParams) => {
   const { t } = useTranslation();
+  const { stuBorder } = useAppContext();
 
   const [inputValue, setInputValue] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -126,7 +128,7 @@ const AuthorsAutofill = ({
       />
       {suggestions.length > 0 && (
         <ul
-          className='absolute top-[60px] border-2 rounded-md z-40 rounded-t-none border-STUColor list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray w-full'
+          className={`absolute top-[60px] border-2 rounded-md z-40 rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray w-full`}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >

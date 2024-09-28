@@ -5,8 +5,11 @@ import useGetCategories from '../../hooks/api/categories/useGetCategories';
 import ItemContainer from '../../components/items/container/ItemContainer';
 import Category from '../../components/items/categories/Category';
 import CategoryForm from '../../components/items/categories/CategoryForm';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 const AdminCategories = () => {
+  const { stuBorder, stuBg } = useAppContext();
+
   const [categories, setCategories] = useState<any[]>([]);
   const [searchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -79,7 +82,7 @@ const AdminCategories = () => {
                 umami.track('Add Category Button');
                 setIsOpen(true);
               }}
-              className={`flex flex-col justify-center dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 border-STUColor bg-STUColor bg-opacity-40 hover:bg-opacity-20 duration-200`}
+              className={`flex flex-col justify-center dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 ${stuBorder} ${stuBg} bg-opacity-40 hover:bg-opacity-20 duration-200`}
             >
               <MdAdd size={50} />
             </button>

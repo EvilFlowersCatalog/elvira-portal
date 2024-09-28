@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import useAppContext from '../../../hooks/contexts/useAppContext';
 
 export interface IFeatureParams {
   imgPath: string;
@@ -8,6 +9,8 @@ export interface IFeatureParams {
 }
 
 const Feature = ({ imgPath, title, description, left }: IFeatureParams) => {
+  const { stuText } = useAppContext();
+
   return (
     <div
       className={`flex flex-col w-full flex-1 items-center ${
@@ -22,7 +25,7 @@ const Feature = ({ imgPath, title, description, left }: IFeatureParams) => {
 
         {/* DESCRIPTION */}
         <div className='text-center p-4 max-w-96 animate-fly-right'>
-          <h1 className='text-xl font-extrabold'>{title}</h1>
+          <h1 className={`${stuText} text-xl font-extrabold`}>{title}</h1>
           <p>{description}</p>
         </div>
       </div>

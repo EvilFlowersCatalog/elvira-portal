@@ -10,7 +10,7 @@ import AdminEntry from '../../../components/items/entry/admin/AdminEntry';
 import EntryBoxLoading from '../../../components/items/entry/loading/EntryBoxLoading';
 
 const AdminEntries = () => {
-  const { showSearchBar } = useAppContext();
+  const { showSearchBar, stuBorder, stuBg } = useAppContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingNext, setLoadingNext] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
@@ -88,7 +88,7 @@ const AdminEntries = () => {
           }`}
         >
           <button
-            className={`flex flex-col justify-center min-h-72 dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 border-STUColor bg-STUColor bg-opacity-40 hover:bg-opacity-20 duration-200`}
+            className={`flex flex-col justify-center min-h-72 dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 ${stuBorder} ${stuBg} bg-opacity-40 hover:bg-opacity-20 duration-200`}
             onClick={() => {
               umami.track('Add Entry Button');
               navigate(NAVIGATION_PATHS.adminAddEntries);

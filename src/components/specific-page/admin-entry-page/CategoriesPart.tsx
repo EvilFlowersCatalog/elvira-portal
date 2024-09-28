@@ -4,9 +4,12 @@ import CategoryAutofill from '../../autofills/CategoryAutofill';
 import { useState } from 'react';
 import CategoryForm from '../../items/categories/CategoryForm';
 import { useTranslation } from 'react-i18next';
+import useAppContext from '../../../hooks/contexts/useAppContext';
 
 const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
   const { t } = useTranslation();
+  const { stuText, stuBg } = useAppContext();
+
   const [open, setOpen] = useState<boolean>(false);
 
   return (
@@ -15,7 +18,7 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
         <div className='flex justify-end'>
           <button
             type='button'
-            className='text-STUColor text-sm text-right hover:underline w-fit'
+            className={`${stuText} text-sm text-right hover:underline w-fit`}
             onClick={() => {
               umami.track('Entry Create Category Button');
 
@@ -31,7 +34,7 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
             <div key={index} className={`h-fit`}>
               <button
                 type='button'
-                className='bg-STUColor p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md'
+                className={`${stuBg}p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md`}
                 onClick={() => {
                   umami.track('Entry Remove Category Button', {
                     categoryId: item.id,

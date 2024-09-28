@@ -2,6 +2,7 @@ import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import Button from '../buttons/Button';
 import { IModalParams } from '../../utils/interfaces/general/general';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface IModalWrapperParams extends IModalParams {
   title: string;
@@ -16,6 +17,8 @@ const ModalWrapper = ({
   buttonLabel,
   yes,
 }: IModalWrapperParams) => {
+  const { stuText } = useAppContext();
+
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -47,13 +50,12 @@ const ModalWrapper = ({
         >
           {/* Header */}
           <div className='relative flex w-full justify-center items-center gap-5'>
-            <span className='text-xl font-bold text-STUColor uppercase text-center'>
+            <span
+              className={`text-xl font-bold ${stuText} uppercase text-center`}
+            >
               {title}
             </span>
-            <button
-              className='absolute -top-3 -right-3 hover:text-STUColor'
-              onClick={handleClick}
-            >
+            <button className='absolute -top-3 -right-3' onClick={handleClick}>
               <IoMdClose size={30} />
             </button>
           </div>

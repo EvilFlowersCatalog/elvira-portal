@@ -22,6 +22,8 @@ interface IEntryListParams {
 const EntryList = ({ entry, triggerReload = null }: IEntryListParams) => {
   const { t } = useTranslation();
   const { auth } = useAuthContext();
+  const { stuBg } = useAppContext();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -122,9 +124,7 @@ const EntryList = ({ entry, triggerReload = null }: IEntryListParams) => {
           {entry.feeds.map((feed, index) => (
             <button
               key={index}
-              className={
-                'px-2 text-sm border border-darkGray text-white border-opacity-0 bg-STUColor hover:bg-opacity-50 rounded-md duration-200'
-              }
+              className={`px-2 text-sm border border-darkGray text-white border-opacity-0 ${stuBg} hover:bg-opacity-50 rounded-md duration-200`}
               onClick={() => setParam('feed-id', feed.id)}
             >
               {feed.title}
@@ -137,9 +137,7 @@ const EntryList = ({ entry, triggerReload = null }: IEntryListParams) => {
           {entry.categories.map((category, index) => (
             <button
               key={index}
-              className={
-                'px-2 text-sm border border-darkGray text-white border-opacity-0 bg-STUColor hover:bg-opacity-50 rounded-md duration-200'
-              }
+              className={`px-2 text-sm border border-darkGray text-white border-opacity-0 ${stuBg} hover:bg-opacity-50 rounded-md duration-200`}
               onClick={() => setParam('category-id', category.id)}
             >
               {category.term}

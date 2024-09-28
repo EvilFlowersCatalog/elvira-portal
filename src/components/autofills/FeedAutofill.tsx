@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { IFeed } from '../../utils/interfaces/feed';
 import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
 import ElviraInput from '../inputs/ElviraInput';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface IFeedAutofillParams {
   entryForm: any;
@@ -19,6 +20,7 @@ const FeedAutofill = ({
   kind = 'acquisition',
   placeholder,
 }: IFeedAutofillParams) => {
+  const { stuBorder } = useAppContext();
   const { t } = useTranslation();
 
   const [inputValue, setInputValue] = useState<string>('');
@@ -125,7 +127,7 @@ const FeedAutofill = ({
       />
       {suggestions.length > 0 && (
         <ul
-          className='absolute top-[60px] border-2 rounded-md rounded-t-none border-STUColor list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full'
+          className={`absolute top-[60px] border-2 rounded-md rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full`}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >

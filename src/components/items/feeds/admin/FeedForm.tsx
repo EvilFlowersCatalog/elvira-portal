@@ -10,7 +10,6 @@ import useGetFeedDetail from '../../../../hooks/api/feeds/useGetFeedDetail';
 import { toast } from 'react-toastify';
 import ModalWrapper from '../../../../components/modal/ModalWrapper';
 import ElviraInput from '../../../../components/inputs/ElviraInput';
-import { CircleLoader } from 'react-spinners';
 import ElviraSelect from '../../../inputs/ElviraSelect';
 import FeedAutofill from '../../../autofills/FeedAutofill';
 import { MdRemoveCircle } from 'react-icons/md';
@@ -28,6 +27,8 @@ const FeedForm = ({
   setReloadPage,
 }: IFeedForm) => {
   const { t } = useTranslation();
+  const { stuBg, stuText } = useAppContext();
+
   const [form, setForm] = useState<IFeedNew>({
     catalog_id: import.meta.env.ELVIRA_CATALOG_ID,
     url_name: uuid(),
@@ -181,7 +182,7 @@ const FeedForm = ({
             <div className='w-full md:w-1/2 lg:w-1/3 flex p-1' key={index}>
               <button
                 type='button'
-                className='bg-STUColor p-2 text-sm hover:bg-red flex w-full gap-2 justify-between items-center text-white rounded-md'
+                className={`${stuBg} p-2 text-sm hover:bg-red flex w-full gap-2 justify-between items-center text-white rounded-md`}
                 onClick={() => {
                   setParentFeeds((prev) => ({
                     feeds: prev.feeds.filter(
@@ -199,10 +200,7 @@ const FeedForm = ({
 
         {/* Kind */}
         <div className='flex w-full flex-col text-left'>
-          <label
-            htmlFor='selection-kind'
-            className='text-sm pl-1 text-STUColor'
-          >
+          <label htmlFor='selection-kind' className={`text-sm pl-1 ${stuText}`}>
             {t('modal.feedForm.kind')}
           </label>
           <ElviraSelect

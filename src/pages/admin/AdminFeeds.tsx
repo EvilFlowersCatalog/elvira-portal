@@ -6,8 +6,11 @@ import ItemContainer from '../../components/items/container/ItemContainer';
 import { MdAdd } from 'react-icons/md';
 import AdminFeed from '../../components/items/feeds/admin/AdminFeed';
 import FeedForm from '../../components/items/feeds/admin/FeedForm';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 const AdminFeeds = () => {
+  const { stuBg, stuBorder } = useAppContext();
+
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingNext, setLoadingNext] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
@@ -85,7 +88,7 @@ const AdminFeeds = () => {
                 umami.track('Add Feed Button');
                 setShowForm(true);
               }}
-              className={`flex flex-col justify-center dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 border-STUColor bg-STUColor bg-opacity-40 hover:bg-opacity-20 duration-200`}
+              className={`flex flex-col justify-center dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 ${stuBorder} ${stuBg} bg-opacity-40 hover:bg-opacity-20 duration-200`}
             >
               <MdAdd size={50} />
             </button>

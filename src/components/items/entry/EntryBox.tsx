@@ -11,7 +11,8 @@ interface IEntryBoxParams {
 
 const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
   const { auth } = useAuthContext();
-  const { showSearchBar, isSmallDevice } = useAppContext();
+  const { showSearchBar, isSmallDevice, stuBg } = useAppContext();
+
   const [isScale, setIsScale] = useState<boolean>(false);
   const [isUnderLine, setIsUnderLine] = useState<boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -47,7 +48,7 @@ const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
     >
       <button
         className={`flex flex-col justify-center p-4 w-full gap-2 rounded-md text-left ${
-          isActive ? 'bg-STUColor' : 'hover:bg-zinc-100 dark:hover:bg-darkGray'
+          isActive ? `${stuBg}` : 'hover:bg-zinc-100 dark:hover:bg-darkGray'
         }`}
         onMouseEnter={handelMouseEnter}
         onMouseLeave={handelMouseLeave}

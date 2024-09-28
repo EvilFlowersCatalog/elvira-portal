@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import useDeleteCategory from '../../../hooks/api/categories/useDeleteCategory';
 import { ICategory } from '../../../utils/interfaces/category';
 import ConfirmationDialog from '../../dialogs/ConfirmationDialog';
+import useAppContext from '../../../hooks/contexts/useAppContext';
 
 interface ICategoryParam {
   category: ICategory;
@@ -14,7 +15,9 @@ interface ICategoryParam {
 }
 
 const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
+  const { stuBg, stuBgHover } = useAppContext();
   const { t } = useTranslation();
+
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [showDeleteMenu, setShowDeleteMenu] = useState<boolean>(false);
 
@@ -36,7 +39,9 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
   return (
     <>
       <div className='w-full flex flex-col md:w-1/2 xl:w-1/3 p-2'>
-        <div className='w-full h-full flex flex-col gap-4 select-none bg-STUColor rounded-t-md p-4'>
+        <div
+          className={`w-full h-full flex flex-col gap-4 select-none ${stuBg} rounded-t-md p-4`}
+        >
           <div className='flex text-left gap-2 items-center'>
             <span className='font-semibold uppercase'>Term:</span>
             <span>{category.term}</span>
@@ -52,7 +57,7 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
         </div>
         <div className='flex rounded-b-md'>
           <button
-            className='flex flex-1 justify-center py-2 bg-green text-white rounded-bl-md hover:bg-STUColor'
+            className={`flex flex-1 justify-center py-2 bg-green text-white rounded-bl-md ${stuBgHover}`}
             onClick={() => {
               umami.track('Edit Category Button', {
                 categoryId: category.id,
@@ -63,7 +68,7 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
             <MdEdit size={20} />
           </button>
           <button
-            className='flex flex-1 justify-center py-2 bg-red text-white rounded-br-md hover:bg-STUColor'
+            className={`flex flex-1 justify-center py-2 bg-red text-white rounded-br-md ${stuBgHover}`}
             onClick={() => {
               umami.track('Delete Category Button', {
                 categoryId: category.id,

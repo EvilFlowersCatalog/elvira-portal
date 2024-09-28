@@ -11,7 +11,7 @@ import Feature, {
 import Footer from '../../components/specific-page/about-page/Footer';
 
 const About = () => {
-  const { theme, titleLogoDark, titleLogoLight } = useAppContext();
+  const { theme, titleLogoDark, titleLogoLight, stuText } = useAppContext();
   const { t } = useTranslation();
 
   const FeatureList: IFeatureParams[] = [
@@ -56,7 +56,7 @@ const About = () => {
         <p>{t('about.subTitle')}</p>
 
         <button
-          className='hover:underline text-STUColor mb-10'
+          className={`hover:underline ${stuText} mb-10`}
           onClick={() => window.open('https://elvira.digital/', '_blank')}
         >
           {t('about.readMore')}

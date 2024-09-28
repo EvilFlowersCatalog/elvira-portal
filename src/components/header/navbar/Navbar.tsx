@@ -38,7 +38,8 @@ const NavbarButton = ({
   isActive,
   onClick = null,
 }: INavbarButtonParams) => {
-  const { specialNavigation } = useAppContext();
+  const { specialNavigation, stuBorder } = useAppContext();
+
   return (
     <button
       className={`flex w-full gap-2 items-center pl-3 py-2 rounded-md ${
@@ -57,7 +58,7 @@ const NavbarButton = ({
     >
       <span
         className={`border-2 h-5/6 ${
-          isActive ? 'border-STUColor' : 'border-transparent'
+          isActive ? `${stuBorder}` : 'border-transparent'
         } rounded-md`}
       />
       {icon}
@@ -81,6 +82,8 @@ const Navbar = () => {
     stuLogoLight,
   } = useAppContext();
   const { auth, logout } = useAuthContext();
+  const { stuBg } = useAppContext();
+
   const { t } = useTranslation();
   const location = useLocation();
   const stuLinks: { [key: string]: string } = {
@@ -139,7 +142,7 @@ const Navbar = () => {
         </button>
         {isSmallDevice && (
           <button
-            className='bg-STUColor h-full flex items-center text-white w-fit rounded-md px-1'
+            className={`${stuBg} h-full flex items-center text-white w-fit rounded-md px-1`}
             onClick={() => setShowNavbar(false)}
           >
             <RiArrowLeftDoubleFill size={18} />

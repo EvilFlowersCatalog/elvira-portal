@@ -7,6 +7,7 @@ import LanguageAutofill from '../../autofills/LanguageAutofill';
 import ElviraSelect from '../../inputs/ElviraSelect';
 import { ChangeEvent, useEffect, useState } from 'react';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
+import useAppContext from '../../../hooks/contexts/useAppContext';
 
 interface IAdditionalDataPartParams extends IPartParams {
   stringImage: string;
@@ -21,6 +22,7 @@ const AdditionalDataPart = ({
 }: IAdditionalDataPartParams) => {
   const { t } = useTranslation();
   const { auth } = useAuthContext();
+  const { stuText } = useAppContext();
 
   const year = new Date().getFullYear();
   const [maxDay, setMaxDay] = useState<number>(31);
@@ -170,7 +172,7 @@ const AdditionalDataPart = ({
             value={entry.publisher ?? ''}
           />
           <div className='flex flex-col'>
-            <span className='text-STUColor pl-1'>{t('entry.wizard.year')}</span>
+            <span className={`${stuText} pl-1`}>{t('entry.wizard.year')}</span>
             <div className='w-fit flex gap-4'>
               <ElviraSelect
                 name='date-year'

@@ -9,7 +9,7 @@ import Button from '../buttons/Button';
 
 const CookiesInformation = () => {
   const { t } = useTranslation();
-  const { theme, titleLogoLight, titleLogoDark } = useAppContext();
+  const { theme, titleLogoLight, titleLogoDark, stuBorder } = useAppContext();
   const { setCookie, setInformed } = useCookiesContext();
 
   const handleAccept = () => {
@@ -19,7 +19,9 @@ const CookiesInformation = () => {
 
   return (
     <div className='fixed w-full bottom-5 flex justify-center z-50 pointer-events-none'>
-      <div className='flex flex-col max-w-[550px] min-w-64 m-auto bg-white dark:bg-black border border-STUColor text-black dark:text-white p-4 gap-5 rounded-md pointer-events-auto'>
+      <div
+        className={`flex flex-col max-w-[550px] min-w-64 m-auto bg-white dark:bg-black border ${stuBorder} text-black dark:text-white p-4 gap-5 rounded-md pointer-events-auto`}
+      >
         <div className='flex w-full justify-center items-center'>
           <img
             className='w-52'

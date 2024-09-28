@@ -3,6 +3,7 @@ import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-toastify';
 import { getFileSize } from '../../utils/func/functions';
 import { IoMdClose } from 'react-icons/io';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface IDragzoneParams {
   title: string;
@@ -22,6 +23,8 @@ const ImageDropzone = ({
   value = null,
   setFile,
 }: IDragzoneParams) => {
+  const { stuBg, stuBorder } = useAppContext();
+
   const [fileName, setFileName] = useState<string>('');
   const [fileSize, setFileSize] = useState<string>('');
 
@@ -66,7 +69,7 @@ const ImageDropzone = ({
         onClick: (e) => {
           if (fileName) e.stopPropagation();
         },
-        className: `w-full h-full flex flex-1 border-4 border-dashed border-spacing-8 border-STUColor rounded-md bg-STUColor hover:bg-opacity-30 bg-opacity-10 text-white duration-200 ${
+        className: `w-full h-full flex flex-1 border-4 border-dashed border-spacing-8 ${stuBorder} rounded-md ${stuBg} hover:bg-opacity-30 bg-opacity-10 text-white duration-200 ${
           fileName ? '' : 'cursor-pointer'
         }`,
       })}

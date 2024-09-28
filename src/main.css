@@ -47,11 +47,123 @@ body,
   animation-delay: -0.16s;
 }
 
-@layer components {
-  button:focus {
-    outline: none;
+@layer base {
+  button {
+    @apply focus:outline-none;
   }
-  input:focus {
-    outline: none;
+  input {
+    @apply focus:outline-none;
+  }
+}
+
+@layer components {
+  .fiit-border {
+    @apply border-primary-fiit dark:border-primary-fiit;
+  }
+  .fad-border {
+    @apply border-primary-fad dark:border-primary-fad;
+  }
+  .fchpt-border {
+    @apply border-primary-fchpt dark:border-primary-fchpt;
+  }
+  .fei-border {
+    @apply border-primary-fei dark:border-primary-fei;
+  }
+  .mtf-border {
+    @apply border-primary-mtf dark:border-primary-mtf;
+  }
+  .sjf-border {
+    @apply border-primary-sjf dark:border-primary-sjf;
+  }
+  .svf-border {
+    @apply border-primary-svf dark:border-primary-svf;
+  }
+
+  .fiit-bg {
+    @apply bg-primary-fiit;
+  }
+  .fad-bg {
+    @apply bg-primary-fad;
+  }
+  .fchpt-bg {
+    @apply bg-primary-fchpt;
+  }
+  .fei-bg {
+    @apply bg-primary-fei;
+  }
+  .mtf-bg {
+    @apply bg-primary-mtf;
+  }
+  .sjf-bg {
+    @apply bg-primary-sjf;
+  }
+  .svf-bg {
+    @apply bg-primary-svf;
+  }
+
+  .fiit-text {
+    @apply text-primary-fiit;
+  }
+  .fad-text {
+    @apply text-primary-fad;
+  }
+  .fchpt-text {
+    @apply text-primary-fchpt;
+  }
+  .fei-text {
+    @apply text-primary-fei;
+  }
+  .mtf-text {
+    @apply text-primary-mtf;
+  }
+  .sjf-text {
+    @apply text-primary-sjf;
+  }
+  .svf-text {
+    @apply text-primary-svf;
+  }
+
+  .fiit-bg-hover {
+    @apply hover:bg-primary-fiit dark:hover:bg-primary-fiit;
+  }
+  .fad-bg-hover {
+    @apply hover:bg-primary-fad dark:hover:bg-primary-fad;
+  }
+  .fchpt-bg-hover {
+    @apply hover:bg-primary-fchpt dark:hover:bg-primary-fchpt;
+  }
+  .fei-bg-hover {
+    @apply hover:bg-primary-fei dark:hover:bg-primary-fei;
+  }
+  .mtf-bg-hover {
+    @apply hover:bg-primary-mtf dark:hover:bg-primary-mtf;
+  }
+  .sjf-bg-hover {
+    @apply hover:bg-primary-sjf dark:hover:bg-primary-sjf;
+  }
+  .svf-bg-hover {
+    @apply hover:bg-primary-svf dark:hover:bg-primary-svf;
+  }
+
+  .fiit-border-focus {
+    @apply focus:border-primary-fiit dark:focus:border-primary-fiit;
+  }
+  .fad-border-focus {
+    @apply focus:border-primary-fad dark:focus:border-primary-fad;
+  }
+  .fchpt-border-focus {
+    @apply focus:border-primary-fchpt dark:focus:border-primary-fchpt;
+  }
+  .fei-border-focus {
+    @apply focus:border-primary-fei dark:focus:border-primary-fei;
+  }
+  .mtf-border-focus {
+    @apply focus:border-primary-mtf dark:focus:border-primary-mtf;
+  }
+  .sjf-border-focus {
+    @apply focus:border-primary-sjf dark:focus:border-primary-sjf;
+  }
+  .svf-border-focus {
+    @apply focus:border-primary-svf dark:focus:border-primary-svf;
   }
 }

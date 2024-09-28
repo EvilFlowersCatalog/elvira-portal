@@ -18,7 +18,7 @@ interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
 }
 const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
-  const { STUColor } = useAppContext();
+  const { STUColor, stuText, stuBg } = useAppContext();
   const { auth } = useAuthContext();
   const { t } = useTranslation();
   const [entry, setEntry] = useState<IEntryDetail | null>(null);
@@ -121,7 +121,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       className={`fixed top-0 right-0 z-50 h-full w-full md:w-2/4 lg:w-2/5 xl:w-1/4 bg-darkGray bg-opacity-95 flex flex-col p-4 overflow-auto`}
     >
       <button
-        className='bg-STUColor text-white h-fit w-fit rounded-md p-2 mb-4'
+        className={`${stuBg} text-white h-fit w-fit rounded-md p-2 mb-4`}
         onClick={() => {
           umami.track('Close Entry Detail Button');
           searchParams.delete('entry-detail-id');
@@ -185,21 +185,21 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               {/* Detail */}
               <div className={'flex flex-col items-center'}>
                 <span className={'text-white'}>PDF</span>
-                <span className={'text-STUColor font-extrabold'}>
+                <span className={`${stuText} font-extrabold`}>
                   {entry.response.acquisitions?.length ?? 0}
                 </span>
               </div>
               <span className={'h-3/6 border-l border-white'}></span>
               <div className={'flex flex-col items-center'}>
                 <span className={'text-white'}>{t('entry.detail.views')}</span>
-                <span className={'text-STUColor font-extrabold'}>
+                <span className={`${stuText} font-extrabold`}>
                   {entry.response.popularity}
                 </span>
               </div>
               <span className={'h-3/6 border-l border-white'}></span>
               <div className={'flex flex-col items-center'}>
                 <span className={'text-white'}>{t('entry.detail.lang')}</span>
-                <span className={'text-STUColor font-extrabold'}>
+                <span className={`${stuText} font-extrabold`}>
                   {entry.response.language?.alpha2?.toLocaleUpperCase() ??
                     entry.response.language?.alpha3?.toLocaleUpperCase() ??
                     '-'}
@@ -233,9 +233,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               {entry.response.feeds.map((feed, index) => (
                 <button
                   key={index}
-                  className={
-                    'px-2 py-1 border border-darkGray text-white border-opacity-0 bg-STUColor hover:bg-opacity-50 rounded-md duration-200'
-                  }
+                  className={`px-2 py-1 border border-darkGray text-white border-opacity-0 ${stuBg} hover:bg-opacity-50 rounded-md duration-200`}
                   onClick={() => {
                     umami.track('Entry Detail Feed Button Param', {
                       feedId: feed.id,
@@ -262,9 +260,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               {entry.response.categories.map((category, index) => (
                 <button
                   key={index}
-                  className={
-                    'px-2 py-1 border border-darkGray text-white border-opacity-0 bg-STUColor hover:bg-opacity-50 rounded-md duration-200'
-                  }
+                  className={`px-2 py-1 border border-darkGray text-white border-opacity-0 ${stuBg} hover:bg-opacity-50 rounded-md duration-200`}
                   onClick={() => {
                     umami.track('Entry Detail Category Button Param', {
                       feedId: category.id,

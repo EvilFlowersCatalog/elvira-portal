@@ -6,8 +6,10 @@
 - **Added**: Possibility for multiple parents for feed
 - **Added**: Few base styles
 - **Added**: UMAMI tracking
+- **Added**: Primary color changes based on `ELVIRA_FACULTY`
 - **Changed**: `Required Auth/Admin` to `Auth/Admin Guard`
 - **Changed**: `Login.tsx` to `Auth.tsx`
+- **Changed**: Viewer from `0.5.9` to `0.5.12`
 - **Removed**: useCustomEffect
 
 ## 3.1.1 : 2024-08-09

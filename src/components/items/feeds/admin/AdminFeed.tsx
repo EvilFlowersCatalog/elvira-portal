@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { IFeed } from '../../../../utils/interfaces/feed';
 import useDeleteFeed from '../../../../hooks/api/feeds/useDeleteFeed';
 import ConfirmationDialog from '../../../dialogs/ConfirmationDialog';
+import useAppContext from '../../../../hooks/contexts/useAppContext';
 
 interface IFeedParams {
   feed: IFeed;
@@ -17,6 +18,8 @@ interface IFeedParams {
 
 const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
   const { t } = useTranslation();
+  const { stuBgHover, stuBg } = useAppContext();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const [showForm, setShowForm] = useState<boolean>(false);
@@ -64,7 +67,7 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
         }
       >
         <button
-          className={`p-5 py-10 gap-5 w-full h-full flex text-center justify-between items-center bg-STUColor text-white rounded-t-md ${
+          className={`p-5 py-10 gap-5 w-full h-full flex text-center justify-between items-center ${stuBg} text-white rounded-t-md ${
             isNavigationFeed() ? '' : 'cursor-default'
           }`}
           onClick={setParent}
@@ -98,7 +101,7 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
         </button>
         <div className='flex'>
           <button
-            className='flex flex-1 justify-center py-2 bg-green text-white rounded-bl-md hover:bg-STUColor'
+            className={`flex flex-1 justify-center py-2 bg-green text-white rounded-bl-md ${stuBgHover}`}
             onClick={() => {
               umami.track('Edit Feed Button', {
                 feedId: feed.id,
@@ -109,7 +112,7 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
             <MdEdit size={20} />
           </button>
           <button
-            className='flex flex-1 justify-center py-2 bg-red text-white rounded-br-md hover:bg-STUColor'
+            className={`flex flex-1 justify-center py-2 bg-red text-white rounded-br-md ${stuBgHover}`}
             onClick={() => {
               umami.track('Delete Feed Button', {
                 feedId: feed.id,

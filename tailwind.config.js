@@ -37,16 +37,15 @@ export default {
         xxl: '1440px',
       },
       colors: {
-        /**
-         * FIIT: #01a9e0
-         * MTF: #e62b1e
-         * SvF: #e5722a
-         * SjF: #4c5b60
-         * FEI: #0c4a8e
-         * FCHPT: #ffda1c
-         * FAD: #009d4a
-         */
-        STUColor: '#01a9e0',
+        primary: {
+          fiit: '#01a9e0',
+          mtf: '#e62b1e',
+          svf: '#e5722a',
+          sjf: '#4c5b60',
+          fei: '#0c4a8e',
+          fchpt: '#ffda1c',
+          fad: '#009d4a',
+        },
         red: '#ff2129',
         green: '#77dd77',
         darkGray: '#1f1f1f',

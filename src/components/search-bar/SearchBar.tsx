@@ -3,17 +3,14 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 import { useTranslation } from 'react-i18next';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import Slider from '@mui/material/Slider';
 import Button from '../buttons/Button';
 import ElviraInput from '../inputs/ElviraInput';
-import { MdRemoveCircle } from 'react-icons/md';
 import FeedAutofill from '../autofills/FeedAutofill';
 import CategoryAutofill from '../autofills/CategoryAutofill';
 import { ICategory } from '../../utils/interfaces/category';
 
 const SearchBar = () => {
-  const { setShowSearchBar, isSmallDevice } = useAppContext();
+  const { setShowSearchBar, isSmallDevice, stuBg } = useAppContext();
   const { t } = useTranslation();
   const [activeFeeds, setActiveFeeds] = useState<{
     feeds: { title: string; id: string }[];
@@ -69,7 +66,7 @@ const SearchBar = () => {
     >
       <div className='flex flex-col justify-between text-center gap-4'>
         <button
-          className='bg-STUColor text-white h-fit w-fit rounded-md p-2'
+          className={`${stuBg} text-white h-fit w-fit rounded-md p-2`}
           onClick={() => setShowSearchBar(false)}
         >
           <RiArrowRightDoubleFill size={18} />
@@ -84,37 +81,6 @@ const SearchBar = () => {
         onSubmit={onSubmit}
         className='flex-1 bg-zinc-100 dark:bg-darkGray py-4 flex flex-col gap-4 rounded-md items-center'
       >
-        <div className='w-full'>
-          <span>{t('searchBar.year')}</span>
-          <div className='w-full px-2'>
-            <Box
-              sx={{
-                width: '100%',
-                '& .MuiSlider-thumb': {
-                  borderRadius: '3px',
-                },
-              }}
-            >
-              <Slider
-                max={2024}
-                min={1950}
-                step={1}
-                value={year}
-                disableSwap
-                onChange={handleYearChange}
-              />
-            </Box>
-          </div>
-          <div className={'flex w-full justify-between'}>
-            <span>
-              {t('searchBar.from')}: {year[0]}
-            </span>
-            <span>
-              {t('searchBar.to')}: {year[1]}
-            </span>
-          </div>
-        </div>
-
         <div className='w-full'>
           <ElviraInput
             placeholder={t('searchBar.title')}
