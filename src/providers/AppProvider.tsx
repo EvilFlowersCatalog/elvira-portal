@@ -68,26 +68,15 @@ export interface IAppContext {
 }
 
 export const AppContext = createContext<IAppContext | null>(null);
+const elviraTheme = import.meta.env.ELVIRA_THEME;
 
 // assets / LOGOS
-const logoDark = `/assets/${
-  import.meta.env.ELVIRA_FACULTY
-}/elvira/logo-dark.png`;
-const logoLight = `/assets/${
-  import.meta.env.ELVIRA_FACULTY
-}/elvira/logo-light.png`;
-const titleLogoDark = `/assets/${
-  import.meta.env.ELVIRA_FACULTY
-}/elvira/title-logo-dark.png`;
-const titleLogoLight = `/assets/${
-  import.meta.env.ELVIRA_FACULTY
-}/elvira/title-logo-light.png`;
-const stuLogoDark = `/assets/${
-  import.meta.env.ELVIRA_FACULTY
-}/stu/logo-dark.png`;
-const stuLogoLight = `/assets/${
-  import.meta.env.ELVIRA_FACULTY
-}/stu/logo-light.png`;
+const logoDark = `/assets/${elviraTheme}/elvira/logo-dark.png`;
+const logoLight = `/assets/${elviraTheme}/elvira/logo-light.png`;
+const titleLogoDark = `/assets/${elviraTheme}/elvira/title-logo-dark.png`;
+const titleLogoLight = `/assets/${elviraTheme}/elvira/title-logo-light.png`;
+const stuLogoDark = `/assets/${elviraTheme}/stu/logo-dark.png`;
+const stuLogoLight = `/assets/${elviraTheme}/stu/logo-light.png`;
 
 const AppProvider = ({ children }: IContextProviderParams) => {
   const { cookies, setCookie } = useCookiesContext();
@@ -121,6 +110,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const [orderBy, setOrderBy] = useState<string | null>(null);
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [author, setAuthor] = useState<string | null>(null);
+  // check main.css
   const [stuColors] = useState<{ [key: string]: string }[]>([
     // backgournd 0
     {
@@ -183,7 +173,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
       fad: '#009d4a',
     },
   ]);
-  const faculty = import.meta.env.ELVIRA_FACULTY;
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -435,12 +424,12 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         setEditingEntryTitle,
         feedParents,
         setFeedParents,
-        stuBg: stuColors[0][faculty],
-        stuBorder: stuColors[1][faculty],
-        stuBgHover: stuColors[2][faculty],
-        stuBorderFocus: stuColors[3][faculty],
-        stuText: stuColors[4][faculty],
-        STUColor: stuColors[5][faculty],
+        stuBg: stuColors[0][elviraTheme],
+        stuBorder: stuColors[1][elviraTheme],
+        stuBgHover: stuColors[2][elviraTheme],
+        stuBorderFocus: stuColors[3][elviraTheme],
+        stuText: stuColors[4][elviraTheme],
+        STUColor: stuColors[5][elviraTheme],
       }}
     >
       {children}

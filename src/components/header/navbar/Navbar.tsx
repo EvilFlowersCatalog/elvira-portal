@@ -157,9 +157,9 @@ const Navbar = () => {
           name={''}
           onClick={() => {
             umami.track('STU Button', {
-              url: stuLinks[import.meta.env.ELVIRA_FACULTY],
+              url: stuLinks[import.meta.env.ELVIRA_THEME],
             });
-            window.open(stuLinks[import.meta.env.ELVIRA_FACULTY], '_blank');
+            window.open(stuLinks[import.meta.env.ELVIRA_THEME], '_blank');
           }}
           icon={
             <img

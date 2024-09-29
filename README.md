@@ -26,7 +26,7 @@ Ah, the secret sauce behind the scenes! 🌟 Here's a quick rundown of our Elvir
 
 - **_ELVIRA_BASE_URL_** - Where the FE (Frontend) fetches all its data from the server.
 - **_ELVIRA_CATALOG_ID_** - The magical ID where all the data resides. Each catalog ID corresponds to a different department at the STU Faculty, housing its unique data.
-- **ELVIRA_FACULTY** - The naming convention corresponds to each STU Faculty, leading you to their respective logo collections.
+- **ELVIRA_THEME** - The naming convention corresponds to each STU Faculty, leading you to their respective logo collections and uniqe colors.
 - **ELVIRA_UMAMI_SERVER** - The url for server where you're handling analytics
 - **ELVIRA_UMAMI_WEBSITE** - ID of website where those analytics should remain
 
@@ -35,7 +35,7 @@ Feel the urge to customize? You can effortlessly overwrite these variables using
 ```bash
 export  ELVIRA_BASE_URL=base_url
 export  ELVIRA_CATALOG_ID=catalog_id
-export  ELVIRA_FACULTY=dir_name
+export  ELVIRA_THEME=theme
 export  ELVIRA_UMAMI_SERVER=server_url
 export  ELVIRA_UMAMI_WEBSITE=website_id
 
@@ -49,28 +49,10 @@ And remember, it's the golden rule to clean up afterward:
 ```bash
 unset  ELVIRA_BASE_URL
 unset  ELVIRA_CATALOG_ID
-unset  ELVIRA_FACULTY
+unset  ELVIRA_THEME
 unset  ELVIRA_UMAMI_SERVER
 unset  ELVIRA_UMAMI_WEBSITE
 ```
-
-## Customizing Elvira's Color
-
-Feel like giving Elvira a fresh coat of paint? 🎨 Let's do it with style!
-
-Just head to `tailwind.config.js`, find extend, then colors and here you find STUColor. Just swap out the hex code for your color you fancy. It's like giving Elvira a brand-new dress for the ball! 💃
-
-```ts
-theme: {
-  extend: {
-    colors: {
-      STUColor: '#hex_code',
-    },
-  },
-}
-```
-
-And there you have it! Your very own Elvira, personalized to perfection. 🤌
 
 ## Preview your build
 

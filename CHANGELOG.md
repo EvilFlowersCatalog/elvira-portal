@@ -9,7 +9,9 @@
 - **Added**: Primary color changes based on `ELVIRA_FACULTY`
 - **Changed**: `Required Auth/Admin` to `Auth/Admin Guard`
 - **Changed**: `Login.tsx` to `Auth.tsx`
+- **Changed**: `README.md`
 - **Changed**: Viewer from `0.5.9` to `0.5.12`
+- **Changed**: In .env `ELVIRA_FACULTY` variable to `ELVIRA_THEME`
 - **Removed**: useCustomEffect
 
 ## 3.1.1 : 2024-08-09
