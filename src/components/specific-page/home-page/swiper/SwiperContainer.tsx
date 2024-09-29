@@ -22,7 +22,7 @@ const SwiperContainer = ({
   activeEntryId,
   type,
 }: ISwiperContainerParams) => {
-  const { STUColor } = useAppContext();
+  const { stuColor } = useAppContext();
 
   return (
     <Swiper
@@ -61,7 +61,7 @@ const SwiperContainer = ({
 
         .swiper-scrollbar-drag:hover {
           height: 11px !important;
-          background-color: ${STUColor} !important;
+          background-color: ${stuColor} !important;
         }
       `}</style>
     </Swiper>

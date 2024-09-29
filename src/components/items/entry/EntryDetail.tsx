@@ -18,7 +18,7 @@ interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
 }
 const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
-  const { STUColor, stuText, stuBg } = useAppContext();
+  const { stuColor, stuText, stuBg } = useAppContext();
   const { auth } = useAuthContext();
   const { t } = useTranslation();
   const [entry, setEntry] = useState<IEntryDetail | null>(null);
@@ -132,7 +132,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       </button>
       {!entry ? (
         <div className={'flex justify-center h-full items-center'}>
-          <CircleLoader color={STUColor} size={50} />
+          <CircleLoader color={stuColor} size={50} />
         </div>
       ) : (
         <div className={'flex-1 flex flex-col'}>

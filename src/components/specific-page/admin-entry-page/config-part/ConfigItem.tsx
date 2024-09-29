@@ -10,7 +10,7 @@ interface IConfigItemProps {
 }
 
 const ConfigItem = ({ name, checked, onChange }: IConfigItemProps) => {
-  const { STUColor } = useAppContext();
+  const { stuColor } = useAppContext();
 
   return (
     <div className='flex items-center'>
@@ -19,9 +19,9 @@ const ConfigItem = ({ name, checked, onChange }: IConfigItemProps) => {
         checked={checked}
         onChange={onChange}
         sx={{
-          color: STUColor,
+          color: stuColor,
           '&.Mui-checked': {
-            color: STUColor,
+            color: stuColor,
           },
         }}
       />

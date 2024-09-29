@@ -11,7 +11,7 @@ import ElviraInput from '../../components/inputs/ElviraInput';
 
 const Auth = () => {
   const { login } = useAuthContext();
-  const { STUColor, theme, titleLogoDark, titleLogoLight } = useAppContext();
+  const { stuColor, theme, titleLogoDark, titleLogoLight } = useAppContext();
   const { t } = useTranslation();
   const [loginForm, setLoginForm] = useState<IAuthCredentials>({
     username: '',
@@ -65,7 +65,7 @@ const Auth = () => {
         <div className='flex w-full h-fit justify-center items-start'>
           {loading ? (
             <div className='flex h-full justify-center items-center'>
-              <CircleLoader color={STUColor} size={50} />
+              <CircleLoader color={stuColor} size={50} />
             </div>
           ) : (
             <form

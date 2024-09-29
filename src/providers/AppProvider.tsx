@@ -49,7 +49,6 @@ export interface IAppContext {
     showScrollUp: boolean,
     setShowScrollUp: (showScrollUp: boolean) => void
   ) => void;
-  STUColor: string;
   logoDark: string;
   logoLight: string;
   titleLogoDark: string;
@@ -65,6 +64,7 @@ export interface IAppContext {
   stuBg: string;
   stuBgHover: string;
   stuText: string;
+  stuColor: string;
 }
 
 export const AppContext = createContext<IAppContext | null>(null);
@@ -429,7 +429,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         stuBgHover: stuColors[2][elviraTheme],
         stuBorderFocus: stuColors[3][elviraTheme],
         stuText: stuColors[4][elviraTheme],
-        STUColor: stuColors[5][elviraTheme],
+        stuColor: stuColors[5][elviraTheme],
       }}
     >
       {children}

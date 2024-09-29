@@ -13,7 +13,7 @@ const PageLoading = ({
   entries = false,
   showLayout = false,
 }: IPageLoadingParams) => {
-  const { STUColor, layout } = useAppContext();
+  const { stuColor, layout } = useAppContext();
 
   return (
     <div className={'flex flex-1 h-full flex-wrap px-4 pb-4'}>
@@ -35,7 +35,7 @@ const PageLoading = ({
         )
       ) : (
         <div className={'flex flex-1 justify-center items-center'}>
-          <CircleLoader color={STUColor} size={100} />
+          <CircleLoader color={stuColor} size={100} />
         </div>
       )}
     </div>

@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import ApplyInfoDialog from '../../dialogs/ApplyInfoDialog';
 
 const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
-  const { STUColor } = useAppContext();
+  const { stuColor } = useAppContext();
   const { t } = useTranslation();
 
   const [loadingInfo, setLoadingInfo] = useState<boolean>(false);
@@ -67,7 +67,7 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
         <span>{t('entry.wizard.identifiers')}</span>
         {loadingInfo ? (
           <div className={'flex h-full justify-center items-center'}>
-            <CircleLoader color={STUColor} size={30} />
+            <CircleLoader color={stuColor} size={30} />
           </div>
         ) : (
           <div className='flex flex-col gap-4'>
@@ -91,7 +91,7 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
                     );
                   }
                 }}
-                color={STUColor}
+                color={stuColor}
               />
             </div>
             <div className='w-full flex gap-2 relative items-center'>
@@ -114,7 +114,7 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
                     );
                   }
                 }}
-                color={STUColor}
+                color={stuColor}
               />
             </div>
           </div>
