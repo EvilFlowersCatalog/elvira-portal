@@ -14,7 +14,7 @@ install dependencies:
   only:
     - dev
 
-build dev:
+build:
   stage: build
   image: node:22
   script:
@@ -28,7 +28,7 @@ build dev:
   environment: $ENVIRONMENT
   parallel:
     matrix:
-      - ENVIRONMENT: [ fiit, fiit-dev, mtf, svf, fei ]
+      - ENVIRONMENT: [ fad, fchpt, fei, fiit, fiit-dev, mtf, sjf, svf ]
   only:
     - dev
 
@@ -40,8 +40,9 @@ deploy:
     BUILD_DIR: _build/$ENVIRONMENT
   script:
     - NODE_PATH=/usr/local/lib/node_modules node /opt/node-deployer/deploy.js
-  environment:
-    name: dev
-    url: https://elvira-dev.fiit.stuba.sk/
+  environment: $ENVIRONMENT
+  parallel:
+    matrix:
+      - ENVIRONMENT: [ fad, fchpt, fei, fiit, fiit-dev, mtf, sjf, svf ]
   only:
     - dev
