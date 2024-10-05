@@ -13,8 +13,10 @@ install dependencies:
       - node_modules
   only:
     - dev
+    - master  # Include master if needed
 
-build:
+# Job template for build
+.build_template:
   stage: build
   image: node:22
   script:
@@ -26,13 +28,27 @@ build:
     paths:
       - _build/$ENVIRONMENT
   environment: $ENVIRONMENT
+
+# Build job for 'dev' branch
+build dev:
+  extends: .build_template
   parallel:
     matrix:
-      - ENVIRONMENT: [ fad, fchpt, fei, fiit, fiit-dev, mtf, sjf, svf ]
+      - ENVIRONMENT: [fiit-dev]
   only:
     - dev
 
-deploy:
+# Build job for 'master' branch
+build production:
+  extends: .build_template
+  parallel:
+    matrix:
+      - ENVIRONMENT: [fad, fchpt, fei, fiit, mtf, sjf, svf]
+  only:
+    - master
+
+# Job template for deploy
+.deploy_template:
   stage: deploy
   image: ghcr.io/backbonesk/node-deployer:master
   variables:
@@ -41,8 +57,21 @@ deploy:
   script:
     - NODE_PATH=/usr/local/lib/node_modules node /opt/node-deployer/deploy.js
   environment: $ENVIRONMENT
+
+# Deploy job for 'dev' branch
+deploy dev:
+  extends: .deploy_template
   parallel:
     matrix:
-      - ENVIRONMENT: [ fad, fchpt, fei, fiit, fiit-dev, mtf, sjf, svf ]
+      - ENVIRONMENT: [fiit-dev]
   only:
     - dev
+
+# Deploy job for 'master' branch
+deploy production:
+  extends: .deploy_template
+  parallel:
+    matrix:
+      - ENVIRONMENT: [fad, fchpt, fei, fiit, mtf, sjf, svf]
+  only:
+    - master
