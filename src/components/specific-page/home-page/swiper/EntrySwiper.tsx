@@ -20,7 +20,7 @@ const EntrySwiper = ({
   clickedEntry,
 }: IEntrySwiperParams) => {
   const { auth } = useAuthContext();
-  const { stuBg } = useAppContext();
+  const { stuBg, umamiTrack } = useAppContext();
 
   const [isScale, setIsScale] = useState<boolean>(false);
   const [isUnderLine, setIsUnderLine] = useState<boolean>(false);
@@ -39,11 +39,11 @@ const EntrySwiper = ({
 
   const openEntryDetail = () => {
     if (type === 'popular')
-      umami.track('Popular Entry Button', {
+      umamiTrack('Popular Entry Button', {
         entryId: entry.id,
       });
     else
-      umami.track('Last Added Entry Button', {
+      umamiTrack('Last Added Entry Button', {
         entryId: entry.id,
       });
 

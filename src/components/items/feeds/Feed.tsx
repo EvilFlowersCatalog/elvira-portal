@@ -11,7 +11,7 @@ interface IFeedParams {
 }
 
 const Feed = ({ feed }: IFeedParams) => {
-  const { stuBg } = useAppContext();
+  const { stuBg, umamiTrack } = useAppContext();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [isHovering, setIsHovering] = useState<boolean>(false);
@@ -19,7 +19,7 @@ const Feed = ({ feed }: IFeedParams) => {
 
   const handleFeedClick = () => {
     if (feed.kind === 'navigation') {
-      umami.track('Feed Parent Button', {
+      umamiTrack('Feed Parent Button', {
         feedId: feed.id,
       });
       const params = new URLSearchParams(searchParams);
@@ -33,7 +33,7 @@ const Feed = ({ feed }: IFeedParams) => {
       params.set('parent-id', path);
       setSearchParams(params);
     } else {
-      umami.track('Feed Button', {
+      umamiTrack('Feed Button', {
         feedId: feed.id,
       });
       const params = new URLSearchParams();

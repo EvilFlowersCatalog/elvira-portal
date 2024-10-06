@@ -18,7 +18,7 @@ interface IFeedParams {
 
 const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
   const { t } = useTranslation();
-  const { stuBgHover, stuBg } = useAppContext();
+  const { stuBgHover, stuBg, umamiTrack } = useAppContext();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [isHovering, setIsHovering] = useState<boolean>(false);
@@ -103,7 +103,7 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
           <button
             className={`flex flex-1 justify-center py-2 bg-green text-white rounded-bl-md ${stuBgHover}`}
             onClick={() => {
-              umami.track('Edit Feed Button', {
+              umamiTrack('Edit Feed Button', {
                 feedId: feed.id,
               });
               setShowForm(true);
@@ -114,7 +114,7 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
           <button
             className={`flex flex-1 justify-center py-2 bg-red text-white rounded-br-md ${stuBgHover}`}
             onClick={() => {
-              umami.track('Delete Feed Button', {
+              umamiTrack('Delete Feed Button', {
                 feedId: feed.id,
               });
               setShowDeleteMenu(true);

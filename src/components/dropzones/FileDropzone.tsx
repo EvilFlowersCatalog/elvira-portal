@@ -29,7 +29,7 @@ const FileDropzone = ({
   setFiles = null,
 }: IFilesDropzoneParams) => {
   const { t } = useTranslation();
-  const { stuBg } = useAppContext();
+  const { stuBg, umamiTrack } = useAppContext();
 
   const [acquisitions, setAcquisitions] = useState<IAcquisition[]>([]);
   const [reload, setReload] = useState<boolean>(false);
@@ -58,7 +58,7 @@ const FileDropzone = ({
 
   const onDropAccepted = useCallback(
     async (acceptedFiles: File[]) => {
-      umami.track('File Dropdown');
+      umamiTrack('File Dropdown');
       const newFiles = acceptedFiles;
       const metadata = {
         relation: 'open-access',
@@ -105,7 +105,7 @@ const FileDropzone = ({
   );
 
   const handleRemoveFile = async (e: MouseEvent<SVGElement>, id: string) => {
-    umami.track('Remove File Dropdown Button');
+    umamiTrack('Remove File Dropdown Button');
     e.stopPropagation();
 
     if (entryId) {

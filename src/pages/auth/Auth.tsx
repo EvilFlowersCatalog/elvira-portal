@@ -11,7 +11,8 @@ import ElviraInput from '../../components/inputs/ElviraInput';
 
 const Auth = () => {
   const { login } = useAuthContext();
-  const { stuColor, theme, titleLogoDark, titleLogoLight } = useAppContext();
+  const { stuColor, theme, titleLogoDark, titleLogoLight, umamiTrack } =
+    useAppContext();
   const { t } = useTranslation();
   const [loginForm, setLoginForm] = useState<IAuthCredentials>({
     username: '',
@@ -41,7 +42,7 @@ const Auth = () => {
   // Submit form function to log in user
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // prevent default (reload in form)
-    umami.track('Login Button');
+    umamiTrack('Login Button');
 
     setLoading(true); // show loader
 

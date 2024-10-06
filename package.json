@@ -11,7 +11,7 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@evilflowers/evilflowersviewer": "^0.5.12",
+    "@evilflowers/evilflowersviewer": "^0.5.13",
     "@mui/material": "^6.0.2",
     "@types/umami": "^2.10.0",
     "axios": "^1.6.7",

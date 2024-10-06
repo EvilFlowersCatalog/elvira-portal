@@ -1,6 +1,5 @@
 import { Checkbox } from '@mui/material';
 import { ChangeEvent } from 'react';
-import { IoHelpCircleOutline } from 'react-icons/io5';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
 
 interface IConfigItemProps {
@@ -26,7 +25,6 @@ const ConfigItem = ({ name, checked, onChange }: IConfigItemProps) => {
         }}
       />
       <span className='text-sm'>{name}</span>
-      <IoHelpCircleOutline className='min-w-10 hidden md:block' size={20} />
     </div>
   );
 };

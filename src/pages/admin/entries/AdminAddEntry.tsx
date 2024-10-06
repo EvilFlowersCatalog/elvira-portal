@@ -19,8 +19,10 @@ import AuthorsPart from '../../../components/specific-page/admin-entry-page/Auth
 import AdditionalDataPart from '../../../components/specific-page/admin-entry-page/AdditionalDataPart';
 import ConfigPart from '../../../components/specific-page/admin-entry-page/config-part/ConfigPart';
 import IdentifiersPart from '../../../components/specific-page/admin-entry-page/IdentifiersPart';
+import useAppContext from '../../../hooks/contexts/useAppContext';
 
 const AdminAddEntry = () => {
+  const { umamiTrack } = useAppContext();
   const { t } = useTranslation();
 
   const [entry, setEntry] = useState<IEntryNewForm>({
@@ -71,7 +73,7 @@ const AdminAddEntry = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    umami.track('Upload Created Entry Button');
+    umamiTrack('Upload Created Entry Button');
 
     const newEntry: IEntryNew = {
       title: entry.title,
@@ -137,7 +139,7 @@ const AdminAddEntry = () => {
 
   return (
     <>
-      <div className='flex flex-col w-full'>
+      <div className='flex flex-col w-full overflow-auto'>
         <Breadcrumb />
         {entry === null || isLoading ? (
           <PageLoading />

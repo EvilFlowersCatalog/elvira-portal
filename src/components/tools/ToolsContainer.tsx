@@ -28,6 +28,7 @@ const ToolsContainer = ({
     updateLayout,
     layout,
     isSmallDevice,
+    umamiTrack,
   } = useAppContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const [input, setInput] = useState<string>('');
@@ -62,7 +63,7 @@ const ToolsContainer = ({
   };
 
   const handleClear = () => {
-    umami.track('Clear Filters Button');
+    umamiTrack('Clear Filters Button');
     setInput('');
     clearFilters();
   };
@@ -115,7 +116,7 @@ const ToolsContainer = ({
           <button
             className='text-sm hover:underline mt-2'
             onClick={() => {
-              umami.track('Advanced Search Button');
+              umamiTrack('Advanced Search Button');
               setShowSearchBar(!showSearchBar);
             }}
           >

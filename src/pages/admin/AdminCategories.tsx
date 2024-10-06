@@ -8,7 +8,7 @@ import CategoryForm from '../../components/items/categories/CategoryForm';
 import useAppContext from '../../hooks/contexts/useAppContext';
 
 const AdminCategories = () => {
-  const { stuBorder, stuBg } = useAppContext();
+  const { stuBorder, stuBg, umamiTrack } = useAppContext();
 
   const [categories, setCategories] = useState<any[]>([]);
   const [searchParams] = useSearchParams();
@@ -79,7 +79,7 @@ const AdminCategories = () => {
           <div className={'w-full p-2 flex md:w-1/2 xl:w-1/3'}>
             <button
               onClick={() => {
-                umami.track('Add Category Button');
+                umamiTrack('Add Category Button');
                 setIsOpen(true);
               }}
               className={`flex flex-col justify-center dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 ${stuBorder} ${stuBg} bg-opacity-40 hover:bg-opacity-20 duration-200`}

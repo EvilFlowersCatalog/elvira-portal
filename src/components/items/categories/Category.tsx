@@ -15,7 +15,7 @@ interface ICategoryParam {
 }
 
 const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
-  const { stuBg, stuBgHover } = useAppContext();
+  const { stuBg, stuBgHover, umamiTrack } = useAppContext();
   const { t } = useTranslation();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -59,7 +59,7 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
           <button
             className={`flex flex-1 justify-center py-2 bg-green text-white rounded-bl-md ${stuBgHover}`}
             onClick={() => {
-              umami.track('Edit Category Button', {
+              umamiTrack('Edit Category Button', {
                 categoryId: category.id,
               });
               setIsOpen(true);
@@ -70,7 +70,7 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
           <button
             className={`flex flex-1 justify-center py-2 bg-red text-white rounded-br-md ${stuBgHover}`}
             onClick={() => {
-              umami.track('Delete Category Button', {
+              umamiTrack('Delete Category Button', {
                 categoryId: category.id,
               });
               setShowDeleteMenu(true);

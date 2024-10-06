@@ -9,7 +9,7 @@ import FeedForm from '../../components/items/feeds/admin/FeedForm';
 import useAppContext from '../../hooks/contexts/useAppContext';
 
 const AdminFeeds = () => {
-  const { stuBg, stuBorder } = useAppContext();
+  const { stuBg, stuBorder, umamiTrack } = useAppContext();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingNext, setLoadingNext] = useState<boolean>(false);
@@ -85,7 +85,7 @@ const AdminFeeds = () => {
           <div className={'flex p-2.5 w-full lg:w-1/2 xl:w-1/3 xxl:w-1/4'}>
             <button
               onClick={() => {
-                umami.track('Add Feed Button');
+                umamiTrack('Add Feed Button');
                 setShowForm(true);
               }}
               className={`flex flex-col justify-center dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 ${stuBorder} ${stuBg} bg-opacity-40 hover:bg-opacity-20 duration-200`}

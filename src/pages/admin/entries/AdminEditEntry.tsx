@@ -23,7 +23,7 @@ import CategoriesPart from '../../../components/specific-page/admin-entry-page/C
 
 const AdminEditEntry = () => {
   const { t } = useTranslation();
-  const { setEditingEntryTitle } = useAppContext();
+  const { setEditingEntryTitle, umamiTrack } = useAppContext();
   const { 'entry-id': id } = useParams();
   const [entry, setEntry] = useState<IEntryNewForm | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -86,7 +86,7 @@ const AdminEditEntry = () => {
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    umami.track('Upload Edited Entry Button', {
+    umamiTrack('Upload Edited Entry Button', {
       entryId: id,
     });
 
@@ -130,7 +130,7 @@ const AdminEditEntry = () => {
 
   return (
     <>
-      <div className='flex flex-col w-full h-full'>
+      <div className='flex flex-col w-full h-full overflow-auto'>
         <Breadcrumb />
         {entry === null || isLoading ? (
           <PageLoading />

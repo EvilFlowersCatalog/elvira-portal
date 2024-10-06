@@ -8,7 +8,7 @@ import useAppContext from '../../../hooks/contexts/useAppContext';
 
 const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
   const { t } = useTranslation();
-  const { stuText, stuBg } = useAppContext();
+  const { stuText, stuBg, umamiTrack } = useAppContext();
 
   const [open, setOpen] = useState<boolean>(false);
 
@@ -20,7 +20,7 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
             type='button'
             className={`${stuText} text-sm text-right hover:underline w-fit`}
             onClick={() => {
-              umami.track('Entry Create Category Button');
+              umamiTrack('Entry Create Category Button');
 
               setOpen(true);
             }}
@@ -36,7 +36,7 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
                 type='button'
                 className={`${stuBg}p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md`}
                 onClick={() => {
-                  umami.track('Entry Remove Category Button', {
+                  umamiTrack('Entry Remove Category Button', {
                     categoryId: item.id,
                   });
                   setEntry({

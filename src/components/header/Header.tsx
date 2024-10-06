@@ -11,16 +11,17 @@ const Header = () => {
     theme,
     titleLogoDark,
     titleLogoLight,
-    stuLogoDark,
-    stuLogoLight,
     specialNavigation,
   } = useAppContext();
 
   return (
-    <div className='w-full h-fit py-3 flex px-5 gap-4 items-center bg-zinc-200 dark:bg-darkGray'>
+    <div className='fixed top-0 z-20 w-full h-fit py-3 flex px-5 gap-4 items-center bg-zinc-200 dark:bg-darkGray'>
       <button className='' onClick={() => setShowNavbar(true)}>
         <FiMenu size={30} />
       </button>
+
+      {/* Spacer */}
+      <span className='flex-1' />
 
       <button onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.home)}>
         <img
@@ -29,15 +30,6 @@ const Header = () => {
           alt='Elvira Logo'
         />
       </button>
-
-      {/* Spacer */}
-      <span className='flex-1' />
-
-      <img
-        className='h-auto w-16'
-        src={theme === THEME_TYPE.dark ? stuLogoLight : stuLogoDark}
-        alt='STU Logo'
-      />
     </div>
   );
 };

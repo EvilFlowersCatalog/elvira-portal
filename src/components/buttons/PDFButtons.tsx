@@ -11,11 +11,11 @@ interface IPDFButtonsParams {
 }
 
 const PDFButtons = ({ acquisitions, entryId }: IPDFButtonsParams) => {
-  const { specialNavigation } = useAppContext();
+  const { specialNavigation, umamiTrack } = useAppContext();
   const { t } = useTranslation();
 
   const handleRead = (e: MouseEvent<HTMLButtonElement>, index: number) => {
-    umami.track('PDF Read Button', {
+    umamiTrack('PDF Read Button', {
       pdf: acquisitions[index].id,
       entryId,
     });

@@ -1,4 +1,3 @@
-import { MouseEvent } from 'react';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import {
   LANG_TYPE,
@@ -7,11 +6,7 @@ import {
 } from '../../../utils/interfaces/general/general';
 
 import { ReactElement } from 'react';
-import {
-  IoDocumentsOutline,
-  IoMoonOutline,
-  IoSunnyOutline,
-} from 'react-icons/io5';
+import { IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
 import { MdOutlineFeed } from 'react-icons/md';
 import { RiAdminLine, RiArrowLeftDoubleFill } from 'react-icons/ri';
 import { PiBooks } from 'react-icons/pi';
@@ -38,7 +33,7 @@ const NavbarButton = ({
   isActive,
   onClick = null,
 }: INavbarButtonParams) => {
-  const { specialNavigation, stuBorder } = useAppContext();
+  const { specialNavigation, stuBorder, umamiTrack } = useAppContext();
 
   return (
     <button
@@ -51,7 +46,7 @@ const NavbarButton = ({
         onClick
           ? (e) => onClick(e)
           : (e) => {
-              umami.track('Navbar Navigation Button', { path });
+              umamiTrack('Navbar Navigation Button', { path });
               specialNavigation(e, path);
             }
       }
@@ -80,6 +75,7 @@ const Navbar = () => {
     setShowNavbar,
     stuLogoDark,
     stuLogoLight,
+    umamiTrack,
   } = useAppContext();
   const { auth, logout } = useAuthContext();
   const { stuBg } = useAppContext();
@@ -104,7 +100,7 @@ const Navbar = () => {
   // Function for switching theme and patching the app state
   const switchTheme = () => {
     const wantedTheme = isDark() ? THEME_TYPE.light : THEME_TYPE.dark;
-    umami.track('Theme Button', {
+    umamiTrack('Theme Button', {
       theme: wantedTheme,
     });
     updateTheme(wantedTheme);
@@ -113,7 +109,7 @@ const Navbar = () => {
   // Function for switching lang and pathing the app state
   const switchLang = () => {
     const wantedLang = lang === LANG_TYPE.sk ? LANG_TYPE.en : LANG_TYPE.sk;
-    umami.track('Language Button', {
+    umamiTrack('Language Button', {
       lang: wantedLang,
     });
     updateLang(wantedLang);
@@ -128,7 +124,7 @@ const Navbar = () => {
           onClick={
             auth
               ? (e) => {
-                  umami.track('Logo Home Button');
+                  umamiTrack('Logo Home Button');
                   specialNavigation(e, NAVIGATION_PATHS.home);
                 }
               : undefined
@@ -156,7 +152,7 @@ const Navbar = () => {
         <NavbarButton
           name={''}
           onClick={() => {
-            umami.track('STU Button', {
+            umamiTrack('STU Button', {
               url: stuLinks[import.meta.env.ELVIRA_THEME],
             });
             window.open(stuLinks[import.meta.env.ELVIRA_THEME], '_blank');
@@ -208,7 +204,7 @@ const Navbar = () => {
               isActive={location.pathname.includes('administration')}
               onClick={(e) => {
                 const path = NAVIGATION_PATHS.adminHome;
-                umami.track('Navbar Navigation Button', {
+                umamiTrack('Navbar Navigation Button', {
                   path,
                 });
                 specialNavigation(e, path);
@@ -278,7 +274,7 @@ const Navbar = () => {
             {auth.username}
             <Button
               onClick={() => {
-                umami.track('Logout Button');
+                umamiTrack('Logout Button');
                 logout();
               }}
               title={t('navbarMenu.logout')}

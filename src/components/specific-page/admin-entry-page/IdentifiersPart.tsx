@@ -14,7 +14,7 @@ import { useTranslation } from 'react-i18next';
 import ApplyInfoDialog from '../../dialogs/ApplyInfoDialog';
 
 const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
-  const { stuColor } = useAppContext();
+  const { stuColor, umamiTrack } = useAppContext();
   const { t } = useTranslation();
 
   const [loadingInfo, setLoadingInfo] = useState<boolean>(false);
@@ -82,7 +82,7 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
                 size={20}
                 onClick={() => {
                   if (entry.identifiers.doi) {
-                    umami.track('DOI Identifier Download Button', {
+                    umamiTrack('DOI Identifier Download Button', {
                       identifier: entry.identifiers.doi,
                     });
                     handleIdentifier(
@@ -105,7 +105,7 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
                 size={20}
                 onClick={() => {
                   if (entry.identifiers.isbn) {
-                    umami.track('ISBN Identifier Download Button', {
+                    umamiTrack('ISBN Identifier Download Button', {
                       identifier: entry.identifiers.isbn,
                     });
                     handleIdentifier(

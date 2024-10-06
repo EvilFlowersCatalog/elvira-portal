@@ -17,7 +17,7 @@ const ModalWrapper = ({
   buttonLabel,
   yes,
 }: IModalWrapperParams) => {
-  const { stuText } = useAppContext();
+  const { stuText, umamiTrack } = useAppContext();
 
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -31,7 +31,7 @@ const ModalWrapper = ({
     }
   };
   const handleClick = () => {
-    umami.track('Close Modal Button');
+    umamiTrack('Close Modal Button');
     close(false);
   };
 

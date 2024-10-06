@@ -22,7 +22,7 @@ const AdditionalDataPart = ({
 }: IAdditionalDataPartParams) => {
   const { t } = useTranslation();
   const { auth } = useAuthContext();
-  const { stuText } = useAppContext();
+  const { stuText, umamiTrack } = useAppContext();
 
   const year = new Date().getFullYear();
   const [maxDay, setMaxDay] = useState<number>(31);
@@ -178,7 +178,7 @@ const AdditionalDataPart = ({
                 name='date-year'
                 value={selectedYear}
                 onChange={(e) => {
-                  umami.track('Year Selection', {
+                  umamiTrack('Year Selection', {
                     year: e.target.value,
                   });
                   setSelectedYear(e.target.value);
@@ -198,7 +198,7 @@ const AdditionalDataPart = ({
                   name='date-month'
                   value={selectedMonth}
                   onChange={(e) => {
-                    umami.track('Month Selection', {
+                    umamiTrack('Month Selection', {
                       month: e.target.value,
                     });
                     setSelectedMonth(e.target.value);
@@ -219,7 +219,7 @@ const AdditionalDataPart = ({
                   name='date-day'
                   value={selectedDay}
                   onChange={(e) => {
-                    umami.track('Day Selection', {
+                    umamiTrack('Day Selection', {
                       day: e.target.value,
                     });
                     setSelectedDay(e.target.value);

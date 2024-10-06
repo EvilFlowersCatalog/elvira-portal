@@ -18,7 +18,7 @@ interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
 }
 const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
-  const { stuColor, stuText, stuBg } = useAppContext();
+  const { stuColor, stuText, stuBg, umamiTrack } = useAppContext();
   const { auth } = useAuthContext();
   const { t } = useTranslation();
   const [entry, setEntry] = useState<IEntryDetail | null>(null);
@@ -110,6 +110,8 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       try {
         const entryDetail = await getEntryDetail(entryId);
         setEntry(entryDetail);
+
+        console.log(entryDetail.response.acquisitions);
       } catch {
         setEntry(null);
       }
@@ -123,7 +125,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       <button
         className={`${stuBg} text-white h-fit w-fit rounded-md p-2 mb-4`}
         onClick={() => {
-          umami.track('Close Entry Detail Button');
+          umamiTrack('Close Entry Detail Button');
           searchParams.delete('entry-detail-id');
           setSearchParams(searchParams);
         }}
@@ -235,7 +237,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                   key={index}
                   className={`px-2 py-1 border border-darkGray text-white border-opacity-0 ${stuBg} hover:bg-opacity-50 rounded-md duration-200`}
                   onClick={() => {
-                    umami.track('Entry Detail Feed Button Param', {
+                    umamiTrack('Entry Detail Feed Button Param', {
                       feedId: feed.id,
                       entryId: entryId,
                     });
@@ -262,7 +264,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                   key={index}
                   className={`px-2 py-1 border border-darkGray text-white border-opacity-0 ${stuBg} hover:bg-opacity-50 rounded-md duration-200`}
                   onClick={() => {
-                    umami.track('Entry Detail Category Button Param', {
+                    umamiTrack('Entry Detail Category Button Param', {
                       feedId: category.id,
                       entryId: entryId,
                     });

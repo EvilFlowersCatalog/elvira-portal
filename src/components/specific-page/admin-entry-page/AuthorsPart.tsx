@@ -6,8 +6,10 @@ import useGetAuthors from '../../../hooks/api/authors/useGetAuthors';
 import { useEffect, useState } from 'react';
 import { IEntryAuthor } from '../../../utils/interfaces/author';
 import { IoRemoveCircle } from 'react-icons/io5';
+import useAppContext from '../../../hooks/contexts/useAppContext';
 
 const AuthorsPart = ({ entry, setEntry }: IPartParams) => {
+  const { umamiTrack } = useAppContext();
   const { t } = useTranslation();
 
   const [authors, setAuthors] = useState<IEntryAuthor[]>([]);
@@ -27,7 +29,7 @@ const AuthorsPart = ({ entry, setEntry }: IPartParams) => {
   }, []);
 
   const addAuthor = () => {
-    umami.track('Entry Add Author Button');
+    umamiTrack('Entry Add Author Button');
     const authors = entry!.authors;
     authors.push({ name: '', surname: '' });
 
@@ -37,7 +39,7 @@ const AuthorsPart = ({ entry, setEntry }: IPartParams) => {
     });
   };
   const removeAuthor = (i: number) => {
-    umami.track('Entry Remove Author Button');
+    umamiTrack('Entry Remove Author Button');
     let a: IEntryAuthor[] = [];
 
     if (entry.authors.length === 1) a = [{ name: '', surname: '' }];

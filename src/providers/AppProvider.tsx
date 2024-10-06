@@ -65,6 +65,7 @@ export interface IAppContext {
   stuBgHover: string;
   stuText: string;
   stuColor: string;
+  umamiTrack: (title: string, data?: Object) => void;
 }
 
 export const AppContext = createContext<IAppContext | null>(null);
@@ -207,6 +208,10 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     if (event.ctrlKey || (event.metaKey && isMac) || event.button === 2)
       window.open(path, '_blank');
     else navigate(path);
+  };
+
+  const umamiTrack = (title: string, data?: Object) => {
+    if (typeof umami !== 'undefined') umami.track(title, data);
   };
 
   const clearFilters = () => {
@@ -356,42 +361,42 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   }, [searchParams]);
   useEffect(() => {
     if (entryDetailId !== null) {
-      umami.track('Entry Detail Param', { entryId: entryDetailId });
+      umamiTrack('Entry Detail Param', { entryId: entryDetailId });
     }
   }, [entryDetailId]);
   useEffect(() => {
     if (parentId !== null) {
-      umami.track('Parent Param', { parentId });
+      umamiTrack('Parent Param', { parentId });
     }
   }, [parentId]);
   useEffect(() => {
     if (query !== null) {
-      umami.track('Query Param', { query });
+      umamiTrack('Query Param', { query });
     }
   }, [query]);
   useEffect(() => {
     if (title !== null) {
-      umami.track('Title Param', { title });
+      umamiTrack('Title Param', { title });
     }
   }, [title]);
   useEffect(() => {
     if (feedId !== null) {
-      umami.track('Feed Param', { feedId });
+      umamiTrack('Feed Param', { feedId });
     }
   }, [feedId]);
   useEffect(() => {
     if (orderBy !== null) {
-      umami.track('Order By Param', { orderBy });
+      umamiTrack('Order By Param', { orderBy });
     }
   }, [orderBy]);
   useEffect(() => {
     if (categoryId !== null) {
-      umami.track('Category Param', { categoryId });
+      umamiTrack('Category Param', { categoryId });
     }
   }, [categoryId]);
   useEffect(() => {
     if (author !== null) {
-      umami.track('Author Param', { author: author });
+      umamiTrack('Author Param', { author: author });
     }
   }, [author]);
 
@@ -430,6 +435,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         stuBorderFocus: stuColors[3][elviraTheme],
         stuText: stuColors[4][elviraTheme],
         stuColor: stuColors[5][elviraTheme],
+        umamiTrack,
       }}
     >
       {children}

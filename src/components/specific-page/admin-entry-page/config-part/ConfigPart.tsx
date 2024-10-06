@@ -2,8 +2,10 @@ import { useTranslation } from 'react-i18next';
 import { IEntryNewForm } from '../../../../utils/interfaces/entry';
 import ConfigItem from './ConfigItem';
 import { IPartParams } from '../../../../utils/interfaces/general/general';
+import useAppContext from '../../../../hooks/contexts/useAppContext';
 
 const ConfigPart = ({ entry, setEntry }: IPartParams) => {
+  const { umamiTrack } = useAppContext();
   const { t } = useTranslation();
 
   return (
@@ -14,7 +16,7 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
           name={t('entry.wizard.download')}
           checked={entry.config?.evilflowres_metadata_fetch ?? false}
           onChange={(e) => {
-            umami.track('Download Config Button', {
+            umamiTrack('Download Config Button', {
               checked: e.target.checked,
             });
             setEntry({
@@ -30,7 +32,7 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
           name={t('entry.wizard.share')}
           checked={entry.config?.evilflowers_share_enabled ?? false}
           onChange={(e) => {
-            umami.track('Share Config Button', {
+            umamiTrack('Share Config Button', {
               checked: e.target.checked,
             });
             setEntry({
@@ -46,7 +48,7 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
           name={t('entry.wizard.print')}
           checked={entry.config?.evilflowers_viewer_print ?? false}
           onChange={(e) => {
-            umami.track('Print Config Button', {
+            umamiTrack('Print Config Button', {
               checked: e.target.checked,
             });
             setEntry({
@@ -62,7 +64,7 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
           name={t('entry.wizard.annotations')}
           checked={entry.config?.evilflowers_annotations_create ?? false}
           onChange={(e) => {
-            umami.track('Annotation Config Button', {
+            umamiTrack('Annotation Config Button', {
               checked: e.target.checked,
             });
             setEntry({
@@ -78,7 +80,7 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
           name={'DRM'}
           checked={entry.config?.evilflowers_ocr_rewrite ?? false}
           onChange={(e) => {
-            umami.track('DRM Config Button', {
+            umamiTrack('DRM Config Button', {
               checked: e.target.checked,
             });
             setEntry({

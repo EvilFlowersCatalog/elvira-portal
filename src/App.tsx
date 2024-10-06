@@ -24,7 +24,6 @@ const App = () => {
 
   // Scripts for analytics
   useEffect(() => {
-    // Development
     const UMAMI_SERVER = import.meta.env.ELVIRA_UMAMI_SERVER;
     const UMAMI_WEBSITE = import.meta.env.ELVIRA_UMAMI_WEBSITE;
 
@@ -47,23 +46,23 @@ const App = () => {
         theme={'dark'}
       />
       {!informed && <CookiesInformation />}
-      <div className='min-h-screen h-screen flex w-screen bg-white dark:bg-gray text-black dark:text-white overflow-hidden'>
+      <div className='h-screen flex w-screen bg-white dark:bg-gray text-black dark:text-white'>
+        {show() && (
+          <>
+            <NavbarContainer />
+            {isSmallDevice && <Header />}
+          </>
+        )}
+
         <div
-          className={`flex flex-col lg:flex-row w-full h-full overflow-hidden`}
+          className={`flex flex-1 h-screen flex-col overflow-hidden ${
+            show() ? 'max-lg:pt-14' : ''
+          }`}
         >
-          {show() && (
-            <>
-              <NavbarContainer />
-              {isSmallDevice && <Header />}
-            </>
-          )}
-
-          <div className={`flex flex-1 flex-col overflow-auto`}>
-            <Outlet />
-          </div>
-
-          <SearchBarContainer />
+          <Outlet />
         </div>
+
+        <SearchBarContainer />
       </div>
     </>
   );

@@ -6,6 +6,7 @@ import useEditCategory from '../../../hooks/api/categories/useEditCategory';
 import useCreateCategory from '../../../hooks/api/categories/useCreateCategory';
 import ModalWrapper from '../../modal/ModalWrapper';
 import ElviraInput from '../../inputs/ElviraInput';
+import useAppContext from '../../../hooks/contexts/useAppContext';
 
 interface ICategoryFormParam {
   category?: ICategory | null;
@@ -20,7 +21,9 @@ const CategoryForm = ({
   reloadPage,
   setReloadPage,
 }: ICategoryFormParam) => {
+  const { umamiTrack } = useAppContext();
   const { t } = useTranslation();
+
   const [form, setForm] = useState<ICategoryNew>({
     term: category?.term ?? '',
     catalog_id: category?.catalog_id ?? import.meta.env.ELVIRA_CATALOG_ID,
@@ -64,13 +67,13 @@ const CategoryForm = ({
     e.preventDefault();
     try {
       if (category) {
-        umami.track('Upload Edited Category Button', {
+        umamiTrack('Upload Edited Category Button', {
           categoryId: category.id,
         });
         await editCategory(category.id, form);
         toast.success(t('notifications.category.edit.success'));
       } else {
-        umami.track('Upload Created Category Button');
+        umamiTrack('Upload Created Category Button');
         await createCategory(form);
         toast.success(t('notifications.category.add.success'));
       }

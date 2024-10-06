@@ -18,7 +18,7 @@ interface IEntryParams {
 const AdminEntry = ({ entry, reload }: IEntryParams) => {
   const { auth } = useAuthContext();
   const { t } = useTranslation();
-  const { showSearchBar, isSmallDevice } = useAppContext();
+  const { showSearchBar, isSmallDevice, umamiTrack } = useAppContext();
   const [showDeleteMenu, setShowDeleteMenu] = useState<boolean>(false);
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
 
@@ -88,7 +88,7 @@ const AdminEntry = ({ entry, reload }: IEntryParams) => {
             <button
               className='flex flex-1 justify-center py-2 bg-green text-white rounded-md hover:bg-zinc-100 dark:hover:bg-darkGray hover:text-green duration-200'
               onClick={() => {
-                umami.track('Edit Entry Button', {
+                umamiTrack('Edit Entry Button', {
                   entryId: entry.id,
                 });
                 navigate(NAVIGATION_PATHS.adminEditEntries + entry.id);
@@ -99,7 +99,7 @@ const AdminEntry = ({ entry, reload }: IEntryParams) => {
             <button
               className='flex flex-1 justify-center py-2 bg-red text-white rounded-md hover:bg-zinc-100 dark:hover:bg-darkGray hover:text-red duration-200'
               onClick={() => {
-                umami.track('Delete Entry Button', {
+                umamiTrack('Delete Entry Button', {
                   entryId: entry.id,
                 });
                 setShowDeleteMenu(true);

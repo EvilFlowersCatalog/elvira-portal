@@ -27,7 +27,7 @@ const FeedForm = ({
   setReloadPage,
 }: IFeedForm) => {
   const { t } = useTranslation();
-  const { stuBg, stuText } = useAppContext();
+  const { stuBg, stuText, umamiTrack } = useAppContext();
 
   const [form, setForm] = useState<IFeedNew>({
     catalog_id: import.meta.env.ELVIRA_CATALOG_ID,
@@ -117,13 +117,13 @@ const FeedForm = ({
     e.preventDefault();
     try {
       if (feedId) {
-        umami.track('Upload Edited Feed Button', {
+        umamiTrack('Upload Edited Feed Button', {
           feedId,
         });
         await editFeed(feedId, form);
         toast.success(t('notifications.feed.edit.success'));
       } else {
-        umami.track('Upload Created Feed Button');
+        umamiTrack('Upload Created Feed Button');
         await uploadFeed(form);
         toast.success(t('notifications.feed.add.success'));
       }

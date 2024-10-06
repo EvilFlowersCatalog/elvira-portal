@@ -25,11 +25,11 @@ const buttonConfig = [
 ];
 
 const AdminHome = () => {
-  const { specialNavigation } = useAppContext();
+  const { specialNavigation, umamiTrack } = useAppContext();
   const { t } = useTranslation();
 
   return (
-    <div className='w-full'>
+    <div className='w-full overflow-auto'>
       <Breadcrumb />
       <div className='flex flex-wrap px-2'>
         {buttonConfig.map(({ icon, textKey, path }, index) => (
@@ -38,7 +38,7 @@ const AdminHome = () => {
             icon={icon}
             text={t(textKey)}
             onClick={(event) => {
-              umami.track('Admin Home Button', {
+              umamiTrack('Admin Home Button', {
                 path,
               });
               specialNavigation(event, path);

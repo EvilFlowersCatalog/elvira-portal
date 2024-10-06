@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import CircleLoader from 'react-spinners/CircleLoader';
 import { IEntry } from '../../utils/interfaces/entry';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface IShelfButtonParams {
   isLoading: boolean;
@@ -17,16 +18,17 @@ const ShelfButton = ({
   shelfId,
   entryId,
 }: IShelfButtonParams) => {
+  const { umamiTrack } = useAppContext();
   const { t } = useTranslation();
 
   const onClickRemove = () => {
-    umami.track('Remove from Shelf Button', {
+    umamiTrack('Remove from Shelf Button', {
       entryId,
     });
     handleRemove();
   };
   const onClickAdd = () => {
-    umami.track('Add to Shelf Button', {
+    umamiTrack('Add to Shelf Button', {
       entryId,
     });
     handleAdd();

@@ -13,7 +13,7 @@ install dependencies:
       - node_modules
   only:
     - dev
-    - master  # Include master if needed
+    - master # Include master if needed
 
 # Job template for build
 .build_template:
@@ -24,7 +24,7 @@ install dependencies:
     - npm run build:prod
     - mv dist _build/$ENVIRONMENT
   artifacts:
-    name: "$ENVIRONMENT-$CI_COMMIT_SHORT_SHA"
+    name: '$ENVIRONMENT-$CI_COMMIT_SHORT_SHA'
     paths:
       - _build/$ENVIRONMENT
   environment: $ENVIRONMENT

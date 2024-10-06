@@ -23,13 +23,13 @@ const ImageDropzone = ({
   value = null,
   setFile,
 }: IDragzoneParams) => {
-  const { stuBg, stuBorder } = useAppContext();
+  const { stuBg, stuBorder, umamiTrack } = useAppContext();
 
   const [fileName, setFileName] = useState<string>('');
   const [fileSize, setFileSize] = useState<string>('');
 
   const onDropAccepted = useCallback((acceptedFiles: File[]) => {
-    umami.track('Image Dropdown');
+    umamiTrack('Image Dropdown');
     const file = acceptedFiles[0];
     setFileName(file.name ?? 'Image File');
     setFileSize(getFileSize(file.size));
@@ -41,7 +41,7 @@ const ImageDropzone = ({
   }, []);
 
   const handleRemoveFile = () => {
-    umami.track('Remove Dropdown Image Button');
+    umamiTrack('Remove Dropdown Image Button');
     setFileName('');
     setFileSize('');
     setFile(null);
