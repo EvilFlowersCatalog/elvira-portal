@@ -9,7 +9,7 @@ import Button from '../buttons/Button';
 
 const CookiesInformation = () => {
   const { t } = useTranslation();
-  const { theme, titleLogoLight, titleLogoDark, stuBorder } = useAppContext();
+  const { theme, titleLogoLight, titleLogoDark } = useAppContext();
   const { setCookie, setInformed } = useCookiesContext();
 
   const handleAccept = () => {
@@ -18,9 +18,9 @@ const CookiesInformation = () => {
   };
 
   return (
-    <div className='fixed w-full bottom-5 flex justify-center z-50 pointer-events-none'>
+    <div className='fixed w-full bottom-5 max-md:bottom-0 flex justify-center z-50 pointer-events-none'>
       <div
-        className={`flex flex-col max-w-[550px] min-w-64 m-auto bg-white dark:bg-black border ${stuBorder} text-black dark:text-white p-4 gap-5 rounded-md pointer-events-auto`}
+        className={`flex flex-col max-w-[550px] min-w-64 m-auto bg-white dark:bg-black bg-opacity-90 dark:bg-opacity-90 text-black dark:text-white p-4 gap-5 md:rounded-md pointer-events-auto`}
       >
         <div className='flex w-full justify-center items-center'>
           <img
@@ -28,13 +28,8 @@ const CookiesInformation = () => {
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
             alt='Elvira Logo'
           />
-          <img
-            className='w-16'
-            src='/assets/static/cookies.png'
-            alt='cookies'
-          />
         </div>
-        <span className='text-sm'>{t('cookies.information')}</span>
+        <span className='text-sm text-center'>{t('cookies.information')}</span>
         <div className='w-full flex justify-center'>
           <Button onClick={handleAccept} title={t('cookies.accept')} />
         </div>

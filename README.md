@@ -5,8 +5,7 @@ Sit back and relax, as the app automatically refreshes whenever you tweak any of
 
 ## Local Server
 
-To fire up a local server, simply execute `npm run start`. Then, glide over to `http://localhost:5173/` in your browser to explore.
-Feeling curious about the inner workings? Peek into the `.env.local` file for a glimpse.
+To fire up a local server, simply execute `npm run start`. Then, glide over to `http://localhost:3000/` in your browser to explore.
 
 ## Build Process
 
