@@ -34,7 +34,7 @@ const PDFButtons = ({ acquisitions, entryId }: IPDFButtonsParams) => {
         onClick={(e) => handleRead(e, index)}
         title={
           acquisitions[index].mime.includes('pdf')
-            ? ' PDF'
+            ? 'PDF'
             : acquisitions[index].mime
         }
       />

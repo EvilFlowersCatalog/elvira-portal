@@ -21,7 +21,6 @@ import {
 import useVerifyCredentials from '../hooks/api/verify/useVerifyCredentials';
 import axios, { CancelTokenSource } from 'axios';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
-import useGetCatalogPermissions from '../hooks/api/users/useGetCatalogPermissions';
 
 export interface IAuthContext {
   auth: IAuth | null;

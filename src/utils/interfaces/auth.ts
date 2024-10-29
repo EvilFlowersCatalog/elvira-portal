@@ -1,5 +1,3 @@
-import { ICatalogPermisions } from './users';
-
 export interface IAuth {
   userId: string;
   username: string;
