@@ -3,31 +3,21 @@ import { useTranslation } from 'react-i18next';
 import { IoSearchOutline } from 'react-icons/io5';
 import { useSearchParams } from 'react-router-dom';
 import useAppContext from '../../hooks/contexts/useAppContext';
-import { FaFilterCircleXmark, FaList } from 'react-icons/fa6';
-import { LAYOUT_TYPE } from '../../utils/interfaces/general/general';
+import { FaFilterCircleXmark } from 'react-icons/fa6';
 import ElviraInput from '../inputs/ElviraInput';
-import { HiMiniSquares2X2 } from 'react-icons/hi2';
 
 interface IToolsContainerParams {
   advancedSearch?: boolean;
-  showLayout?: boolean;
   param: string;
 }
 
-const ToolsContainer = ({
-  advancedSearch,
-  param,
-  showLayout = false,
-}: IToolsContainerParams) => {
+const ToolsContainer = ({ advancedSearch, param }: IToolsContainerParams) => {
   const { t } = useTranslation();
   const {
     showSearchBar,
     setShowSearchBar,
     clearFilters,
     isParamsEmpty,
-    updateLayout,
-    layout,
-    isSmallDevice,
     umamiTrack,
   } = useAppContext();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -72,21 +62,6 @@ const ToolsContainer = ({
     <div className={`flex gap-4 px-4 pb-4 item-start flex-col md:flex-row`}>
       <div className='w-full md:w-1/2 xl:w-1/4 pl-1'>
         <div className='flex gap-4 items-center'>
-          {!isSmallDevice &&
-            showLayout &&
-            (layout === LAYOUT_TYPE.list ? (
-              <FaList
-                size={30}
-                className='cursor-pointer mt-4'
-                onClick={() => updateLayout(LAYOUT_TYPE.box)}
-              />
-            ) : (
-              <HiMiniSquares2X2
-                size={30}
-                className='cursor-pointer mt-4'
-                onClick={() => updateLayout(LAYOUT_TYPE.list)}
-              />
-            ))}
           <form
             className='relative flex flex-1 items-center gap-2 text-darkGray dark:text-white'
             onSubmit={submit}

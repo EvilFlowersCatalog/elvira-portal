@@ -9,9 +9,11 @@ import Feature, {
   IFeatureParams,
 } from '../../components/specific-page/about-page/Feature';
 import Footer from '../../components/specific-page/about-page/Footer';
+import Header from '../../components/header/Header';
 
 const About = () => {
-  const { theme, titleLogoDark, titleLogoLight, stuText } = useAppContext();
+  const { theme, titleLogoDark, titleLogoLight, stuText, isSmallDevice } =
+    useAppContext();
   const { t } = useTranslation();
 
   const FeatureList: IFeatureParams[] = [
@@ -44,7 +46,9 @@ const About = () => {
   ];
 
   return (
-    <div className='flex w-full flex-col overflow-x-hidden'>
+    <div className='flex w-full flex-col overflow-x-hidden max-lg:pt-14'>
+      {isSmallDevice && <Header />}
+
       <Breadcrumb />
       <div className='flex flex-col w-full p-4 justify-start items-center text-center'>
         <img

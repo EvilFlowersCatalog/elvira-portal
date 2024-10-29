@@ -9,6 +9,7 @@ import ScrollUpButton from '../../buttons/ScrollUpButton';
 import ToolsContainer from '../../tools/ToolsContainer';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import EntryDetail from '../entry/EntryDetail';
+import Header from '../../header/Header';
 
 interface IItemContainer {
   children: ReactNode;
@@ -51,8 +52,13 @@ const ItemContainer = ({
   searchSpecifier,
   showEmpty = true,
 }: IItemContainer) => {
-  const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty } =
-    useAppContext();
+  const {
+    handleScroll,
+    searchParamsEqual,
+    clearFilters,
+    isParamsEmpty,
+    isSmallDevice,
+  } = useAppContext();
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [showScrollUp, setShowScrollUp] = useState<boolean>(false);
@@ -85,7 +91,7 @@ const ItemContainer = ({
     <>
       <div
         ref={scrollRef}
-        className='flex h-screen flex-col w-full overflow-auto'
+        className='flex h-screen flex-col w-full overflow-auto max-lg:pt-14'
         onScroll={() =>
           handleScroll(
             scrollRef,
@@ -99,13 +105,11 @@ const ItemContainer = ({
           )
         }
       >
+        {isSmallDevice && <Header />}
+
         <Breadcrumb />
 
-        <ToolsContainer
-          param={searchSpecifier}
-          advancedSearch={isEntries}
-          showLayout={showLayout}
-        />
+        <ToolsContainer param={searchSpecifier} advancedSearch={isEntries} />
 
         {isLoading && (
           <PageLoading entries={isEntries} showLayout={showLayout} />

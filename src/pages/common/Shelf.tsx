@@ -2,16 +2,11 @@ import { useEffect, useState } from 'react';
 import { IEntry } from '../../utils/interfaces/entry';
 import { useSearchParams } from 'react-router-dom';
 import useGetShelf from '../../hooks/api/my-shelf/useGetShelf';
-import { LAYOUT_TYPE } from '../../utils/interfaces/general/general';
-import useAppContext from '../../hooks/contexts/useAppContext';
 import ItemContainer from '../../components/items/container/ItemContainer';
-import EntryList from '../../components/items/entry/EntryList';
 import EntryBox from '../../components/items/entry/EntryBox';
-import EntryListLoading from '../../components/items/entry/loading/EntryListLoading';
-import EntryBoxLoading from '../../components/items/entry/loading/EntryBoxLoading';
+import EntryBoxLoading from '../../components/items/entry/EntryBoxLoading';
 
 const Shelf = () => {
-  const { layout } = useAppContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingNext, setLoadingNext] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
@@ -87,29 +82,17 @@ const Shelf = () => {
       searchSpecifier={'query'}
     >
       <div className='flex flex-wrap p-4 pt-0'>
-        {layout === LAYOUT_TYPE.list
-          ? entries.map((entry, index) => (
-              <EntryList
-                key={index}
-                entry={entry}
-                triggerReload={triggerReload}
-              />
-            ))
-          : entries.map((entry, index) => (
-              <EntryBox
-                key={index}
-                entry={entry}
-                isActive={activeEntryId === entry.id}
-              />
-            ))}
+        {entries.map((entry, index) => (
+          <EntryBox
+            key={index}
+            entry={entry}
+            isActive={activeEntryId === entry.id}
+          />
+        ))}
         {loadingNext &&
-          (layout === LAYOUT_TYPE.list
-            ? Array.from({ length: 30 }).map((_, index) => (
-                <EntryListLoading key={index} />
-              ))
-            : Array.from({ length: 30 }).map((_, index) => (
-                <EntryBoxLoading key={index} />
-              )))}
+          Array.from({ length: 30 }).map((_, index) => (
+            <EntryBoxLoading key={index} />
+          ))}
       </div>
     </ItemContainer>
   );

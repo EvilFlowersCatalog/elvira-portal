@@ -1,7 +1,7 @@
 import { Swiper, SwiperSlide } from 'swiper/react';
 import EntrySwiper from './EntrySwiper';
 import { IEntry } from '../../../../utils/interfaces/entry';
-import EntryBoxLoading from '../../../items/entry/loading/EntryBoxLoading';
+import EntryBoxLoading from '../../../items/entry/EntryBoxLoading';
 import { Scrollbar } from 'swiper/modules';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
 

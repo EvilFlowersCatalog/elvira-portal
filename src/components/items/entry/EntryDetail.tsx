@@ -139,13 +139,22 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       ) : (
         <div className={'flex-1 flex flex-col'}>
           <div className={'flex flex-col gap-2 justify-center items-center'}>
-            <div
+            <h1
               className={
-                'w-full text-white text-center text-md font-bold uppercase'
+                'w-full text-white text-center text-xl font-bold uppercase'
               }
             >
               {entry.response.title}
-            </div>
+            </h1>
+
+            <ShelfButton
+              isLoading={isLoading}
+              entryId={entryId!}
+              handleAdd={handleAdd}
+              handleRemove={handleRemove}
+              shelfId={entry.response.shelf_record_id}
+            />
+
             <div className={'w-full flex flex-col items-center'}>
               <div
                 className={`w-1/2 flex justify-center border border-white rounded-md ${
@@ -186,9 +195,11 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
             >
               {/* Detail */}
               <div className={'flex flex-col items-center'}>
-                <span className={'text-white'}>PDF</span>
-                <span className={`${stuText} font-extrabold`}>
-                  {entry.response.acquisitions?.length ?? 0}
+                <span className={'text-white'}>
+                  {t('entry.detail.relation')}
+                </span>
+                <span className={`${stuText} font-extrabold uppercase`}>
+                  {entry.response.acquisitions[0].relation ?? 0}
                 </span>
               </div>
               <span className={'h-3/6 border-l border-white'}></span>
@@ -208,14 +219,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                 </span>
               </div>
             </div>
-
-            <ShelfButton
-              isLoading={isLoading}
-              entryId={entryId!}
-              handleAdd={handleAdd}
-              handleRemove={handleRemove}
-              shelfId={entry.response.shelf_record_id}
-            />
 
             <PDFButtons
               acquisitions={entry.response.acquisitions}

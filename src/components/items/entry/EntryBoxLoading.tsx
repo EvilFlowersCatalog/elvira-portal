@@ -1,4 +1,4 @@
-import useAppContext from '../../../../hooks/contexts/useAppContext';
+import useAppContext from '../../../hooks/contexts/useAppContext';
 
 interface IEntryBoxLoading {
   fixedSize?: boolean;

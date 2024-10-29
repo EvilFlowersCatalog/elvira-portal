@@ -181,13 +181,10 @@ export const sk = {
     // SEARCH BAR COMPONENT
     searchBar: {
       advancedSearch: 'Pokročilé Vyhľadávanie',
-      title: 'Názov',
+      title: 'Názov publikácie',
       author: 'Autorové Meno',
       category: 'Kategória',
-      year: 'Rok',
-      from: 'Od',
-      to: 'Do',
-      feeds: 'Skupiny',
+      feeds: 'Skupina',
       search: 'Hľadať',
     },
 
@@ -204,6 +201,7 @@ export const sk = {
         categories: 'Kategórie',
         summary: 'Zhrnutie',
         read: 'Čítať',
+        relation: 'Relácia',
       },
       wizard: {
         requiredMessages: {

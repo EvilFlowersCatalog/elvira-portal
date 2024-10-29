@@ -2,15 +2,12 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { NAVIGATION_PATHS } from './utils/interfaces/general/general';
 import { ToastContainer } from 'react-toastify';
 import NavbarContainer from './components/header/navbar/NavbarContainer';
-import Header from './components/header/Header';
-import useAppContext from './hooks/contexts/useAppContext';
 import SearchBarContainer from './components/search-bar/SearchBarContainer';
 import useCookiesContext from './hooks/contexts/useCookiesContext';
 import CookiesInformation from './components/dialogs/CookiesInformation';
 import { useEffect } from 'react';
 
 const App = () => {
-  const { isSmallDevice } = useAppContext();
   const { informed } = useCookiesContext();
 
   const location = useLocation();
@@ -47,18 +44,9 @@ const App = () => {
       />
       {!informed && <CookiesInformation />}
       <div className='h-screen flex w-screen bg-white dark:bg-gray text-black dark:text-white'>
-        {show() && (
-          <>
-            <NavbarContainer />
-            {isSmallDevice && <Header />}
-          </>
-        )}
+        {show() && <NavbarContainer />}
 
-        <div
-          className={`flex flex-1 h-screen flex-col overflow-hidden ${
-            show() ? 'max-lg:pt-14' : ''
-          }`}
-        >
+        <div className={`flex flex-1 h-screen flex-col overflow-hidden`}>
           <Outlet />
         </div>
 

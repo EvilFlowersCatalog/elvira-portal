@@ -41,7 +41,7 @@ const ShelfButton = ({
       ) : shelfId ? (
         <button
           className={
-            'flex gap-2 items-center px-2 py-1 text-red mb-2 border border-darkGray border-opacity-0 hover:border-red rounded-md'
+            'flex gap-2 items-center px-4 py-2 text-white font-semibold mb-2 border-2 border-red rounded-md hover:bg-red hover:bg-opacity-50 duration-200'
           }
           onClick={onClickRemove}
         >
@@ -50,7 +50,7 @@ const ShelfButton = ({
       ) : (
         <button
           className={
-            'flex gap-2 items-center px-2 py-1 text-green mb-2 border border-darkGray border-opacity-0 hover:border-green rounded-md'
+            'flex gap-2 items-center px-4 py-2 text-white font-semibold mb-2 border-2 border-green rounded-md hover:bg-green hover:bg-opacity-50 duration-200'
           }
           onClick={onClickAdd}
         >

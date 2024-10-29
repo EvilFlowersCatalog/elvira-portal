@@ -182,14 +182,11 @@ export const en = {
     // SEARCH BAR COMPONENT
     searchBar: {
       advancedSearch: 'Advanced Search',
-      title: 'Title',
+      title: 'Title of entry',
       author: "Author's Name",
       category: 'Category',
-      year: 'Year',
-      from: 'From',
-      to: 'To',
-      feeds: 'Feeds',
-      search: 'Seach',
+      feeds: 'Feed',
+      search: 'Search',
     },
 
     // ENTRY COMPONENT
@@ -205,6 +202,7 @@ export const en = {
         categories: 'Categories',
         summary: 'Summary',
         read: 'Read',
+        relation: 'Relation',
       },
       wizard: {
         requiredMessages: {

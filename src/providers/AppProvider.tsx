@@ -8,7 +8,6 @@ import {
 import {
   COOKIES_TYPE,
   LANG_TYPE,
-  LAYOUT_TYPE,
   NAVIGATION_PATHS,
   THEME_TYPE,
 } from '../utils/interfaces/general/general';
@@ -22,12 +21,11 @@ export interface IAppContext {
   updateTheme: (theme: THEME_TYPE) => void;
   lang: LANG_TYPE;
   updateLang: (lang: LANG_TYPE) => void;
-  layout: LAYOUT_TYPE;
-  updateLayout: (layout: LAYOUT_TYPE) => void;
   clearFilters: () => void;
   specialNavigation: (
     event: MouseEvent<HTMLButtonElement>,
-    path: NAVIGATION_PATHS | string
+    path: NAVIGATION_PATHS | string,
+    viewerFrom?: string
   ) => void;
   isSmallDevice: boolean;
   showNavbar: boolean;
@@ -56,8 +54,6 @@ export interface IAppContext {
   stuLogoDark: string;
   stuLogoLight: string;
   editingEntryTitle: string;
-  feedParents: { id: string; title: string }[];
-  setFeedParents: (feedParents: { id: string; title: string }[]) => void;
   setEditingEntryTitle: (editingEntryTitle: string) => void;
   stuBorder: string;
   stuBorderFocus: string;
@@ -88,9 +84,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const [lang, setLang] = useState<LANG_TYPE>(
     cookies[COOKIES_TYPE.LANG_KEY] ?? LANG_TYPE.sk
   );
-  const [layout, setLayout] = useState<LAYOUT_TYPE>(
-    cookies[COOKIES_TYPE.LAYOUT_KEY] ?? LAYOUT_TYPE.box
-  );
   const [showNavbar, setShowNavbar] = useState<boolean>(false);
   const [editingEntryTitle, setEditingEntryTitle] = useState<string>('');
   const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
@@ -98,9 +91,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     window.innerWidth < 959
   );
   const [searchParams, setSearchParams] = useSearchParams();
-  const [feedParents, setFeedParents] = useState<
-    { id: string; title: string }[]
-  >([]);
 
   // umami
   const [entryDetailId, setEntryDetailId] = useState<string | null>(null);
@@ -190,16 +180,11 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     setCookie(COOKIES_TYPE.LANG_KEY, lang, { maxAge: 60 * 60 * 24 * 365 }); // year
   };
 
-  // Update layout and localstorage
-  const updateLayout = (layout: LAYOUT_TYPE) => {
-    setLayout(layout);
-    setCookie(COOKIES_TYPE.LAYOUT_KEY, layout, { maxAge: 60 * 60 * 24 * 365 }); // year
-  };
-
   // Special navigation stands for navigation that can open new window tab with holding ctr/cmd
   const specialNavigation = (
     event: MouseEvent<HTMLButtonElement>,
-    path: NAVIGATION_PATHS | string
+    path: NAVIGATION_PATHS | string,
+    viewerFrom?: string
   ) => {
     const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     event.preventDefault();
@@ -207,7 +192,10 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     // If ctrl or meta && is on mac open new tab
     if (event.ctrlKey || (event.metaKey && isMac) || event.button === 2)
       window.open(path, '_blank');
-    else navigate(path);
+    else {
+      if (viewerFrom) navigate(path, { state: { from: viewerFrom } });
+      else navigate(path);
+    }
   };
 
   const umamiTrack = (title: string, data?: Object) => {
@@ -325,7 +313,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     // handle resizeing window and set height/width
     const handleResize = () => {
       const newWidth: number = window.innerWidth;
-      if (newWidth < 959) updateLayout(LAYOUT_TYPE.box);
       setIsSmallDevice(newWidth < 959);
     };
 
@@ -407,8 +394,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         updateTheme,
         lang,
         updateLang,
-        layout,
-        updateLayout,
         showNavbar,
         setShowNavbar,
         showSearchBar,
@@ -427,8 +412,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         logoLight,
         editingEntryTitle,
         setEditingEntryTitle,
-        feedParents,
-        setFeedParents,
         stuBg: stuColors[0][elviraTheme],
         stuBorder: stuColors[1][elviraTheme],
         stuBgHover: stuColors[2][elviraTheme],

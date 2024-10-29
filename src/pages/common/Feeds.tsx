@@ -1,16 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { IFeed } from '../../utils/interfaces/feed';
 import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
 import ItemContainer from '../../components/items/container/ItemContainer';
 import Feed from '../../components/items/feeds/Feed';
 import LoadNext from '../../components/items/loadings/LoadNext';
-import useAppContext from '../../hooks/contexts/useAppContext';
-import useGetFeedDetail from '../../hooks/api/feeds/useGetFeedDetail';
 
 const Feeds = () => {
-  const { feedParents, setFeedParents } = useAppContext();
-
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingNext, setLoadingNext] = useState<boolean>(true);
   const [isError, setIsError] = useState<boolean>(false);
@@ -18,40 +14,8 @@ const Feeds = () => {
   const [maxPage, setMaxPage] = useState<number>(0);
   const [feeds, setFeeds] = useState<IFeed[]>([]);
   const [searchParams] = useSearchParams();
-  const [tmp, setTmp] = useState<{ id: string; title: string }[]>([]);
-
-  const location = useLocation();
 
   const getFeeds = useGetFeeds();
-  const getFeedDetail = useGetFeedDetail();
-
-  useEffect(() => {
-    const fp = searchParams.get('parent-id')?.split('&');
-    setTmp([]);
-
-    (async () => {
-      if (fp) {
-        await Promise.all(
-          fp.map(async (id) => {
-            const t = feedParents.filter((feed) => feed.id === id)[0];
-            if (t) return { id: t.id, title: t.title };
-            try {
-              const { response: detail } = await getFeedDetail(id);
-              return { id, title: detail.title };
-            } catch {
-              return { id, title: 'feed' };
-            }
-          })
-        ).then((results) => {
-          setTmp(results);
-        });
-      }
-    })();
-  }, [location.search]);
-
-  useEffect(() => {
-    setFeedParents(tmp);
-  }, [tmp]);
 
   useEffect(() => {
     if (page === 0) {

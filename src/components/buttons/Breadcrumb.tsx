@@ -7,14 +7,15 @@ import {
 import { MdOutlineKeyboardDoubleArrowRight } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
+import useGetFeedDetail from '../../hooks/api/feeds/useGetFeedDetail';
 
 const Breadcrumb = () => {
-  const { specialNavigation, lang, editingEntryTitle, feedParents } =
-    useAppContext();
+  const { specialNavigation, lang, editingEntryTitle } = useAppContext();
   const [breadcrumbs, setBreadcrumbs] = useState<
     { path: string; label: string }[]
   >([]);
   const [searchParams] = useSearchParams();
+  const [feeds, setFeeds] = useState<{ id: string; title: string }[]>([]);
 
   const isEn = (): boolean => {
     return lang === LANG_TYPE.en;
@@ -34,6 +35,7 @@ const Breadcrumb = () => {
   };
 
   const location = useLocation();
+  const getFeedDetail = useGetFeedDetail();
 
   useEffect(() => {
     // Split the current path into parts
@@ -59,9 +61,8 @@ const Breadcrumb = () => {
       }
     });
 
-    // if there is parent feed in feed page
-    if (feedParents.length > 0) {
-      feedParents.map((feed, index) => {
+    if (feeds.length > 0) {
+      feeds.map((feed, index) => {
         const part = index === 0 ? `?parent-id=${feed.id}` : `&${feed.id}`;
         const path = pathParts.join('/') + part;
 
@@ -71,8 +72,32 @@ const Breadcrumb = () => {
         });
       });
     }
+
     setBreadcrumbs(newBreadcrumbs);
-  }, [location, lang, editingEntryTitle, feedParents]);
+  }, [location, lang, editingEntryTitle, feeds]);
+
+  useEffect(() => {
+    const fp = searchParams.get('parent-id')?.split('&');
+
+    (async () => {
+      if (fp) {
+        await Promise.all(
+          fp.map(async (id) => {
+            try {
+              const { response: detail } = await getFeedDetail(id);
+              return { id, title: detail.title };
+            } catch {
+              return { id, title: 'Feed' };
+            }
+          })
+        ).then((results) => {
+          setFeeds(results);
+        });
+      } else {
+        setFeeds([]);
+      }
+    })();
+  }, [location.search]);
 
   return (
     <div className='flex gap-3 flex-wrap items-center p-4 pl-5'>

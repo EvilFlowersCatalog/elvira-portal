@@ -28,11 +28,6 @@ export enum LANG_TYPE {
   en = 'en',
 }
 
-export enum LAYOUT_TYPE {
-  list = 'list',
-  box = 'box',
-}
-
 export enum IDENTIFIERS_TYPE {
   doi = 'doi',
   isbn = 'isbn',

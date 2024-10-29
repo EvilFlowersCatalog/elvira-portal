@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
 import {
@@ -36,6 +36,8 @@ const Viewer = () => {
   const { t } = useTranslation();
   const [loading, setLoading] = useState<boolean>(true);
   const [progressBar, setProgressBar] = useState<number>(0);
+
+  const location = useLocation();
 
   const navigate = useNavigate();
   const createUserAcquisition = useCreateUserAcquisition();
@@ -77,6 +79,14 @@ const Viewer = () => {
   // Home function for viewer to navigate home
   const homeFunction = () => {
     navigate(NAVIGATION_PATHS.home);
+  };
+  const closeFunction = () => {
+    const path =
+      location.state?.from === 'shelf'
+        ? `${NAVIGATION_PATHS.shelf}?entry-detail-id=${id}`
+        : `${NAVIGATION_PATHS.library}?entry-detail-id=${id}`;
+
+    navigate(path);
   };
   const saveLayerFunc = async (
     svg: string,
@@ -180,61 +190,52 @@ const Viewer = () => {
     (async () => {
       try {
         setProgressBar(30);
-        const { response: entryDetail } = await getEntryDetail(id!);
-        const responseAcquisitionId =
-          entryDetail.acquisitions[parseInt(index || '0')].id;
+
+        // Fetch entry details and process acquisition
+        const [{ response: entryDetail }, { response: userAcquisition }] =
+          await Promise.all([
+            getEntryDetail(id!),
+            getEntryDetail(id!).then(({ response }) =>
+              createUserAcquisition({
+                acquisition_id:
+                  response.acquisitions[parseInt(index || '0')].id,
+                type: 'personal',
+              })
+            ),
+          ]);
+
+        acquisition_id = entryDetail.acquisitions[parseInt(index || '0')].id;
+        user_acquisition_id = userAcquisition.id;
 
         setProgressBar(50);
 
-        // Set acquistion id for usage in share
-        acquisition_id = responseAcquisitionId;
-
-        // Create acquisiton
-        const acquisition: IUserAcquisition = {
-          acquisition_id: responseAcquisitionId,
-          type: 'personal',
+        // Update metatags if properties exist
+        const metaTagUpdates = {
+          citation_year: entryDetail.published_at,
+          citation_publisher: entryDetail.publisher,
+          citation_doi: entryDetail.identifiers.doi,
+          citation_isbn: entryDetail.identifiers.isbn,
+          citation_authors: entryDetail.authors
+            .map((author) => `${author.name}, ${author.surname}`)
+            .join('; '),
+          citation_title: entryDetail.title,
+          citation_first_page: '1',
+          citation_pdf_url: `${userAcquisition.url}?access_token=${auth?.token}`,
         };
 
-        // Create user acquisition by given acquistion
-        const { response: userAcquisition } = await createUserAcquisition(
-          acquisition
-        );
-
-        user_acquisition_id = userAcquisition.id;
-
-        // Update metatags
-        if (entryDetail.published_at)
-          updateMetaTag('citation_year', entryDetail.published_at);
-        if (entryDetail.publisher)
-          updateMetaTag('citation_publisher', entryDetail.publisher);
-        if (entryDetail.identifiers.doi)
-          updateMetaTag('citation_doi', entryDetail.identifiers.doi);
-        if (entryDetail.identifiers.isbn)
-          updateMetaTag('citation_isbn', entryDetail.identifiers.isbn);
-        if (entryDetail.authors.length > 0)
-          updateMetaTag(
-            'citation_authors',
-            entryDetail.authors
-              .map((author) => author.name + ', ' + author.surname)
-              .join('; ')
-          );
-
-        updateMetaTag('citation_title', entryDetail.title);
-        updateMetaTag('citation_first_page', '1');
-        updateMetaTag(
-          'citation_pdf_url',
-          userAcquisition.url + `?access_token=${auth?.token}`
-        );
+        Object.entries(metaTagUpdates).forEach(([key, value]) => {
+          if (value) updateMetaTag(key, value);
+        });
 
         setProgressBar(70);
 
-        // Get pdf
+        // Fetch the PDF data
         const { data } = await getUserAcquisition(userAcquisition.id);
-        setProgressBar(90);
-
         const pdf = await data;
 
-        // Render viewer and set options
+        setProgressBar(90);
+
+        // Render viewer with the provided options and configurations
         renderViewer({
           rootId,
           data: pdf,
@@ -242,6 +243,7 @@ const Viewer = () => {
             theme,
             lang,
             citationBib: entryDetail.citation,
+            closeFunction,
             homeFunction,
             shareFunction,
             editPackage: {
@@ -262,7 +264,7 @@ const Viewer = () => {
             edit: entryDetail.config.evilflowers_annotations_create,
           },
         });
-      } catch {
+      } catch (error) {
         navigate(NAVIGATION_PATHS.home, { replace: true });
         toast.error(t('notifications.fileFailed'));
       } finally {

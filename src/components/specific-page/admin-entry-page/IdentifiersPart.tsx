@@ -78,7 +78,7 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
                 value={entry.identifiers?.doi ?? ''}
               />
               <IoMdDownload
-                className='absolute right-2 top-8 z-50 cursor-pointer'
+                className='absolute right-2 top-8 z-10 cursor-pointer'
                 size={20}
                 onClick={() => {
                   if (entry.identifiers.doi) {
@@ -101,7 +101,7 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
                 value={entry.identifiers?.isbn ?? ''}
               />
               <IoMdDownload
-                className='absolute right-2 top-8 z-50 cursor-pointer'
+                className='absolute right-2 top-8 z-10 cursor-pointer'
                 size={20}
                 onClick={() => {
                   if (entry.identifiers.isbn) {

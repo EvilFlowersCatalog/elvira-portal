@@ -20,9 +20,10 @@ import AdditionalDataPart from '../../../components/specific-page/admin-entry-pa
 import ConfigPart from '../../../components/specific-page/admin-entry-page/config-part/ConfigPart';
 import IdentifiersPart from '../../../components/specific-page/admin-entry-page/IdentifiersPart';
 import useAppContext from '../../../hooks/contexts/useAppContext';
+import Header from '../../../components/header/Header';
 
 const AdminAddEntry = () => {
-  const { umamiTrack } = useAppContext();
+  const { umamiTrack, isSmallDevice } = useAppContext();
   const { t } = useTranslation();
 
   const [entry, setEntry] = useState<IEntryNewForm>({
@@ -139,7 +140,9 @@ const AdminAddEntry = () => {
 
   return (
     <>
-      <div className='flex flex-col w-full overflow-auto'>
+      <div className='flex flex-col w-full overflow-auto max-lg:pt-14'>
+        {isSmallDevice && <Header />}
+
         <Breadcrumb />
         {entry === null || isLoading ? (
           <PageLoading />

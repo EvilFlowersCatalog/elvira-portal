@@ -5,6 +5,7 @@ import Breadcrumb from '../../components/buttons/Breadcrumb';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import AdminButton from '../../components/buttons/AdminButton';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
+import Header from '../../components/header/Header';
 
 const buttonConfig = [
   {
@@ -25,11 +26,13 @@ const buttonConfig = [
 ];
 
 const AdminHome = () => {
-  const { specialNavigation, umamiTrack } = useAppContext();
+  const { specialNavigation, umamiTrack, isSmallDevice } = useAppContext();
   const { t } = useTranslation();
 
   return (
-    <div className='w-full overflow-auto'>
+    <div className='w-full overflow-auto max-lg:pt-14'>
+      {isSmallDevice && <Header />}
+
       <Breadcrumb />
       <div className='flex flex-wrap px-2'>
         {buttonConfig.map(({ icon, textKey, path }, index) => (

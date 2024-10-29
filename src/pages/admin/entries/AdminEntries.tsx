@@ -7,7 +7,7 @@ import { MdAdd } from 'react-icons/md';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import ItemContainer from '../../../components/items/container/ItemContainer';
 import AdminEntry from '../../../components/items/entry/admin/AdminEntry';
-import EntryBoxLoading from '../../../components/items/entry/loading/EntryBoxLoading';
+import EntryBoxLoading from '../../../components/items/entry/EntryBoxLoading';
 
 const AdminEntries = () => {
   const { showSearchBar, stuBorder, stuBg, umamiTrack } = useAppContext();

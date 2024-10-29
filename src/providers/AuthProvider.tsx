@@ -21,6 +21,7 @@ import {
 import useVerifyCredentials from '../hooks/api/verify/useVerifyCredentials';
 import axios, { CancelTokenSource } from 'axios';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
+import useGetCatalogPermissions from '../hooks/api/users/useGetCatalogPermissions';
 
 export interface IAuthContext {
   auth: IAuth | null;
@@ -45,6 +46,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
   let logoutChannel: BroadcastChannel | null;
 
   const verifyCredentials = useVerifyCredentials();
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -76,13 +78,20 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
 
   const login = async (loginForm: IAuthCredentials) => {
     try {
-      const { response: user } = await verifyCredentials(loginForm); // verify given credentials
+      // Verify given credentials and retrieve user data
+      const { response: user } = await verifyCredentials(loginForm);
 
-      // Set auth with given values
+      // If needed and determine isSuperUser status
+      const isSuperUser =
+        user.user.is_superuser ||
+        user.user.catalog_permissions[import.meta.env.ELVIRA_CATALOG_ID] ===
+          'manage';
+
+      // Set authentication context
       setAuth({
         userId: user.user.id,
         username: user.user.username,
-        isSuperUser: user.user.is_superuser,
+        isSuperUser,
         token: user.access_token,
         refreshToken: user.refresh_token,
       });

@@ -8,11 +8,18 @@ import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { THEME_TYPE } from '../../utils/interfaces/general/general';
 import { CircleLoader } from 'react-spinners';
 import ElviraInput from '../../components/inputs/ElviraInput';
+import Header from '../../components/header/Header';
 
 const Auth = () => {
   const { login } = useAuthContext();
-  const { stuColor, theme, titleLogoDark, titleLogoLight, umamiTrack } =
-    useAppContext();
+  const {
+    stuColor,
+    theme,
+    titleLogoDark,
+    titleLogoLight,
+    umamiTrack,
+    isSmallDevice,
+  } = useAppContext();
   const { t } = useTranslation();
   const [loginForm, setLoginForm] = useState<IAuthCredentials>({
     username: '',
@@ -53,7 +60,9 @@ const Auth = () => {
   };
 
   return (
-    <div className='flex w-full flex-1 flex-col justify-center items-center p-4'>
+    <div className='flex w-full flex-1 flex-col justify-center items-center p-4 max-lg:pt-14'>
+      {isSmallDevice && <Header />}
+
       <div className='flex flex-col p-5 h-[500px] w-full md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 bg-zinc-100 dark:bg-darkGray justify-evenly items-center rounded-md'>
         <div className='flex flex-col items-center justify-center gap-2'>
           <img

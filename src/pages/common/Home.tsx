@@ -6,9 +6,13 @@ import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import HomeHeader from '../../components/specific-page/home-page/HomeHeader';
 import SwiperContainer from '../../components/specific-page/home-page/swiper/SwiperContainer';
 import EntryDetail from '../../components/items/entry/EntryDetail';
+import Header from '../../components/header/Header';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 const Home = () => {
   const { t } = useTranslation();
+  const { isSmallDevice } = useAppContext();
+
   const [popularEntries, setPopularEntries] = useState<IEntry[]>([]);
   const [clickedEntry, setClickedEntry] = useState<
     'popular' | 'lastAdded' | ''
@@ -23,18 +27,21 @@ const Home = () => {
   useEffect(() => {
     (async () => {
       try {
-        const { items: popular } = await getEntries({
-          page: 1,
-          limit: 30,
-          orderBy: '-popularity',
-        });
-        setPopularEntries(popular);
+        const [{ items: popular }, { items: lastAdded }] = await Promise.all([
+          getEntries({
+            page: 1,
+            limit: 30,
+            orderBy: '-popularity',
+          }),
+          getEntries({
+            page: 1,
+            limit: 30,
+            orderBy: '-created_at',
+          }),
+        ]);
 
-        const { items: lastAdded } = await getEntries({
-          page: 1,
-          limit: 30,
-          orderBy: '-created_at',
-        });
+        // Set entries
+        setPopularEntries(popular);
         setLastAddedEntries(lastAdded);
       } finally {
         setIsLoading(false);
@@ -50,7 +57,9 @@ const Home = () => {
 
   return (
     <>
-      <div className='w-full h-full p-4 overflow-auto'>
+      <div className='w-full h-full p-4 overflow-auto max-lg:pt-14'>
+        {isSmallDevice && <Header />}
+
         <HomeHeader />
 
         {/* POPULAR */}

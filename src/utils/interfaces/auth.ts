@@ -1,3 +1,5 @@
+import { ICatalogPermisions } from './users';
+
 export interface IAuth {
   userId: string;
   username: string;
@@ -32,6 +34,7 @@ export interface ILoginResponse {
       is_active: boolean;
       created_at: string;
       updated_at: string;
+      catalog_permissions: { [key: string]: string };
     };
   };
 }
