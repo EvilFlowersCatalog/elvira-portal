@@ -37,7 +37,7 @@ const Feed = ({ feed }: IFeedParams) => {
         feedId: feed.id,
       });
       const params = new URLSearchParams();
-      params.set('feed-id', feed.id);
+      params.set('feed-id-step', feed.id);
       navigate({
         pathname: NAVIGATION_PATHS.library,
         search: params.toString(),

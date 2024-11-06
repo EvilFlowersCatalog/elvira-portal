@@ -44,7 +44,7 @@ const BaseRoutes = () => {
         {/* Only authorized */}
         <Route element={<RequireAuth />}>
           <Route index element={<Home />} />
-          <Route path='about' element={<About />} />
+          {/* <Route path='about' element={<About />} /> */}
           <Route path='library' element={<Library />} />
           <Route path='shelf' element={<Shelf />} />
           {/* <Route path='loans' element={<Loans />} /> */}

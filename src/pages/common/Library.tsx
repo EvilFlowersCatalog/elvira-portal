@@ -33,7 +33,10 @@ const Library = () => {
           limit: 30,
           title: searchParams.get('title') ?? '',
           categoryId: searchParams.get('category-id') ?? '',
-          feedId: searchParams.get('feed-id') ?? '',
+          feedId:
+            searchParams.get('feed-id') ??
+            searchParams.get('feed-id-step') ??
+            '',
           authors: searchParams.get('author') ?? '',
           publishedAtGte: searchParams.get('from') ?? '',
           publishedAtLte: searchParams.get('to') ?? '',

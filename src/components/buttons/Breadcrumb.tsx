@@ -16,6 +16,10 @@ const Breadcrumb = () => {
   >([]);
   const [searchParams] = useSearchParams();
   const [feeds, setFeeds] = useState<{ id: string; title: string }[]>([]);
+  const [feedStep, setFeedStep] = useState<{ id: string; title: string }>({
+    id: '',
+    title: '',
+  });
 
   const isEn = (): boolean => {
     return lang === LANG_TYPE.en;
@@ -73,11 +77,19 @@ const Breadcrumb = () => {
       });
     }
 
+    if (feedStep.title) {
+      newBreadcrumbs.push({
+        path: pathParts.join('/') + `?feed-id-step=${feedStep.id}`,
+        label: feedStep.title,
+      });
+    }
+
     setBreadcrumbs(newBreadcrumbs);
-  }, [location, lang, editingEntryTitle, feeds]);
+  }, [location, lang, editingEntryTitle, feeds, feedStep]);
 
   useEffect(() => {
     const fp = searchParams.get('parent-id')?.split('&');
+    const feedStepId = searchParams.get('feed-id-step');
 
     (async () => {
       if (fp) {
@@ -95,6 +107,16 @@ const Breadcrumb = () => {
         });
       } else {
         setFeeds([]);
+      }
+      if (feedStepId) {
+        try {
+          const { response: detail } = await getFeedDetail(feedStepId);
+          setFeedStep({ id: detail.id, title: detail.title });
+        } catch {
+          setFeedStep({ id: '', title: '' });
+        }
+      } else {
+        setFeedStep({ id: '', title: '' });
       }
     })();
   }, [location.search]);

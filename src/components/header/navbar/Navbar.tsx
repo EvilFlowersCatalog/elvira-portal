@@ -190,12 +190,12 @@ const Navbar = () => {
             icon={<MdOutlineFeed size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.feeds}
           />
-          <NavbarButton
+          {/* <NavbarButton
             name={t('navbarMenu.about')}
             path={NAVIGATION_PATHS.about}
             icon={<FiHelpCircle size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.about}
-          />
+          /> */}
           {auth.isSuperUser && (
             <NavbarButton
               name={t('navbarMenu.administration')}

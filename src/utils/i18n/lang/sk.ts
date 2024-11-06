@@ -120,7 +120,8 @@ export const sk = {
       username: 'Prihlasovacie meno',
       password: 'Heslo',
       loginBtn: 'Prihlásiť sa',
-      license: 'Licenčné podmienky',
+      license: 'Prihlasením súhlasím s licenčnými podmienkami',
+      licenseTitle: 'Licenčné podmienky',
     },
 
     // ADMINISTRATION PAGE
@@ -273,12 +274,6 @@ export const sk = {
         empty: 'Kategóre sú prázdne',
         selected: 'Vybrané',
         options: 'Možnosti',
-      },
-      applyInfo: {
-        label: 'Aplikovať',
-        title: 'Informácie',
-        dialog:
-          'Želáte si aplikovať získané informácie z vášho {{x}} identifikátora: {{y}}?',
       },
       confirmation: {
         label: 'Vymazať',

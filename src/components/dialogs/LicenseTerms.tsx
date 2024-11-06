@@ -11,7 +11,7 @@ const LicenseTerms = ({ setOpenLicenseModal }: ILicenseTermsParams) => {
 
   return (
     <ModalWrapper
-      title={t('login.license')}
+      title={t('login.licenseTitle')}
       buttonLabel=''
       close={setOpenLicenseModal}
     >

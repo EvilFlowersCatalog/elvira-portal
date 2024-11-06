@@ -49,24 +49,22 @@ const ModalWrapper = ({
           onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className='relative flex w-full justify-center items-center gap-5 pt-4'>
+          <div className='flex w-full justify-center items-center gap-5'>
             <span
               className={`text-xl font-bold ${stuText} uppercase text-center`}
             >
               {title}
             </span>
-            <button className='absolute -top-2 -right-2' onClick={handleClick}>
-              <IoMdClose size={30} />
-            </button>
           </div>
           <div className='py-5 text-center justify-center items-center flex flex-1 flex-col'>
             {children}
           </div>
-          {yes && (
-            <div className='flex justify-center'>
-              <Button onClick={yes} title={buttonLabel} />
-            </div>
-          )}
+          <div className='flex justify-end gap-2'>
+            {yes && <Button onClick={yes} title={buttonLabel} />}
+            <button className='hover:underline' onClick={handleClick}>
+              Close
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -120,7 +120,8 @@ export const en = {
       username: 'Username',
       password: 'Password',
       loginBtn: 'Login',
-      license: 'License terms',
+      license: 'By logging in, I agree to the license terms',
+      licenseTitle: 'License terms',
     },
 
     // ADMINISTRATION PAGE
@@ -280,12 +281,6 @@ export const en = {
         empty: 'Categories are empty',
         selected: 'Selected',
         options: 'Options',
-      },
-      applyInfo: {
-        label: 'Apply',
-        title: 'Information',
-        dialog:
-          'Do you wish to apply the information obtained from your {{x}} identifier: {{y}}?',
       },
       confirmation: {
         label: 'Delete',
