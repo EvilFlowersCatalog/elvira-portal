@@ -6,14 +6,17 @@
 - **Added**: Possibility for multiple parents for feed
 - **Added**: Few base styles
 - **Added**: UMAMI tracking
+- **Added**: License terms
 - **Added**: Primary color changes based on `ELVIRA_FACULTY`
 - **Added**: Check for catalog permissions if not super user
 - **Changed**: `Required Auth/Admin` to `Auth/Admin Guard`
 - **Changed**: `Login.tsx` to `Auth.tsx`
+- **Changed**: Modal
 - **Changed**: `README.md` and cookies info
 - **Changed**: Viewer from `0.5.9` to `0.5.15`
 - **Changed**: In .env `ELVIRA_FACULTY` variable to `ELVIRA_THEME`
-- **Removed**: useCustomEffect
+- **Removed**: `useCustomEffect`
+- **Removed**: `applyInfo` modal
 - **Fixed**: UMAMI tracking
 
 ## 3.1.1 : 2024-08-09
