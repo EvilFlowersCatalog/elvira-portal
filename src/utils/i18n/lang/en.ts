@@ -268,6 +268,7 @@ export const en = {
     },
 
     modal: {
+      close: 'Close',
       feedMenu: {
         label: 'Apply',
         title: 'Feeds',

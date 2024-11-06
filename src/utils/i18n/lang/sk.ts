@@ -261,6 +261,7 @@ export const sk = {
     },
 
     modal: {
+      close: 'Zavrieť',
       feedMenu: {
         label: 'Aplikovať',
         title: 'Skupiny',

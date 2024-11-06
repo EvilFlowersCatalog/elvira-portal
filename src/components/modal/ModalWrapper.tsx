@@ -3,6 +3,7 @@ import { IoMdClose } from 'react-icons/io';
 import Button from '../buttons/Button';
 import { IModalParams } from '../../utils/interfaces/general/general';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import { useTranslation } from 'react-i18next';
 
 interface IModalWrapperParams extends IModalParams {
   title: string;
@@ -18,6 +19,7 @@ const ModalWrapper = ({
   yes,
 }: IModalWrapperParams) => {
   const { stuText, umamiTrack } = useAppContext();
+  const { t } = useTranslation();
 
   const ref = useRef<HTMLDivElement | null>(null);
 
@@ -62,7 +64,7 @@ const ModalWrapper = ({
           <div className='flex justify-end gap-2'>
             {yes && <Button onClick={yes} title={buttonLabel} />}
             <button className='hover:underline' onClick={handleClick}>
-              Close
+              {t('modal.close')}
             </button>
           </div>
         </div>
