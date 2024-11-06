@@ -25,6 +25,7 @@ const CookiesProvider = ({ children }: IContextProviderParams) => {
     COOKIES_TYPE.LAYOUT_KEY,
     COOKIES_TYPE.THEME_KEY,
     COOKIES_TYPE.INFOMED_KEY,
+    COOKIES_TYPE.LICENSE_KEY,
   ]);
   const [informed, setInformed] = useState<boolean>(
     cookies[COOKIES_TYPE.INFOMED_KEY] === true

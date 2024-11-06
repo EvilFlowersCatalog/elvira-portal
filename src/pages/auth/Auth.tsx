@@ -5,15 +5,23 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { IAuthCredentials } from '../../utils/interfaces/auth';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
-import { THEME_TYPE } from '../../utils/interfaces/general/general';
+import {
+  COOKIES_TYPE,
+  THEME_TYPE,
+} from '../../utils/interfaces/general/general';
 import { CircleLoader } from 'react-spinners';
 import ElviraInput from '../../components/inputs/ElviraInput';
 import { Checkbox } from '@mui/material';
+import useCookiesContext from '../../hooks/contexts/useCookiesContext';
+import ModalWrapper from '../../components/modal/ModalWrapper';
+import LicenseTerms from '../../components/dialogs/LicenseTerms';
 
 const Auth = () => {
   const { login } = useAuthContext();
   const { stuColor, theme, titleLogoDark, titleLogoLight, umamiTrack } =
     useAppContext();
+  const { cookies, setCookie } = useCookiesContext();
+
   const { t } = useTranslation();
   const [loginForm, setLoginForm] = useState<IAuthCredentials>({
     username: '',
@@ -21,8 +29,11 @@ const Auth = () => {
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [checked, setChecked] = useState<boolean>(false);
+  const [checked, setChecked] = useState<boolean>(
+    cookies[COOKIES_TYPE.LICENSE_KEY] ?? false
+  );
   const [checkInvalid, setCheckInvalid] = useState<boolean>(false);
+  const [openLicenseModal, setOpenLicenseModal] = useState<boolean>(false);
 
   // Handle usernamen input change
   const handleUsername = (event: ChangeEvent<HTMLInputElement>) => {
@@ -57,6 +68,9 @@ const Auth = () => {
 
   const handleCheckChange = (e: ChangeEvent<HTMLInputElement>) => {
     setCheckInvalid(false);
+    setCookie(COOKIES_TYPE.LICENSE_KEY, e.target.checked, {
+      maxAge: 60 * 60 * 24 * 365, // year
+    });
     setChecked(e.target.checked);
   };
 
@@ -67,6 +81,9 @@ const Auth = () => {
 
   return (
     <>
+      {openLicenseModal && (
+        <LicenseTerms setOpenLicenseModal={setOpenLicenseModal} />
+      )}
       <div className='flex w-full flex-1 flex-col justify-center items-center p-4'>
         <div className='flex flex-col p-5 h-[500px] w-full md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 bg-zinc-100 dark:bg-darkGray justify-evenly items-center rounded-md'>
           <div className='flex flex-col items-center justify-center gap-2'>
@@ -131,6 +148,7 @@ const Auth = () => {
                   />
                   <button
                     type='button'
+                    onClick={() => setOpenLicenseModal(true)}
                     className={`hover:underline text-sm cursor-pointer ${
                       checkInvalid ? 'text-red' : 'text-black dark:text-white'
                     }`}

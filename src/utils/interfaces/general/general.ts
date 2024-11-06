@@ -45,6 +45,7 @@ export enum COOKIES_TYPE {
   LANG_KEY = 'elvira-lang',
   LAYOUT_KEY = 'elvira-layout',
   INFOMED_KEY = 'elvira-cookie-informed',
+  LICENSE_KEY = 'elvira-license-terms',
 }
 
 export interface IMetadata {
@@ -64,7 +65,7 @@ export interface IConfig {
 
 export interface IModalParams {
   close: (open: boolean) => void;
-  yes: () => void;
+  yes?: () => void;
 }
 
 export interface IWizardParams {

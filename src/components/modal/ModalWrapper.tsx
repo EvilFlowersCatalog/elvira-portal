@@ -37,34 +37,36 @@ const ModalWrapper = ({
 
   return (
     <div
-      className='fixed z-50 top-0 left-0 bottom-0 right-0 bg-white bg-opacity-90 dark:bg-gray dark:bg-opacity-90 flex justify-center items-center'
+      className='fixed z-50 top-0 left-0 bottom-0 right-0 bg-white bg-opacity-90 dark:bg-gray dark:bg-opacity-90'
       onKeyDown={handleKeyDown}
       onClick={handleClick}
       tabIndex={-1}
       ref={ref}
     >
-      <div className='w-full h-full p-4 overflow-auto flex justify-start sm:justify-center items-center'>
+      <div className='w-full h-full p-4 overflow-auto flex'>
         <div
-          className='flex flex-col justify-start p-5 bg-zinc-100 dark:bg-darkGray min-w-64 md:min-w-[400px] h-fit w-fit lg:max-w-[40%] lg:min-w-[600px] rounded-md'
+          className='flex m-auto flex-col justify-start p-5 bg-zinc-100 dark:bg-darkGray min-w-64 md:min-w-[400px] h-fit w-fit lg:max-w-[40%] lg:min-w-[600px] rounded-md'
           onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
         >
           {/* Header */}
-          <div className='relative flex w-full justify-center items-center gap-5'>
+          <div className='relative flex w-full justify-center items-center gap-5 pt-4'>
             <span
               className={`text-xl font-bold ${stuText} uppercase text-center`}
             >
               {title}
             </span>
-            <button className='absolute -top-3 -right-3' onClick={handleClick}>
+            <button className='absolute -top-2 -right-2' onClick={handleClick}>
               <IoMdClose size={30} />
             </button>
           </div>
           <div className='py-5 text-center justify-center items-center flex flex-1 flex-col'>
             {children}
           </div>
-          <div className='flex justify-center'>
-            <Button onClick={yes} title={buttonLabel} />
-          </div>
+          {yes && (
+            <div className='flex justify-center'>
+              <Button onClick={yes} title={buttonLabel} />
+            </div>
+          )}
         </div>
       </div>
     </div>
