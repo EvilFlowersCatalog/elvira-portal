@@ -63,7 +63,10 @@ const ModalWrapper = ({
           </div>
           <div className='flex justify-end gap-2'>
             {yes && <Button onClick={yes} title={buttonLabel} />}
-            <button className='hover:underline' onClick={handleClick}>
+            <button
+              className='hover:underline text-red font-bold'
+              onClick={handleClick}
+            >
               {t('modal.close')}
             </button>
           </div>
