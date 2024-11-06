@@ -120,6 +120,7 @@ export const en = {
       username: 'Username',
       password: 'Password',
       loginBtn: 'Login',
+      license: 'License terms',
     },
 
     // ADMINISTRATION PAGE

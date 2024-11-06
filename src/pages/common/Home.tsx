@@ -6,12 +6,9 @@ import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import HomeHeader from '../../components/specific-page/home-page/HomeHeader';
 import SwiperContainer from '../../components/specific-page/home-page/swiper/SwiperContainer';
 import EntryDetail from '../../components/items/entry/EntryDetail';
-import Header from '../../components/header/Header';
-import useAppContext from '../../hooks/contexts/useAppContext';
 
 const Home = () => {
   const { t } = useTranslation();
-  const { isSmallDevice } = useAppContext();
 
   const [popularEntries, setPopularEntries] = useState<IEntry[]>([]);
   const [clickedEntry, setClickedEntry] = useState<
@@ -57,9 +54,7 @@ const Home = () => {
 
   return (
     <>
-      <div className='w-full h-full p-4 overflow-auto max-lg:pt-14'>
-        {isSmallDevice && <Header />}
-
+      <div className='w-full h-full p-4 overflow-auto'>
         <HomeHeader />
 
         {/* POPULAR */}

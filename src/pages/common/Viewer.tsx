@@ -1,10 +1,7 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useEffect, useState } from 'react';
-import {
-  IUserAcquisition,
-  IUserAcquisitionShare,
-} from '../../utils/interfaces/acquisition';
+import { IUserAcquisitionShare } from '../../utils/interfaces/acquisition';
 import useCreateUserAcquisition from '../../hooks/api/acquisitiions/user-acquistions/useCreateUserAcquisition';
 import {
   NAVIGATION_PATHS,

@@ -110,8 +110,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       try {
         const entryDetail = await getEntryDetail(entryId);
         setEntry(entryDetail);
-
-        console.log(entryDetail.response.acquisitions);
       } catch {
         setEntry(null);
       }
@@ -195,21 +193,12 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
             >
               {/* Detail */}
               <div className={'flex flex-col items-center'}>
-                <span className={'text-white'}>
-                  {t('entry.detail.relation')}
-                </span>
-                <span className={`${stuText} font-extrabold uppercase`}>
-                  {entry.response.acquisitions[0].relation ?? 0}
-                </span>
-              </div>
-              <span className={'h-3/6 border-l border-white'}></span>
-              <div className={'flex flex-col items-center'}>
                 <span className={'text-white'}>{t('entry.detail.views')}</span>
                 <span className={`${stuText} font-extrabold`}>
                   {entry.response.popularity}
                 </span>
               </div>
-              <span className={'h-3/6 border-l border-white'}></span>
+              <span className={'h-3/6 border-x-2 border-white'}></span>
               <div className={'flex flex-col items-center'}>
                 <span className={'text-white'}>{t('entry.detail.lang')}</span>
                 <span className={`${stuText} font-extrabold`}>

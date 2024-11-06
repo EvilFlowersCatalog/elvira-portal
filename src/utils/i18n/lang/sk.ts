@@ -120,6 +120,7 @@ export const sk = {
       username: 'Prihlasovacie meno',
       password: 'Heslo',
       loginBtn: 'Prihlásiť sa',
+      license: 'Licenčné podmienky',
     },
 
     // ADMINISTRATION PAGE

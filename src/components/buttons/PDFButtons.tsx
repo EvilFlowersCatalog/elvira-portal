@@ -13,6 +13,7 @@ interface IPDFButtonsParams {
 
 const PDFButtons = ({ acquisitions, entryId }: IPDFButtonsParams) => {
   const { specialNavigation, umamiTrack } = useAppContext();
+  const { t } = useTranslation();
   const location = useLocation();
 
   const handleRead = (e: MouseEvent<HTMLButtonElement>, index: number) => {
@@ -27,19 +28,20 @@ const PDFButtons = ({ acquisitions, entryId }: IPDFButtonsParams) => {
     );
   };
 
-  return acquisitions?.map((_, index) => (
-    <div key={index} className='flex gap-4 items-center text-white'>
-      <Button
-        className='py-0'
-        onClick={(e) => handleRead(e, index)}
-        title={
-          acquisitions[index].mime.includes('pdf')
-            ? 'PDF'
-            : acquisitions[index].mime
-        }
-      />
+  return (
+    <div className='flex gap-2 items-center'>
+      {' '}
+      {acquisitions?.map((acq, index) => (
+        <div key={acq.id} className='text-white'>
+          <Button
+            className='py-0'
+            onClick={(e) => handleRead(e, index)}
+            title={t('entry.detail.read')}
+          />
+        </div>
+      ))}
     </div>
-  ));
+  );
 };
 
 export default PDFButtons;

@@ -82,6 +82,16 @@ const EntrySwiper = ({
             onLoad={() => setImageLoaded(true)}
           />
         </div>
+        <div className='flex gap-2'>
+          {entry.feeds.map((feed) => (
+            <div
+              key={feed.id}
+              className={`px-2 py-1 text-sm ${stuBg} text-white rounded-md`}
+            >
+              {feed.title}
+            </div>
+          ))}
+        </div>
         <span
           className={`text-sm ${
             isActive ? 'text-white' : 'text-darkGray dark:text-white'

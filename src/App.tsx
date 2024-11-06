@@ -6,9 +6,12 @@ import SearchBarContainer from './components/search-bar/SearchBarContainer';
 import useCookiesContext from './hooks/contexts/useCookiesContext';
 import CookiesInformation from './components/dialogs/CookiesInformation';
 import { useEffect } from 'react';
+import Header from './components/header/Header';
+import useAppContext from './hooks/contexts/useAppContext';
 
 const App = () => {
   const { informed } = useCookiesContext();
+  const { isSmallDevice } = useAppContext();
 
   const location = useLocation();
 
@@ -44,9 +47,18 @@ const App = () => {
       />
       {!informed && <CookiesInformation />}
       <div className='h-screen flex w-screen bg-white dark:bg-gray text-black dark:text-white'>
-        {show() && <NavbarContainer />}
+        {show() && (
+          <>
+            <NavbarContainer />
+            {isSmallDevice && <Header />}
+          </>
+        )}
 
-        <div className={`flex flex-1 h-screen flex-col overflow-hidden`}>
+        <div
+          className={`flex flex-1 h-screen flex-col overflow-hidden ${
+            show() ? 'max-lg:pt-14' : ''
+          }`}
+        >
           <Outlet />
         </div>
 

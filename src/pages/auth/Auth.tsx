@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, InvalidEvent, useState } from 'react';
+import { ChangeEvent, FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Button from '../../components/buttons/Button';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
@@ -8,18 +8,12 @@ import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { THEME_TYPE } from '../../utils/interfaces/general/general';
 import { CircleLoader } from 'react-spinners';
 import ElviraInput from '../../components/inputs/ElviraInput';
-import Header from '../../components/header/Header';
+import { Checkbox } from '@mui/material';
 
 const Auth = () => {
   const { login } = useAuthContext();
-  const {
-    stuColor,
-    theme,
-    titleLogoDark,
-    titleLogoLight,
-    umamiTrack,
-    isSmallDevice,
-  } = useAppContext();
+  const { stuColor, theme, titleLogoDark, titleLogoLight, umamiTrack } =
+    useAppContext();
   const { t } = useTranslation();
   const [loginForm, setLoginForm] = useState<IAuthCredentials>({
     username: '',
@@ -27,6 +21,8 @@ const Auth = () => {
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [checked, setChecked] = useState<boolean>(false);
+  const [checkInvalid, setCheckInvalid] = useState<boolean>(false);
 
   // Handle usernamen input change
   const handleUsername = (event: ChangeEvent<HTMLInputElement>) => {
@@ -59,63 +55,96 @@ const Auth = () => {
     setLoading(false); // hide loader
   };
 
-  return (
-    <div className='flex w-full flex-1 flex-col justify-center items-center p-4 max-lg:pt-14'>
-      {isSmallDevice && <Header />}
+  const handleCheckChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setCheckInvalid(false);
+    setChecked(e.target.checked);
+  };
 
-      <div className='flex flex-col p-5 h-[500px] w-full md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 bg-zinc-100 dark:bg-darkGray justify-evenly items-center rounded-md'>
-        <div className='flex flex-col items-center justify-center gap-2'>
-          <img
-            className='w-96'
-            src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
-            alt='Elvira Logo'
-          />
-          <span className='text-lg'>{t('login.digitalLibrary')}</span>
-        </div>
-        <div className='flex w-full h-fit justify-center items-start'>
-          {loading ? (
-            <div className='flex h-full justify-center items-center'>
-              <CircleLoader color={stuColor} size={50} />
-            </div>
-          ) : (
-            <form
-              className='flex flex-col gap-4 w-3/4 items-center'
-              onSubmit={submit}
-            >
-              <ElviraInput
-                value={loginForm.username}
-                onChange={handleUsername}
-                placeholder={t('login.username')}
-                invalidMessage={t('login.requiredMessage.username')}
-                required
-              />
-              <div className='relative w-full flex'>
+  const handleCheckkInvalid = (e: FormEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setCheckInvalid(true);
+  };
+
+  return (
+    <>
+      <div className='flex w-full flex-1 flex-col justify-center items-center p-4'>
+        <div className='flex flex-col p-5 h-[500px] w-full md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 bg-zinc-100 dark:bg-darkGray justify-evenly items-center rounded-md'>
+          <div className='flex flex-col items-center justify-center gap-2'>
+            <img
+              className='w-96'
+              src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
+              alt='Elvira Logo'
+            />
+            <span className='text-lg'>{t('login.digitalLibrary')}</span>
+          </div>
+          <div className='flex w-full h-fit justify-center items-start'>
+            {loading ? (
+              <div className='flex h-full justify-center items-center'>
+                <CircleLoader color={stuColor} size={50} />
+              </div>
+            ) : (
+              <form
+                className='flex flex-col gap-4 w-3/4 items-center'
+                onSubmit={submit}
+              >
                 <ElviraInput
-                  value={loginForm.password}
-                  onChange={handlePassword}
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder={t('login.password')}
-                  invalidMessage={t('login.requiredMessage.password')}
+                  value={loginForm.username}
+                  onChange={handleUsername}
+                  placeholder={t('login.username')}
+                  invalidMessage={t('login.requiredMessage.username')}
                   required
                 />
-                <button
-                  className='absolute top-[31px] -right-7'
-                  type='button'
-                  onClick={() => setShowPassword((prevShow) => !prevShow)}
-                >
-                  {showPassword ? (
-                    <FaEye size={20} />
-                  ) : (
-                    <FaEyeSlash size={20} />
-                  )}
-                </button>
-              </div>
-              <Button type='submit' title={t('login.loginBtn')} />
-            </form>
-          )}
+                <div className='relative w-full flex'>
+                  <ElviraInput
+                    value={loginForm.password}
+                    onChange={handlePassword}
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder={t('login.password')}
+                    invalidMessage={t('login.requiredMessage.password')}
+                    required
+                  />
+                  <button
+                    className='absolute top-[31px] -right-7'
+                    type='button'
+                    onClick={() => setShowPassword((prevShow) => !prevShow)}
+                  >
+                    {showPassword ? (
+                      <FaEye size={20} />
+                    ) : (
+                      <FaEyeSlash size={20} />
+                    )}
+                  </button>
+                </div>
+                <div className='flex w-full gap-2 items-center'>
+                  <Checkbox
+                    size='small'
+                    required
+                    checked={checked}
+                    onChange={handleCheckChange}
+                    onInvalid={handleCheckkInvalid}
+                    sx={{
+                      color: checkInvalid ? 'red' : stuColor,
+                      '&.Mui-checked': {
+                        color: checkInvalid ? 'red' : stuColor,
+                      },
+                    }}
+                  />
+                  <button
+                    type='button'
+                    className={`hover:underline text-sm cursor-pointer ${
+                      checkInvalid ? 'text-red' : 'text-black dark:text-white'
+                    }`}
+                  >
+                    {t('login.license')}
+                  </button>
+                </div>
+                <Button type='submit' title={t('login.loginBtn')} />
+              </form>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

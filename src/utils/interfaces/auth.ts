@@ -46,5 +46,6 @@ export interface IRefreshTokenResponse {
 export interface IVerifyAdminResponse {
   response: {
     is_superuser: boolean;
+    catalog_permissions: { [key: string]: string };
   };
 }
