@@ -130,19 +130,18 @@ const FileDropzone = ({
     onDropAccepted,
     accept: { 'application/pdf': [] },
     multiple: true,
-    noClick: true,
   });
 
   return (
     <>
       {isLoading ? (
-        <div className='flex-2 min-h-60 max-h-[500px] rounded-md p-4 bg-zinc-100 dark:bg-darkGray'>
+        <div className='flex-2 min-h-60 max-h-[500px] rounded-md p-4 bg-zinc-100 dark:bg-darkGray cursor-pointer'>
           <PageLoading />
         </div>
       ) : (
         <div
           {...getRootProps({
-            className: `relative flex-2 min-h-60 max-h-[500px] overflow-auto rounded-md p-4 border-4 border-dashed duration-200 ${
+            className: `relative flex-2 min-h-60 max-h-[500px] overflow-auto rounded-md p-4 border-4 border-dashed duration-200 cursor-pointer ${
               isDragActive
                 ? `${stuBg} bg-opacity-50 border-white`
                 : 'bg-zinc-100 dark:bg-darkGray border-transparent'

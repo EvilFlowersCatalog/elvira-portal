@@ -149,7 +149,7 @@ const Auth = () => {
                   <button
                     type='button'
                     onClick={() => setOpenLicenseModal(true)}
-                    className={`hover:underline text-sm cursor-pointer ${
+                    className={`hover:underline text-sm cursor-pointer text-left ${
                       checkInvalid ? 'text-red' : 'text-black dark:text-white'
                     }`}
                   >
