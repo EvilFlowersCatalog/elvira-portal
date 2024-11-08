@@ -42,6 +42,7 @@ const Library = () => {
           publishedAtLte: searchParams.get('to') ?? '',
           orderBy: searchParams.get('order-by') ?? '',
           query: searchParams.get('query') ?? '',
+          config__readium_enabled: false,
         });
 
         setMaxPage(metadata.pages);
