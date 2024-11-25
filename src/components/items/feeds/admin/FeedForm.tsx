@@ -35,6 +35,7 @@ const FeedForm = ({
     title: '',
     content: '',
     kind: 'acquisition',
+    parents: [],
   });
   const [searchParams] = useSearchParams();
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -79,31 +80,31 @@ const FeedForm = ({
   }, [parentFeeds]);
 
   useEffect(() => {
-    const parentId = searchParams.get('parent-id') ?? '';
-    if (parentId) {
-      (async () => {
-        try {
-          const { response } = await getFeedDetail(parentId);
-          setParentFeeds({
-            feeds: [{ id: response.id, title: response.title }],
-          });
-        } catch {
-          setParentFeeds({ feeds: [] });
-        }
-      })();
-    }
-
     try {
       if (feedId) {
         (async () => {
           const { response } = await getFeedDetail(feedId);
+
+          if (response.parents) {
+            const details = await Promise.all(
+              response.parents.map((id) => getFeedDetail(id))
+            );
+
+            const parents: { feeds: { title: string; id: string }[] } = {
+              feeds: [],
+            };
+            details.map(({ response }) => {
+              parents.feeds.push({ id: response.id, title: response.title });
+            });
+
+            setParentFeeds(parents);
+          }
 
           setForm({
             catalog_id: response.catalog_id,
             url_name: response.url_name,
             title: response.title,
             content: response.content,
-            parents: response.parents,
             kind: response.kind,
           });
         })();

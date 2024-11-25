@@ -17,6 +17,7 @@
 - **Changed**: In .env `ELVIRA_FACULTY` variable to `ELVIRA_THEME`
 - **Removed**: `useCustomEffect`
 - **Removed**: `applyInfo` modal
+- **Fixed**: Parents in `Admin Feed`
 - **Fixed**: UMAMI tracking
 
 ## 3.1.1 : 2024-08-09
