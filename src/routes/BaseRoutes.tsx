@@ -14,6 +14,7 @@ import About from '../pages/common/About';
 import AdminEditEntry from '../pages/admin/entries/AdminEditEntry';
 import AdminEntries from '../pages/admin/entries/AdminEntries';
 import AdminCategories from '../pages/admin/AdminCategories';
+import AdminUsers from '../pages/admin/AdminUsers';
 import Feeds from '../pages/common/Feeds';
 import AdminHome from '../pages/admin/AdminHome';
 import AdminAddEntry from '../pages/admin/entries/AdminAddEntry';
@@ -61,6 +62,7 @@ const BaseRoutes = () => {
             </Route>
             <Route path='feeds' element={<AdminFeeds />} />
             <Route path='categories' element={<AdminCategories />} />
+            <Route path='users' element={<AdminUsers />} />
           </Route>
         </Route>
       </Route>

@@ -130,7 +130,15 @@ export const en = {
         entries: 'Entries',
         feeds: 'Feeds',
         categories: 'Categories',
+        users: 'Users',
       },
+    },
+
+     // ADMINISTRATION USERS PAGE
+     users: {
+      userName: 'Username',
+      firstName: 'First Name',
+      lastName: 'Last Name',
     },
 
     general: {

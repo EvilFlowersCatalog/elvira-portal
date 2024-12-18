@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { FaBook } from 'react-icons/fa';
-import { MdCategory, MdFeed } from 'react-icons/md';
+import { MdCategory, MdFeed, MdAccountCircle } from 'react-icons/md';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import AdminButton from '../../components/buttons/AdminButton';
@@ -21,6 +21,11 @@ const buttonConfig = [
     icon: <MdCategory size={25} />,
     textKey: 'administration.homePage.categories',
     path: NAVIGATION_PATHS.adminCategories,
+  },
+  {
+    icon: <MdAccountCircle size={25} />,
+    textKey: 'administration.homePage.users',
+    path: NAVIGATION_PATHS.adminUsers
   },
 ];
 

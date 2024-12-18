@@ -130,7 +130,15 @@ export const sk = {
         entries: 'Publikácie',
         feeds: 'Skupiny',
         categories: 'Kategórie',
+        users: 'Používatelia',
       },
+    },
+
+    // ADMINISTRATION USERS PAGE
+    users: {
+      userName: 'Používateľské meno',
+      firstName: 'Meno',
+      lastName: 'Priezvisko',
     },
 
     general: {

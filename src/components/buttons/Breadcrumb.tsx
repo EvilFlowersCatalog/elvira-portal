@@ -35,6 +35,7 @@ const Breadcrumb = () => {
     ['entries']: isEn() ? 'Entries' : 'Publikácie',
     ['add']: isEn() ? 'Add' : 'Pridanie',
     ['categories']: isEn() ? 'Categories' : 'Kategórie',
+    ['users']: isEn() ? 'Users' : 'Používatelia',
     ['edit']: editingEntryTitle,
   };
 
