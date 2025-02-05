@@ -71,6 +71,7 @@ const AdminLicences = () => {
       showSearch={false}
     >
       <div className='flex flex-wrap px-3 pb-4'>
+        {/* admin licenses */}
         {licenses.map((license, index) => (
           <AdminLicense
             key={index}
