@@ -40,6 +40,7 @@ const AdminAddEntry = () => {
       evilflowres_metadata_fetch: false,
       evilflowers_annotations_create: false,
       evilflowers_ocr_rewrite: false,
+      readium_enabled: false,
     },
     categories: [],
     citation: '',

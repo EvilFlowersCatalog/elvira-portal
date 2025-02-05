@@ -6,15 +6,15 @@ export enum NAVIGATION_PATHS {
   home = '/',
   library = '/library',
   shelf = '/shelf',
-  loans = '/loans',
   feeds = '/feeds',
-  about = '/about',
+  licenses = '/licenses',
   viewer = '/viewer/',
   adminHome = '/administration',
   adminEntries = '/administration/entries',
   adminAddEntries = '/administration/entries/add',
   adminEditEntries = '/administration/entries/edit/',
   adminFeeds = '/administration/feeds',
+  adminLicencies = '/administration/licenses',
   adminCategories = '/administration/categories',
 }
 
@@ -61,6 +61,7 @@ export interface IConfig {
   evilflowres_metadata_fetch: boolean;
   evilflowers_annotations_create: boolean;
   evilflowers_ocr_rewrite: boolean;
+  readium_enabled: boolean;
 }
 
 export interface IModalParams {

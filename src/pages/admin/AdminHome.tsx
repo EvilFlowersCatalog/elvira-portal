@@ -5,6 +5,7 @@ import Breadcrumb from '../../components/buttons/Breadcrumb';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import AdminButton from '../../components/buttons/AdminButton';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
+import { RiKey2Line } from 'react-icons/ri';
 
 const buttonConfig = [
   {
@@ -21,6 +22,11 @@ const buttonConfig = [
     icon: <MdCategory size={25} />,
     textKey: 'administration.homePage.categories',
     path: NAVIGATION_PATHS.adminCategories,
+  },
+  {
+    icon: <RiKey2Line size={25} />,
+    textKey: 'administration.homePage.licenses',
+    path: NAVIGATION_PATHS.adminLicencies,
   },
 ];
 

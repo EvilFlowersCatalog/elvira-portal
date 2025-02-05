@@ -11,13 +11,15 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@evilflowers/evilflowersviewer": "^0.5.15",
+    "@evilflowers/evilflowersviewer": "^0.5.1",
     "@mui/material": "^6.0.2",
     "@types/umami": "^2.10.0",
     "axios": "^1.6.7",
     "broadcast-channel": "^7.0.0",
+    "luxon": "^3.5.0",
     "react": "^18.2.0",
     "react-cookie": "^7.2.0",
+    "react-datepicker": "^7.6.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-gravatar": "^2.6.3",
@@ -31,6 +33,7 @@
   },
   "devDependencies": {
     "@types/jwt-encode": "^1.0.3",
+    "@types/luxon": "^3.4.2",
     "@types/node": "^22.5.5",
     "@types/react": "^18.2.56",
     "@types/react-dom": "^18.2.19",

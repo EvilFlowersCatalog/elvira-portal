@@ -6,15 +6,19 @@ import {
 } from '../../../utils/interfaces/general/general';
 
 import { ReactElement } from 'react';
-import { IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
+import {
+  IoDocumentsOutline,
+  IoMoonOutline,
+  IoSunnyOutline,
+} from 'react-icons/io5';
 import { MdOutlineFeed } from 'react-icons/md';
-import { RiAdminLine, RiArrowLeftDoubleFill } from 'react-icons/ri';
+import { RiAdminLine, RiArrowLeftDoubleFill, RiKey2Line } from 'react-icons/ri';
 import { PiBooks } from 'react-icons/pi';
 import { HiOutlineLanguage } from 'react-icons/hi2';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { FiBookOpen, FiHelpCircle } from 'react-icons/fi';
+import { FiBookOpen } from 'react-icons/fi';
 import { RxHome } from 'react-icons/rx';
 import Gravatar from 'react-gravatar';
 import Button from '../../buttons/Button';
@@ -78,7 +82,7 @@ const Navbar = () => {
     umamiTrack,
   } = useAppContext();
   const { auth, logout } = useAuthContext();
-  const { stuBg } = useAppContext();
+  const { stuBg, stuText } = useAppContext();
 
   const { t } = useTranslation();
   const location = useLocation();
@@ -148,6 +152,15 @@ const Navbar = () => {
 
       <div className='flex flex-col items-start'>
         <h1 className='font-bold'>{t('navbarMenu.catalog')}</h1>
+        <a
+          className={`text-[13px] font-mono mb-2 ${stuText} hover:underline cursor-pointer`}
+          onClick={() => {
+            umamiTrack('Catalog Info Button');
+            window.open('https://elvira.stuba.sk/', '_blank');
+          }}
+        >
+          https://elvira.stuba.sk/
+        </a>
         {/* STU Logo */}
         <NavbarButton
           name={''}
@@ -190,12 +203,6 @@ const Navbar = () => {
             icon={<MdOutlineFeed size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.feeds}
           />
-          {/* <NavbarButton
-            name={t('navbarMenu.about')}
-            path={NAVIGATION_PATHS.about}
-            icon={<FiHelpCircle size={23} />}
-            isActive={location.pathname === NAVIGATION_PATHS.about}
-          /> */}
           {auth.isSuperUser && (
             <NavbarButton
               name={t('navbarMenu.administration')}
@@ -224,12 +231,12 @@ const Navbar = () => {
             icon={<PiBooks size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.shelf}
           />
-          {/* <NavbarButton
-            name={t('navbarMenu.loan')}
-            path={NAVIGATION_PATHS.loans}
-            icon={<IoDocumentsOutline size={23} />}
-            isActive={location.pathname === NAVIGATION_PATHS.loans}
-          /> */}
+          <NavbarButton
+            name={t('navbarMenu.licenses')}
+            path={NAVIGATION_PATHS.licenses}
+            icon={<RiKey2Line size={23} />}
+            isActive={location.pathname === NAVIGATION_PATHS.licenses}
+          />
         </div>
       )}
 

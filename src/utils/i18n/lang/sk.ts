@@ -89,13 +89,23 @@ export const sk = {
             error: 'Skupinu vrstiev sa nepodarilo pridať.',
           },
           edit: {
-            success: 'Skupina vrstiev vola úspešne upravená.',
+            success: 'Skupina vrstiev bola úspešne upravená.',
             error: 'Skupinu vrstiev sa nepodarilo upraviť.',
           },
           remove: {
             success: 'Skupina vrstiev bola úspešne odstránená.',
             error: 'Skupinu vrstiev sa nepodarilo odstrániť.',
           },
+        },
+      },
+      license: {
+        add: {
+          success: 'Licencia bola úspešne pridaná.',
+          error: 'Licenciu sa nepodarilo pridať.',
+        },
+        edit: {
+          success: 'Licencia bola úspešne upravená.',
+          error: 'Licenciu sa nepodarilo upraviť.',
         },
       },
       login: {
@@ -130,7 +140,14 @@ export const sk = {
         entries: 'Publikácie',
         feeds: 'Skupiny',
         categories: 'Kategórie',
+        licenses: 'Licencie',
       },
+    },
+
+    license: {
+      startsAt: 'Začína',
+      expiresAt: 'Expiruje',
+      edit: 'Upraviť',
     },
 
     general: {
@@ -158,6 +175,7 @@ export const sk = {
       myShelf: 'Polička',
       loan: 'Výpožičky',
       feeds: 'Skupiny',
+      licenses: 'Licencie',
       administration: 'Administrácia',
       darkMode: 'Tmavý Režim',
       lightMode: 'Svetlý Režim',
@@ -203,6 +221,8 @@ export const sk = {
         categories: 'Kategórie',
         summary: 'Zhrnutie',
         read: 'Čítať',
+        borrow: 'Vypožičať',
+        download: 'Stiahnúť',
         relation: 'Relácia',
       },
       wizard: {
@@ -313,6 +333,22 @@ export const sk = {
         requiredMessages: {
           term: 'Termín je povinný. Pred pokračovaním je potrebné ho vyplniť.',
         },
+      },
+      licenseForm: {
+        title: {
+          add: 'Vytvoriť novú licenciu',
+          edit: 'Upraviť aktuálnu licenciu',
+        },
+        button: {
+          add: 'Pridať licenciu',
+          edit: 'Upraviť licenciu',
+        },
+        startDate: 'Dátum začatia',
+        endDate: 'Dátum skončenia',
+      },
+      licensePicker: {
+        title: 'Vybrať licenciu',
+        button: 'Vybrať',
       },
     },
 

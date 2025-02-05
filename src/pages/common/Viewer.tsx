@@ -9,6 +9,7 @@ import {
 } from '../../utils/interfaces/general/general';
 import useGetEntryDetail from '../../hooks/api/entries/useGetEntryDetail';
 import useGetUserAcquisition from '../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisition';
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import { renderViewer } from '@evilflowers/evilflowersviewer';
 import useAppContext from '../../hooks/contexts/useAppContext';

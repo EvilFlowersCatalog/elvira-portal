@@ -98,6 +98,16 @@ export const en = {
           },
         },
       },
+      license: {
+        add: {
+          success: 'License was successfully added.',
+          error: 'License failed to be added.',
+        },
+        edit: {
+          success: 'License was successfully edited.',
+          error: 'License failed to be edited.',
+        },
+      },
       login: {
         success: 'You have been successfully logged in.',
         error: 'Wrong credentials.',
@@ -130,7 +140,15 @@ export const en = {
         entries: 'Entries',
         feeds: 'Feeds',
         categories: 'Categories',
+        licenses: 'Licenses',
       },
+    },
+
+    // License
+    license: {
+      startsAt: 'Starts at',
+      expiresAt: 'Expires at',
+      edit: 'Edit',
     },
 
     general: {
@@ -159,6 +177,7 @@ export const en = {
       loan: 'Loans',
       loanHistory: 'Loans Histroy',
       feeds: 'Feeds',
+      licenses: 'Licenses',
       administration: 'Administration',
       darkMode: 'Dark Mode',
       lightMode: 'Light Mode',
@@ -204,6 +223,8 @@ export const en = {
         categories: 'Categories',
         summary: 'Summary',
         read: 'Read',
+        borrow: 'Borrow',
+        download: 'Download',
         relation: 'Relation',
       },
       wizard: {
@@ -308,6 +329,22 @@ export const en = {
             'Title field is required. It must be filled out before proceeding.',
           content:
             'Content field is required. It must be filled out before proceeding.',
+        },
+        licenseForm: {
+          title: {
+            add: 'Create new license',
+            edit: 'Edit current license',
+          },
+          button: {
+            add: 'Add license',
+            edit: 'Edit license',
+          },
+          startDate: 'Start date',
+          endDate: 'End date',
+        },
+        licensePicker: {
+          title: 'Pick license',
+          button: 'Choose',
         },
       },
       categoryForm: {

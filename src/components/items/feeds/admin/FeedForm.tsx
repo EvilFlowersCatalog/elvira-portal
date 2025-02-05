@@ -3,7 +3,6 @@ import useAppContext from '../../../../hooks/contexts/useAppContext';
 import { useTranslation } from 'react-i18next';
 import { IFeedNew } from '../../../../utils/interfaces/feed';
 import { uuid } from '../../../../utils/func/functions';
-import { useSearchParams } from 'react-router-dom';
 import useUploadFeed from '../../../../hooks/api/feeds/useUploadFeed';
 import useEditFeed from '../../../../hooks/api/feeds/useEditFeed';
 import useGetFeedDetail from '../../../../hooks/api/feeds/useGetFeedDetail';
@@ -37,7 +36,6 @@ const FeedForm = ({
     kind: 'acquisition',
     parents: [],
   });
-  const [searchParams] = useSearchParams();
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const [parentFeeds, setParentFeeds] = useState<{
     feeds: { title: string; id: string }[];
@@ -112,7 +110,7 @@ const FeedForm = ({
     } catch {
       setOpen(false);
     }
-  }, []);
+  }, [feedId]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

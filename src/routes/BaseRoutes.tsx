@@ -10,7 +10,6 @@ import useAuthContext from '../hooks/contexts/useAuthContext';
 import RequireAdmin from './guards/AdminGuard';
 import Viewer from '../pages/common/Viewer';
 import Home from '../pages/common/Home';
-import About from '../pages/common/About';
 import AdminEditEntry from '../pages/admin/entries/AdminEditEntry';
 import AdminEntries from '../pages/admin/entries/AdminEntries';
 import AdminCategories from '../pages/admin/AdminCategories';
@@ -18,6 +17,8 @@ import Feeds from '../pages/common/Feeds';
 import AdminHome from '../pages/admin/AdminHome';
 import AdminAddEntry from '../pages/admin/entries/AdminAddEntry';
 import Auth from '../pages/auth/Auth';
+import AdminLicences from '../pages/admin/AdminLicences';
+import Licenses from '../pages/common/Licenses';
 
 const BaseRoutes = () => {
   const { auth } = useAuthContext();
@@ -44,11 +45,10 @@ const BaseRoutes = () => {
         {/* Only authorized */}
         <Route element={<RequireAuth />}>
           <Route index element={<Home />} />
-          {/* <Route path='about' element={<About />} /> */}
           <Route path='library' element={<Library />} />
           <Route path='shelf' element={<Shelf />} />
-          {/* <Route path='loans' element={<Loans />} /> */}
           <Route path='feeds' element={<Feeds />} />
+          <Route path='licenses' element={<Licenses />} />
           <Route path='viewer/:entry-id/:index' element={<Viewer />} />
 
           {/* Only with admin role */}
@@ -60,6 +60,7 @@ const BaseRoutes = () => {
               <Route path='edit/:entry-id' element={<AdminEditEntry />} />
             </Route>
             <Route path='feeds' element={<AdminFeeds />} />
+            <Route path='licenses' element={<AdminLicences />} />
             <Route path='categories' element={<AdminCategories />} />
           </Route>
         </Route>
