@@ -37,7 +37,10 @@ export default {
         xxl: '1440px',
       },
       colors: {
-        primary: {
+        primary: '#0077CC',
+        primaryLight: '#E6F3FF',
+        secondary: '#15384E',
+        identity: {
           fiit: '#01a9e0',
           mtf: '#e62b1e',
           svf: '#e5722a',

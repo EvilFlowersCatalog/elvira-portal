@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 *,
 *::after,
 *::before {
@@ -10,6 +12,7 @@
   margin: 0;
   scrollbar-width: thin !important; /* For Firefox */
   scrollbar-color: #555 transparent !important; /* For Firefox */
+  font-family: "Inter", sans-serif !important; /* !important since evilflowersviewer is overriding * selector */
 }
 
 /* Custom Scrollbar for WebKit Browsers */
@@ -58,112 +61,112 @@ body,
 
 @layer components {
   .fiit-border {
-    @apply border-primary-fiit dark:border-primary-fiit;
+    @apply border-identity-fiit dark:border-identity-fiit;
   }
   .fad-border {
-    @apply border-primary-fad dark:border-primary-fad;
+    @apply border-identity-fad dark:border-identity-fad;
   }
   .fchpt-border {
-    @apply border-primary-fchpt dark:border-primary-fchpt;
+    @apply border-identity-fchpt dark:border-identity-fchpt;
   }
   .fei-border {
-    @apply border-primary-fei dark:border-primary-fei;
+    @apply border-identity-fei dark:border-identity-fei;
   }
   .mtf-border {
-    @apply border-primary-mtf dark:border-primary-mtf;
+    @apply border-identity-mtf dark:border-identity-mtf;
   }
   .sjf-border {
-    @apply border-primary-sjf dark:border-primary-sjf;
+    @apply border-identity-sjf dark:border-identity-sjf;
   }
   .svf-border {
-    @apply border-primary-svf dark:border-primary-svf;
+    @apply border-identity-svf dark:border-identity-svf;
   }
 
   .fiit-bg {
-    @apply bg-primary-fiit;
+    @apply bg-identity-fiit;
   }
   .fad-bg {
-    @apply bg-primary-fad;
+    @apply bg-identity-fad;
   }
   .fchpt-bg {
-    @apply bg-primary-fchpt;
+    @apply bg-identity-fchpt;
   }
   .fei-bg {
-    @apply bg-primary-fei;
+    @apply bg-identity-fei;
   }
   .mtf-bg {
-    @apply bg-primary-mtf;
+    @apply bg-identity-mtf;
   }
   .sjf-bg {
-    @apply bg-primary-sjf;
+    @apply bg-identity-sjf;
   }
   .svf-bg {
-    @apply bg-primary-svf;
+    @apply bg-identity-svf;
   }
 
   .fiit-text {
-    @apply text-primary-fiit;
+    @apply text-identity-fiit;
   }
   .fad-text {
-    @apply text-primary-fad;
+    @apply text-identity-fad;
   }
   .fchpt-text {
-    @apply text-primary-fchpt;
+    @apply text-identity-fchpt;
   }
   .fei-text {
-    @apply text-primary-fei;
+    @apply text-identity-fei;
   }
   .mtf-text {
-    @apply text-primary-mtf;
+    @apply text-identity-mtf;
   }
   .sjf-text {
-    @apply text-primary-sjf;
+    @apply text-identity-sjf;
   }
   .svf-text {
-    @apply text-primary-svf;
+    @apply text-identity-svf;
   }
 
   .fiit-bg-hover {
-    @apply hover:bg-primary-fiit dark:hover:bg-primary-fiit;
+    @apply hover:bg-identity-fiit dark:hover:bg-identity-fiit;
   }
   .fad-bg-hover {
-    @apply hover:bg-primary-fad dark:hover:bg-primary-fad;
+    @apply hover:bg-identity-fad dark:hover:bg-identity-fad;
   }
   .fchpt-bg-hover {
-    @apply hover:bg-primary-fchpt dark:hover:bg-primary-fchpt;
+    @apply hover:bg-identity-fchpt dark:hover:bg-identity-fchpt;
   }
   .fei-bg-hover {
-    @apply hover:bg-primary-fei dark:hover:bg-primary-fei;
+    @apply hover:bg-identity-fei dark:hover:bg-identity-fei;
   }
   .mtf-bg-hover {
-    @apply hover:bg-primary-mtf dark:hover:bg-primary-mtf;
+    @apply hover:bg-identity-mtf dark:hover:bg-identity-mtf;
   }
   .sjf-bg-hover {
-    @apply hover:bg-primary-sjf dark:hover:bg-primary-sjf;
+    @apply hover:bg-identity-sjf dark:hover:bg-identity-sjf;
   }
   .svf-bg-hover {
-    @apply hover:bg-primary-svf dark:hover:bg-primary-svf;
+    @apply hover:bg-identity-svf dark:hover:bg-identity-svf;
   }
 
   .fiit-border-focus {
-    @apply focus:border-primary-fiit dark:focus:border-primary-fiit;
+    @apply focus:border-identity-fiit dark:focus:border-identity-fiit;
   }
   .fad-border-focus {
-    @apply focus:border-primary-fad dark:focus:border-primary-fad;
+    @apply focus:border-identity-fad dark:focus:border-identity-fad;
   }
   .fchpt-border-focus {
-    @apply focus:border-primary-fchpt dark:focus:border-primary-fchpt;
+    @apply focus:border-identity-fchpt dark:focus:border-identity-fchpt;
   }
   .fei-border-focus {
-    @apply focus:border-primary-fei dark:focus:border-primary-fei;
+    @apply focus:border-identity-fei dark:focus:border-identity-fei;
   }
   .mtf-border-focus {
-    @apply focus:border-primary-mtf dark:focus:border-primary-mtf;
+    @apply focus:border-identity-mtf dark:focus:border-identity-mtf;
   }
   .sjf-border-focus {
-    @apply focus:border-primary-sjf dark:focus:border-primary-sjf;
+    @apply focus:border-identity-sjf dark:focus:border-identity-sjf;
   }
   .svf-border-focus {
-    @apply focus:border-primary-svf dark:focus:border-primary-svf;
+    @apply focus:border-identity-svf dark:focus:border-identity-svf;
   }
 }
