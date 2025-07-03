@@ -34,6 +34,7 @@ export default {
       screens: {
         sm: '321px',
         md: '599px',
+        mdlg: '768px',
         lg: '959px',
         xl: '1240px',
         xxl: '1440px',
