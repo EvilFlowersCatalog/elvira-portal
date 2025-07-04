@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import { twMerge } from 'tailwind-merge';
 
 interface CustomInputProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   title: string;
@@ -18,9 +19,10 @@ const Button = forwardRef<HTMLButtonElement, CustomInputProps>(
       <button
         ref={ref}
         {...props}
-        className={`px-8 border-2 ${stuBorder} text-[17px] font-semibold rounded-md w-fit h-fit ${stuBgHover} hover:bg-opacity-50 dark:hover:bg-opacity-50 duration-100 ${
-          className ? className : 'py-2'
-        }`}
+        className={twMerge(
+          `px-4 py-2 border-none ${stuBorder} ${stuBgHover} font-normal bg-primary text-white text-[14px] rounded-md w-fit h-fit duration-100`,
+          className
+        )}
       >
         {title}
       </button>
