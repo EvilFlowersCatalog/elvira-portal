@@ -156,7 +156,7 @@ const Auth = () => {
                     {t('login.license')}
                   </button>
                 </div>
-                <Button type='submit' title={t('login.loginBtn')} />
+                <Button type='submit'>{t('login.loginBtn')}</Button>
               </form>
             )}
           </div>

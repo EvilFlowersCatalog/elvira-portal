@@ -114,7 +114,7 @@ const SearchBar = () => {
         </div>
 
         <div className='fixed bottom-5'>
-          <Button type='submit' title={t('searchBar.search')} />
+          <Button type='submit'>{t('searchBar.search')}</Button>
         </div>
       </form>
     </div>

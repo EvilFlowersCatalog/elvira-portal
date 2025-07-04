@@ -35,9 +35,7 @@ const NotFound = () => {
           <span>{t('notFound.infoPart2')}</span>
         </div>
         <Button
-          onClick={() => navigate(NAVIGATION_PATHS.home)}
-          title={t('notFound.goBack')}
-        />
+          onClick={() => navigate(NAVIGATION_PATHS.home)}>{t('notFound.goBack')}</Button>
       </div>
     </div>
   );

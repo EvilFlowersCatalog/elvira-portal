@@ -59,7 +59,7 @@ const HomeHeader = () => {
         }}>
         <p className='font-bold mb-2'>{t('about.banner.title')}</p>
         <p className='text-sm mb-4'>{t('about.banner.description')}</p>
-        <Button title={t('about.banner.action')}></Button>
+        <Button>{t('about.banner.action')}</Button>
 
         <div className='absolute right-4 top-0 h-full w-auto aspect-square p-6 hidden mdlg:block'>
           <svg className='w-full h-full' viewBox="0 0 500 500" version="1.1" xmlns="http://www.w3.org/2000/svg">

@@ -35,9 +35,9 @@ const PDFButtons = ({ acquisitions, entryId }: IPDFButtonsParams) => {
         <div key={acq.id} className='text-white'>
           <Button
             className='py-0'
-            onClick={(e) => handleRead(e, index)}
-            title={t('entry.detail.read')}
-          />
+            onClick={(e) => handleRead(e, index)}>
+              {t('entry.detail.read')}
+            </Button>
         </div>
       ))}
     </div>

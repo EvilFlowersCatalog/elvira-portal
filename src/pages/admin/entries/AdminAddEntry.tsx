@@ -213,7 +213,7 @@ const AdminAddEntry = () => {
             </div>
             {!isFilesLoading && (
               <div className='flex justify-center'>
-                <Button type='submit' title={t('entry.wizard.upload')} />
+                <Button type='submit'>{t('entry.wizard.upload')}</Button>
               </div>
             )}
           </form>

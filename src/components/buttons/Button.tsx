@@ -3,7 +3,7 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 import { twMerge } from 'tailwind-merge';
 
 interface CustomInputProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  title: string;
+  
 }
 
 /**
@@ -12,7 +12,7 @@ interface CustomInputProps extends ButtonHTMLAttributes<HTMLButtonElement> {
  * @returns custom button used in global merite
  */
 const Button = forwardRef<HTMLButtonElement, CustomInputProps>(
-  ({ title, className, ...props }, ref) => {
+  ({ children, className, ...props }, ref) => {
     const { stuBorder, stuBgHover } = useAppContext();
 
     return (
@@ -24,7 +24,7 @@ const Button = forwardRef<HTMLButtonElement, CustomInputProps>(
           className
         )}
       >
-        {title}
+        {children}
       </button>
     );
   }

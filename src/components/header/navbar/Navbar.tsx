@@ -276,9 +276,7 @@ const Navbar = () => {
               onClick={() => {
                 umamiTrack('Logout Button');
                 logout();
-              }}
-              title={t('navbarMenu.logout')}
-            />
+              }}><FiLogOut/></Button>
           </div>
         </>
       )}

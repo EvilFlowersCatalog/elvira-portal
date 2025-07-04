@@ -203,7 +203,7 @@ const AdminEditEntry = () => {
             </div>
             {!isFilesLoading && (
               <div className='flex justify-center'>
-                <Button type='submit' title={t('entry.wizard.edit')} />
+                <Button type='submit'>{t('entry.wizard.edit')}</Button>
               </div>
             )}
           </form>

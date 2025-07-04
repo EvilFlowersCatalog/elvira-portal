@@ -31,7 +31,9 @@ const CookiesInformation = () => {
         </div>
         <span className='text-sm text-center'>{t('cookies.information')}</span>
         <div className='w-full flex justify-center'>
-          <Button onClick={handleAccept} title={t('cookies.accept')} />
+          <Button onClick={handleAccept}>
+            {t('cookies.accept')}
+          </Button>
         </div>
       </div>
     </div>

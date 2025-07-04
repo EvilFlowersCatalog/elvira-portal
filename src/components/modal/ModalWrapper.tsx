@@ -62,7 +62,7 @@ const ModalWrapper = ({
             {children}
           </div>
           <div className='flex justify-end gap-2'>
-            {yes && <Button onClick={yes} title={buttonLabel} />}
+            {yes && <Button onClick={yes} >{buttonLabel}</Button>}
             <button
               className='hover:underline text-red font-bold'
               onClick={handleClick}
