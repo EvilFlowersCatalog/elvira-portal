@@ -110,7 +110,7 @@ const Navbar = () => {
   };
 
   return (
-    <div className='flex flex-col gap-6 w-64 h-full bg-zinc-100 dark:bg-zinc-800 p-4 overflow-auto'>
+    <div className='flex flex-col gap-6 w-64 h-full bg-zinc-100 dark:bg-zinc-800 pt-8 pb-3 px-5 overflow-auto'>
       {/* Logos */}
       <div className='flex justify-between items-center'>
         <button
@@ -252,13 +252,10 @@ const Navbar = () => {
         />
       </div>
 
-      {/* Spacer */}
-      <span className='flex-1 min-h-10'></span>
-
       {/* Logout */}
       {auth && (
         <>
-          <div className='flex flex px-4 py-2 items-center gap-3 rounded-lg bg-slate-200 dark:bg-darkGray'>
+          <div className='flex flex px-4 py-2 mt-auto items-center gap-3 rounded-lg bg-slate-200 dark:bg-darkGray'>
             <Gravatar
               email={`${auth.username}@stuba.sk`}
               size={34}

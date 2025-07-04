@@ -53,7 +53,7 @@ const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
             className={`absolute font-light
                 ${isFocused || value 
                   ? `top-0 text-[12px] ${isInvalid ? 'text-red' : `${stuText}`}`
-                  : `top-1/2`}
+                  : `top-1/2 -translate-y-[1px]`}
                 duration-200 pointer-events-none select-none`}
                 style={{ paddingLeft: isFocused || value ? 0 : `${paddingLeft}px` }}
           >
