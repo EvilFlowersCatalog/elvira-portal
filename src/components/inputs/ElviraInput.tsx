@@ -7,20 +7,22 @@ import {
 } from 'react';
 import { uuid } from '../../utils/func/functions';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import { twMerge } from 'tailwind-merge';
 
 interface CustomInputProps extends InputHTMLAttributes<HTMLInputElement> {
   invalidMessage?: string;
+  paddingLeft?: number;
 }
 // Custom input used in step forms in ADMIN
 const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
-  ({ invalidMessage, ...props }, ref) => {
+  ({ invalidMessage, paddingLeft = 7, ...props }, ref) => {
     const { stuText, stuBorderFocus, stuBorder } = useAppContext();
 
     const id = uuid();
     const [isInvalid, setIsInvalid] = useState<boolean>(false);
     const [isFocused, setIsFocused] = useState<boolean>(false);
 
-    const { onChange, onFocus, onBlur, value, required, placeholder } = props;
+    const { onChange, onFocus, onBlur, value, required, placeholder, className } = props;
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
       e.target.setCustomValidity('');
@@ -48,29 +50,27 @@ const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
       <div className={`w-full text-left flex flex-col items-start`}>
         <div className='relative w-full h-16 flex flex-col justify-end gap-2'>
           <span
-            className={`absolute ${
-              isFocused || value
-                ? `left-0 top-0 text-[12px] ${
-                    isInvalid ? 'text-red' : `${stuText}`
-                  }`
-                : 'left-3 top-[30px]'
-            } duration-200 pointer-events-none select-none`}
+            className={`absolute font-light
+                ${isFocused || value 
+                  ? `top-0 text-[12px] ${isInvalid ? 'text-red' : `${stuText}`}`
+                  : `top-1/2`}
+                duration-200 pointer-events-none select-none`}
+                style={{ paddingLeft: isFocused || value ? 0 : `${paddingLeft}px` }}
           >
             {`${placeholder} ${required ? '*' : ''}`}
           </span>
-
           <input
             ref={ref}
             {...props}
-            className={`w-full p-2 border-2
-              ${
-                value
-                  ? `${stuBorder}`
-                  : isInvalid
+            className={twMerge(`w-full p-2 border-2 
+              ${value
+                ? `${stuBorder}`
+                : isInvalid
                   ? 'border-red dark:border-red'
                   : `${stuBorderFocus} border-black dark:border-white`
               }
-              bg-transparent outline-none rounded-md`}
+              bg-white shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A] dark:bg-strongDarkGray outline-none rounded-md`, className)}
+            style={{ paddingLeft: `${paddingLeft}px` }}  
             required={required}
             placeholder=''
             onChange={handleChange}

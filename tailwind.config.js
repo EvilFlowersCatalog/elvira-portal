@@ -43,6 +43,7 @@ export default {
         primary: '#0077CC',
         primaryLight: '#E6F3FF',
         secondary: '#15384E',
+        secondaryLight: '#A8D0E6',
         lightGray: "#F5F7FA",
         darkGray: '#333333',
         identity: {

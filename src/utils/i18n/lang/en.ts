@@ -341,6 +341,11 @@ export const en = {
       title: 'Digital academic library',
       subTitle: 'Open and easy to use tools for document distribution',
       readMore: 'Read more',
+      banner: {
+        title: 'Take advantage of the Elvira AI assistant',
+        description: 'Ask for recommendations, search for information, or generate book summaries',
+        action: 'Try the assistant'
+      },
       read: {
         title: 'Read',
         descriptionPart1:

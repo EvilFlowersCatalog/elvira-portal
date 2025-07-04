@@ -334,6 +334,11 @@ export const sk = {
       subTitle:
         'Otvorené a jednoducho použiteľné nástroje pre distribúciu dokumentov',
       readMore: 'Čítať viac',
+      banner: {
+        title: 'Využite Elvira AI asistenta',
+        description: 'Spýtajte sa na odporúčania, vyhľadávajte informácie alebo generujte súhrny kníh',
+        action: 'Vyskúšať asistenta'
+      },
       read: {
         title: 'Čítanie',
         descriptionPart1: 'Vytvorili sme open-source čítačku PDF s názvom ',
