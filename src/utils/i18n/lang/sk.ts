@@ -161,7 +161,8 @@ export const sk = {
       administration: 'Administrácia',
       darkMode: 'Tmavý Režim',
       lightMode: 'Svetlý Režim',
-      logout: 'Odhlásiť sa',
+      user: 'Študent',
+      superUser: 'Admin',
     },
 
     // PAGE

@@ -162,7 +162,8 @@ export const en = {
       administration: 'Administration',
       darkMode: 'Dark Mode',
       lightMode: 'Light Mode',
-      logout: 'Logout',
+      user: 'Student',
+      superUser: 'Admin',
     },
 
     // PAGE

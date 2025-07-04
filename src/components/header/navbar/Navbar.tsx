@@ -14,7 +14,7 @@ import { HiOutlineLanguage } from 'react-icons/hi2';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
-import { FiBookOpen, FiHelpCircle } from 'react-icons/fi';
+import { FiBookOpen, FiLogOut } from 'react-icons/fi';
 import { RxHome } from 'react-icons/rx';
 import Gravatar from 'react-gravatar';
 import Button from '../../buttons/Button';
@@ -37,25 +37,19 @@ const NavbarButton = ({
 
   return (
     <button
-      className={`flex w-full gap-2 items-center pl-3 py-2 rounded-md ${
-        isActive
-          ? 'bg-zinc-200 dark:bg-strongDarkGray'
-          : 'bg-zinc-100 dark:dark:bg-darkGray'
-      } hover:bg-zinc-200 dark:hover:bg-strongDarkGray`}
+      className={`flex w-full gap-2 items-center px-5 py-1 rounded-md ${isActive
+          ? 'bg-primaryLight dark:bg-primary text-primary dark:text-primaryLight'
+          : 'bg-zinc-100 dark:dark:bg-zinc-800'
+        } hover:bg-zinc-200 dark:hover:bg-strongDarkGray hover:text-black dark:hover:text-white`}
       onClick={
         onClick
           ? (e) => onClick(e)
           : (e) => {
-              umamiTrack('Navbar Navigation Button', { path });
-              specialNavigation(e, path);
-            }
+            umamiTrack('Navbar Navigation Button', { path });
+            specialNavigation(e, path);
+          }
       }
     >
-      <span
-        className={`border-2 h-5/6 ${
-          isActive ? `${stuBorder}` : 'border-transparent'
-        } rounded-md`}
-      />
       {icon}
       {name}
     </button>
@@ -116,17 +110,17 @@ const Navbar = () => {
   };
 
   return (
-    <div className='flex flex-col gap-2 w-64 h-full bg-zinc-100 dark:bg-darkGray p-4 overflow-auto'>
+    <div className='flex flex-col gap-6 w-64 h-full bg-zinc-100 dark:bg-zinc-800 p-4 overflow-auto'>
       {/* Logos */}
-      <div className='flex mb-5 justify-between items-center'>
+      <div className='flex justify-between items-center'>
         <button
           className={auth ? 'cursor-pointer' : 'cursor-default'}
           onClick={
             auth
               ? (e) => {
-                  umamiTrack('Logo Home Button');
-                  specialNavigation(e, NAVIGATION_PATHS.home);
-                }
+                umamiTrack('Logo Home Button');
+                specialNavigation(e, NAVIGATION_PATHS.home);
+              }
               : undefined
           }
         >
@@ -147,7 +141,7 @@ const Navbar = () => {
       </div>
 
       <div className='flex flex-col items-start'>
-        <h1 className='font-bold'>{t('navbarMenu.catalog')}</h1>
+        <span className='font-bold mb-3 uppercase font-medium'>{t('navbarMenu.catalog')}</span>
         {/* STU Logo */}
         <NavbarButton
           name={''}
@@ -170,8 +164,8 @@ const Navbar = () => {
 
       {/* Portal container */}
       {auth && (
-        <div className='flex flex-col items-start'>
-          <h1 className='font-bold'>{t('navbarMenu.portal')}</h1>
+        <div className='flex gap-2 flex-col items-start'>
+          <span className='font-bold uppercase font-medium'>{t('navbarMenu.portal')}</span>
           <NavbarButton
             name={t('navbarMenu.home')}
             path={NAVIGATION_PATHS.home}
@@ -217,7 +211,7 @@ const Navbar = () => {
       {/* Personal container */}
       {auth && (
         <div className='flex flex-col items-start'>
-          <h1 className='font-bold'>{t('navbarMenu.personal')}</h1>
+          <span className='font-bold mb-3 uppercase font-medium'>{t('navbarMenu.personal')}</span>
           <NavbarButton
             name={t('navbarMenu.myShelf')}
             path={NAVIGATION_PATHS.shelf}
@@ -235,7 +229,7 @@ const Navbar = () => {
 
       {/* Settings container */}
       <div className='flex flex-col items-start'>
-        <h1 className='font-bold'>{t('navbarMenu.settings')}</h1>
+        <span className='font-bold mb-3 uppercase font-medium'>{t('navbarMenu.settings')}</span>
         <NavbarButton
           name={isDark() ? t('navbarMenu.lightMode') : t('navbarMenu.darkMode')}
           path=''
@@ -264,19 +258,26 @@ const Navbar = () => {
       {/* Logout */}
       {auth && (
         <>
-          <div className='flex flex-col pl-2 items-center justify-center gap-3 text-lg font-extrabold'>
+          <div className='flex flex px-4 py-2 items-center gap-3 rounded-lg bg-slate-200 dark:bg-darkGray'>
             <Gravatar
               email={`${auth.username}@stuba.sk`}
-              size={80}
+              size={34}
               className='rounded-full'
               default='monsterid'
             />
-            {auth.username}
+            <div className='flex flex-col items-start'>
+              <p className='text-sm font-medium'>
+                {auth.username}
+              </p>
+              <p className='text-xs font-medium'>
+                {auth.isSuperUser ? t('navbarMenu.superUser') : t('navbarMenu.user')}
+              </p>
+            </div>
             <Button
               onClick={() => {
                 umamiTrack('Logout Button');
                 logout();
-              }}><FiLogOut/></Button>
+              }} className='bg-transparent text-black dark:text-white ml-auto hover:text-white '><FiLogOut/></Button>
           </div>
         </>
       )}
