@@ -140,28 +140,6 @@ const Navbar = () => {
         )}
       </div>
 
-      <div className='flex flex-col items-start'>
-        <span className='font-bold mb-3 uppercase font-medium'>{t('navbarMenu.catalog')}</span>
-        {/* STU Logo */}
-        <NavbarButton
-          name={''}
-          onClick={() => {
-            umamiTrack('STU Button', {
-              url: stuLinks[import.meta.env.ELVIRA_THEME],
-            });
-            window.open(stuLinks[import.meta.env.ELVIRA_THEME], '_blank');
-          }}
-          icon={
-            <img
-              className='h-auto w-[70px]'
-              src={theme === THEME_TYPE.dark ? stuLogoLight : stuLogoDark}
-              alt='STU Logo'
-            />
-          }
-          isActive={false}
-        />
-      </div>
-
       {/* Portal container */}
       {auth && (
         <div className='flex gap-2 flex-col items-start'>
@@ -255,18 +233,18 @@ const Navbar = () => {
       {/* Logout */}
       {auth && (
         <>
-          <div className='flex flex px-4 py-2 mt-auto items-center gap-3 rounded-lg bg-slate-200 dark:bg-darkGray'>
+          <div className='flex flex px-4 py-2 mt-auto items-center gap-2 rounded-lg bg-slate-200 dark:bg-darkGray'>
             <Gravatar
               email={`${auth.username}@stuba.sk`}
-              size={34}
+              size={30}
               className='rounded-full'
               default='monsterid'
             />
             <div className='flex flex-col items-start'>
-              <p className='text-sm font-medium'>
-                {auth.username}
+              <p className='text-[12px] font-medium overflow-hidden text-ellipsis whitespace-nowrap max-w-[100px]'>
+                {auth.name} {auth.surname}
               </p>
-              <p className='text-xs font-medium'>
+              <p className='text-[10px] font-medium shrink-0'>
                 {auth.isSuperUser ? t('navbarMenu.superUser') : t('navbarMenu.user')}
               </p>
             </div>
@@ -274,7 +252,7 @@ const Navbar = () => {
               onClick={() => {
                 umamiTrack('Logout Button');
                 logout();
-              }} className='bg-transparent text-black dark:text-white ml-auto hover:text-white '><FiLogOut/></Button>
+              }} className='bg-transparent text-black dark:text-white ml-auto hover:text-white p-2'><FiLogOut/></Button>
           </div>
         </>
       )}
