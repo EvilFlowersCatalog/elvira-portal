@@ -206,6 +206,7 @@ export const en = {
         summary: 'Summary',
         read: 'Read',
         relation: 'Relation',
+        noAuthor: 'Unknown author',
       },
       wizard: {
         requiredMessages: {

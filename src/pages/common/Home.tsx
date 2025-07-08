@@ -6,6 +6,7 @@ import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import HomeHeader from '../../components/specific-page/home-page/HomeHeader';
 import SwiperContainer from '../../components/specific-page/home-page/swiper/SwiperContainer';
 import EntryDetail from '../../components/items/entry/EntryDetail';
+import EntryDisplay from '../../components/specific-page/home-page/display/EntryDisplay';
 
 const Home = () => {
   const { t } = useTranslation();
@@ -58,30 +59,47 @@ const Home = () => {
         <HomeHeader />
 
         {/* POPULAR */}
-        <h1 className='text-lg mb-2 font-medium'>{t('home.popular')}</h1>
-        <SwiperContainer
+        <div className='flex justify-between items-center mb-5 flex-wrap'>
+          <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>{t('home.popular')}</h2>
+          <p className='text-sm text-primary cursor-pointer'>Zobraziť všetko</p>
+        </div>
+        <EntryDisplay
           isLoading={isLoading}
           entries={popularEntries}
-          setClickedEntry={setClickedEntry}
-          clickedEntry={clickedEntry}
-          activeEntryId={activeEntryId}
           type='popular'
+          limitRows={true}
         />
+        {/* <SwiperContainer
+            isLoading={isLoading}
+            entries={popularEntries}
+            setClickedEntry={setClickedEntry}
+            clickedEntry={clickedEntry}
+            activeEntryId={activeEntryId}
+            type='popular'
+          /> */}
 
-        <div className='h-10'></div>
+        <div className='h-3'></div>
 
         {/* LAST ADDED */}
-        <h1 className='text-lg mb-2 font-medium'>{t('home.lastAdded')}</h1>
-        <SwiperContainer
+        <div className='flex justify-between items-center mb-5 flex-wrap'>
+          <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>{t('home.lastAdded')}</h2>
+          <p className='text-sm text-primary cursor-pointer'>Zobraziť všetko</p>
+        </div>
+        <EntryDisplay
+          isLoading={isLoading}
+          entries={lastAddedEntries}
+          type='popular'
+          limitRows={true}
+        />
+        {/* <SwiperContainer
           isLoading={isLoading}
           entries={lastAddedEntries}
           setClickedEntry={setClickedEntry}
           clickedEntry={clickedEntry}
           activeEntryId={activeEntryId}
           type='lastAdded'
-        />
+        /> */}
 
-        <div className='h-4'></div>
       </div>
       {activeEntryId && <EntryDetail />}
     </>

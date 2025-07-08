@@ -205,6 +205,7 @@ export const sk = {
         summary: 'Zhrnutie',
         read: 'Čítať',
         relation: 'Relácia',
+        noAuthor: 'Neznámy autor'
       },
       wizard: {
         requiredMessages: {

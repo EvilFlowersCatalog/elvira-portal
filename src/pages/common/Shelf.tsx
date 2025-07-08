@@ -3,8 +3,9 @@ import { IEntry } from '../../utils/interfaces/entry';
 import { useSearchParams } from 'react-router-dom';
 import useGetShelf from '../../hooks/api/my-shelf/useGetShelf';
 import ItemContainer from '../../components/items/container/ItemContainer';
-import EntryBox from '../../components/items/entry/EntryBox';
 import EntryBoxLoading from '../../components/items/entry/EntryBoxLoading';
+import EntryItem from '../../components/specific-page/home-page/display/EntryItem';
+import EntriesWrapper from '../../components/specific-page/home-page/display/EntriesWrapper';
 
 const Shelf = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -45,7 +46,12 @@ const Shelf = () => {
         // extract shelf entries
         const shelfEntries = items.map((item) => item.entry);
 
-        setEntries([...(entries ?? []), ...shelfEntries]);
+        const allEntries = [...entries, ...shelfEntries];
+        const uniqueShelfEntries = Array.from(
+          new Map(allEntries.map(entry => [entry.id, entry])).values()
+        );
+
+        setEntries(uniqueShelfEntries);
       } catch {
         // if there was error set to true
         setIsError(true);
@@ -81,19 +87,15 @@ const Shelf = () => {
       showLayout
       searchSpecifier={'query'}
     >
-      <div className='flex flex-wrap p-4 pt-0'>
+     <EntriesWrapper>
         {entries.map((entry, index) => (
-          <EntryBox
-            key={index}
-            entry={entry}
-            isActive={activeEntryId === entry.id}
-          />
+          <EntryItem key={entry.id} entry={entry} triggerReload={triggerReload}/>
         ))}
         {loadingNext &&
           Array.from({ length: 30 }).map((_, index) => (
             <EntryBoxLoading key={index} />
           ))}
-      </div>
+      </EntriesWrapper>
     </ItemContainer>
   );
 };

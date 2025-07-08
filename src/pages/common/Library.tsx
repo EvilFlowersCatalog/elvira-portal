@@ -5,6 +5,8 @@ import { useSearchParams } from 'react-router-dom';
 import ItemContainer from '../../components/items/container/ItemContainer';
 import EntryBox from '../../components/items/entry/EntryBox';
 import EntryBoxLoading from '../../components/items/entry/EntryBoxLoading';
+import EntryItem from '../../components/specific-page/home-page/display/EntryItem';
+import EntriesWrapper from '../../components/specific-page/home-page/display/EntriesWrapper';
 
 const Library = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -44,6 +46,12 @@ const Library = () => {
           query: searchParams.get('query') ?? '',
         });
 
+        const allEntries = [...(entries ?? []), ...items];
+        const uniqueEntries = Array.from(
+          new Map(allEntries.map(entry => [entry.id, entry])).values()
+        );
+        setEntries(uniqueEntries);
+
         setMaxPage(metadata.pages);
         setEntries([...(entries ?? []), ...items]);
       } catch {
@@ -74,19 +82,15 @@ const Library = () => {
       showLayout
       searchSpecifier={'query'}
     >
-      <div className='flex flex-wrap p-4 pt-0'>
+      <EntriesWrapper>
         {entries.map((entry, index) => (
-          <EntryBox
-            key={index}
-            entry={entry}
-            isActive={activeEntryId === entry.id}
-          />
+          <EntryItem key={entry.id} entry={entry} />
         ))}
         {loadingNext &&
           Array.from({ length: 30 }).map((_, index) => (
             <EntryBoxLoading key={index} />
           ))}
-      </div>
+      </EntriesWrapper>
     </ItemContainer>
   );
 };
