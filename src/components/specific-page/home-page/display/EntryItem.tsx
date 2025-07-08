@@ -58,7 +58,7 @@ export default function EntryItem({ entry, triggerReload }: IEntryItem) {
                 </svg>
             </div>
         </div>
-        <div className="bg-white dark:bg-gray-800 relative p-2 h-full">
+        <div className="bg-white dark:bg-strongDarkGray relative p-2 h-full">
             <div className="mb-2">
                 {entry.feeds.map(feed => (
                     <span key={feed.id} className="font-semibold px-2 py-1 text-xs bg-primaryLight text-primary rounded-md mr-1">
@@ -66,9 +66,13 @@ export default function EntryItem({ entry, triggerReload }: IEntryItem) {
                     </span>
                 ))}
             </div>
-            <h3 className="cursor-pointer font-bold text-secondary text-sm line-clamp-2 overflow-hidden text-ellipsis mb-2">{entry.title}</h3>
-            {entry.authors.length > 0 ? <p className="text-xs">{entry.authors[0]?.name} {entry.authors[0]?.surname}</p> :
-                <p className="text-xs text-gray-500">{t('entry.detail.noAuthor')}</p>}
+            <h3 className="cursor-pointer font-bold text-secondary dark:text-white text-sm line-clamp-2 overflow-hidden text-ellipsis mb-2">{entry.title}</h3>
+            <p className="text-xs">
+                {entry.authors.length > 0
+                    ? `${entry.authors[0]?.name} ${entry.authors[0]?.surname}`
+                    : <span className="text-gray-500">{t('entry.detail.noAuthor')}</span>
+                }
+            </p>
         </div>
     </div>
 }
