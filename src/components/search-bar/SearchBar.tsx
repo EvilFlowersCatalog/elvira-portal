@@ -102,6 +102,7 @@ const SearchBar = () => {
             entryForm={activeCategory}
             setEntryForm={setActiveCategory}
             single
+            setIsSelectionOpen={() => {}}
           />
         </div>
 
@@ -110,6 +111,7 @@ const SearchBar = () => {
             entryForm={activeFeeds}
             setEntryForm={setActiveFeeds}
             single
+            setIsSelectionOpen={() => {}}
           />
         </div>
 

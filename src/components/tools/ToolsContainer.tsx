@@ -5,6 +5,11 @@ import { useSearchParams } from 'react-router-dom';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { FaFilterCircleXmark } from 'react-icons/fa6';
 import ElviraInput from '../inputs/ElviraInput';
+import CategoryAutofill from '../autofills/CategoryAutofill';
+import FeedAutofill from '../autofills/FeedAutofill';
+import { ICategory } from '../../utils/interfaces/category';
+import Button from '../buttons/Button';
+import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
 
 interface IToolsContainerParams {
   advancedSearch?: boolean;
@@ -15,15 +20,62 @@ interface IToolsContainerParams {
 const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsContainerParams) => {
   const { t } = useTranslation();
   const {
-    showSearchBar,
-    setShowSearchBar,
     clearFilters,
     isParamsEmpty,
     umamiTrack,
   } = useAppContext();
   const [searchParams, setSearchParams] = useSearchParams();
+  const orderBy = searchParams.get('order-by') || '-created_at';
   const [input, setInput] = useState<string>('');
   const [selection, setSelection] = useState('-created_at');
+
+  const [showAdvancedSearch, setShowAdvancedBar] = useState<boolean>(false);
+  const [isSelectionOpen, setIsSelectionOpen] = useState<boolean>(false);
+  const [activeFeeds, setActiveFeeds] = useState<{
+    feeds: { title: string; id: string }[];
+  }>({ feeds: [] });
+  const [activeCategory, setActiveCategory] = useState<{
+    categories: ICategory[];
+  }>({ categories: [] });
+
+  const [year, setYear] = useState<number[]>([1950, new Date().getFullYear()]);
+  const [title, setTitle] = useState<string>('');
+  const [author, setAuthor] = useState<string>('');
+  const handleYearChange = (_: Event, newValue: number | number[]) => {
+    setYear(newValue as number[]);
+  };
+
+  const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.target.value);
+  };
+
+  const handleAuthorChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setAuthor(e.target.value);
+  };
+
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (title) searchParams.set('title', title);
+    else searchParams.delete('title');
+
+    if (author) searchParams.set('author', author);
+    else searchParams.delete('author');
+
+    if (activeCategory.categories.length > 0)
+      searchParams.set('category-id', activeCategory.categories[0].id);
+    else searchParams.delete('category-id');
+
+    if (activeFeeds.feeds.length > 0)
+      searchParams.set('feed-id', activeFeeds.feeds[0].id);
+    else searchParams.delete('feed-id');
+
+    searchParams.set('publishedAtGte', year[0].toString());
+    searchParams.set('publishedAtLte', year[1].toString());
+
+    setSearchParams(searchParams);
+  };
+
 
   // submit input (search title)
   const submit = (e: FormEvent<HTMLFormElement>) => {
@@ -47,7 +99,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
     setInput(e.target.value);
   };
 
-  const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  const handleSelectChange = (e: SelectChangeEvent) => {
     if (e.target.value === 'none') searchParams.delete('order-by');
     else searchParams.set('order-by', e.target.value);
     setSearchParams(searchParams);
@@ -98,38 +150,77 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
           )}
         </div>
 
-        {/* Only for entries */}
-        {advancedSearch && (
-          <button
-            className='text-sm hover:underline mt-2'
-            onClick={() => {
-              umamiTrack('Advanced Search Button');
-              setShowSearchBar(!showSearchBar);
-            }}
-          >
-            {t('tools.advancedSearch')}
-          </button>
-        )}
-
-        <div className='flex gap-3 justify-end md:items-start text-[15px]'>
-          <select
-            className='bg-transparent cursor-pointer outline-none uppercase text-left mt-0 md:mt-[30px]'
-            name='orderBy'
-            id='orderBy'
-            value={selection}
-            onChange={handleSelectChange}
-          >
-            <option value='-created_at'>
-              {t('tools.orderBy.createdAtDesc')}
-            </option>
-            <option value='created_at'>{t('tools.orderBy.createdAtAsc')}</option>
-            <option value='-title'>{t('tools.orderBy.titleDesc')}</option>
-            <option value='title'>{t('tools.orderBy.titleAsc')}</option>
-          </select>
+        <div
+          className='flex flex-wrap gap-3 w-full text-[15px] mt-3 items-center'>
+          {advancedSearch && (
+            <button
+              className='text-sm hover:underline'
+              onClick={() => {
+                umamiTrack('Advanced Search Button');
+                setShowAdvancedBar(!showAdvancedSearch);
+              }}
+            >
+              {t('tools.advancedSearch')}
+            </button>
+          )}
+          <Select className="ml-auto" label={"Sort By"} value={orderBy} labelId='sort-label' id="orderBy" onChange={handleSelectChange} variant="standard" >
+            <MenuItem value="created_at">{t('tools.orderBy.createdAtAsc')}</MenuItem>
+            <MenuItem value="-created_at">{t('tools.orderBy.createdAtDesc')}</MenuItem>
+            <MenuItem value="title">{t('tools.orderBy.titleAsc')}</MenuItem>
+            <MenuItem value="-title">{t('tools.orderBy.titleDesc')}</MenuItem>
+            {/* <MenuItem value="publishedAt">{t('tools.orderBy.publishedAt')}</MenuItem>
+            <MenuItem value="-publishedAt">{t('tools.orderBy.publishedAtDesc')}</MenuItem> */}
+          </Select>
         </div>
 
+        <form
+          onSubmit={onSubmit}
+          className={`h-full transition-all duration-400 ${showAdvancedSearch
+            ? isSelectionOpen
+              ? 'overflow-visible max-h-[500px] mt-4'
+              : 'overflow-auto max-h-[500px] mt-4'
+            : 'overflow-hidden max-h-0'
+            }`}>
+          <div className='flex flex-wrap gap-x-4 gap-y-2 mb-4'>
+            <div className='max-w-[400px] '>
+              <ElviraInput
+                placeholder={t('searchBar.title')}
+                value={title}
+                onChange={handleTitleChange}
+              />
+            </div>
+            <div className='max-w-[400px]'>
+              <ElviraInput
+                placeholder={t('searchBar.author')}
+                value={author}
+                onChange={handleAuthorChange}
+              />
+            </div>
+            <div className='max-w-[400px]'>
+              <CategoryAutofill
+                entryForm={activeCategory}
+                setEntryForm={setActiveCategory}
+                setIsSelectionOpen={setIsSelectionOpen}
+                single
+              />
+            </div>
+            <div className='max-w-[400px]'>
+              <FeedAutofill
+                entryForm={activeFeeds}
+                setEntryForm={setActiveFeeds}
+                setIsSelectionOpen={setIsSelectionOpen}
+                single
+              />
+            </div>
+          </div>
+
+          <div className=''>
+            <Button type='submit'>{t('searchBar.search')}</Button>
+          </div>
+        </form>
+
       </div>
-    </div>
+    </div >
   );
 };
 

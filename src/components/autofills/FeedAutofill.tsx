@@ -11,6 +11,7 @@ interface IFeedAutofillParams {
   single?: boolean;
   kind?: 'acquisition' | 'navigation';
   placeholder?: string;
+  setIsSelectionOpen: (isOpen: boolean) => void;
 }
 
 const FeedAutofill = ({
@@ -19,6 +20,7 @@ const FeedAutofill = ({
   single = false,
   kind = 'acquisition',
   placeholder,
+  setIsSelectionOpen
 }: IFeedAutofillParams) => {
   const { stuBorder } = useAppContext();
   const { t } = useTranslation();
@@ -94,7 +96,7 @@ const FeedAutofill = ({
   return (
     <div className='w-full relative'>
       <ElviraInput
-        className={`bg-white dark:bg-gray ${
+        className={`bg-white ${
           suggestions.length > 0 ? 'rounded-b-none' : ''
         }`}
         type='text'
@@ -110,6 +112,7 @@ const FeedAutofill = ({
           );
 
           setSuggestions(filteredSuggestions);
+          setIsSelectionOpen(true);
         }}
         onBlur={() => {
           const feed = feeds.filter(
@@ -123,11 +126,13 @@ const FeedAutofill = ({
           }
           // if we click outside out input no on suggestions
           if (!isHovering) setSuggestions([]);
+          setIsSelectionOpen(false);
         }}
       />
       {suggestions.length > 0 && (
         <ul
-          className={`absolute top-[60px] border-2 rounded-md rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full`}
+          className={`absolute top-[60px] rounded-md rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full
+          shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A]`}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >

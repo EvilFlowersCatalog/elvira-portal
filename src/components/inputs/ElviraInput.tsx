@@ -62,7 +62,7 @@ const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
           <input
             ref={ref}
             {...props}
-            className={twMerge(`w-full p-2 border-2 
+            className={twMerge(`w-full p-2 border-none 
               ${value
                 ? `${stuBorder}`
                 : isInvalid
