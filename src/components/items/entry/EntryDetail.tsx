@@ -134,7 +134,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
 
   return (
     <div className='fixed top-0 right-0 z-50 h-full w-full bg-black bg-opacity-60 flex items-center justify-center'>
-      <div className='absolute bg-white dark:bg-gray max-w-6xl rounded-xl w-full h-full max-h-[90vh] overflow-hidden rounded-md shadow-lg flex flex-col'>
+      <div className='absolute bg-white dark:bg-gray max-w-6xl rounded-xl w-full h-full max-h-[90vh] mdlg:overflow-hidden overflow-auto rounded-md shadow-lg flex flex-col'>
         <div className='w-full pl-8 pr-4 py-2 flex items-center border-b-[1px] border-lightGray dark:border-darkGray'>
           <h2 className='text-secondary dark:text-secondaryLight text-lg font-bold'>
             {t('entry.detail.title')}
@@ -155,10 +155,10 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
             <CircleLoader color={stuColor} size={50} />
           </div>
         ) : (
-          <div className={'flex h-full overflow-hidden'}>
+          <div className={'flex h-full flex-col mdlg:flex-row'}>
             <div className='p-8 bg-lightGray dark:bg-darkGray h-full min-w-[350px]'>
               <div className={'w-full flex flex-col items-center'}>
-                <div className={`w-full flex justify-center border rounded-md ${imageLoaded ? 'h-auto' : 'h-64'} overflow-hidden`}>
+                <div className={`w-full flex justify-center max-w-[300px] border rounded-md ${imageLoaded ? 'h-auto' : 'h-64'} overflow-hidden`}>
                   <img className={'w-full h-full'}
                     src={entry.response.thumbnail + `?access_token=${auth?.token}`}
                     alt='Entry Thumbnail'
@@ -199,7 +199,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                 </button>
               </div>
             </div>
-            <div className='p-4 bg-white dark:bg-gray overflow-y-auto h-full '>
+            <div className='p-4 bg-white dark:bg-gray mdlg:overflow-y-auto h-full pb-20'>
 
               {/* Feeds */}
               <div className={'mb-6 flex gap-2 w-full'}>
