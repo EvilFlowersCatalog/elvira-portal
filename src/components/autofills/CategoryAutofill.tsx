@@ -88,9 +88,8 @@ const CategoryAutofill = ({
   return (
     <div className='w-full relative'>
       <ElviraInput
-        className={`bg-white ${
-          suggestions.length > 0 ? 'rounded-b-none' : ''
-        }`}
+        className={`bg-white ${suggestions.length > 0 ? 'rounded-b-none' : ''
+          }`}
         type='text'
         value={inputValue}
         onChange={handleInputChange}
@@ -121,8 +120,10 @@ const CategoryAutofill = ({
             handleSuggestionClick(category[0]);
           }
           // if we click outside out input no on suggestions
-          if (!isHovering) setSuggestions([]);
-          setIsSelectionOpen(false);
+          if (!isHovering) {
+            setSuggestions([]);
+            setIsSelectionOpen(false);
+          }
         }}
       />
       {suggestions.length > 0 && (

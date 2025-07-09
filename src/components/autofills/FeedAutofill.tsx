@@ -96,9 +96,8 @@ const FeedAutofill = ({
   return (
     <div className='w-full relative'>
       <ElviraInput
-        className={`bg-white ${
-          suggestions.length > 0 ? 'rounded-b-none' : ''
-        }`}
+        className={`bg-white ${suggestions.length > 0 ? 'rounded-b-none' : ''
+          }`}
         type='text'
         value={inputValue}
         onChange={handleInputChange}
@@ -125,8 +124,10 @@ const FeedAutofill = ({
             handleSuggestionClick(feed[0]);
           }
           // if we click outside out input no on suggestions
-          if (!isHovering) setSuggestions([]);
-          setIsSelectionOpen(false);
+          if (!isHovering) {
+            setSuggestions([]);
+            setIsSelectionOpen(false);
+          }
         }}
       />
       {suggestions.length > 0 && (
@@ -139,7 +140,7 @@ const FeedAutofill = ({
           {suggestions.map((feed, index) => (
             <li
               key={index}
-              className='bg-white dark:bg-gray hover:bg-zinc-200 dark:hover:bg-darkGray text-left'
+              className='bg-white dark:bg-gray hover:bg-zinc-200 dark:hover:bg-darkGray text-left relative z-20'
               onClick={() => handleSuggestionClick(feed)}
               style={{ padding: '5px', cursor: 'pointer' }}
             >

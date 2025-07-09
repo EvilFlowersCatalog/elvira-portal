@@ -113,7 +113,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
   };
 
   return (
-    <div className={`flex gap-4 px-4 pb-4 item-start flex-col md:flex-row`}>
+    <div className={`flex gap-4 px-4 pb-4 item-start flex-col md:flex-row z-50`}>
       <div className='w-full pl-1'>
         <div className='flex gap-4 items-center'>
           <form
@@ -191,49 +191,45 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
 
         <form
           onSubmit={onSubmit}
-          className={`h-full transition-all duration-400 ${showAdvancedSearch
-            ? isSelectionOpen
-              ? 'overflow-visible max-h-[500px] mt-4'
-              : 'overflow-auto max-h-[500px] mt-4'
-            : 'overflow-hidden max-h-0'
-            }`}>
-          <div className='flex flex-wrap gap-x-4 gap-y-2 mb-4'>
-            <div className='max-w-[400px] '>
-              <ElviraInput
-                placeholder={t('searchBar.title')}
-                value={title}
-                onChange={handleTitleChange}
-              />
-            </div>
-            <div className='max-w-[400px]'>
-              <ElviraInput
-                placeholder={t('searchBar.author')}
-                value={author}
-                onChange={handleAuthorChange}
-              />
-            </div>
-            <div className='max-w-[400px]'>
-              <CategoryAutofill
-                entryForm={activeCategory}
-                setEntryForm={setActiveCategory}
-                setIsSelectionOpen={setIsSelectionOpen}
-                single
-              />
-            </div>
-            <div className='max-w-[400px]'>
-              <FeedAutofill
-                entryForm={activeFeeds}
-                setEntryForm={setActiveFeeds}
-                setIsSelectionOpen={setIsSelectionOpen}
-                single
-              />
-            </div>
+          className={`transition-all duration-400
+              ${showAdvancedSearch ? 'bg-zinc-100 dark:bg-zinc-800 drop-shadow-md rounded-xl p-4 mt-4 mb-4' : ''} 
+              ${showAdvancedSearch
+              ? isSelectionOpen
+                ? 'overflow-visible max-h-[500px]'
+                : 'overflow-hidden max-h-[500px]'
+              : 'overflow-hidden max-h-0'}
+            `}
+        >
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
+            <ElviraInput
+              placeholder={t('searchBar.title')}
+              value={title}
+              onChange={handleTitleChange}
+            />
+            <ElviraInput
+              placeholder={t('searchBar.author')}
+              value={author}
+              onChange={handleAuthorChange}
+            />
+            <CategoryAutofill
+              entryForm={activeCategory}
+              setEntryForm={setActiveCategory}
+              setIsSelectionOpen={setIsSelectionOpen}
+              single
+            />
+            <FeedAutofill
+              entryForm={activeFeeds}
+              setEntryForm={setActiveFeeds}
+              setIsSelectionOpen={setIsSelectionOpen}
+              single
+            />
           </div>
 
-          <div className=''>
-            <Button type='submit'>{t('searchBar.search')}</Button>
+          <div className='flex justify-end'>
+            <Button type='submit' className='bg-primary dark:bg-primaryLight text-white dark:text-primary'>{t('searchBar.search')}</Button>
           </div>
         </form>
+
 
       </div>
     </div >
