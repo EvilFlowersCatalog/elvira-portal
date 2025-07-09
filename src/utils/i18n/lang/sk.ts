@@ -108,6 +108,11 @@ export const sk = {
       },
       logout: 'Boli ste odhlásený.',
       fileFailed: 'Niečo sa pokazilo pri čítaní súboru.',
+      citation: {
+        noCite: 'Citácia nie je dostupná.',
+        copySuccess: 'Citácia bola skopírovaná do schránky.',
+        copyError: 'Nepodarilo sa skopírovať citáciu.',
+      }
     },
 
     // LOGIN PAGE
@@ -195,17 +200,25 @@ export const sk = {
     entry: {
       detail: {
         close: 'Zavrieť',
-        add: '+ Pridať do poličky',
-        remove: '- Odstrániť z poličky',
-        pages: 'Strany',
-        views: 'Zobrazenia',
+        add: 'Uložiť',
+        remove: 'Odstrániť',
+        pages: 'Strán',
+        rating: 'Hodnotenie',
+        views: 'Čitateľov',
         lang: 'Jazyk',
         feeds: 'Skupiny',
         categories: 'Kategórie',
+        publisher: 'Vydavateľ',
+        publishDate: 'Dátum vydania',
         summary: 'Zhrnutie',
         read: 'Čítať',
+        cite: 'Citovať',
+        share: 'Zdieľať',
         relation: 'Relácia',
-        noAuthor: 'Neznámy autor'
+        noAuthor: 'Neznámy autor',
+        title: 'Detail knihy',
+        readMore: 'Čítať Viac',
+        readLess: 'Zobraziť Menej',
       },
       wizard: {
         requiredMessages: {

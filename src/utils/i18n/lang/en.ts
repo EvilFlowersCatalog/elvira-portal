@@ -1,3 +1,5 @@
+import { Rating } from "@mui/material";
+
 export const en = {
   translation: {
     // NOTIFICATIONS
@@ -108,6 +110,11 @@ export const en = {
       },
       logout: 'You have been logged out.',
       fileFailed: 'Something went wrong while reading the file.',
+      citation: {
+        noCite: 'Citation is not available.',
+        copySuccess: 'Citation has been copied to the clipboard.',
+        copyError: 'Failed to copy the citation.',
+      }
     },
 
     // LOGIN PAGE
@@ -199,14 +206,22 @@ export const en = {
         add: '+ Add to shelf',
         remove: '- Remove from shelf',
         pages: 'Pages',
+        rating: 'Rating',
         views: 'Views',
         lang: 'Language',
         feeds: 'Feeds',
         categories: 'Categories',
+        publisher: 'Publisher',
+        publishDate: 'Date of publication',
         summary: 'Summary',
         read: 'Read',
+        cite: 'Cite',
+        share: 'Share',
         relation: 'Relation',
         noAuthor: 'Unknown author',
+        title: 'Book Detail',
+        readMore: 'Read More',
+        readLess: 'Read Less',
       },
       wizard: {
         requiredMessages: {

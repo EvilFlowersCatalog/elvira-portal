@@ -1,5 +1,5 @@
 import { IEntry } from "../../../../utils/interfaces/entry";
-import EntryBoxLoading from "../../../items/entry/EntryBoxLoading";
+import EntryBoxLoading from "../EntryBoxLoading";
 import EntriesWrapper from "./EntriesWrapper";
 import EntryItem from "./EntryItem";
 

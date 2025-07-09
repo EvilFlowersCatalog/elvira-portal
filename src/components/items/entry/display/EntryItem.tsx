@@ -5,6 +5,10 @@ import { useEffect, useState } from "react";
 import useAddToShelf from "../../../../hooks/api/my-shelf/useAddToShelf";
 import useRemoveFromShelf from "../../../../hooks/api/my-shelf/useRemoveFromShelf";
 import useGetEntryDetail from "../../../../hooks/api/entries/useGetEntryDetail";
+import { toast } from 'react-toastify';
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { NAVIGATION_PATHS } from "../../../../utils/interfaces/general/general";
+
 
 interface IEntryItem {
     entry: IEntry;
@@ -14,6 +18,8 @@ interface IEntryItem {
 export default function EntryItem({ entry, triggerReload }: IEntryItem) {
     const { auth } = useAuthContext();
     const { t } = useTranslation();
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const addToShelf = useAddToShelf();
     const removeFromShelf = useRemoveFromShelf();
     const getDetails = useGetEntryDetail();
@@ -29,19 +35,56 @@ export default function EntryItem({ entry, triggerReload }: IEntryItem) {
 
     const handleBookmarkToggle = async () => {
         if (isOnShelf) {
-            triggerReload?.();
-            await removeFromShelf(entry.shelf_record_id);
-            setIsOnShelf(false);
+            try {
+                await removeFromShelf(entry.shelf_record_id);
+                triggerReload?.();
+                setIsOnShelf(false);
+                toast.success(t('notifications.myShelf.add.success')); // Notify user
+            } catch {
+                toast.error(t('notifications.myShelf.add.error')); // notify user
+            }
         } else {
-            const shelfRecordId = await addToShelf(entry.id);
-            setIsOnShelf(true);
-            entry.shelf_record_id = shelfRecordId.response.id;
+            try {
+                const shelfRecordId = await addToShelf(entry.id);
+                setIsOnShelf(true);
+                entry.shelf_record_id = shelfRecordId.response.id;
+                toast.success(t('notifications.myShelf.remove.success')); // Notify user
+            } catch {
+                toast.error(t('notifications.myShelf.remove.error')); // Notify user
+            }
+        }
+    };
+
+    /* TODO: trigger search */
+
+    const openEntryDetail = () => {
+        const params = new URLSearchParams(searchParams);
+        const id = searchParams.get('entry-detail-id');
+
+        if (id === entry.id) params.delete('entry-detail-id');
+        else params.set('entry-detail-id', entry.id);
+
+        setSearchParams(params);
+    };
+
+
+    const handleParamClick = (name: string, value: string) => {
+        if (location.pathname === NAVIGATION_PATHS.library) {
+            searchParams.set(name, value);
+            setSearchParams(searchParams);
+        } else {
+            const params = new URLSearchParams();
+            params.set(name, value);
+            navigate({
+                pathname: NAVIGATION_PATHS.library,
+                search: params.toString(),
+            });
         }
     };
 
     return <div className="rounded-lg overflow-hidden relative w-full mb-8 h-68 max-w-[200px]">
         <div className="h-40">
-            <img
+            <img onClick={openEntryDetail}
                 className='w-full h-full object-cover select-none cursor-pointer'
                 src={entry.thumbnail + `?access_token=${auth?.token}`}
                 alt='Entry Thumbnail'
@@ -61,13 +104,17 @@ export default function EntryItem({ entry, triggerReload }: IEntryItem) {
         <div className="bg-white dark:bg-strongDarkGray relative p-2 h-full">
             <div className="mb-2">
                 {entry.feeds.map(feed => (
-                    <span key={feed.id} className="font-semibold px-2 py-1 text-xs bg-primaryLight text-primary rounded-md mr-1">
+                    <span key={feed.id} onClick={() => {
+                        handleParamClick('feed-id', feed.id);
+                    }} className="cursor-pointer font-semibold px-2 py-1 text-xs bg-primaryLight text-primary rounded-md mr-1">
                         {feed.title}
                     </span>
                 ))}
             </div>
-            <h3 className="cursor-pointer font-bold text-secondary dark:text-white text-sm line-clamp-2 overflow-hidden text-ellipsis mb-2">{entry.title}</h3>
-            <p className="text-xs">
+            <h3 onClick={openEntryDetail} className="cursor-pointer font-bold text-secondary dark:text-white text-sm line-clamp-2 overflow-hidden text-ellipsis mb-2">{entry.title}</h3>
+            <p className="text-xs cursor-pointer" onClick={() => {
+                handleParamClick('author', entry.authors[0]?.name + ' ' + entry.authors[0]?.surname);
+            }}>
                 {entry.authors.length > 0
                     ? `${entry.authors[0]?.name} ${entry.authors[0]?.surname}`
                     : <span className="text-gray-500">{t('entry.detail.noAuthor')}</span>

@@ -9,7 +9,7 @@ import CategoryAutofill from '../autofills/CategoryAutofill';
 import FeedAutofill from '../autofills/FeedAutofill';
 import { ICategory } from '../../utils/interfaces/category';
 import Button from '../buttons/Button';
-import { FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 
 interface IToolsContainerParams {
   advancedSearch?: boolean;
@@ -24,6 +24,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
     isParamsEmpty,
     umamiTrack,
   } = useAppContext();
+
   const [searchParams, setSearchParams] = useSearchParams();
   const orderBy = searchParams.get('order-by') || '-created_at';
   const [input, setInput] = useState<string>('');
@@ -163,7 +164,22 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
               {t('tools.advancedSearch')}
             </button>
           )}
-          <Select className="ml-auto" label={"Sort By"} value={orderBy} labelId='sort-label' id="orderBy" onChange={handleSelectChange} variant="standard" >
+          <Select className="ml-auto dark:text-white"
+            sx={{
+              '&:before': {
+                borderBottom: '0px',
+              },
+              '&:hover:not(.Mui-disabled):before': {
+                borderBottom: '0px',
+              },
+              '.MuiSelect-icon': {
+                color: 'black',
+              },
+              '.dark & .MuiSelect-icon': {
+                color: 'white',
+              },
+            }}
+            label={"Sort By"} value={orderBy} labelId='sort-label' id="orderBy" onChange={handleSelectChange} variant="standard" >
             <MenuItem value="created_at">{t('tools.orderBy.createdAtAsc')}</MenuItem>
             <MenuItem value="-created_at">{t('tools.orderBy.createdAtDesc')}</MenuItem>
             <MenuItem value="title">{t('tools.orderBy.titleAsc')}</MenuItem>

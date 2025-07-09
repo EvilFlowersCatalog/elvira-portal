@@ -6,7 +6,7 @@ import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import HomeHeader from '../../components/specific-page/home-page/HomeHeader';
 import SwiperContainer from '../../components/specific-page/home-page/swiper/SwiperContainer';
 import EntryDetail from '../../components/items/entry/EntryDetail';
-import EntryDisplay from '../../components/specific-page/home-page/display/EntryDisplay';
+import EntryDisplay from '../../components/items/entry/display/EntryDisplay';
 
 const Home = () => {
   const { t } = useTranslation();

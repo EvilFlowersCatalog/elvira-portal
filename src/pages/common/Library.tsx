@@ -5,8 +5,8 @@ import { useSearchParams } from 'react-router-dom';
 import ItemContainer from '../../components/items/container/ItemContainer';
 import EntryBox from '../../components/items/entry/EntryBox';
 import EntryBoxLoading from '../../components/items/entry/EntryBoxLoading';
-import EntryItem from '../../components/specific-page/home-page/display/EntryItem';
-import EntriesWrapper from '../../components/specific-page/home-page/display/EntriesWrapper';
+import EntryItem from '../../components/items/entry/display/EntryItem';
+import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper';
 
 const Library = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
