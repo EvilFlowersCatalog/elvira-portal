@@ -170,10 +170,10 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               <div className='grid grid-cols-2 gap-4 py-4'>
                 <PDFButtons
                   acquisitions={entry.response.acquisitions}
-                  entryId={entry.response.id}> <button
+                  entryId={entry.response.id}> <div
                     className={`w-full px-4 py-2 rounded-lg text-darkGray dark:text-lightGray font-light flex justify-start gap-4 border-[1px] border-darkGray dark:border-lightGray`}>
                     <BiBookOpen size={24} />{t('entry.detail.read')}
-                  </button>
+                  </div>
                 </PDFButtons>
                 <ShelfButton
                   isLoading={isLoading}
