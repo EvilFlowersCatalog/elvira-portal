@@ -8,7 +8,6 @@ interface IScrollUpButtonParams {
 }
 
 const ScrollUpButton = ({ scrollRef }: IScrollUpButtonParams) => {
-  const { isSmallDevice, showSearchBar } = useAppContext();
   const { t } = useTranslation();
 
   const handleScrollUp = () => {
@@ -21,9 +20,7 @@ const ScrollUpButton = ({ scrollRef }: IScrollUpButtonParams) => {
 
   return (
     <button
-      className={`fixed p-2 pr-4 flex items-center gap-2 bottom-20 ${
-        !isSmallDevice && showSearchBar ? 'right-[270px]' : 'right-5'
-      } z-10 uppercase rounded-md bg-darkGray dark:bg-white text-white dark:text-black border border-white dark:border-black`}
+      className={`fixed p-2 pr-4 flex items-center gap-2 bottom-20 right-5 z-10 uppercase rounded-md bg-darkGray dark:bg-white text-white dark:text-black border border-white dark:border-black`}
       onClick={handleScrollUp}
     >
       <MdKeyboardDoubleArrowUp size={30} />

@@ -18,7 +18,7 @@ interface IEntryParams {
 const AdminEntry = ({ entry, reload }: IEntryParams) => {
   const { auth } = useAuthContext();
   const { t } = useTranslation();
-  const { showSearchBar, isSmallDevice, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
   const [showDeleteMenu, setShowDeleteMenu] = useState<boolean>(false);
   const [imageLoaded, setImageLoaded] = useState<boolean>(false);
 
@@ -50,11 +50,7 @@ const AdminEntry = ({ entry, reload }: IEntryParams) => {
         />
       )}
       <div
-        className={`flex p-2.5 w-full sm:w-1/2 md:w-1/4 ${
-          !isSmallDevice && showSearchBar
-            ? 'lg:w-1/3 xl:w-1/4 xxl:w-1/6'
-            : 'xl:w-1/5 xxl:w-[14.28%]'
-        }`}
+        className={`flex p-2.5 w-full sm:w-1/2 md:w-1/4 xl:w-1/5 xxl:w-[14.28%]`}
       >
         <div
           className={`flex flex-col justify-center p-2 w-full gap-2 rounded-md text-left bg-zinc-100 dark:bg-darkGray`}

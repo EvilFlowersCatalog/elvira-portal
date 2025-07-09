@@ -30,8 +30,6 @@ export interface IAppContext {
   isSmallDevice: boolean;
   showNavbar: boolean;
   setShowNavbar: (showNavbar: boolean) => void;
-  showSearchBar: boolean;
-  setShowSearchBar: (showSearchBar: boolean) => void;
   isParamsEmpty: () => boolean;
   searchParamsEqual: (
     prevSearchParams: URLSearchParams | null,
@@ -86,7 +84,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   );
   const [showNavbar, setShowNavbar] = useState<boolean>(false);
   const [editingEntryTitle, setEditingEntryTitle] = useState<string>('');
-  const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
   const [isSmallDevice, setIsSmallDevice] = useState<boolean>(
     window.innerWidth < 959
   );
@@ -305,7 +302,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   // Each page change reset
   useEffect(() => {
     setShowNavbar(false);
-    setShowSearchBar(false);
     setEditingEntryTitle('');
   }, [location.pathname]);
 
@@ -321,7 +317,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
       if (e?.code?.toLocaleLowerCase() === 'escape') {
         searchParams.delete('entry-detail-id');
         setSearchParams(searchParams);
-        setShowSearchBar(false);
       }
     };
 
@@ -396,8 +391,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         updateLang,
         showNavbar,
         setShowNavbar,
-        showSearchBar,
-        setShowSearchBar,
         specialNavigation,
         clearFilters,
         isSmallDevice,

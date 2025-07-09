@@ -10,7 +10,7 @@ import AdminEntry from '../../../components/items/entry/admin/AdminEntry';
 import EntryBoxLoading from '../../../components/items/entry/EntryBoxLoading';
 
 const AdminEntries = () => {
-  const { showSearchBar, stuBorder, stuBg, umamiTrack } = useAppContext();
+  const { stuBorder, stuBg, umamiTrack } = useAppContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingNext, setLoadingNext] = useState<boolean>(false);
   const [isError, setIsError] = useState<boolean>(false);
@@ -81,11 +81,7 @@ const AdminEntries = () => {
     >
       <div className='flex flex-wrap px-3 pb-4'>
         <div
-          className={`flex p-2 w-full sm:w-1/2 md:w-1/4 ${
-            showSearchBar
-              ? 'lg:w-1/3 xl:w-1/4 xxl:w-1/6'
-              : 'xl:w-1/5 xxl:w-[14.28%]'
-          }`}
+          className={`flex p-2 w-full sm:w-1/2 md:w-1/4 xl:w-1/5 xxl:w-[14.28%]`}
         >
           <button
             className={`flex flex-col justify-center min-h-72 dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 ${stuBorder} ${stuBg} bg-opacity-40 hover:bg-opacity-20 duration-200`}

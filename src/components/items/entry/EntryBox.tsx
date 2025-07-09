@@ -11,7 +11,7 @@ interface IEntryBoxParams {
 
 const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
   const { auth } = useAuthContext();
-  const { showSearchBar, isSmallDevice, stuBg } = useAppContext();
+  const { stuBg } = useAppContext();
 
   const [isScale, setIsScale] = useState<boolean>(false);
   const [isUnderLine, setIsUnderLine] = useState<boolean>(false);
@@ -40,11 +40,7 @@ const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
 
   return (
     <div
-      className={`flex w-full sm:w-1/2 md:w-1/4 ${
-        !isSmallDevice && showSearchBar
-          ? 'lg:w-1/3 xl:w-1/4 xxl:w-1/6'
-          : 'xl:w-1/5 xxl:w-[14.28%]'
-      }`}
+      className={`flex w-full sm:w-1/2 md:w-1/4 xl:w-1/5 xxl:w-[14.28%]`}
     >
       <button
         className={`flex flex-col justify-center p-4 w-full gap-2 rounded-md text-left ${

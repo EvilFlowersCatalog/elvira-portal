@@ -5,18 +5,13 @@ interface IEntryBoxLoading {
 }
 
 const EntryBoxLoading = ({ fixedSize = false }: IEntryBoxLoading) => {
-  const { showSearchBar, isSmallDevice } = useAppContext();
 
   return (
     <div
       className={
         fixedSize
           ? 'h-80 w-full p-4'
-          : `flex min-h-80 w-full sm:w-1/2 md:w-1/4 ${
-              !isSmallDevice && showSearchBar
-                ? 'lg:w-1/3 xl:w-1/4 xxl:w-1/6'
-                : 'xl:w-1/5 xxl:w-[14.28%]'
-            } p-4`
+          : `flex min-h-80 w-full sm:w-1/2 md:w-1/4 xl:w-1/5 xxl:w-[14.28%] p-4`
       }
     >
       <div className='flex flex-col w-full h-full bg-zinc-300 dark:bg-darkGray overflow-hidden rounded-md animate-pulse p-2 gap-2'>
