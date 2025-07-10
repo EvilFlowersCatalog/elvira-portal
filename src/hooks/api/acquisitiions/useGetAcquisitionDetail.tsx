@@ -9,11 +9,9 @@ const useGetAcquisitionDetail = () => {
   ): Promise<IAcquisitionDetail> => {
     // Get acquistion detail
     const ACQUISITION_DETAIL_URL = `/api/v1/acquisitions/${acquisitionId}`;
-    const { data: acquisitionDetail } = await axios.get<IAcquisitionDetail>(
-      ACQUISITION_DETAIL_URL
-    );
+    const { data: acquisitionDetail } = await axios.get<{response: IAcquisitionDetail}>(ACQUISITION_DETAIL_URL);
 
-    return acquisitionDetail;
+    return acquisitionDetail.response;
   };
 
   return getAcquisitionDetail;

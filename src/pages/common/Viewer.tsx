@@ -62,7 +62,7 @@ const Viewer = () => {
     };
 
     try {
-      const { response: response } = await createUserAcquisition(
+      const response = await createUserAcquisition(
         userAcquisitionShare
       );
 
@@ -91,7 +91,7 @@ const Viewer = () => {
     page: number
   ): Promise<{ id: string; svg: string } | null> => {
     try {
-      const { response } = await createAnotationItem({
+      const response = await createAnotationItem({
         annotation_id: groupId,
         page,
         content: svg,
@@ -189,13 +189,13 @@ const Viewer = () => {
         setProgressBar(30);
 
         // Fetch entry details and process acquisition
-        const [{ response: entryDetail }, { response: userAcquisition }] =
+        const [entryDetail, userAcquisition] =
           await Promise.all([
             getEntryDetail(id!),
-            getEntryDetail(id!).then(({ response }) =>
+            getEntryDetail(id!).then((info) =>
               createUserAcquisition({
                 acquisition_id:
-                  response.acquisitions[parseInt(index || '0')].id,
+                  info.acquisitions[parseInt(index || '0')].id,
                 type: 'personal',
               })
             ),

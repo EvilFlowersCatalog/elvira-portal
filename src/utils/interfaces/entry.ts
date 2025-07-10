@@ -104,13 +104,11 @@ export interface IEntryIdentifiers {
 }
 
 export interface IEntryInfo {
-  response: {
-    title: string;
-    publisher: string;
-    doi: string;
-    authors: IEntryAuthor[];
-    year: string;
-    language: string;
-    bibtex: string;
-  };
+  title: string;
+  publisher: string;
+  doi: string;
+  authors: IEntryAuthor[];
+  year: string;
+  language: string;
+  bibtex: string;
 }

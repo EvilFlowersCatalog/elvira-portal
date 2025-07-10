@@ -14,11 +14,9 @@ const useGetData = () => {
       driver,
       identifier: encodedIdentifier,
     };
-    const { data: entryInfo } = await axios.get('/api/v1/entry-introspection', {
-      params,
-    });
+    const { data: entryInfo } = await axios.get<{ response: IEntryInfo }>('/api/v1/entry-introspection', { params });
 
-    return entryInfo as IEntryInfo;
+    return entryInfo.response;
   };
 
   return getData;

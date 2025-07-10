@@ -1,13 +1,11 @@
 import { IMetadata } from './general/general';
 
 export interface IAcquisitionDetail {
-  response: {
-    relation: string;
-    mime: string;
-    url: string;
-    id: string;
-    content: string;
-  };
+  relation: string;
+  mime: string;
+  url: string;
+  id: string;
+  content: string;
 }
 
 export interface IAcquisitionQuery {
@@ -41,16 +39,12 @@ export interface IUserAcquisitionShare {
 }
 
 export interface IUserAcquisitionResponse {
-  response: {
-    id: string;
-    url: string;
-  };
+  id: string;
+  url: string;
 }
 
 export interface IUserAcquisitionData {
-  response: {
-    data: string;
-  };
+  data: string;
 }
 
 export interface IEntryAcquisition {

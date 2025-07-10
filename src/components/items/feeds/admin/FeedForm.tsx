@@ -83,7 +83,7 @@ const FeedForm = ({
     if (parentId) {
       (async () => {
         try {
-          const { response } = await getFeedDetail(parentId);
+          const response  = await getFeedDetail(parentId);
           setParentFeeds({
             feeds: [{ id: response.id, title: response.title }],
           });
@@ -96,7 +96,7 @@ const FeedForm = ({
     try {
       if (feedId) {
         (async () => {
-          const { response } = await getFeedDetail(feedId);
+          const response  = await getFeedDetail(feedId);
 
           setForm({
             catalog_id: response.catalog_id,

@@ -12,7 +12,7 @@ interface IFeedAutofillParams {
   single?: boolean;
   kind?: 'acquisition' | 'navigation';
   placeholder?: string;
-  setIsSelectionOpen: (isOpen: boolean) => void;
+  setIsSelectionOpen?: (isOpen: boolean) => void;
 }
 
 const FeedAutofill = ({
@@ -126,7 +126,7 @@ const FeedAutofill = ({
           );
 
           setSuggestions(filteredSuggestions);
-          setIsSelectionOpen(true);
+          setIsSelectionOpen?.(true);
         }}
         onBlur={() => {
           const feed = feeds.filter(
@@ -141,7 +141,7 @@ const FeedAutofill = ({
           // if we click outside out input no on suggestions
           if (!isHovering) {
             setSuggestions([]);
-            setIsSelectionOpen(false);
+            setIsSelectionOpen?.(false);
           }
         }}
       />

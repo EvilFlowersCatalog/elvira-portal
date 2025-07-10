@@ -96,7 +96,7 @@ const Breadcrumb = () => {
         await Promise.all(
           fp.map(async (id) => {
             try {
-              const { response: detail } = await getFeedDetail(id);
+              const detail = await getFeedDetail(id);
               return { id, title: detail.title };
             } catch {
               return { id, title: 'Feed' };
@@ -110,7 +110,8 @@ const Breadcrumb = () => {
       }
       if (feedStepId) {
         try {
-          const { response: detail } = await getFeedDetail(feedStepId);
+          const detail = await getFeedDetail(feedStepId);
+          console.log(detail);
           setFeedStep({ id: detail.id, title: detail.title });
         } catch {
           setFeedStep({ id: '', title: '' });
@@ -128,11 +129,10 @@ const Breadcrumb = () => {
       </button>
       {breadcrumbs.map((breadcrumb, index) => (
         <button
-          className={`flex gap-3 w-fit items-center text-sm text-left ${
-            index === breadcrumbs.length - 1
+          className={`flex gap-3 w-fit items-center text-sm text-left ${index === breadcrumbs.length - 1
               ? 'cursor-default'
               : 'cursor-pointer'
-          }`}
+            }`}
           key={index}
           onClick={
             index !== breadcrumbs.length - 1

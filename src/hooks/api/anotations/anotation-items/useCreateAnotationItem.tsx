@@ -11,12 +11,12 @@ const useCreateAnotationItem = () => {
     anotationItem: IAnotationItemBody
   ): Promise<ICreateAnotationItemResponse> => {
     const CREATE_ANNOTATION_ITEM_URL = '/api/v1/annotation-items';
-    const { data: response } = await axios.post<ICreateAnotationItemResponse>(
+    const { data: info } = await axios.post<{ response: ICreateAnotationItemResponse }>(
       CREATE_ANNOTATION_ITEM_URL,
       anotationItem
     );
 
-    return response;
+    return info.response;
   };
 
   return createAnotationItem;

@@ -16,20 +16,18 @@ export interface IFeed {
 }
 
 export interface IFeedDetail {
-  response: {
-    id: string;
-    title: string;
-    content: string;
-    url_name: string;
-    kind: string;
-    parents?: string[];
-    children?: string[];
-    creator_id: string;
-    catalog_id: string;
-    url: string;
-    created_at: string;
-    updated_at: string;
-  };
+  id: string;
+  title: string;
+  content: string;
+  url_name: string;
+  kind: string;
+  parents?: string[];
+  children?: string[];
+  creator_id: string;
+  catalog_id: string;
+  url: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface IFeedQuery {
