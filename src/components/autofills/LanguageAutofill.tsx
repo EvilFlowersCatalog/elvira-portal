@@ -148,7 +148,7 @@ const LanguageAutofill = ({
   return (
     <div className='w-full relative'>
       <ElviraInput
-        className={`bg-white dark:bg-gray ${suggestions.length > 0 ? 'rounded-b-none' : ''
+        className={`bg-white ${suggestions.length > 0 ? 'rounded-b-none' : ''
           }`}
         type='text'
         value={inputValue}
