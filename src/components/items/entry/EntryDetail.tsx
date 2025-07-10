@@ -67,7 +67,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
 
     // remove
     try {
-      await removeFromShelf(entry.response.shelf_record_id);
+      await removeFromShelf(entry.shelf_record_id);
 
       // If user is in 'my shelf' trigger reload
       if (location.pathname === NAVIGATION_PATHS.shelf && triggerReload)
@@ -98,7 +98,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   };
 
   const copyCite = () => {
-    const cite = entry?.response.citation;
+    const cite = entry?.citation;
     if (!cite) {
       toast.error(t('notifications.citation.noCite'));
       return;
@@ -159,7 +159,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
             <div className='p-8 bg-lightGray dark:bg-darkGray h-full min-w-[350px] flex flex-col'>
               <div className={`w-full flex justify-center border rounded-md flex-shrink overflow-hidden h-full`}>
                 <img className={'w-full h-full object-cover'}
-                  src={entry.response.thumbnail + `?access_token=${auth?.token}`}
+                  src={entry.thumbnail + `?access_token=${auth?.token}`}
                   alt='Entry Thumbnail'
                   onLoad={() => setImageLoaded(true)}
                 />
@@ -167,8 +167,8 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
 
               <div className='grid grid-cols-2 gap-4 py-4 mt-auto mb-4'>
                 <PDFButtons
-                  acquisitions={entry.response.acquisitions}
-                  entryId={entry.response.id}> <div
+                  acquisitions={entry.acquisitions}
+                  entryId={entry.id}> <div
                     className={`w-full px-4 py-2 rounded-lg text-darkGray dark:text-lightGray font-light flex justify-start gap-4 border-[1px] border-darkGray dark:border-lightGray`}>
                     <BiBookOpen size={24} />{t('entry.detail.read')}
                   </div>
@@ -178,11 +178,11 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                   entryId={entryId!}
                   handleAdd={handleAdd}
                   handleRemove={handleRemove}
-                  shelfId={entry.response.shelf_record_id}
+                  shelfId={entry.shelf_record_id}
                 >
                   <button
                     className={`w-full px-4 py-2 rounded-lg text-darkGray dark:text-lightGray font-light flex justify-start gap-4 border-[1px] border-darkGray dark:border-lightGray`}>
-                    {entry.response.shelf_record_id ?
+                    {entry.shelf_record_id ?
                       <><RiBookmarkFill className='fill-primary dark:fill-primaryLight' size={24} />{t('entry.detail.remove')}</>
                       : <><RiBookmarkLine size={24} />{t('entry.detail.add')} </>}
                   </button>
@@ -201,10 +201,10 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
 
               {/* Feeds */}
               <div className={'mb-6 flex gap-2 w-full'}>
-                {entry.response.feeds.length === 0 && (
+                {entry.feeds.length === 0 && (
                   <span className='text-white'>-</span>
                 )}
-                {entry.response.feeds.map((feed, index) => (
+                {entry.feeds.map((feed, index) => (
                   <button
                     key={index}
                     className={`cursor-pointer font-semibold px-2 py-1 text-md bg-primaryLight text-primary rounded-lg`}
@@ -221,17 +221,17 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                 ))}
               </div>
 
-              <h1 className='w-full text-secondary dark:text-secondaryLight text-xl font-bold mb-3'>{entry.response.title}</h1>
-              {entry.response.authors.length > 0 && (
+              <h1 className='w-full text-secondary dark:text-secondaryLight text-xl font-bold mb-3'>{entry.title}</h1>
+              {entry.authors.length > 0 && (
                 <div className=''>
                   <span className={'text-darkGray dark:text-lightGray text-center font-light text-xl'}>
-                    {entry.response.authors[0].name}{' '}
-                    {entry.response.authors[0].surname}
+                    {entry.authors[0].name}{' '}
+                    {entry.authors[0].surname}
                   </span>
                   <div
                     className={`flex text-zinc-500`}
                   >
-                    {entry.response.authors.slice(1).map((author, index, arr) => (
+                    {entry.authors.slice(1).map((author, index, arr) => (
                       <span key={index}>
                         {author.name} {author.surname}
                         {index < arr.length - 1 && <span>,&nbsp;</span>}
@@ -251,7 +251,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                   <span className={'text-gray dark:text-white text-light text-small'}>{t('entry.detail.rating')}</span>
                 </div>
                 <div className={'flex flex-col'}>
-                  <span className={`text-primary dark:text-primaryLight text-2xl font-medium`}>{entry.response.popularity}</span>
+                  <span className={`text-primary dark:text-primaryLight text-2xl font-medium`}>{entry.popularity}</span>
                   <span className={'text-gray dark:text-white text-light text-small'}>{t('entry.detail.views')}</span>
                 </div>
               </div>
@@ -259,18 +259,18 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               {/* Summary */}
               <div className='w-full text-left'>
               </div>
-              {entry.response.summary && (
+              {entry.summary && (
                 <div className="w-full text-left">
                   <span
                     className={'text-gray-500 dark:text-white'}
                     dangerouslySetInnerHTML={{
                       __html: !showFullSummary
-                        ? entry.response.summary.slice(0, 240) +
-                        (entry.response.summary.length > 240 ? '...' : '')
-                        : entry.response.summary,
+                        ? entry.summary.slice(0, 240) +
+                        (entry.summary.length > 240 ? '...' : '')
+                        : entry.summary,
                     }}
                   ></span>
-                  {entry.response.summary.length > 240 && !showFullSummary && (
+                  {entry.summary.length > 240 && !showFullSummary && (
                     <button
                       className="mt-3 text-primary dark:text-primaryLight flex gap-2 justify-center"
                       onClick={() => setShowFullSummary(true)}
@@ -297,7 +297,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                     {t('entry.detail.publisher')}
                   </span>
                   <span className={`text-secondary dark:text-secondaryLight font-extrabold`}>
-                    {entry.response.publisher ?? '-'}
+                    {entry.publisher ?? '-'}
                   </span>
                 </div>
 
@@ -306,8 +306,8 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                     {t('entry.detail.publishDate')}
                   </span>
                   <span className={`text-secondary dark:text-secondaryLight font-extrabold`}>
-                    {entry.response.published_at ?
-                      new Date(entry.response.published_at).toLocaleDateString('sk-SK', { year: 'numeric' })
+                    {entry.published_at ?
+                      new Date(entry.published_at).toLocaleDateString('sk-SK', { year: 'numeric' })
                       : '-'}
                   </span>
                 </div>
@@ -317,9 +317,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                     {t('entry.detail.lang')}
                   </span>
                   <span className={`text-secondary dark:text-secondaryLight font-extrabold`}>
-                    {entry.response.language?.alpha2?.toLocaleUpperCase() ??
-                      entry.response.language?.alpha3?.toLocaleUpperCase() ??
-                      '-'}
+                    {entry.language?.name?.toLocaleUpperCase() || '-'}
                   </span>
                 </div>
 
@@ -328,10 +326,10 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                     {t('entry.detail.categories')}
                   </span>
                   <div className='flex flex-col gap-1'>
-                    {entry.response.categories.length === 0 ? (
+                    {entry.categories.length === 0 ? (
                       <span className='text-white'>-</span>
                     ) : (
-                      entry.response.categories.map((category, index) => (
+                      entry.categories.map((category, index) => (
                         <span
                           key={index}
                           className={`text-secondary dark:text-secondaryLight font-extrabold cursor-pointer`}

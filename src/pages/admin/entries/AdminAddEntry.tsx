@@ -104,7 +104,7 @@ const AdminAddEntry = () => {
       // Upload
       try {
         setIsLoading(true);
-        const { response: info } = await uploadEntry(newEntry);
+        const info = await uploadEntry(newEntry);
 
         await Promise.all(
           files.map(async (item) => {

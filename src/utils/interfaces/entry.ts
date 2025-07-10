@@ -29,29 +29,27 @@ export interface IEntry {
 }
 
 export interface IEntryDetail {
-  response: {
-    id: string;
-    creator_id: string;
-    catalog_id: string;
-    authors: IEntryAuthor[];
-    categories: ICategory[];
-    popularity: string;
-    feeds: IFeed[];
-    language?: ILanguage;
-    title: string;
-    config: IConfig;
-    published_at: string;
-    publisher: string;
-    created_at: string;
-    updated_at: string;
-    summary: string;
-    content: string;
-    identifiers: IEntryIdentifiers;
-    acquisitions: IEntryAcquisition[];
-    citation: string;
-    shelf_record_id: string;
-    thumbnail: string;
-  };
+  id: string;
+  creator_id: string;
+  catalog_id: string;
+  authors: IEntryAuthor[];
+  categories: ICategory[];
+  popularity: string;
+  feeds: IFeed[];
+  language?: ILanguage;
+  title: string;
+  config: IConfig;
+  published_at: string;
+  publisher: string;
+  created_at: string;
+  updated_at: string;
+  summary: string;
+  content: string;
+  identifiers: IEntryIdentifiers;
+  acquisitions: IEntryAcquisition[];
+  citation: string;
+  shelf_record_id: string;
+  thumbnail: string;
 }
 
 export interface IEntryQuery {
