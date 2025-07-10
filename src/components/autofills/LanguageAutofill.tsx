@@ -4,31 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { IEntryNewForm } from '../../utils/interfaces/entry';
 import ElviraInput from '../inputs/ElviraInput';
 import useAppContext from '../../hooks/contexts/useAppContext';
-
-export const languages: ILanguage[] = [
-  { name: 'English', alpha3: 'eng', alpha2: 'en' },
-  { name: 'Esperanto', alpha3: 'epo', alpha2: 'eo' },
-  { name: 'Estonian', alpha3: 'est', alpha2: 'et' },
-  { name: 'Finnish', alpha3: 'fin', alpha2: 'fi' },
-  { name: 'French', alpha3: 'fre', alpha2: 'fr' },
-  { name: 'Germanic languages', alpha3: 'gem', alpha2: "ge" }, /* Check if ge is valid */
-  { name: 'German', alpha3: 'deu', alpha2: 'de' },
-  { name: 'Georgian', alpha3: 'geo', alpha2: 'ka' },
-  { name: 'Slovak', alpha3: 'slk', alpha2: 'sk' },
-  { name: 'Slovenian', alpha3: 'slv', alpha2: 'sl' },
-  { name: 'Czech', alpha3: 'ces', alpha2: 'cs' },
-  { name: 'Hungarian', alpha3: 'hun', alpha2: 'hu' },
-  { name: 'Polish', alpha3: 'pol', alpha2: 'pl' },
-  { name: 'Spanish', alpha3: 'spa', alpha2: 'es' },
-  { name: 'Swedish', alpha3: 'swe', alpha2: 'sv' },
-  { name: 'Norwegian', alpha3: 'nor', alpha2: 'no' },
-  { name: 'Serbian', alpha3: 'srp', alpha2: 'sr' },
-  { name: 'Ukrainian', alpha3: 'ukr', alpha2: 'uk' },
-  { name: 'Russian', alpha3: 'rus', alpha2: 'ru' },
-  { name: 'Italian', alpha3: 'ita', alpha2: 'it' },
-];
+import useGetLanguages from '../../hooks/api/languages/useGetLanguages';
 
 export type AcceptedLanguage = 'sk' | 'en';
+/* /api/v1/languages returns 184 languages, which aren't translated */
 export type TranslatedLanguage = 'sk' | 'en' | 'eo' | 'et' | 'fi' | 'fr' | 'de' | 'ka' | 'sl' | 'cs' | 'hu' | 'pl' | 'es' | 'sv' | 'no' | 'sr' | 'uk' | 'ru' | 'it' | 'ge';
 type LanguageDictionary = {
   [key in AcceptedLanguage]: {
@@ -83,7 +62,11 @@ const dict: LanguageDictionary = {
 }
 
 export function languagesDictionary(currentLanguage: AcceptedLanguage, languageCode: TranslatedLanguage): string {
-  return dict[currentLanguage]?.[languageCode] || '-';
+  return dict[currentLanguage]?.[languageCode];
+}
+
+function removeDiacritics(str: string) {
+  return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 }
 
 interface ILanguageAutofillParams {
@@ -96,14 +79,23 @@ const LanguageAutofill = ({
 }: ILanguageAutofillParams) => {
   const { stuBorder } = useAppContext();
   const { i18n, t } = useTranslation();
+  const getLanguages = useGetLanguages();
 
   const [inputValue, setInputValue] = useState<string>('');
   const [suggestions, setSuggestions] = useState<ILanguage[]>([]);
   const [isHovering, setIsHovering] = useState<boolean>(false);
+  const [languages, setLanguages] = useState<ILanguage[]>([]);
 
   const getTranslatedName = (language: ILanguage) =>
     languagesDictionary(i18n.language as AcceptedLanguage, language.alpha2 as TranslatedLanguage) ||
     language.name;
+
+  useEffect(() => {
+    (async () => {
+      var response: ILanguage[] = await getLanguages();
+      setLanguages(response);
+    })()
+  }, []);
 
   useEffect(() => {
     if (entryForm.language_code) {
@@ -122,7 +114,7 @@ const LanguageAutofill = ({
     setInputValue(value);
 
     const filteredSuggestions = languages.filter((language) =>
-      getTranslatedName(language).toLowerCase().startsWith(value.toLowerCase())
+      removeDiacritics(getTranslatedName(language).toLowerCase()).startsWith(removeDiacritics(value.toLowerCase()))
     );
 
     setSuggestions(filteredSuggestions);
@@ -152,18 +144,17 @@ const LanguageAutofill = ({
         onFocus={() => {
           const filteredSuggestions = languages.filter(
             (language) =>
-              getTranslatedName(language)
-                .toLowerCase()
-                .startsWith(inputValue.toLowerCase()) &&
-              getTranslatedName(language) !== inputValue
+              removeDiacritics(getTranslatedName(language)
+                .toLowerCase())
+                .startsWith(removeDiacritics(inputValue.toLowerCase()))
+              && removeDiacritics(getTranslatedName(language)) !== removeDiacritics(inputValue)
           );
           setSuggestions(filteredSuggestions);
         }}
         onBlur={() => {
           const matchedLang = languages.find(
             (language) =>
-              getTranslatedName(language).toLowerCase() ===
-              inputValue.toLowerCase()
+              removeDiacritics(getTranslatedName(language).toLowerCase()) === removeDiacritics(inputValue.toLowerCase())
           );
           if (matchedLang) {
             setInputValue(getTranslatedName(matchedLang));
