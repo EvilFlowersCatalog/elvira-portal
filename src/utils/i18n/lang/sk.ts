@@ -194,6 +194,8 @@ export const sk = {
       category: 'Kategória',
       feeds: 'Skupina',
       search: 'Hľadať',
+      yearFrom: 'Rok od',
+      yearTo: 'Rok do',
     },
 
     // ENTRY COMPONENT

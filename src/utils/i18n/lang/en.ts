@@ -197,6 +197,8 @@ export const en = {
       category: 'Category',
       feeds: 'Feed',
       search: 'Search',
+      yearFrom: 'Year from',
+      yearTo: 'Year to',
     },
 
     // ENTRY COMPONENT

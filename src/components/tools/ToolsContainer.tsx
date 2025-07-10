@@ -44,7 +44,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
   const [year, setYear] = useState<number[]>([1950, new Date().getFullYear()]);
   const [title, setTitle] = useState<string>('');
   const [author, setAuthor] = useState<string>('');
-  const handleYearChange = (_: Event, newValue: number | number[]) => {
+  const handleYearChange = (newValue: number | number[]) => {
     setYear(newValue as number[]);
   };
 
@@ -96,11 +96,14 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
     const query = searchParams.get('query') || '';
     const title = searchParams.get('title') || '';
     const author = searchParams.get('author') || '';
+    const publishedAtGte = searchParams.get('publishedAtGte') || '1950';
+    const publishedAtLte = searchParams.get('publishedAtLte') || new Date().getFullYear().toString();
     const feedId = searchParams.get('feed-id') || '';
     const categoryId = searchParams.get('category-id') || '';
     if (query) setInput(query);
     if (title) setTitle(title);
     if (author) setAuthor(author);
+    setYear([Number(publishedAtGte), Number(publishedAtLte)]);
 
     if(feedId) setDefaultFeedId(feedId);
     if(categoryId) setDefaultCategoryId(categoryId);
@@ -222,6 +225,16 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
                 value={author}
                 onChange={handleAuthorChange}
               />
+              <ElviraInput  type='number'
+                placeholder={t('searchBar.yearFrom')}
+                value={year[0]}
+                onChange={(e) => handleYearChange([Number(e.target.value), year[1]])}
+              />
+              <ElviraInput type='number'
+                placeholder={t('searchBar.yearTo')}
+                value={year[1]}
+                onChange={(e) => handleYearChange([year[0], Number(e.target.value)])}
+              />
               <CategoryAutofill
                 defaultCategoryId={defaultCategoryId}
                 entryForm={activeCategory}
@@ -245,9 +258,6 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
             </div>
           </form>
         </div>
-
-
-
       </div>
     </div>
   );
