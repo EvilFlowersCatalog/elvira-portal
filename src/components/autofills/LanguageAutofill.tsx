@@ -6,113 +6,171 @@ import ElviraInput from '../inputs/ElviraInput';
 import useAppContext from '../../hooks/contexts/useAppContext';
 
 export const languages: ILanguage[] = [
-  { name: 'English', alpha2: 'eng', alpha3: 'en' },
-  { name: 'Esperanto', alpha2: 'epo', alpha3: 'eo' },
-  { name: 'Estonian', alpha2: 'est', alpha3: 'et' },
-  { name: 'Finnish', alpha2: 'fin', alpha3: 'fi' },
-  { name: 'French', alpha2: 'fre', alpha3: 'fr' },
-  { name: 'Germanic languages', alpha2: 'gem' },
-  { name: 'German', alpha2: 'deu', alpha3: 'de' },
-  { name: 'Georgian', alpha2: 'geo', alpha3: 'ka' },
-  { name: 'Slovak', alpha2: 'slk', alpha3: 'sk' },
-  { name: 'Slovenian', alpha2: 'slv', alpha3: 'sl' },
-  { name: 'Czech', alpha2: 'ces', alpha3: 'cs' },
-  { name: 'Hungarian', alpha2: 'hun', alpha3: 'hu' },
-  { name: 'Polish', alpha2: 'pol', alpha3: 'pl' },
-  { name: 'Spanish', alpha2: 'spa', alpha3: 'es' },
-  { name: 'Swedish', alpha2: 'swe', alpha3: 'sv' },
-  { name: 'Norwegian', alpha2: 'nor', alpha3: 'no' },
-  { name: 'Serbian', alpha2: 'srp', alpha3: 'sr' },
-  { name: 'Ukrainian', alpha2: 'ukr', alpha3: 'uk' },
-  { name: 'Russian', alpha2: 'rus', alpha3: 'ru' },
-  { name: 'Italian', alpha2: 'ita', alpha3: 'it' },
+  { name: 'English', alpha3: 'eng', alpha2: 'en' },
+  { name: 'Esperanto', alpha3: 'epo', alpha2: 'eo' },
+  { name: 'Estonian', alpha3: 'est', alpha2: 'et' },
+  { name: 'Finnish', alpha3: 'fin', alpha2: 'fi' },
+  { name: 'French', alpha3: 'fre', alpha2: 'fr' },
+  { name: 'Germanic languages', alpha3: 'gem', alpha2: "ge" }, /* Check if ge is valid */
+  { name: 'German', alpha3: 'deu', alpha2: 'de' },
+  { name: 'Georgian', alpha3: 'geo', alpha2: 'ka' },
+  { name: 'Slovak', alpha3: 'slk', alpha2: 'sk' },
+  { name: 'Slovenian', alpha3: 'slv', alpha2: 'sl' },
+  { name: 'Czech', alpha3: 'ces', alpha2: 'cs' },
+  { name: 'Hungarian', alpha3: 'hun', alpha2: 'hu' },
+  { name: 'Polish', alpha3: 'pol', alpha2: 'pl' },
+  { name: 'Spanish', alpha3: 'spa', alpha2: 'es' },
+  { name: 'Swedish', alpha3: 'swe', alpha2: 'sv' },
+  { name: 'Norwegian', alpha3: 'nor', alpha2: 'no' },
+  { name: 'Serbian', alpha3: 'srp', alpha2: 'sr' },
+  { name: 'Ukrainian', alpha3: 'ukr', alpha2: 'uk' },
+  { name: 'Russian', alpha3: 'rus', alpha2: 'ru' },
+  { name: 'Italian', alpha3: 'ita', alpha2: 'it' },
 ];
+
+export type AcceptedLanguage = 'sk' | 'en';
+export type TranslatedLanguage = 'sk' | 'en' | 'eo' | 'et' | 'fi' | 'fr' | 'de' | 'ka' | 'sl' | 'cs' | 'hu' | 'pl' | 'es' | 'sv' | 'no' | 'sr' | 'uk' | 'ru' | 'it' | 'ge';
+type LanguageDictionary = {
+  [key in AcceptedLanguage]: {
+    [key in TranslatedLanguage]: string;
+  };
+};
+const dict: LanguageDictionary = {
+  'sk': {
+    'sk': 'Slovenčina',
+    'en': 'Angličtina',
+    'eo': 'Esperanto',
+    'et': 'Estónčina',
+    'fi': 'Fínčina',
+    'fr': 'Francúzština',
+    'de': 'Nemčina',
+    'ka': 'Gruzínčina',
+    'sl': 'Slovinčina',
+    'cs': 'Čeština',
+    'hu': 'Maďarčina',
+    'pl': 'Poľština',
+    'es': 'Španielčina',
+    'sv': 'Švédčina',
+    'no': 'Nórčina',
+    'sr': 'Srbčina',
+    'uk': 'Ukrajinčina',
+    'ru': 'Ruština',
+    'it': 'Taliančina',
+    'ge': 'Germánske jazyky',
+  },
+  'en': {
+    'sk': 'Slovak',
+    'en': 'English',
+    'eo': 'Esperanto',
+    'et': 'Estonian',
+    'fi': 'Finnish',
+    'fr': 'French',
+    'de': 'German',
+    'ka': 'Georgian',
+    'sl': 'Slovenian',
+    'cs': 'Czech',
+    'hu': 'Hungarian',
+    'pl': 'Polish',
+    'es': 'Spanish',
+    'sv': 'Swedish',
+    'no': 'Norwegian',
+    'sr': 'Serbian',
+    'uk': 'Ukrainian',
+    'ru': 'Russian',
+    'it': 'Italian',
+    'ge': 'Germanic languages',
+  },
+}
+
+export function languagesDictionary(currentLanguage: AcceptedLanguage, languageCode: TranslatedLanguage): string {
+  return dict[currentLanguage]?.[languageCode] || '-';
+}
 
 interface ILanguageAutofillParams {
   entryForm: IEntryNewForm;
   setEntryForm: (entryForm: IEntryNewForm) => void;
 }
-
 const LanguageAutofill = ({
   entryForm,
   setEntryForm,
 }: ILanguageAutofillParams) => {
   const { stuBorder } = useAppContext();
-  const { t } = useTranslation();
+  const { i18n, t } = useTranslation();
 
   const [inputValue, setInputValue] = useState<string>('');
   const [suggestions, setSuggestions] = useState<ILanguage[]>([]);
   const [isHovering, setIsHovering] = useState<boolean>(false);
 
+  const getTranslatedName = (language: ILanguage) =>
+    languagesDictionary(i18n.language as AcceptedLanguage, language.alpha2 as TranslatedLanguage) ||
+    language.name;
+
   useEffect(() => {
     if (entryForm.language_code) {
-      const lang = languages.filter(
+      const lang = languages.find(
         (l) =>
           l.alpha2 === entryForm.language_code ||
           l.alpha3 === entryForm.language_code
       );
-      if (lang.length > 0) setInputValue(lang[0].name);
+      if (lang) setInputValue(getTranslatedName(lang));
       else setInputValue('');
     }
-  }, [entryForm]);
+  }, [entryForm, i18n.language]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
 
-    // Filter languages based on input
     const filteredSuggestions = languages.filter((language) =>
-      language.name.toLowerCase().startsWith(value.toLowerCase())
+      getTranslatedName(language).toLowerCase().startsWith(value.toLowerCase())
     );
 
     setSuggestions(filteredSuggestions);
   };
 
   const handleSuggestionClick = (language: ILanguage) => {
-    setInputValue(language.name);
+    setInputValue(getTranslatedName(language));
     setEntryForm({
       ...entryForm,
       language_code: language.alpha3 ?? language.alpha2,
     });
     setIsHovering(false);
-    setSuggestions([]); // Hide suggestions after selection
+    setSuggestions([]);
   };
 
   return (
     <div className='w-full relative'>
       <ElviraInput
-        className={`bg-white dark:bg-gray ${
-          suggestions.length > 0 ? 'rounded-b-none' : ''
-        }`}
+        className={`bg-white dark:bg-gray ${suggestions.length > 0 ? 'rounded-b-none' : ''
+          }`}
         type='text'
         value={inputValue}
         onChange={handleInputChange}
         placeholder={t('entry.wizard.lang')}
         required
         invalidMessage={t('entry.wizard.requiredMessages.lang')}
-        onFocus={(e) => {
+        onFocus={() => {
           const filteredSuggestions = languages.filter(
             (language) =>
-              language.name
+              getTranslatedName(language)
                 .toLowerCase()
                 .startsWith(inputValue.toLowerCase()) &&
-              language.name !== inputValue
+              getTranslatedName(language) !== inputValue
           );
-
           setSuggestions(filteredSuggestions);
         }}
         onBlur={() => {
-          const lang = languages.filter(
-            (lang) =>
-              lang.name.toLocaleLowerCase() === inputValue.toLocaleLowerCase()
+          const matchedLang = languages.find(
+            (language) =>
+              getTranslatedName(language).toLowerCase() ===
+              inputValue.toLowerCase()
           );
-          if (lang.length === 0) {
-            setInputValue('');
+          if (matchedLang) {
+            setInputValue(getTranslatedName(matchedLang));
+            handleSuggestionClick(matchedLang);
           } else {
-            setInputValue(lang[0].name);
-            handleSuggestionClick(lang[0]);
+            setInputValue('');
           }
-          // if we click outside out input no on suggestions
           if (!isHovering) setSuggestions([]);
         }}
       />
@@ -129,7 +187,7 @@ const LanguageAutofill = ({
               onClick={() => handleSuggestionClick(language)}
               style={{ padding: '5px', cursor: 'pointer' }}
             >
-              {language.name}
+              {getTranslatedName(language)}
             </li>
           ))}
         </ul>

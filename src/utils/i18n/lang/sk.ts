@@ -153,7 +153,7 @@ export const sk = {
 
     // NAVBAR MENU
     navbarMenu: {
-      portal: 'Portál',
+      portal: 'Hlavné Menu',
       personal: 'Osobné',
       settings: 'Nastavenia',
       catalog: 'Katalóg',

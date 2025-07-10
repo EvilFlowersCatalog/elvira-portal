@@ -14,14 +14,16 @@ import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import ShelfButton from '../../buttons/ShelfButton';
 import PDFButtons from '../../buttons/PDFButtons';
 import { BiBookOpen } from 'react-icons/bi';
+import { AcceptedLanguage, languagesDictionary, TranslatedLanguage } from '../../autofills/LanguageAutofill';
 
 interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
 }
+
 const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const { stuColor, stuText, stuBg, umamiTrack } = useAppContext();
   const { auth } = useAuthContext();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [entry, setEntry] = useState<IEntryDetail | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -126,6 +128,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       try {
         const entryDetail = await getEntryDetail(entryId);
         setEntry(entryDetail);
+        console.log('Entry Detail:', entryDetail);
       } catch {
         setEntry(null);
       }
@@ -166,13 +169,14 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               </div>
 
               <div className='grid grid-cols-2 gap-4 py-4 mt-auto mb-4'>
-                <PDFButtons
-                  acquisitions={entry.acquisitions}
-                  entryId={entry.id}> <div
-                    className={`w-full px-4 py-2 rounded-lg text-darkGray dark:text-lightGray font-light flex justify-start gap-4 border-[1px] border-darkGray dark:border-lightGray`}>
-                    <BiBookOpen size={24} />{t('entry.detail.read')}
-                  </div>
-                </PDFButtons>
+                {entry.acquisitions.length > 0 && (
+                  <PDFButtons
+                    acquisitions={entry.acquisitions}
+                    entryId={entry.id}> <div
+                      className={`w-full px-4 py-2 rounded-lg text-darkGray dark:text-lightGray font-light flex justify-start gap-4 border-[1px] border-darkGray dark:border-lightGray`}>
+                      <BiBookOpen size={24} />{t('entry.detail.read')}
+                    </div>
+                  </PDFButtons>)}
                 <ShelfButton
                   isLoading={isLoading}
                   entryId={entryId!}
@@ -187,17 +191,18 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                       : <><RiBookmarkLine size={24} />{t('entry.detail.add')} </>}
                   </button>
                 </ShelfButton>
-                <button onClick={copyCite}
-                  className={`w-full px-4 py-2 rounded-lg text-darkGray dark:text-lightGray font-light flex justify-start gap-4 border-[1px] border-darkGray dark:border-lightGray`}>
-                  <RiChatQuoteLine size={24} />{t('entry.detail.cite')}
-                </button>
+                {entry.citation && (
+                  <button onClick={copyCite}
+                    className={`w-full px-4 py-2 rounded-lg text-darkGray dark:text-lightGray font-light flex justify-start gap-4 border-[1px] border-darkGray dark:border-lightGray`}>
+                    <RiChatQuoteLine size={24} />{t('entry.detail.cite')}
+                  </button>)}
                 <button
                   className={`w-full px-4 py-2 rounded-lg text-darkGray dark:text-lightGray font-light flex justify-start gap-4 border-[1px] border-darkGray dark:border-lightGray`}>
                   <RiShareLine size={24} />{t('entry.detail.share')}
                 </button>
               </div>
             </div>
-            <div className='p-4 bg-white dark:bg-gray mdlg:overflow-y-auto h-full pb-20'>
+            <div className='p-4 bg-white dark:bg-gray mdlg:overflow-y-auto h-full pb-20 w-full'>
 
               {/* Feeds */}
               <div className={'mb-6 flex gap-2 w-full'}>
@@ -317,7 +322,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                     {t('entry.detail.lang')}
                   </span>
                   <span className={`text-secondary dark:text-secondaryLight font-extrabold`}>
-                    {entry.language?.name || '-'}
+                    {languagesDictionary(i18n.language as AcceptedLanguage, entry.language?.alpha2 as TranslatedLanguage)}
                   </span>
                 </div>
 

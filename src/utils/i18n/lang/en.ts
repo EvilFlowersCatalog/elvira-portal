@@ -155,7 +155,7 @@ export const en = {
 
     // NAVBAR MENU
     navbarMenu: {
-      portal: 'Portal',
+      portal: 'Main Menu',
       personal: 'Personal',
       settings: 'Settings',
       catalog: 'Catalog',

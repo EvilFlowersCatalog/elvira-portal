@@ -39,7 +39,7 @@ const AdminEditEntry = () => {
       (async () => {
         setIsLoading(true);
         if (id) {
-          const { response: entryDetail } = await getEntryDetail(id);
+          const entryDetail  = await getEntryDetail(id);
           setEditingEntryTitle(entryDetail.title);
 
           setEntry({
