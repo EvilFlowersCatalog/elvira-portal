@@ -65,10 +65,16 @@ const Breadcrumb = () => {
       }
     });
 
+
     if (feeds.length > 0) {
       feeds.map((feed, index) => {
-        const part = index === 0 ? `?parent-id=${feed.id}` : `&${feed.id}`;
-        const path = pathParts.join('/') + part;
+        var previousFeeds = feeds.slice(0, index);
+        // %26 is the URL encoded version of &
+        const part =
+          index !== 0
+            ? `?parent-id=${previousFeeds.map((f) => f.id).join('%26')}%26${feed.id}`
+            : `?parent-id=${feed.id}`;
+        const path = "/feeds" + part;
 
         newBreadcrumbs.push({
           path,
@@ -111,7 +117,6 @@ const Breadcrumb = () => {
       if (feedStepId) {
         try {
           const detail = await getFeedDetail(feedStepId);
-          console.log(detail);
           setFeedStep({ id: detail.id, title: detail.title });
         } catch {
           setFeedStep({ id: '', title: '' });
