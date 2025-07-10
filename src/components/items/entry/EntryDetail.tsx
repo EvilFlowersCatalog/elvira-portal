@@ -317,7 +317,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                     {t('entry.detail.lang')}
                   </span>
                   <span className={`text-secondary dark:text-secondaryLight font-extrabold`}>
-                    {entry.language?.name?.toLocaleUpperCase() || '-'}
+                    {entry.language?.name || '-'}
                   </span>
                 </div>
 
