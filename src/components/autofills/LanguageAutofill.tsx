@@ -74,12 +74,14 @@ interface ILanguageAutofillParams {
   setEntryForm: (entryForm: any) => void;
   setIsSelectionOpen: (isOpen: boolean) => void;
   defaultLanguageId?: string;
+  isRequired: boolean;
 }
 const LanguageAutofill = ({
   entryForm,
   setEntryForm,
   setIsSelectionOpen,
   defaultLanguageId,
+  isRequired 
 }: ILanguageAutofillParams) => {
   const { stuBorder } = useAppContext();
   const { i18n, t } = useTranslation();
@@ -152,7 +154,7 @@ const LanguageAutofill = ({
         value={inputValue}
         onChange={handleInputChange}
         placeholder={t('entry.wizard.lang')}
-        required
+        required={isRequired}
         invalidMessage={t('entry.wizard.requiredMessages.lang')}
         onFocus={() => {
           const filteredSuggestions = languages.filter(

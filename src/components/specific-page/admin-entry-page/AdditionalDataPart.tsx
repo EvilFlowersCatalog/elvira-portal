@@ -165,7 +165,7 @@ const AdditionalDataPart = ({
             value={entry.title ?? ''}
             required
           />
-          <LanguageAutofill entryForm={entry} setEntryForm={setEntry} setIsSelectionOpen={()=>{}} />
+          <LanguageAutofill entryForm={entry} setEntryForm={setEntry} setIsSelectionOpen={()=>{}} isRequired={true} />
           <ElviraInput
             onChange={handlePublisherChange}
             placeholder={t('entry.wizard.publisher')}

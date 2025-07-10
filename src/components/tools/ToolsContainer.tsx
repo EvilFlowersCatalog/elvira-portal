@@ -251,7 +251,8 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
                 defaultLanguageId={defaultLanguageId}
                 entryForm={language}
                 setEntryForm={setLanguage}
-                setIsSelectionOpen={setIsSelectionOpen} />
+                setIsSelectionOpen={setIsSelectionOpen} 
+                isRequired={false}/>
               <CategoryAutofill
                 defaultCategoryId={defaultCategoryId}
                 entryForm={activeCategory}
