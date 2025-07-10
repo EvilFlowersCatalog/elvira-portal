@@ -57,7 +57,13 @@ const Breadcrumb = () => {
           label: breadcrumbsTranslator[part.toLocaleLowerCase()], // Capitalize the first letter
         });
         skip = true;
-      } else {
+      } else if (feeds.length > 0) {
+        newBreadcrumbs.push({
+          path: "/feeds",
+          label: breadcrumbsTranslator['feeds'],
+        });
+      }
+      else {
         newBreadcrumbs.push({
           path: `/${pathParts.slice(0, index + 1).join('/')}`,
           label: breadcrumbsTranslator[part.toLocaleLowerCase()], // Capitalize the first letter
@@ -75,6 +81,8 @@ const Breadcrumb = () => {
             ? `?parent-id=${previousFeeds.map((f) => f.id).join('%26')}%26${feed.id}`
             : `?parent-id=${feed.id}`;
         const path = "/feeds" + part;
+
+        if (!feed.id) return;
 
         newBreadcrumbs.push({
           path,
@@ -135,8 +143,8 @@ const Breadcrumb = () => {
       {breadcrumbs.map((breadcrumb, index) => (
         <button
           className={`flex gap-3 w-fit items-center text-sm text-left ${index === breadcrumbs.length - 1
-              ? 'cursor-default'
-              : 'cursor-pointer'
+            ? 'cursor-default'
+            : 'cursor-pointer'
             }`}
           key={index}
           onClick={

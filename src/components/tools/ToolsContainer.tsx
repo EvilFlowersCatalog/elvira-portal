@@ -226,7 +226,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
                   : 'overflow-hidden max-h-[500px]'
                 : 'overflow-hidden max-h-0'
               }`}>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4 mb-4 mt-1'>
+            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-2 gap-x-4 mb-4 mt-1'>
               <ElviraInput
                 placeholder={t('searchBar.title')}
                 value={title}
