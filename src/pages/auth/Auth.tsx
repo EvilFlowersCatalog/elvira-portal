@@ -119,9 +119,10 @@ const Auth = () => {
                     placeholder={t('login.password')}
                     invalidMessage={t('login.requiredMessage.password')}
                     required
+                    className='pr-12'
                   />
                   <button
-                    className='absolute top-[31px] -right-7'
+                    className='absolute top-[33px] right-4'
                     type='button'
                     onClick={() => setShowPassword((prevShow) => !prevShow)}
                   >
