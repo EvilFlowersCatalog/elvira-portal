@@ -20,11 +20,11 @@ const ScrollUpButton = ({ scrollRef }: IScrollUpButtonParams) => {
 
   return (
     <button
-      className={`fixed p-2 pr-4 flex items-center gap-2 bottom-20 right-5 z-10 uppercase rounded-md bg-darkGray dark:bg-white text-white dark:text-black border border-white dark:border-black`}
+      className="fixed p-3 flex items-center justify-center bottom-5 right-10 z-10 rounded-full bg-primary text-white dark:text-white border-none shadow-lg"
       onClick={handleScrollUp}
+      aria-label={t('general.scrollUp')}
     >
       <MdKeyboardDoubleArrowUp size={30} />
-      {t('general.scrollUp')}
     </button>
   );
 };
