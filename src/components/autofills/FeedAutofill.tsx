@@ -7,6 +7,7 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface IFeedAutofillParams {
   entryForm: any;
+  defaultFeedId?: string;
   setEntryForm: (entryForm: any) => void;
   single?: boolean;
   kind?: 'acquisition' | 'navigation';
@@ -17,6 +18,7 @@ interface IFeedAutofillParams {
 const FeedAutofill = ({
   entryForm,
   setEntryForm,
+  defaultFeedId,
   single = false,
   kind = 'acquisition',
   placeholder,
@@ -25,7 +27,7 @@ const FeedAutofill = ({
   const { stuBorder } = useAppContext();
   const { t } = useTranslation();
 
-  const [inputValue, setInputValue] = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>(entryForm.feeds?.[0]?.title || '');
   const [suggestions, setSuggestions] = useState<IFeed[]>([]);
   const [feeds, setFeeds] = useState<IFeed[]>([]);
   const [isHovering, setIsHovering] = useState<boolean>(false);
@@ -45,6 +47,19 @@ const FeedAutofill = ({
       }
     })();
   }, []);
+
+  useEffect(() => {
+    if (defaultFeedId && feeds) {
+      const defaultFeed = feeds.find((feed: IFeed) => feed.id === defaultFeedId);
+      if (defaultFeed) {
+        setInputValue(defaultFeed.title);
+        setEntryForm({
+          ...entryForm,
+          feeds: [{ title: defaultFeed.title, id: defaultFeed.id }],
+        });
+      }
+    }
+  }, [defaultFeedId, feeds])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

@@ -7,6 +7,7 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface ICategoryAutofillParams {
   entryForm: any;
+  defaultCategoryId?: string;
   setEntryForm: (entryForm: any) => void;
   single?: boolean;
   setIsSelectionOpen: (isOpen: boolean) => void;
@@ -15,6 +16,7 @@ interface ICategoryAutofillParams {
 const CategoryAutofill = ({
   entryForm,
   setEntryForm,
+  defaultCategoryId,
   single = false,
   setIsSelectionOpen
 }: ICategoryAutofillParams) => {
@@ -40,6 +42,19 @@ const CategoryAutofill = ({
       }
     })();
   }, []);
+
+  useEffect(() => {
+    if (defaultCategoryId && categories) {
+      const defaultCategory = categories.find((category: ICategory) => category.id === defaultCategoryId);
+      if (defaultCategory) {
+        setInputValue(defaultCategory.term);
+        setEntryForm({
+          ...entryForm,
+          categories: [{ term: defaultCategory.term, id: defaultCategory.id }],
+        });
+      }
+    }
+  });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

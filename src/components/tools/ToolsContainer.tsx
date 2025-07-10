@@ -10,6 +10,8 @@ import FeedAutofill from '../autofills/FeedAutofill';
 import { ICategory } from '../../utils/interfaces/category';
 import Button from '../buttons/Button';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
+import { IFeed, IFeedsList } from '../../utils/interfaces/feed';
 
 interface IToolsContainerParams {
   advancedSearch?: boolean;
@@ -24,6 +26,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
     isParamsEmpty,
     umamiTrack,
   } = useAppContext();
+  const getFeeds = useGetFeeds();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const orderBy = searchParams.get('order-by') || '-created_at';
@@ -32,9 +35,12 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
 
   const [showAdvancedSearch, setShowAdvancedBar] = useState<boolean>(false);
   const [isSelectionOpen, setIsSelectionOpen] = useState<boolean>(false);
+
+  const [defaultFeedId, setDefaultFeedId] = useState<string>('');
   const [activeFeeds, setActiveFeeds] = useState<{
     feeds: { title: string; id: string }[];
   }>({ feeds: [] });
+  const [defaultCategoryId, setDefaultCategoryId] = useState<string>('');
   const [activeCategory, setActiveCategory] = useState<{
     categories: ICategory[];
   }>({ categories: [] });
@@ -92,7 +98,19 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
 
   useEffect(() => {
     const orderBy = searchParams.get('order-by');
+    const query = searchParams.get('query') || '';
+    const title = searchParams.get('title') || '';
+    const author = searchParams.get('author') || '';
+    const feedId = searchParams.get('feed-id') || '';
+    const categoryId = searchParams.get('category-id') || '';
     if (orderBy) setSelection(orderBy);
+    if (query) setInput(query);
+    if (title) setTitle(title);
+    if (author) setAuthor(author);
+
+    if(feedId) setDefaultFeedId(feedId);
+    if(categoryId) setDefaultCategoryId(categoryId);
+    
   }, [searchParams]);
 
   // Handle input
@@ -113,7 +131,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
   };
 
   return (
-    <div className={`flex gap-4 px-4 pb-4 item-start flex-col md:flex-row z-50`}>
+    <div className={`flex gap-4 px-4 pb-4 item-start flex-col md:flex-row z-10`}>
       <div className='w-full pl-1'>
         <div className='flex gap-4 items-center'>
           <form
@@ -152,87 +170,90 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
         </div>
 
         <div
-          className='flex flex-wrap gap-3 w-full text-[15px] mt-3 items-center'>
-          {advancedSearch && (
-            <button
-              className='text-sm hover:underline'
-              onClick={() => {
-                umamiTrack('Advanced Search Button');
-                setShowAdvancedBar(!showAdvancedSearch);
+          className={`transition-all duration-400 w-full 
+            ${showAdvancedSearch ? 'bg-zinc-100 dark:bg-zinc-800 drop-shadow-md rounded-xl p-4 mt-4 mb-4' : ''}`}>
+          <div className='flex flex-wrap gap-3 w-full text-[15px] items-center'>
+            {advancedSearch && (
+              <button
+                className='text-sm hover:underline'
+                onClick={() => {
+                  umamiTrack('Advanced Search Button');
+                  setShowAdvancedBar(!showAdvancedSearch);
+                }}
+              >
+                {t('tools.advancedSearch')}
+              </button>
+            )}
+            <Select
+              className="ml-auto dark:text-white"
+              sx={{
+                '&:before': { borderBottom: '0px' },
+                '&:hover:not(.Mui-disabled):before': { borderBottom: '0px' },
+                '.MuiSelect-icon': { color: 'black' },
+                '.dark & .MuiSelect-icon': { color: 'white' },
               }}
+              label={"Sort By"}
+              value={orderBy}
+              labelId='sort-label'
+              id="orderBy"
+              onChange={handleSelectChange}
+              variant="standard"
             >
-              {t('tools.advancedSearch')}
-            </button>
-          )}
-          <Select className="ml-auto dark:text-white"
-            sx={{
-              '&:before': {
-                borderBottom: '0px',
-              },
-              '&:hover:not(.Mui-disabled):before': {
-                borderBottom: '0px',
-              },
-              '.MuiSelect-icon': {
-                color: 'black',
-              },
-              '.dark & .MuiSelect-icon': {
-                color: 'white',
-              },
-            }}
-            label={"Sort By"} value={orderBy} labelId='sort-label' id="orderBy" onChange={handleSelectChange} variant="standard" >
-            <MenuItem value="created_at">{t('tools.orderBy.createdAtAsc')}</MenuItem>
-            <MenuItem value="-created_at">{t('tools.orderBy.createdAtDesc')}</MenuItem>
-            <MenuItem value="title">{t('tools.orderBy.titleAsc')}</MenuItem>
-            <MenuItem value="-title">{t('tools.orderBy.titleDesc')}</MenuItem>
-            {/* <MenuItem value="publishedAt">{t('tools.orderBy.publishedAt')}</MenuItem>
-            <MenuItem value="-publishedAt">{t('tools.orderBy.publishedAtDesc')}</MenuItem> */}
-          </Select>
+              <MenuItem value="created_at">{t('tools.orderBy.createdAtAsc')}</MenuItem>
+              <MenuItem value="-created_at">{t('tools.orderBy.createdAtDesc')}</MenuItem>
+              <MenuItem value="title">{t('tools.orderBy.titleAsc')}</MenuItem>
+              <MenuItem value="-title">{t('tools.orderBy.titleDesc')}</MenuItem>
+            </Select>
+          </div>
+
+          <form
+            onSubmit={onSubmit}
+            className={`transition-all duration-400
+              ${showAdvancedSearch
+                ? isSelectionOpen
+                  ? 'overflow-visible max-h-[500px]'
+                  : 'overflow-hidden max-h-[500px]'
+                : 'overflow-hidden max-h-0'
+              }`}>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4 mb-4 mt-1'>
+              <ElviraInput
+                placeholder={t('searchBar.title')}
+                value={title}
+                onChange={handleTitleChange}
+              />
+              <ElviraInput
+                placeholder={t('searchBar.author')}
+                value={author}
+                onChange={handleAuthorChange}
+              />
+              <CategoryAutofill
+                defaultCategoryId={defaultCategoryId}
+                entryForm={activeCategory}
+                setEntryForm={setActiveCategory}
+                setIsSelectionOpen={setIsSelectionOpen}
+                single
+              />
+              <FeedAutofill
+                defaultFeedId={defaultFeedId}
+                entryForm={activeFeeds}
+                setEntryForm={setActiveFeeds}
+                setIsSelectionOpen={setIsSelectionOpen}
+                single
+              />
+            </div>
+
+            <div className='flex justify-end'>
+              <Button type='submit' className='bg-primary dark:bg-primaryLight text-white dark:text-primary'>
+                {t('searchBar.search')}
+              </Button>
+            </div>
+          </form>
         </div>
 
-        <form
-          onSubmit={onSubmit}
-          className={`transition-all duration-400
-              ${showAdvancedSearch ? 'bg-zinc-100 dark:bg-zinc-800 drop-shadow-md rounded-xl p-4 mt-4 mb-4' : ''} 
-              ${showAdvancedSearch
-              ? isSelectionOpen
-                ? 'overflow-visible max-h-[500px]'
-                : 'overflow-hidden max-h-[500px]'
-              : 'overflow-hidden max-h-0'}
-            `}
-        >
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-4'>
-            <ElviraInput
-              placeholder={t('searchBar.title')}
-              value={title}
-              onChange={handleTitleChange}
-            />
-            <ElviraInput
-              placeholder={t('searchBar.author')}
-              value={author}
-              onChange={handleAuthorChange}
-            />
-            <CategoryAutofill
-              entryForm={activeCategory}
-              setEntryForm={setActiveCategory}
-              setIsSelectionOpen={setIsSelectionOpen}
-              single
-            />
-            <FeedAutofill
-              entryForm={activeFeeds}
-              setEntryForm={setActiveFeeds}
-              setIsSelectionOpen={setIsSelectionOpen}
-              single
-            />
-          </div>
-
-          <div className='flex justify-end'>
-            <Button type='submit' className='bg-primary dark:bg-primaryLight text-white dark:text-primary'>{t('searchBar.search')}</Button>
-          </div>
-        </form>
 
 
       </div>
-    </div >
+    </div>
   );
 };
 
