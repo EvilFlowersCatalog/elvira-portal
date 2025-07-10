@@ -10,8 +10,6 @@ import FeedAutofill from '../autofills/FeedAutofill';
 import { ICategory } from '../../utils/interfaces/category';
 import Button from '../buttons/Button';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
-import { IFeed, IFeedsList } from '../../utils/interfaces/feed';
 
 interface IToolsContainerParams {
   advancedSearch?: boolean;
@@ -26,12 +24,10 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
     isParamsEmpty,
     umamiTrack,
   } = useAppContext();
-  const getFeeds = useGetFeeds();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const orderBy = searchParams.get('order-by') || '-created_at';
   const [input, setInput] = useState<string>('');
-  const [selection, setSelection] = useState('-created_at');
 
   const [showAdvancedSearch, setShowAdvancedBar] = useState<boolean>(false);
   const [isSelectionOpen, setIsSelectionOpen] = useState<boolean>(false);
@@ -97,13 +93,11 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
   };
 
   useEffect(() => {
-    const orderBy = searchParams.get('order-by');
     const query = searchParams.get('query') || '';
     const title = searchParams.get('title') || '';
     const author = searchParams.get('author') || '';
     const feedId = searchParams.get('feed-id') || '';
     const categoryId = searchParams.get('category-id') || '';
-    if (orderBy) setSelection(orderBy);
     if (query) setInput(query);
     if (title) setTitle(title);
     if (author) setAuthor(author);
@@ -203,6 +197,8 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
               <MenuItem value="-created_at">{t('tools.orderBy.createdAtDesc')}</MenuItem>
               <MenuItem value="title">{t('tools.orderBy.titleAsc')}</MenuItem>
               <MenuItem value="-title">{t('tools.orderBy.titleDesc')}</MenuItem>
+              <MenuItem value="popularity">{t('tools.orderBy.popularityAsc')}</MenuItem>
+              <MenuItem value="-popularity">{t('tools.orderBy.popularityDesc')}</MenuItem>
             </Select>
           </div>
 

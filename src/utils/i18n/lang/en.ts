@@ -350,6 +350,8 @@ export const en = {
         createdAtDesc: 'Created at ↓',
         titleAsc: 'Title ↑',
         titleDesc: 'Title ↓',
+        popularityAsc: 'Popularity ↑',
+        popularityDesc: 'Popularity ↓',
       },
     },
 

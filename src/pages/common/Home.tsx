@@ -4,7 +4,6 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import HomeHeader from '../../components/specific-page/home-page/HomeHeader';
-import SwiperContainer from '../../components/specific-page/home-page/swiper/SwiperContainer';
 import EntryDetail from '../../components/items/entry/EntryDetail';
 import EntryDisplay from '../../components/items/entry/display/EntryDisplay';
 
@@ -61,7 +60,7 @@ const Home = () => {
         {/* POPULAR */}
         <div className='flex justify-between items-center mb-5 flex-wrap'>
           <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>{t('home.popular')}</h2>
-          <p className='text-sm text-primary cursor-pointer'>Zobraziť všetko</p>
+          <a href="/library?order-by=-popularity" className='text-sm text-primary cursor-pointer'>Zobraziť všetko</a>
         </div>
         <EntryDisplay
           isLoading={isLoading}
@@ -69,21 +68,13 @@ const Home = () => {
           type='popular'
           limitRows={true}
         />
-        {/* <SwiperContainer
-            isLoading={isLoading}
-            entries={popularEntries}
-            setClickedEntry={setClickedEntry}
-            clickedEntry={clickedEntry}
-            activeEntryId={activeEntryId}
-            type='popular'
-          /> */}
 
         <div className='h-3'></div>
 
         {/* LAST ADDED */}
         <div className='flex justify-between items-center mb-5 flex-wrap'>
           <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>{t('home.lastAdded')}</h2>
-          <p className='text-sm text-primary cursor-pointer'>Zobraziť všetko</p>
+          <a href="/library?order-by=-created_at" className='text-sm text-primary cursor-pointer'>Zobraziť všetko</a>
         </div>
         <EntryDisplay
           isLoading={isLoading}
@@ -91,15 +82,6 @@ const Home = () => {
           type='popular'
           limitRows={true}
         />
-        {/* <SwiperContainer
-          isLoading={isLoading}
-          entries={lastAddedEntries}
-          setClickedEntry={setClickedEntry}
-          clickedEntry={clickedEntry}
-          activeEntryId={activeEntryId}
-          type='lastAdded'
-        /> */}
-
       </div>
       {activeEntryId && <EntryDetail />}
     </>

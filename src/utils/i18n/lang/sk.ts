@@ -340,6 +340,8 @@ export const sk = {
         createdAtDesc: 'Dátum publikovania ↓',
         titleAsc: 'Názov ↑',
         titleDesc: 'Názov ↓',
+        popularityAsc: 'Popularita ↑',
+        popularityDesc: 'Popularita ↓',
       },
     },
 

@@ -12,7 +12,6 @@ import Button from '../../buttons/Button';
 
 const HomeHeader = () => {
   const { t } = useTranslation();
-  const { theme, titleLogoDark, titleLogoLight } = useAppContext();
   const [searchInput, setSearchInput] = useState<string>('');
 
   const navigate = useNavigate();
@@ -41,14 +40,8 @@ const HomeHeader = () => {
 
   return (
     <div className='flex flex-col gap-5 py-12'>
-      {/* <img
-        className='w-full md:w-1/4'
-        src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
-        alt='Elvira Logo'
-      /> */}
       <div className='text-center'>
         <h1 className='text-secondary dark:text-secondaryLight text-4xl font-extrabold text-left mb-4'>{t('about.title')}</h1>
-        {/* <p>{t('about.subTitle')}</p> */}
       </div>
 
       <div
