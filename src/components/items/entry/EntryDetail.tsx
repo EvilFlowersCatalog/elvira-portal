@@ -128,7 +128,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       try {
         const entryDetail = await getEntryDetail(entryId);
         setEntry(entryDetail);
-        console.log('Entry Detail:', entryDetail);
       } catch {
         setEntry(null);
       }

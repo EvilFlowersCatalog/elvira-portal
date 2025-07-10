@@ -63,6 +63,7 @@ export interface IEntryQuery {
   publishedAtLte?: string;
   orderBy?: string;
   query?: string;
+  languageId?: string;
 }
 
 export interface IEntryNew {

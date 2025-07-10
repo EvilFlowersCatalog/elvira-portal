@@ -70,12 +70,16 @@ function removeDiacritics(str: string) {
 }
 
 interface ILanguageAutofillParams {
-  entryForm: IEntryNewForm;
-  setEntryForm: (entryForm: IEntryNewForm) => void;
+  entryForm: any;
+  setEntryForm: (entryForm: any) => void;
+  setIsSelectionOpen: (isOpen: boolean) => void;
+  defaultLanguageId?: string;
 }
 const LanguageAutofill = ({
   entryForm,
   setEntryForm,
+  setIsSelectionOpen,
+  defaultLanguageId,
 }: ILanguageAutofillParams) => {
   const { stuBorder } = useAppContext();
   const { i18n, t } = useTranslation();
@@ -96,6 +100,14 @@ const LanguageAutofill = ({
       setLanguages(response);
     })()
   }, []);
+
+  useEffect(() => {
+    if (defaultLanguageId && languages.length > 0) {
+      const lang = languages.find(l => l.id == defaultLanguageId);
+      if (!lang) return;
+      setInputValue(getTranslatedName(lang as ILanguage));
+    }
+  }, [defaultLanguageId, languages])
 
   useEffect(() => {
     if (entryForm.language_code) {
@@ -125,6 +137,7 @@ const LanguageAutofill = ({
     setEntryForm({
       ...entryForm,
       language_code: language.alpha3 ?? language.alpha2,
+      language_id: language.id,
     });
     setIsHovering(false);
     setSuggestions([]);
@@ -150,6 +163,7 @@ const LanguageAutofill = ({
               && removeDiacritics(getTranslatedName(language)) !== removeDiacritics(inputValue)
           );
           setSuggestions(filteredSuggestions);
+          setIsSelectionOpen(true);
         }}
         onBlur={() => {
           const matchedLang = languages.find(
@@ -162,12 +176,15 @@ const LanguageAutofill = ({
           } else {
             setInputValue('');
           }
-          if (!isHovering) setSuggestions([]);
+          if (!isHovering) {
+            setSuggestions([]);
+            setIsSelectionOpen(false);
+          }
         }}
       />
       {suggestions.length > 0 && (
         <ul
-          className={`absolute top-[60px] border-2 rounded-md rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full`}
+          className={`absolute top-[60px] rounded-md list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full`}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >

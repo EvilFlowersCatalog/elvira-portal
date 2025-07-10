@@ -10,6 +10,7 @@ import FeedAutofill from '../autofills/FeedAutofill';
 import { ICategory } from '../../utils/interfaces/category';
 import Button from '../buttons/Button';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import LanguageAutofill from '../autofills/LanguageAutofill';
 
 interface IToolsContainerParams {
   advancedSearch?: boolean;
@@ -41,6 +42,9 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
     categories: ICategory[];
   }>({ categories: [] });
 
+  const [defaultLanguageId, setDefaultLanguageId] = useState<string>('');
+  const [language, setLanguage] = useState<{ language_code: '', language_id: '' }>({ language_code: '', language_id: '' });
+
   const [year, setYear] = useState<number[]>([1950, new Date().getFullYear()]);
   const [title, setTitle] = useState<string>('');
   const [author, setAuthor] = useState<string>('');
@@ -55,6 +59,10 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
   const handleAuthorChange = (e: ChangeEvent<HTMLInputElement>) => {
     setAuthor(e.target.value);
   };
+
+  const handleLanguageChange = (e: ChangeEvent<HTMLInputElement>) => {
+    // setLanguage(e.target.value);
+  }
 
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -75,6 +83,8 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
 
     searchParams.set('publishedAtGte', year[0].toString());
     searchParams.set('publishedAtLte', year[1].toString());
+
+    searchParams.set('language-id', language.language_id);
 
     setSearchParams(searchParams);
   };
@@ -100,14 +110,16 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
     const publishedAtLte = searchParams.get('publishedAtLte') || new Date().getFullYear().toString();
     const feedId = searchParams.get('feed-id') || '';
     const categoryId = searchParams.get('category-id') || '';
+    const languageId = searchParams.get('language-id') || '';
     if (query) setInput(query);
     if (title) setTitle(title);
     if (author) setAuthor(author);
     setYear([Number(publishedAtGte), Number(publishedAtLte)]);
 
-    if(feedId) setDefaultFeedId(feedId);
-    if(categoryId) setDefaultCategoryId(categoryId);
-    
+    if (feedId) setDefaultFeedId(feedId);
+    if (categoryId) setDefaultCategoryId(categoryId);
+    if (languageId) setDefaultLanguageId(languageId);
+
   }, [searchParams]);
 
   // Handle input
@@ -225,7 +237,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
                 value={author}
                 onChange={handleAuthorChange}
               />
-              <ElviraInput  type='number'
+              <ElviraInput type='number'
                 placeholder={t('searchBar.yearFrom')}
                 value={year[0]}
                 onChange={(e) => handleYearChange([Number(e.target.value), year[1]])}
@@ -235,6 +247,11 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
                 value={year[1]}
                 onChange={(e) => handleYearChange([year[0], Number(e.target.value)])}
               />
+              <LanguageAutofill
+                defaultLanguageId={defaultLanguageId}
+                entryForm={language}
+                setEntryForm={setLanguage}
+                setIsSelectionOpen={setIsSelectionOpen} />
               <CategoryAutofill
                 defaultCategoryId={defaultCategoryId}
                 entryForm={activeCategory}
