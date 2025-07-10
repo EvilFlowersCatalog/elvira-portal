@@ -203,8 +203,8 @@ export const en = {
     entry: {
       detail: {
         close: 'Close',
-        add: '+ Add to shelf',
-        remove: '- Remove from shelf',
+        add: 'Add',
+        remove: 'Remove',
         pages: 'Pages',
         rating: 'Rating',
         views: 'Views',

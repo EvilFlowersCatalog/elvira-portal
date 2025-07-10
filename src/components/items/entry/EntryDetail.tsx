@@ -104,9 +104,9 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       return;
     }
     navigator.clipboard.writeText(cite).then(() => {
-        toast.success(t('notifications.citation.copySuccess'));
+      toast.success(t('notifications.citation.copySuccess'));
     }, () => {
-        toast.error(t('notifications.citation.copyError'));
+      toast.error(t('notifications.citation.copyError'));
     });
   };
 
@@ -156,18 +156,16 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
           </div>
         ) : (
           <div className={'flex h-full flex-col mdlg:flex-row'}>
-            <div className='p-8 bg-lightGray dark:bg-darkGray h-full min-w-[350px]'>
-              <div className={'w-full flex flex-col items-center'}>
-                <div className={`w-full flex justify-center max-w-[300px] border rounded-md ${imageLoaded ? 'h-auto' : 'h-64'} overflow-hidden`}>
-                  <img className={'w-full h-full'}
-                    src={entry.response.thumbnail + `?access_token=${auth?.token}`}
-                    alt='Entry Thumbnail'
-                    onLoad={() => setImageLoaded(true)}
-                  />
-                </div>
+            <div className='p-8 bg-lightGray dark:bg-darkGray h-full min-w-[350px] flex flex-col'>
+              <div className={`w-full flex justify-center border rounded-md flex-shrink overflow-hidden h-full`}>
+                <img className={'w-full h-full object-cover'}
+                  src={entry.response.thumbnail + `?access_token=${auth?.token}`}
+                  alt='Entry Thumbnail'
+                  onLoad={() => setImageLoaded(true)}
+                />
               </div>
 
-              <div className='grid grid-cols-2 gap-4 py-4'>
+              <div className='grid grid-cols-2 gap-4 py-4 mt-auto mb-4'>
                 <PDFButtons
                   acquisitions={entry.response.acquisitions}
                   entryId={entry.response.id}> <div
