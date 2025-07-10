@@ -57,7 +57,7 @@ const Breadcrumb = () => {
           label: breadcrumbsTranslator[part.toLocaleLowerCase()], // Capitalize the first letter
         });
         skip = true;
-      } else if (feeds.length > 0) {
+      } else if (feeds.length > 0 && pathParts[0] == 'library') {
         newBreadcrumbs.push({
           path: "/feeds",
           label: breadcrumbsTranslator['feeds'],
@@ -79,8 +79,8 @@ const Breadcrumb = () => {
         const part =
           index !== 0
             ? `?parent-id=${previousFeeds.map((f) => f.id).join('%26')}%26${feed.id}`
-            : `?parent-id=${feed.id}`;
-        const path = "/feeds" + part;
+            : `?parent-id=${feed.id}`;          
+        const path = pathParts[0] === 'library' ? "/feeds" + part : `/${pathParts.join('/')}` + part;
 
         if (!feed.id) return;
 
