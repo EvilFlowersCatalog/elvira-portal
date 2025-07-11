@@ -221,6 +221,11 @@ export const sk = {
         title: 'Detail knihy',
         readMore: 'Čítať Viac',
         readLess: 'Zobraziť Menej',
+        tabs: {
+          contents: 'Obsah',
+          reviews: 'Recenzie',
+          related: 'Súvisiace',
+        },
       },
       wizard: {
         requiredMessages: {

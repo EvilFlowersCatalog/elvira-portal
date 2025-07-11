@@ -15,6 +15,7 @@ import ShelfButton from '../../buttons/ShelfButton';
 import PDFButtons from '../../buttons/PDFButtons';
 import { BiBookOpen } from 'react-icons/bi';
 import { AcceptedLanguage, languagesDictionary, TranslatedLanguage } from '../../autofills/LanguageAutofill';
+import { TabContent, Tabs, TabsComponent, TabsHeader, TabTitle } from './EntryDetailTabs';
 
 interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
@@ -352,8 +353,32 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                 </div>
               </div>
 
+              {/* TABS */}
+              <TabsComponent defaultTab='contents'>
+                <TabsHeader>
+                  <TabTitle id="contents">{t('entry.detail.tabs.contents')}</TabTitle>
+                  <TabTitle id="reviews">{t('entry.detail.tabs.reviews')}</TabTitle>
+                  <TabTitle id="related">{t('entry.detail.tabs.related')}</TabTitle>
+                </TabsHeader>
+                <Tabs>
+                  <TabContent id="contents">
+                    <span className="text-gray-600 dark:text-gray-300">
+                      {t('entry.detail.tabs.contents')}
+                    </span>
+                  </TabContent>
+                  <TabContent id="reviews">
+                    <span className="text-gray-600 dark:text-gray-300">
+                     {t('entry.detail.tabs.reviews')}
+                    </span>
+                  </TabContent>
+                  <TabContent id="related">
+                    <span className="text-gray-600 dark:text-gray-300">
+                     {t('entry.detail.tabs.related')}
+                    </span>
+                  </TabContent>
+                </Tabs>
+              </TabsComponent>
             </div>
-
           </div>
         )}
       </div>

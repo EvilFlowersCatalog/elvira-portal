@@ -224,6 +224,11 @@ export const en = {
         title: 'Book Detail',
         readMore: 'Read More',
         readLess: 'Read Less',
+        tabs: {
+          contents: 'Contents',
+          reviews: 'Reviews',
+          related: 'Related',
+        }
       },
       wizard: {
         requiredMessages: {
