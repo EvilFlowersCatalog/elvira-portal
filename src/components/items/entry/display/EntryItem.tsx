@@ -28,8 +28,8 @@ export default function EntryItem({ entry, triggerReload }: IEntryItem) {
 
     useEffect(() => {
         getDetails(entry.id).then((details) => {
-            entry.shelf_record_id = details.response.shelf_record_id;
-            setIsOnShelf(details.response.shelf_record_id != null);
+            entry.shelf_record_id = details.shelf_record_id;
+            setIsOnShelf(details.   shelf_record_id != null);
         }).catch(() => { });
     }, [entry]);
 
@@ -82,7 +82,7 @@ export default function EntryItem({ entry, triggerReload }: IEntryItem) {
         }
     };
 
-    return <div className="rounded-lg overflow-hidden relative w-full mb-8 h-68 max-w-[200px]">
+    return <div className="group rounded-lg overflow-hidden relative w-full mb-8 h-68 max-w-[200px] hover:shadow-[0_6px_20px_rgba(0,0,0,0.4)] dark:hover:shadow-strongDarkGray transition-shadow duration-300 ">
         <div className="h-40">
             <img onClick={openEntryDetail}
                 className='w-full h-full object-cover select-none cursor-pointer'
@@ -111,7 +111,7 @@ export default function EntryItem({ entry, triggerReload }: IEntryItem) {
                     </span>
                 ))}
             </div>
-            <h3 onClick={openEntryDetail} className="cursor-pointer font-bold text-secondary dark:text-white text-sm line-clamp-2 overflow-hidden text-ellipsis mb-2">{entry.title}</h3>
+            <h3 onClick={openEntryDetail} className="group-hover:underline transition-udnerline duration-300 cursor-pointer font-bold text-secondary dark:text-white text-sm line-clamp-2 overflow-hidden text-ellipsis mb-2">{entry.title}</h3>
             <p className="text-xs cursor-pointer" onClick={() => {
                 handleParamClick('author', entry.authors[0]?.name + ' ' + entry.authors[0]?.surname);
             }}>

@@ -204,28 +204,27 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
             <div className='p-4 bg-white dark:bg-gray mdlg:overflow-y-auto h-full pb-20 w-full'>
 
               {/* Feeds */}
-              <div className={'mb-6 flex gap-2 w-full'}>
-                {entry.feeds.length === 0 && (
-                  <span className='text-white'>-</span>
-                )}
-                {entry.feeds.map((feed, index) => (
-                  <button
-                    key={index}
-                    className={`cursor-pointer font-semibold px-2 py-1 text-md bg-primaryLight text-primary rounded-lg`}
-                    onClick={() => {
-                      umamiTrack('Entry Detail Feed Button Param', {
-                        feedId: feed.id,
-                        entryId: entryId,
-                      });
-                      handleParamClick('feed-id', feed.id);
-                    }}
-                  >
-                    {feed.title}
-                  </button>
-                ))}
-              </div>
+              {entry.feeds.length > 0 && (
+                <div className={'mb-6 flex gap-2 w-full'}>
+                  {entry.feeds.map((feed, index) => (
+                    <button
+                      key={index}
+                      className={`cursor-pointer font-semibold px-2 py-1 text-md bg-primaryLight text-primary rounded-lg`}
+                      onClick={() => {
+                        umamiTrack('Entry Detail Feed Button Param', {
+                          feedId: feed.id,
+                          entryId: entryId,
+                        });
+                        handleParamClick('feed-id', feed.id);
+                      }}
+                    >
+                      {feed.title}
+                    </button>
+                  ))}
+                </div>
+              )}
 
-              <h1 className='w-full text-secondary dark:text-secondaryLight text-xl font-bold mb-3'>{entry.title}</h1>
+              <h3 className='w-full text-secondary dark:text-secondaryLight text-xl font-bold mb-3'>{entry.title}</h3>
               {entry.authors.length > 0 && (
                 <div className=''>
                   <span className={'text-darkGray dark:text-lightGray text-center font-light text-xl'}>
