@@ -4,7 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import HomeHeader from '../../components/specific-page/home-page/HomeHeader';
-import EntryDetail from '../../components/items/entry/EntryDetail';
+import EntryDetail from '../../components/items/entry/details/EntryDetail';
 import EntryDisplay from '../../components/items/entry/display/EntryDisplay';
 
 const Home = () => {

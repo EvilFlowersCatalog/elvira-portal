@@ -8,7 +8,7 @@ import useAppContext from '../../../hooks/contexts/useAppContext';
 import ScrollUpButton from '../../buttons/ScrollUpButton';
 import ToolsContainer from '../../tools/ToolsContainer';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
-import EntryDetail from '../entry/EntryDetail';
+import EntryDetail from '../entry/details/EntryDetail';
 
 interface IItemContainer {
   children: ReactNode;

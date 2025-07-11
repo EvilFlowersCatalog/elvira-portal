@@ -112,7 +112,8 @@ export const sk = {
         noCite: 'Citácia nie je dostupná.',
         copySuccess: 'Citácia bola skopírovaná do schránky.',
         copyError: 'Nepodarilo sa skopírovať citáciu.',
-      }
+      },
+      shareSuccess: 'Adresa bola skopírovaná.',
     },
 
     // LOGIN PAGE

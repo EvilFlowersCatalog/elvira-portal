@@ -114,7 +114,8 @@ export const en = {
         noCite: 'Citation is not available.',
         copySuccess: 'Citation has been copied to the clipboard.',
         copyError: 'Failed to copy the citation.',
-      }
+      },
+      shareSuccess: 'Address successfully copied.',
     },
 
     // LOGIN PAGE
