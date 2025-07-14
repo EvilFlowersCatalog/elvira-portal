@@ -85,7 +85,7 @@ const Auth = () => {
         <LicenseTerms setOpenLicenseModal={setOpenLicenseModal} />
       )}
       <div className='flex w-full flex-1 flex-col justify-center items-center p-4'>
-        <div className='flex flex-col p-5 h-[500px] w-full md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 bg-zinc-100 dark:bg-darkGray justify-evenly items-center rounded-md'>
+        <div className='flex flex-col p-5 h-[500px] w-full max-w-[700px] bg-zinc-100 dark:bg-darkGray justify-evenly items-center rounded-md'>
           <div className='flex flex-col items-center justify-center gap-2'>
             <img
               className='w-96'
@@ -101,7 +101,7 @@ const Auth = () => {
               </div>
             ) : (
               <form
-                className='flex flex-col gap-4 w-3/4 items-center'
+                className='flex flex-col gap-4 md:w-3/4 items-center'
                 onSubmit={submit}
               >
                 <ElviraInput
@@ -122,7 +122,7 @@ const Auth = () => {
                     className='pr-12'
                   />
                   <button
-                    className='absolute top-[33px] right-4'
+                    className='absolute top-[26px] right-1 p-2'
                     type='button'
                     onClick={() => setShowPassword((prevShow) => !prevShow)}
                   >
