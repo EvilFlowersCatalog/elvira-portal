@@ -7,6 +7,7 @@ import EntryBox from '../../components/items/entry/EntryBox';
 import EntryBoxLoading from '../../components/items/entry/EntryBoxLoading';
 import EntryItem from '../../components/items/entry/display/EntryItem';
 import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper';
+import { useTranslation } from 'react-i18next';
 
 const Library = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -17,6 +18,7 @@ const Library = () => {
   const [entries, setEntries] = useState<IEntry[]>([]);
   const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
 
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const getEntries = useGetEntries();
 
@@ -82,6 +84,7 @@ const Library = () => {
       setLoadingNext={setLoadingNext}
       showLayout
       searchSpecifier={'query'}
+      title={t('navbarMenu.library')}
     >
       <EntriesWrapper>
         {entries.map((entry, index) => (

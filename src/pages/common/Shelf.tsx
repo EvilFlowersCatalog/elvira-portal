@@ -6,6 +6,7 @@ import ItemContainer from '../../components/items/container/ItemContainer';
 import EntryBoxLoading from '../../components/items/entry/EntryBoxLoading';
 import EntryItem from '../../components/items/entry/display/EntryItem';
 import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper';
+import { useTranslation } from 'react-i18next';
 
 const Shelf = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -16,6 +17,7 @@ const Shelf = () => {
   const [entries, setEntries] = useState<IEntry[]>([]);
   const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
 
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const getShelf = useGetShelf();
 
@@ -86,6 +88,7 @@ const Shelf = () => {
       triggerReload={triggerReload}
       showLayout
       searchSpecifier={'query'}
+      title={t('navbarMenu.myShelf')}
     >
      <EntriesWrapper>
         {entries.map((entry, index) => (

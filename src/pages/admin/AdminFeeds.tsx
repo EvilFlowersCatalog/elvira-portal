@@ -7,6 +7,7 @@ import { MdAdd } from 'react-icons/md';
 import AdminFeed from '../../components/items/feeds/admin/AdminFeed';
 import FeedForm from '../../components/items/feeds/admin/FeedForm';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import { useTranslation } from 'react-i18next';
 
 const AdminFeeds = () => {
   const { stuBg, stuBorder, umamiTrack } = useAppContext();
@@ -20,6 +21,7 @@ const AdminFeeds = () => {
   const [showForm, setShowForm] = useState<boolean>(false);
   const [reloadPage, setReloadPage] = useState<boolean>(false);
 
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const getFeeds = useGetFeeds();
 
@@ -79,6 +81,7 @@ const AdminFeeds = () => {
         isEntries={false}
         showEmpty={false}
         searchSpecifier={'title'}
+        title={t('administration.homePage.feeds')}
       >
         <div className='flex flex-row flex-wrap px-2 pb-4'>
           {/* Add button */}

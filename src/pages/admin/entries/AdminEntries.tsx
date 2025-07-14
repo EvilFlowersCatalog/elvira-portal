@@ -8,6 +8,7 @@ import useAppContext from '../../../hooks/contexts/useAppContext';
 import ItemContainer from '../../../components/items/container/ItemContainer';
 import AdminEntry from '../../../components/items/entry/admin/AdminEntry';
 import EntryBoxLoading from '../../../components/items/entry/EntryBoxLoading';
+import { useTranslation } from 'react-i18next';
 
 const AdminEntries = () => {
   const { stuBorder, stuBg, umamiTrack } = useAppContext();
@@ -18,6 +19,7 @@ const AdminEntries = () => {
   const [maxPage, setMaxPage] = useState<number>(0);
   const [entries, setEntries] = useState<IEntry[]>([]);
 
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const getEntries = useGetEntries();
   const navigate = useNavigate();
@@ -78,6 +80,7 @@ const AdminEntries = () => {
       setLoadingNext={setLoadingNext}
       showEmpty={false}
       searchSpecifier={'query'}
+      title={t('administration.homePage.entries')}
     >
       <div className='flex flex-wrap px-3 pb-4'>
         <div

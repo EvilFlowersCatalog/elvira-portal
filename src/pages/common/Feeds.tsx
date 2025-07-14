@@ -5,6 +5,7 @@ import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
 import ItemContainer from '../../components/items/container/ItemContainer';
 import Feed from '../../components/items/feeds/Feed';
 import LoadNext from '../../components/items/loadings/LoadNext';
+import { useTranslation } from 'react-i18next';
 
 const Feeds = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -15,6 +16,7 @@ const Feeds = () => {
   const [feeds, setFeeds] = useState<IFeed[]>([]);
   const [searchParams] = useSearchParams();
 
+  const { t } = useTranslation();
   const getFeeds = useGetFeeds();
 
   useEffect(() => {
@@ -62,6 +64,7 @@ const Feeds = () => {
       setLoadingNext={setLoadingNext}
       isEntries={false}
       searchSpecifier={'title'}
+      title={t('navbarMenu.feeds')}
     >
       <div className='flex flex-wrap px-3 pb-4'>
         {feeds.map((feed, index) => (

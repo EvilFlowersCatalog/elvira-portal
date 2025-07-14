@@ -31,6 +31,9 @@ const AdminHome = () => {
   return (
     <div className='w-full overflow-auto'>
       <Breadcrumb />
+
+      <h1 className='text-secondary dark:text-secondaryLight text-4xl font-extrabold text-left mb-4'>{t('navbarMenu.administration')}</h1>
+
       <div className='flex flex-wrap px-2'>
         {buttonConfig.map(({ icon, textKey, path }, index) => (
           <AdminButton

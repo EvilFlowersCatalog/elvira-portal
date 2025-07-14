@@ -6,6 +6,7 @@ import ItemContainer from '../../components/items/container/ItemContainer';
 import Category from '../../components/items/categories/Category';
 import CategoryForm from '../../components/items/categories/CategoryForm';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import { useTranslation } from 'react-i18next';
 
 const AdminCategories = () => {
   const { stuBorder, stuBg, umamiTrack } = useAppContext();
@@ -20,6 +21,7 @@ const AdminCategories = () => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [reloadPage, setReloadPage] = useState<boolean>(false);
 
+  const { t } = useTranslation();
   const getCategories = useGetCategories();
 
   // When searchParams change or is triggered reload -> Reset page
@@ -73,6 +75,7 @@ const AdminCategories = () => {
         isEntries={false}
         showEmpty={false}
         searchSpecifier={'query'}
+        title={t('administration.homePage.categories')}
       >
         <div className='flex flex-wrap px-3 pb-4'>
           {/* Add button */}

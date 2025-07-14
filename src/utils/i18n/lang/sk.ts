@@ -178,6 +178,7 @@ export const sk = {
       error: 'Nastala chyba pri načítavaní dát',
       scrollUp: 'Posunúť nahor',
       removeFilters: 'Odstrániť filtre',
+      results: 'Výsledky',
     },
 
     // HOME PAGE

@@ -29,6 +29,7 @@ interface IItemContainer {
   setLoadingNext: (loadingNext: boolean) => void;
   searchSpecifier: string;
   showEmpty?: boolean;
+  title: string;
 }
 
 const ItemContainer = ({
@@ -50,6 +51,7 @@ const ItemContainer = ({
   isEntries = true,
   searchSpecifier,
   showEmpty = true,
+  title
 }: IItemContainer) => {
   const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty } =
     useAppContext();
@@ -101,13 +103,18 @@ const ItemContainer = ({
       >
         <Breadcrumb />
 
+        <h1 className='px-4 text-secondary dark:text-secondaryLight text-4xl font-extrabold text-left mb-4'>{title}</h1>
+
         <ToolsContainer param={searchSpecifier} advancedSearch={isEntries} />
+
+        <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-bold text-left mb-3'>{t('page.results')}</h2>
 
         {isLoading && (
           <PageLoading entries={isEntries} showLayout={showLayout} />
         )}
 
         {!isLoading && isError && <PageMessage message={t('page.error')} />}
+
 
         {!isLoading && !isError && (
           <>

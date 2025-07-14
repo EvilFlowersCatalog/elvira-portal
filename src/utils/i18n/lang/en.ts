@@ -181,6 +181,7 @@ export const en = {
       error: 'An error occurred while loading data',
       scrollUp: 'Scroll up',
       removeFilters: 'Remove filters',
+      results: 'Results',
     },
 
     // HOME PAGE
