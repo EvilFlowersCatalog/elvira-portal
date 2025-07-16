@@ -135,14 +135,43 @@ export const en = {
     // ADMINISTRATION PAGE
     administration: {
       homePage: {
-        entries: 'Entries',
-        feeds: 'Feeds',
-        categories: 'Categories',
+        entries: {
+          title: 'Entries',
+          text: 'Manage and view all entries in the system.',
+        },
+        feeds: {
+          title: 'Feeds',
+          text: 'Manage and organize feeds for content distribution.',
+        },
+        categories: {
+          title: 'Categories',
+          text: 'Manage and edit categories for better organization.',
+        },
       },
+      feedsPage: {
+        add: 'Add Feed',
+        edit: 'Edit',
+        delete: 'Delete',
+      },
+      categoriesPage: {
+        info: 'Category Info',
+        term: 'Term',
+        label: 'Label',
+        scheme: 'Scheme',
+        none: 'None',
+        add: 'Add Category',
+        edit: 'Edit',
+        delete: 'Delete'
+      }
+
     },
 
     general: {
-      scrollUp: 'Scroll Up',
+      scrollUp: {
+        object: 'Scroll Up',
+        title: 'Scroll Up',
+        text: 'Scroll to the top of the page.',
+      },
     },
 
     // NOT FOUND PAGE

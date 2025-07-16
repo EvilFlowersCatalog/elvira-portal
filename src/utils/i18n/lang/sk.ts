@@ -133,10 +133,34 @@ export const sk = {
     // ADMINISTRATION PAGE
     administration: {
       homePage: {
-        entries: 'Publikácie',
-        feeds: 'Skupiny',
-        categories: 'Kategórie',
+        entries: {
+          title: 'Publikácie',
+          text: 'Spravujte a zobrazujte všetky publikácie v systéme.',
+        },
+        feeds: {
+          title: 'Skupiny',
+          text: 'Spravujte a organizujte skupiny pre distribúciu obsahu.',
+        },
+        categories: {
+          title: 'Kategórie',
+          text: 'Spravujte a upravujte kategórie pre lepšiu organizáciu.',
+        },
       },
+      feedsPage: {
+        add: 'Pridať Skupinu',
+        edit: 'Upraviť',
+        delete: 'Odstrániť',
+      },
+      categoriesPage: {
+        info: 'Informácie o kategórii',
+        term: 'Termín',
+        label: 'Popis',
+        scheme: 'Schéma',
+        none: 'Žiadna',
+        add: 'Pridať kategóriu',
+        edit: 'Upraviť',
+        delete: 'Odstrániť'
+      }
     },
 
     general: {

@@ -9,6 +9,7 @@ import ItemContainer from '../../../components/items/container/ItemContainer';
 import AdminEntry from '../../../components/items/entry/admin/AdminEntry';
 import EntryBoxLoading from '../../../components/items/entry/EntryBoxLoading';
 import { useTranslation } from 'react-i18next';
+import AdminEntriesTable from '../../../components/items/entry/admin/AdminEntriesTable';
 
 const AdminEntries = () => {
   const { stuBorder, stuBg, umamiTrack } = useAppContext();
@@ -80,23 +81,9 @@ const AdminEntries = () => {
       setLoadingNext={setLoadingNext}
       showEmpty={false}
       searchSpecifier={'query'}
-      title={t('administration.homePage.entries')}
+      title={t('administration.homePage.entries.title')}
     >
-      <div className='flex flex-wrap px-3 pb-4'>
-        <div
-          className={`flex p-2 w-full sm:w-1/2 md:w-1/4 xl:w-1/5 xxl:w-[14.28%]`}
-        >
-          <button
-            className={`flex flex-col justify-center min-h-72 dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 ${stuBorder} ${stuBg} bg-opacity-40 hover:bg-opacity-20 duration-200`}
-            onClick={() => {
-              umamiTrack('Add Entry Button');
-              navigate(NAVIGATION_PATHS.adminAddEntries);
-            }}
-          >
-            <MdAdd size={50} />
-          </button>
-        </div>
-
+     <AdminEntriesTable>
         {entries.map((entry, index) => (
           <AdminEntry key={index} entry={entry} reload={reload} />
         ))}
@@ -104,7 +91,7 @@ const AdminEntries = () => {
           Array.from({ length: 30 }).map((_, index) => (
             <EntryBoxLoading key={index} />
           ))}
-      </div>
+      </AdminEntriesTable>
     </ItemContainer>
   );
 };

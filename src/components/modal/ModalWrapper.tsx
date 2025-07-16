@@ -45,15 +45,15 @@ const ModalWrapper = ({
       tabIndex={-1}
       ref={ref}
     >
-      <div className='w-full h-full p-4 overflow-auto flex'>
+      <div className='w-full h-full p-4 overflow-auto flex items-center justify-center'>
         <div
-          className='flex m-auto flex-col justify-start p-5 bg-zinc-100 dark:bg-darkGray min-w-64 md:min-w-[400px] h-fit w-fit lg:max-w-[40%] lg:min-w-[600px] rounded-md'
+          className='relative flex flex-col w-full max-w-[90%] sm:max-w-[500px] lg:max-w-[700px] bg-lightGray dark:bg-darkGray rounded-xl shadow-xl border border-zinc-300 dark:border-zinc-700 p-6'
           onClick={(e: MouseEvent<HTMLDivElement>) => e.stopPropagation()}
         >
           {/* Header */}
           <div className='flex w-full justify-center items-center gap-5'>
             <span
-              className={`text-xl font-bold ${stuText} uppercase text-center`}
+              className={`text-xl text-primary dark:text-primaryLight font-bold ${stuText} uppercase text-center`}
             >
               {title}
             </span>
@@ -61,10 +61,10 @@ const ModalWrapper = ({
           <div className='py-5 text-center justify-center items-center flex flex-1 flex-col'>
             {children}
           </div>
-          <div className='flex justify-end gap-2'>
+          <div className='flex justify-end items-center gap-4'>
             {yes && <Button onClick={yes} >{buttonLabel}</Button>}
             <button
-              className='hover:underline text-red font-bold'
+              className='hover:underline text-red font-bold py-2'
               onClick={handleClick}
             >
               {t('modal.close')}

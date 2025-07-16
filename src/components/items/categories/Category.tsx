@@ -38,26 +38,30 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
 
   return (
     <>
-      <div className='w-full flex flex-col md:w-1/2 xl:w-1/3 p-2'>
-        <div
-          className={`w-full h-full flex flex-col gap-4 select-none ${stuBg} rounded-t-md p-4`}
-        >
-          <div className='flex text-left gap-2 items-center'>
-            <span className='font-semibold uppercase'>Term:</span>
-            <span>{category.term}</span>
+      <div className='flex flex-col rounded-xl overflow-hidden shadow-md bg-white dark:bg-darkGray border border-zinc-300 dark:border-zinc-700'>
+        <div className={`w-full h-full flex flex-col gap-3 select-none ${stuBg} text-white p-5`}>
+          <h3 className="text-lg font-bold uppercase tracking-wide mb-2">{t('administration.categoriesPage.info')}</h3>
+
+          <div className="flex justify-between items-center border-b border-white/20 pb-2">
+            <span className="text-sm font-medium text-white/80">{t('administration.categoriesPage.term')}</span>
+            <span className="text-sm">{category.term}</span>
           </div>
-          <div className='flex text-left gap-2 items-center'>
-            <span className='font-semibold uppercase'>Label:</span>
-            <span>{category.label ? category.label : '-'}</span>
+
+          <div className="flex justify-between items-center border-b border-white/20 pb-2">
+            <span className="text-sm font-medium text-white/80">{t('administration.categoriesPage.label')}</span>
+            <span className="text-sm">{category.label || <span className="opacity-50 italic">{t('administration.categoriesPage.none')}</span>}</span>
           </div>
-          <div className='flex text-left gap-2 items-center'>
-            <span className='font-semibold uppercase'>Schema:</span>
-            <span>{category.scheme ? category.scheme : '-'}</span>
+
+          <div className="flex justify-between items-center">
+            <span className="text-sm font-medium text-white/80">{t('administration.categoriesPage.scheme')}</span>
+            <span className="text-sm break-all">{category.scheme || <span className="opacity-50 italic">{t('administration.categoriesPage.none')}</span>}</span>
           </div>
         </div>
-        <div className='flex rounded-b-md'>
+
+        {/* Action Buttons */}
+        <div className='grid grid-cols-2'>
           <button
-            className={`flex flex-1 justify-center py-2 bg-green text-white rounded-bl-md ${stuBgHover}`}
+            className={`py-2 flex items-center justify-center text-sm font-medium bg-green text-white hover:brightness-110 transition-colors ${stuBgHover}`}
             onClick={() => {
               umamiTrack('Edit Category Button', {
                 categoryId: category.id,
@@ -66,9 +70,10 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
             }}
           >
             <MdEdit size={20} />
+            {t('administration.categoriesPage.edit')}
           </button>
           <button
-            className={`flex flex-1 justify-center py-2 bg-red text-white rounded-br-md ${stuBgHover}`}
+            className={`py-2 flex items-center justify-center text-sm font-medium bg-red text-white hover:brightness-110 transition-colors ${stuBgHover}`}
             onClick={() => {
               umamiTrack('Delete Category Button', {
                 categoryId: category.id,
@@ -77,6 +82,7 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
             }}
           >
             <MdDelete size={20} />
+            {t('administration.categoriesPage.delete')}
           </button>
         </div>
       </div>

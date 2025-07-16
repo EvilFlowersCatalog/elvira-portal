@@ -9,17 +9,20 @@ import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 const buttonConfig = [
   {
     icon: <FaBook size={25} />,
-    textKey: 'administration.homePage.entries',
+    titleKey: 'administration.homePage.entries.title',
+    textKey: 'administration.homePage.entries.text',
     path: NAVIGATION_PATHS.adminEntries,
   },
   {
     icon: <MdFeed size={25} />,
-    textKey: 'administration.homePage.feeds',
+    titleKey: 'administration.homePage.feeds.title',
+    textKey: 'administration.homePage.feeds.text',
     path: NAVIGATION_PATHS.adminFeeds,
   },
   {
     icon: <MdCategory size={25} />,
-    textKey: 'administration.homePage.categories',
+    titleKey: 'administration.homePage.categories.title',
+    textKey: 'administration.homePage.categories.text',
     path: NAVIGATION_PATHS.adminCategories,
   },
 ];
@@ -32,14 +35,15 @@ const AdminHome = () => {
     <div className='w-full overflow-auto'>
       <Breadcrumb />
 
-      <h1 className='text-secondary dark:text-secondaryLight text-4xl font-extrabold text-left mb-4'>{t('navbarMenu.administration')}</h1>
+      <h1 className='px-4 text-secondary dark:text-secondaryLight text-4xl font-extrabold text-left mb-4'>{t('navbarMenu.administration')}</h1>
 
       <div className='flex flex-wrap px-2'>
-        {buttonConfig.map(({ icon, textKey, path }, index) => (
+        {buttonConfig.map(({ icon, titleKey, textKey, path }, index) => (
           <AdminButton
             key={index}
             icon={icon}
             text={t(textKey)}
+            title={t(titleKey)}
             onClick={(event) => {
               umamiTrack('Admin Home Button', {
                 path,

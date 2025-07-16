@@ -81,19 +81,25 @@ const AdminFeeds = () => {
         isEntries={false}
         showEmpty={false}
         searchSpecifier={'title'}
-        title={t('administration.homePage.feeds')}
+        title={t('administration.homePage.feeds.title')}
       >
-        <div className='flex flex-row flex-wrap px-2 pb-4'>
+        <div className='grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4 p-4'>
           {/* Add button */}
-          <div className={'flex p-2.5 w-full lg:w-1/2 xl:w-1/3 xxl:w-1/4'}>
+          <div className={'w-full'}>
             <button
               onClick={() => {
                 umamiTrack('Add Feed Button');
                 setShowForm(true);
               }}
-              className={`flex flex-col justify-center dark:text-white text-black items-center p-2 w-full rounded-md border-4 border-dashed border-spacing-8 ${stuBorder} ${stuBg} bg-opacity-40 hover:bg-opacity-20 duration-200`}
+              className={`
+        flex flex-col justify-center items-center gap-3 w-full h-full p-8 
+        rounded-xl border-4 border-dashed border-zinc-300 dark:border-zinc-600 
+        text-zinc-500 dark:text-zinc-400 hover:text-primary hover:border-primary 
+        hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-200
+      `}
             >
-              <MdAdd size={50} />
+              <MdAdd size={40} />
+              <span className="font-semibold text-lg">{t('administration.feedsPage.add')}</span>
             </button>
           </div>
           {/* FEEDS */}

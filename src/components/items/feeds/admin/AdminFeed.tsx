@@ -61,85 +61,70 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
 
   return (
     <>
-      <div
-        className={
-          'relative flex flex-col p-2.5 w-full lg:w-1/2 xl:w-1/3 xxl:w-1/4'
-        }
-      >
-        <button
-          className={`p-5 py-10 gap-5 w-full h-full flex text-center justify-between items-center ${stuBg} text-white rounded-t-md ${
-            isNavigationFeed() ? '' : 'cursor-default'
-          }`}
-          onClick={setParent}
-          onMouseEnter={() => setIsHovering(true)}
-          onMouseOut={() => setIsHovering(false)}
-        >
-          <div
-            className={
-              'w-full flex flex-col text-center sm:text-left pointer-events-none'
-            }
+      <div className="w-full sm:w-1/2 xl:w-1/3 2xl:w-1/4">
+        <div className="flex flex-col rounded-xl overflow-hidden shadow-md bg-white dark:bg-darkGray border border-zinc-300 dark:border-zinc-700">
+          <button
+            className={`p-6 gap-4 flex flex-col items-start justify-between text-left h-full transition-colors 
+        ${stuBg} text-white hover:brightness-110 duration-200 
+        ${isNavigationFeed() ? 'cursor-pointer' : 'cursor-default'}`}
+            onClick={setParent}
+            onMouseEnter={() => setIsHovering(true)}
+            onMouseLeave={() => setIsHovering(false)}
           >
-            <span className={'text-xl font-bold'}>{feed.title}</span>
-            <span className={'text-xs'}>{feed.content}</span>
-          </div>
-
-          <div
-            className={
-              'w-20 h-full pointer-events-none flex items-center justify-end'
-            }
-          >
-            {isNavigationFeed() ? (
-              isHovering ? (
-                <FaFolderOpen size={30} />
+            <div className="w-full">
+              <span className="block text-lg font-bold">{feed.title}</span>
+              <span className="block text-sm opacity-80 mt-1">{feed.content}</span>
+            </div>
+            <div className="flex justify-end w-full text-white">
+              {isNavigationFeed() ? (
+                isHovering ? <FaFolderOpen size={26} /> : <FaFolder size={26} />
               ) : (
-                <FaFolder size={30} />
-              )
-            ) : (
-              <MdFeed size={30} />
-            )}
+                <MdFeed size={26} />
+              )}
+            </div>
+          </button>
+
+          {/* Action Buttons */}
+          <div className="grid grid-cols-2">
+            <button
+              className={`py-2 flex items-center justify-center text-sm font-medium bg-green text-white hover:brightness-110 transition-colors ${stuBgHover}`}
+              onClick={() => {
+                umamiTrack('Edit Feed Button', { feedId: feed.id });
+                setShowForm(true);
+              }}
+            >
+              <MdEdit size={18} className="mr-1" /> {t('administration.feedsPage.edit')}
+            </button>
+            <button
+              className={`py-2 flex items-center justify-center text-sm font-medium bg-red text-white hover:brightness-110 transition-colors ${stuBgHover}`}
+              onClick={() => {
+                umamiTrack('Delete Feed Button', { feedId: feed.id });
+                setShowDeleteMenu(true);
+              }}
+            >
+              <MdDelete size={18} className="mr-1" /> {t('administration.feedsPage.delete')}
+            </button>
           </div>
-        </button>
-        <div className='flex'>
-          <button
-            className={`flex flex-1 justify-center py-2 bg-green text-white rounded-bl-md ${stuBgHover}`}
-            onClick={() => {
-              umamiTrack('Edit Feed Button', {
-                feedId: feed.id,
-              });
-              setShowForm(true);
-            }}
-          >
-            <MdEdit size={20} />
-          </button>
-          <button
-            className={`flex flex-1 justify-center py-2 bg-red text-white rounded-br-md ${stuBgHover}`}
-            onClick={() => {
-              umamiTrack('Delete Feed Button', {
-                feedId: feed.id,
-              });
-              setShowDeleteMenu(true);
-            }}
-          >
-            <MdDelete size={20} />
-          </button>
         </div>
+
+        {/* Form + Confirmation */}
+        {showForm && (
+          <FeedForm
+            setOpen={setShowForm}
+            feedId={feed.id}
+            reloadPage={reloadPage}
+            setReloadPage={setReloadPage}
+          />
+        )}
+        {showDeleteMenu && (
+          <ConfirmationDialog
+            name={feed.title}
+            close={setShowDeleteMenu}
+            yes={handleDelete}
+            type="feed"
+          />
+        )}
       </div>
-      {showForm && (
-        <FeedForm
-          setOpen={setShowForm}
-          feedId={feed.id}
-          reloadPage={reloadPage}
-          setReloadPage={setReloadPage}
-        />
-      )}
-      {showDeleteMenu && (
-        <ConfirmationDialog
-          name={feed.title}
-          close={setShowDeleteMenu}
-          yes={handleDelete}
-          type='feed'
-        />
-      )}
     </>
   );
 };

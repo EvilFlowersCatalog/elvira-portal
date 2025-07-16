@@ -46,68 +46,61 @@ const AdminEntry = ({ entry, reload }: IEntryParams) => {
           name={entry.title}
           close={setShowDeleteMenu}
           yes={handleDelete}
-          type='entry'
+          type="entry"
         />
       )}
-      <div
-        className={`flex p-2.5 w-full sm:w-1/2 md:w-1/4 xl:w-1/5 xxl:w-[14.28%]`}
-      >
-        <div
-          className={`flex flex-col justify-center p-2 w-full gap-2 rounded-md text-left bg-zinc-100 dark:bg-darkGray`}
-        >
-          <div
-            className={`w-full ${
-              imageLoaded ? 'h-auto' : 'h-64'
-            } rounded-md border border-gray overflow-hidden`}
-          >
-            <img
-              className={`w-full h-full duration-1000`}
-              src={entry.thumbnail + `?access_token=${auth?.token}`}
-              alt='Entry Thumbnail'
-              onLoad={() => setImageLoaded(true)}
-            />
+
+      <div className="flex flex-col md:flex-row w-full rounded-2xl bg-white dark:bg-darkGray border border-border dark:border-zinc-700 hover:shadow-md transition-shadow duration-150 overflow-hidden">
+        {/* Thumbnail */}
+        <div className="w-full md:w-48 h-48 md:h-24 flex-shrink-0 border-b md:border-b-0 md:border-r border-zinc-200 dark:border-zinc-700 bg-muted flex items-center justify-center">
+          <img
+            className={`w-full h-full object-cover transition-opacity duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+            src={entry.thumbnail + `?access_token=${auth?.token}`}
+            alt="Entry Thumbnail"
+            onLoad={() => setImageLoaded(true)}
+          />
+        </div>
+
+        {/* Main content */}
+        <div className="flex flex-col md:flex-row flex-1 justify-between items-start px-4 py-4 gap-4">
+          <div className="flex flex-col gap-1 w-full md:max-w-[70%]">
+            <div className="text-base md:text-lg font-semibold text-black dark:text-white line-clamp-2">
+              {entry.title}
+            </div>
+            {entry.authors.length > 0 && (
+              <div className="text-sm text-zinc-500 dark:text-zinc-400">
+                {entry.authors[0].name} {entry.authors[0].surname}
+              </div>
+            )}
           </div>
 
-          <span className={'flex-1'}></span>
-
-          <span
-            className={`text-sm font-bold line-clamp-3 md:line-clamp-2 text-black dark:text-white`}
-          >
-            {entry.title}
-          </span>
-          {entry.authors.length > 0 && (
-            <span className={`text-xs text-zinc-400 `}>
-              {entry.authors[0].name} {entry.authors[0].surname}
-            </span>
-          )}
-          <div className='flex gap-2'>
+          {/* Actions */}
+          <div className="flex gap-2 w-full md:w-auto">
             <button
-              className='flex flex-1 justify-center py-2 bg-green text-white rounded-md hover:bg-zinc-100 dark:hover:bg-darkGray hover:text-green duration-200'
+              className="p-2 rounded-full hover:bg-green/20 transition-colors"
               onClick={() => {
-                umamiTrack('Edit Entry Button', {
-                  entryId: entry.id,
-                });
-                navigate(NAVIGATION_PATHS.adminEditEntries + entry.id);
+              umamiTrack('Edit Entry Button', { entryId: entry.id });
+              navigate(NAVIGATION_PATHS.adminEditEntries + entry.id);
               }}
             >
-              <MdEdit size={20} />
+              <MdEdit size={24} className="text-green" />
             </button>
             <button
-              className='flex flex-1 justify-center py-2 bg-red text-white rounded-md hover:bg-zinc-100 dark:hover:bg-darkGray hover:text-red duration-200'
+              className="p-2 rounded-full hover:bg-red/20 transition-colors"
               onClick={() => {
-                umamiTrack('Delete Entry Button', {
-                  entryId: entry.id,
-                });
-                setShowDeleteMenu(true);
+              umamiTrack('Delete Entry Button', { entryId: entry.id });
+              setShowDeleteMenu(true);
               }}
             >
-              <MdDelete size={20} />
+              <MdDelete size={24} className="text-red" />
             </button>
           </div>
         </div>
       </div>
+
     </>
   );
+
 };
 
 export default AdminEntry;
