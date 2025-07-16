@@ -17,6 +17,7 @@ const ConfigItem = ({ name, checked, onChange }: IConfigItemProps) => {
         size='small'
         checked={checked}
         onChange={onChange}
+        id={`checkbox-${name.toLocaleLowerCase()}`}
         sx={{
           color: stuColor,
           '&.Mui-checked': {
@@ -24,7 +25,7 @@ const ConfigItem = ({ name, checked, onChange }: IConfigItemProps) => {
           },
         }}
       />
-      <span className='text-sm'>{name}</span>
+      <label className='text-sm cursor-pointer' htmlFor={`checkbox-${name.toLocaleLowerCase()}`}>{name}</label>
     </div>
   );
 };

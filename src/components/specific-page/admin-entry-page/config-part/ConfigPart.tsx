@@ -11,7 +11,7 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
   return (
     <div className='flex flex-col flex-2 gap-2'>
       <span>{t('entry.wizard.configuration')}</span>
-      <div className='bg-white dark:bg-gray flex-1 rounded-md grid grid-cols-2 xxl:grid-cols-3 gap-4'>
+      <div className='flex-1 rounded-md grid grid-cols-2 xxl:grid-cols-3 gap-1'>
         <ConfigItem
           name={t('entry.wizard.download')}
           checked={entry.config?.evilflowres_metadata_fetch ?? false}

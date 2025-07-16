@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { IEntryAuthor } from '../../../utils/interfaces/author';
 import { IoRemoveCircle } from 'react-icons/io5';
 import useAppContext from '../../../hooks/contexts/useAppContext';
+import { BiTrash } from 'react-icons/bi';
 
 const AuthorsPart = ({ entry, setEntry }: IPartParams) => {
   const { umamiTrack } = useAppContext();
@@ -52,13 +53,10 @@ const AuthorsPart = ({ entry, setEntry }: IPartParams) => {
   };
 
   return (
-    <div className='min-h-64 flex flex-col bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
-      <div
-        className='w-fit mx-auto flex justify-center items-center gap-2 cursor-pointer'
-        onClick={addAuthor}
-      >
-        <span>{t('entry.wizard.authors')}</span>
-        <IoMdAdd size={20} />
+    <div className='flex flex-col bg-slate-200 dark:bg-gray rounded-md p-4 gap-2'>
+      <div className='w-full flex items-center gap-2'>
+        <h2 className='text-lg'>{t('entry.wizard.authors')}</h2>
+        <IoMdAdd onClick={addAuthor} className='ml-auto cursor-pointer' size={20} />
       </div>
       <div className='flex-1 rounded-md'>
         <div className='flex flex-col flex-1 gap-4'>
@@ -78,7 +76,7 @@ const AuthorsPart = ({ entry, setEntry }: IPartParams) => {
                 authors={authors}
                 type='surname'
               />
-              <IoRemoveCircle
+              <BiTrash
                 color='red'
                 size={40}
                 className='cursor-pointer pt-[18px]'

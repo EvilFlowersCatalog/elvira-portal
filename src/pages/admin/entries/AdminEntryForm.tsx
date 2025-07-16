@@ -69,15 +69,8 @@ export default function AdminEntryForm({
                     >
                         <div className='flex flex-col gap-4'>
 
-                            <AdditionalDataPart
-                                entry={entry}
-                                setEntry={setEntry}
-                                stringImage={stringImage}
-                                setStringImage={setStringImage}
-                            />
-
-                            {/* First row, first column */}
-                            <div className='flex flex-col bg-zinc-100 dark:bg-darkGray p-4 rounded-md gap-4'>
+                            {/* First row */}
+                            <div className='flex flex-col bg-slate-200 dark:bg-gray p-4 rounded-md gap-4'>
                                 {/* Identifiers */}
                                 <IdentifiersPart entry={entry} setEntry={setEntry} />
 
@@ -85,12 +78,20 @@ export default function AdminEntryForm({
                                 <ConfigPart entry={entry} setEntry={setEntry} />
                             </div>
 
-                            {/* Third row, first column */}
+                            {/* Second row */}
+                            <AdditionalDataPart
+                                entry={entry}
+                                setEntry={setEntry}
+                                stringImage={stringImage}
+                                setStringImage={setStringImage}
+                            />
+
+                            {/* Third row */}
                             <div className='flex flex-col gap-4'>
                                 {/* Authors */}
                                 <AuthorsPart entry={entry} setEntry={setEntry} />
 
-                                <div className='flex flex-col md:flex-row gap-4'>
+                                <div className='grid lg:grid-cols-2 gap-4'>
                                     {/* Feeds */}
                                     <FeedsPart entry={entry} setEntry={setEntry} />
 

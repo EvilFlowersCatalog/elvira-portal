@@ -87,9 +87,7 @@ const AuthorsAutofill = ({
   return (
     <div className='w-full relative'>
       <ElviraInput
-        className={`bg-white dark:bg-gray ${
-          suggestions.length > 0 ? 'rounded-b-none' : ''
-        }`}
+        className={`bg-white ${suggestions.length > 0 ? 'rounded-b-none' : ''}`}
         type='text'
         value={inputValue}
         onChange={handleInputChange}
@@ -128,14 +126,15 @@ const AuthorsAutofill = ({
       />
       {suggestions.length > 0 && (
         <ul
-          className={`absolute top-[60px] border-2 rounded-md z-40 rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray w-full`}
+         className={`absolute top-[60px] rounded-md rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full
+          shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A]`}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
           {suggestions.map((suggestion, index) => (
             <li
               key={index}
-              className='bg-white dark:bg-gray hover:bg-zinc-200 dark:hover:bg-darkGray'
+              className='bg-white dark:bg-gray hover:bg-zinc-200 dark:hover:bg-darkGray text-left relative z-20'
               onClick={() => handleSuggestionClick(suggestion)}
               style={{ padding: '5px', cursor: 'pointer' }}
             >
