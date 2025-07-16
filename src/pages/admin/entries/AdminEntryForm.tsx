@@ -67,72 +67,65 @@ export default function AdminEntryForm({
                         className='flex flex-col flex-1 p-4 pt-0 gap-4'
                         onSubmit={handleSubmit}
                     >
-                        <div className='flex flex-1 flex-col xl:flex-row gap-4'>
-                            {/* First column */}
-                            <div className='flex flex-col flex-2 gap-4'>
-                                {/* First row, first column */}
-                                <div className='flex flex-col bg-zinc-100 dark:bg-darkGray p-4 rounded-md gap-4'>
-                                    {/* Identifiers */}
-                                    <IdentifiersPart entry={entry} setEntry={setEntry} />
+                        <div className='flex flex-col gap-4'>
 
-                                    {/* Configs */}
-                                    <ConfigPart entry={entry} setEntry={setEntry} />
-                                </div>
+                            <AdditionalDataPart
+                                entry={entry}
+                                setEntry={setEntry}
+                                stringImage={stringImage}
+                                setStringImage={setStringImage}
+                            />
 
-                                {/* Second row, first column */}
-                                <AdditionalDataPart
-                                    entry={entry}
-                                    setEntry={setEntry}
-                                    stringImage={stringImage}
-                                    setStringImage={setStringImage}
-                                />
+                            {/* First row, first column */}
+                            <div className='flex flex-col bg-zinc-100 dark:bg-darkGray p-4 rounded-md gap-4'>
+                                {/* Identifiers */}
+                                <IdentifiersPart entry={entry} setEntry={setEntry} />
 
-                                {/* Third row, first column */}
-                                <div className='flex flex-col gap-4'>
-                                    {/* Authors */}
-                                    <AuthorsPart entry={entry} setEntry={setEntry} />
-
-                                    <div className='flex flex-col md:flex-row gap-4'>
-                                        {/* Feeds */}
-                                        <FeedsPart entry={entry} setEntry={setEntry} />
-
-                                        {/* Categories */}
-                                        <CategoriesPart entry={entry} setEntry={setEntry} />
-                                    </div>
-                                </div>
+                                {/* Configs */}
+                                <ConfigPart entry={entry} setEntry={setEntry} />
                             </div>
 
-                            {/* Second column */}
-                            <div className='flex flex-col flex-3 gap-4'>
-                                {/* FILES */}
-                                {FormType === 'add' ?
-                                    <FileDropzone
-                                        files={files}
-                                        setFiles={setFiles}
-                                        isLoading={isFilesLoading}
-                                        setIsLoading={setIsFilesLoading} />
-                                    : <FileDropzone
-                                        entryId={id!}
-                                        isLoading={isFilesLoading}
-                                        setIsLoading={setIsFilesLoading}
-                                    />}
-                                {/* SUMMARY */}
-                                <div className='flex flex-col flex-1 min-h-60 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
-                                    <span>{t('entry.wizard.summary')}</span>
-                                    <WYSIWYG
-                                        value={entry.summary}
-                                        onChange={handleSummaryChange}
-                                    />
+                            {/* Third row, first column */}
+                            <div className='flex flex-col gap-4'>
+                                {/* Authors */}
+                                <AuthorsPart entry={entry} setEntry={setEntry} />
+
+                                <div className='flex flex-col md:flex-row gap-4'>
+                                    {/* Feeds */}
+                                    <FeedsPart entry={entry} setEntry={setEntry} />
+
+                                    {/* Categories */}
+                                    <CategoriesPart entry={entry} setEntry={setEntry} />
                                 </div>
-                                {/* CITATION */}
-                                <div className='flex flex-col min-h-96 xl:min-h-0 flex-2 bg-zinc-100 dark:bg-darkGray rounded-md p-4 pt-2 gap-2'>
-                                    <ElviraTextarea
-                                        onChange={handleCitationChange}
-                                        className='bg-white dark:bg-gray outline-none resize-none flex-1 p-2 rounded-md'
-                                        placeholder={t('entry.wizard.citation')}
-                                        value={entry.citation ?? ''}
-                                    />
-                                </div>
+                            </div>
+                            {/* FILES */}
+                            {FormType === 'add' ?
+                                <FileDropzone
+                                    files={files}
+                                    setFiles={setFiles}
+                                    isLoading={isFilesLoading}
+                                    setIsLoading={setIsFilesLoading} />
+                                : <FileDropzone
+                                    entryId={id!}
+                                    isLoading={isFilesLoading}
+                                    setIsLoading={setIsFilesLoading}
+                                />}
+                            {/* SUMMARY */}
+                            <div className='flex flex-col flex-1 min-h-60 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
+                                <span>{t('entry.wizard.summary')}</span>
+                                <WYSIWYG
+                                    value={entry.summary}
+                                    onChange={handleSummaryChange}
+                                />
+                            </div>
+                            {/* CITATION */}
+                            <div className='flex flex-col min-h-96 xl:min-h-0 flex-2 bg-zinc-100 dark:bg-darkGray rounded-md p-4 pt-2 gap-2'>
+                                <ElviraTextarea
+                                    onChange={handleCitationChange}
+                                    className='bg-white dark:bg-gray outline-none resize-none flex-1 p-2 rounded-md'
+                                    placeholder={t('entry.wizard.citation')}
+                                    value={entry.citation ?? ''}
+                                />
                             </div>
                         </div>
                         {!isFilesLoading && (
