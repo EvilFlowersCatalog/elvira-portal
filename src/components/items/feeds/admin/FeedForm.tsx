@@ -10,9 +10,10 @@ import useGetFeedDetail from '../../../../hooks/api/feeds/useGetFeedDetail';
 import { toast } from 'react-toastify';
 import ModalWrapper from '../../../../components/modal/ModalWrapper';
 import ElviraInput from '../../../../components/inputs/ElviraInput';
-import ElviraSelect from '../../../inputs/ElviraSelect';
+import ElviraSelect, { MUISelectStyle } from '../../../inputs/ElviraSelect';
 import FeedAutofill from '../../../autofills/FeedAutofill';
 import { MdRemoveCircle } from 'react-icons/md';
+import { MenuItem, Select } from '@mui/material';
 
 interface IFeedForm {
   setOpen: (open: boolean) => void;
@@ -63,9 +64,9 @@ const FeedForm = ({
     }));
   };
   // set kind
-  const handleKindChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  const handleKindChange = (e: any) => {
     setForm((prevForm) => ({
-      ...prevForm, // Preserve existing properties of feedForm
+      ...prevForm,
       kind: e.target.value,
     }));
   };
@@ -203,16 +204,20 @@ const FeedForm = ({
           <label htmlFor='selection-kind' className={`text-sm pl-1 ${stuText}`}>
             {t('modal.feedForm.kind')}
           </label>
-          <ElviraSelect
-            name='selection-kind'
-            value={form.kind}
-            onChange={handleKindChange}
-          >
-            <option value='acquisition'>
-              {t('modal.feedForm.acquistion')}
-            </option>
-            <option value='navigation'>{t('modal.feedForm.navigation')}</option>
-          </ElviraSelect>
+            <Select
+              className="dark:text-white"
+              sx={MUISelectStyle}
+              label={"Selection Kind"}
+              value={form.kind}
+              labelId='selection-kind'
+              id="selectionKind"
+              onChange={handleKindChange}
+              variant="standard"
+            >
+                <MenuItem value="acquisition">{t('modal.feedForm.acquistion')}</MenuItem>
+                <MenuItem value="navigation">{t('modal.feedForm.navigation')}</MenuItem>
+            </Select>
+            
         </div>
         <button ref={buttonRef} type='submit' className='hidden'></button>
       </form>

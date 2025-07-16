@@ -61,7 +61,7 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
 
   return (
     <>
-      <div className="w-full sm:w-1/2 xl:w-1/3 2xl:w-1/4">
+      <div className="w-full">
         <div className="flex flex-col rounded-xl overflow-hidden shadow-md bg-white dark:bg-darkGray border border-zinc-300 dark:border-zinc-700">
           <button
             className={`p-6 gap-4 flex flex-col items-start justify-between text-left h-full transition-colors 

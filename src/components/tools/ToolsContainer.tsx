@@ -11,6 +11,7 @@ import { ICategory } from '../../utils/interfaces/category';
 import Button from '../buttons/Button';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import LanguageAutofill from '../autofills/LanguageAutofill';
+import { MUISelectStyle } from '../inputs/ElviraSelect';
 
 interface IToolsContainerParams {
   advancedSearch?: boolean;
@@ -195,12 +196,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
             )}
             <Select
               className="ml-auto dark:text-white"
-              sx={{
-                '&:before': { borderBottom: '0px' },
-                '&:hover:not(.Mui-disabled):before': { borderBottom: '0px' },
-                '.MuiSelect-icon': { color: 'black' },
-                '.dark & .MuiSelect-icon': { color: 'white' },
-              }}
+              sx={MUISelectStyle}
               label={"Sort By"}
               value={orderBy}
               labelId='sort-label'
