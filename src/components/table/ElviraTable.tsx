@@ -1,5 +1,4 @@
 import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow } from "@mui/material";
-import { useState } from "react";
 
 interface ElviraTableProps {
     title: string;
@@ -7,8 +6,10 @@ interface ElviraTableProps {
         label: string;
         selector: string;
         width?: string;
+        onClick?: (row: any) => void;
+        align?: 'left' | 'center' | 'right';
     }[];
-    data: any[];
+    data: Array<Record<string, string | JSX.Element>>;
     metadata: {
         page: number;
         limit: number;
@@ -25,7 +26,7 @@ export interface ElviraTableFetchFunction {
 
 export default function ElviraTable({ title, header, data, metadata, fetchFunction, rowsPerPageOptions }: ElviraTableProps) {
     function getPagination() {
-        if(!metadata) return null;
+        if (!metadata) return null;
 
         return <TablePagination
             className='dark:text-white'
@@ -61,17 +62,17 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
             }}>
                 <TableContainer>
                     <Table>
-                        <TableHead>
+                        <TableHead className='bg-gray/10 dark:bg-black/70'>
                             <TableCell width="200px">
                                 <h2 className='dark:text-white'>{title}</h2>
                             </TableCell>
                             {getPagination()}
                         </TableHead>
 
-                        <TableHead>
+                        <TableHead className="bg-gray/10 dark:bg-black/70">
                             <TableRow>
                                 {header.map((col, index) => (
-                                    <TableCell key={index} width={col.width}>
+                                    <TableCell key={index} width={col.width} align={col.align}>
                                         <h3 className='dark:text-white'>{col.label}</h3>
                                     </TableCell>
                                 ))}
@@ -82,7 +83,12 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                             {data.map((row, index) => (
                                 <TableRow key={index}>
                                     {header.map((col, colIndex) => (
-                                        <TableCell className="dark:text-white" key={colIndex} style={{ width: col.width }}>
+                                        <TableCell className={`dark:text-white ${col.onClick && 'cursor-pointer'}`} key={colIndex} style={{ width: col.width }}
+                                            onClick={() => {
+                                                col.onClick?.(row);
+                                            }}
+                                            align={col.align}
+                                        >
                                             {row[col.selector]}
                                         </TableCell>
                                     ))}
@@ -90,7 +96,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                             ))}
                         </TableBody>
 
-                        <TableFooter>
+                        <TableFooter className='bg-gray/10 dark:bg-black/70'>
                             {getPagination()}
                         </TableFooter>
                     </Table>
