@@ -11,6 +11,7 @@ interface ElviraTableProps {
         align?: 'left' | 'center' | 'right';
         disableSort?: boolean;
     }[];
+    toolBar?: JSX.Element[];
     data: Array<Record<string, string | JSX.Element>>;
     metadata: {
         page: number;
@@ -28,7 +29,7 @@ export interface ElviraTableFetchFunction {
 
 type Order = 'asc' | 'desc';
 
-export default function ElviraTable({ title, header, data, metadata, fetchFunction, rowsPerPageOptions }: ElviraTableProps) {
+export default function ElviraTable({ title, header, data, metadata, fetchFunction, rowsPerPageOptions, toolBar }: ElviraTableProps) {
     var [sortBy, setSortBy] = useState<{ selector: string, order: Order }>({
         selector: '',
         order: 'asc',
@@ -83,12 +84,20 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                 <TableContainer>
                     <Table>
                         <TableHead className='bg-gray/10 dark:bg-black/70'>
-                            <TableCell width="200px">
-                                <h2 className='dark:text-white'>{title}</h2>
+                            <TableCell width="200px" colSpan={2}>
+                                <div className="flex items-center">
+                                    <h2 className='dark:text-white mr-4'>{title}</h2>
+                                    <div>
+                                        {toolBar && toolBar.map((item, index) => (
+                                            <span key={index} className='mr-2 flex'>
+                                                {item}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
                             </TableCell>
                             {getPagination()}
                         </TableHead>
-
                         <TableHead className="bg-gray/10 dark:bg-black/70">
                             <TableRow>
                                 {header.map((col, index) => (
@@ -128,7 +137,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                         </TableFooter>
                     </Table>
                 </TableContainer>
-            </Paper>
-        </Box>
+            </Paper >
+        </Box >
     );
 }

@@ -23,6 +23,7 @@ export default function Test() {
     const [data, setData] = useState(getData(API_DATA, 0, limit));
 
     function getData(data: any, start: number, end: number, sortBy?: string) {
+        /* to simulate backend */
         var sortedData = data.sort((a: any, b: any) => {
             if (sortBy) {
                 const isAsc = sortBy[0] !== '-';
@@ -33,15 +34,16 @@ export default function Test() {
             return 0;
         });
         sortedData = sortedData.slice(start, end);
+        /* transform data */
         return sortedData.map((item: any, index: number) => ({
             name: <SubText text={item.name} subtext={`Subtext ${index + 1}`} />,
             location: <BubbleText text={item.location} className="bg-secondary" />,
             id: <ActionButton icon={<BiTrash size={20} />} onClick={() => console.log(`Delete ${item.name}`)} />,
         }));
     }
-
+    
+    /* to simulate backend */
     const fetchFunction: ElviraTableFetchFunction = async ({ page, limit, sortBy }) => {
-        console.log('sortBy', sortBy);
         setPage(page);
         setLimit(limit);
         setPagesCount(Math.ceil(API_DATA.length / limit));
