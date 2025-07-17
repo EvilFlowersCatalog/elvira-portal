@@ -54,10 +54,7 @@ const AdminHome = () => {
             }}
           />
         ))}
-      </div>
-
-      <ElviraTableTest />
-    
+      </div>    
     </div>
   );
 };

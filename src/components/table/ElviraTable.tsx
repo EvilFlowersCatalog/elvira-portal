@@ -1,4 +1,5 @@
-import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow } from "@mui/material";
+import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TableSortLabel } from "@mui/material";
+import { useState } from "react";
 
 interface ElviraTableProps {
     title: string;
@@ -8,6 +9,7 @@ interface ElviraTableProps {
         width?: string;
         onClick?: (row: any) => void;
         align?: 'left' | 'center' | 'right';
+        disableSort?: boolean;
     }[];
     data: Array<Record<string, string | JSX.Element>>;
     metadata: {
@@ -21,10 +23,28 @@ interface ElviraTableProps {
 }
 
 export interface ElviraTableFetchFunction {
-    (params: { page: number; limit: number, sortBy?: string }): Promise<void>;
+    (params: { page: number; limit: number, sortBy: string }): Promise<void>;
 }
 
+type Order = 'asc' | 'desc';
+
 export default function ElviraTable({ title, header, data, metadata, fetchFunction, rowsPerPageOptions }: ElviraTableProps) {
+    var [sortBy, setSortBy] = useState<{ selector: string, order: Order }>({
+        selector: header[0].selector,
+        order: 'desc',
+    });
+
+    function getOrderByLabel() {
+        return sortBy.order === 'desc' ? `-${sortBy.selector}` : sortBy.selector;
+    }
+
+    function handleSort(col: { selector: string }) {
+        var newOrder: Order = sortBy.selector === col.selector && sortBy.order === 'asc' ? 'desc' : 'asc';
+        var orderBy = newOrder == 'desc' ? `-${col.selector}` : col.selector;
+        fetchFunction?.({ page: metadata.page, limit: metadata.limit, sortBy: orderBy });
+        setSortBy({ selector: col.selector, order: newOrder });
+    }
+
     function getPagination() {
         if (!metadata) return null;
 
@@ -43,10 +63,10 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
             page={metadata.page}
             rowsPerPage={metadata.limit}
             onPageChange={(e, newPage: number) => {
-                fetchFunction?.({ page: newPage, limit: metadata.limit });
+                fetchFunction?.({ page: newPage, limit: metadata.limit, sortBy: getOrderByLabel() });
             }}
             onRowsPerPageChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                fetchFunction?.({ page: 0, limit: parseInt(e.target.value, 10) });
+                fetchFunction?.({ page: 0, limit: parseInt(e.target.value, 10), sortBy: getOrderByLabel() });
             }}
         />
     }
@@ -73,7 +93,14 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                             <TableRow>
                                 {header.map((col, index) => (
                                     <TableCell key={index} width={col.width} align={col.align}>
-                                        <h3 className='dark:text-white'>{col.label}</h3>
+                                        <TableSortLabel
+                                            disabled={col.disableSort}
+                                            sx={{ '.dark & .MuiSvgIcon-root': { color: 'white' } }}
+                                            active={sortBy?.selector === col.selector}
+                                            direction={sortBy?.selector === col.selector ? sortBy.order : 'asc'}
+                                            onClick={() => handleSort(col)}>
+                                            <h3 className='dark:text-white'>{col.label}</h3>
+                                        </TableSortLabel>
                                     </TableCell>
                                 ))}
                             </TableRow>
