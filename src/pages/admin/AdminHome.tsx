@@ -6,6 +6,7 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 import AdminButton from '../../components/buttons/AdminButton';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 import { H1 } from '../../components/primitives/Heading';
+import ElviraTableTest from '../../components/primitives/ElviraTableTest';
 
 const buttonConfig = [
   {
@@ -54,6 +55,9 @@ const AdminHome = () => {
           />
         ))}
       </div>
+
+      <ElviraTableTest />
+    
     </div>
   );
 };
