@@ -164,9 +164,11 @@ export const en = {
         delete: 'Delete'
       },
       entriesPage: {
-        detail: 'Entry Detail',
+        tableTitle: 'Entries',
+        detail: 'Detail',
         feeds: 'Feed',
-        categories: 'Category'
+        categories: 'Category',
+        actions: 'Actions',
       }
     },
 

@@ -7,8 +7,8 @@ export function SubText({ text, subtext }: { text: string, subtext: string }){
     </>
 }
 
-export function BubbleText({text, className}: { text: string, className?: string }) {
-    return <span className={twMerge('px-2 py-1 bg-primary rounded-lg text-sm text-white cursor-pointer', className)}>{text}</span>;
+export function BubbleText({text, className, onClick}: { text: string, className?: string, onClick?: () => void }) {
+    return <span onClick={onClick} className={twMerge('px-2 py-1 bg-primary rounded-lg text-sm text-white cursor-pointer', className)}>{text}</span>;
 }
 
 export function ActionButton({ icon, onClick }: { icon: JSX.Element, onClick: () => void }) {

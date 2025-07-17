@@ -162,9 +162,11 @@ export const sk = {
         delete: 'Odstrániť'
       },
       entriesPage: {
-        detail: 'Detail publikácie',
+        tableTitle: 'Publikácie',
+        detail: 'Detail',
         feeds: 'Skupina',
         categories: 'Kategória',
+        actions: 'Akcie',
       }
     },
 
