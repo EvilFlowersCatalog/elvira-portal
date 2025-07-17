@@ -42,8 +42,8 @@ const AdminEntries = () => {
           feedId: searchParams.get('feed-id') ?? '',
           categoryId: searchParams.get('category-id') ?? '',
           authors: searchParams.get('author') ?? '',
-          publishedAtGte: searchParams.get('from') ?? '',
-          publishedAtLte: searchParams.get('to') ?? '',
+          publishedAtGte: searchParams.get('publishedAtGte') ?? '',
+          publishedAtLte: searchParams.get('publishedAtLte') ?? '',
           orderBy: searchParams.get('order-by') ?? '',
           query: searchParams.get('query') ?? '',
         });
