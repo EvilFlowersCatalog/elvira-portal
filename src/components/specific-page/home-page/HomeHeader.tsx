@@ -9,7 +9,7 @@ import {
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import ElviraInput from '../../inputs/ElviraInput';
 import Button from '../../buttons/Button';
-import { H1 } from '../../header/Heading';
+import { H1 } from '../../primitives/Heading';
 
 const HomeHeader = () => {
   const { t } = useTranslation();

@@ -9,7 +9,7 @@ import ScrollUpButton from '../../buttons/ScrollUpButton';
 import ToolsContainer from '../../tools/ToolsContainer';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import EntryDetail from '../entry/details/EntryDetail';
-import { H1 } from '../../header/Heading';
+import { H1 } from '../../primitives/Heading';
 
 interface IItemContainer {
   children: ReactNode;

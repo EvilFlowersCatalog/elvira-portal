@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import AdminEntriesTable from '../../../components/items/entry/admin/AdminEntriesTable';
 import ToolsContainer from '../../../components/tools/ToolsContainer';
-import { H1 } from '../../../components/header/Heading';
+import { H1 } from '../../../components/primitives/Heading';
 
 const AdminEntries = () => {
   const { t } = useTranslation();

@@ -5,7 +5,7 @@ import Breadcrumb from '../../components/buttons/Breadcrumb';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import AdminButton from '../../components/buttons/AdminButton';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
-import { H1 } from '../../components/header/Heading';
+import { H1 } from '../../components/primitives/Heading';
 
 const buttonConfig = [
   {
