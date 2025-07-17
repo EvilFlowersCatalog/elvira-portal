@@ -30,8 +30,8 @@ type Order = 'asc' | 'desc';
 
 export default function ElviraTable({ title, header, data, metadata, fetchFunction, rowsPerPageOptions }: ElviraTableProps) {
     var [sortBy, setSortBy] = useState<{ selector: string, order: Order }>({
-        selector: header[0].selector,
-        order: 'desc',
+        selector: '',
+        order: 'asc',
     });
 
     function getOrderByLabel() {
@@ -66,7 +66,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                 fetchFunction?.({ page: newPage, limit: metadata.limit, sortBy: getOrderByLabel() });
             }}
             onRowsPerPageChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                fetchFunction?.({ page: 0, limit: parseInt(e.target.value, 10), sortBy: getOrderByLabel() });
+                fetchFunction?.({ page: 1, limit: parseInt(e.target.value, 10), sortBy: getOrderByLabel() });
             }}
         />
     }
