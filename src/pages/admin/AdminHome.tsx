@@ -37,7 +37,7 @@ const AdminHome = () => {
 
       <h1 className='px-4 text-secondary dark:text-secondaryLight text-4xl font-extrabold text-left mb-4'>{t('navbarMenu.administration')}</h1>
 
-      <div className='flex flex-wrap px-2'>
+      <div className='grid md:grid-cols-3 px-2'>
         {buttonConfig.map(({ icon, titleKey, textKey, path }, index) => (
           <AdminButton
             key={index}

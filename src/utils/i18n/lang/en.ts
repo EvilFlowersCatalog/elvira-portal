@@ -162,8 +162,12 @@ export const en = {
         add: 'Add Category',
         edit: 'Edit',
         delete: 'Delete'
+      },
+      entriesPage: {
+        detail: 'Entry Detail',
+        feeds: 'Feed',
+        categories: 'Category'
       }
-
     },
 
     general: {

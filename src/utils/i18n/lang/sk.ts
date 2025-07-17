@@ -160,6 +160,11 @@ export const sk = {
         add: 'Pridať kategóriu',
         edit: 'Upraviť',
         delete: 'Odstrániť'
+      },
+      entriesPage: {
+        detail: 'Detail publikácie',
+        feeds: 'Skupina',
+        categories: 'Kategória',
       }
     },
 

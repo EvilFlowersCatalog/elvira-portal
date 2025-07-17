@@ -9,7 +9,7 @@ interface CustomInputProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 const AdminButton = forwardRef<HTMLButtonElement, CustomInputProps>(
   ({title, text, icon, ...props }, ref) => {
     return (
-      <div className="w-full p-2 sm:w-1/2 md:w-1/3 xl:w-1/4 2xl:w-1/5">
+      <div className="w-full p-2">
         <button
           ref={ref}
           {...props}
