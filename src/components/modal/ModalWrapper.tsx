@@ -52,11 +52,11 @@ const ModalWrapper = ({
         >
           {/* Header */}
           <div className='flex w-full justify-center items-center gap-5'>
-            <span
+            <h2
               className={`text-xl text-primary dark:text-primaryLight font-bold ${stuText} uppercase text-center`}
             >
               {title}
-            </span>
+            </h2>
           </div>
           <div className='py-5 text-center justify-center items-center flex flex-1 flex-col'>
             {children}

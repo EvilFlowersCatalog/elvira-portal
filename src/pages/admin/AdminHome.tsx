@@ -5,6 +5,7 @@ import Breadcrumb from '../../components/buttons/Breadcrumb';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import AdminButton from '../../components/buttons/AdminButton';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
+import { H1 } from '../../components/header/Heading';
 
 const buttonConfig = [
   {
@@ -35,7 +36,7 @@ const AdminHome = () => {
     <div className='w-full overflow-auto'>
       <Breadcrumb />
 
-      <h1 className='px-4 text-secondary dark:text-secondaryLight text-4xl font-extrabold text-left mb-4'>{t('navbarMenu.administration')}</h1>
+      <H1>{t('navbarMenu.administration')}</H1>
 
       <div className='grid md:grid-cols-3 px-2'>
         {buttonConfig.map(({ icon, titleKey, textKey, path }, index) => (

@@ -9,6 +9,7 @@ import {
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import ElviraInput from '../../inputs/ElviraInput';
 import Button from '../../buttons/Button';
+import { H1 } from '../../header/Heading';
 
 const HomeHeader = () => {
   const { t } = useTranslation();
@@ -41,7 +42,7 @@ const HomeHeader = () => {
   return (
     <div className='flex flex-col gap-5 py-12'>
       <div className='text-center'>
-        <h1 className='text-secondary dark:text-secondaryLight text-4xl font-extrabold text-left mb-4'>{t('about.title')}</h1>
+        <H1 className='px-0'>{t('about.title')}</H1>
       </div>
 
       <div

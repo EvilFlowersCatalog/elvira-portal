@@ -9,6 +9,7 @@ import ScrollUpButton from '../../buttons/ScrollUpButton';
 import ToolsContainer from '../../tools/ToolsContainer';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import EntryDetail from '../entry/details/EntryDetail';
+import { H1 } from '../../header/Heading';
 
 interface IItemContainer {
   children: ReactNode;
@@ -102,9 +103,7 @@ const ItemContainer = ({
         }
       >
         <Breadcrumb />
-
-        <h1 className='px-4 text-secondary dark:text-secondaryLight text-4xl font-extrabold text-left mb-4'>{title}</h1>
-
+        <H1>{title}</H1>
         <ToolsContainer param={searchSpecifier} advancedSearch={isEntries} />
 
         <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-bold text-left mb-4'>{t('page.results')}</h2>
