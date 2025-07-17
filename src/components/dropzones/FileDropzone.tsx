@@ -18,8 +18,8 @@ interface IFilesDropzoneParams {
   setIsLoading: (isLoading: boolean) => void;
   files?: { id: string; relation: string; file: File }[] | null;
   setFiles?:
-    | ((files: { id: string; relation: string; file: File }[]) => void)
-    | null;
+  | ((files: { id: string; relation: string; file: File }[]) => void)
+  | null;
 }
 const FileDropzone = ({
   entryId,
@@ -122,6 +122,7 @@ const FileDropzone = ({
       setFiles!(files!.filter((file) => file.id !== id));
     }
   };
+
   const handleEditFile = (e: MouseEvent<SVGElement>, id: string) => {
     e.stopPropagation();
   };
@@ -141,20 +142,20 @@ const FileDropzone = ({
       ) : (
         <div
           {...getRootProps({
-            className: `relative flex-2 min-h-60 max-h-[500px] overflow-auto rounded-md p-4 border-4 border-dashed duration-200 cursor-pointer ${
-              isDragActive
+            className: `relative flex-2 min-h-60 max-h-[500px] overflow-auto rounded-md p-4 border-4 border-dashed duration-200 cursor-pointer ${isDragActive
                 ? `${stuBg} bg-opacity-50 border-white`
                 : 'bg-slate-200 dark:bg-gray border-transparent'
-            }`,
+              }`,
           })}
         >
+          <h2 className='text-lg'>{t('entry.wizard.files')}</h2>
           <input {...getInputProps()} />
           {isDragActive && (
             <div className='absolute top-0 left-0 w-full h-full flex justify-center items-center'>
               {((files && files?.length !== 0) ||
                 acquisitions.length !== 0) && (
-                <GoPlus color='white' size={100} />
-              )}
+                  <GoPlus color='white' size={100} />
+                )}
             </div>
           )}
           {files === null ? (

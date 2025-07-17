@@ -107,7 +107,7 @@ const ItemContainer = ({
 
         <ToolsContainer param={searchSpecifier} advancedSearch={isEntries} />
 
-        <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-bold text-left mb-3'>{t('page.results')}</h2>
+        <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-bold text-left mb-4'>{t('page.results')}</h2>
 
         {isLoading && (
           <PageLoading entries={isEntries} showLayout={showLayout} />

@@ -18,9 +18,9 @@ const CookiesInformation = () => {
   };
 
   return (
-    <div className='fixed w-full bottom-5 max-md:bottom-0 flex justify-center z-50 pointer-events-none'>
+    <div className='fixed w-full bottom-0 flex justify-center z-50 pointer-events-none'>
       <div
-        className={`flex flex-col max-w-[550px] min-w-64 m-auto bg-white dark:bg-black bg-opacity-90 dark:bg-opacity-90 text-black dark:text-white p-4 gap-5 md:rounded-md pointer-events-auto`}
+        className={`flex flex-col w-full min-w-64 m-auto bg-white dark:bg-black bg-opacity-90 dark:bg-opacity-90 text-black dark:text-white p-4 gap-5 md:rounded-md pointer-events-auto`}
       >
         <div className='flex w-full justify-center items-center'>
           <img

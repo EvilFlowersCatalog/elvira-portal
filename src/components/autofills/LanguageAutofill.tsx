@@ -121,7 +121,7 @@ const LanguageAutofill = ({
       if (lang) setInputValue(getTranslatedName(lang));
       else setInputValue('');
     }
-  }, [entryForm, i18n.language]);
+  }, [languages, entryForm, i18n.language]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

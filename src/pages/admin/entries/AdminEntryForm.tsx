@@ -1,4 +1,3 @@
-import { Button } from "@mui/material";
 import Breadcrumb from "../../../components/buttons/Breadcrumb";
 import FileDropzone from "../../../components/dropzones/FileDropzone";
 import ElviraTextarea from "../../../components/inputs/ElviraTextarea";
@@ -15,6 +14,8 @@ import { IEntryNewForm } from "../../../utils/interfaces/entry";
 import { ContentEditableEvent } from "react-simple-wysiwyg";
 import { ChangeEvent, useState } from "react";
 import { useParams } from "react-router-dom";
+import Button from "../../../components/buttons/Button";
+import { BiSave } from "react-icons/bi";
 
 interface IAdminEntryFormProps {
     FormType: "add" | "edit";
@@ -112,15 +113,16 @@ export default function AdminEntryForm({
                                     setIsLoading={setIsFilesLoading}
                                 />}
                             {/* SUMMARY */}
-                            <div className='flex flex-col flex-1 min-h-60 bg-zinc-100 dark:bg-darkGray rounded-md p-4 gap-2'>
-                                <span>{t('entry.wizard.summary')}</span>
+                            <div className='flex flex-col min-h-60 bg-slate-200 dark:bg-gray rounded-md p-4 gap-2 c'>
+                                <h2 className='text-lg'>{t('entry.wizard.summary')}</h2>
                                 <WYSIWYG
                                     value={entry.summary}
                                     onChange={handleSummaryChange}
                                 />
                             </div>
                             {/* CITATION */}
-                            <div className='flex flex-col min-h-96 xl:min-h-0 flex-2 bg-zinc-100 dark:bg-darkGray rounded-md p-4 pt-2 gap-2'>
+                            <div className='flex flex-col min-h-96 xl:min-h-0 flex-2 bg-slate-200 dark:bg-gray rounded-md p-4 pt-2 gap-2'>
+                                <h2 className='text-lg'>{t('entry.wizard.citation')}</h2>
                                 <ElviraTextarea
                                     onChange={handleCitationChange}
                                     className='bg-white dark:bg-gray outline-none resize-none flex-1 p-2 rounded-md'
@@ -131,9 +133,9 @@ export default function AdminEntryForm({
                         </div>
                         {!isFilesLoading && (
                             <div className='flex justify-center'>
-                                {FormType === 'add' ?
-                                    <Button type='submit'>{t('entry.wizard.upload')}</Button>
-                                    : <Button type='submit'>{t('entry.wizard.edit')}</Button>}
+                                <Button type='submit' className="flex items-center gap-2">
+                                    <BiSave size={18} />
+                                    {FormType === 'add' ? t('entry.wizard.upload') : t('entry.wizard.edit')}</Button>
                             </div>
                         )}
                     </form>

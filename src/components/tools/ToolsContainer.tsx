@@ -180,7 +180,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
         </div>
 
         <div
-          className={`transition-all duration-400 w-full
+          className={`transition-all duration-400 w-full mt-2
             ${showAdvancedSearch ? 'bg-zinc-100 dark:bg-zinc-800 drop-shadow-md rounded-xl p-4 mt-4 mb-4' : 'px-1'}`}>
           <div className='flex flex-wrap gap-3 w-full text-[15px] items-center'>
             {advancedSearch && (
