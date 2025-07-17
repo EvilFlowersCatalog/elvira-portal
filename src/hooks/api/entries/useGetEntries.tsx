@@ -29,8 +29,8 @@ const useGetEntries = () => {
     // Check if there is param, if yes set it
     if (title) params.set('title', title);
     if (feedId) params.set('feed_id', feedId);
-    if (publishedAtGte) params.set('published_at_gte', publishedAtGte);
-    if (publishedAtLte) params.set('published_at_lte', publishedAtLte);
+    if (publishedAtGte) params.set('published_at__gte', publishedAtGte);
+    if (publishedAtLte) params.set('published_at__lte', publishedAtLte);
     if (authors) params.set('author', authors);
     if (categoryId) params.set('category_id', categoryId);
     if (query) params.set('query', query);

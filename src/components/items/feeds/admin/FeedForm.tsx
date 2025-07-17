@@ -10,7 +10,7 @@ import useGetFeedDetail from '../../../../hooks/api/feeds/useGetFeedDetail';
 import { toast } from 'react-toastify';
 import ModalWrapper from '../../../../components/modal/ModalWrapper';
 import ElviraInput from '../../../../components/inputs/ElviraInput';
-import ElviraSelect, { MUISelectStyle } from '../../../inputs/ElviraSelect';
+import { MUISelectStyle } from '../../../inputs/ElviraSelect';
 import FeedAutofill from '../../../autofills/FeedAutofill';
 import { MdRemoveCircle } from 'react-icons/md';
 import { MenuItem, Select } from '@mui/material';
