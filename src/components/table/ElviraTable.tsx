@@ -119,7 +119,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                             {data.map((row, index) => (
                                 <TableRow key={index}>
                                     {header.map((col, colIndex) => (
-                                        <TableCell className={`dark:text-white ${col.onClick && 'cursor-pointer'}`} key={colIndex} style={{ width: col.width }}
+                                        <TableCell className={`dark:text-white ${col.onClick && 'cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800'}`} key={colIndex} style={{ width: col.width }}
                                             onClick={() => {
                                                 col.onClick?.(row);
                                             }}

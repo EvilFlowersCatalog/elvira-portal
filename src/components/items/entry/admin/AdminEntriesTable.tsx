@@ -76,16 +76,22 @@ export default function AdminEntriesTable({ }) {
             id: item.id,
             title: <SubText text={item.title} subtext={`${item.authors[0]?.name} ${item.authors[0]?.name}`} />,
             feeds: <div className='flex flex-wrap gap-x-4 gap-y-2'>{item.feeds?.map(feed => (
-                <BubbleText key={feed.id} text={feed.title} className='bg-blue-500' onClick={() => { }} />
+                <BubbleText key={feed.id} text={feed.title} className='bg-blue-500' onClick={() => {
+                    searchParams.set('feed-id', feed.id);
+                    setSearchParams(searchParams);
+                }} />
             ))}</div>,
             categories: <div className='flex flex-wrap gap-x-4 gap-y-2'>{item.categories?.map(category => (
-                <BubbleText key={category.id} text={category.term} className='bg-secondary' onClick={() => { }} />
+                <BubbleText key={category.id} text={category.term} className='bg-secondary' onClick={() => {
+                    searchParams.set('category-id', category.id);
+                    setSearchParams(searchParams);
+                }} />
             ))}</div>,
             actions: (
                 <div className='flex justify-end gap-2'>
                     <ActionButton icon={<MdEdit size={24} />} onClick={() => {
-                        umamiTrack('Add Entry Button');
-                        navigate(NAVIGATION_PATHS.adminAddEntries);
+                        umamiTrack('Edit Entry Button', { entryId: item.id });
+                        navigate(NAVIGATION_PATHS.adminEditEntries + item.id);
                     }} />
                     <ActionButton icon={<IoMdTrash size={24} />} onClick={() => {
                         setDeleteMenuEntry(item)
@@ -112,7 +118,10 @@ export default function AdminEntriesTable({ }) {
                 navigate(NAVIGATION_PATHS.adminAddEntries);
             }} />
         ]} header={[
-            { label: t('administration.entriesPage.detail'), selector: 'title', width: '700px' },
+            { label: t('administration.entriesPage.detail'), selector: 'title', width: '700px', onClick: (row) => {
+                umamiTrack('Entry Detail Click', { entryId: row.id });
+                navigate(NAVIGATION_PATHS.adminEditEntries + row.id);
+            }},
             { label: t('administration.entriesPage.feeds'), selector: 'feeds', },
             { label: t('administration.entriesPage.categories'), selector: 'categories', },
             { label: t('administration.entriesPage.actions'), selector: 'actions', width: '75px', align: 'right', disableSort: true }
