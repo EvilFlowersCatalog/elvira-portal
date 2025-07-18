@@ -9,21 +9,47 @@ import CategoryAutofill from "../../autofills/CategoryAutofill";
 import FeedAutofill from "../../autofills/FeedAutofill";
 import { Button } from "@mui/material";
 import ElviraNumberInput from "../../inputs/ElviraNumberInput";
+import { IoClose } from "react-icons/io5";
 
 export function AdvancedSearchWrapper({ children }: { children: React.ReactNode }) {
-    const { showAdvancedSearch } = useAppContext();
+    const { showAdvancedSearch, setShowAdvancedSearch } = useAppContext();
     return (
-        <div className='flex'>
+        <div className="flex flex-col md:flex-row">
+            {/* Desktop sidebar */}
             <div
-                className={`bg-slate-200 dark:bg-gray rounded-tr-lg
-                  transition-all duration-500 ease-in-out 
-                  overflow-hidden ${showAdvancedSearch ? 'max-w-[300px] opacity-100 p-3' : 'max-w-0 opacity-0'} w-full
-                  sticky top-0 h-fit z-10`}
+                className={`
+                    hidden md:block
+                    bg-slate-200 dark:bg-gray rounded-tr-lg
+                    transition-all duration-500 ease-in-out 
+                    overflow-hidden ${showAdvancedSearch ? 'max-w-[300px] opacity-100 p-3' : 'max-w-0 opacity-0'} w-full
+                    sticky top-0 h-fit z-10
+                `}
                 style={{
                     maxHeight: '100vh',
                     overflowY: showAdvancedSearch ? 'auto' : 'hidden'
                 }}
             >
+                <AdvancedSearch />
+            </div>
+            {/* Mobile fixed top/bottom sheet */}
+            <div
+                className={`
+                    md:hidden
+                    fixed left-0 right-0
+                    transition-all duration-500 ease-in-out
+                    bg-slate-200 dark:bg-gray
+                    z-30
+                    ${showAdvancedSearch ? 'top-0 bottom-0 opacity-100 p-3' : '-top-full opacity-0 pointer-events-none'}
+                    rounded-none
+                `}
+                style={{
+                    maxHeight: '100vh',
+                    overflowY: showAdvancedSearch ? 'auto' : 'hidden'
+                }}
+            >
+                <div className="pt-4">
+                    <IoClose size={24} className="absolute top-3 right-3 cursor-pointer" onClick={() => setShowAdvancedSearch(false)} />
+                </div>
                 <AdvancedSearch />
             </div>
             <div className="w-full">
