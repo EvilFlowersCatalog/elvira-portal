@@ -18,9 +18,10 @@ interface IToolsContainerParams {
   param: string;
   aiEnabled?: boolean;
   enableSort?: boolean;
+  customFilters?: React.ReactNode;
 }
 
-const ToolsContainer = ({ advancedSearch, aiEnabled = true, enableSort=true, param }: IToolsContainerParams) => {
+const ToolsContainer = ({ advancedSearch, aiEnabled = true, enableSort=true, param, customFilters }: IToolsContainerParams) => {
   const { t } = useTranslation();
   const {
     clearFilters,
@@ -54,8 +55,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, enableSort=true, par
 
   useEffect(() => {
     const query = searchParams.get('query') || '';
-    if (query) setInput(query);
-
+    setInput(query);
   }, [searchParams]);
 
   // Handle input
@@ -128,6 +128,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, enableSort=true, par
                 {t('tools.advancedSearch')}
               </button>
             )}
+            {customFilters}
             {enableSort && (
               <Select
                 className="ml-auto dark:text-white"

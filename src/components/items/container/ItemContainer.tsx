@@ -32,6 +32,7 @@ interface IItemContainer {
   searchSpecifier: string;
   showEmpty?: boolean;
   title: string;
+  customFilters?: ReactNode;
 }
 
 const ItemContainer = ({
@@ -53,7 +54,8 @@ const ItemContainer = ({
   isEntries = true,
   searchSpecifier,
   showEmpty = true,
-  title
+  title,
+  customFilters
 }: IItemContainer) => {
   const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty, showAdvancedSearch } =
     useAppContext();
@@ -105,11 +107,15 @@ const ItemContainer = ({
       >
         <Breadcrumb />
         <H1>{title}</H1>
-        <ToolsContainer param={searchSpecifier} advancedSearch={isEntries} />
+        <ToolsContainer param={searchSpecifier} advancedSearch={isEntries} customFilters={customFilters} />
 
         <AdvancedSearchWrapper>
           <>
-            <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-bold text-left mb-4'>{t('page.results')}</h2>
+            <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-bold text-left mb-4'>
+              {searchParams.get('query')
+                ? t('page.resultsQuery', { x: searchParams.get('query') })
+                : t('page.results')}
+            </h2>
 
             {isLoading && (
               <PageLoading entries={isEntries} showLayout={showLayout} />

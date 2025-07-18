@@ -210,6 +210,7 @@ export const sk = {
       scrollUp: 'Posunúť nahor',
       removeFilters: 'Odstrániť filtre',
       results: 'Výsledky',
+      resultsQuery: 'Výsledky pre vyhľadávanie "{{x}}"',
     },
 
     // HOME PAGE
@@ -227,6 +228,7 @@ export const sk = {
       category: 'Kategória',
       feeds: 'Skupina',
       search: 'Hľadať',
+      searchAll: "Prehľadávať všetko",
       yearFrom: 'Rok od',
       yearTo: 'Rok do',
     },

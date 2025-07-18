@@ -23,8 +23,11 @@ const Feed = ({ feed }: IFeedParams) => {
         feedId: feed.id,
       });
       const params = new URLSearchParams(searchParams);
-      params.delete('title');
+      params.delete('query');
       const previous = params.get('parent-id');
+
+      // TODO: if query was used, parent-id was cleared
+      // so we need to set it back and retrieve all of the previous parents
 
       let path = '';
       if (previous) path = previous + '&' + feed.id;

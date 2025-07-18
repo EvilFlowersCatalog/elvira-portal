@@ -217,6 +217,7 @@ export const en = {
       scrollUp: 'Scroll up',
       removeFilters: 'Remove filters',
       results: 'Results',
+      resultsQuery: 'Results for search "{{x}}"',
     },
 
     // HOME PAGE
@@ -234,6 +235,7 @@ export const en = {
       category: 'Category',
       feeds: 'Feed',
       search: 'Search',
+      searchAll: 'Search All',
       yearFrom: 'Year from',
       yearTo: 'Year to',
     },
