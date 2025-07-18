@@ -132,6 +132,23 @@ const LanguageAutofill = ({
     );
 
     setSuggestions(filteredSuggestions);
+    const matchedLang = languages.find(
+      (language) =>
+      removeDiacritics(getTranslatedName(language).toLowerCase()) === removeDiacritics(value.toLowerCase())
+    );
+    if (matchedLang) {
+      setEntryForm({
+      ...entryForm,
+      language_code: matchedLang.alpha3 ?? matchedLang.alpha2,
+      language_id: matchedLang.id,
+      });
+    } else {
+      setEntryForm({
+      ...entryForm,
+      language_code: '',
+      language_id: '',
+      });
+    }
   };
 
   const handleSuggestionClick = (language: ILanguage) => {
