@@ -14,22 +14,18 @@ import { IoClose } from "react-icons/io5";
 export function AdvancedSearchWrapper({ children }: { children: React.ReactNode }) {
     const { showAdvancedSearch, setShowAdvancedSearch } = useAppContext();
     return (
-        <div className="flex flex-col md:flex-row">
+        <div className="flex flex-col md:flex-row border-t-2 border-gray-300 dark:border-gray-700">
             {/* Desktop sidebar */}
             <div
                 className={`
                     hidden md:block
-                    bg-slate-200 dark:bg-gray rounded-tr-lg
+                    border-r-2 border-gray-300 dark:border-gray-700
                     transition-all duration-500 ease-in-out 
-                    overflow-hidden ${showAdvancedSearch ? 'max-w-[300px] opacity-100 p-3' : 'max-w-0 opacity-0'} w-full
-                    sticky top-0 h-fit z-10
+                    overflow-auto ${showAdvancedSearch ? 'max-w-[300px] opacity-100 p-3' : 'max-w-0 opacity-0'} w-full
+                    sticky top-0 h-fit z-10 pb-20 h-screen
                 `}
-                style={{
-                    maxHeight: '100vh',
-                    overflowY: showAdvancedSearch ? 'auto' : 'hidden'
-                }}
             >
-                <AdvancedSearch />
+                <AdvancedSearch  />
             </div>
             {/* Mobile fixed top/bottom sheet */}
             <div
@@ -40,19 +36,15 @@ export function AdvancedSearchWrapper({ children }: { children: React.ReactNode 
                     bg-slate-200 dark:bg-gray
                     z-30
                     ${showAdvancedSearch ? 'top-0 bottom-0 opacity-100 p-3' : '-top-full opacity-0 pointer-events-none'}
-                    rounded-none
+                    rounded-none h-screen
                 `}
-                style={{
-                    maxHeight: '100vh',
-                    overflowY: showAdvancedSearch ? 'auto' : 'hidden'
-                }}
             >
                 <div className="pt-4">
                     <IoClose size={24} className="absolute top-3 right-3 cursor-pointer" onClick={() => setShowAdvancedSearch(false)} />
                 </div>
                 <AdvancedSearch />
             </div>
-            <div className="w-full">
+            <div className="w-full pt-3">
                 {children}
             </div>
         </div>
@@ -162,25 +154,24 @@ export function AdvancedSearch() {
                 defaultLanguageId={defaultLanguageId}
                 entryForm={language}
                 setEntryForm={setLanguage}
-                setIsSelectionOpen={() => { }}
+                setIsSelectionOpen={()=>{}}
                 isRequired={false} />
             <CategoryAutofill
                 defaultCategoryId={defaultCategoryId}
                 entryForm={activeCategory}
                 setEntryForm={setActiveCategory}
-                setIsSelectionOpen={() => { }}
+                setIsSelectionOpen={() => {}}
                 single
             />
             <FeedAutofill
                 defaultFeedId={defaultFeedId}
                 entryForm={activeFeeds}
                 setEntryForm={setActiveFeeds}
-                setIsSelectionOpen={() => { }}
                 single
             />
         </div>
 
-        <div className='flex justify-end'>
+        <div className='flex justify-end mt-5'>
             <Button type='submit' className='bg-primary dark:bg-primaryLight text-white dark:text-primary'>
                 {t('searchBar.search')}
             </Button>

@@ -83,6 +83,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
             }}>
                 <TableContainer>
                     <Table>
+
                         <TableHead className='bg-gray/10 dark:bg-black/70'>
                             <TableCell width="200px" colSpan={2}>
                                 <div className="flex items-center">
@@ -98,6 +99,8 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                             </TableCell>
                             {getPagination()}
                         </TableHead>
+                    </Table>
+                    <Table>
                         <TableHead className="bg-gray/10 dark:bg-black/70">
                             <TableRow>
                                 {header.map((col, index) => (
