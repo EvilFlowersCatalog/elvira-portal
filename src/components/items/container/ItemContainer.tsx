@@ -10,6 +10,7 @@ import ToolsContainer from '../../tools/ToolsContainer';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import EntryDetail from '../entry/details/EntryDetail';
 import { H1 } from '../../primitives/Heading';
+import { AdvancedSearchWrapper } from './AdvancedSearch';
 
 interface IItemContainer {
   children: ReactNode;
@@ -54,7 +55,7 @@ const ItemContainer = ({
   showEmpty = true,
   title
 }: IItemContainer) => {
-  const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty } =
+  const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty, showAdvancedSearch } =
     useAppContext();
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
@@ -106,50 +107,54 @@ const ItemContainer = ({
         <H1>{title}</H1>
         <ToolsContainer param={searchSpecifier} advancedSearch={isEntries} />
 
-        <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-bold text-left mb-4'>{t('page.results')}</h2>
-
-        {isLoading && (
-          <PageLoading entries={isEntries} showLayout={showLayout} />
-        )}
-
-        {!isLoading && isError && <PageMessage message={t('page.error')} />}
-
-
-        {!isLoading && !isError && (
+        <AdvancedSearchWrapper>
           <>
-            {showEmpty ? (
+            <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-bold text-left mb-4'>{t('page.results')}</h2>
+
+            {isLoading && (
+              <PageLoading entries={isEntries} showLayout={showLayout} />
+            )}
+
+            {!isLoading && isError && <PageMessage message={t('page.error')} />}
+
+
+            {!isLoading && !isError && (
               <>
-                {items.length > 0 && children}
-                {items.length === 0 && (
-                  <PageMessage
-                    message={
-                      isParamsEmpty()
-                        ? location.pathname === NAVIGATION_PATHS.shelf
-                          ? t('page.shelfEmpty')
-                          : t('page.notFound')
-                        : t('page.notFound')
-                    }
-                    clearParams={!isParamsEmpty() ? clearFilters : undefined}
-                  />
-                )}
-              </>
-            ) : (
-              <>
-                {(items.length === 0 && isParamsEmpty()) || items.length > 0 ? (
-                  children
+                {showEmpty ? (
+                  <>
+                    {items.length > 0 && children}
+                    {items.length === 0 && (
+                      <PageMessage
+                        message={
+                          isParamsEmpty()
+                            ? location.pathname === NAVIGATION_PATHS.shelf
+                              ? t('page.shelfEmpty')
+                              : t('page.notFound')
+                            : t('page.notFound')
+                        }
+                        clearParams={!isParamsEmpty() ? clearFilters : undefined}
+                      />
+                    )}
+                  </>
                 ) : (
-                  <PageMessage
-                    message={t('page.notFound')}
-                    clearParams={clearFilters}
-                  />
+                  <>
+                    {(items.length === 0 && isParamsEmpty()) || items.length > 0 ? (
+                      children
+                    ) : (
+                      <PageMessage
+                        message={t('page.notFound')}
+                        clearParams={clearFilters}
+                      />
+                    )}
+                  </>
                 )}
               </>
             )}
+            {showScrollUp && <ScrollUpButton scrollRef={scrollRef} />}
+            {activeEntryId && <EntryDetail triggerReload={triggerReload} />}
           </>
-        )}
+        </AdvancedSearchWrapper >
       </div>
-      {showScrollUp && <ScrollUpButton scrollRef={scrollRef} />}
-      {activeEntryId && <EntryDetail triggerReload={triggerReload} />}
     </>
   );
 };

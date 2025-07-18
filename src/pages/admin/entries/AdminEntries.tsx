@@ -3,6 +3,7 @@ import AdminEntriesTable from '../../../components/items/entry/admin/AdminEntrie
 import ToolsContainer from '../../../components/tools/ToolsContainer';
 import { H1 } from '../../../components/primitives/Heading';
 import Breadcrumb from '../../../components/buttons/Breadcrumb';
+import { AdvancedSearchWrapper } from '../../../components/items/container/AdvancedSearch';
 
 const AdminEntries = () => {
   const { t } = useTranslation();
@@ -10,8 +11,10 @@ const AdminEntries = () => {
     <div className='overflow-auto pb-10'>
       <Breadcrumb />
       <H1>{t('administration.homePage.entries.title')}</H1>
-      <ToolsContainer param={'query'} advancedSearch={true} />
-      <AdminEntriesTable></AdminEntriesTable>
+      <ToolsContainer param={'query'} advancedSearch={true} enableSort={false} />
+      <AdvancedSearchWrapper>
+        <AdminEntriesTable></AdminEntriesTable>
+      </AdvancedSearchWrapper>
     </div>
   );
 };

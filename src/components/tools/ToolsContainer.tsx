@@ -17,79 +17,28 @@ interface IToolsContainerParams {
   advancedSearch?: boolean;
   param: string;
   aiEnabled?: boolean;
+  enableSort?: boolean;
 }
 
-const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsContainerParams) => {
+const ToolsContainer = ({ advancedSearch, aiEnabled = true, enableSort=true, param }: IToolsContainerParams) => {
   const { t } = useTranslation();
   const {
     clearFilters,
     isParamsEmpty,
     umamiTrack,
+    showAdvancedSearch,
+    setShowAdvancedSearch
   } = useAppContext();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const orderBy = searchParams.get('order-by') || '-created_at';
   const [input, setInput] = useState<string>('');
 
-  const [showAdvancedSearch, setShowAdvancedBar] = useState<boolean>(false);
-  const [isSelectionOpen, setIsSelectionOpen] = useState<boolean>(false);
-
-  const [defaultFeedId, setDefaultFeedId] = useState<string>('');
-  const [activeFeeds, setActiveFeeds] = useState<{
-    feeds: { title: string; id: string }[];
-  }>({ feeds: [] });
-  const [defaultCategoryId, setDefaultCategoryId] = useState<string>('');
-  const [activeCategory, setActiveCategory] = useState<{
-    categories: ICategory[];
-  }>({ categories: [] });
-
-  const [defaultLanguageId, setDefaultLanguageId] = useState<string>('');
-  const [language, setLanguage] = useState<{ language_code: '', language_id: '' }>({ language_code: '', language_id: '' });
-
-  const [year, setYear] = useState<number[]>([1950, new Date().getFullYear()]);
-  const [title, setTitle] = useState<string>('');
-  const [author, setAuthor] = useState<string>('');
-  const handleYearChange = (newValue: number | number[]) => {
-    setYear(newValue as number[]);
-  };
-
-  const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
-  };
-
-  const handleAuthorChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setAuthor(e.target.value);
-  };
-
-  const handleLanguageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    // setLanguage(e.target.value);
-  }
-
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (title) searchParams.set('title', title);
-    else searchParams.delete('title');
-
-    if (author) searchParams.set('author', author);
-    else searchParams.delete('author');
-
-    if (activeCategory.categories.length > 0)
-      searchParams.set('category-id', activeCategory.categories[0].id);
-    else searchParams.delete('category-id');
-
-    if (activeFeeds.feeds.length > 0)
-      searchParams.set('feed-id', activeFeeds.feeds[0].id);
-    else searchParams.delete('feed-id');
-
-    searchParams.set('publishedAtGte', year[0].toString());
-    searchParams.set('publishedAtLte', year[1].toString());
-
-    searchParams.set('language-id', language.language_id);
-
-    setSearchParams(searchParams);
-  };
-
+  useEffect(()=>{
+    if(!advancedSearch) {
+      setShowAdvancedSearch(false);
+    }
+  },[advancedSearch])
 
   // submit input (search title)
   const submit = (e: FormEvent<HTMLFormElement>) => {
@@ -105,21 +54,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
 
   useEffect(() => {
     const query = searchParams.get('query') || '';
-    const title = searchParams.get('title') || '';
-    const author = searchParams.get('author') || '';
-    const publishedAtGte = searchParams.get('publishedAtGte') || '1950';
-    const publishedAtLte = searchParams.get('publishedAtLte') || new Date().getFullYear().toString();
-    const feedId = searchParams.get('feed-id') || '';
-    const categoryId = searchParams.get('category-id') || '';
-    const languageId = searchParams.get('language-id') || '';
     if (query) setInput(query);
-    if (title) setTitle(title);
-    if (author) setAuthor(author);
-    setYear([Number(publishedAtGte), Number(publishedAtLte)]);
-
-    if (feedId) setDefaultFeedId(feedId);
-    if (categoryId) setDefaultCategoryId(categoryId);
-    if (languageId) setDefaultLanguageId(languageId);
 
   }, [searchParams]);
 
@@ -180,97 +115,38 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, param }: IToolsConta
         </div>
 
         <div
-          className={`transition-all duration-400 w-full mt-2
-            ${showAdvancedSearch ? 'bg-zinc-100 dark:bg-zinc-800 drop-shadow-md rounded-xl p-4 mt-4 mb-4' : 'px-1'}`}>
+          className={`transition-all duration-400 w-full mt-2`}>
           <div className='flex flex-wrap gap-3 w-full text-[15px] items-center'>
             {advancedSearch && (
               <button
                 className='text-sm hover:underline'
                 onClick={() => {
                   umamiTrack('Advanced Search Button');
-                  setShowAdvancedBar(!showAdvancedSearch);
+                  setShowAdvancedSearch(!showAdvancedSearch)
                 }}
               >
                 {t('tools.advancedSearch')}
               </button>
             )}
-            <Select
-              className="ml-auto dark:text-white"
-              sx={MUISelectStyle}
-              label={"Sort By"}
-              value={orderBy}
-              labelId='sort-label'
-              id="orderBy"
-              onChange={handleSelectChange}
-              variant="standard"
-            >
-              <MenuItem value="created_at">{t('tools.orderBy.createdAtAsc')}</MenuItem>
-              <MenuItem value="-created_at">{t('tools.orderBy.createdAtDesc')}</MenuItem>
-              <MenuItem value="title">{t('tools.orderBy.titleAsc')}</MenuItem>
-              <MenuItem value="-title">{t('tools.orderBy.titleDesc')}</MenuItem>
-              <MenuItem value="popularity">{t('tools.orderBy.popularityAsc')}</MenuItem>
-              <MenuItem value="-popularity">{t('tools.orderBy.popularityDesc')}</MenuItem>
-            </Select>
+            {enableSort && (
+              <Select
+                className="ml-auto dark:text-white"
+                sx={MUISelectStyle}
+                label={"Sort By"}
+                value={orderBy}
+                labelId='sort-label'
+                id="orderBy"
+                onChange={handleSelectChange}
+                variant="standard"
+              >
+                <MenuItem value="created_at">{t('tools.orderBy.createdAtAsc')}</MenuItem>
+                <MenuItem value="-created_at">{t('tools.orderBy.createdAtDesc')}</MenuItem>
+                <MenuItem value="title">{t('tools.orderBy.titleAsc')}</MenuItem>
+                <MenuItem value="-title">{t('tools.orderBy.titleDesc')}</MenuItem>
+                <MenuItem value="popularity">{t('tools.orderBy.popularityAsc')}</MenuItem>
+                <MenuItem value="-popularity">{t('tools.orderBy.popularityDesc')}</MenuItem>
+              </Select>)}
           </div>
-
-          <form
-            onSubmit={onSubmit}
-            className={`transition-all duration-400
-              ${showAdvancedSearch
-                ? isSelectionOpen
-                  ? 'overflow-visible max-h-[500px]'
-                  : 'overflow-hidden max-h-[500px]'
-                : 'overflow-hidden max-h-0'
-              }`}>
-            <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-y-2 gap-x-4 mb-4 mt-1'>
-              <ElviraInput
-                placeholder={t('searchBar.title')}
-                value={title}
-                onChange={handleTitleChange}
-              />
-              <ElviraInput
-                placeholder={t('searchBar.author')}
-                value={author}
-                onChange={handleAuthorChange}
-              />
-              <ElviraInput type='number'
-                placeholder={t('searchBar.yearFrom')}
-                value={year[0]}
-                onChange={(e) => handleYearChange([Number(e.target.value), year[1]])}
-              />
-              <ElviraInput type='number'
-                placeholder={t('searchBar.yearTo')}
-                value={year[1]}
-                onChange={(e) => handleYearChange([year[0], Number(e.target.value)])}
-              />
-              <LanguageAutofill
-                defaultLanguageId={defaultLanguageId}
-                entryForm={language}
-                setEntryForm={setLanguage}
-                setIsSelectionOpen={setIsSelectionOpen} 
-                isRequired={false}/>
-              <CategoryAutofill
-                defaultCategoryId={defaultCategoryId}
-                entryForm={activeCategory}
-                setEntryForm={setActiveCategory}
-                setIsSelectionOpen={setIsSelectionOpen}
-                single
-              />
-              <FeedAutofill
-                defaultFeedId={defaultFeedId}
-                entryForm={activeFeeds}
-                setEntryForm={setActiveFeeds}
-                setIsSelectionOpen={setIsSelectionOpen}
-                single
-              />
-            </div>
-
-            <div className='flex justify-end'>
-              <Button type='submit' className='bg-primary dark:bg-primaryLight text-white dark:text-primary'>
-                {t('searchBar.search')}
-              </Button>
-            </div>
-          </form>
         </div>
       </div>
     </div>

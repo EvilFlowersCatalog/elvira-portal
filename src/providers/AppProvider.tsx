@@ -30,6 +30,8 @@ export interface IAppContext {
   isSmallDevice: boolean;
   showNavbar: boolean;
   setShowNavbar: (showNavbar: boolean) => void;
+  showAdvancedSearch: boolean;
+  setShowAdvancedSearch: (showAdvancedSearch: boolean) => void;
   isParamsEmpty: () => boolean;
   searchParamsEqual: (
     prevSearchParams: URLSearchParams | null,
@@ -83,6 +85,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     cookies[COOKIES_TYPE.LANG_KEY] ?? LANG_TYPE.sk
   );
   const [showNavbar, setShowNavbar] = useState<boolean>(false);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState<boolean>(false);
   const [editingEntryTitle, setEditingEntryTitle] = useState<string>('');
   const [isSmallDevice, setIsSmallDevice] = useState<boolean>(
     window.innerWidth < 959
@@ -391,6 +394,8 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         updateLang,
         showNavbar,
         setShowNavbar,
+        showAdvancedSearch,
+        setShowAdvancedSearch,
         specialNavigation,
         clearFilters,
         isSmallDevice,
