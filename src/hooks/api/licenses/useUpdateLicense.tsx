@@ -13,8 +13,8 @@ const useUpdateLiceseState = () => {
         params.set('state', state);
         params.set('duration', duration);
 
-        const GET_LICENCES_URL = `/readium/v1/licenses/${license_id}`;
-        const { data } = await axios.put<ILicense>(GET_LICENCES_URL, { params });
+        const UPDATE_LICENCES_URL = `/readium/v1/licenses/${license_id}`;
+        const { data } = await axios.put<ILicense>(UPDATE_LICENCES_URL, { params });
 
         return data;
     };

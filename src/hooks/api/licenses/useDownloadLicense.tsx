@@ -5,8 +5,8 @@ const useDownloadLicense = () => {
     const axios = useAxios();
 
     const downloadLicense = async (license_id: string): Promise<void> => {
-        const GET_LICENCES_URL = `/readium/v1/licenses/${license_id}.lcpl`;
-        const { data } = await axios.get(GET_LICENCES_URL, { responseType: 'blob' });
+        const DOWNLOAD_LICENCE_URL = `/readium/v1/licenses/${license_id}.lcpl`;
+        const { data } = await axios.get(DOWNLOAD_LICENCE_URL, { responseType: 'blob' });
 
         // Create a URL for the blob and trigger download
         const url = window.URL.createObjectURL(data);

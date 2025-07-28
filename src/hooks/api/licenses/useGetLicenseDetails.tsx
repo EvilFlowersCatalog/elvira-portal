@@ -9,8 +9,8 @@ const useGetLicenseDetails = () => {
 
         params.set('license_id', license_id);
 
-        const GET_LICENCES_URL = `/readium/v1/licenses/${license_id}`;
-        const { data } = await axios.get<ILicense>(GET_LICENCES_URL, { params });
+        const GET_LICENCE_DETAILS_URL = `/readium/v1/licenses/${license_id}`;
+        const { data } = await axios.get<ILicense>(GET_LICENCE_DETAILS_URL, { params });
 
         return data;
     };
