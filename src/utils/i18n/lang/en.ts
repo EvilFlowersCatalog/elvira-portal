@@ -327,6 +327,7 @@ export const en = {
     license: {
       calendar: {
         title: 'License Calendar',
+        periodBooked: 'The selected period is already booked.',
       }
     },
 

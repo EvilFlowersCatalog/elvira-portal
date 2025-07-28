@@ -1,10 +1,13 @@
-import React from "react";
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isToday } from "date-fns";
+import React, { useEffect } from "react";
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameMonth, isToday, isSameDay, set } from "date-fns";
 import { useTranslation } from "react-i18next";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { twMerge } from "tailwind-merge";
 
 interface CalendarProps {
     bookedDates?: string[];
+    onSelectionChanged?: (start: Date, end: Date) => void;
 }
 
 const translation = {
@@ -18,11 +21,62 @@ const translation = {
     }
 };
 
-const Calendar: React.FC<CalendarProps> = ({ bookedDates = [] }) => {
-    const { i18n } = useTranslation();
+const Calendar: React.FC<CalendarProps> = ({ bookedDates = [], onSelectionChanged }) => {
+    const { i18n, t } = useTranslation();
     const lang = i18n.language as 'en' | 'sk';
     const weekDays = translation[lang].days;
     const [currentDate, setCurrentDate] = React.useState(new Date());
+
+    const [selectionDayStart, setSelectionDayStart] = React.useState<Date | null>(null);
+    const [selectionDayEnd, setSelectionDayEnd] = React.useState<Date | null>(null);
+
+    function validateSelection() {
+        if (!selectionDayStart || !selectionDayEnd || !onSelectionChanged) return;
+
+        const start = selectionDayStart < selectionDayEnd ? selectionDayStart : selectionDayEnd;
+        const end = selectionDayStart > selectionDayEnd ? selectionDayStart : selectionDayEnd;
+        let day = new Date(start);
+        let isPeriodBooked = false;
+
+        while (day <= end) {
+            const formattedDate = format(day, "yyyy-MM-dd");
+            if (bookedDates.includes(formattedDate)) {
+                isPeriodBooked = true;
+                break;
+            }
+            day = addDays(day, 1);
+        }
+
+        if (isPeriodBooked) {
+            setSelectionDayStart(null);
+            setSelectionDayEnd(null);
+            return toast.error(t('license.calendar.periodBooked'));
+        } 
+
+        onSelectionChanged(selectionDayStart, selectionDayEnd);
+    }
+
+    useEffect(() => {
+        if (selectionDayStart && selectionDayEnd) validateSelection();
+    }, [selectionDayStart, selectionDayEnd]);
+
+    function handleDayClick(stringDate: string) {
+        const date = new Date(stringDate);
+        if (selectionDayStart && selectionDayEnd) {
+            setSelectionDayStart(date);
+            setSelectionDayEnd(null);
+        } else if (selectionDayStart) {
+            if (date < selectionDayStart) {
+                setSelectionDayEnd(selectionDayStart);
+                setSelectionDayStart(date);
+            } else {
+                setSelectionDayEnd(date);
+            }
+        } else {
+            setSelectionDayStart(date);
+            setSelectionDayEnd(null);
+        }
+    }
 
     const handlePrevMonth = () => {
         setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
@@ -42,18 +96,32 @@ const Calendar: React.FC<CalendarProps> = ({ bookedDates = [] }) => {
         for (let i = 0; i < 7; i++) {
             const formattedDate = format(day, "yyyy-MM-dd");
             const isBooked = bookedDates.includes(formattedDate);
+            const isPreviousDayBooked = bookedDates.includes(format(addDays(day, -1), "yyyy-MM-dd"));
+            const isNextDayBooked = bookedDates.includes(format(addDays(day, 1), "yyyy-MM-dd"));
             const isCurrentMonth = isSameMonth(day, currentDate);
+
+            const isStartDate = selectionDayStart && isSameDay(day, format(selectionDayStart, "yyyy-MM-dd"));
+            const isWithinSelection = selectionDayStart && selectionDayEnd && day >= selectionDayStart && day < selectionDayEnd;
+            const isEndDate = selectionDayEnd && isSameDay(day, format(selectionDayEnd, "yyyy-MM-dd"));
 
             days.push(
                 <div
                     key={day.getTime()}
-                    className={`group cursor-pointer aspect-square flex items-center justify-center transition-all rounded-lg
-                        ${isBooked ? 'bg-pink-200 dark:bg-pink-800' : 'bg-white dark:bg-zinc-900 hover:bg-primary/80'}
-                        ${isCurrentMonth ? '' : 'opacity-40'}
-                    `}
+                    data-key={formattedDate}
+                    onClick={(event) => {
+                        handleDayClick(event.currentTarget.getAttribute('data-key') || '');
+                    }}
+                    className={twMerge("group cursor-pointer aspect-square flex items-center justify-center transition-all rounded-lg",
+                        `${isBooked ? 'bg-rose-400 dark:bg-pink-800' : 'bg-white dark:bg-zinc-900 hover:bg-primary/80'}`,
+                        `${isCurrentMonth ? '' : 'opacity-40'}`,
+                        `${isBooked && isNextDayBooked ? 'rounded-r-none' : ''}`,
+                        `${isBooked && isPreviousDayBooked ? 'rounded-l-none' : ''}`,
+                        `${isStartDate ? 'bg-blue-200 rounded-r-none' : ''}`,
+                        `${isWithinSelection ? 'bg-blue-200 rounded-none' : ''}`,
+                        `${isEndDate ? 'bg-blue-200 rounded-r-lg' : ''}`)}
                 >
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
-                        ${isToday(day) ? 'bg-blue-500 text-white' : ''}
+                        ${isToday(day) ? 'bg-blue-500 text-white group-hover:bg-white group-hover:text-black' : ''}
                         ${isBooked ? 'text-black dark:text-white' : 'text-black dark:text-white group-hover:text-white'}`}>
                         {format(day, "d")}
                     </div>

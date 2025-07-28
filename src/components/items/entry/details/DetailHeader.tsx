@@ -15,12 +15,14 @@ type DetailHeaderProps = {
     entry: IEntryDetail;
     handleParamClick?: (param: string, value: string) => void;
     umamiTrack?: (event: string, data: Record<string, any>) => void;
+    feedsDisabled?: boolean;
 };
 
 export function DetailHeader({
     entry,
     handleParamClick,
     umamiTrack,
+    feedsDisabled
 }: DetailHeaderProps) {
     const handleFeedClick = (feed: Feed) => {
         umamiTrack?.("Entry Detail Feed Button Param", {
@@ -33,7 +35,7 @@ export function DetailHeader({
     return (
         <div className="w-full">
             {/* Feeds */}
-            {entry.feeds.length > 0 && (
+            {entry.feeds.length > 0 && !feedsDisabled && (
                 <div className="mb-6 flex gap-2 w-full flex-wrap">
                     {entry.feeds.map((feed, index) => (
                         <button

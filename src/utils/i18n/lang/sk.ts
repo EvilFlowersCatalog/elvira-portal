@@ -315,7 +315,8 @@ export const sk = {
 
     license: {
       calendar: {
-        title: 'Licenčný Kalendár',
+        title: 'Kalendár výpožičiek', 
+        periodBooked: 'Vybraný časový úsek je už obsadený.',
 
       },
     },
