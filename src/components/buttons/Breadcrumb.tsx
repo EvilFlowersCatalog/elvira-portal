@@ -28,6 +28,7 @@ const Breadcrumb = () => {
   const breadcrumbsTranslator: { [key: string]: string } = {
     ['library']: isEn() ? 'Library' : 'Knižnica',
     ['feeds']: isEn() ? 'Feeds' : 'Skupiny',
+    ['feedsSearch']: isEn() ? 'Feeds Search' : 'Hľadanie v skupinách',
     ['about']: isEn() ? 'About' : 'O Projekte',
     ['administration']: isEn() ? 'Administration' : 'Administrácia',
     ['shelf']: isEn() ? 'Shelf' : 'Polička',
@@ -58,10 +59,18 @@ const Breadcrumb = () => {
         });
         skip = true;
       } else if (feeds.length > 0 && pathParts[0] == 'library') {
-        newBreadcrumbs.push({
-          path: "/feeds",
-          label: breadcrumbsTranslator['feeds'],
-        });
+        if (searchParams.get('search-all') === 'true') {
+          newBreadcrumbs.push({
+            path: "/feeds",
+            label: breadcrumbsTranslator['feedsSearch'],
+          });
+        }
+        else {
+          newBreadcrumbs.push({
+            path: "/feeds",
+            label: breadcrumbsTranslator['feeds'],
+          });
+        }
       }
       else {
         newBreadcrumbs.push({
@@ -79,7 +88,7 @@ const Breadcrumb = () => {
         const part =
           index !== 0
             ? `?parent-id=${previousFeeds.map((f) => f.id).join('%26')}%26${feed.id}`
-            : `?parent-id=${feed.id}`;          
+            : `?parent-id=${feed.id}`;
         const path = pathParts[0] === 'library' ? "/feeds" + part : `/${pathParts.join('/')}` + part;
 
         if (!feed.id) return;

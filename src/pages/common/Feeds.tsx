@@ -15,11 +15,19 @@ const Feeds = () => {
   const [page, setPage] = useState<number>(0);
   const [maxPage, setMaxPage] = useState<number>(0);
   const [feeds, setFeeds] = useState<IFeed[]>([]);
-  const [searchParams,setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchAll, setSearchAll] = useState<boolean>(false);
 
   const { t } = useTranslation();
   const getFeeds = useGetFeeds();
+
+  useEffect(() => {
+    setSearchParams((prev) => {
+      const newParams = new URLSearchParams(prev);
+      newParams.set('search-all', searchAll.toString());
+      return newParams;
+    });
+  }, [searchAll]);
 
   useEffect(() => {
     if (page === 0) {
@@ -32,11 +40,11 @@ const Feeds = () => {
 
       var title = searchParams.get('query') ?? '';
       var parentId = fp.length > 0 ? fp[fp.length - 1] : 'null'
-      if (searchAll && title.length > 0) { 
+      if (searchAll && title.length > 0) {
         var params = new URLSearchParams(searchParams);
         params.delete('parent-id');
         setSearchParams(params);
-        parentId = ''; 
+        parentId = '';
       }
 
       const options = {

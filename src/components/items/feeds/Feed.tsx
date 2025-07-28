@@ -28,6 +28,7 @@ const Feed = ({ feed }: IFeedParams) => {
 
       // TODO: if query was used, parent-id was cleared
       // so we need to set it back and retrieve all of the previous parents
+      // For now search-all is added (3 files changed)
 
       let path = '';
       if (previous) path = previous + '&' + feed.id;
@@ -40,6 +41,7 @@ const Feed = ({ feed }: IFeedParams) => {
         feedId: feed.id,
       });
       const params = new URLSearchParams();
+      params.set('search-all', searchParams.get('search-all') ?? 'false');
       params.set('parent-id', searchParams.get('parent-id') ?? '');
       params.set('feed-id-step', feed.id);
       navigate({
