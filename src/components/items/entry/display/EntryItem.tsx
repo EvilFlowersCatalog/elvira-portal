@@ -22,15 +22,11 @@ export default function EntryItem({ entry, triggerReload }: IEntryItem) {
     const [searchParams, setSearchParams] = useSearchParams();
     const addToShelf = useAddToShelf();
     const removeFromShelf = useRemoveFromShelf();
-    const getDetails = useGetEntryDetail();
 
     const [isOnShelf, setIsOnShelf] = useState<boolean>(entry.shelf_record_id != null);
 
     useEffect(() => {
-        getDetails(entry.id).then((details) => {
-            entry.shelf_record_id = details.shelf_record_id;
-            setIsOnShelf(details.   shelf_record_id != null);
-        }).catch(() => { });
+        setIsOnShelf(entry.shelf_record_id != null);
     }, [entry]);
 
     const handleBookmarkToggle = async () => {
@@ -39,18 +35,18 @@ export default function EntryItem({ entry, triggerReload }: IEntryItem) {
                 await removeFromShelf(entry.shelf_record_id);
                 triggerReload?.();
                 setIsOnShelf(false);
-                toast.success(t('notifications.myShelf.add.success')); // Notify user
+                toast.success(t('notifications.myShelf.remove.success')); // Notify user
             } catch {
-                toast.error(t('notifications.myShelf.add.error')); // notify user
+                toast.error(t('notifications.myShelf.remove.error')); // notify user
             }
         } else {
             try {
                 const shelfRecordId = await addToShelf(entry.id);
                 setIsOnShelf(true);
                 entry.shelf_record_id = shelfRecordId.response.id;
-                toast.success(t('notifications.myShelf.remove.success')); // Notify user
+                toast.success(t('notifications.myShelf.add.success')); // Notify user
             } catch {
-                toast.error(t('notifications.myShelf.remove.error')); // Notify user
+                toast.error(t('notifications.myShelf.add.error')); // Notify user
             }
         }
     };

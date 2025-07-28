@@ -46,7 +46,11 @@ const Shelf = () => {
 
         setMaxPage(metadata.pages);
         // extract shelf entries
-        const shelfEntries = items.map((item) => item.entry);
+        const shelfEntries = items.map((item) => {
+          var entry = item.entry;
+          entry.shelf_record_id = item.id;
+          return entry;
+        });
 
         const allEntries = [...entries, ...shelfEntries];
         const uniqueShelfEntries = Array.from(
@@ -90,9 +94,9 @@ const Shelf = () => {
       searchSpecifier={'query'}
       title={t('navbarMenu.myShelf')}
     >
-     <EntriesWrapper>
+      <EntriesWrapper>
         {entries.map((entry, index) => (
-          <EntryItem key={entry.id} entry={entry} triggerReload={triggerReload}/>
+          <EntryItem key={entry.id} entry={entry} triggerReload={triggerReload} />
         ))}
         {loadingNext &&
           Array.from({ length: 30 }).map((_, index) => (
