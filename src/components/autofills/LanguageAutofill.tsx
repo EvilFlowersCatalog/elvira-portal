@@ -35,7 +35,7 @@ const LanguageAutofill = ({
     if (defaultLanguageCode) {
       const lang = getLanguage(defaultLanguageCode)
       if (!lang) return;
-      setInputValue(lang.name.en);
+      setInputValue(lang.name[i18n.language as AcceptedLanguage]);
     }
   }, [defaultLanguageCode])
 
