@@ -34,7 +34,7 @@ export default function LicenseCalendar({ }: {}) {
             isOpen={!!entryId}
             zIndex={50}
         >
-            <div className="pd-2 lg:p-8 overflow-auto">
+            <div className="p-2 lg:p-8 overflow-auto grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
                 <div className="flex mb-4 px-4 pt-2">
                     <h2 className="text-lg font-bold">Entry details</h2>
                 </div>
