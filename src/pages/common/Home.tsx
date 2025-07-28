@@ -6,6 +6,7 @@ import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import HomeHeader from '../../components/specific-page/home-page/HomeHeader';
 import EntryDetail from '../../components/items/entry/details/EntryDetail';
 import EntryDisplay from '../../components/items/entry/display/EntryDisplay';
+import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
 
 const Home = () => {
   const { t } = useTranslation();
@@ -84,6 +85,7 @@ const Home = () => {
         />
       </div>
       {activeEntryId && <EntryDetail />}
+      <LicenseCalendar />
     </>
   );
 };

@@ -324,6 +324,12 @@ export const en = {
       },
     },
 
+    license: {
+      calendar: {
+        title: 'License Calendar',
+      }
+    },
+
     dropzone: {
       errorMessage: {
         image: 'Image was bigger than max size (5 MB).',

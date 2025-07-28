@@ -22,6 +22,7 @@ import { DetailHeader } from './DetailHeader';
 import { ActionButtonStyle, ActionsButton, ActionsWrapper } from './DetailActions';
 import { AcceptedLanguage, getLanguage } from '../../../../hooks/api/languages/languages';
 import AcquisitionsButton from '../../../buttons/AcqusitionsButton';
+import Modal from '../../../dialogs/Modal';
 
 interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
@@ -119,7 +120,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   };
 
   const share = () => {
-    
+
     if (navigator.share) {
       navigator.share({
         title: entry?.title || '',
@@ -156,144 +157,134 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   }, [entryId, update]);
 
   return (
-    <div className='fixed top-0 right-0 z-50 h-full w-full bg-black bg-opacity-60 flex items-center justify-center'>
-      <div className='absolute bg-white dark:bg-gray max-w-6xl rounded-xl w-full h-full max-h-[90vh] mdlg:overflow-hidden overflow-auto rounded-md shadow-lg flex flex-col'>
-        <div className='w-full pl-8 pr-4 py-2 flex items-center border-b-[1px] border-lightGray dark:border-darkGray'>
-          <h2 className='text-secondary dark:text-secondaryLight text-lg font-bold'>
-            {t('entry.detail.title')}
-          </h2>
-          <button
-            className={`text-black dark:text-white p-0 ml-auto`}
-            onClick={() => {
-              umamiTrack('Close Entry Detail Button');
-              searchParams.delete('entry-detail-id');
-              setSearchParams(searchParams);
-            }}
-          >
-            <RiCloseLine size={32} />
-          </button>
+    <Modal title={t('entry.detail.title')}
+      onClose={() => {
+        umamiTrack('Close Entry Detail Button');
+        searchParams.delete('entry-detail-id');
+        setSearchParams(searchParams);
+      }}
+      isOpen={true}
+      zIndex={50}
+    >
+      {!entry ? (
+        <div className={'flex justify-center h-full items-center'}>
+          <CircleLoader color={stuColor} size={50} />
         </div>
-        {!entry ? (
-          <div className={'flex justify-center h-full items-center'}>
-            <CircleLoader color={stuColor} size={50} />
-          </div>
-        ) : (
-          <div className={'flex h-full flex-col mdlg:flex-row'}>
-            <div className='p-8 bg-lightGray dark:bg-darkGray h-full min-w-[350px] flex flex-col'>
-              <div className={`w-full flex justify-center border rounded-md flex-shrink overflow-hidden h-full`}>
-                <img className={'w-full h-full object-cover'}
-                  src={entry.thumbnail + `?access_token=${auth?.token}`}
-                  alt='Entry Thumbnail'
-                  onLoad={() => setImageLoaded(true)}
-                />
-              </div>
+      ) : (
+        <div className={'flex h-full flex-col mdlg:flex-row'}>
+          <div className='p-8 bg-lightGray dark:bg-darkGray h-full min-w-[350px] flex flex-col'>
+            <div className={`w-full flex justify-center border rounded-md flex-shrink overflow-hidden h-full`}>
+              <img className={'w-full h-full object-cover'}
+                src={entry.thumbnail + `?access_token=${auth?.token}`}
+                alt='Entry Thumbnail'
+                onLoad={() => setImageLoaded(true)}
+              />
+            </div>
 
-              <ActionsWrapper>
-                <AcquisitionsButton acquisitions={entry.acquisitions} entry={entry} />
-                <ShelfButton
-                  isLoading={isLoading}
-                  entryId={entryId!}
-                  handleAdd={handleAdd}
-                  handleRemove={handleRemove}
-                  shelfId={entry.shelf_record_id}
-                >
-                  <ActionsButton>
-                    {entry.shelf_record_id ?
-                      <><RiBookmarkFill className='fill-primary dark:fill-primaryLight' size={24} />{t('entry.detail.remove')}</>
-                      : <><RiBookmarkLine size={24} />{t('entry.detail.add')} </>}
-                  </ActionsButton>
-                </ShelfButton>
-                {entry.citation && (
-                  <ActionsButton onClick={copyCite}>
-                    <RiChatQuoteLine size={24} />{t('entry.detail.cite')}
-                  </ActionsButton>
-                )}
-                <ActionsButton onClick={share}>
-                  <RiShareLine size={24} />{t('entry.detail.share')}
+            <ActionsWrapper>
+              <AcquisitionsButton acquisitions={entry.acquisitions} entry={entry} />
+              <ShelfButton
+                isLoading={isLoading}
+                entryId={entryId!}
+                handleAdd={handleAdd}
+                handleRemove={handleRemove}
+                shelfId={entry.shelf_record_id}
+              >
+                <ActionsButton>
+                  {entry.shelf_record_id ?
+                    <><RiBookmarkFill className='fill-primary dark:fill-primaryLight' size={24} />{t('entry.detail.remove')}</>
+                    : <><RiBookmarkLine size={24} />{t('entry.detail.add')} </>}
                 </ActionsButton>
-              </ActionsWrapper>
-            </div>
-
-            <div className='p-4 bg-white dark:bg-gray mdlg:overflow-y-auto h-full pb-20 w-full'>
-              <DetailHeader
-                entry={entry}
-                handleParamClick={handleParamClick}
-                umamiTrack={umamiTrack}
-              />
-
-              <StatGroup>
-                <StatItem value={999} label={t('entry.detail.pages')} />
-                <StatItem value={9.9} label={t('entry.detail.rating')} />
-                <StatItem value={entry.popularity} label={t('entry.detail.views')} />
-              </StatGroup>
-
-              {/* Summary */}
-              <SummaryText
-                html={entry.summary}
-                readMoreText={t('entry.detail.readMore')}
-                readLessText={t('entry.detail.readLess')}
-              />
-
-              {/* Info Grid */}
-              <InfoGrid>
-                <InfoItem label={t('entry.detail.publisher')}>{entry.publisher ?? '-'}</InfoItem>
-                <InfoItem label={t('entry.detail.publishDate')}>{entry.published_at ? new Date(entry.published_at).toLocaleDateString('sk-SK', { year: 'numeric', }) : '-'}</InfoItem>
-                <InfoItem label={t('entry.detail.lang')}>{getLanguage(entry.language?.alpha2 || '')?.name[i18n.language as AcceptedLanguage]}</InfoItem>
-
-                <InfoItemCustom label={t('entry.detail.categories')}>
-                  <div className="flex flex-col gap-1">
-                    {entry.categories.length === 0 ? (
-                      <span className="text-secondary dark:text-secondaryLight">-</span>
-                    ) : (
-                      entry.categories.map((category, index) => (
-                        <span
-                          key={index}
-                          className="text-secondary dark:text-secondaryLight font-extrabold cursor-pointer"
-                          onClick={() => {
-                            umamiTrack('Entry Detail Category Button Param', {
-                              feedId: category.id,
-                              entryId: entryId,
-                            });
-                            handleParamClick('category-id', category.id);
-                          }}
-                        >{category.term}</span>
-                      ))
-                    )}
-                  </div>
-                </InfoItemCustom>
-              </InfoGrid>
-
-              {/* TABS */}
-              <TabsComponent defaultTab='contents'>
-                <TabsHeader>
-                  <TabTitle id="contents">{t('entry.detail.tabs.contents')}</TabTitle>
-                  <TabTitle id="reviews">{t('entry.detail.tabs.reviews')}</TabTitle>
-                  <TabTitle id="related">{t('entry.detail.tabs.related')}</TabTitle>
-                </TabsHeader>
-                <Tabs>
-                  <TabContent id="contents">
-                    <span className="text-gray-600 dark:text-gray-300">
-                      {t('entry.detail.tabs.contents')}
-                    </span>
-                  </TabContent>
-                  <TabContent id="reviews">
-                    <span className="text-gray-600 dark:text-gray-300">
-                      {t('entry.detail.tabs.reviews')}
-                    </span>
-                  </TabContent>
-                  <TabContent id="related">
-                    <span className="text-gray-600 dark:text-gray-300">
-                      {t('entry.detail.tabs.related')}
-                    </span>
-                  </TabContent>
-                </Tabs>
-              </TabsComponent>
-            </div>
+              </ShelfButton>
+              {entry.citation && (
+                <ActionsButton onClick={copyCite}>
+                  <RiChatQuoteLine size={24} />{t('entry.detail.cite')}
+                </ActionsButton>
+              )}
+              <ActionsButton onClick={share}>
+                <RiShareLine size={24} />{t('entry.detail.share')}
+              </ActionsButton>
+            </ActionsWrapper>
           </div>
-        )}
-      </div>
 
-    </div>
+          <div className='p-4 bg-white dark:bg-gray mdlg:overflow-y-auto h-full pb-20 w-full'>
+            <DetailHeader
+              entry={entry}
+              handleParamClick={handleParamClick}
+              umamiTrack={umamiTrack}
+            />
+
+            <StatGroup>
+              <StatItem value={999} label={t('entry.detail.pages')} />
+              <StatItem value={9.9} label={t('entry.detail.rating')} />
+              <StatItem value={entry.popularity} label={t('entry.detail.views')} />
+            </StatGroup>
+
+            {/* Summary */}
+            <SummaryText
+              html={entry.summary}
+              readMoreText={t('entry.detail.readMore')}
+              readLessText={t('entry.detail.readLess')}
+            />
+
+            {/* Info Grid */}
+            <InfoGrid>
+              <InfoItem label={t('entry.detail.publisher')}>{entry.publisher ?? '-'}</InfoItem>
+              <InfoItem label={t('entry.detail.publishDate')}>{entry.published_at ? new Date(entry.published_at).toLocaleDateString('sk-SK', { year: 'numeric', }) : '-'}</InfoItem>
+              <InfoItem label={t('entry.detail.lang')}>{getLanguage(entry.language?.alpha2 || '')?.name[i18n.language as AcceptedLanguage]}</InfoItem>
+
+              <InfoItemCustom label={t('entry.detail.categories')}>
+                <div className="flex flex-col gap-1">
+                  {entry.categories.length === 0 ? (
+                    <span className="text-secondary dark:text-secondaryLight">-</span>
+                  ) : (
+                    entry.categories.map((category, index) => (
+                      <span
+                        key={index}
+                        className="text-secondary dark:text-secondaryLight font-extrabold cursor-pointer"
+                        onClick={() => {
+                          umamiTrack('Entry Detail Category Button Param', {
+                            feedId: category.id,
+                            entryId: entryId,
+                          });
+                          handleParamClick('category-id', category.id);
+                        }}
+                      >{category.term}</span>
+                    ))
+                  )}
+                </div>
+              </InfoItemCustom>
+            </InfoGrid>
+
+            {/* TABS */}
+            <TabsComponent defaultTab='contents'>
+              <TabsHeader>
+                <TabTitle id="contents">{t('entry.detail.tabs.contents')}</TabTitle>
+                <TabTitle id="reviews">{t('entry.detail.tabs.reviews')}</TabTitle>
+                <TabTitle id="related">{t('entry.detail.tabs.related')}</TabTitle>
+              </TabsHeader>
+              <Tabs>
+                <TabContent id="contents">
+                  <span className="text-gray-600 dark:text-gray-300">
+                    {t('entry.detail.tabs.contents')}
+                  </span>
+                </TabContent>
+                <TabContent id="reviews">
+                  <span className="text-gray-600 dark:text-gray-300">
+                    {t('entry.detail.tabs.reviews')}
+                  </span>
+                </TabContent>
+                <TabContent id="related">
+                  <span className="text-gray-600 dark:text-gray-300">
+                    {t('entry.detail.tabs.related')}
+                  </span>
+                </TabContent>
+              </Tabs>
+            </TabsComponent>
+          </div>
+        </div>
+      )}
+    </Modal >
   );
 };
 

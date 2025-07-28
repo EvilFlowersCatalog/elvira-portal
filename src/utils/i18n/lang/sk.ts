@@ -1,3 +1,5 @@
+import { ca } from "date-fns/locale";
+
 export const sk = {
   translation: {
     // NOTIFICATIONS
@@ -308,6 +310,13 @@ export const sk = {
         share: 'Zdielanie',
         print: 'Tlač',
         annotations: 'Anotácie',
+      },
+    },
+
+    license: {
+      calendar: {
+        title: 'Licenčný Kalendár',
+
       },
     },
 

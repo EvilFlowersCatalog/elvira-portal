@@ -88,7 +88,11 @@ const Feeds = () => {
       title={t('navbarMenu.feeds')}
       customFilters={
         <div className="flex items-center gap-2">
-          <FormControlLabel control={<Checkbox onClick={() => {
+          <FormControlLabel control={<Checkbox sx={{
+            '.dark & .MuiSvgIcon-root': {
+              color: 'white',
+            }
+          }} onClick={() => {
             setSearchAll(true);
           }} />} label={t('searchBar.searchAll')} />
         </div>
