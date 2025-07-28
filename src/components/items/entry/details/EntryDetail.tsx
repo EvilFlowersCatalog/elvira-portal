@@ -14,13 +14,13 @@ import { NAVIGATION_PATHS } from '../../../../utils/interfaces/general/general';
 import ShelfButton from '../../../buttons/ShelfButton';
 import PDFButtons from '../../../buttons/PDFButtons';
 import { BiBookOpen } from 'react-icons/bi';
-import { AcceptedLanguage, languagesDictionary, TranslatedLanguage } from '../../../autofills/LanguageAutofill';
 import { TabContent, Tabs, TabsComponent, TabsHeader, TabTitle } from './EntryDetailTabs';
 import { InfoGrid, InfoItem, InfoItemCustom } from './EntryGrid';
 import { SummaryText } from './SummaryText';
 import { StatGroup, StatItem } from './StatGroup';
 import { DetailHeader } from './DetailHeader';
 import { ActionButtonStyle, ActionsButton, ActionsWrapper } from './DetailActions';
+import { AcceptedLanguage, getLanguage } from '../../../../hooks/api/languages/languages';
 
 interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
@@ -234,7 +234,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               <InfoGrid>
                 <InfoItem label={t('entry.detail.publisher')}>{entry.publisher ?? '-'}</InfoItem>
                 <InfoItem label={t('entry.detail.publishDate')}>{entry.published_at ? new Date(entry.published_at).toLocaleDateString('sk-SK', { year: 'numeric', }) : '-'}</InfoItem>
-                <InfoItem label={t('entry.detail.lang')}>{languagesDictionary(i18n.language as AcceptedLanguage, entry.language?.alpha2 as TranslatedLanguage)}</InfoItem>
+                <InfoItem label={t('entry.detail.lang')}>{getLanguage(entry.language?.alpha2 || '')?.name[i18n.language as AcceptedLanguage]}</InfoItem>
 
                 <InfoItemCustom label={t('entry.detail.categories')}>
                   <div className="flex flex-col gap-1">

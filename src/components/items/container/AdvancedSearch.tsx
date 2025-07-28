@@ -55,14 +55,14 @@ export function AdvancedSearch() {
     const [searchParams, setSearchParams] = useSearchParams();
     const { t } = useTranslation();
 
-    const [defaultLanguageId, setDefaultLanguageId] = useState<string>('');
+    const [defaultLanguageCode, setDefaultLanguageCode] = useState<string>('');
     const [defaultCategoryId, setDefaultCategoryId] = useState<string>('');
     const [defaultFeedId, setDefaultFeedId] = useState<string>('');
 
     const [title, setTitle] = useState<string>('');
     const [author, setAuthor] = useState<string>('');
     const [year, setYear] = useState<string[]>(["", ""]);
-    const [language, setLanguage] = useState<{ language_code: '', language_id: '' }>({ language_code: '', language_id: '' });
+    const [languageCode, setLanguageCode] = useState<string>('');
 
     const [activeFeeds, setActiveFeeds] = useState<{
         feeds: { title: string; id: string }[];
@@ -92,7 +92,7 @@ export function AdvancedSearch() {
         searchParams.set('publishedAtGte', year[0].toString());
         searchParams.set('publishedAtLte', year[1].toString());
 
-        searchParams.set('language-id', language.language_id);
+        searchParams.set('language-code', languageCode);
 
         setSearchParams(searchParams);
     };
@@ -104,14 +104,14 @@ export function AdvancedSearch() {
         const publishedAtLte = searchParams.get('publishedAtLte') || '';
         const feedId = searchParams.get('feed-id') || '';
         const categoryId = searchParams.get('category-id') || '';
-        const languageId = searchParams.get('language-id') || '';
+        const languageCode = searchParams.get('language-code') || '';
         if (title) setTitle(title);
         if (author) setAuthor(author);
         setYear([publishedAtGte, publishedAtLte]);
 
         if (feedId) setDefaultFeedId(feedId);
         if (categoryId) setDefaultCategoryId(categoryId);
-        if (languageId) setDefaultLanguageId(languageId);
+        if (languageCode) setDefaultLanguageCode(languageCode);
 
     }, [searchParams]);
 
@@ -151,9 +151,9 @@ export function AdvancedSearch() {
                 }}
             />
             <LanguageAutofill
-                defaultLanguageId={defaultLanguageId}
-                entryForm={language}
-                setEntryForm={setLanguage}
+                defaultLanguageCode={defaultLanguageCode}
+                languageCode={languageCode}
+                setLanguageCode={setLanguageCode}
                 setIsSelectionOpen={()=>{}}
                 isRequired={false} />
             <CategoryAutofill

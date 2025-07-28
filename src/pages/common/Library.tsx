@@ -46,7 +46,7 @@ const Library = () => {
           publishedAtLte: searchParams.get('publishedAtLte') ?? '',
           orderBy: searchParams.get('order-by') ?? '',
           query: searchParams.get('query') ?? '',
-          languageId: searchParams.get('language-id') ?? '',
+          languageCode: searchParams.get('language-code') ?? '',
         });
 
         const allEntries = [...(entries ?? []), ...items];

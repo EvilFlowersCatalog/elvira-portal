@@ -34,7 +34,6 @@ const Feeds = () => {
       var parentId = fp.length > 0 ? fp[fp.length - 1] : 'null'
       if (searchAll && title.length > 0) { 
         var params = new URLSearchParams(searchParams);
-        params.delete('query');
         params.delete('parent-id');
         setSearchParams(params);
         parentId = ''; 
