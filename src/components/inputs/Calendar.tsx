@@ -7,7 +7,7 @@ import { twMerge } from "tailwind-merge";
 
 interface CalendarProps {
     bookedDates?: string[];
-    onSelectionChanged?: (start: Date, end: Date) => void;
+    onSelectionChanged?: (start: Date | null, end: Date | null) => void;
 }
 
 const translation = {
@@ -31,7 +31,9 @@ const Calendar: React.FC<CalendarProps> = ({ bookedDates = [], onSelectionChange
     const [selectionDayEnd, setSelectionDayEnd] = React.useState<Date | null>(null);
 
     function validateSelection() {
-        if (!selectionDayStart || !selectionDayEnd || !onSelectionChanged) return;
+        if (!onSelectionChanged) return;
+        onSelectionChanged(null, null);
+        if (!selectionDayEnd || !selectionDayStart) return;
 
         const start = selectionDayStart < selectionDayEnd ? selectionDayStart : selectionDayEnd;
         const end = selectionDayStart > selectionDayEnd ? selectionDayStart : selectionDayEnd;
@@ -51,7 +53,7 @@ const Calendar: React.FC<CalendarProps> = ({ bookedDates = [], onSelectionChange
             setSelectionDayStart(null);
             setSelectionDayEnd(null);
             return toast.error(t('license.calendar.periodBooked'));
-        } 
+        }
 
         onSelectionChanged(selectionDayStart, selectionDayEnd);
     }
@@ -63,6 +65,8 @@ const Calendar: React.FC<CalendarProps> = ({ bookedDates = [], onSelectionChange
     function handleDayClick(stringDate: string) {
         const date = new Date(stringDate);
         if (selectionDayStart && selectionDayEnd) {
+            if (date < new Date()) return;
+            onSelectionChanged?.(null, null);
             setSelectionDayStart(date);
             setSelectionDayEnd(null);
         } else if (selectionDayStart) {
@@ -73,6 +77,7 @@ const Calendar: React.FC<CalendarProps> = ({ bookedDates = [], onSelectionChange
                 setSelectionDayEnd(date);
             }
         } else {
+            if (date < new Date()) return;
             setSelectionDayStart(date);
             setSelectionDayEnd(null);
         }

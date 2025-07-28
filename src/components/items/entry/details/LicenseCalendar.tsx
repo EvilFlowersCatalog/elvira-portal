@@ -8,6 +8,8 @@ import useGetEntryDetail from "../../../../hooks/api/entries/useGetEntryDetail";
 import { CircleLoader } from "react-spinners";
 import useAppContext from "../../../../hooks/contexts/useAppContext";
 import { DetailHeader } from "./DetailHeader";
+import { formatDate } from "date-fns";
+import { FaRegCalendarXmark, FaRegCalendarPlus } from "react-icons/fa6";
 
 // http://localhost:3000/?licensing-entry-id=ce40e042-1491-434f-a0b4-593c0a867b99
 
@@ -23,7 +25,7 @@ export default function LicenseCalendar({ }: {}) {
     const [selectionDayStart, setSelectionDayStart] = useState<Date | null>(null);
     const [selectionDayEnd, setSelectionDayEnd] = useState<Date | null>(null);
 
-    function onSelectionChange(start: Date, end: Date) {
+    function onSelectionChange(start: Date | null, end: Date | null) {
         setSelectionDayStart(start);
         setSelectionDayEnd(end);
     }
@@ -73,16 +75,23 @@ export default function LicenseCalendar({ }: {}) {
         >
             <div className="p-2 lg:p-8 overflow-auto grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
                 {entry ? (<>
-                    <div className="flex mb-4 px-4 pt-2">
+                    <div className="flex flex-col mb-4 px-4 pt-2">
                         <DetailHeader entry={entry} feedsDisabled />
-                        <div className="flex flex-col justify-center ml-8">
-                            <span>
-                                {selectionDayStart ? selectionDayStart.toLocaleDateString() : '-'}
-                            </span>
-                            <span>
-                                 {selectionDayEnd ? selectionDayEnd.toLocaleDateString() : '-'}
-                            </span>
-                        </div>
+
+                        {selectionDayStart ? <div className="border rounded-lg mt-5 grid grid-cols-1 lg:grid-cols-2 justify-between">
+                            <div className="p-4 flex gap-4">
+                                <FaRegCalendarPlus size={24} />
+                                <p>
+                                    {selectionDayStart ? formatDate(selectionDayStart, 'dd.MM.yyyy') : '-'}
+                                </p>
+                            </div>
+                            <div className="p-4 flex gap-4 lg:border-l max-lg:border-t">
+                                <FaRegCalendarXmark size={24} />
+                                <p>
+                                    {selectionDayEnd ? formatDate(selectionDayEnd, 'dd.MM.yyyy') : '-'}
+                                </p>
+                            </div>
+                        </div> : null}
                     </div>
 
                     <Calendar onSelectionChanged={onSelectionChange} bookedDates={[
@@ -99,6 +108,6 @@ export default function LicenseCalendar({ }: {}) {
                 )}
 
             </div>
-        </Modal>
+        </Modal >
     );
 }
