@@ -249,6 +249,7 @@ export const sk = {
         publishDate: 'Dátum vydania',
         summary: 'Zhrnutie',
         read: 'Čítať',
+        more: 'Prístup',
         cite: 'Citovať',
         share: 'Zdieľať',
         relation: 'Relácia',

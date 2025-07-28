@@ -12,7 +12,7 @@ import useAddToShelf from '../../../../hooks/api/my-shelf/useAddToShelf';
 import useRemoveFromShelf from '../../../../hooks/api/my-shelf/useRemoveFromShelf';
 import { NAVIGATION_PATHS } from '../../../../utils/interfaces/general/general';
 import ShelfButton from '../../../buttons/ShelfButton';
-import PDFButtons from '../../../buttons/PDFButtons';
+import PDFButton from '../../../buttons/PDFButtons';
 import { BiBookOpen } from 'react-icons/bi';
 import { TabContent, Tabs, TabsComponent, TabsHeader, TabTitle } from './EntryDetailTabs';
 import { InfoGrid, InfoItem, InfoItemCustom } from './EntryGrid';
@@ -21,6 +21,7 @@ import { StatGroup, StatItem } from './StatGroup';
 import { DetailHeader } from './DetailHeader';
 import { ActionButtonStyle, ActionsButton, ActionsWrapper } from './DetailActions';
 import { AcceptedLanguage, getLanguage } from '../../../../hooks/api/languages/languages';
+import AcquisitionsButton from '../../../buttons/AcqusitionsButton';
 
 interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
@@ -118,6 +119,16 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   };
 
   const share = () => {
+    
+    if (navigator.share) {
+      navigator.share({
+        title: entry?.title || '',
+        text: entry?.summary || '',
+        url: window.location.href,
+      })
+      return;
+    }
+
     umamiTrack('Entry Detail Share Button');
     navigator.clipboard.writeText(window.location.href);
     toast.success(t('notifications.shareSuccess'));
@@ -178,14 +189,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               </div>
 
               <ActionsWrapper>
-                {entry.acquisitions.length > 0 && (
-                  <PDFButtons
-                    acquisitions={entry.acquisitions}
-                    entryId={entry.id}> <div
-                      className={ActionButtonStyle}>
-                      <BiBookOpen size={24} />{t('entry.detail.read')}
-                    </div>
-                  </PDFButtons>)}
+                <AcquisitionsButton acquisitions={entry.acquisitions} entry={entry} />
                 <ShelfButton
                   isLoading={isLoading}
                   entryId={entryId!}

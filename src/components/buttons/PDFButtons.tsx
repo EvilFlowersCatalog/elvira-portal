@@ -7,19 +7,19 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
 interface IPDFButtonsParams {
-  acquisitions: IEntryAcquisition[];
+  acquisition: IEntryAcquisition;
   entryId: string;
   children: React.ReactNode;
 }
 
-const PDFButtons = ({ acquisitions, entryId, children }: IPDFButtonsParams) => {
+const PDFButton = ({ acquisition, entryId, children }: IPDFButtonsParams) => {
   const { specialNavigation, umamiTrack } = useAppContext();
   const { t } = useTranslation();
   const location = useLocation();
 
   const handleRead = (e: MouseEvent<HTMLButtonElement>, index: number) => {
     umamiTrack('PDF Read Button', {
-      pdf: acquisitions[index].id,
+      pdf: acquisition.id,
       entryId,
     });
     specialNavigation(
@@ -35,19 +35,7 @@ const PDFButtons = ({ acquisitions, entryId, children }: IPDFButtonsParams) => {
     }}>
       {children}
     </button>
-    // <div className='flex gap-2 items-center'>
-    //   {' '}
-    //   {acquisitions?.map((acq, index) => (
-    //     <div key={acq.id} className='text-white'>
-    //       <Button
-    //         className='py-0'
-    //         onClick={(e) => handleRead(e, index)}>
-    //           {t('entry.detail.read')}
-    //         </Button>
-    //     </div>
-    //   ))}
-    // </div>
   );
 };
 
-export default PDFButtons;
+export default PDFButton;

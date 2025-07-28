@@ -256,6 +256,7 @@ export const en = {
         publishDate: 'Date of publication',
         summary: 'Summary',
         read: 'Read',
+        more: 'Access',
         cite: 'Cite',
         share: 'Share',
         relation: 'Relation',
