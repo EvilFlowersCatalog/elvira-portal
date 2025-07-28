@@ -100,6 +100,8 @@ const Calendar: React.FC<CalendarProps> = ({ bookedDates = [], onSelectionChange
     while (day <= endDate) {
         for (let i = 0; i < 7; i++) {
             const formattedDate = format(day, "yyyy-MM-dd");
+
+            const isPast = day < new Date();
             const isBooked = bookedDates.includes(formattedDate);
             const isPreviousDayBooked = bookedDates.includes(format(addDays(day, -1), "yyyy-MM-dd"));
             const isNextDayBooked = bookedDates.includes(format(addDays(day, 1), "yyyy-MM-dd"));
@@ -117,7 +119,7 @@ const Calendar: React.FC<CalendarProps> = ({ bookedDates = [], onSelectionChange
                         handleDayClick(event.currentTarget.getAttribute('data-key') || '');
                     }}
                     className={twMerge("group cursor-pointer aspect-square flex items-center justify-center transition-all rounded-lg",
-                        `${isBooked ? 'bg-rose-400 dark:bg-pink-800' : 'bg-white dark:bg-zinc-900 hover:bg-primary/80'}`,
+                        `${isBooked ? 'bg-rose-400 dark:bg-pink-800' : 'bg-transparent hover:bg-primary/80'}`,
                         `${isCurrentMonth ? '' : 'opacity-40'}`,
                         `${isBooked && isNextDayBooked ? 'rounded-r-none' : ''}`,
                         `${isBooked && isPreviousDayBooked ? 'rounded-l-none' : ''}`,
@@ -125,9 +127,11 @@ const Calendar: React.FC<CalendarProps> = ({ bookedDates = [], onSelectionChange
                         `${isWithinSelection ? 'bg-blue-200 rounded-none' : ''}`,
                         `${isEndDate ? 'bg-blue-200 rounded-r-lg' : ''}`)}
                 >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold
-                        ${isToday(day) ? 'bg-blue-500 text-white group-hover:bg-white group-hover:text-black' : ''}
-                        ${isBooked ? 'text-black dark:text-white' : 'text-black dark:text-white group-hover:text-white'}`}>
+                    <div className={twMerge(`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold`,
+                        `${isBooked ? 'text-black dark:text-white' : `text-black dark:text-white group-hover:text-white`}`,
+                        `${isPast ? 'text-gray/50 dark:text-white/60' : ''}`,
+                        `${isToday(day) ? `bg-blue-500 text-white dark:text-white group-hover:bg-white group-hover:text-black` : ''}`,
+                        `${isWithinSelection || isStartDate ? 'dark:text-black' : ''}`)}>
                         {format(day, "d")}
                     </div>
                 </div>
