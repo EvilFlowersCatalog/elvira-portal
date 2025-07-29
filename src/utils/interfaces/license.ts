@@ -10,7 +10,7 @@ export interface ILicense {
     updated_at: string;
     starts_at: string;
     expires_at: string;
-    lcp_license_id?: string;
+    lcp_license_id: string;
 }
 
 export interface INewLicense {

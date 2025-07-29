@@ -119,11 +119,11 @@ export const sk = {
       shareSuccess: 'Adresa bola skopírovaná.',
       license: {
         create: {
-          success: 'Licencia bola úspešne vytvorená.',
-          error: 'Licenciu sa nepodarilo vytvoriť.',
+          success: 'Publikácia bola úspešne vypožičaná.',
+          error: 'Nepodarilo sa vypožičať publikáciu.',
         },
         download: {
-          error: 'Nepodarilo sa stiahnuť licenciu.',
+          error: 'Nepodarilo sa stiahnuť výpožičku.',
         },
       },
     },

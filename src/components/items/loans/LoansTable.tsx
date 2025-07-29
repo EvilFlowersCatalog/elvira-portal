@@ -96,6 +96,7 @@ export default function LoansTable({ }) {
                 {
                     id: 'e0b6bede-d678-4b64-9415-e7243a0489f7',
                     entry_id: 'e0b6bede-d678-4b64-9415-e7243a0489f7',
+                    lcp_license_id: 'lcp-1',
                     user_id: 'user-1',
                     state: 'active',
                     created_at: new Date().toISOString(),
@@ -117,7 +118,7 @@ export default function LoansTable({ }) {
         setData(items.map((item) => ({
             entry_id: item.entry_id,
             title: <Title entryId={item.entry_id} />,
-            state: <BubbleText text={translateState(item.state, t)} style={stateStyle(item.state, t)} />,
+            state: <BubbleText className='cursor-default' text={translateState(item.state, t)} style={stateStyle(item.state, t)} />,
             starts_at: formatDate(item.starts_at, 'dd.MM.yyyy'),
             ends_at: formatDate(item.expires_at, 'dd.MM.yyyy'),
             actions: <ActionButton onClick={()=>{

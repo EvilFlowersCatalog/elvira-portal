@@ -3,6 +3,7 @@ import {
   BiBookAlt,
   BiBookOpen,
   BiCalendar,
+  BiDownload,
 } from "react-icons/bi";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -14,6 +15,9 @@ import { ActionButtonStyle } from "../items/entry/details/DetailActions";
 import { IEntryDetail } from "../../utils/interfaces/entry";
 import { IEntryAcquisition } from "../../utils/interfaces/acquisition";
 import { IAvailabilityResponse, ILicense } from "../../utils/interfaces/license";
+import useDownloadLicense from "../../hooks/api/licenses/useDownloadLicense";
+import { toast } from "react-toastify";
+import { FaDownload } from "react-icons/fa";
 
 export default function AcquisitionsButton({
   entry,
@@ -28,6 +32,8 @@ export default function AcquisitionsButton({
   const [isOpen, setIsOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const getUserLicenses = useGetLicenses();
+  const downloadLicense = useDownloadLicense();
+
   const [activeLicense, setActiveLicense] = useState<ILicense | null>(null);
 
   useEffect(() => {
@@ -70,9 +76,13 @@ export default function AcquisitionsButton({
     </div>
   );
 
-  const ActiveLicenseButton = () => (
-    <div className={twMerge(ActionButtonStyle, "w-full cursor-pointer")}>
-      <BiBookAlt size={24} className="flex-shrink-0" />
+  const ActiveLicenseButton = ({ lcp_license_id }: { lcp_license_id: string }) => (
+    <div className={twMerge(ActionButtonStyle, "w-full cursor-pointer")} onClick={() => {
+      downloadLicense(lcp_license_id).catch((err) => {
+        toast.error(t('notifications.license.download.error'));
+      })
+    }}>
+      <BiDownload size={24} className="flex-shrink-0" />
       {t("entry.detail.activeLicense")}
     </div>
   );
@@ -106,7 +116,7 @@ export default function AcquisitionsButton({
           </PDFButton>
         ))}
         {availability?.available && !activeLicense && <BorrowButton />}
-        {availability?.available && activeLicense && <ActiveLicenseButton />}
+        {availability?.available && activeLicense && <ActiveLicenseButton lcp_license_id={activeLicense.lcp_license_id} />}
       </div>
     </div>
   );
@@ -122,7 +132,7 @@ export default function AcquisitionsButton({
   }
 
   if (acquisitions.length === 0 && activeLicense) {
-    return <ActiveLicenseButton />;
+    return <ActiveLicenseButton lcp_license_id={activeLicense.lcp_license_id} />;
   }
 
   return <MultipleAcquisitionsDropdown />;

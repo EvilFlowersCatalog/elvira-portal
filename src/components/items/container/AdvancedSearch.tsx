@@ -25,7 +25,7 @@ export function AdvancedSearchWrapper({ children }: { children: React.ReactNode 
                     sticky top-0 h-fit z-10 pb-20 h-screen
                 `}
             >
-                <AdvancedSearch  />
+                <AdvancedSearch />
             </div>
             {/* Mobile fixed top/bottom sheet */}
             <div
@@ -137,30 +137,34 @@ export function AdvancedSearch() {
                 onChange={handleAuthorChange}
             />
 
-            <ElviraNumberInput
-                placeholder={t('searchBar.yearFrom')}
-                value={year[0].toString()} onChange={function (e: ChangeEvent<HTMLInputElement>): void {
-                    setYear([e.target.value, year[1]]);
-                }} />
+            <div className='flex gap-2'>
 
-            <ElviraNumberInput
-                placeholder={t('searchBar.yearTo')}
-                value={year[1].toString()}
-                onChange={function (e: ChangeEvent<HTMLInputElement>): void {
-                    setYear([year[0], e.target.value]);
-                }}
-            />
+                <ElviraNumberInput
+                    placeholder={t('searchBar.yearFrom')}
+                    value={year[0].toString()} onChange={function (e: ChangeEvent<HTMLInputElement>): void {
+                        setYear([e.target.value, year[1]]);
+                    }} />
+
+                <ElviraNumberInput
+                    placeholder={t('searchBar.yearTo')}
+                    value={year[1].toString()}
+                    onChange={function (e: ChangeEvent<HTMLInputElement>): void {
+                        setYear([year[0], e.target.value]);
+                    }}
+                />
+            </div>
+            
             <LanguageAutofill
                 defaultLanguageCode={defaultLanguageCode}
                 languageCode={languageCode}
                 setLanguageCode={setLanguageCode}
-                setIsSelectionOpen={()=>{}}
+                setIsSelectionOpen={() => { }}
                 isRequired={false} />
             <CategoryAutofill
                 defaultCategoryId={defaultCategoryId}
                 entryForm={activeCategory}
                 setEntryForm={setActiveCategory}
-                setIsSelectionOpen={() => {}}
+                setIsSelectionOpen={() => { }}
                 single
             />
             <FeedAutofill
