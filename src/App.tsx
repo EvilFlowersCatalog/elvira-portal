@@ -54,9 +54,8 @@ const App = () => {
         )}
 
         <div
-          className={`flex flex-1 h-screen flex-col overflow-hidden bg-lightGray dark:bg-darkGray ${
-            show() ? 'max-lg:pt-14' : ''
-          }`}
+          id="outlet-wrapper"
+          className={`flex flex-1 h-screen flex-col overflow-hidden bg-lightGray dark:bg-darkGray ${show() ? 'max-lg:pt-14' : ''}`}
         >
           <Outlet />
         </div>

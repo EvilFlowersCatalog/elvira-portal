@@ -3,15 +3,10 @@ import { useTranslation } from 'react-i18next';
 import { IoSearchOutline } from 'react-icons/io5';
 import { useSearchParams } from 'react-router-dom';
 import useAppContext from '../../hooks/contexts/useAppContext';
-import { FaFilterCircleXmark } from 'react-icons/fa6';
 import ElviraInput from '../inputs/ElviraInput';
-import CategoryAutofill from '../autofills/CategoryAutofill';
-import FeedAutofill from '../autofills/FeedAutofill';
-import { ICategory } from '../../utils/interfaces/category';
-import Button from '../buttons/Button';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
-import LanguageAutofill from '../autofills/LanguageAutofill';
 import { MUISelectStyle } from '../inputs/ElviraSelect';
+import { MdFilterListOff } from 'react-icons/md';
 
 interface IToolsContainerParams {
   advancedSearch?: boolean;
@@ -109,7 +104,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, enableSort=true, par
 
           {!isParamsEmpty() && (
             <button className='text-gray dark:text-white hover:text-primary dark:hover:text-primaryLight pt-6' onClick={handleClear}>
-              <FaFilterCircleXmark size={25} />
+              <MdFilterListOff size={25} />
             </button>
           )}
         </div>

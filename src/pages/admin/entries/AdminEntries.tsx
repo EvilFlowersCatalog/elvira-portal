@@ -4,9 +4,11 @@ import ToolsContainer from '../../../components/tools/ToolsContainer';
 import { H1 } from '../../../components/primitives/Heading';
 import Breadcrumb from '../../../components/buttons/Breadcrumb';
 import { AdvancedSearchWrapper } from '../../../components/items/container/AdvancedSearch';
+import OpenFiltersButton from '../../../components/buttons/OpenFiltersButton';
 
 const AdminEntries = () => {
   const { t } = useTranslation();
+
   return (
     <div className='overflow-auto pb-10'>
       <Breadcrumb />
@@ -15,6 +17,7 @@ const AdminEntries = () => {
       <AdvancedSearchWrapper>
         <AdminEntriesTable></AdminEntriesTable>
       </AdvancedSearchWrapper>
+      <OpenFiltersButton />
     </div>
   );
 };

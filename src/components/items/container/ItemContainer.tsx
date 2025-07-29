@@ -11,6 +11,7 @@ import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import EntryDetail from '../entry/details/EntryDetail';
 import { H1 } from '../../primitives/Heading';
 import { AdvancedSearchWrapper } from './AdvancedSearch';
+import OpenFiltersButton from '../../buttons/OpenFiltersButton';
 
 interface IItemContainer {
   children: ReactNode;
@@ -53,8 +54,7 @@ const ItemContainer = ({
   title,
   customFilters
 }: IItemContainer) => {
-  const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty, showAdvancedSearch } =
-    useAppContext();
+  const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty } = useAppContext();
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [showScrollUp, setShowScrollUp] = useState<boolean>(false);
@@ -148,7 +148,7 @@ const ItemContainer = ({
                 )}
               </>
             )}
-            {showScrollUp && <ScrollUpButton scrollRef={scrollRef} />}
+            <OpenFiltersButton />
             <EntryDetail triggerReload={triggerReload} />
           </>
         </AdvancedSearchWrapper >
