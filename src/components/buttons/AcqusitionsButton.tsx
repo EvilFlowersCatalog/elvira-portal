@@ -1,18 +1,28 @@
-import { BiBookAdd, BiBookOpen, BiCalendar } from "react-icons/bi";
+import { BiBookAdd, BiBookAlt, BiBookOpen, BiCalendar } from "react-icons/bi";
 import { IEntryAcquisition } from "../../utils/interfaces/acquisition";
 import { IEntryDetail } from "../../utils/interfaces/entry";
 import { ActionButtonStyle } from "../items/entry/details/DetailActions";
 import PDFButton from "./PDFButtons";
 import { useTranslation } from "react-i18next";
 import { twMerge } from "tailwind-merge";
-import { useState } from "react";
-import { IAvailabilityResponse } from "../../utils/interfaces/license";
+import { useEffect, useState } from "react";
+import { IAvailabilityResponse, ILicense } from "../../utils/interfaces/license";
 import { useSearchParams } from "react-router-dom";
+import useGetLicenses from "../../hooks/api/licenses/useGetLicenses";
 
 export default function AcquisitionsButton({ entry, acquisitions, availability }: { entry: IEntryDetail, acquisitions: IEntryAcquisition[], availability: IAvailabilityResponse | null }) {
     const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
+    const getUserLicenses = useGetLicenses();
+    const [activeLicense, setActiveLicense] = useState<ILicense | undefined | null>(null);
+
+    useEffect(() => {
+        getUserLicenses({}).then(existingLicenses => {
+            const foundLicense = existingLicenses.items.find(license => license.entry_id === entry.id && ['active', 'ready'].includes(license.state));
+            setActiveLicense(foundLicense);
+        });
+    }, []);
 
     if (acquisitions.length === 0 && !availability?.available) return null;
 
@@ -34,16 +44,24 @@ export default function AcquisitionsButton({ entry, acquisitions, availability }
         setSearchParams(params);
     }
 
-    if (acquisitions.length === 0 && availability?.available) {
+    if (acquisitions.length === 0 && availability?.available && activeLicense == null) {
         return (
             <div>
                 <div className={twMerge(ActionButtonStyle, 'w-full cursor-pointer')}
-                onClick={openBorrowModal}
+                    onClick={openBorrowModal}
                 >
                     <BiCalendar className="flex-shrink-0" size={24} /> {t('entry.detail.borrow')}
                 </div>
             </div>
         )
+    }
+
+    if( acquisitions.length === 0 && activeLicense != null) {
+        return (
+            <div className={twMerge(ActionButtonStyle, 'w-full cursor-pointer')}>
+                <BiBookAlt className="flex-shrink-0" size={24} /> {t('entry.detail.activeLicense')}
+            </div>
+        );
     }
 
     return (
@@ -76,12 +94,17 @@ export default function AcquisitionsButton({ entry, acquisitions, availability }
                         </div>
                     </PDFButton>
                 ))}
-                {availability?.available && (
+                {availability?.available && activeLicense == null && (
                     <div
                         className={twMerge(ActionButtonStyle, 'w-full cursor-pointer')}
                         onClick={openBorrowModal}
                     >
-                        <BiCalendar size={24} className="flex-shrink-0"/> {t('entry.detail.borrow')}
+                        <BiCalendar size={24} className="flex-shrink-0" /> {t('entry.detail.borrow')}
+                    </div>
+                )}
+                {availability?.available && activeLicense != null && (
+                    <div className={twMerge(ActionButtonStyle, 'w-full cursor-pointer')}>
+                        <BiBookAlt size={24} className="flex-shrink-0" /> {t('entry.detail.activeLicense')}
                     </div>
                 )}
             </div>

@@ -118,6 +118,10 @@ export const sk = {
       },
       shareSuccess: 'Adresa bola skopírovaná.',
       license: {
+        create: {
+          success: 'Licencia bola úspešne vytvorená.',
+          error: 'Licenciu sa nepodarilo vytvoriť.',
+        },
         download: {
           error: 'Nepodarilo sa stiahnuť licenciu.',
         },
@@ -259,6 +263,7 @@ export const sk = {
         read: 'Čítať',
         more: 'Prístup',
         borrow: 'Vypožičať',
+        activeLicense: 'Výpožička',
         cite: 'Citovať',
         share: 'Zdieľať',
         relation: 'Relácia',
@@ -325,9 +330,11 @@ export const sk = {
         title: 'Kalendár výpožičiek',
         periodBooked: 'Vybraný časový úsek je už obsadený.',
         noAvailability: 'Táto kniha nie je k dispozícii.',
+        lend: 'Vypožičať',
       },
       loansPage: {
         title: 'Výpožičky',
+        
         table: {
           title: 'Počet výpožičiek: {{x}}',
           entry: 'Publikácia',

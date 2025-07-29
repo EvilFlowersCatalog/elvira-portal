@@ -92,7 +92,7 @@ export default function LoansTable({ }) {
             sortBy
         }).then(({ items: data, metadata }) => {
             // setItems(data);
-            setItems([
+            setItems([ // TEMP-BE
                 {
                     id: 'e0b6bede-d678-4b64-9415-e7243a0489f7',
                     entry_id: 'e0b6bede-d678-4b64-9415-e7243a0489f7',

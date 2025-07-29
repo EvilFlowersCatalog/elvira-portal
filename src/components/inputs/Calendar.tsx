@@ -68,8 +68,8 @@ const Calendar: React.FC<CalendarProps> = ({ availability, requestAvailability, 
 
     function handleDayClick(stringDate: string) {
         const date = new Date(stringDate);
+        if (date < new Date(new Date().setHours(0, 0, 0, 0))) return;
         if (selectionDayStart && selectionDayEnd) {
-            if (date < new Date()) return;
             onSelectionChanged?.(null, null);
             setSelectionDayStart(date);
             setSelectionDayEnd(null);
@@ -81,7 +81,6 @@ const Calendar: React.FC<CalendarProps> = ({ availability, requestAvailability, 
                 setSelectionDayEnd(date);
             }
         } else {
-            if (date < new Date()) return;
             setSelectionDayStart(date);
             setSelectionDayEnd(null);
         }
@@ -116,7 +115,7 @@ const Calendar: React.FC<CalendarProps> = ({ availability, requestAvailability, 
         for (let i = 0; i < 7; i++) {
             const formattedDate = format(day, "yyyy-MM-dd");
 
-            const isPast = day < new Date();
+            const isPast = day < new Date(new Date().setHours(0, 0, 0, 0));
             const isBooked = isDateBooked(day, availability);
             const isPreviousDayBooked = isDateBooked(addDays(day, -1), availability);
             const isNextDayBooked = isDateBooked(addDays(day, 1), availability);

@@ -1,5 +1,6 @@
 import { Rating } from "@mui/material";
 import { error } from "console";
+import { create } from "domain";
 
 export const en = {
   translation: {
@@ -118,6 +119,10 @@ export const en = {
       },
       shareSuccess: 'Address successfully copied.',
       license:{
+        create: {
+          success: 'License has been successfully created.',
+          error: 'License failed to be created.',
+        },
         download:{
           error: 'Failed to download the license.',
         }
@@ -264,6 +269,7 @@ export const en = {
         read: 'Read',
         more: 'Access',
         borrow: 'Borrow',
+        activeLicense: 'Loan',
         cite: 'Cite',
         share: 'Share',
         relation: 'Relation',
@@ -336,6 +342,7 @@ export const en = {
         title: 'License Calendar',
         periodBooked: 'The selected period is already booked.',
         noAvailability: 'This book is not available.',
+        lend: 'Lend',
       },
       loansPage: {
         title: 'Loans',

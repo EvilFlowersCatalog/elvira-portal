@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Modal from "../../../dialogs/Modal";
 import Calendar from "../../../inputs/Calendar";
 import { IEntryDetail } from "../../../../utils/interfaces/entry";
@@ -12,6 +12,10 @@ import { formatDate } from "date-fns";
 import { FaRegCalendarXmark, FaRegCalendarPlus } from "react-icons/fa6";
 import { IAvailabilityResponse } from "../../../../utils/interfaces/license";
 import useGetAvailability from "../../../../hooks/api/licenses/useGetAvailability";
+import useCreateLicense from "../../../../hooks/api/licenses/useCreateLicense";
+import { toast } from "react-toastify";
+import Button from "../../../buttons/Button";
+import { NAVIGATION_PATHS } from "../../../../utils/interfaces/general/general";
 
 // http://localhost:3000/?licensing-entry-id=ce40e042-1491-434f-a0b4-593c0a867b99
 
@@ -21,6 +25,8 @@ export default function LicenseCalendar({ }: {}) {
     const [searchParams, setSearchParams] = useSearchParams();
     const getEntryDetail = useGetEntryDetail();
     const getAvailability = useGetAvailability();
+    const createLicense = useCreateLicense();
+    const navigate = useNavigate();
 
     const [entryId, setEntryId] = useState<string | null>(null);
     const [entry, setEntry] = useState<IEntryDetail | null>(null);
@@ -47,7 +53,6 @@ export default function LicenseCalendar({ }: {}) {
         (async () => {
             try {
                 const availabilityData = await getAvailability(start, end, entryId);
-                console.log(availabilityData)
                 setAvailability((prev) => {
                     if (prev == null) return availabilityData;
                     prev.available = availabilityData.available;
@@ -58,6 +63,31 @@ export default function LicenseCalendar({ }: {}) {
                 setAvailability(null);
             }
         })();
+    }
+
+    function lendBook() {
+        if (!selectionDayStart || !entryId) return;
+
+        if (!selectionDayEnd) return;
+        const durationMs = selectionDayEnd.getTime() - selectionDayStart.getTime();
+        const durationDays = Math.ceil(durationMs / (1000 * 60 * 60 * 24)) + 1;
+        createLicense({
+            entry_id: entryId,
+            state: 'active',
+            starts_at: formatDate(selectionDayStart, 'yyyy-MM-dd'),
+            duration: `P${durationDays}D`,
+        }).then(() => {
+            closeCalendar();
+            toast.success(t('notifications.license.create.success'));
+            const params = new URLSearchParams();
+            params.set('entry-detail-id', entryId);
+            navigate({
+                pathname: NAVIGATION_PATHS.loans,
+                search: params.toString(),
+            });
+        }).catch(() => {
+            toast.error(t('notifications.license.create.error'));
+        });
     }
 
     useEffect(() => {
@@ -98,27 +128,37 @@ export default function LicenseCalendar({ }: {}) {
                     <div className="flex flex-col mb-4 px-4 pt-2">
                         <DetailHeader entry={entry} feedsDisabled />
 
-                        {selectionDayStart ? <div className="border rounded-lg mt-5 grid grid-cols-1 lg:grid-cols-2 justify-between">
-                            <div className="p-4 flex gap-4">
-                                <FaRegCalendarPlus size={24} />
-                                <p>
-                                    {selectionDayStart ? formatDate(selectionDayStart, 'dd.MM.yyyy') : '-'}
-                                </p>
+                        {selectionDayStart ? <>
+                            <div className="border rounded-lg mt-5 grid grid-cols-1 lg:grid-cols-2 justify-between">
+                                <div className="p-4 flex gap-4">
+                                    <FaRegCalendarPlus size={24} />
+                                    <p>
+                                        {selectionDayStart ? formatDate(selectionDayStart, 'dd.MM.yyyy') : '-'}
+                                    </p>
+                                </div>
+                                <div className="p-4 flex gap-4 lg:border-l max-lg:border-t">
+                                    <FaRegCalendarXmark size={24} />
+                                    <p>
+                                        {selectionDayEnd ? formatDate(selectionDayEnd, 'dd.MM.yyyy') : '-'}
+                                    </p>
+                                </div>
                             </div>
-                            <div className="p-4 flex gap-4 lg:border-l max-lg:border-t">
-                                <FaRegCalendarXmark size={24} />
-                                <p>
-                                    {selectionDayEnd ? formatDate(selectionDayEnd, 'dd.MM.yyyy') : '-'}
-                                </p>
-                            </div>
-                        </div> : null}
+                            <Button
+                                className="mt-4"
+                                onClick={lendBook}
+                                disabled={!selectionDayStart || !selectionDayEnd}
+                            >
+                                {t('license.calendar.lend')}
+                            </Button>
+                        </> : null}
                     </div>
 
-                    {availability?.available ? (
+                    {/* The calendar will request availability for the selected date range */}
+                    {availability == null || availability?.available ? (
                         <Calendar onSelectionChanged={onSelectionChange} availability={availability} requestAvailability={requestAvailability} />
                     ) : (
                         <div className="flex justify-center items-center h-full">
-                           {t('license.calendar.noAvailability')}
+                            {t('license.calendar.noAvailability')}
                         </div>
                     )}
                 </>) : (
