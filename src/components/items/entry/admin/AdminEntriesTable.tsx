@@ -118,7 +118,7 @@ export default function AdminEntriesTable({ }) {
                 navigate(NAVIGATION_PATHS.adminAddEntries);
             }} />
         ]} header={[
-            { label: t('administration.entriesPage.detail'), selector: 'title', width: '700px', onClick: (row) => {
+            { label: t('administration.entriesPage.detail'), selector: 'title', width: '500px', onClick: (row) => {
                 umamiTrack('Entry Detail Click', { entryId: row.id });
                 navigate(NAVIGATION_PATHS.adminEditEntries + row.id);
             }},

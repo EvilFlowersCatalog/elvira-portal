@@ -15,7 +15,6 @@ const Shelf = () => {
   const [page, setPage] = useState<number>(0);
   const [maxPage, setMaxPage] = useState<number>(0);
   const [entries, setEntries] = useState<IEntry[]>([]);
-  const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
 
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
@@ -78,8 +77,6 @@ const Shelf = () => {
 
   return (
     <ItemContainer
-      activeEntryId={activeEntryId}
-      setActiveEntryId={setActiveEntryId}
       isLoading={isLoading}
       setIsLoading={setIsLoading}
       isError={isError}

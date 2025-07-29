@@ -8,6 +8,7 @@ import { AdvancedSearchWrapper } from '../../components/items/container/Advanced
 import LoansTable from '../../components/items/loans/LoansTable';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import { H1 } from '../../components/primitives/Heading';
+import EntryDetail from '../../components/items/entry/details/EntryDetail';
 
 const Loans = () => {
   const { t } = useTranslation();
@@ -17,6 +18,7 @@ const Loans = () => {
     <AdvancedSearchWrapper>
       <LoansTable></LoansTable>
     </AdvancedSearchWrapper>
+    <EntryDetail />
   </>
   );
 };

@@ -14,8 +14,6 @@ import { AdvancedSearchWrapper } from './AdvancedSearch';
 
 interface IItemContainer {
   children: ReactNode;
-  activeEntryId?: string | null;
-  setActiveEntryId?: ((activeEntryId: string | null) => void) | null;
   isLoading: boolean;
   showLayout?: boolean;
   setIsLoading: (isLoading: boolean) => void;
@@ -37,8 +35,6 @@ interface IItemContainer {
 
 const ItemContainer = ({
   children,
-  activeEntryId = null,
-  setActiveEntryId = null,
   isLoading,
   isError,
   items,
@@ -81,10 +77,6 @@ const ItemContainer = ({
     previousSearchParamsRef.current = searchParams;
 
     const entryDetailId = searchParams.get('entry-detail-id');
-    if (setActiveEntryId) {
-      if (entryDetailId) setActiveEntryId(entryDetailId);
-      else setActiveEntryId(null);
-    }
   }, [searchParams]);
 
   return (
@@ -157,7 +149,7 @@ const ItemContainer = ({
               </>
             )}
             {showScrollUp && <ScrollUpButton scrollRef={scrollRef} />}
-            {activeEntryId && <EntryDetail triggerReload={triggerReload} />}
+            <EntryDetail triggerReload={triggerReload} />
           </>
         </AdvancedSearchWrapper >
       </div>

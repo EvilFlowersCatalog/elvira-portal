@@ -83,24 +83,23 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
             }}>
                 <TableContainer>
                     <Table>
-
-                        <TableHead className='bg-gray/10 dark:bg-black/70'>
-                            <TableCell width="200px" colSpan={2}>
-                                <div className="flex items-center">
-                                    <h2 className='dark:text-white mr-4'>{title}</h2>
-                                    <div>
-                                        {toolBar && toolBar.map((item, index) => (
-                                            <span key={index} className='mr-2 flex'>
-                                                {item}
-                                            </span>
-                                        ))}
+                        <TableHead>
+                            <TableRow className="bg-gray/10 dark:bg-black/70">
+                                <TableCell colSpan={1} className="p-0">
+                                    <div className="flex items-center pr-4 py-2">
+                                        <h2 className="dark:text-white mr-4 text-nowrap">{title}</h2>
+                                        <div className="flex">
+                                            {toolBar?.map((item, index) => (
+                                                <span key={index} className="mr-2 flex">
+                                                    {item}
+                                                </span>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            </TableCell>
-                            {getPagination()}
+                                </TableCell>
+                                {getPagination()}
+                            </TableRow>
                         </TableHead>
-                    </Table>
-                    <Table>
                         <TableHead className="bg-gray/10 dark:bg-black/70">
                             <TableRow>
                                 {header.map((col, index) => (
@@ -136,7 +135,9 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                         </TableBody>
 
                         <TableFooter className='bg-gray/10 dark:bg-black/70'>
-                            {getPagination()}
+                            <TableRow>
+                                {getPagination()}
+                            </TableRow>
                         </TableFooter>
                     </Table>
                 </TableContainer>

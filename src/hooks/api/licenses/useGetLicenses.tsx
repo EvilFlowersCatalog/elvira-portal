@@ -32,8 +32,6 @@ const useGetLicenses = () => {
             }
         }>(GET_LICENCES_URL, { params });
 
-        console.log(data, "expecting results, may be items")
-
         return data;
     };
 

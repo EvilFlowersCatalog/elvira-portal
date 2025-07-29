@@ -164,6 +164,8 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     })();
   }, [entryId, update]);
 
+  if(!entryId) return <></>;
+
   return (
     <Modal title={t('entry.detail.title')}
       onClose={() => {

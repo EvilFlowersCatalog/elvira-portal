@@ -17,7 +17,6 @@ const Home = () => {
   >('');
   const [lastAddedEntries, setLastAddedEntries] = useState<IEntry[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
 
   const getEntries = useGetEntries();
@@ -46,12 +45,6 @@ const Home = () => {
       }
     })();
   }, []);
-
-  useEffect(() => {
-    const entryDetailId = searchParams.get('entry-detail-id');
-    if (entryDetailId) setActiveEntryId(entryDetailId);
-    else setActiveEntryId(null);
-  }, [searchParams]);
 
   return (
     <>
@@ -84,7 +77,7 @@ const Home = () => {
           limitRows={true}
         />
       </div>
-      {activeEntryId && <EntryDetail />}
+      <EntryDetail />
       <LicenseCalendar />
     </>
   );
