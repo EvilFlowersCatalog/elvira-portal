@@ -4,10 +4,10 @@ import { IEntry } from "../../../../utils/interfaces/entry";
 import { useEffect, useState } from "react";
 import useAddToShelf from "../../../../hooks/api/my-shelf/useAddToShelf";
 import useRemoveFromShelf from "../../../../hooks/api/my-shelf/useRemoveFromShelf";
-import useGetEntryDetail from "../../../../hooks/api/entries/useGetEntryDetail";
 import { toast } from 'react-toastify';
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { NAVIGATION_PATHS } from "../../../../utils/interfaces/general/general";
+import { NAVIGATION_PATHS, THEME_TYPE } from "../../../../utils/interfaces/general/general";
+import useAppContext from "../../../../hooks/contexts/useAppContext";
 
 
 interface IEntryItem {
@@ -16,13 +16,13 @@ interface IEntryItem {
 }
 
 export default function EntryItem({ entry, triggerReload }: IEntryItem) {
+    const { titleLogoDark } = useAppContext();
     const { auth } = useAuthContext();
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
     const addToShelf = useAddToShelf();
     const removeFromShelf = useRemoveFromShelf();
-
     const [isOnShelf, setIsOnShelf] = useState<boolean>(entry.shelf_record_id != null);
 
     useEffect(() => {
@@ -78,13 +78,31 @@ export default function EntryItem({ entry, triggerReload }: IEntryItem) {
         }
     };
 
+    const [isFallbackImage, setIsFallbackImage] = useState(false);
+    function invalidImageFallback(e: React.SyntheticEvent<HTMLImageElement, Event>) {
+        e.currentTarget.src = '/assets/thumbnail.webp';
+        setIsFallbackImage(true);
+    }
+
     return <div className="group rounded-lg overflow-hidden relative w-full mb-8 h-68 max-w-[200px] hover:shadow-[0_6px_20px_rgba(0,0,0,0.4)] dark:hover:shadow-strongDarkGray transition-shadow duration-300 ">
         <div className="h-40">
-            <img onClick={openEntryDetail}
-                className='w-full h-full object-cover select-none cursor-pointer'
-                src={entry.thumbnail + `?access_token=${auth?.token}`}
-                alt='Entry Thumbnail'
-            />
+            <div onClick={openEntryDetail}
+                className='relative w-full h-full object-cover select-none cursor-pointer'
+            >
+                <img
+                    className="w-full h-full object-cover select-none cursor-pointer"
+                    src={entry.thumbnail + `?access_token=${auth?.token}`}
+                    alt={`Thumbnail ${entry.title}`}
+                    onError={invalidImageFallback}
+                />
+                {isFallbackImage && (
+                    <img
+                        className={`absolute w-[80%] z-10 top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 transition-opacity duration-300 opacity-1 group-hover:scale-110 transition-transform duration-300`}
+                        src={titleLogoDark}
+                        alt='Elvira Logo'
+                    />
+                )}
+            </div>
             <div onClick={handleBookmarkToggle}
                 className={`cursor-pointer absolute top-2 right-2 w-10 h-8 rounded-lg p-2 flex items-center justify-center shadow-md
                  ${isOnShelf ? 'bg-primaryLight border-2 border-primary' : 'bg-white'}`}>
