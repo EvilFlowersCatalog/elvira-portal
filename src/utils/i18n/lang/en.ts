@@ -1,4 +1,5 @@
 import { Rating } from "@mui/material";
+import { error } from "console";
 
 export const en = {
   translation: {
@@ -116,6 +117,11 @@ export const en = {
         copyError: 'Failed to copy the citation.',
       },
       shareSuccess: 'Address successfully copied.',
+      license:{
+        download:{
+          error: 'Failed to download the license.',
+        }
+      }
     },
 
     // LOGIN PAGE
@@ -257,6 +263,7 @@ export const en = {
         summary: 'Summary',
         read: 'Read',
         more: 'Access',
+        borrow: 'Borrow',
         cite: 'Cite',
         share: 'Share',
         relation: 'Relation',
@@ -328,6 +335,26 @@ export const en = {
       calendar: {
         title: 'License Calendar',
         periodBooked: 'The selected period is already booked.',
+        noAvailability: 'This book is not available.',
+      },
+      loansPage: {
+        title: 'Loans',
+        table: {
+          title: 'Amount of loans: {{x}}',
+          entry: 'Entry',
+          state: 'State',
+          states: {
+            ready: 'Ready',
+            active: 'Active',
+            returned: 'Returned',
+            expired: 'Expired',
+            revoked: 'Revoked',
+            cancelled: 'Cancelled',
+          },
+          starts_at: 'Starts at',
+          ends_at: 'Ends at',
+          actions: 'Actions',
+        }
       }
     },
 

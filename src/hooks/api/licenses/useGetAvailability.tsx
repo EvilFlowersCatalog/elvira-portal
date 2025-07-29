@@ -1,17 +1,18 @@
-import { ILanguage } from '../../../utils/interfaces/language';
-import { ILicense } from '../../../utils/interfaces/license';
-import useAuthContext from '../../contexts/useAuthContext';
+import { formatDate } from 'date-fns';
+import { IAvailabilityResponse } from '../../../utils/interfaces/license';
 import useAxios from '../useAxios';
 
 const useGetAvailability = () => {
     const axios = useAxios();
 
-    const getAvailability = async (entry_id:string): Promise<any> => {
+    const getAvailability = async (startDate: Date, endDate: Date, entry_id: string): Promise<IAvailabilityResponse> => {
+        const params = new URLSearchParams();
+        params.append('start_date', formatDate(startDate, 'yyyy-MM-dd'));
+        params.append('end_date', formatDate(endDate, 'yyyy-MM-dd'));
         const GET_AVAILABILITY_URL = `/readium/v1/entries/${entry_id}/availability`;
 
-        const { data } = await axios.get<any >(GET_AVAILABILITY_URL);
-
-        return data;
+        const { data } = await axios.get<{response:IAvailabilityResponse}>(GET_AVAILABILITY_URL, { params });
+        return data.response;
     };
 
     return getAvailability;

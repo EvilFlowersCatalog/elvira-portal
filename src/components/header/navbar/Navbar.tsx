@@ -6,7 +6,7 @@ import {
 } from '../../../utils/interfaces/general/general';
 
 import { ReactElement } from 'react';
-import { IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
+import { IoDocumentsOutline, IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
 import { MdOutlineFeed } from 'react-icons/md';
 import { RiAdminLine, RiArrowLeftDoubleFill } from 'react-icons/ri';
 import { PiBooks } from 'react-icons/pi';
@@ -188,7 +188,7 @@ const Navbar = () => {
 
       {/* Personal container */}
       {auth && (
-        <div className='flex flex-col items-start'>
+        <div className='flex gap-2 flex-col items-start'>
           <span className='font-bold mb-3 uppercase font-medium'>{t('navbarMenu.personal')}</span>
           <NavbarButton
             name={t('navbarMenu.myShelf')}
@@ -196,12 +196,12 @@ const Navbar = () => {
             icon={<PiBooks size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.shelf}
           />
-          {/* <NavbarButton
+          <NavbarButton
             name={t('navbarMenu.loan')}
             path={NAVIGATION_PATHS.loans}
             icon={<IoDocumentsOutline size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.loans}
-          /> */}
+          />
         </div>
       )}
 

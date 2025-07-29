@@ -1,14 +1,14 @@
 import { twMerge } from "tailwind-merge";
 
-export function SubText({ text, subtext }: { text: string, subtext: string }){
+export function SubText({ text, subtext }: { text: string, subtext: string }) {
     return <>
         <h3 className='text-[16px] dark:text-white'>{text}</h3>
         <p className='text-sm text-gray/70 dark:text-white/50'>{subtext}</p>
     </>
 }
 
-export function BubbleText({text, className, onClick}: { text: string, className?: string, onClick?: () => void }) {
-    return <span onClick={onClick} className={twMerge('px-2 py-1 bg-primary rounded-lg text-sm text-white cursor-pointer', className)}>{text}</span>;
+export function BubbleText({ text, className, onClick, style }: { text: string, className?: string, onClick?: () => void, style?: any }) {
+    return <span style={style} onClick={onClick} className={twMerge('px-2 py-1 bg-primary rounded-lg text-sm text-white cursor-pointer', className)}>{text}</span>;
 }
 
 export function ActionButton({ icon, onClick }: { icon: JSX.Element, onClick: () => void }) {

@@ -18,6 +18,7 @@ import Feeds from '../pages/common/Feeds';
 import AdminHome from '../pages/admin/AdminHome';
 import AdminAddEntry from '../pages/admin/entries/AdminAddEntry';
 import Auth from '../pages/auth/Auth';
+import Loans from '../pages/common/Loans';
 
 const BaseRoutes = () => {
   const { auth } = useAuthContext();
@@ -47,7 +48,7 @@ const BaseRoutes = () => {
           {/* <Route path='about' element={<About />} /> */}
           <Route path='library' element={<Library />} />
           <Route path='shelf' element={<Shelf />} />
-          {/* <Route path='loans' element={<Loans />} /> */}
+          <Route path='loans' element={<Loans />} />
           <Route path='feeds' element={<Feeds />} />
           <Route path='viewer/:entry-id/:index' element={<Viewer />} />
 

@@ -10,6 +10,7 @@ export interface ILicense {
     updated_at: string;
     starts_at: string;
     expires_at: string;
+    lcp_license_id?: string;
 }
 
 export interface INewLicense {
@@ -18,3 +19,14 @@ export interface INewLicense {
     duration: string; // ISO 8601 duration, e.g. "P1Y2M10DT2H30M"
     starts_at?: string;
 }
+
+export interface IAvailabilityResponse {
+    available: boolean;
+    max_concurrent: string;
+    calendar: {
+        date: string;
+        available_slots: number;
+        total_slots: number;
+        is_available: boolean;
+    }[];
+} 

@@ -23,6 +23,8 @@ import { ActionButtonStyle, ActionsButton, ActionsWrapper } from './DetailAction
 import { AcceptedLanguage, getLanguage } from '../../../../hooks/api/languages/languages';
 import AcquisitionsButton from '../../../buttons/AcqusitionsButton';
 import Modal from '../../../dialogs/Modal';
+import useGetAvailability from '../../../../hooks/api/licenses/useGetAvailability';
+import { IAvailabilityResponse } from '../../../../utils/interfaces/license';
 
 interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
@@ -32,17 +34,21 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const { stuColor, stuText, stuBg, umamiTrack } = useAppContext();
   const { auth } = useAuthContext();
   const { t, i18n } = useTranslation();
-  const [entry, setEntry] = useState<IEntryDetail | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [entryId, setEntryId] = useState<string | null>(null);
-  const [update, setUpdate] = useState<boolean>(false);
-  const [imageLoaded, setImageLoaded] = useState<boolean>(false);
+  
+  const [entry, setEntry] = useState<IEntryDetail | null>(null);
+  const [availability, setAvailability] = useState<IAvailabilityResponse | null>(null);
 
+  const [update, setUpdate] = useState<boolean>(false);
+  
   const location = useLocation();
   const navigate = useNavigate();
 
   const getEntryDetail = useGetEntryDetail();
+  const getAvailability = useGetAvailability();
   const addToShelf = useAddToShelf();
   const removeFromShelf = useRemoveFromShelf();
 
@@ -149,7 +155,9 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     (async () => {
       try {
         const entryDetail = await getEntryDetail(entryId);
+        const entryAvailability = await getAvailability(new Date(), new Date(), entryId);
         setEntry(entryDetail);
+        setAvailability(entryAvailability);
       } catch {
         setEntry(null);
       }
@@ -172,17 +180,16 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
         </div>
       ) : (
         <div className={'flex h-full flex-col mdlg:flex-row'}>
-          <div className='p-8 bg-lightGray dark:bg-darkGray h-full min-w-[350px] flex flex-col'>
+          <div className='p-8 bg-lightGray dark:bg-darkGray h-full min-w-[400px] flex flex-col'>
             <div className={`w-full flex justify-center border rounded-md flex-shrink overflow-hidden h-full`}>
               <img className={'w-full h-full object-cover'}
                 src={entry.thumbnail + `?access_token=${auth?.token}`}
                 alt='Entry Thumbnail'
-                onLoad={() => setImageLoaded(true)}
               />
             </div>
 
             <ActionsWrapper>
-              <AcquisitionsButton acquisitions={entry.acquisitions} entry={entry} />
+              <AcquisitionsButton acquisitions={entry.acquisitions} availability={availability} entry={entry} />
               <ShelfButton
                 isLoading={isLoading}
                 entryId={entryId!}

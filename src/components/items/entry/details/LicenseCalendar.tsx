@@ -10,6 +10,8 @@ import useAppContext from "../../../../hooks/contexts/useAppContext";
 import { DetailHeader } from "./DetailHeader";
 import { formatDate } from "date-fns";
 import { FaRegCalendarXmark, FaRegCalendarPlus } from "react-icons/fa6";
+import { IAvailabilityResponse } from "../../../../utils/interfaces/license";
+import useGetAvailability from "../../../../hooks/api/licenses/useGetAvailability";
 
 // http://localhost:3000/?licensing-entry-id=ce40e042-1491-434f-a0b4-593c0a867b99
 
@@ -18,6 +20,7 @@ export default function LicenseCalendar({ }: {}) {
     const { t } = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
     const getEntryDetail = useGetEntryDetail();
+    const getAvailability = useGetAvailability();
 
     const [entryId, setEntryId] = useState<string | null>(null);
     const [entry, setEntry] = useState<IEntryDetail | null>(null);
@@ -30,10 +33,32 @@ export default function LicenseCalendar({ }: {}) {
         setSelectionDayEnd(end);
     }
 
+    const [availability, setAvailability] = useState<IAvailabilityResponse | null>(null);
+
     useEffect(() => {
         const paramEntryId = searchParams.get('licensing-entry-id');
         setEntryId(paramEntryId);
+        setAvailability(null);
     }, [searchParams]);
+
+    function requestAvailability(start: Date, end: Date) {
+        if (!entryId) return;
+
+        (async () => {
+            try {
+                const availabilityData = await getAvailability(start, end, entryId);
+                console.log(availabilityData)
+                setAvailability((prev) => {
+                    if (prev == null) return availabilityData;
+                    prev.available = availabilityData.available;
+                    prev.calendar = [...prev.calendar, ...availabilityData.calendar];
+                    return prev;
+                });
+            } catch {
+                setAvailability(null);
+            }
+        })();
+    }
 
     useEffect(() => {
         // Reset
@@ -60,11 +85,6 @@ export default function LicenseCalendar({ }: {}) {
         });
         setEntryId(null);
     }
-
-    useEffect(() => {
-        console.log('load entry')
-        console.log(entry)
-    }, [entryId]);
 
     return (
         <Modal
@@ -94,13 +114,13 @@ export default function LicenseCalendar({ }: {}) {
                         </div> : null}
                     </div>
 
-                    <Calendar onSelectionChanged={onSelectionChange} bookedDates={[
-                        '2025-07-30',
-                        '2025-07-28',
-                        '2025-07-27',
-                        '2025-07-26',
-                        '2025-07-25',
-                    ]} />
+                    {availability?.available ? (
+                        <Calendar onSelectionChanged={onSelectionChange} availability={availability} requestAvailability={requestAvailability} />
+                    ) : (
+                        <div className="flex justify-center items-center h-full">
+                           {t('license.calendar.noAvailability')}
+                        </div>
+                    )}
                 </>) : (
                     <div className={'flex justify-center h-full items-center'}>
                         <CircleLoader color={stuColor} size={50} />

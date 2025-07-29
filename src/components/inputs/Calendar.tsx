@@ -4,9 +4,11 @@ import { useTranslation } from "react-i18next";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { toast } from "react-toastify";
 import { twMerge } from "tailwind-merge";
+import { IAvailabilityResponse } from "../../utils/interfaces/license";
 
 interface CalendarProps {
-    bookedDates?: string[];
+    availability: IAvailabilityResponse | null;
+    requestAvailability: (start: Date, end: Date) => void;
     onSelectionChanged?: (start: Date | null, end: Date | null) => void;
 }
 
@@ -21,11 +23,16 @@ const translation = {
     }
 };
 
-const Calendar: React.FC<CalendarProps> = ({ bookedDates = [], onSelectionChanged }) => {
+function isDateBooked(date: Date, availability: IAvailabilityResponse | null): boolean {
+    if (!availability) return false;
+    const formattedDate = format(date, "yyyy-MM-dd");
+    return availability.calendar?.some(slot => slot.date === formattedDate && !slot.is_available);
+}
+
+const Calendar: React.FC<CalendarProps> = ({ availability, requestAvailability, onSelectionChanged }) => {
     const { i18n, t } = useTranslation();
     const lang = i18n.language as 'en' | 'sk';
     const weekDays = translation[lang].days;
-    const [currentDate, setCurrentDate] = React.useState(new Date());
 
     const [selectionDayStart, setSelectionDayStart] = React.useState<Date | null>(null);
     const [selectionDayEnd, setSelectionDayEnd] = React.useState<Date | null>(null);
@@ -41,11 +48,8 @@ const Calendar: React.FC<CalendarProps> = ({ bookedDates = [], onSelectionChange
         let isPeriodBooked = false;
 
         while (day <= end) {
-            const formattedDate = format(day, "yyyy-MM-dd");
-            if (bookedDates.includes(formattedDate)) {
-                isPeriodBooked = true;
-                break;
-            }
+            isPeriodBooked = isDateBooked(day, availability);
+            if (isPeriodBooked) break;
             day = addDays(day, 1);
         }
 
@@ -82,6 +86,10 @@ const Calendar: React.FC<CalendarProps> = ({ bookedDates = [], onSelectionChange
             setSelectionDayEnd(null);
         }
     }
+    
+    const [currentDate, setCurrentDate] = React.useState(new Date());
+    const [startDate, setStartDate] = React.useState<Date>(() => startOfWeek(startOfMonth(new Date())));
+    const [endDate, setEndDate] = React.useState<Date>(() => endOfWeek(endOfMonth(new Date())));
 
     const handlePrevMonth = () => {
         setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() - 1, 1));
@@ -91,8 +99,15 @@ const Calendar: React.FC<CalendarProps> = ({ bookedDates = [], onSelectionChange
         setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + 1, 1));
     };
 
-    const startDate = startOfWeek(startOfMonth(currentDate));
-    const endDate = endOfWeek(endOfMonth(currentDate));
+
+    useEffect(() => {
+        setStartDate(startOfWeek(startOfMonth(currentDate)));
+        setEndDate(endOfWeek(endOfMonth(currentDate)));
+    }, [currentDate]);
+
+    useEffect(() => {
+        requestAvailability(startDate, endDate);
+    }, [startDate, endDate]);
 
     let days = [];
     let day = startDate;
@@ -102,9 +117,9 @@ const Calendar: React.FC<CalendarProps> = ({ bookedDates = [], onSelectionChange
             const formattedDate = format(day, "yyyy-MM-dd");
 
             const isPast = day < new Date();
-            const isBooked = bookedDates.includes(formattedDate);
-            const isPreviousDayBooked = bookedDates.includes(format(addDays(day, -1), "yyyy-MM-dd"));
-            const isNextDayBooked = bookedDates.includes(format(addDays(day, 1), "yyyy-MM-dd"));
+            const isBooked = isDateBooked(day, availability);
+            const isPreviousDayBooked = isDateBooked(addDays(day, -1), availability);
+            const isNextDayBooked = isDateBooked(addDays(day, 1), availability);
             const isCurrentMonth = isSameMonth(day, currentDate);
 
             const isStartDate = selectionDayStart && isSameDay(day, format(selectionDayStart, "yyyy-MM-dd"));

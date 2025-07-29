@@ -1,21 +1,22 @@
-import { BiBookAdd, BiBookOpen } from "react-icons/bi";
+import { BiBookAdd, BiBookOpen, BiCalendar } from "react-icons/bi";
 import { IEntryAcquisition } from "../../utils/interfaces/acquisition";
 import { IEntryDetail } from "../../utils/interfaces/entry";
 import { ActionButtonStyle } from "../items/entry/details/DetailActions";
 import PDFButton from "./PDFButtons";
 import { useTranslation } from "react-i18next";
 import { twMerge } from "tailwind-merge";
-import { useState} from "react";
+import { useState } from "react";
+import { IAvailabilityResponse } from "../../utils/interfaces/license";
+import { useSearchParams } from "react-router-dom";
 
-export default function AcquisitionsButton({ entry, acquisitions }: { entry: IEntryDetail, acquisitions: IEntryAcquisition[] }) {
-
-    // Todo get license, open calendar popup, etc.
-
+export default function AcquisitionsButton({ entry, acquisitions, availability }: { entry: IEntryDetail, acquisitions: IEntryAcquisition[], availability: IAvailabilityResponse | null }) {
     const { t } = useTranslation();
     const [isOpen, setIsOpen] = useState(false);
-    if (acquisitions.length === 0) return null;
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    if (acquisitions.length === 1) {
+    if (acquisitions.length === 0 && !availability?.available) return null;
+
+    if (acquisitions.length === 1 && !availability?.available) {
         return (
             <PDFButton
                 acquisition={acquisitions[0]}
@@ -25,6 +26,24 @@ export default function AcquisitionsButton({ entry, acquisitions }: { entry: IEn
                 </div>
             </PDFButton>
         );
+    }
+
+    function openBorrowModal() {
+        const params = new URLSearchParams(searchParams);
+        params.set('licensing-entry-id', entry.id);
+        setSearchParams(params);
+    }
+
+    if (acquisitions.length === 0 && availability?.available) {
+        return (
+            <div>
+                <div className={twMerge(ActionButtonStyle, 'w-full cursor-pointer')}
+                onClick={openBorrowModal}
+                >
+                    <BiCalendar className="flex-shrink-0" size={24} /> {t('entry.detail.borrow')}
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -42,7 +61,7 @@ export default function AcquisitionsButton({ entry, acquisitions }: { entry: IEn
 
             <div
                 className={twMerge(
-                    "absolute bottom-full left-0 w-full flex-col gap-2 p-1 transition-opacity duration-200 bg-lightGray rounded-lg shadow-lg",
+                    "absolute bottom-full left-0 w-full flex-col gap-2 p-1 transition-opacity duration-200 bg-lightGray dark:bg-gray rounded-lg shadow-lg",
                     isOpen ? "flex opacity-100" : "hidden opacity-0"
                 )}
                 style={{ zIndex: 10 }}
@@ -53,10 +72,18 @@ export default function AcquisitionsButton({ entry, acquisitions }: { entry: IEn
                         acquisition={acquisition}
                         entryId={entry.id}>
                         <div className={twMerge(ActionButtonStyle, 'w-full')}>
-                            <BiBookOpen size={24} /> {t('entry.detail.read') } {index + 1}
-                         </div>
+                            <BiBookOpen size={24} /> {t('entry.detail.read')} {index + 1}
+                        </div>
                     </PDFButton>
                 ))}
+                {availability?.available && (
+                    <div
+                        className={twMerge(ActionButtonStyle, 'w-full cursor-pointer')}
+                        onClick={openBorrowModal}
+                    >
+                        <BiCalendar size={24} className="flex-shrink-0"/> {t('entry.detail.borrow')}
+                    </div>
+                )}
             </div>
         </div>
     );

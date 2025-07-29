@@ -1,4 +1,5 @@
 import { ca } from "date-fns/locale";
+import { stat } from "fs";
 
 export const sk = {
   translation: {
@@ -116,6 +117,11 @@ export const sk = {
         copyError: 'Nepodarilo sa skopírovať citáciu.',
       },
       shareSuccess: 'Adresa bola skopírovaná.',
+      license: {
+        download: {
+          error: 'Nepodarilo sa stiahnuť licenciu.',
+        },
+      },
     },
 
     // LOGIN PAGE
@@ -252,6 +258,7 @@ export const sk = {
         summary: 'Zhrnutie',
         read: 'Čítať',
         more: 'Prístup',
+        borrow: 'Vypožičať',
         cite: 'Citovať',
         share: 'Zdieľať',
         relation: 'Relácia',
@@ -315,10 +322,29 @@ export const sk = {
 
     license: {
       calendar: {
-        title: 'Kalendár výpožičiek', 
+        title: 'Kalendár výpožičiek',
         periodBooked: 'Vybraný časový úsek je už obsadený.',
-
+        noAvailability: 'Táto kniha nie je k dispozícii.',
       },
+      loansPage: {
+        title: 'Výpožičky',
+        table: {
+          title: 'Počet výpožičiek: {{x}}',
+          entry: 'Publikácia',
+          state: 'Stav',
+          states: {
+            ready: 'Pripravené',
+            active: 'Aktívne',
+            returned: 'Vrátené',
+            expired: 'Expirujúce',
+            revoked: 'Zrušené',
+            cancelled: 'Zrušené',
+          },
+          starts_at: 'Začiatok',
+          ends_at: 'Koniec',
+          actions: 'Akcie',
+        },
+      }
     },
 
     dropzone: {
