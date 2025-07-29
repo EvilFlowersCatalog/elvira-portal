@@ -46,10 +46,11 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
         setSortBy({ selector: col.selector, order: newOrder });
     }
 
-    function getPagination() {
+    function getPagination(span:number) {
         if (!metadata) return null;
 
         return <TablePagination
+            colSpan={ span }
             className='dark:text-white'
             sx={{
                 '.dark & .MuiButtonBase-root.Mui-disabled': {
@@ -61,10 +62,10 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
             }}
             rowsPerPageOptions={rowsPerPageOptions || [metadata.limit]}
             count={metadata.total}
-            page={metadata.page}
+            page={metadata.page-1}
             rowsPerPage={metadata.limit}
             onPageChange={(e, newPage: number) => {
-                fetchFunction?.({ page: newPage, limit: metadata.limit, sortBy: getOrderByLabel() });
+                fetchFunction?.({ page: newPage+1, limit: metadata.limit, sortBy: getOrderByLabel() });
             }}
             onRowsPerPageChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 fetchFunction?.({ page: 1, limit: parseInt(e.target.value, 10), sortBy: getOrderByLabel() });
@@ -97,7 +98,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                                         </div>
                                     </div>
                                 </TableCell>
-                                {getPagination()}
+                                {getPagination(header.length - 1)}
                             </TableRow>
                         </TableHead>
                         <TableHead className="bg-gray/10 dark:bg-black/70">
@@ -136,7 +137,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
 
                         <TableFooter className='bg-gray/10 dark:bg-black/70'>
                             <TableRow>
-                                {getPagination()}
+                                {getPagination(header.length)}
                             </TableRow>
                         </TableFooter>
                     </Table>
