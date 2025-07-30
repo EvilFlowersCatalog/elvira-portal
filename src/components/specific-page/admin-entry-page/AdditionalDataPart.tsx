@@ -26,6 +26,14 @@ const AdditionalDataPart = ({
   const { stuText, umamiTrack } = useAppContext();
 
   const [image, setImage] = useState<File | null>(null);
+  const [languageCode, setLanguageCode] = useState<string>(entry.language_code || '');
+
+  useEffect(() => {
+    setEntry({
+      ...entry,
+      language_code: languageCode,
+    });
+  }, [languageCode]);
 
   // set image
   useEffect(() => {
@@ -105,7 +113,7 @@ const AdditionalDataPart = ({
             value={entry.title ?? ''}
             required
           />
-          <LanguageAutofill entryForm={entry} setEntryForm={setEntry} setIsSelectionOpen={() => { }} isRequired={true} />
+          <LanguageAutofill languageCode={languageCode} setLanguageCode={setLanguageCode} setIsSelectionOpen={() => { }} isRequired={true} />
           <ElviraInput
             onChange={handlePublisherChange}
             placeholder={t('entry.wizard.publisher')}

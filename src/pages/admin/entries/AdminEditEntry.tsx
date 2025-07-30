@@ -28,6 +28,7 @@ const AdminEditEntry = () => {
         if (id) {
           const entryDetail  = await getEntryDetail(id);
           setEditingEntryTitle(entryDetail.title);
+          setStringImage(entryDetail.thumbnail || '');
 
           setEntry({
             title: entryDetail.title,
