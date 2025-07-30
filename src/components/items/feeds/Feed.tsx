@@ -5,6 +5,8 @@ import { useState } from 'react';
 import { IFeed } from '../../../utils/interfaces/feed';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import useAppContext from '../../../hooks/contexts/useAppContext';
+import useGetFeeds from '../../../hooks/api/feeds/useGetFeeds';
+import useGetFeedDetail from '../../../hooks/api/feeds/useGetFeedDetail';
 
 interface IFeedParams {
   feed: IFeed;
@@ -12,6 +14,7 @@ interface IFeedParams {
 
 const Feed = ({ feed }: IFeedParams) => {
   const { stuBg, umamiTrack } = useAppContext();
+  var getFeedDetails = useGetFeedDetail();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [isHovering, setIsHovering] = useState<boolean>(false);
@@ -26,10 +29,6 @@ const Feed = ({ feed }: IFeedParams) => {
       params.delete('query');
       const previous = params.get('parent-id');
 
-      // TODO: if query was used, parent-id was cleared
-      // so we need to set it back and retrieve all of the previous parents
-      // For now search-all is added (3 files changed)
-
       let path = '';
       if (previous) path = previous + '&' + feed.id;
       else path = feed.id;
@@ -41,13 +40,32 @@ const Feed = ({ feed }: IFeedParams) => {
         feedId: feed.id,
       });
       const params = new URLSearchParams();
-      params.set('search-all', searchParams.get('search-all') ?? 'false');
-      params.set('parent-id', searchParams.get('parent-id') ?? '');
-      params.set('feed-id-step', feed.id);
-      navigate({
-        pathname: NAVIGATION_PATHS.library,
-        search: params.toString(),
-      });
+
+      var searchAll = searchParams.get('search-all') === 'true';
+
+      async function getParentFeed(feedId: string): Promise<string[]> {
+        const feed = await getFeedDetails(feedId);
+        if (feed.parents && feed.parents.length > 0) return [...await getParentFeed(feed.parents[0]), feedId];
+        else return [feedId];
+      }
+
+      (async () => {
+        if (searchAll) {
+          if (feed.parents && feed.parents.length > 0) {
+            var parentPath = await getParentFeed(feed.parents[0]);
+            params.set('parent-id', parentPath.join("&"));
+          }
+        } else {
+          params.set('parent-id', searchParams.get('parent-id') ?? '');
+        }
+        params.set('feed-id-step', feed.id);
+
+        navigate({
+          pathname: NAVIGATION_PATHS.library,
+          search: params.toString(),
+        });
+      })()
+
     }
   };
 

@@ -83,7 +83,7 @@ const FileDropzone = ({
               );
             } catch {
               // Show error notification
-              toast.error(t('notifications.acquisition.add.error', file.name));
+              toast.error(t('notifications.acquisition.add.error', { x: file.name }));
             }
           })
         );
@@ -143,8 +143,8 @@ const FileDropzone = ({
         <div
           {...getRootProps({
             className: `relative flex-2 min-h-60 max-h-[500px] overflow-auto rounded-md p-4 border-4 border-dashed duration-200 cursor-pointer ${isDragActive
-                ? `${stuBg} bg-opacity-50 border-white`
-                : 'bg-slate-200 dark:bg-gray border-transparent'
+              ? `${stuBg} bg-opacity-50 border-white`
+              : 'bg-slate-200 dark:bg-gray border-transparent'
               }`,
           })}
         >

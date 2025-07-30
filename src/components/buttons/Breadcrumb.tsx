@@ -28,7 +28,6 @@ const Breadcrumb = () => {
   const breadcrumbsTranslator: { [key: string]: string } = {
     ['library']: isEn() ? 'Library' : 'Knižnica',
     ['feeds']: isEn() ? 'Feeds' : 'Skupiny',
-    ['feedsSearch']: isEn() ? 'Feeds Search' : 'Hľadanie v skupinách',
     ['about']: isEn() ? 'About' : 'O Projekte',
     ['administration']: isEn() ? 'Administration' : 'Administrácia',
     ['shelf']: isEn() ? 'Shelf' : 'Polička',
@@ -59,18 +58,10 @@ const Breadcrumb = () => {
         });
         skip = true;
       } else if (feeds.length > 0 && pathParts[0] == 'library') {
-        if (searchParams.get('search-all') === 'true') {
-          newBreadcrumbs.push({
-            path: "/feeds",
-            label: breadcrumbsTranslator['feedsSearch'],
-          });
-        }
-        else {
-          newBreadcrumbs.push({
-            path: "/feeds",
-            label: breadcrumbsTranslator['feeds'],
-          });
-        }
+        newBreadcrumbs.push({
+          path: "/feeds",
+          label: breadcrumbsTranslator['feeds'],
+        });
       }
       else {
         newBreadcrumbs.push({
