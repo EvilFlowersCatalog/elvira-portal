@@ -98,7 +98,7 @@ const AdminAddEntry = () => {
             } catch {
               // Show error notification
               toast.error(
-                t('notifications.acquisition.add.error', item.file.name)
+                t('notifications.acquisition.add.error', {x: item.file.name})
               );
             }
           })

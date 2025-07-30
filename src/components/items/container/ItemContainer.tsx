@@ -12,6 +12,7 @@ import EntryDetail from '../entry/details/EntryDetail';
 import { H1 } from '../../primitives/Heading';
 import { AdvancedSearchWrapper } from './AdvancedSearch';
 import OpenFiltersButton from '../../buttons/OpenFiltersButton';
+import LicenseCalendar from '../entry/details/LicenseCalendar';
 
 interface IItemContainer {
   children: ReactNode;
@@ -150,6 +151,7 @@ const ItemContainer = ({
             )}
             <OpenFiltersButton />
             <EntryDetail triggerReload={triggerReload} />
+            <LicenseCalendar />
           </>
         </AdvancedSearchWrapper >
       </div>
