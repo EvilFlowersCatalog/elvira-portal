@@ -20,20 +20,38 @@ const Feed = ({ feed }: IFeedParams) => {
   const [isHovering, setIsHovering] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const handleFeedClick = () => {
+  async function getParentFeed(feedId: string): Promise<string[]> {
+    const feed = await getFeedDetails(feedId);
+    if (feed.parents && feed.parents.length > 0) return [...await getParentFeed(feed.parents[0]), feedId];
+    else return [feedId];
+  }
+
+  const handleFeedClick = async () => {
     if (feed.kind === 'navigation') {
       umamiTrack('Feed Parent Button', {
         feedId: feed.id,
       });
       const params = new URLSearchParams(searchParams);
       params.delete('query');
-      const previous = params.get('parent-id');
 
+      var searchAll = searchParams.get('search-all') === 'true';
+
+      var previous;
+      if (searchAll) {
+        params.delete('search-all');
+        if (feed.parents && feed.parents.length > 0) {
+          previous = await getParentFeed(feed.parents[0]);
+          previous = previous.join('&');
+        }
+      } else {
+        previous = params.get('parent-id');
+      }
+      
       let path = '';
       if (previous) path = previous + '&' + feed.id;
       else path = feed.id;
-
       params.set('parent-id', path);
+
       setSearchParams(params);
     } else {
       umamiTrack('Feed Button', {
@@ -43,13 +61,6 @@ const Feed = ({ feed }: IFeedParams) => {
 
       var searchAll = searchParams.get('search-all') === 'true';
 
-      async function getParentFeed(feedId: string): Promise<string[]> {
-        const feed = await getFeedDetails(feedId);
-        if (feed.parents && feed.parents.length > 0) return [...await getParentFeed(feed.parents[0]), feedId];
-        else return [feedId];
-      }
-
-      (async () => {
         if (searchAll) {
           if (feed.parents && feed.parents.length > 0) {
             var parentPath = await getParentFeed(feed.parents[0]);
@@ -64,7 +75,6 @@ const Feed = ({ feed }: IFeedParams) => {
           pathname: NAVIGATION_PATHS.library,
           search: params.toString(),
         });
-      })()
 
     }
   };
@@ -73,7 +83,7 @@ const Feed = ({ feed }: IFeedParams) => {
     <div className={'relative flex p-2 w-full md:w-1/2 xl:w-1/4'}>
       <button
         className={`p-5 py-10 gap-5 w-full h-full flex text-center justify-between items-center ${stuBg} text-white rounded-md duration-200`}
-        onClick={handleFeedClick}
+        onClick={() => handleFeedClick()}
         onMouseEnter={() => setIsHovering(true)}
         onMouseOut={() => setIsHovering(false)}
       >
