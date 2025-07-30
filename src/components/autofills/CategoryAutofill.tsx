@@ -54,7 +54,7 @@ const CategoryAutofill = ({
         });
       }
     }
-  });
+  }, [defaultCategoryId, categories]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;

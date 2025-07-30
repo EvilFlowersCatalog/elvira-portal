@@ -237,7 +237,7 @@ export const sk = {
       advancedSearch: 'Pokročilé Vyhľadávanie',
       title: 'Názov publikácie',
       author: 'Autorové Meno',
-      category: 'Kategória',
+      categories: 'Kategórie',
       feeds: 'Skupina',
       search: 'Hľadať',
       searchAll: "Prehľadávať všetko",

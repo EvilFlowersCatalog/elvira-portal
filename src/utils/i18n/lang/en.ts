@@ -243,7 +243,7 @@ export const en = {
       advancedSearch: 'Advanced Search',
       title: 'Title of entry',
       author: "Author's Name",
-      category: 'Category',
+      categories: 'Categories',
       feeds: 'Feed',
       search: 'Search',
       searchAll: 'Search All',

@@ -10,6 +10,8 @@ import FeedAutofill from "../../autofills/FeedAutofill";
 import { Button } from "@mui/material";
 import ElviraNumberInput from "../../inputs/ElviraNumberInput";
 import { IoClose } from "react-icons/io5";
+import AdvancedCheckboxes from "../../inputs/AdvancedCheckboxes";
+import useGetCategories from "../../../hooks/api/categories/useGetCategories";
 
 export function AdvancedSearchWrapper({ children }: { children: React.ReactNode }) {
     const { showAdvancedSearch, setShowAdvancedSearch } = useAppContext();
@@ -72,6 +74,20 @@ export function AdvancedSearch() {
         categories: ICategory[];
     }>({ categories: [] });
 
+
+    const getCategories = useGetCategories();
+    const [allCategories, setAllCategories] = useState<ICategory[]>([]);
+    const [activeCategories, setActiveCategories] = useState<ICategory[]>([]);
+
+    useEffect(() => {
+        (async () => {
+            const { items } = await getCategories({
+                paginate: false,
+            });
+            setAllCategories(items);
+        })();
+    }, []);
+
     const onSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -84,6 +100,10 @@ export function AdvancedSearch() {
         if (activeCategory.categories.length > 0)
             searchParams.set('category-id', activeCategory.categories[0].id);
         else searchParams.delete('category-id');
+
+        if(activeCategories.length > 0) {
+            searchParams.set('categories', activeCategories.map(cat => cat.id).join(','));
+        } else searchParams.delete('categories');
 
         if (activeFeeds.feeds.length > 0)
             searchParams.set('feed-id', activeFeeds.feeds[0].id);
@@ -153,7 +173,7 @@ export function AdvancedSearch() {
                     }}
                 />
             </div>
-            
+
             <LanguageAutofill
                 defaultLanguageCode={defaultLanguageCode}
                 languageCode={languageCode}
@@ -167,6 +187,17 @@ export function AdvancedSearch() {
                 setIsSelectionOpen={() => { }}
                 single
             />
+
+            <AdvancedCheckboxes
+                title={t('searchBar.categories')}
+                options={allCategories.map(cat => ({ label: cat.term, value: cat.id }))}
+                selected={activeCategories.map(cat => cat.id)}
+                setSelected={(selected) => {
+                    const selectedCategories = allCategories.filter(cat => selected.includes(cat.id));
+                    setActiveCategories(selectedCategories);
+                }}
+            />
+
             <FeedAutofill
                 defaultFeedId={defaultFeedId}
                 entryForm={activeFeeds}
