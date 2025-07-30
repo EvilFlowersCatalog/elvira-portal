@@ -91,20 +91,20 @@ export default function LoansTable({ }) {
             limit,
             sortBy
         }).then(({ items: data, metadata }) => {
-            // setItems(data);
-            setItems([ // TEMP-BE
-                {
-                    id: 'e0b6bede-d678-4b64-9415-e7243a0489f7',
-                    entry_id: 'e0b6bede-d678-4b64-9415-e7243a0489f7',
-                    lcp_license_id: 'lcp-1',
-                    user_id: 'user-1',
-                    state: 'active',
-                    created_at: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                    starts_at: new Date().toISOString(),
-                    expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
-                }
-            ]);
+            setItems(data);
+            // setItems([ // TEMP-BE
+            //     {
+            //         id: 'e0b6bede-d678-4b64-9415-e7243a0489f7',
+            //         entry_id: 'e0b6bede-d678-4b64-9415-e7243a0489f7',
+            //         lcp_license_id: 'lcp-1',
+            //         user_id: 'user-1',
+            //         state: 'active',
+            //         created_at: new Date().toISOString(),
+            //         updated_at: new Date().toISOString(),
+            //         starts_at: new Date().toISOString(),
+            //         expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
+            //     }
+            // ]);
             setMetadata(metadata);
         });
     };

@@ -12,8 +12,6 @@ import useAddToShelf from '../../../../hooks/api/my-shelf/useAddToShelf';
 import useRemoveFromShelf from '../../../../hooks/api/my-shelf/useRemoveFromShelf';
 import { NAVIGATION_PATHS } from '../../../../utils/interfaces/general/general';
 import ShelfButton from '../../../buttons/ShelfButton';
-import PDFButton from '../../../buttons/PDFButtons';
-import { BiBookOpen } from 'react-icons/bi';
 import { TabContent, Tabs, TabsComponent, TabsHeader, TabTitle } from './EntryDetailTabs';
 import { InfoGrid, InfoItem, InfoItemCustom } from './EntryGrid';
 import { SummaryText } from './SummaryText';

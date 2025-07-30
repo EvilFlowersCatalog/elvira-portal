@@ -189,21 +189,14 @@ const Viewer = () => {
         setProgressBar(30);
 
         // Fetch entry details and process acquisition
-        const [entryDetail, userAcquisition] =
-          await Promise.all([
-            getEntryDetail(id!),
-            getEntryDetail(id!).then((info) =>
-              createUserAcquisition({
-                acquisition_id:
-                  info.acquisitions[parseInt(index || '0')].id,
-                type: 'personal',
-              })
-            ),
-          ]);
+        const entryDetail = await getEntryDetail(id!);
+        const userAcquisition = await createUserAcquisition({
+          acquisition_id: entryDetail.acquisitions[parseInt(index || '0')].id,
+          type: 'personal',
+        });
 
         acquisition_id = entryDetail.acquisitions[parseInt(index || '0')].id;
         user_acquisition_id = userAcquisition.id;
-
         setProgressBar(50);
 
         // Update metatags if properties exist

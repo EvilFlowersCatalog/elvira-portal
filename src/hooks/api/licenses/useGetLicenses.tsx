@@ -32,27 +32,28 @@ const useGetLicenses = () => {
             }
         }>(GET_LICENCES_URL, { params });
 
-        // TEMP-BE
-        return {
-            items: [
-                {
-                    entry_id: 'e0b6bede-d678-4b64-9415-e7243a0489f7',
-                    id: 'license-1',
-                    state: 'active',
-                    created_at: '2023-01-01',
-                    expires_at: '2024-01-01',
-                    user_id: '',
-                    updated_at: '',
-                    starts_at: ''
-                }
-            ],
-            metadata: {
-                pages: 1,
-                total: 1,
-                limit: 10,
-                page: 1
-            }
-        };
+        // // TEMP-BE
+        // return {
+        //     items: [
+        //         {
+        //             entry_id: 'e0b6bede-d678-4b64-9415-e7243a0489f7',
+        //             id: 'license-1',
+        //             state: 'active',
+        //             created_at: '2023-01-01',
+        //             expires_at: '2024-01-01',
+        //             user_id: '',
+        //             updated_at: '',
+        //             starts_at: '',
+        //             lcp_license_id: 'lcp-license-1',
+        //         }
+        //     ],
+        //     metadata: {
+        //         pages: 1,
+        //         total: 1,
+        //         limit: 10,
+        //         page: 1
+        //     }
+        // };
 
         return data;
     };

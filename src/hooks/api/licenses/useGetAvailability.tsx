@@ -12,7 +12,7 @@ const useGetAvailability = () => {
         const GET_AVAILABILITY_URL = `/readium/v1/entries/${entry_id}/availability`;
 
         const { data } = await axios.get<{response:IAvailabilityResponse}>(GET_AVAILABILITY_URL, { params });
-        data.response.available = true; // TEMP-BE
+        // data.response.available = true; // TEMP-BE
         return data.response;
     };
 

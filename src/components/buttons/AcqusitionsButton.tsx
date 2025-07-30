@@ -58,7 +58,7 @@ export default function AcquisitionsButton({
   // === Subcomponents ===
 
   const SinglePDFButton = () => (
-    <PDFButton acquisition={acquisitions[0]} entryId={entry.id}>
+    <PDFButton acquisition={acquisitions[0]} index={0} entryId={entry.id}>
       <div className={ActionButtonStyle}>
         <BiBookOpen size={24} />
         {t("entry.detail.read")}
@@ -108,7 +108,7 @@ export default function AcquisitionsButton({
         style={{ zIndex: 10 }}
       >
         {acquisitions.map((acq, i) => (
-          <PDFButton key={i} acquisition={acq} entryId={entry.id}>
+          <PDFButton key={i} index={i} acquisition={acq} entryId={entry.id}>
             <div className={twMerge(ActionButtonStyle, "w-full")}>
               <BiBookOpen size={24} />
               {t("entry.detail.read")} {i + 1}

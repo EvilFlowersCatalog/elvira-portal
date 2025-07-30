@@ -13,11 +13,10 @@ const useCreateUserAcquisition = () => {
   ): Promise<IUserAcquisitionResponse> => {
     // Create user acquistion
     const CREATE_USER_ACQUISITION_URL = '/api/v1/user-acquisitions';
-    const { data: info } = await axios.post<{response: IUserAcquisitionResponse}>(
+    const { data: info } = await axios.post<{ response: IUserAcquisitionResponse }>(
       CREATE_USER_ACQUISITION_URL,
-      userAcquisition
+      userAcquisition,
     );
-
     // return whatever response
     return info.response;
   };

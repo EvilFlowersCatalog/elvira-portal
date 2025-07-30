@@ -9,15 +9,16 @@ import { useLocation } from 'react-router-dom';
 interface IPDFButtonsParams {
   acquisition: IEntryAcquisition;
   entryId: string;
+  index: number;
   children: React.ReactNode;
 }
 
-const PDFButton = ({ acquisition, entryId, children }: IPDFButtonsParams) => {
+const PDFButton = ({ acquisition, index, entryId, children }: IPDFButtonsParams) => {
   const { specialNavigation, umamiTrack } = useAppContext();
   const { t } = useTranslation();
   const location = useLocation();
 
-  const handleRead = (e: MouseEvent<HTMLButtonElement>, index: number) => {
+  const handleRead = (e: MouseEvent<HTMLButtonElement>) => {
     umamiTrack('PDF Read Button', {
       pdf: acquisition.id,
       entryId,
@@ -31,7 +32,7 @@ const PDFButton = ({ acquisition, entryId, children }: IPDFButtonsParams) => {
 
   return (
     <button onClick={(e)=>{
-      handleRead(e, 0)
+      handleRead(e)
     }}>
       {children}
     </button>
