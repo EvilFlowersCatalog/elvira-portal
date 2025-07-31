@@ -60,7 +60,7 @@ const AdminEntries = () => {
             <Breadcrumb />
             <H1>{t('administration.usersPage.title')}</H1>
             <ToolsContainer param={'name'} advancedSearch={false} enableSort={false} />
-            <ElviraTable title={t('administration.usersPage.tableTitle', { x: 0 })}
+            <ElviraTable title={t('administration.usersPage.tableTitle', { x: metadata.total })}
                 header={[
                     { label: t('administration.usersPage.username'), selector: 'username', disableHide: true },
                     { label: t('administration.usersPage.name'), selector: 'name' },

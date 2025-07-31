@@ -65,6 +65,9 @@ export default function AdvancedCheckboxes({
                         "&.MuiCheckbox-root": {
                             'padding': '1px 0',
                             'marginLeft': '1rem',
+                        },
+                        ".dark & .MuiSvgIcon-root": {
+                            color: 'white',
                         }
                     }}
                         onChange={(e) => {

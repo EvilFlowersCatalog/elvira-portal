@@ -383,7 +383,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     (Object.entries(paramEventMap) as [keyof typeof umamiParameters, string][]).forEach(([key, eventName]) => {
       const value = umamiParameters[key];
       if (value !== null && value.length > 0 && previousParams.current[key] !== value) {
-        console.log(`umami track: ${eventName} - ${value}`);
         umamiTrack(eventName, { [key]: value });
       }
     });

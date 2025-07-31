@@ -15,6 +15,8 @@ const Breadcrumb = () => {
     { path: string; label: string }[]
   >([]);
   const [searchParams] = useSearchParams();
+
+  const [feedsLoading, setFeedsLoading] = useState<boolean>(searchParams.get('parent-id') || searchParams.get('feed-id-step') ? true : false);
   const [feeds, setFeeds] = useState<{ id: string; title: string }[]>([]);
   const [feedStep, setFeedStep] = useState<{ id: string; title: string }>({
     id: '',
@@ -57,7 +59,7 @@ const Breadcrumb = () => {
           label: breadcrumbsTranslator[part.toLocaleLowerCase()], // Capitalize the first letter
         });
         skip = true;
-      } else if (feeds.length > 0 && pathParts[0] == 'library') {
+      } else if ((feedsLoading || feeds.length > 0) && pathParts[0] == 'library') {
         newBreadcrumbs.push({
           path: "/feeds",
           label: breadcrumbsTranslator['feeds'],
@@ -104,35 +106,44 @@ const Breadcrumb = () => {
   useEffect(() => {
     const fp = searchParams.get('parent-id')?.split('&');
     const feedStepId = searchParams.get('feed-id-step');
-
+    
     (async () => {
-      if (fp) {
-        await Promise.all(
-          fp.map(async (id) => {
-            try {
-              const detail = await getFeedDetail(id);
-              return { id, title: detail.title };
-            } catch {
-              return { id, title: 'Feed' };
-            }
-          })
-        ).then((results) => {
+      const feedsPromise = (async () => {
+        if (fp) {
+          const results = await Promise.all(
+            fp.map(async (id) => {
+              try {
+                const detail = await getFeedDetail(id);
+                return { id, title: detail.title };
+              } catch {
+                return { id, title: 'Feed' };
+              }
+            })
+          );
           setFeeds(results);
-        });
-      } else {
-        setFeeds([]);
-      }
-      if (feedStepId) {
-        try {
-          const detail = await getFeedDetail(feedStepId);
-          setFeedStep({ id: detail.id, title: detail.title });
-        } catch {
+        } else {
+          setFeeds([]);
+        }
+      })();
+
+      const feedStepPromise = (async () => {
+        if (feedStepId) {
+          try {
+            const detail = await getFeedDetail(feedStepId);
+            setFeedStep({ id: detail.id, title: detail.title });
+          } catch {
+            setFeedStep({ id: '', title: '' });
+          }
+        } else {
           setFeedStep({ id: '', title: '' });
         }
-      } else {
-        setFeedStep({ id: '', title: '' });
-      }
+      })();
+
+      await Promise.all([feedsPromise, feedStepPromise]);
+
+      setFeedsLoading(false);
     })();
+
   }, [location.search]);
 
   return (
