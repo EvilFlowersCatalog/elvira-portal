@@ -80,7 +80,7 @@ export default function LoansTable({ }) {
         page: 1,
         limit: 10,
         pages: 1, // undefined
-        total: 1, // undefined
+        total: 0, // undefined
     });
 
     const [searchParams, setSearchParams] = useSearchParams();

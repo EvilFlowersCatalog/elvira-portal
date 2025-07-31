@@ -157,6 +157,10 @@ export const sk = {
           title: 'Kategórie',
           text: 'Spravujte a upravujte kategórie pre lepšiu organizáciu.',
         },
+        users: {
+          title: 'Používatelia',
+          text: 'Spravujte a zobrazujte všetkých používateľov v systéme.',
+        },
       },
       feedsPage: {
         add: 'Pridať Skupinu',
@@ -178,6 +182,21 @@ export const sk = {
         detail: 'Detail',
         feeds: 'Skupina',
         categories: 'Kategória',
+        actions: 'Akcie',
+      },
+      usersPage: {
+        title: 'Správa používateľov',
+        tableTitle: 'Používatelia ({{x}})',
+        detail: 'Detail',
+        username: 'Používateľské meno',
+        name: 'Meno',
+        surname: 'Priezvisko',
+        isActive: 'Aktívny',
+        active: "Aktívny",
+        inactive: "Neaktívny",
+        lastLogin: 'Posledné prihlásenie',
+        createdAt: 'Vytvorené',
+        updatedAt: 'Aktualizované',
         actions: 'Akcie',
       }
     },

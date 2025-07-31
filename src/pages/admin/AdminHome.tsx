@@ -1,12 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { FaBook } from 'react-icons/fa';
-import { MdCategory, MdFeed } from 'react-icons/md';
+import { MdCategory, MdFeed, MdPerson } from 'react-icons/md';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import AdminButton from '../../components/buttons/AdminButton';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 import { H1 } from '../../components/primitives/Heading';
-import ElviraTableTest from '../../components/table/ElviraTableExample';
 
 const buttonConfig = [
   {
@@ -27,6 +26,12 @@ const buttonConfig = [
     textKey: 'administration.homePage.categories.text',
     path: NAVIGATION_PATHS.adminCategories,
   },
+  {
+    icon: <MdPerson size={25} />,
+    titleKey: 'administration.homePage.users.title',
+    textKey: 'administration.homePage.users.text',
+    path: NAVIGATION_PATHS.adminUsers,
+  }
 ];
 
 const AdminHome = () => {
@@ -39,7 +44,7 @@ const AdminHome = () => {
 
       <H1>{t('navbarMenu.administration')}</H1>
 
-      <div className='grid md:grid-cols-3 px-2'>
+      <div className='grid md:grid-cols-4 px-2'>
         {buttonConfig.map(({ icon, titleKey, textKey, path }, index) => (
           <AdminButton
             key={index}
@@ -54,7 +59,7 @@ const AdminHome = () => {
             }}
           />
         ))}
-      </div>    
+      </div>
     </div>
   );
 };

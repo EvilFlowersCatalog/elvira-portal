@@ -158,6 +158,10 @@ export const en = {
           title: 'Categories',
           text: 'Manage and edit categories for better organization.',
         },
+        users: {
+          title: 'Users',
+          text: 'Manage and view all users in the system.',
+        },
       },
       feedsPage: {
         add: 'Add Feed',
@@ -180,7 +184,22 @@ export const en = {
         feeds: 'Feed',
         categories: 'Category',
         actions: 'Actions',
-      }
+      },
+      usersPage: {
+        title: 'User Management',
+        tableTitle: 'Users ({{x}})',
+        detail: 'Detail',
+        username: 'Username',
+        name: 'Name',
+        surname: 'Surname',
+        isActive: 'Active',
+        active: "Active",
+        inactive: 'Inactive',
+        lastLogin: 'Last Login',
+        createdAt: 'Created At',
+        updatedAt: 'Updated At',
+        actions: 'Actions',
+      },
     },
 
     general: {
