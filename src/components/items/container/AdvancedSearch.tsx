@@ -123,7 +123,7 @@ export function AdvancedSearch() {
         searchParams.set('publishedAtGte', year[0].toString());
         searchParams.set('publishedAtLte', year[1].toString());
 
-        searchParams.set('language-code', languageCode);
+        searchParams.set('languageCode', languageCode);
 
         setSearchParams(searchParams);
     };
@@ -137,7 +137,7 @@ export function AdvancedSearch() {
         // const categoryId = searchParams.get('category-id') || '';
         const feeds = searchParams.get('feeds') || '';
         const categories = searchParams.get('categories') || '';
-        const languageCode = searchParams.get('language-code') || '';
+        const languageCode = searchParams.get('languageCode') || '';
         if (title) setTitle(title);
         if (author) setAuthor(author);
         setYear([publishedAtGte, publishedAtLte]);

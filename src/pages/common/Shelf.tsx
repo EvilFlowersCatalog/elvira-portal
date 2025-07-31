@@ -41,7 +41,7 @@ const Shelf = () => {
           publishedAtLte: searchParams.get('publishedAtLte') ?? '',
           orderBy: searchParams.get('order-by') ?? '',
           query: searchParams.get('query') ?? '',
-          languageCode: searchParams.get('language-code') ?? '',
+          languageCode: searchParams.get('languageCode') ?? '',
         });
 
         setMaxPage(metadata.pages);
