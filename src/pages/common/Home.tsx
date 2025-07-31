@@ -80,7 +80,6 @@ const Home = () => {
       </div>
       <EntryDetail />
       <LicenseCalendar />
-      <AiAssistant />
     </>
   );
 };

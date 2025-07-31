@@ -1,11 +1,10 @@
-import { Rating } from "@mui/material";
-import { error } from "console";
-import { create } from "domain";
-
 export const en = {
   translation: {
     assistant: {
       title: 'AI Assistant',
+      inputPlaceholder: 'Ask me anything...',
+      suggestion1: 'How do I learn programming?',
+      suggestion2: 'Find a book about mathematics',
     },
     // NOTIFICATIONS
     notifications: {

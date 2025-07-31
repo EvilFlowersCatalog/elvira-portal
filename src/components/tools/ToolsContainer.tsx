@@ -7,6 +7,7 @@ import ElviraInput from '../inputs/ElviraInput';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { MUISelectStyle } from '../inputs/ElviraSelect';
 import { MdFilterListOff } from 'react-icons/md';
+import AiAssistant from '../dialogs/AiAssistant';
 
 interface IToolsContainerParams {
   advancedSearch?: boolean;
@@ -92,7 +93,7 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, enableSort = true, p
               <IoSearchOutline size={25} />
             </button>
 
-            {aiEnabled && (
+            {aiEnabled && (<>
               <button
                 onClick={() => {
                   setShowAiAssistant(true);
@@ -103,6 +104,8 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, enableSort = true, p
                 </svg>
                 <p className='whitespace-nowrap'>{t('assistant.title')}</p>
               </button>
+              <AiAssistant />
+            </>
             )}
 
           </form>

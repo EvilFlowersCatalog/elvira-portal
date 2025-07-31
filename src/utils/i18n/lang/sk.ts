@@ -1,10 +1,10 @@
-import { ca } from "date-fns/locale";
-import { stat } from "fs";
-
 export const sk = {
   translation: {
     assistant: {
       title: 'AI Asistent',
+      inputPlaceholder: 'Spýtajte sa ma na čokoľvek...',
+      suggestion1: 'Ako sa naučím programovať?',
+      suggestion2: 'Nájdi knihu o matematike',
     },
     // NOTIFICATIONS
     notifications: {
