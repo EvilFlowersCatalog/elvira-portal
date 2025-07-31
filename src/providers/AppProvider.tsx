@@ -306,6 +306,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   useEffect(() => {
     setShowNavbar(false);
     setEditingEntryTitle('');
+    setShowAdvancedSearch(false);
   }, [location.pathname]);
 
   useEffect(() => {

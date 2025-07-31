@@ -1,5 +1,6 @@
 import { Checkbox, FormControlLabel } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { IoClose } from "react-icons/io5";
 
 /**
@@ -9,17 +10,25 @@ export default function AdvancedCheckboxes({
     options,
     selected,
     setSelected,
-    title
+    title,
+    enableSearch = false
 }: {
     options: { label: string; value: string }[];
     selected: string[];
     setSelected: (selected: string[]) => void;
     title?: string;
+    enableSearch?: boolean;
 }) {
+    const { t } = useTranslation();
     const [showMore, setShowMore] = useState(false);
+    const [filteredOptions, setFilteredOptions] = useState(options);
+
+    useEffect(()=>{
+        setFilteredOptions(options);
+    }, [options])
 
     return <div className={`relative ${showMore ? 'max-h-auto' : 'max-h-[200px]'} h-full overflow-y-hidden`}>
-        {!showMore && options.length > 5 ?
+        {!showMore && filteredOptions.length > 5 ?
             <div className="absolute z-10 bottom-0 left-0 w-full">
                 <div className="absolute bottom-0 left-0 w-full h-8 pointer-events-none bg-gradient-to-t from-lightGray dark:from-darkGray to-transparent z-2" />
                 <div
@@ -32,8 +41,20 @@ export default function AdvancedCheckboxes({
         }
 
         <div className="relative z-1 flex flex-col">
-            <h2 className="text-lg capitalize mb-1 mt-2">{title}</h2>
-            {options.map((option, index) => {
+            <h2 className="text-lg capitalize mb-1 mt-2">{title}
+                {selected.length > 0 ? <span className="text-sm text-gray-400 ml-1">({selected.length})</span> : null}</h2>
+
+            {enableSearch ?
+                <input className="dark:bg-strongDarkGray dark border-gray-300 dark:border-none rounded-md px-2 py-1 mb-2 placeholder:text-gray dark:placeholder:text-lightGray" placeholder={t('searchBar.search')}
+                    onChange={(e) => {
+                        const searchValue = e.target.value.toLowerCase();
+                        if (!searchValue) setFilteredOptions(options);
+                        else setFilteredOptions(options.filter(option => option.label.toLowerCase().includes(searchValue)));
+                    }}
+                />
+                : null}
+
+            {filteredOptions.map((option, index) => {
                 return <div key={option.value}>
                     <FormControlLabel sx={{
                         "& .MuiFormControlLabel-label": {
@@ -45,20 +66,20 @@ export default function AdvancedCheckboxes({
                             'padding': '1px 0',
                             'marginLeft': '1rem',
                         }
-                    }} 
-                    onChange={(e) => {
-                        if (e.target.checked) {
-                            setSelected([...selected, option.value]);
-                        } else {
-                            setSelected(selected.filter(item => item !== option.value));
-                        }
                     }}
-                    checked={selected.includes(option.value)}
-                    label={option.label} />} label={option.label} />
+                        onChange={(e) => {
+                            if (e.target.checked) {
+                                setSelected([...selected, option.value]);
+                            } else {
+                                setSelected(selected.filter(item => item !== option.value));
+                            }
+                        }}
+                        checked={selected.includes(option.value)}
+                        label={option.label} />} label={option.label} />
                 </div>;
             })}
         </div>
-        {showMore && options.length > 5 ?
+        {showMore && filteredOptions.length > 5 ?
             <div
                 onClick={() => setShowMore(false)}
                 className="relative flex gap-2 items-center justify-center w-full text-center font-semibold cursor-pointer select-none px-4 text-primary dark:text-primaryLight">

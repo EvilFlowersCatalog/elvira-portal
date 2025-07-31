@@ -238,7 +238,7 @@ export const sk = {
       title: 'Názov publikácie',
       author: 'Autorové Meno',
       categories: 'Kategórie',
-      feeds: 'Skupina',
+      feeds: 'Skupiny',
       search: 'Hľadať',
       searchAll: "Prehľadávať všetko",
       yearFrom: 'Rok od',

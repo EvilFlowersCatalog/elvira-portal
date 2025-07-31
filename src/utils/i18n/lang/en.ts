@@ -244,7 +244,7 @@ export const en = {
       title: 'Title of entry',
       author: "Author's Name",
       categories: 'Categories',
-      feeds: 'Feed',
+      feeds: 'Feeds',
       search: 'Search',
       searchAll: 'Search All',
       yearFrom: 'Year from',

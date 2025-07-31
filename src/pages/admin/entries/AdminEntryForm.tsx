@@ -121,7 +121,7 @@ export default function AdminEntryForm({
                                 />
                             </div>
                             {/* CITATION */}
-                            <div className='flex flex-col min-h-96 xl:min-h-0 flex-2 bg-slate-200 dark:bg-gray rounded-md p-4 pt-2 gap-2'>
+                            <div className='flex flex-col min-h-96 xl:min-h-0 bg-slate-200 dark:bg-gray rounded-md p-4 pt-2 gap-2'>
                                 <h2 className='text-lg'>{t('entry.wizard.citation')}</h2>
                                 <ElviraTextarea
                                     onChange={handleCitationChange}
