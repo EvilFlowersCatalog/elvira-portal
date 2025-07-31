@@ -33,6 +33,8 @@ export interface IAppContext {
   setShowNavbar: (showNavbar: boolean) => void;
   showAdvancedSearch: boolean;
   setShowAdvancedSearch: (showAdvancedSearch: boolean) => void;
+  showAiAssistant: boolean;
+  setShowAiAssistant: (showAiAssistant: boolean) => void;
   isParamsEmpty: () => boolean;
   searchParamsEqual: (
     prevSearchParams: URLSearchParams | null,
@@ -87,6 +89,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   );
   const [showNavbar, setShowNavbar] = useState<boolean>(false);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState<boolean>(false);
+  const [showAiAssistant, setShowAiAssistant] = useState<boolean>(false);
   const [editingEntryTitle, setEditingEntryTitle] = useState<string>('');
   const [isSmallDevice, setIsSmallDevice] = useState<boolean>(
     window.innerWidth < 959
@@ -401,6 +404,8 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         setShowNavbar,
         showAdvancedSearch,
         setShowAdvancedSearch,
+        showAiAssistant,
+        setShowAiAssistant,
         specialNavigation,
         clearFilters,
         isSmallDevice,

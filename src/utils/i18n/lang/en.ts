@@ -4,6 +4,9 @@ import { create } from "domain";
 
 export const en = {
   translation: {
+    assistant: {
+      title: 'AI Assistant',
+    },
     // NOTIFICATIONS
     notifications: {
       myShelf: {

@@ -3,6 +3,9 @@ import { stat } from "fs";
 
 export const sk = {
   translation: {
+    assistant: {
+      title: 'AI Asistent',
+    },
     // NOTIFICATIONS
     notifications: {
       myShelf: {
