@@ -35,7 +35,7 @@ export interface ElviraTableFetchFunction {
 type Order = 'asc' | 'desc';
 
 export default function ElviraTable({ title, header, data, metadata, fetchFunction, rowsPerPageOptions, toolBar }: ElviraTableProps) {
-    const [activeHeader, setActiveHeader] = useState<ElviraTableHeader[]>(header.filter(col => !col.hidden));
+    const [activeHeader, setActiveHeader] = useState<ElviraTableHeader[]>(header);
     const [hiddenHeader, setHiddenHeader] = useState<ElviraTableHeader[]>(header.filter(col => col.hidden));
     const drawerHeaderRef = useRef<HTMLDivElement>(null);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -62,7 +62,21 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
         setSortBy({ selector: col.selector, order: newOrder });
     }
 
-    function handleContextMenu(event: React.MouseEvent<HTMLHeadingElement>, options: any) {
+    function getVisibleHeader() {
+        return activeHeader.filter(col => !col.hidden);
+    }
+
+    function hideHeader(colId: string, hide: boolean) {
+        setActiveHeader((prev) => {
+            var index = prev.findIndex((col) => col.selector === colId);
+            if (index !== -1) {
+                prev[index].hidden = hide;
+            }
+            return [...prev];
+        });
+    }
+
+    function handleContextMenu(event: React.MouseEvent<HTMLSpanElement>, options: any) {
         event.preventDefault();
         setHeaderContextMenu(
             headerContextMenu === null
@@ -81,7 +95,6 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
             });
         }
     }
-
 
     function getPagination(span: number) {
         if (!metadata) return null;
@@ -130,7 +143,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                     }
                 >
                     <MenuItem disabled={headerContextMenu?.options.isHidable == true} onClick={() => {
-                        setActiveHeader((prev) => prev.filter((col) => col.selector !== headerContextMenu!.options.colId));
+                        hideHeader(headerContextMenu!.options.colId, true);
                         setHiddenHeader((prev) => [...prev, header.find((col) => col.selector === headerContextMenu!.options.colId)!]);
                         setHeaderContextMenu(null)
                     }}>Hide</MenuItem>
@@ -151,34 +164,48 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                                         </div>
                                     </div>
                                 </TableCell>
-                                {getPagination(activeHeader.length - 1)}
+                                {getPagination(getVisibleHeader().length - 1)}
                             </TableRow>
                         </TableHead>
                         <TableHead className="bg-gray/10 dark:bg-black/70">
                             <TableRow>
-                                {activeHeader.map((col, index) => (
+                                {getVisibleHeader().map((col, index) => (
                                     <TableCell className="relative" key={index} width={col.width} align={col.align}>
-                                        <TableSortLabel
-                                            disabled={col.disableSort}
-                                            sx={{ '.dark & .MuiSvgIcon-root': { color: 'white' } }}
-                                            active={sortBy?.selector === col.selector}
-                                            direction={sortBy?.selector === col.selector ? sortBy.order : 'asc'}
-                                            onClick={() => handleSort(col)}>
-                                            <h3 className='dark:text-white whitespace-nowrap'
+                                        {!col.disableSort ? (
+                                            <TableSortLabel
+                                                disabled={col.disableSort}
+                                                sx={{ '.dark & .MuiSvgIcon-root': { color: 'white' } }}
+                                                active={sortBy?.selector === col.selector}
+                                                direction={sortBy?.selector === col.selector ? sortBy.order : 'asc'}
+                                                onClick={() => handleSort(col)}>
+                                                <span className='dark:text-white whitespace-nowrap pointer'
+                                                    style={{
+                                                        paddingRight: index == getVisibleHeader().length - 1 && hiddenHeader.length > 0 ? '2rem' : '0',
+                                                    }}
+                                                    onContextMenu={(e) => handleContextMenu(e, {
+                                                        colId: col.selector,
+                                                        isHidable: col.disableHide
+                                                    })}
+                                                >{col.label}</span>
+                                            </TableSortLabel>) : <span className='dark:text-white whitespace-nowrap pointer'
+                                                style={{
+                                                    paddingRight: index == getVisibleHeader().length - 1 && hiddenHeader.length > 0 ? '2rem' : '0',
+                                                }}
                                                 onContextMenu={(e) => handleContextMenu(e, {
                                                     colId: col.selector,
                                                     isHidable: col.disableHide
-                                                })}
-                                            >{col.label}</h3>
-                                        </TableSortLabel>
-                                        {index == activeHeader.length - 1 && hiddenHeader.length > 0 ? <div>
+                                                })}>
+                                            <span className='dark:text-white whitespace-nowrap pointer'>{col.label}</span>
+                                        </span>
+                                        }
+                                        {index == getVisibleHeader().length - 1 && hiddenHeader.length > 0 ? <div>
                                             <p
                                                 ref={drawerHeaderRef}
                                                 aria-controls={isDrawerOpen ? 'composition-menu' : undefined}
                                                 aria-expanded={isDrawerOpen ? 'true' : undefined}
                                                 aria-haspopup="true"
                                                 className="absolute top-0 right-0 px-4 h-full flex justify-center items-center">
-                                                <FiPlus size={18} className="cursor-pointer" onClick={() => {
+                                                <FiPlus size={18} className="cursor-pointer dark:text-white" onClick={() => {
                                                     setIsDrawerOpen(true);
                                                 }} />
                                             </p>
@@ -202,7 +229,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                                                                 <MenuList>
                                                                     {hiddenHeader.map((item, index) => (
                                                                         <MenuItem key={index} onClick={() => {
-                                                                            setActiveHeader((prev) => [...prev, item]);
+                                                                            hideHeader(item.selector, false);
                                                                             setHiddenHeader((prev) => prev.filter((i) => i !== item));
                                                                             setIsDrawerOpen(false);
                                                                         }}>
@@ -224,7 +251,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                         <TableBody>
                             {data.map((row, index) => (
                                 <TableRow key={index}>
-                                    {activeHeader.map((col, colIndex) => (
+                                    {getVisibleHeader().map((col, colIndex) => (
                                         <TableCell className={`dark:text-white ${col.onClick && 'cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800'}`} key={colIndex} style={{ width: col.width }}
                                             onClick={() => {
                                                 col.onClick?.(row);
@@ -240,7 +267,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
 
                         <TableFooter className='bg-gray/10 dark:bg-black/70'>
                             <TableRow>
-                                {getPagination(activeHeader.length)}
+                                {getPagination(getVisibleHeader().length)}
                             </TableRow>
                         </TableFooter>
                     </Table>
