@@ -13,7 +13,6 @@ import useAppContext from "../../hooks/contexts/useAppContext";
 import EntryItem from "../items/entry/display/EntryItem";
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
 import { IEntry } from "../../utils/interfaces/entry";
-import zIndex from "@mui/material/styles/zIndex";
 import { useSearchParams } from "react-router-dom";
 
 interface MessageContent {
@@ -22,7 +21,6 @@ interface MessageContent {
 }
 
 /* CREATE COMPONENTS OUT OF PARTS ☠️ */
-/* if entry detail is opened, it's always above, add check if popup was opened from the entry detail, or vice versa */
 
 function MessageElement({ msg }: { msg: { role: string; content: MessageContent } }) {
     const [books, setBooks] = useState<any[]>([]);
@@ -70,7 +68,7 @@ function MessageElement({ msg }: { msg: { role: string; content: MessageContent 
                 }}
             >
                 {books.map((entry: IEntry) => (
-                    <EntryItem entry={entry} id={'ai-' + entry.id} />
+                    <EntryItem entry={entry} id={'ai-' + entry.id} type="ai-recommendation" />
                 ))}
             </Box>
         default:
@@ -146,6 +144,9 @@ export default function AiAssistant() {
 
     function handleCloseDrawer() {
         setShowAiAssistant(false);
+        const params = new URLSearchParams(searchParams);
+        params.delete('dialog-priority');
+        setSearchParams(params);
     }
 
     return (
@@ -155,7 +156,9 @@ export default function AiAssistant() {
             onClose={handleCloseDrawer}
             transitionDuration={300}
             sx={{
-                zIndex: searchParams.get('entry-detail-id') ? 49 : 1200
+                zIndex: searchParams.get('dialog-priority') ?
+                    (searchParams.get('dialog-priority') == 'ai-assistant' ? 1200 : 49)
+                    : 1200
             }}
             PaperProps={{
                 sx: {

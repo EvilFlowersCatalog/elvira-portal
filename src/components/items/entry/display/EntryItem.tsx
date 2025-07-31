@@ -14,9 +14,10 @@ interface IEntryItem {
     entry: IEntry;
     triggerReload?: () => void;
     id?: string;
+    type?: 'ai-recommendation' | 'library-item';
 }
 
-export default function EntryItem({ entry, triggerReload, id }: IEntryItem) {
+export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem) {
     const { titleLogoDark } = useAppContext();
     const { auth } = useAuthContext();
     const { t } = useTranslation();
@@ -56,14 +57,15 @@ export default function EntryItem({ entry, triggerReload, id }: IEntryItem) {
 
     const openEntryDetail = () => {
         const params = new URLSearchParams(searchParams);
-        const id = searchParams.get('entry-detail-id');
+      
+        if (type == 'ai-recommendation') {
+            params.set('dialog-priority', 'entry-detail')
+        }
 
-        if (id === entry.id) params.delete('entry-detail-id');
-        else params.set('entry-detail-id', entry.id);
+        params.set('entry-detail-id', entry.id);
 
         setSearchParams(params);
     };
-
 
     const handleParamClick = (name: string, value: string) => {
         if (location.pathname === NAVIGATION_PATHS.library) {

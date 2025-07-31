@@ -29,7 +29,7 @@ interface IEntryDetailParams {
 }
 
 const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
-  const { stuColor, stuText, stuBg, umamiTrack } = useAppContext();
+  const { stuColor, setShowAiAssistant, umamiTrack } = useAppContext();
   const { auth } = useAuthContext();
   const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -162,6 +162,14 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     })();
   }, [entryId, update]);
 
+   const askAi = () => {
+        setShowAiAssistant(true);
+        const params = new URLSearchParams(searchParams);
+        params.set('dialog-priority', 'ai-assistant');
+        setSearchParams(params);
+    };
+
+
   if(!entryId) return <></>;
 
   return (
@@ -262,6 +270,13 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                 </div>
               </InfoItemCustom>
             </InfoGrid>
+
+            <button
+              className="my-4 px-4 py-2 rounded bg-primary text-white font-semibold hover:bg-primaryDark transition-colors duration-150"
+              onClick={askAi}
+            >
+              {t('entry.detail.askAi', 'Ask AI')}
+            </button>
 
             {/* TABS */}
             <TabsComponent defaultTab='contents'>
