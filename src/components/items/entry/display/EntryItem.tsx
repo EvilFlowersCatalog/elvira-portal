@@ -13,9 +13,10 @@ import useAppContext from "../../../../hooks/contexts/useAppContext";
 interface IEntryItem {
     entry: IEntry;
     triggerReload?: () => void;
+    id?: string;
 }
 
-export default function EntryItem({ entry, triggerReload }: IEntryItem) {
+export default function EntryItem({ entry, triggerReload, id }: IEntryItem) {
     const { titleLogoDark } = useAppContext();
     const { auth } = useAuthContext();
     const { t } = useTranslation();
@@ -118,7 +119,7 @@ export default function EntryItem({ entry, triggerReload }: IEntryItem) {
         <div className="bg-white dark:bg-strongDarkGray relative p-2 h-full">
             <div className="mb-2">
                 {entry.feeds.map(feed => (
-                    <span key={feed.id} onClick={() => {
+                    <span key={id ? `${id}-${feed.id}` : feed.id} onClick={() => {
                         handleParamClick('feed-id', feed.id);
                     }} className="cursor-pointer font-semibold px-2 py-1 text-xs bg-primaryLight text-primary rounded-md mr-1">
                         {feed.title}
@@ -126,7 +127,7 @@ export default function EntryItem({ entry, triggerReload }: IEntryItem) {
                 ))}
             </div>
             <h3 onClick={openEntryDetail} className="group-hover:underline transition-udnerline duration-300 cursor-pointer font-bold text-secondary dark:text-white text-sm line-clamp-2 overflow-hidden text-ellipsis mb-2">{entry.title}</h3>
-            <p className="text-xs cursor-pointer" onClick={() => {
+            <p className="text-xs cursor-pointer dark:text-white" onClick={() => {
                 handleParamClick('author', entry.authors[0]?.name + ' ' + entry.authors[0]?.surname);
             }}>
                 {entry.authors.length > 0

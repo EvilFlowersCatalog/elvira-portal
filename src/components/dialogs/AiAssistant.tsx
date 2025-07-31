@@ -10,31 +10,81 @@ import { FaX, FaPaperPlane } from "react-icons/fa6";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import useAppContext from "../../hooks/contexts/useAppContext";
+import EntryItem from "../items/entry/display/EntryItem";
+import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
+import { IEntry } from "../../utils/interfaces/entry";
+import zIndex from "@mui/material/styles/zIndex";
+import { useSearchParams } from "react-router-dom";
 
-/* Add support for custom elements, calendars, etc. */
-function getMessageElement(msg: { role: string; content: any }, index: number) {
-    return <Box
-        key={index}
-        sx={{
-            mb: 1,
-            p: 1.5,
-            borderRadius: 2,
-            backgroundColor: msg.role === "user" ? "primary.main" : "grey.200",
-            color: msg.role === "user" ? "white" : "text.primary",
-            alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-            maxWidth: "80%",
-        }}
-    >
-        {msg.content}
-    </Box>
+interface MessageContent {
+    type: "message" | 'entries'
+    data: any
+}
+
+/* CREATE COMPONENTS OUT OF PARTS ☠️ */
+/* if entry detail is opened, it's always above, add check if popup was opened from the entry detail, or vice versa */
+
+function MessageElement({ msg }: { msg: { role: string; content: MessageContent } }) {
+    const [books, setBooks] = useState<any[]>([]);
+    const getEntryDetail = useGetEntryDetail();
+
+    useEffect(() => {
+        if (msg.content.type === "entries") {
+            const entryIds = msg.content.data.entryIds;
+            (async () => {
+                const details = await Promise.all(
+                    entryIds.map((id: string) => getEntryDetail(id))
+                );
+                const entries: IEntry[] = details.map(entryDetail => ({
+                    ...entryDetail,
+                    popularity: Number(entryDetail.popularity),
+                }));
+                setBooks(entries);
+            })();
+        }
+    }, [])
+
+    switch (msg.content.type) {
+        case "message":
+            return <Box
+                sx={{
+                    mb: 1,
+                    p: 1.5,
+                    borderRadius: 2,
+                    backgroundColor: msg.role === "user" ? "primary.main" : "grey.200",
+                    color: msg.role === "user" ? "white" : "text.primary",
+                    alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
+                    maxWidth: "80%",
+                }}
+            >
+                {msg.content.data}
+            </Box>;
+        case "entries":
+            return <Box
+                sx={{
+                    display: "flex",
+                    overflowX: "auto",
+                    gap: 1,
+                    mb: 1,
+                    py: 1,
+                }}
+            >
+                {books.map((entry: IEntry) => (
+                    <EntryItem entry={entry} id={'ai-' + entry.id} />
+                ))}
+            </Box>
+        default:
+            return <p className="dark:text-white text-center">404</p>
+    }
 }
 
 export default function AiAssistant() {
     const { t } = useTranslation();
+    const [searchParams, setSearchParams] = useSearchParams();
     const { showAiAssistant, setShowAiAssistant, umamiTrack } = useAppContext();
+
     const [input, setInput] = useState("");
     const [showSuggestions, setShowSuggestions] = useState(true);
-
     const [messages, setMessages] = useState<{ role: string; content: any }[]>([]);
 
     useEffect(() => {
@@ -51,7 +101,12 @@ export default function AiAssistant() {
     }, [messages]);
 
     function sendMessage(message: string) {
-        setMessages((prev) => [...prev, { role: "user", content: message }]);
+        setMessages((prev) => [...prev, {
+            role: "user", content: {
+                type: "message",
+                data: message
+            }
+        }]);
         // Simulate AI response
         setTimeout(() => {
             receiveMessage(`Tak to je crazy! Neviem.`);
@@ -60,7 +115,20 @@ export default function AiAssistant() {
     }
 
     function receiveMessage(response: string) {
-        setMessages((prev) => [...prev, { role: "assistant", content: response }]);
+        setMessages((prev) => [...prev, {
+            role: "assistant", content: {
+                type: "message",
+                data: response
+            }
+        }]);
+        setMessages((prev) => [...prev, {
+            role: "assistant", content: {
+                type: "entries",
+                data: {
+                    entryIds: ['ce40e042-1491-434f-a0b4-593c0a867b99', 'b623e984-a8e7-4d9d-ade0-15084faaccb5']
+                }
+            }
+        }]);
     }
 
     const handleSuggestion = (suggestion: string) => {
@@ -86,13 +154,16 @@ export default function AiAssistant() {
             open={showAiAssistant}
             onClose={handleCloseDrawer}
             transitionDuration={300}
+            sx={{
+                zIndex: searchParams.get('entry-detail-id') ? 49 : 1200
+            }}
             PaperProps={{
                 sx: {
                     maxWidth: 400,
                     width: "100%",
                     borderTopLeftRadius: 8,
                     borderBottomLeftRadius: 8,
-                    backgroundColor: "white",
+                    backgroundColor: "#F4F6F9",
                     ".dark &": {
                         backgroundColor: '#27272A'
                     },
@@ -101,23 +172,19 @@ export default function AiAssistant() {
                 },
             }}
         >
-            <Box
-                sx={{
-                    p: 3,
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                }}
-            >
+            <Box sx={{
+                p: 3,
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+            }}>
                 {/* Header */}
-                <Box
-                    sx={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        mb: 2,
-                    }}
-                >
+                <Box sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    mb: 2,
+                }}>
                     <Typography variant="h6" fontWeight={600} className="text-black dark:text-white">
                         {t("assistant.title")}
                     </Typography>
@@ -145,7 +212,7 @@ export default function AiAssistant() {
                     }}
                 >
                     {messages.map((msg, index) => (
-                        getMessageElement(msg, index)
+                        <MessageElement key={index} msg={msg} />
                     ))}
                 </Box>
 
