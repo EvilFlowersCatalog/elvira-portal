@@ -20,6 +20,20 @@ interface MessageContent {
     data: any
 }
 
+function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, handleSuggestion: (suggestion: string) => void }) {
+    return (
+        <Box
+            className="flex items-center justify-center flex-1 rounded-lg p-2 cursor-pointer transition-colors duration-200 text-center text-sm bg-zinc-200 text-gray hover:bg-zinc-300 dark:bg-zinc-700 dark:text-white dark:hover:bg-zinc-600"
+            onClick={() => {
+                handleSuggestion(suggestion);
+            }}
+        >
+            {suggestion}
+        </Box>
+    );
+}
+
+
 function MessageElement({ msg }: { msg: { role: string; content: MessageContent } }) {
     const [books, setBooks] = useState<any[]>([]);
     const getEntryDetail = useGetEntryDetail();
@@ -42,32 +56,19 @@ function MessageElement({ msg }: { msg: { role: string; content: MessageContent 
 
     switch (msg.content.type) {
         case "message":
-            return <Box
+            return <Box className="mb-2 p-2 rounded-lg max-w-[80%]"
                 sx={{
-                    mb: 1,
-                    p: 1.5,
-                    borderRadius: 2,
                     backgroundColor: msg.role === "user" ? "primary.main" : "grey.200",
                     color: msg.role === "user" ? "white" : "text.primary",
                     alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-                    maxWidth: "80%",
-                }}
-            >
+                }}>
                 {msg.content.data}
             </Box>;
         case "entries":
-            return <Box
-                sx={{
-                    display: "flex",
-                    overflowX: "auto",
-                    gap: 1,
-                    mb: 1,
-                    py: 1,
-                    flexShrink: 0
-                }}
+            return <Box className="flex gap-3 mb-2 py-2 shrink-0"
             >
                 {books.map((entry: IEntry) => (
-                    <EntryItem entry={entry} id={'ai-' + entry.id} type="ai-recommendation" />
+                    <EntryItem entry={entry} key={"ai-" + entry.id} id={'ai-' + entry.id} type="ai-recommendation" />
                 ))}
             </Box>
         default:
@@ -85,6 +86,14 @@ export default function AiAssistant() {
     const [showSuggestions, setShowSuggestions] = useState(true);
     const [messages, setMessages] = useState<{ role: string; content: any }[]>([]);
     const [assistantEntry, setAssistantEntry] = useState<IEntryDetail | null>(null);
+
+
+    function clearAssistantEntry() {
+        setAssistantEntry(null);
+        const params = new URLSearchParams(searchParams);
+        params.delete('assistant-entry-id');
+        setSearchParams(params);
+    }
 
     useEffect(() => {
         if (showAiAssistant) {
@@ -118,26 +127,33 @@ export default function AiAssistant() {
         }]);
         // Simulate AI response
         setTimeout(() => {
-            receiveMessage(`Tak to je crazy! Neviem.`);
+            receiveMessage(`Tak to je crazy! Neviem, tu máš moje obľúbené knihy.`);
         }, 1000);
         setInput("");
     }
 
+    /* todo: response: AiResponse interface  */
     function receiveMessage(response: string) {
-        setMessages((prev) => [...prev, {
-            role: "assistant", content: {
-                type: "message",
-                data: response
-            }
-        }]);
-        setMessages((prev) => [...prev, {
-            role: "assistant", content: {
-                type: "entries",
-                data: {
-                    entryIds: ['ce40e042-1491-434f-a0b4-593c0a867b99', 'b623e984-a8e7-4d9d-ade0-15084faaccb5']
-                }
-            }
-        }]);
+        // Simulate AI response
+        setMessages((prev) => [
+            ...prev,
+            {
+                role: "assistant",
+                content: {
+                    type: "message",
+                    data: response,
+                },
+            },
+            {
+                role: "assistant",
+                content: {
+                    type: "entries",
+                    data: {
+                        entryIds: ['ce40e042-1491-434f-a0b4-593c0a867b99', 'b623e984-a8e7-4d9d-ade0-15084faaccb5'],
+                    },
+                },
+            },
+        ]);
     }
 
     const handleSuggestion = (suggestion: string) => {
@@ -187,19 +203,9 @@ export default function AiAssistant() {
                 },
             }}
         >
-            <Box sx={{
-                p: 3,
-                height: "100%",
-                display: "flex",
-                flexDirection: "column",
-            }}>
+            <Box className="p-3 h-full flex flex-col">
                 {/* Header */}
-                <Box sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    mb: 2,
-                }}>
+                <Box className="flex items-center justify-between mb-2">
                     <Typography variant="h6" fontWeight={600} className="text-black dark:text-white">
                         {t("assistant.title")}
                     </Typography>
@@ -212,105 +218,24 @@ export default function AiAssistant() {
                 </Box>
 
                 {/* Body */}
-                <Box
-                    id="chat"
-                    sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        flexGrow: 1,
-                        animation: "fadeIn 0.4s ease-in-out",
-                        "@keyframes fadeIn": {
-                            from: { opacity: 0 },
-                            to: { opacity: 1 },
-                        },
-                        overflowY: "auto",
-                    }}
-                >
+                <Box id="chat" className="flex flex-col grow overflow-y-auto">
                     {messages.map((msg, index) => (
                         <MessageElement key={index} msg={msg} />
                     ))}
                 </Box>
 
                 {/* Input */}
-                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-                    {!assistantEntry && showSuggestions ? <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
-                        <Box
-                            sx={{
-                                flex: 1,
-                                backgroundColor: "grey.100",
-                                borderRadius: 2,
-                                px: 2,
-                                py: 1,
-                                cursor: "pointer",
-                                transition: "background 0.2s",
-                                "&:hover": { backgroundColor: "grey.200" },
-                                ".dark &": {
-                                    backgroundColor: '#3f3f46',
-                                    color: '#e5e7eb',
-                                    "&:hover": { backgroundColor: '#4b5563' }
-                                },
-                                fontSize: 14,
-                                color: "text.secondary",
-                                textAlign: "center",
-                            }}
-                            onClick={() => handleSuggestion(t("assistant.suggestion1"))}
-                        >
-                            {t("assistant.suggestion1")}
-                        </Box>
-                        <Box
-                            sx={{
-                                flex: 1,
-                                backgroundColor: "grey.100",
-                                borderRadius: 2,
-                                px: 2,
-                                py: 1,
-                                cursor: "pointer",
-                                transition: "background 0.2s",
-                                "&:hover": { backgroundColor: "grey.200" },
-                                ".dark &": {
-                                    backgroundColor: '#3f3f46',
-                                    color: '#e5e7eb',
-                                    "&:hover": { backgroundColor: '#4b5563' }
-                                },
-                                fontSize: 14,
-                                color: "text.secondary",
-                                textAlign: "center",
-                            }}
-                            onClick={() => handleSuggestion(t("assistant.suggestion2"))}
-                        >
-                            {t("assistant.suggestion2")}
-                        </Box>
+                <Box component="form" onSubmit={handleSubmit}>
+                    {!assistantEntry && showSuggestions ? <Box className="flex gap-2 mb-2">
+                        <AiSuggestion suggestion={t("assistant.suggestion1")} handleSuggestion={handleSuggestion} />
+                        <AiSuggestion suggestion={t("assistant.suggestion2")} handleSuggestion={handleSuggestion} />
                     </Box> : null}
                     {assistantEntry ?
-                        <Box sx={{
-                            mb: 0.5,
-                            mt: 1,
-                            p: 0,
-                            borderRadius: 2,
-                            backgroundColor: "inherit",
-                            ".dark &": {
-                                color: '#e5e7eb',
-                            },
-                            alignSelf: "flex-start",
-                            display: "flex",
-                            width: "100%",
-                            alignItems: "center",
-                        }}>
-                            <Typography
-                                sx={{
-                                    whiteSpace: "nowrap",
-                                    maxWidth: "100%",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
-                                    fontSize: 12,
-                                    paddingRight: 2
-                                }}
-                            >
+                        <Box className="mb-0.5 p-0 rounded-lg bg-inherit dark:text-zinc-200 self-start flex w-full items-center">
+                            <Typography className="whitespace-nowrap max-w-full overflow-hidden text-ellipsis text-xs pr-2">
                                 {t("assistant.entryAssistant", { x: assistantEntry.title })}
                             </Typography>
-                            <Box sx={{
-                                marginLeft: "auto",
-                            }} onClick={() => { setAssistantEntry(null); }}>
+                            <Box className="ml-auto" onClick={() => { clearAssistantEntry(); }}>
                                 <FaX size={12} className="text-black dark:text-white cursor-pointer" />
                             </Box>
                         </Box> : null
@@ -318,7 +243,7 @@ export default function AiAssistant() {
                     <TextField
                         fullWidth
                         size="small"
-                        placeholder={t("assistant.inputPlaceholder") || "Ask me anything..."}
+                        placeholder={t("assistant.inputPlaceholder")}
                         sx={{
                             backgroundColor: "grey.100",
                             borderRadius: 2,
