@@ -7,7 +7,6 @@ import HomeHeader from '../../components/specific-page/home-page/HomeHeader';
 import EntryDetail from '../../components/items/entry/details/EntryDetail';
 import EntryDisplay from '../../components/items/entry/display/EntryDisplay';
 import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
-import AiAssistant from '../../components/dialogs/AiAssistant';
 
 const Home = () => {
   const { t } = useTranslation();

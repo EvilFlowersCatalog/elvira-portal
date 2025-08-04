@@ -12,15 +12,13 @@ import { useTranslation } from "react-i18next";
 import useAppContext from "../../hooks/contexts/useAppContext";
 import EntryItem from "../items/entry/display/EntryItem";
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
-import { IEntry } from "../../utils/interfaces/entry";
+import { IEntry, IEntryDetail } from "../../utils/interfaces/entry";
 import { useSearchParams } from "react-router-dom";
 
 interface MessageContent {
     type: "message" | 'entries'
     data: any
 }
-
-/* CREATE COMPONENTS OUT OF PARTS ☠️ */
 
 function MessageElement({ msg }: { msg: { role: string; content: MessageContent } }) {
     const [books, setBooks] = useState<any[]>([]);
@@ -65,6 +63,7 @@ function MessageElement({ msg }: { msg: { role: string; content: MessageContent 
                     gap: 1,
                     mb: 1,
                     py: 1,
+                    flexShrink: 0
                 }}
             >
                 {books.map((entry: IEntry) => (
@@ -80,10 +79,12 @@ export default function AiAssistant() {
     const { t } = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
     const { showAiAssistant, setShowAiAssistant, umamiTrack } = useAppContext();
+    const getEntryDetail = useGetEntryDetail();
 
     const [input, setInput] = useState("");
     const [showSuggestions, setShowSuggestions] = useState(true);
     const [messages, setMessages] = useState<{ role: string; content: any }[]>([]);
+    const [assistantEntry, setAssistantEntry] = useState<IEntryDetail | null>(null);
 
     useEffect(() => {
         if (showAiAssistant) {
@@ -97,6 +98,16 @@ export default function AiAssistant() {
             behavior: "smooth",
         });
     }, [messages]);
+
+    useEffect(() => {
+        var assistantEntryId = searchParams.get('assistant-entry-id');
+        if (assistantEntryId) {
+            getEntryDetail(assistantEntryId).then((entry) => {
+                setAssistantEntry(entry);
+            });
+        }
+
+    }, [searchParams]);
 
     function sendMessage(message: string) {
         setMessages((prev) => [...prev, {
@@ -146,6 +157,7 @@ export default function AiAssistant() {
         setShowAiAssistant(false);
         const params = new URLSearchParams(searchParams);
         params.delete('dialog-priority');
+        params.delete('assistant-entry-id');
         setSearchParams(params);
     }
 
@@ -162,7 +174,7 @@ export default function AiAssistant() {
             }}
             PaperProps={{
                 sx: {
-                    maxWidth: 400,
+                    maxWidth: 800,
                     width: "100%",
                     borderTopLeftRadius: 8,
                     borderBottomLeftRadius: 8,
@@ -221,7 +233,7 @@ export default function AiAssistant() {
 
                 {/* Input */}
                 <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-                    {showSuggestions ? <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
+                    {!assistantEntry && showSuggestions ? <Box sx={{ display: "flex", gap: 1, mb: 1 }}>
                         <Box
                             sx={{
                                 flex: 1,
@@ -269,6 +281,40 @@ export default function AiAssistant() {
                             {t("assistant.suggestion2")}
                         </Box>
                     </Box> : null}
+                    {assistantEntry ?
+                        <Box sx={{
+                            mb: 0.5,
+                            mt: 1,
+                            p: 0,
+                            borderRadius: 2,
+                            backgroundColor: "inherit",
+                            ".dark &": {
+                                color: '#e5e7eb',
+                            },
+                            alignSelf: "flex-start",
+                            display: "flex",
+                            width: "100%",
+                            alignItems: "center",
+                        }}>
+                            <Typography
+                                sx={{
+                                    whiteSpace: "nowrap",
+                                    maxWidth: "100%",
+                                    overflow: "hidden",
+                                    textOverflow: "ellipsis",
+                                    fontSize: 12,
+                                    paddingRight: 2
+                                }}
+                            >
+                                {t("assistant.entryAssistant", { x: assistantEntry.title })}
+                            </Typography>
+                            <Box sx={{
+                                marginLeft: "auto",
+                            }} onClick={() => { setAssistantEntry(null); }}>
+                                <FaX size={12} className="text-black dark:text-white cursor-pointer" />
+                            </Box>
+                        </Box> : null
+                    }
                     <TextField
                         fullWidth
                         size="small"
@@ -299,6 +345,6 @@ export default function AiAssistant() {
                     />
                 </Box>
             </Box>
-        </Drawer>
+        </Drawer >
     );
 }

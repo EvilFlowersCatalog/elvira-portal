@@ -5,6 +5,7 @@ export const en = {
       inputPlaceholder: 'Ask me anything...',
       suggestion1: 'How do I learn programming?',
       suggestion2: 'Find a book about mathematics',
+      entryAssistant: "Reference to the book {{x}}",
     },
     // NOTIFICATIONS
     notifications: {
@@ -302,7 +303,8 @@ export const en = {
           contents: 'Contents',
           reviews: 'Reviews',
           related: 'Related',
-        }
+        },
+        askAi: 'Ask AI',
       },
       wizard: {
         requiredMessages: {

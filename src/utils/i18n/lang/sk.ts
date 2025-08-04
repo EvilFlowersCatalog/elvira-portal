@@ -5,6 +5,7 @@ export const sk = {
       inputPlaceholder: 'Spýtajte sa ma na čokoľvek...',
       suggestion1: 'Ako sa naučím programovať?',
       suggestion2: 'Nájdi knihu o matematike',
+      entryAssistant: "Referencia na knihu {{x}}",
     },
     // NOTIFICATIONS
     notifications: {
@@ -298,6 +299,7 @@ export const sk = {
           reviews: 'Recenzie',
           related: 'Súvisiace',
         },
+        askAi: 'Spýtať sa AI',
       },
       wizard: {
         requiredMessages: {
