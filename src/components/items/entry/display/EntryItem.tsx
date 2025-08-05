@@ -29,6 +29,16 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
 
     useEffect(() => {
         setIsOnShelf(entry.shelf_record_id != null);
+
+        document.addEventListener('shelf-updated', (event: Event) => {
+            const customEvent = event as CustomEvent;
+            const updatedEntry = customEvent.detail.id;
+            if (updatedEntry === entry.id) {
+                var isOnShelf = customEvent.detail.isOnShelf;
+                if (isOnShelf) entry.shelf_record_id = customEvent.detail.shelf_record_id;
+                setIsOnShelf(isOnShelf);
+            }
+        });
     }, [entry]);
 
     const handleBookmarkToggle = async () => {
@@ -38,6 +48,7 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
                 triggerReload?.();
                 setIsOnShelf(false);
                 toast.success(t('notifications.myShelf.remove.success')); // Notify user
+                document.dispatchEvent(new CustomEvent('shelf-updated', { detail: { id: entry.id, isOnShelf: false } }));
             } catch {
                 toast.error(t('notifications.myShelf.remove.error')); // notify user
             }
@@ -47,6 +58,7 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
                 setIsOnShelf(true);
                 entry.shelf_record_id = shelfRecordId.response.id;
                 toast.success(t('notifications.myShelf.add.success')); // Notify user
+                document.dispatchEvent(new CustomEvent('shelf-updated', { detail: { id: entry.id, isOnShelf: true, shelf_record_id: entry.shelf_record_id } }));
             } catch {
                 toast.error(t('notifications.myShelf.add.error')); // Notify user
             }
@@ -57,7 +69,7 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
 
     const openEntryDetail = () => {
         const params = new URLSearchParams(searchParams);
-      
+
         if (type == 'ai-recommendation') {
             params.set('dialog-priority', 'entry-detail')
         }
