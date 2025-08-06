@@ -212,7 +212,13 @@ export const en = {
       loansPage: {
         title: 'Loan Management',
         tableTitle: 'Loans ({{x}})',
-        
+        table: {
+          entry: 'Entry',
+          state: 'State',
+          starts_at: 'Starts At',
+          ends_at: 'Ends At',
+          actions: 'Actions',
+        }
       }
     },
 

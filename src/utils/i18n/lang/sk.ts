@@ -212,7 +212,13 @@ export const sk = {
       loansPage: {
         title: 'Správa výpožičiek',
         tableTitle: 'Výpožičky ({{x}})',
-        
+        table: {
+          entry: 'Publikácia',
+          state: 'Stav',
+          starts_at: 'Začiatok',
+          ends_at: 'Koniec',
+          actions: 'Akcie',
+        }
       }
     },
 
@@ -369,7 +375,7 @@ export const sk = {
       },
       loansPage: {
         title: 'Výpožičky',
-        
+
         table: {
           title: 'Počet výpožičiek: {{x}}',
           entry: 'Publikácia',
@@ -379,7 +385,7 @@ export const sk = {
             active: 'Aktívne',
             returned: 'Vrátené',
             expired: 'Expirujúce',
-            revoked: 'Zrušené',
+            revoked: 'Odvolané',
             cancelled: 'Zrušené',
           },
           starts_at: 'Začiatok',

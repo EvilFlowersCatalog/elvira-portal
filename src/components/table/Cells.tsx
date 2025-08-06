@@ -7,7 +7,7 @@ export function SubText({ text, subtext }: { text: string, subtext: string }) {
     </>
 }
 
-export function BubbleText({ text, className, onClick, style }: { text: string, className?: string, onClick?: () => void, style?: any }) {
+export function BubbleText({ text, className, onClick, style }: { text: string, className?: string, onClick?: (arg0: React.MouseEvent<HTMLElement>) => void, style?: any}) {
     return <span style={style} onClick={onClick} className={twMerge('px-2 py-1 bg-primary rounded-lg text-sm text-white cursor-pointer', className)}>{text}</span>;
 }
 

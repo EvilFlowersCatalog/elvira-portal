@@ -12,7 +12,7 @@ import { FaDownload } from 'react-icons/fa';
 import useGetEntryDetail from '../../../hooks/api/entries/useGetEntryDetail';
 
 
-function Title({ entryId }: { entryId: string }) {
+export function Title({ entryId }: { entryId: string }) {
     const getEntryDetail = useGetEntryDetail();
     const [title, setTitle] = useState<string>('Loading...');
 
@@ -31,7 +31,7 @@ function Title({ entryId }: { entryId: string }) {
     return <span>{title}</span>;
 }
 
-function translateState(state: string, t: any): string {
+export function translateState(state: string, t: any): string {
     switch (state) {
         case 'ready':
             return t('license.loansPage.table.states.ready');
@@ -50,7 +50,7 @@ function translateState(state: string, t: any): string {
     }
 }
 
-function stateStyle(state: string, t: any): React.CSSProperties {
+export function stateStyle(state: string, t: any): React.CSSProperties {
     switch (state) {
         case 'ready':
             return { color: 'white', backgroundColor: 'green' };
@@ -59,11 +59,11 @@ function stateStyle(state: string, t: any): React.CSSProperties {
         case 'returned':
             return { color: 'white', backgroundColor: 'gray' };
         case 'expired':
-            return { color: 'white', backgroundColor: 'red' };
+            return { color: 'white', backgroundColor: 'purple' };
         case 'revoked':
             return { color: 'white', backgroundColor: 'orange' };
         case 'cancelled':
-            return { color: 'white', backgroundColor: 'purple' };
+            return { color: 'white', backgroundColor: 'red' };
         default:
             return {};
     }
@@ -133,7 +133,6 @@ export default function LoansTable({ }) {
         <ElviraTable title={t('license.loansPage.table.title', { x: metadata.total })} header={[
             { label: t('license.loansPage.table.entry'), selector: 'title', onClick(row){
                 setSearchParams((prev)=>{
-                    console.log(row);
                     prev.set("entry-detail-id", row.entry_id);
                     return prev;
                 })
