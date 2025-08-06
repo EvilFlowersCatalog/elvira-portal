@@ -37,10 +37,9 @@ export default function AcquisitionsButton({
   const [activeLicense, setActiveLicense] = useState<ILicense | null>(null);
 
   useEffect(() => {
-    getUserLicenses({}).then((res) => {
+    getUserLicenses({pagination: false, entry_id: entry.id}).then((res) => {
       const found = res.items.find(
-        (l) =>
-          l.entry_id === entry.id && ["active", "ready"].includes(l.state)
+        (l) => ["active", "ready"].includes(l.state)
       );
       setActiveLicense(found || null);
     });

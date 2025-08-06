@@ -1,3 +1,5 @@
+import { title } from "process";
+
 export const en = {
   translation: {
     assistant: {
@@ -165,6 +167,10 @@ export const en = {
           title: 'Users',
           text: 'Manage and view all users in the system.',
         },
+        loans: {
+          title: 'Loans',
+          text: 'Manage and view all loans in the system.',
+        }
       },
       feedsPage: {
         add: 'Add Feed',
@@ -203,6 +209,11 @@ export const en = {
         updatedAt: 'Updated At',
         actions: 'Actions',
       },
+      loansPage: {
+        title: 'Loan Management',
+        tableTitle: 'Loans ({{x}})',
+        
+      }
     },
 
     general: {

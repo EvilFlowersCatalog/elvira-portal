@@ -15,9 +15,9 @@ import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { FiBookOpen, FiLogOut } from 'react-icons/fi';
-import { RxHome } from 'react-icons/rx';
 import Gravatar from 'react-gravatar';
 import Button from '../../buttons/Button';
+import { FaHome } from 'react-icons/fa';
 
 interface INavbarButtonParams {
   name: string;
@@ -147,7 +147,7 @@ const Navbar = () => {
           <NavbarButton
             name={t('navbarMenu.home')}
             path={NAVIGATION_PATHS.home}
-            icon={<RxHome size={23} />}
+            icon={<FaHome size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.home}
           />
           <NavbarButton

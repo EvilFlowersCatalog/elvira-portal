@@ -20,6 +20,7 @@ import AdminAddEntry from '../pages/admin/entries/AdminAddEntry';
 import Auth from '../pages/auth/Auth';
 import Loans from '../pages/common/Loans';
 import AdminUsers from '../pages/admin/AdminUsers';
+import AdminLoans from '../pages/admin/AdminLoans';
 
 const BaseRoutes = () => {
   const { auth } = useAuthContext();
@@ -64,6 +65,7 @@ const BaseRoutes = () => {
             <Route path='feeds' element={<AdminFeeds />} />
             <Route path='categories' element={<AdminCategories />} />
             <Route path="users" element={<AdminUsers />} />
+            <Route path='loans' element={<AdminLoans />} />
           </Route>
         </Route>
       </Route>

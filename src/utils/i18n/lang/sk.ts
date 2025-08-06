@@ -1,3 +1,5 @@
+import Loans from "../../../pages/common/Loans";
+
 export const sk = {
   translation: {
     assistant: {
@@ -165,6 +167,10 @@ export const sk = {
           title: 'Používatelia',
           text: 'Spravujte a zobrazujte všetkých používateľov v systéme.',
         },
+        loans: {
+          title: 'Výpožičky',
+          text: 'Spravujte a zobrazujte všetky výpožičky v systéme.',
+        }
       },
       feedsPage: {
         add: 'Pridať Skupinu',
@@ -202,6 +208,11 @@ export const sk = {
         createdAt: 'Vytvorené',
         updatedAt: 'Aktualizované',
         actions: 'Akcie',
+      },
+      loansPage: {
+        title: 'Správa výpožičiek',
+        tableTitle: 'Výpožičky ({{x}})',
+        
       }
     },
 

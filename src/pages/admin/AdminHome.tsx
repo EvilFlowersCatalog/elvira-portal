@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { FaBook } from 'react-icons/fa';
-import { MdCategory, MdFeed, MdPerson } from 'react-icons/md';
+import { MdCategory, MdFeed, MdInventory, MdPerson } from 'react-icons/md';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import AdminButton from '../../components/buttons/AdminButton';
@@ -31,6 +31,12 @@ const buttonConfig = [
     titleKey: 'administration.homePage.users.title',
     textKey: 'administration.homePage.users.text',
     path: NAVIGATION_PATHS.adminUsers,
+  },
+  {
+    icon: <MdInventory size={25} />,
+    titleKey: 'administration.homePage.loans.title',
+    textKey: 'administration.homePage.loans.text',
+    path: NAVIGATION_PATHS.adminLoans,
   }
 ];
 
