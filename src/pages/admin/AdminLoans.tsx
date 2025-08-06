@@ -18,12 +18,28 @@ import EntryDetail from '../../components/items/entry/details/EntryDetail';
 import { Menu, MenuItem } from '@mui/material';
 import { TFunction } from 'i18next';
 import useUpdateLiceseState from '../../hooks/api/licenses/useUpdateLicense';
+import useGetUserDetails from '../../hooks/api/users/useGetUserDetails';
 
 interface StateSelectorProps {
     item: ILicense;
     t: TFunction;
     onStateChange: (newState: InterfaceState) => void;
 }
+
+function UserName({ userId }: { userId: string }) {
+    const getUser = useGetUserDetails();
+    const [userName, setUserName] = useState<string>('Loading...');
+
+    useEffect(() => {
+        getUser(userId).then((user) => {
+            setUserName(`${user.name} ${user.surname}`);
+        }).catch(() => {
+            setUserName('Unknown User');
+        });
+    }, [userId, getUser]);
+    return <span>{userName}</span>;
+}
+
 
 function StateSelector({ item, t, onStateChange }: StateSelectorProps) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -114,6 +130,7 @@ const AdminLoans = () => {
         setData(items.map((item) => ({
             entry_id: item.entry_id,
             title: <Title entryId={item.entry_id} />,
+            user: <UserName userId={item.user_id} />,
             state: <StateSelector item={item} t={t} onStateChange={(newState: InterfaceState) => {
                setItems((prevItems) => prevItems.map((prevItem) => 
                     prevItem.id === item.id ? { ...prevItem, state: newState as typeof prevItem.state } : prevItem
@@ -141,6 +158,7 @@ const AdminLoans = () => {
                             })
                         }, width: '500px'
                     },
+                    { label: t('administration.loansPage.table.user'), selector: 'user' },
                     { label: t('administration.loansPage.table.state'), selector: 'state' },
                     { label: t('administration.loansPage.table.starts_at'), selector: 'starts_at' },
                     { label: t('administration.loansPage.table.ends_at'), selector: 'ends_at' },

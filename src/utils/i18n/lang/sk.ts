@@ -1,5 +1,3 @@
-import Loans from "../../../pages/common/Loans";
-
 export const sk = {
   translation: {
     assistant: {
@@ -218,6 +216,7 @@ export const sk = {
           starts_at: 'Začiatok',
           ends_at: 'Koniec',
           actions: 'Akcie',
+          user: 'Používateľ',
         }
       }
     },

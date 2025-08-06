@@ -218,6 +218,7 @@ export const en = {
           starts_at: 'Starts At',
           ends_at: 'Ends At',
           actions: 'Actions',
+          user: 'User',
         }
       }
     },

@@ -70,7 +70,7 @@ const useGetLicenses = () => {
                     state: 'active',
                     created_at: '2023-01-01',
                     expires_at: '2024-01-01',
-                    user_id: '',
+                    user_id: '702d07de-12d7-4bb6-ba3d-40f8ad9b1b0a',
                     updated_at: '2023-01-01',
                     starts_at: '2023-01-01',
                     lcp_license_id: 'lcp-license-1',
