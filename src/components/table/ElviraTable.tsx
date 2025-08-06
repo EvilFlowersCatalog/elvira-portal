@@ -170,7 +170,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                         <TableHead className="bg-gray/10 dark:bg-black/70">
                             <TableRow>
                                 {getVisibleHeader().map((col, index) => (
-                                    <TableCell className="relative" key={index} width={col.width} align={col.align}>
+                                    <TableCell colSpan={getVisibleHeader().length == 1 ? 2 : 1} className="relative" key={index} width={col.width} align={col.align}>
                                         {!col.disableSort ? (
                                             <TableSortLabel
                                                 disabled={col.disableSort}
@@ -252,7 +252,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                             {data.map((row, index) => (
                                 <TableRow key={index}>
                                     {getVisibleHeader().map((col, colIndex) => (
-                                        <TableCell className={`dark:text-white ${col.onClick && 'cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800'}`} key={colIndex} style={{ width: col.width }}
+                                        <TableCell colSpan={getVisibleHeader().length == 1 ? 2 : 1} className={`dark:text-white ${col.onClick && 'cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800'}`} key={colIndex} style={{ width: col.width }}
                                             onClick={() => {
                                                 col.onClick?.(row);
                                             }}
@@ -267,7 +267,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
 
                         <TableFooter className='bg-gray/10 dark:bg-black/70'>
                             <TableRow>
-                                {getPagination(getVisibleHeader().length)}
+                                {getPagination(Math.max(getVisibleHeader().length, 2))}
                             </TableRow>
                         </TableFooter>
                     </Table>
