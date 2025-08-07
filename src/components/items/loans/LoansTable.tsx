@@ -91,6 +91,7 @@ export default function LoansTable({ }) {
             limit,
             sortBy
         }).then(({ items: data, metadata }) => {
+            console.log(data);
             setItems(data);
             // setItems([ // TEMP-BE
             //     {
