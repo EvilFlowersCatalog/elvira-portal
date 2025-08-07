@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import useAuthContext from "../../../../hooks/contexts/useAuthContext";
-import { IEntry } from "../../../../utils/interfaces/entry";
+import { IEntry, IEntryDetail } from "../../../../utils/interfaces/entry";
 import { useEffect, useState } from "react";
 import useAddToShelf from "../../../../hooks/api/my-shelf/useAddToShelf";
 import useRemoveFromShelf from "../../../../hooks/api/my-shelf/useRemoveFromShelf";
@@ -11,7 +11,7 @@ import useAppContext from "../../../../hooks/contexts/useAppContext";
 
 
 interface IEntryItem {
-    entry: IEntry;
+    entry: IEntry | IEntryDetail;
     triggerReload?: () => void;
     id?: string;
     type?: 'ai-recommendation' | 'library-item';

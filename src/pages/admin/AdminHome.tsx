@@ -50,7 +50,7 @@ const AdminHome = () => {
 
       <H1>{t('navbarMenu.administration')}</H1>
 
-      <div className='grid md:grid-cols-4 px-2'>
+      <div className='grid xl:grid-cols-4 md:grid-cols-2 px-2'>
         {buttonConfig.map(({ icon, titleKey, textKey, path }, index) => (
           <AdminButton
             key={index}

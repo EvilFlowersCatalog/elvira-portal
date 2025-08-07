@@ -20,7 +20,7 @@ export function StatGroup({ children }: StatGroupProps) {
 export function StatItem({ value, label }: StatItemProps) {
     return (
         <div className="flex flex-col">
-            <span className="text-primary dark:text-primaryLight text-2xl font-medium">
+            <span className="text-primary dark:text-primaryLight text-2xl font-semibold">
                 {value}
             </span>
             <span className="text-gray dark:text-white text-light text-small">

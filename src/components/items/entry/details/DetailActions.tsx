@@ -11,7 +11,7 @@ type ActionsButtonProps = {
     onClick?: () => void;
 }
 
-export const ActionButtonStyle = "w-full px-4 py-2 rounded-lg text-darkGray dark:text-lightGray font-light flex justify-start gap-4 border-[1px] border-darkGray dark:border-lightGray"
+export const ActionButtonStyle = "w-full px-4 py-2 rounded-lg text-darkGray dark:text-lightGray font-light flex justify-start gap-4 border-[1px] border-darkGray dark:border-lightGray hover:border-transparent hover:dark:border-transparent hover:bg-primaryLight hover:text-primary hover:dark:bg-secondary hover:dark:text-primaryLight transition-colors duration-200"
 
 export function ActionsButton({ children, onClick }: ActionsButtonProps) {
     return <button

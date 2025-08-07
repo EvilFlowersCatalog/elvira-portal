@@ -24,6 +24,8 @@ import Modal from '../../../dialogs/Modal';
 import useGetAvailability from '../../../../hooks/api/licenses/useGetAvailability';
 import { IAvailabilityResponse } from '../../../../utils/interfaces/license';
 import { Tooltip } from '@mui/material';
+import { twMerge } from 'tailwind-merge';
+import EntryItem from '../display/EntryItem';
 
 interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
@@ -40,6 +42,24 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
 
   const [entry, setEntry] = useState<IEntryDetail | null>(null);
   const [availability, setAvailability] = useState<IAvailabilityResponse | null>(null);
+  const chapters = ["Introduction", "Chapter 1", "Chapter 2"];
+  const reviews = [
+    {
+      name: "John Doe",
+      date: "2023-10-01",
+      content: "This is a great entry! I really enjoyed the content and found it very informative.",
+    },
+    {
+      name: "Jane Smith",
+      date: "2023-10-02",
+      content: "An excellent read! The author did a fantastic job explaining the concepts.",
+    },
+    {
+      name: "Alice Johnson",
+      date: "2023-10-03",
+      content: "I learned a lot from this entry. Highly recommend it to anyone interested in the topic.",
+    },
+  ]
 
   const [update, setUpdate] = useState<boolean>(false);
 
@@ -297,24 +317,49 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               <Tabs>
                 <TabContent id="contents">
                   <span className="text-gray-600 dark:text-gray-300">
-                    {t('entry.detail.tabs.contents')}
+                    {chapters.map((chapter, index) => (
+                      <p key={index} className={twMerge('font-medium text-black dark:text-white text-lg mb-2 ', index != chapters.length ? 'border-b border-gray-300 dark:border-gray-700 pb-2' : '')}>
+                        <span className="text-primary dark:text-primaryLight font-semibold mr-2">
+                          {index + 1}.
+                        </span>
+                        {chapter}
+                      </p>
+                    ))}
                   </span>
                 </TabContent>
                 <TabContent id="reviews">
                   <span className="text-gray-600 dark:text-gray-300">
-                    {t('entry.detail.tabs.reviews')}
+                    {reviews.map((review, index) => (
+                      <div
+                        key={index}
+                        className={twMerge(
+                          'mb-2 pb-2',
+                          index !== reviews.length - 1 ? 'border-b border-gray-300 dark:border-gray-700' : ''
+                        )}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-primary dark:text-primaryLight">{review.name}</span>
+                        </div>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(review.date).toLocaleDateString()}</p>
+                        <p className="mt-2">{review.content}</p>
+                      </div>
+                    ))}
                   </span>
                 </TabContent>
                 <TabContent id="related">
-                  <span className="text-gray-600 dark:text-gray-300">
-                    {t('entry.detail.tabs.related')}
+                  <span className="text-gray-600 dark:text-gray-300 flex flex-wrap gap-4">
+                    <EntryItem entry={entry} />
+                    <EntryItem entry={entry} />
+                    <EntryItem entry={entry} />
+                    <EntryItem entry={entry} />
                   </span>
                 </TabContent>
               </Tabs>
             </TabsComponent>
           </div>
         </div>
-      )}
+      )
+      }
     </Modal >
   );
 };
