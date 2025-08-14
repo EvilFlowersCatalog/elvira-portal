@@ -14,6 +14,7 @@ import EntryItem from "../items/entry/display/EntryItem";
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
 import { IEntry, IEntryDetail } from "../../utils/interfaces/entry";
 import { useSearchParams } from "react-router-dom";
+import axios from "axios";
 
 interface MessageContent {
     type: "message" | 'entries'
@@ -40,7 +41,7 @@ function MessageElement({ msg }: { msg: { role: string; content: MessageContent 
 
     useEffect(() => {
         if (msg.content.type === "entries") {
-            const entryIds = msg.content.data.entryIds;
+            const entryIds = msg.content.data;
             (async () => {
                 const details = await Promise.all(
                     entryIds.map((id: string) => getEntryDetail(id))
@@ -82,7 +83,11 @@ export default function AiAssistant() {
     const { showAiAssistant, setShowAiAssistant, umamiTrack } = useAppContext();
     const getEntryDetail = useGetEntryDetail();
 
+    const [chatId, setChatId] = useState<string | null>(null);
+
     const [input, setInput] = useState("");
+    const [isGeneratingResponse, setGeneratingResponse] = useState(false);
+
     const [showSuggestions, setShowSuggestions] = useState(true);
     const [messages, setMessages] = useState<{ role: string; content: any }[]>([]);
     const [assistantEntry, setAssistantEntry] = useState<IEntryDetail | null>(null);
@@ -118,17 +123,49 @@ export default function AiAssistant() {
 
     }, [searchParams]);
 
-    function sendMessage(message: string) {
+    async function sendMessage(message: string) {
         setMessages((prev) => [...prev, {
             role: "user", content: {
                 type: "message",
                 data: message
             }
         }]);
-        // Simulate AI response
-        setTimeout(() => {
-            receiveMessage(`Tak to je crazy! Neviem, tu máš moje obľúbené knihy.`);
-        }, 1000);
+        setGeneratingResponse(true);
+
+        try {
+            var currentChatId = chatId;
+            if (!currentChatId) {
+                const response = await axios.post(`${process.env.ASSISTANT_URL}api/startchat`, {
+                    entryId: assistantEntry?.id || null,
+                });
+                currentChatId = response.data.chatId;
+                setChatId(currentChatId);
+            }
+
+            const response = await axios.post<{ messages: { type: 'string', data: string | string[] }[] }>(`${process.env.ASSISTANT_URL}/api/sendchat`, {
+                chatId: currentChatId,
+                message: message,
+                entryId: assistantEntry?.id || null
+            });
+
+            for (const msg of response.data.messages) {
+                setMessages((prev) => [...prev, {
+                    role: "assistant", content: {
+                        type: msg.type,
+                        data: msg.data
+                    }
+                }]);
+            }
+        } catch (err) {
+            setMessages((prev) => [...prev, {
+                role: "assistant", content: {
+                    type: 'message',
+                    data: "An error occurred while processing your request."
+                }
+            }]);
+        }
+
+        setGeneratingResponse(false);
         setInput("");
     }
 
@@ -243,6 +280,7 @@ export default function AiAssistant() {
                     <TextField
                         fullWidth
                         size="small"
+                        disabled={isGeneratingResponse}
                         placeholder={t("assistant.inputPlaceholder")}
                         sx={{
                             backgroundColor: "grey.100",
