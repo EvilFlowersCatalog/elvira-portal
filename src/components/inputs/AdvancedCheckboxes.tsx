@@ -78,7 +78,8 @@ export default function AdvancedCheckboxes({
                             }
                         }}
                         checked={selected.includes(option.value)}
-                        label={option.label} />} label={option.label} />
+                        />}
+                        label={option.label} />
                 </div>;
             })}
         </div>
