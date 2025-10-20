@@ -10,7 +10,6 @@ import useAuthContext from '../hooks/contexts/useAuthContext';
 import RequireAdmin from './guards/AdminGuard';
 import Viewer from '../pages/common/Viewer';
 import Home from '../pages/common/Home';
-import About from '../pages/common/About';
 import AdminEditEntry from '../pages/admin/entries/AdminEditEntry';
 import AdminEntries from '../pages/admin/entries/AdminEntries';
 import AdminCategories from '../pages/admin/AdminCategories';
@@ -47,7 +46,6 @@ const BaseRoutes = () => {
         {/* Only authorized */}
         <Route element={<RequireAuth />}>
           <Route index element={<Home />} />
-          {/* <Route path='about' element={<About />} /> */}
           <Route path='library' element={<Library />} />
           <Route path='shelf' element={<Shelf />} />
           <Route path='loans' element={<Loans />} />

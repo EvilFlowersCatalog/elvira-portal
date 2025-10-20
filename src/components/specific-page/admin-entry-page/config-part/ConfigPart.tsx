@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { IEntryNewForm } from '../../../../utils/interfaces/entry';
 import ConfigItem from './ConfigItem';
 import { IPartParams } from '../../../../utils/interfaces/general/general';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
@@ -88,6 +87,22 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
               config: {
                 ...entry?.config!,
                 evilflowers_ocr_rewrite: e.target.checked,
+              },
+            });
+          }}
+        />
+        <ConfigItem
+          name={'RDM'}
+          checked={entry.config?.readium_enabled ?? false}
+          onChange={(e) => {
+            umamiTrack('RDM Config Button', {
+              checked: e.target.checked,
+            });
+            setEntry({
+              ...entry,
+              config: {
+                ...entry?.config!,
+                readium_enabled: e.target.checked,
               },
             });
           }}

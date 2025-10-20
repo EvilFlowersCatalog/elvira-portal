@@ -63,6 +63,7 @@ export interface IEntryQuery {
   publishedAtLte?: string;
   orderBy?: string;
   query?: string;
+  config__readium_enabled?: boolean;
   languageCode?: string;
 }
 

@@ -312,6 +312,7 @@ export const en = {
         activeLicense: 'Loan',
         cite: 'Cite',
         share: 'Share',
+		download: 'Download',
         relation: 'Relation',
         noAuthor: 'Unknown author',
         title: 'Book Detail',
