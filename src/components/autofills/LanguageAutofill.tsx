@@ -118,14 +118,14 @@ const LanguageAutofill = ({
       />
       {suggestions.length > 0 && (
         <ul
-          className={`absolute top-[60px] rounded-md list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full`}
+          className={`absolute top-[60px] rounded-md list-none max-h-40 overflow-y-scroll bg-white dark:bg-darkGray z-20 w-full`}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
           {suggestions.map((language, index) => (
             <li
               key={index}
-              className='bg-white dark:bg-gray hover:bg-zinc-200 dark:hover:bg-darkGray'
+              className='bg-white dark:bg-darkGray hover:bg-zinc-200 dark:hover:bg-darkGray'
               onClick={() => handleSuggestionClick(language)}
               style={{ padding: '5px', cursor: 'pointer' }}
             >

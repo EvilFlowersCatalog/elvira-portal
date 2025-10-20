@@ -39,7 +39,7 @@ const ModalWrapper = ({
 
   return (
     <div
-      className='fixed z-50 top-0 left-0 bottom-0 right-0 bg-white bg-opacity-90 dark:bg-gray dark:bg-opacity-90'
+      className='fixed z-50 top-0 left-0 bottom-0 right-0 bg-white bg-opacity-90 dark:bg-darkGray dark:bg-opacity-90'
       onKeyDown={handleKeyDown}
       onClick={handleClick}
       tabIndex={-1}

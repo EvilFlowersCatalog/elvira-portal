@@ -151,7 +151,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                 <TableContainer>
                     <Table>
                         <TableHead>
-                            <TableRow className="bg-gray/10 dark:bg-black/70">
+                            <TableRow className="bg-darkGray/10 dark:bg-black/70">
                                 <TableCell colSpan={1} className="p-0">
                                     <div className="flex items-center pr-4 py-2">
                                         <h2 className="dark:text-white mr-4 text-nowrap">{title}</h2>
@@ -167,7 +167,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                                 {getPagination(getVisibleHeader().length - 1)}
                             </TableRow>
                         </TableHead>
-                        <TableHead className="bg-gray/10 dark:bg-black/70">
+                        <TableHead className="bg-darkGray/10 dark:bg-black/70">
                             <TableRow>
                                 {getVisibleHeader().map((col, index) => (
                                     <TableCell colSpan={getVisibleHeader().length == 1 ? 2 : 1} className="relative" key={index} width={col.width} align={col.align}>
@@ -265,7 +265,7 @@ export default function ElviraTable({ title, header, data, metadata, fetchFuncti
                             ))}
                         </TableBody>
 
-                        <TableFooter className='bg-gray/10 dark:bg-black/70'>
+                        <TableFooter className='bg-darkGray/10 dark:bg-black/70'>
                             <TableRow>
                                 {getPagination(Math.max(getVisibleHeader().length, 2))}
                             </TableRow>

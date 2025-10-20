@@ -23,7 +23,7 @@ export function StatItem({ value, label }: StatItemProps) {
             <span className="text-primary dark:text-primaryLight text-2xl font-semibold">
                 {value}
             </span>
-            <span className="text-gray dark:text-white text-light text-small">
+            <span className="text-gray-500 dark:text-white text-light text-small">
                 {label}
             </span>
         </div>

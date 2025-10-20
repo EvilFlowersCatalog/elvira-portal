@@ -146,7 +146,7 @@ const FeedAutofill = ({
       />
       {suggestions.length > 0 && (
         <ul
-          className={`absolute top-[60px] rounded-md rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full
+          className={`absolute top-[60px] rounded-md rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-darkGray z-20 w-full
           shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A]`}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
@@ -154,7 +154,7 @@ const FeedAutofill = ({
           {suggestions.map((feed, index) => (
             <li
               key={index}
-              className='bg-white dark:bg-gray hover:bg-zinc-200 dark:hover:bg-darkGray text-left relative z-20'
+              className='bg-white dark:bg-darkGray hover:bg-zinc-200 dark:hover:bg-darkGray text-left relative z-20'
               onClick={() => handleSuggestionClick(feed)}
               style={{ padding: '5px', cursor: 'pointer' }}
             >

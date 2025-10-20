@@ -69,7 +69,7 @@ const EntrySwiper = ({
         onClick={openEntryDetail}
       >
         <div
-          className={`w-full rounded-md border border-gray dark:border-zinc-200 ${
+              className={`w-full rounded-md border border-gray-300 dark:border-zinc-200 ${
             imageLoaded ? 'h-auto my-auto' : 'h-72'
           } overflow-hidden max-h-72`}
         >
@@ -104,7 +104,7 @@ const EntrySwiper = ({
         {entry.authors.length > 0 && (
           <span
             className={`text-xs ${
-              isActive ? 'text-zinc-200' : 'text-gray dark:text-zinc-200'
+              isActive ? 'text-zinc-200' : 'text-gray-500 dark:text-zinc-200'
             }`}
           >
             {entry.authors[0].name} {entry.authors[0].surname}

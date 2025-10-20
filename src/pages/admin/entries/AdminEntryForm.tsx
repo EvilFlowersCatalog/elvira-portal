@@ -71,7 +71,7 @@ export default function AdminEntryForm({
                         <div className='flex flex-col gap-4'>
 
                             {/* First row */}
-                            <div className='flex flex-col bg-slate-200 dark:bg-gray p-4 rounded-md gap-4'>
+                            <div className='flex flex-col bg-slate-200 dark:bg-darkGray p-4 rounded-md gap-4'>
                                 {/* Identifiers */}
                                 <IdentifiersPart entry={entry} setEntry={setEntry} />
 
@@ -113,7 +113,7 @@ export default function AdminEntryForm({
                                     setIsLoading={setIsFilesLoading}
                                 />}
                             {/* SUMMARY */}
-                            <div className='flex flex-col min-h-60 bg-slate-200 dark:bg-gray rounded-md p-4 gap-2 c'>
+                            <div className='flex flex-col min-h-60 bg-slate-200 dark:bg-darkGray rounded-md p-4 gap-2 c'>
                                 <h2 className='text-lg'>{t('entry.wizard.summary')}</h2>
                                 <WYSIWYG
                                     value={entry.summary}
@@ -121,11 +121,11 @@ export default function AdminEntryForm({
                                 />
                             </div>
                             {/* CITATION */}
-                            <div className='flex flex-col min-h-96 xl:min-h-0 bg-slate-200 dark:bg-gray rounded-md p-4 pt-2 gap-2'>
+                            <div className='flex flex-col min-h-96 xl:min-h-0 bg-slate-200 dark:bg-darkGray rounded-md p-4 pt-2 gap-2'>
                                 <h2 className='text-lg'>{t('entry.wizard.citation')}</h2>
                                 <ElviraTextarea
                                     onChange={handleCitationChange}
-                                    className='bg-white dark:bg-gray outline-none resize-none flex-1 p-2 rounded-md'
+                                    className='bg-white dark:bg-darkGray outline-none resize-none flex-1 p-2 rounded-md'
                                     placeholder={t('entry.wizard.citation')}
                                     value={entry.citation ?? ''}
                                 />

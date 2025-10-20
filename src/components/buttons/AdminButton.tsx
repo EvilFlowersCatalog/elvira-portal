@@ -14,7 +14,7 @@ const AdminButton = forwardRef<HTMLButtonElement, CustomInputProps>(
           ref={ref}
           {...props}
           className={`
-            group w-full h-full rounded-xl bg-white dark:bg-gray shadow-md 
+            group w-full h-full rounded-xl bg-white dark:bg-darkGray shadow-md 
             hover:shadow-lg transition-all duration-200 p-6 text-left
             border border-zinc-300 dark:border-zinc-700 hover:border-transparent
             hover:bg-primary hover:text-white dark:hover:bg-primary-dark

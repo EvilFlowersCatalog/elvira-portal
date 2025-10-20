@@ -53,7 +53,7 @@ const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
         <div
           className={`w-full flex ${
             imageLoaded ? 'h-auto my-auto' : 'h-64'
-          } rounded-md border border-gray dark:border-zinc-200 overflow-hidden`}
+          } rounded-md border border-gray-300 dark:border-zinc-200 overflow-hidden`}
         >
           <img
             className={`w-full h-full ${
@@ -86,7 +86,7 @@ const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
         {entry.authors.length > 0 && (
           <span
             className={`text-xs ${
-              isActive ? 'text-zinc-200' : 'text-gray dark:text-zinc-200'
+              isActive ? 'text-zinc-200' : 'text-gray-500 dark:text-zinc-200'
             }`}
           >
             {entry.authors[0].name} {entry.authors[0].surname}

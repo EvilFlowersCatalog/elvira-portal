@@ -37,7 +37,7 @@ export function AdvancedSearchWrapper({ children }: { children: React.ReactNode 
                     md:hidden
                     fixed left-0 right-0
                     transition-all duration-500 ease-in-out
-                    bg-slate-200 dark:bg-gray
+                    bg-slate-200 dark:bg-darkGray
                     z-30
                     ${showAdvancedSearch ? 'top-0 bottom-0 opacity-100 p-3' : '-top-full opacity-0 pointer-events-none'}
                     rounded-none h-screen

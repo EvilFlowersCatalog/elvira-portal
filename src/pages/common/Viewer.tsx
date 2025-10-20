@@ -313,7 +313,7 @@ const Viewer = () => {
       {loading && (
         <div
           className={
-            "fixed top-0 bottom-0 left-0 right-0 bg-white dark:bg-gray bg-opacity-80 dark:bg-opacity-80 z-50 flex flex-col gap-10 justify-center items-center"
+            "fixed top-0 bottom-0 left-0 right-0 bg-white dark:bg-darkGray bg-opacity-80 dark:bg-opacity-80 z-50 flex flex-col gap-10 justify-center items-center"
           }
         >
           <img

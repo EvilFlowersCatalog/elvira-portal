@@ -79,7 +79,7 @@ const AdditionalDataPart = ({
   };
 
   return (
-    <div className='grid grid-cols-1 md:grid-cols-[auto,1fr] bg-slate-200 dark:bg-gray gap-4 rounded-md p-4'>
+    <div className='grid grid-cols-1 md:grid-cols-[auto,1fr] bg-slate-200 dark:bg-darkGray gap-4 rounded-md p-4'>
       <div className={`relative w-48 m-auto h-full p-2`}>
         {stringImage && (
           <img className='w-full h-full object-cover' src={stringImage} alt='image' />

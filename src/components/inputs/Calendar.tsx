@@ -143,7 +143,7 @@ const Calendar: React.FC<CalendarProps> = ({ availability, requestAvailability, 
                 >
                     <div className={twMerge(`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold`,
                         `${isBooked ? 'text-black dark:text-white' : `text-black dark:text-white group-hover:text-white`}`,
-                        `${isPast ? 'text-gray/50 dark:text-white/60' : ''}`,
+                        `${isPast ? 'text-gray-500/50 dark:text-white/60' : ''}`,
                         `${isToday(day) ? `bg-blue-500 text-white dark:text-white group-hover:bg-white group-hover:text-black` : ''}`,
                         `${isWithinSelection || isStartDate ? 'dark:text-black' : ''}`)}>
                         {format(day, "d")}
@@ -155,7 +155,7 @@ const Calendar: React.FC<CalendarProps> = ({ availability, requestAvailability, 
     }
 
     return (
-        <div className="p-4 border rounded-2xl shadow-md bg-white dark:bg-zinc-800">
+        <div className="p-4 border-gray-300 border rounded-2xl shadow-md bg-white dark:bg-zinc-800">
             <div className="flex justify-center items-center gap-4 mb-4">
                 <FaChevronLeft className="cursor-pointer text-zinc-700 dark:text-zinc-300 hover:scale-110 transition" onClick={handlePrevMonth} />
                 <h2 className="text-xl font-bold text-center text-zinc-800 dark:text-white">

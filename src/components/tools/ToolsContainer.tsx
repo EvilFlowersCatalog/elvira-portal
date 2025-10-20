@@ -110,8 +110,8 @@ const ToolsContainer = ({ advancedSearch, aiEnabled = true, enableSort = true, p
 
           </form>
 
-          {!isParamsEmpty() && (
-            <button className='text-gray dark:text-white hover:text-primary dark:hover:text-primaryLight pt-6' onClick={handleClear}>
+            {!isParamsEmpty() && (
+            <button className='text-gray-500 dark:text-white hover:text-primary dark:hover:text-primaryLight pt-6' onClick={handleClear}>
               <MdFilterListOff size={25} />
             </button>
           )}

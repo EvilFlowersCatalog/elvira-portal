@@ -2,8 +2,8 @@ import { twMerge } from "tailwind-merge";
 
 export function SubText({ text, subtext }: { text: string, subtext: string }) {
     return <>
-        <h3 className='text-[16px] dark:text-white'>{text}</h3>
-        <p className='text-sm text-gray/70 dark:text-white/50'>{subtext}</p>
+    <h3 className='text-[16px] dark:text-white'>{text}</h3>
+    <p className='text-sm text-gray-500/70 dark:text-white/50'>{subtext}</p>
     </>
 }
 
@@ -14,7 +14,7 @@ export function BubbleText({ text, className, onClick, style }: { text: string, 
 export function ActionButton({ icon, onClick }: { icon: JSX.Element, onClick: () => void }) {
     return (
         <button
-            className='p-2 rounded-full hover:bg-gray/10 dark:hover:bg-black/70 transition-colors'
+            className='p-2 rounded-full hover:bg-darkGray/10 dark:hover:bg-black/70 transition-colors'
             onClick={onClick}
         >
             {icon}

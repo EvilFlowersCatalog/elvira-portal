@@ -244,7 +244,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
             </ActionsWrapper>
           </div>
 
-          <div className='p-4 bg-white dark:bg-gray mdlg:overflow-y-auto h-full pb-20 w-full'>
+          <div className='p-4 bg-white dark:bg-darkGray mdlg:overflow-y-auto h-full pb-20 w-full'>
             <DetailHeader
               entry={entry}
               handleParamClick={handleParamClick}

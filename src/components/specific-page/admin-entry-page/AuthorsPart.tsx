@@ -53,7 +53,7 @@ const AuthorsPart = ({ entry, setEntry }: IPartParams) => {
   };
 
   return (
-    <div className='flex flex-col bg-slate-200 dark:bg-gray rounded-md p-4 gap-2'>
+    <div className='flex flex-col bg-slate-200 dark:bg-darkGray rounded-md p-4 gap-2'>
       <div className='w-full flex items-center gap-2'>
         <h2 className='text-lg'>{t('entry.wizard.authors')}</h2>
         <IoMdAdd onClick={addAuthor} className='ml-auto cursor-pointer' size={20} />

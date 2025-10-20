@@ -101,7 +101,7 @@ export default function AcquisitionsButton({
       </div>
       <div
         className={twMerge(
-          "absolute bottom-full left-0 w-full flex-col gap-2 p-1 transition-opacity duration-200 bg-lightGray dark:bg-gray rounded-lg shadow-lg",
+          "absolute bottom-full left-0 w-full flex-col gap-2 p-1 transition-opacity duration-200 bg-lightGray dark:bg-darkGray rounded-lg shadow-lg",
           isOpen ? "flex opacity-100" : "hidden opacity-0"
         )}
         style={{ zIndex: 10 }}
