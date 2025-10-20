@@ -11,7 +11,7 @@ import useGetEntryDetail from '../../hooks/api/entries/useGetEntryDetail';
 import useGetUserAcquisition from '../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisition';
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { renderViewer } from '@evilflowers/evilflowersviewer';
+import renderViewer from '@evilflowers/evilflowersviewer';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { toast } from 'react-toastify';
 import { updateMetaTag } from '../../utils/func/functions';
@@ -228,7 +228,7 @@ const Viewer = () => {
 
         // Render viewer with the provided options and configurations
         renderViewer({
-          rootId,
+          rootId: `#${rootId}`,
           data: pdf,
           options: {
             theme,

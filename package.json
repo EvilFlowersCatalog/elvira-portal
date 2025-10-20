@@ -11,7 +11,9 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@evilflowers/evilflowersviewer": "^0.5.15",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@evilflowers/evilflowersviewer": "file:viewer.tgz",
     "@mui/material": "^6.0.2",
     "@mui/x-date-pickers": "^8.8.0",
     "@popperjs/core": "^2.11.8",
