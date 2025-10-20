@@ -40,6 +40,9 @@ export default {
         xxl: '1440px',
       },
       colors: {
+        // Extend Tailwind's default colors instead of replacing them
+        ...require('tailwindcss/defaultTheme').colors,
+        // Your custom colors
         primary: '#0077CC',
         primaryLight: '#E6F3FF',
         secondary: '#15384E',
@@ -58,7 +61,6 @@ export default {
         red: '#ff2129',
         green: '#77dd77',
         strongDarkGray: '#141414',
-        gray: '#2e2e2e',
       },
       flex: {
         2: '2 2 0%',
