@@ -7,14 +7,18 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface ICategoryAutofillParams {
   entryForm: any;
+  defaultCategoryId?: string;
   setEntryForm: (entryForm: any) => void;
   single?: boolean;
+  setIsSelectionOpen: (isOpen: boolean) => void;
 }
 
 const CategoryAutofill = ({
   entryForm,
   setEntryForm,
+  defaultCategoryId,
   single = false,
+  setIsSelectionOpen
 }: ICategoryAutofillParams) => {
   const { stuBorder } = useAppContext();
   const { t } = useTranslation();
@@ -38,6 +42,19 @@ const CategoryAutofill = ({
       }
     })();
   }, []);
+
+  useEffect(() => {
+    if (defaultCategoryId && categories) {
+      const defaultCategory = categories.find((category: ICategory) => category.id === defaultCategoryId);
+      if (defaultCategory) {
+        setInputValue(defaultCategory.term);
+        setEntryForm({
+          ...entryForm,
+          categories: [{ term: defaultCategory.term, id: defaultCategory.id }],
+        });
+      }
+    }
+  }, [defaultCategoryId, categories]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -86,9 +103,8 @@ const CategoryAutofill = ({
   return (
     <div className='w-full relative'>
       <ElviraInput
-        className={`bg-white dark:bg-gray ${
-          suggestions.length > 0 ? 'rounded-b-none' : ''
-        }`}
+        className={`bg-white ${suggestions.length > 0 ? 'rounded-b-none' : ''
+          }`}
         type='text'
         value={inputValue}
         onChange={handleInputChange}
@@ -104,6 +120,7 @@ const CategoryAutofill = ({
           );
 
           setSuggestions(filteredSuggestions);
+          setIsSelectionOpen(true);
         }}
         onBlur={() => {
           const category = categories.filter(
@@ -118,12 +135,16 @@ const CategoryAutofill = ({
             handleSuggestionClick(category[0]);
           }
           // if we click outside out input no on suggestions
-          if (!isHovering) setSuggestions([]);
+          if (!isHovering) {
+            setSuggestions([]);
+            setIsSelectionOpen(false);
+          }
         }}
       />
       {suggestions.length > 0 && (
         <ul
-          className={`absolute top-[60px] border-2 rounded-md rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full`}
+          className={`absolute top-[60px] rounded-md rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full
+          shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A]`}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >

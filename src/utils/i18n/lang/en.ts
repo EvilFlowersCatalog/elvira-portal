@@ -1,5 +1,14 @@
+import { title } from "process";
+
 export const en = {
   translation: {
+    assistant: {
+      title: 'AI Assistant',
+      inputPlaceholder: 'Ask me anything...',
+      suggestion1: 'How do I learn programming?',
+      suggestion2: 'Find a book about mathematics',
+      entryAssistant: "Reference to the book {{x}}",
+    },
     // NOTIFICATIONS
     notifications: {
       myShelf: {
@@ -98,16 +107,6 @@ export const en = {
           },
         },
       },
-      license: {
-        add: {
-          success: 'License was successfully added.',
-          error: 'License failed to be added.',
-        },
-        edit: {
-          success: 'License was successfully edited.',
-          error: 'License failed to be edited.',
-        },
-      },
       login: {
         success: 'You have been successfully logged in.',
         error: 'Wrong credentials.',
@@ -118,6 +117,21 @@ export const en = {
       },
       logout: 'You have been logged out.',
       fileFailed: 'Something went wrong while reading the file.',
+      citation: {
+        noCite: 'Citation is not available.',
+        copySuccess: 'Citation has been copied to the clipboard.',
+        copyError: 'Failed to copy the citation.',
+      },
+      shareSuccess: 'Address successfully copied.',
+      license:{
+        create: {
+          success: 'License has been successfully created.',
+          error: 'License failed to be created.',
+        },
+        download:{
+          error: 'Failed to download the license.',
+        }
+      }
     },
 
     // LOGIN PAGE
@@ -137,22 +151,84 @@ export const en = {
     // ADMINISTRATION PAGE
     administration: {
       homePage: {
-        entries: 'Entries',
-        feeds: 'Feeds',
-        categories: 'Categories',
-        licenses: 'Licenses',
+        entries: {
+          title: 'Entries',
+          text: 'Manage and view all entries in the system.',
+        },
+        feeds: {
+          title: 'Feeds',
+          text: 'Manage and organize feeds for content distribution.',
+        },
+        categories: {
+          title: 'Categories',
+          text: 'Manage and edit categories for better organization.',
+        },
+        users: {
+          title: 'Users',
+          text: 'Manage and view all users in the system.',
+        },
+        loans: {
+          title: 'Loans',
+          text: 'Manage and view all loans in the system.',
+        }
       },
-    },
-
-    // License
-    license: {
-      startsAt: 'Starts at',
-      expiresAt: 'Expires at',
-      edit: 'Edit',
+      feedsPage: {
+        add: 'Add Feed',
+        edit: 'Edit',
+        delete: 'Delete',
+      },
+      categoriesPage: {
+        info: 'Category Info',
+        term: 'Term',
+        label: 'Label',
+        scheme: 'Scheme',
+        none: 'None',
+        add: 'Add Category',
+        edit: 'Edit',
+        delete: 'Delete'
+      },
+      entriesPage: {
+        tableTitle: 'Entries',
+        detail: 'Detail',
+        feeds: 'Feed',
+        categories: 'Category',
+        actions: 'Actions',
+      },
+      usersPage: {
+        title: 'User Management',
+        tableTitle: 'Users ({{x}})',
+        detail: 'Detail',
+        username: 'Username',
+        name: 'Name',
+        surname: 'Surname',
+        isActive: 'Active',
+        active: "Active",
+        inactive: 'Inactive',
+        lastLogin: 'Last Login',
+        createdAt: 'Created At',
+        updatedAt: 'Updated At',
+        actions: 'Actions',
+      },
+      loansPage: {
+        title: 'Loan Management',
+        tableTitle: 'Loans ({{x}})',
+        table: {
+          entry: 'Entry',
+          state: 'State',
+          starts_at: 'Starts At',
+          ends_at: 'Ends At',
+          actions: 'Actions',
+          user: 'User',
+        }
+      }
     },
 
     general: {
-      scrollUp: 'Scroll Up',
+      scrollUp: {
+        object: 'Scroll Up',
+        title: 'Scroll Up',
+        text: 'Scroll to the top of the page.',
+      },
     },
 
     // NOT FOUND PAGE
@@ -166,7 +242,7 @@ export const en = {
 
     // NAVBAR MENU
     navbarMenu: {
-      portal: 'Portal',
+      portal: 'Main Menu',
       personal: 'Personal',
       settings: 'Settings',
       catalog: 'Catalog',
@@ -177,11 +253,11 @@ export const en = {
       loan: 'Loans',
       loanHistory: 'Loans Histroy',
       feeds: 'Feeds',
-      licenses: 'Licenses',
       administration: 'Administration',
       darkMode: 'Dark Mode',
       lightMode: 'Light Mode',
-      logout: 'Logout',
+      user: 'Student',
+      superUser: 'Admin',
     },
 
     // PAGE
@@ -191,6 +267,8 @@ export const en = {
       error: 'An error occurred while loading data',
       scrollUp: 'Scroll up',
       removeFilters: 'Remove filters',
+      results: 'Results',
+      resultsQuery: 'Results for search "{{x}}"',
     },
 
     // HOME PAGE
@@ -205,27 +283,47 @@ export const en = {
       advancedSearch: 'Advanced Search',
       title: 'Title of entry',
       author: "Author's Name",
-      category: 'Category',
-      feeds: 'Feed',
+      categories: 'Categories',
+      feeds: 'Feeds',
       search: 'Search',
+      searchAll: 'Search All',
+      yearFrom: 'Year from',
+      yearTo: 'Year to',
     },
 
     // ENTRY COMPONENT
     entry: {
       detail: {
         close: 'Close',
-        add: '+ Add to shelf',
-        remove: '- Remove from shelf',
+        add: 'Add',
+        remove: 'Remove',
         pages: 'Pages',
+        rating: 'Rating',
         views: 'Views',
         lang: 'Language',
         feeds: 'Feeds',
         categories: 'Categories',
+        publisher: 'Publisher',
+        publishDate: 'Date of publication',
         summary: 'Summary',
         read: 'Read',
+        more: 'Access',
         borrow: 'Borrow',
-        download: 'Download',
+        activeLicense: 'Loan',
+        cite: 'Cite',
+        share: 'Share',
+		download: 'Download',
         relation: 'Relation',
+        noAuthor: 'Unknown author',
+        title: 'Book Detail',
+        readMore: 'Read More',
+        readLess: 'Read Less',
+        tabs: {
+          contents: 'Contents',
+          reviews: 'Reviews',
+          related: 'Related',
+        },
+        askAi: 'Ask AI',
       },
       wizard: {
         requiredMessages: {
@@ -281,6 +379,34 @@ export const en = {
       },
     },
 
+    license: {
+      calendar: {
+        title: 'License Calendar',
+        periodBooked: 'The selected period is already booked.',
+        noAvailability: 'This book is not available.',
+        lend: 'Lend',
+      },
+      loansPage: {
+        title: 'Loans',
+        table: {
+          title: 'Amount of loans: {{x}}',
+          entry: 'Entry',
+          state: 'State',
+          states: {
+            ready: 'Ready',
+            active: 'Active',
+            returned: 'Returned',
+            expired: 'Expired',
+            revoked: 'Revoked',
+            cancelled: 'Cancelled',
+          },
+          starts_at: 'Starts at',
+          ends_at: 'Ends at',
+          actions: 'Actions',
+        }
+      }
+    },
+
     dropzone: {
       errorMessage: {
         image: 'Image was bigger than max size (5 MB).',
@@ -330,22 +456,6 @@ export const en = {
           content:
             'Content field is required. It must be filled out before proceeding.',
         },
-        licenseForm: {
-          title: {
-            add: 'Create new license',
-            edit: 'Edit current license',
-          },
-          button: {
-            add: 'Add license',
-            edit: 'Edit license',
-          },
-          startDate: 'Start date',
-          endDate: 'End date',
-        },
-        licensePicker: {
-          title: 'Pick license',
-          button: 'Choose',
-        },
       },
       categoryForm: {
         edit: 'Edit',
@@ -370,6 +480,8 @@ export const en = {
         createdAtDesc: 'Created at ↓',
         titleAsc: 'Title ↑',
         titleDesc: 'Title ↓',
+        popularityAsc: 'Popularity ↑',
+        popularityDesc: 'Popularity ↓',
       },
     },
 
@@ -378,6 +490,11 @@ export const en = {
       title: 'Digital academic library',
       subTitle: 'Open and easy to use tools for document distribution',
       readMore: 'Read more',
+      banner: {
+        title: 'Take advantage of the Elvira AI assistant',
+        description: 'Ask for recommendations, search for information, or generate book summaries',
+        action: 'Try the assistant'
+      },
       read: {
         title: 'Read',
         descriptionPart1:

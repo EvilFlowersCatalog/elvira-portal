@@ -6,9 +6,9 @@ const useGetFeedDetail = () => {
 
   const getFeedDetail = async (feed_id: string): Promise<IFeedDetail> => {
     const FEED_DETAIL_URL = `/api/v1/feeds/${feed_id}`;
-    const { data: feedDetail } = await axios.get(FEED_DETAIL_URL);
+    const { data: feedDetail } = await axios.get<{response: IFeedDetail}>(FEED_DETAIL_URL);
 
-    return feedDetail;
+    return feedDetail.response;
   };
 
   return getFeedDetail;

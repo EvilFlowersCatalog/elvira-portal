@@ -8,12 +8,14 @@ import useAppContext from '../../../hooks/contexts/useAppContext';
 import ScrollUpButton from '../../buttons/ScrollUpButton';
 import ToolsContainer from '../../tools/ToolsContainer';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
-import EntryDetail from '../entry/EntryDetail';
+import EntryDetail from '../entry/details/EntryDetail';
+import { H1 } from '../../primitives/Heading';
+import { AdvancedSearchWrapper } from './AdvancedSearch';
+import OpenFiltersButton from '../../buttons/OpenFiltersButton';
+import LicenseCalendar from '../entry/details/LicenseCalendar';
 
 interface IItemContainer {
   children: ReactNode;
-  activeEntryId?: string | null;
-  setActiveEntryId?: ((activeEntryId: string | null) => void) | null;
   isLoading: boolean;
   showLayout?: boolean;
   setIsLoading: (isLoading: boolean) => void;
@@ -29,13 +31,12 @@ interface IItemContainer {
   setLoadingNext: (loadingNext: boolean) => void;
   searchSpecifier: string;
   showEmpty?: boolean;
-  showSearch?: boolean;
+  title: string;
+  customFilters?: ReactNode;
 }
 
 const ItemContainer = ({
   children,
-  activeEntryId = null,
-  setActiveEntryId = null,
   isLoading,
   isError,
   items,
@@ -51,10 +52,10 @@ const ItemContainer = ({
   isEntries = true,
   searchSpecifier,
   showEmpty = true,
-  showSearch = true,
+  title,
+  customFilters
 }: IItemContainer) => {
-  const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty } =
-    useAppContext();
+  const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty } = useAppContext();
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [showScrollUp, setShowScrollUp] = useState<boolean>(false);
@@ -77,10 +78,6 @@ const ItemContainer = ({
     previousSearchParamsRef.current = searchParams;
 
     const entryDetailId = searchParams.get('entry-detail-id');
-    if (setActiveEntryId) {
-      if (entryDetailId) setActiveEntryId(entryDetailId);
-      else setActiveEntryId(null);
-    }
   }, [searchParams]);
 
   return (
@@ -102,52 +99,62 @@ const ItemContainer = ({
         }
       >
         <Breadcrumb />
+        <H1>{title}</H1>
+        <ToolsContainer param={searchSpecifier} advancedSearch={isEntries} customFilters={customFilters} />
 
-        {showSearch && (
-          <ToolsContainer param={searchSpecifier} advancedSearch={isEntries} />
-        )}
-
-        {isLoading && (
-          <PageLoading entries={isEntries} showLayout={showLayout} />
-        )}
-
-        {!isLoading && isError && <PageMessage message={t('page.error')} />}
-
-        {!isLoading && !isError && (
+        <AdvancedSearchWrapper>
           <>
-            {showEmpty ? (
+            <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-bold text-left mb-4'>
+              {searchParams.get('query')
+                ? t('page.resultsQuery', { x: searchParams.get('query') })
+                : t('page.results')}
+            </h2>
+
+            {isLoading && (
+              <PageLoading entries={isEntries} showLayout={showLayout} />
+            )}
+
+            {!isLoading && isError && <PageMessage message={t('page.error')} />}
+
+
+            {!isLoading && !isError && (
               <>
-                {items.length > 0 && children}
-                {items.length === 0 && (
-                  <PageMessage
-                    message={
-                      isParamsEmpty()
-                        ? location.pathname === NAVIGATION_PATHS.shelf
-                          ? t('page.shelfEmpty')
-                          : t('page.notFound')
-                        : t('page.notFound')
-                    }
-                    clearParams={!isParamsEmpty() ? clearFilters : undefined}
-                  />
-                )}
-              </>
-            ) : (
-              <>
-                {(items.length === 0 && isParamsEmpty()) || items.length > 0 ? (
-                  children
+                {showEmpty ? (
+                  <>
+                    {items.length > 0 && children}
+                    {items.length === 0 && (
+                      <PageMessage
+                        message={
+                          isParamsEmpty()
+                            ? location.pathname === NAVIGATION_PATHS.shelf
+                              ? t('page.shelfEmpty')
+                              : t('page.notFound')
+                            : t('page.notFound')
+                        }
+                        clearParams={!isParamsEmpty() ? clearFilters : undefined}
+                      />
+                    )}
+                  </>
                 ) : (
-                  <PageMessage
-                    message={t('page.notFound')}
-                    clearParams={clearFilters}
-                  />
+                  <>
+                    {(items.length === 0 && isParamsEmpty()) || items.length > 0 ? (
+                      children
+                    ) : (
+                      <PageMessage
+                        message={t('page.notFound')}
+                        clearParams={clearFilters}
+                      />
+                    )}
+                  </>
                 )}
               </>
             )}
+            <OpenFiltersButton />
+            <EntryDetail triggerReload={triggerReload} />
+            <LicenseCalendar />
           </>
-        )}
+        </AdvancedSearchWrapper >
       </div>
-      {showScrollUp && <ScrollUpButton scrollRef={scrollRef} />}
-      {activeEntryId && <EntryDetail triggerReload={triggerReload} />}
     </>
   );
 };

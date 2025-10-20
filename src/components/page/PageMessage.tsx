@@ -23,7 +23,7 @@ const PageMessage = ({ message, clearParams = null }: IPageMessageParams) => {
         {message}
       </span>
       {clearParams && (
-        <Button onClick={clearParams} title={t('page.removeFilters')} />
+        <Button onClick={clearParams}>{t('page.removeFilters')}</Button>
       )}
     </div>
   );

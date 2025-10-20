@@ -90,6 +90,8 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
       setAuth({
         userId: user.user.id,
         username: user.user.username,
+        name: user.user.name,
+        surname: user.user.surname,
         isSuperUser,
         token: user.access_token,
         refreshToken: user.refresh_token,

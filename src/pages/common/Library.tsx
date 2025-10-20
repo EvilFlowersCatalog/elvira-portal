@@ -5,6 +5,9 @@ import { useSearchParams } from 'react-router-dom';
 import ItemContainer from '../../components/items/container/ItemContainer';
 import EntryBox from '../../components/items/entry/EntryBox';
 import EntryBoxLoading from '../../components/items/entry/EntryBoxLoading';
+import EntryItem from '../../components/items/entry/display/EntryItem';
+import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper';
+import { useTranslation } from 'react-i18next';
 
 const Library = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -13,8 +16,8 @@ const Library = () => {
   const [page, setPage] = useState<number>(0);
   const [maxPage, setMaxPage] = useState<number>(0);
   const [entries, setEntries] = useState<IEntry[]>([]);
-  const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
 
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const getEntries = useGetEntries();
 
@@ -38,12 +41,18 @@ const Library = () => {
             searchParams.get('feed-id-step') ??
             '',
           authors: searchParams.get('author') ?? '',
-          publishedAtGte: searchParams.get('from') ?? '',
-          publishedAtLte: searchParams.get('to') ?? '',
+          publishedAtGte: searchParams.get('publishedAtGte') ?? '',
+          publishedAtLte: searchParams.get('publishedAtLte') ?? '',
           orderBy: searchParams.get('order-by') ?? '',
           query: searchParams.get('query') ?? '',
-          config__readium_enabled: false,
+          languageCode: searchParams.get('languageCode') ?? '',
         });
+
+        const allEntries = [...(entries ?? []), ...items];
+        const uniqueEntries = Array.from(
+          new Map(allEntries.map(entry => [entry.id, entry])).values()
+        );
+        setEntries(uniqueEntries);
 
         setMaxPage(metadata.pages);
         setEntries([...(entries ?? []), ...items]);
@@ -60,8 +69,6 @@ const Library = () => {
 
   return (
     <ItemContainer
-      activeEntryId={activeEntryId}
-      setActiveEntryId={setActiveEntryId}
       isLoading={isLoading}
       setIsLoading={setIsLoading}
       isError={isError}
@@ -74,20 +81,17 @@ const Library = () => {
       setLoadingNext={setLoadingNext}
       showLayout
       searchSpecifier={'query'}
+      title={t('navbarMenu.library')}
     >
-      <div className='flex flex-wrap p-4 pt-0'>
+      <EntriesWrapper>
         {entries.map((entry, index) => (
-          <EntryBox
-            key={index}
-            entry={entry}
-            isActive={activeEntryId === entry.id}
-          />
+          <EntryItem key={entry.id} entry={entry} />
         ))}
         {loadingNext &&
           Array.from({ length: 30 }).map((_, index) => (
             <EntryBoxLoading key={index} />
           ))}
-      </div>
+      </EntriesWrapper>
     </ItemContainer>
   );
 };

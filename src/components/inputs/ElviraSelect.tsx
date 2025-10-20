@@ -7,6 +7,13 @@ interface IElviraSelectParams {
   children: ReactNode;
 }
 
+export const MUISelectStyle = {
+  '&:before': { borderBottom: '0px' },
+  '&:hover:not(.Mui-disabled):before': { borderBottom: '0px' },
+  '.MuiSelect-icon': { color: 'black' },
+  '.dark & .MuiSelect-icon': { color: 'white' },
+}
+
 const ElviraSelect = ({
   name,
   value,

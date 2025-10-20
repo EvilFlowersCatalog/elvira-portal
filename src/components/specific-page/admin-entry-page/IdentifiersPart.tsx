@@ -29,12 +29,12 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
 
       setEntry({
         ...entry!,
-        title: info?.response.title ?? entry?.title ?? '',
-        authors: info?.response.authors ?? entry?.authors ?? [],
-        publisher: info?.response.publisher ?? entry?.publisher ?? '',
-        published_at: info?.response.year ?? entry?.published_at ?? '',
-        language_code: info?.response.language ?? entry?.language_code,
-        citation: info?.response.bibtex ?? entry?.citation,
+        title: info?.title ?? entry?.title ?? '',
+        authors: info?.authors ?? entry?.authors ?? [],
+        publisher: info?.publisher ?? entry?.publisher ?? '',
+        published_at: info?.year ?? entry?.published_at ?? '',
+        language_code: info?.language ?? entry?.language_code,
+        citation: info?.bibtex ?? entry?.citation,
       });
 
       toast.success(t('notifications.dataFromIdentifiers.success'));
@@ -74,7 +74,7 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
               value={entry.identifiers?.doi ?? ''}
             />
             <IoMdDownload
-              className='absolute right-2 top-8 z-10 cursor-pointer'
+              className='absolute right-2 top-[34px] z-10 cursor-pointer'
               size={20}
               onClick={() => {
                 if (entry.identifiers.doi) {
@@ -94,7 +94,7 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
               value={entry.identifiers?.isbn ?? ''}
             />
             <IoMdDownload
-              className='absolute right-2 top-8 z-10 cursor-pointer'
+              className='absolute right-2 top-[34px] z-10 cursor-pointer'
               size={20}
               onClick={() => {
                 if (entry.identifiers.isbn) {

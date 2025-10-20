@@ -29,29 +29,27 @@ export interface IEntry {
 }
 
 export interface IEntryDetail {
-  response: {
-    id: string;
-    creator_id: string;
-    catalog_id: string;
-    authors: IEntryAuthor[];
-    categories: ICategory[];
-    popularity: string;
-    feeds: IFeed[];
-    language?: ILanguage;
-    title: string;
-    config: IConfig;
-    published_at: string;
-    publisher: string;
-    created_at: string;
-    updated_at: string;
-    summary: string;
-    content: string;
-    identifiers: IEntryIdentifiers;
-    acquisitions: IEntryAcquisition[];
-    citation: string;
-    shelf_record_id: string;
-    thumbnail: string;
-  };
+  id: string;
+  creator_id: string;
+  catalog_id: string;
+  authors: IEntryAuthor[];
+  categories: ICategory[];
+  popularity: string;
+  feeds: IFeed[];
+  language?: ILanguage;
+  title: string;
+  config: IConfig;
+  published_at: string;
+  publisher: string;
+  created_at: string;
+  updated_at: string;
+  summary: string;
+  content: string;
+  identifiers: IEntryIdentifiers;
+  acquisitions: IEntryAcquisition[];
+  citation: string;
+  shelf_record_id: string;
+  thumbnail: string;
 }
 
 export interface IEntryQuery {
@@ -66,6 +64,7 @@ export interface IEntryQuery {
   orderBy?: string;
   query?: string;
   config__readium_enabled?: boolean;
+  languageCode?: string;
 }
 
 export interface IEntryNew {
@@ -107,13 +106,11 @@ export interface IEntryIdentifiers {
 }
 
 export interface IEntryInfo {
-  response: {
-    title: string;
-    publisher: string;
-    doi: string;
-    authors: IEntryAuthor[];
-    year: string;
-    language: string;
-    bibtex: string;
-  };
+  title: string;
+  publisher: string;
+  doi: string;
+  authors: IEntryAuthor[];
+  year: string;
+  language: string;
+  bibtex: string;
 }

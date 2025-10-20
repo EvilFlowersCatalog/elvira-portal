@@ -9,6 +9,7 @@ interface IShelfButtonParams {
   entryId: string;
   handleAdd: () => void;
   handleRemove: () => void;
+  children: React.ReactNode;
 }
 
 const ShelfButton = ({
@@ -17,9 +18,9 @@ const ShelfButton = ({
   handleRemove,
   shelfId,
   entryId,
+  children,
 }: IShelfButtonParams) => {
   const { umamiTrack } = useAppContext();
-  const { t } = useTranslation();
 
   const onClickRemove = () => {
     umamiTrack('Remove from Shelf Button', {
@@ -36,26 +37,14 @@ const ShelfButton = ({
 
   return (
     <>
-      {isLoading ? (
-        <CircleLoader className={'my-2.5'} color={'#00abe1'} size={28} />
-      ) : shelfId ? (
-        <button
-          className={
-            'flex gap-2 items-center px-4 py-2 text-white font-semibold mb-2 border-2 border-red rounded-md hover:bg-red hover:bg-opacity-50 duration-200'
-          }
-          onClick={onClickRemove}
-        >
-          {t('entry.detail.remove')}
-        </button>
+      {shelfId ? (
+        <div onClick={onClickRemove}>
+          {children}
+        </div>
       ) : (
-        <button
-          className={
-            'flex gap-2 items-center px-4 py-2 text-white font-semibold mb-2 border-2 border-green rounded-md hover:bg-green hover:bg-opacity-50 duration-200'
-          }
-          onClick={onClickAdd}
-        >
-          {t('entry.detail.add')}
-        </button>
+        <div onClick={onClickAdd}>
+          {children}
+        </div>
       )}
     </>
   );

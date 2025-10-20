@@ -11,15 +11,16 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0"
   },
   "dependencies": {
-    "@evilflowers/evilflowersviewer": "^0.5.1",
+    "@evilflowers/evilflowersviewer": "^0.5.15",
     "@mui/material": "^6.0.2",
+    "@mui/x-date-pickers": "^8.8.0",
+    "@popperjs/core": "^2.11.8",
     "@types/umami": "^2.10.0",
     "axios": "^1.6.7",
     "broadcast-channel": "^7.0.0",
-    "luxon": "^3.5.0",
+    "date-fns": "^4.1.0",
     "react": "^18.2.0",
     "react-cookie": "^7.2.0",
-    "react-datepicker": "^7.6.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-gravatar": "^2.6.3",
@@ -29,11 +30,11 @@
     "react-simple-wysiwyg": "^3.1.1",
     "react-spinners": "^0.13.8",
     "react-toastify": "^10.0.4",
-    "swiper": "^11.1.1"
+    "swiper": "^11.1.1",
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@types/jwt-encode": "^1.0.3",
-    "@types/luxon": "^3.4.2",
     "@types/node": "^22.5.5",
     "@types/react": "^18.2.56",
     "@types/react-dom": "^18.2.19",

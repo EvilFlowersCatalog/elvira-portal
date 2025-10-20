@@ -3,8 +3,10 @@ import { IEntry } from '../../utils/interfaces/entry';
 import { useSearchParams } from 'react-router-dom';
 import useGetShelf from '../../hooks/api/my-shelf/useGetShelf';
 import ItemContainer from '../../components/items/container/ItemContainer';
-import EntryBox from '../../components/items/entry/EntryBox';
 import EntryBoxLoading from '../../components/items/entry/EntryBoxLoading';
+import EntryItem from '../../components/items/entry/display/EntryItem';
+import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper';
+import { useTranslation } from 'react-i18next';
 
 const Shelf = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -13,8 +15,8 @@ const Shelf = () => {
   const [page, setPage] = useState<number>(0);
   const [maxPage, setMaxPage] = useState<number>(0);
   const [entries, setEntries] = useState<IEntry[]>([]);
-  const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
 
+  const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const getShelf = useGetShelf();
 
@@ -35,18 +37,27 @@ const Shelf = () => {
           feedId: searchParams.get('feed-id') ?? '',
           categoryId: searchParams.get('category-id') ?? '',
           authors: searchParams.get('author') ?? '',
-          publishedAtGte: searchParams.get('from') ?? '',
-          publishedAtLte: searchParams.get('to') ?? '',
+          publishedAtGte: searchParams.get('publishedAtGte') ?? '',
+          publishedAtLte: searchParams.get('publishedAtLte') ?? '',
           orderBy: searchParams.get('order-by') ?? '',
           query: searchParams.get('query') ?? '',
-          config__readium_enabled: false,
+          languageCode: searchParams.get('languageCode') ?? '',
         });
 
         setMaxPage(metadata.pages);
         // extract shelf entries
-        const shelfEntries = items.map((item) => item.entry);
+        const shelfEntries = items.map((item) => {
+          var entry = item.entry;
+          entry.shelf_record_id = item.id;
+          return entry;
+        });
 
-        setEntries([...(entries ?? []), ...shelfEntries]);
+        const allEntries = [...entries, ...shelfEntries];
+        const uniqueShelfEntries = Array.from(
+          new Map(allEntries.map(entry => [entry.id, entry])).values()
+        );
+
+        setEntries(uniqueShelfEntries);
       } catch {
         // if there was error set to true
         setIsError(true);
@@ -66,8 +77,6 @@ const Shelf = () => {
 
   return (
     <ItemContainer
-      activeEntryId={activeEntryId}
-      setActiveEntryId={setActiveEntryId}
       isLoading={isLoading}
       setIsLoading={setIsLoading}
       isError={isError}
@@ -81,20 +90,17 @@ const Shelf = () => {
       triggerReload={triggerReload}
       showLayout
       searchSpecifier={'query'}
+      title={t('navbarMenu.myShelf')}
     >
-      <div className='flex flex-wrap p-4 pt-0'>
+      <EntriesWrapper>
         {entries.map((entry, index) => (
-          <EntryBox
-            key={index}
-            entry={entry}
-            isActive={activeEntryId === entry.id}
-          />
+          <EntryItem key={entry.id} entry={entry} triggerReload={triggerReload} />
         ))}
         {loadingNext &&
           Array.from({ length: 30 }).map((_, index) => (
             <EntryBoxLoading key={index} />
           ))}
-      </div>
+      </EntriesWrapper>
     </ItemContainer>
   );
 };

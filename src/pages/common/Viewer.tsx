@@ -63,7 +63,7 @@ const Viewer = () => {
     };
 
     try {
-      const { response: response } = await createUserAcquisition(
+      const response = await createUserAcquisition(
         userAcquisitionShare
       );
 
@@ -92,7 +92,7 @@ const Viewer = () => {
     page: number
   ): Promise<{ id: string; svg: string } | null> => {
     try {
-      const { response } = await createAnotationItem({
+      const response = await createAnotationItem({
         annotation_id: groupId,
         page,
         content: svg,
@@ -190,21 +190,14 @@ const Viewer = () => {
         setProgressBar(30);
 
         // Fetch entry details and process acquisition
-        const [{ response: entryDetail }, { response: userAcquisition }] =
-          await Promise.all([
-            getEntryDetail(id!),
-            getEntryDetail(id!).then(({ response }) =>
-              createUserAcquisition({
-                acquisition_id:
-                  response.acquisitions[parseInt(index || '0')].id,
-                type: 'personal',
-              })
-            ),
-          ]);
+        const entryDetail = await getEntryDetail(id!);
+        const userAcquisition = await createUserAcquisition({
+          acquisition_id: entryDetail.acquisitions[parseInt(index || '0')].id,
+          type: 'personal',
+        });
 
         acquisition_id = entryDetail.acquisitions[parseInt(index || '0')].id;
         user_acquisition_id = userAcquisition.id;
-
         setProgressBar(50);
 
         // Update metatags if properties exist

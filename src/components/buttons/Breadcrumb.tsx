@@ -15,6 +15,8 @@ const Breadcrumb = () => {
     { path: string; label: string }[]
   >([]);
   const [searchParams] = useSearchParams();
+
+  const [feedsLoading, setFeedsLoading] = useState<boolean>(searchParams.get('parent-id') || searchParams.get('feed-id-step') ? true : false);
   const [feeds, setFeeds] = useState<{ id: string; title: string }[]>([]);
   const [feedStep, setFeedStep] = useState<{ id: string; title: string }>({
     id: '',
@@ -57,7 +59,13 @@ const Breadcrumb = () => {
           label: breadcrumbsTranslator[part.toLocaleLowerCase()], // Capitalize the first letter
         });
         skip = true;
-      } else {
+      } else if ((feedsLoading || feeds.length > 0) && pathParts[0] == 'library') {
+        newBreadcrumbs.push({
+          path: "/feeds",
+          label: breadcrumbsTranslator['feeds'],
+        });
+      }
+      else {
         newBreadcrumbs.push({
           path: `/${pathParts.slice(0, index + 1).join('/')}`,
           label: breadcrumbsTranslator[part.toLocaleLowerCase()], // Capitalize the first letter
@@ -65,10 +73,18 @@ const Breadcrumb = () => {
       }
     });
 
+
     if (feeds.length > 0) {
       feeds.map((feed, index) => {
-        const part = index === 0 ? `?parent-id=${feed.id}` : `&${feed.id}`;
-        const path = pathParts.join('/') + part;
+        var previousFeeds = feeds.slice(0, index);
+        // %26 is the URL encoded version of &
+        const part =
+          index !== 0
+            ? `?parent-id=${previousFeeds.map((f) => f.id).join('%26')}%26${feed.id}`
+            : `?parent-id=${feed.id}`;
+        const path = pathParts[0] === 'library' ? "/feeds" + part : `/${pathParts.join('/')}` + part;
+
+        if (!feed.id) return;
 
         newBreadcrumbs.push({
           path,
@@ -90,35 +106,44 @@ const Breadcrumb = () => {
   useEffect(() => {
     const fp = searchParams.get('parent-id')?.split('&');
     const feedStepId = searchParams.get('feed-id-step');
-
+    
     (async () => {
-      if (fp) {
-        await Promise.all(
-          fp.map(async (id) => {
-            try {
-              const { response: detail } = await getFeedDetail(id);
-              return { id, title: detail.title };
-            } catch {
-              return { id, title: 'Feed' };
-            }
-          })
-        ).then((results) => {
+      const feedsPromise = (async () => {
+        if (fp) {
+          const results = await Promise.all(
+            fp.map(async (id) => {
+              try {
+                const detail = await getFeedDetail(id);
+                return { id, title: detail.title };
+              } catch {
+                return { id, title: 'Feed' };
+              }
+            })
+          );
           setFeeds(results);
-        });
-      } else {
-        setFeeds([]);
-      }
-      if (feedStepId) {
-        try {
-          const { response: detail } = await getFeedDetail(feedStepId);
-          setFeedStep({ id: detail.id, title: detail.title });
-        } catch {
+        } else {
+          setFeeds([]);
+        }
+      })();
+
+      const feedStepPromise = (async () => {
+        if (feedStepId) {
+          try {
+            const detail = await getFeedDetail(feedStepId);
+            setFeedStep({ id: detail.id, title: detail.title });
+          } catch {
+            setFeedStep({ id: '', title: '' });
+          }
+        } else {
           setFeedStep({ id: '', title: '' });
         }
-      } else {
-        setFeedStep({ id: '', title: '' });
-      }
+      })();
+
+      await Promise.all([feedsPromise, feedStepPromise]);
+
+      setFeedsLoading(false);
     })();
+
   }, [location.search]);
 
   return (
@@ -128,11 +153,10 @@ const Breadcrumb = () => {
       </button>
       {breadcrumbs.map((breadcrumb, index) => (
         <button
-          className={`flex gap-3 w-fit items-center text-sm text-left ${
-            index === breadcrumbs.length - 1
-              ? 'cursor-default'
-              : 'cursor-pointer'
-          }`}
+          className={`flex gap-3 w-fit items-center text-sm text-left ${index === breadcrumbs.length - 1
+            ? 'cursor-default'
+            : 'cursor-pointer'
+            }`}
           key={index}
           onClick={
             index !== breadcrumbs.length - 1

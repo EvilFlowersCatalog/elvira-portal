@@ -4,6 +4,7 @@ import {
   MouseEvent,
   RefObject,
   useEffect,
+  useRef,
 } from 'react';
 import {
   COOKIES_TYPE,
@@ -30,8 +31,10 @@ export interface IAppContext {
   isSmallDevice: boolean;
   showNavbar: boolean;
   setShowNavbar: (showNavbar: boolean) => void;
-  showSearchBar: boolean;
-  setShowSearchBar: (showSearchBar: boolean) => void;
+  showAdvancedSearch: boolean;
+  setShowAdvancedSearch: (showAdvancedSearch: boolean) => void;
+  showAiAssistant: boolean;
+  setShowAiAssistant: (showAiAssistant: boolean) => void;
   isParamsEmpty: () => boolean;
   searchParamsEqual: (
     prevSearchParams: URLSearchParams | null,
@@ -85,22 +88,38 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     cookies[COOKIES_TYPE.LANG_KEY] ?? LANG_TYPE.sk
   );
   const [showNavbar, setShowNavbar] = useState<boolean>(false);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState<boolean>(false);
+  const [showAiAssistant, setShowAiAssistant] = useState<boolean>(false);
   const [editingEntryTitle, setEditingEntryTitle] = useState<string>('');
-  const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
   const [isSmallDevice, setIsSmallDevice] = useState<boolean>(
     window.innerWidth < 959
   );
   const [searchParams, setSearchParams] = useSearchParams();
 
   // umami
-  const [entryDetailId, setEntryDetailId] = useState<string | null>(null);
-  const [parentId, setParentId] = useState<string | null>(null);
-  const [query, setQuery] = useState<string | null>(null);
-  const [title, setTitle] = useState<string | null>(null);
-  const [feedId, setFeedId] = useState<string | null>(null);
-  const [orderBy, setOrderBy] = useState<string | null>(null);
-  const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [author, setAuthor] = useState<string | null>(null);
+  const [umamiParameters, setUmamiParameters] = useState<{
+    query: string;
+    parentId: string;
+    title: string;
+    author: string;
+    categories: string[];
+    feeds: string[];
+    publishedAtGte: string;
+    publishedAtLte: string;
+    languageCode: string;
+    orderBy: string;
+  }>({
+    query: '',
+    parentId: '',
+    title: '',
+    author: '',
+    categories: [],
+    feeds: [],
+    publishedAtGte: '',
+    publishedAtLte: '',
+    languageCode: '',
+    orderBy: '',
+  });
   // check main.css
   const [stuColors] = useState<{ [key: string]: string }[]>([
     // backgournd 0
@@ -305,8 +324,8 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   // Each page change reset
   useEffect(() => {
     setShowNavbar(false);
-    setShowSearchBar(false);
     setEditingEntryTitle('');
+    setShowAdvancedSearch(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -321,7 +340,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
       if (e?.code?.toLocaleLowerCase() === 'escape') {
         searchParams.delete('entry-detail-id');
         setSearchParams(searchParams);
-        setShowSearchBar(false);
       }
     };
 
@@ -337,55 +355,43 @@ const AppProvider = ({ children }: IContextProviderParams) => {
 
   // track searchParam for umami
   useEffect(() => {
-    setEntryDetailId(searchParams.get('entry-detail-id'));
-    setParentId(searchParams.get('parent-id'));
-    setQuery(searchParams.get('query'));
-    setTitle(searchParams.get('title'));
-    setFeedId(searchParams.get('feed-id'));
-    setOrderBy(searchParams.get('order-by'));
-    setCategoryId(searchParams.get('category-id'));
-    setAuthor(searchParams.get('author'));
+    setUmamiParameters({
+      query: searchParams.get('query') || '',
+      parentId: searchParams.get('parent-id') || '',
+      title: searchParams.get('title') || '',
+      author: searchParams.get('author') || '',
+      categories: searchParams.get('categories')?.split(',') || [],
+      feeds: searchParams.get('feeds')?.split(',') || [],
+      publishedAtGte: searchParams.get('publishedAtGte') || '',
+      publishedAtLte: searchParams.get('publishedAtLte') || '',
+      languageCode: searchParams.get('languageCode') || '',
+      orderBy: searchParams.get('orderBy') || '',
+    });
   }, [searchParams]);
+  const previousParams = useRef<{ [K in keyof typeof umamiParameters]?: any }>({});
+  const paramEventMap: { [K in keyof typeof umamiParameters]: string } = {
+    title: 'Title Param',
+    parentId: 'Parent Param',
+    query: 'Query Param',
+    feeds: 'Feed Params',
+    orderBy: 'Order By Param',
+    categories: 'Category Param',
+    author: 'Author Param',
+    publishedAtGte: 'Published At GTE Param',
+    publishedAtLte: 'Published At LTE Param',
+    languageCode: 'Language Code Param',
+  };
   useEffect(() => {
-    if (entryDetailId !== null) {
-      umamiTrack('Entry Detail Param', { entryId: entryDetailId });
-    }
-  }, [entryDetailId]);
-  useEffect(() => {
-    if (parentId !== null) {
-      umamiTrack('Parent Param', { parentId });
-    }
-  }, [parentId]);
-  useEffect(() => {
-    if (query !== null) {
-      umamiTrack('Query Param', { query });
-    }
-  }, [query]);
-  useEffect(() => {
-    if (title !== null) {
-      umamiTrack('Title Param', { title });
-    }
-  }, [title]);
-  useEffect(() => {
-    if (feedId !== null) {
-      umamiTrack('Feed Param', { feedId });
-    }
-  }, [feedId]);
-  useEffect(() => {
-    if (orderBy !== null) {
-      umamiTrack('Order By Param', { orderBy });
-    }
-  }, [orderBy]);
-  useEffect(() => {
-    if (categoryId !== null) {
-      umamiTrack('Category Param', { categoryId });
-    }
-  }, [categoryId]);
-  useEffect(() => {
-    if (author !== null) {
-      umamiTrack('Author Param', { author: author });
-    }
-  }, [author]);
+
+    (Object.entries(paramEventMap) as [keyof typeof umamiParameters, string][]).forEach(([key, eventName]) => {
+      const value = umamiParameters[key];
+      if (value !== null && value.length > 0 && previousParams.current[key] !== value) {
+        umamiTrack(eventName, { [key]: value });
+      }
+    });
+
+    previousParams.current = { ...umamiParameters };
+  }, [umamiParameters]);
 
   return (
     <AppContext.Provider
@@ -396,8 +402,10 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         updateLang,
         showNavbar,
         setShowNavbar,
-        showSearchBar,
-        setShowSearchBar,
+        showAdvancedSearch,
+        setShowAdvancedSearch,
+        showAiAssistant,
+        setShowAiAssistant,
         specialNavigation,
         clearFilters,
         isSmallDevice,

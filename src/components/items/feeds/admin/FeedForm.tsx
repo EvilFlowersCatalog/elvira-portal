@@ -3,15 +3,17 @@ import useAppContext from '../../../../hooks/contexts/useAppContext';
 import { useTranslation } from 'react-i18next';
 import { IFeedNew } from '../../../../utils/interfaces/feed';
 import { uuid } from '../../../../utils/func/functions';
+import { useSearchParams } from 'react-router-dom';
 import useUploadFeed from '../../../../hooks/api/feeds/useUploadFeed';
 import useEditFeed from '../../../../hooks/api/feeds/useEditFeed';
 import useGetFeedDetail from '../../../../hooks/api/feeds/useGetFeedDetail';
 import { toast } from 'react-toastify';
 import ModalWrapper from '../../../../components/modal/ModalWrapper';
 import ElviraInput from '../../../../components/inputs/ElviraInput';
-import ElviraSelect from '../../../inputs/ElviraSelect';
+import { MUISelectStyle } from '../../../inputs/ElviraSelect';
 import FeedAutofill from '../../../autofills/FeedAutofill';
 import { MdRemoveCircle } from 'react-icons/md';
+import { MenuItem, Select } from '@mui/material';
 
 interface IFeedForm {
   setOpen: (open: boolean) => void;
@@ -34,8 +36,8 @@ const FeedForm = ({
     title: '',
     content: '',
     kind: 'acquisition',
-    parents: [],
   });
+  const [searchParams] = useSearchParams();
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const [parentFeeds, setParentFeeds] = useState<{
     feeds: { title: string; id: string }[];
@@ -62,9 +64,9 @@ const FeedForm = ({
     }));
   };
   // set kind
-  const handleKindChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  const handleKindChange = (e: any) => {
     setForm((prevForm) => ({
-      ...prevForm, // Preserve existing properties of feedForm
+      ...prevForm,
       kind: e.target.value,
     }));
   };
@@ -78,31 +80,31 @@ const FeedForm = ({
   }, [parentFeeds]);
 
   useEffect(() => {
+    const parentId = searchParams.get('parent-id') ?? '';
+    if (parentId) {
+      (async () => {
+        try {
+          const response  = await getFeedDetail(parentId);
+          setParentFeeds({
+            feeds: [{ id: response.id, title: response.title }],
+          });
+        } catch {
+          setParentFeeds({ feeds: [] });
+        }
+      })();
+    }
+
     try {
       if (feedId) {
         (async () => {
-          const { response } = await getFeedDetail(feedId);
-
-          if (response.parents) {
-            const details = await Promise.all(
-              response.parents.map((id) => getFeedDetail(id))
-            );
-
-            const parents: { feeds: { title: string; id: string }[] } = {
-              feeds: [],
-            };
-            details.map(({ response }) => {
-              parents.feeds.push({ id: response.id, title: response.title });
-            });
-
-            setParentFeeds(parents);
-          }
+          const response  = await getFeedDetail(feedId);
 
           setForm({
             catalog_id: response.catalog_id,
             url_name: response.url_name,
             title: response.title,
             content: response.content,
+            parents: response.parents,
             kind: response.kind,
           });
         })();
@@ -110,7 +112,7 @@ const FeedForm = ({
     } catch {
       setOpen(false);
     }
-  }, [feedId]);
+  }, []);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -202,16 +204,20 @@ const FeedForm = ({
           <label htmlFor='selection-kind' className={`text-sm pl-1 ${stuText}`}>
             {t('modal.feedForm.kind')}
           </label>
-          <ElviraSelect
-            name='selection-kind'
-            value={form.kind}
-            onChange={handleKindChange}
-          >
-            <option value='acquisition'>
-              {t('modal.feedForm.acquistion')}
-            </option>
-            <option value='navigation'>{t('modal.feedForm.navigation')}</option>
-          </ElviraSelect>
+            <Select
+              className="dark:text-white"
+              sx={MUISelectStyle}
+              label={"Selection Kind"}
+              value={form.kind}
+              labelId='selection-kind'
+              id="selectionKind"
+              onChange={handleKindChange}
+              variant="standard"
+            >
+                <MenuItem value="acquisition">{t('modal.feedForm.acquistion')}</MenuItem>
+                <MenuItem value="navigation">{t('modal.feedForm.navigation')}</MenuItem>
+            </Select>
+            
         </div>
         <button ref={buttonRef} type='submit' className='hidden'></button>
       </form>

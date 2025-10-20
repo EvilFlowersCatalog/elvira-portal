@@ -16,6 +16,8 @@ export enum NAVIGATION_PATHS {
   adminFeeds = '/administration/feeds',
   adminLicencies = '/administration/licenses',
   adminCategories = '/administration/categories',
+  adminUsers = '/administration/users',
+  adminLoans = '/administration/loans',
 }
 
 export enum THEME_TYPE {
@@ -79,4 +81,11 @@ export interface IWizardParams {
 export interface IPartParams {
   entry: IEntryNewForm;
   setEntry: (entry: IEntryNewForm) => void;
+}
+
+export interface Metadata {
+  page: number;
+  limit: number;
+  pages: number;
+  total: number;
 }

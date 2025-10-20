@@ -17,8 +17,9 @@ import Feeds from '../pages/common/Feeds';
 import AdminHome from '../pages/admin/AdminHome';
 import AdminAddEntry from '../pages/admin/entries/AdminAddEntry';
 import Auth from '../pages/auth/Auth';
-import AdminLicences from '../pages/admin/AdminLicences';
-import Licenses from '../pages/common/Licenses';
+import Loans from '../pages/common/Loans';
+import AdminUsers from '../pages/admin/AdminUsers';
+import AdminLoans from '../pages/admin/AdminLoans';
 
 const BaseRoutes = () => {
   const { auth } = useAuthContext();
@@ -47,8 +48,8 @@ const BaseRoutes = () => {
           <Route index element={<Home />} />
           <Route path='library' element={<Library />} />
           <Route path='shelf' element={<Shelf />} />
+          <Route path='loans' element={<Loans />} />
           <Route path='feeds' element={<Feeds />} />
-          <Route path='licenses' element={<Licenses />} />
           <Route path='viewer/:entry-id/:index' element={<Viewer />} />
 
           {/* Only with admin role */}
@@ -60,8 +61,9 @@ const BaseRoutes = () => {
               <Route path='edit/:entry-id' element={<AdminEditEntry />} />
             </Route>
             <Route path='feeds' element={<AdminFeeds />} />
-            <Route path='licenses' element={<AdminLicences />} />
             <Route path='categories' element={<AdminCategories />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path='loans' element={<AdminLoans />} />
           </Route>
         </Route>
       </Route>

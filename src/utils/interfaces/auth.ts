@@ -1,6 +1,8 @@
 export interface IAuth {
   userId: string;
   username: string;
+  name: string;
+  surname: string;
   isSuperUser: boolean;
   token: string;
   refreshToken: string;
