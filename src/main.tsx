@@ -9,7 +9,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import './main.css';
 import '@evilflowers/evilflowersviewer/dist/style.css';
 import 'swiper/swiper-bundle.css';
-import 'react-datepicker/dist/react-datepicker.css';
 
 // For zotero to update
 document.dispatchEvent(
