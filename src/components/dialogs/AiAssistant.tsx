@@ -135,14 +135,15 @@ export default function AiAssistant() {
         try {
             var currentChatId = chatId;
             if (!currentChatId) {
-                const response = await axios.post(`${process.env.ASSISTANT_URL}api/startchat`, {
+                console.log(import.meta.env.ELVIRA_ASSISTANT_URL);
+                const response = await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/startchat`, {
                     entryId: assistantEntry?.id || null,
                 });
                 currentChatId = response.data.chatId;
                 setChatId(currentChatId);
             }
 
-            const response = await axios.post<{ messages: { type: 'string', data: string | string[] }[] }>(`${process.env.ASSISTANT_URL}/api/sendchat`, {
+            const response = await axios.post<{ messages: { type: 'string', data: string | string[] }[] }>(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/sendchat`, {
                 chatId: currentChatId,
                 message: message,
                 entryId: assistantEntry?.id || null
