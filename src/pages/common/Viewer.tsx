@@ -11,10 +11,10 @@ import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
 import useGetUserAcquisition from "../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisition";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import renderViewer from "@evilflowers/evilflowersviewer";
+import renderViewer from "evil-flowers-viewer";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import viewerStyles from "@evilflowers/evilflowersviewer/dist/style.css?inline";
+import viewerStyles from "evil-flowers-viewer/dist/style.css?inline";
 import useAppContext from "../../hooks/contexts/useAppContext";
 import { toast } from "react-toastify";
 import { updateMetaTag } from "../../utils/func/functions";
@@ -28,7 +28,7 @@ import useUpdateAnotationItem from "../../hooks/api/anotations/anotation-items/u
 import useCreateAnotationItem from "../../hooks/api/anotations/anotation-items/useCreateAnotationItem";
 import useDeleteAnotationItem from "../../hooks/api/anotations/anotation-items/useDeleteAnotationItem";
 
-const rootId = "pdf-viewer-page";
+const rootId = "elvira-viewer-app";
 
 const Viewer = () => {
   const { lang, theme, titleLogoDark, titleLogoLight, stuBg } = useAppContext();
