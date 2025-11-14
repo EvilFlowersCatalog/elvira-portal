@@ -26,7 +26,7 @@ const translation = {
 function isDateBooked(date: Date, availability: IAvailabilityResponse | null): boolean {
     if (!availability) return false;
     const formattedDate = format(date, "yyyy-MM-dd");
-    return availability.calendar?.some(slot => slot.date === formattedDate && !slot.is_available);
+    return availability.calendar?.some((slot: { date: string; is_available: boolean }) => slot.date === formattedDate && !slot.is_available);
 }
 
 const Calendar: React.FC<CalendarProps> = ({ availability, requestAvailability, onSelectionChanged }) => {

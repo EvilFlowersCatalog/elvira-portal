@@ -17,6 +17,7 @@ import LicenseCalendar from '../entry/details/LicenseCalendar';
 interface IItemContainer {
   children: ReactNode;
   isLoading: boolean;
+  showSearch?: boolean;
   showLayout?: boolean;
   setIsLoading: (isLoading: boolean) => void;
   isError: boolean;
@@ -31,7 +32,7 @@ interface IItemContainer {
   setLoadingNext: (loadingNext: boolean) => void;
   searchSpecifier: string;
   showEmpty?: boolean;
-  title: string;
+  title?: string;
   customFilters?: ReactNode;
 }
 
@@ -99,7 +100,7 @@ const ItemContainer = ({
         }
       >
         <Breadcrumb />
-        <H1>{title}</H1>
+        {title && <H1>{title}</H1>}
         <ToolsContainer param={searchSpecifier} advancedSearch={isEntries} customFilters={customFilters} />
 
         <AdvancedSearchWrapper>

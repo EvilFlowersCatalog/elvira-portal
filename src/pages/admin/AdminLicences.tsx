@@ -68,7 +68,6 @@ const AdminLicences = () => {
       setLoadingNext={setLoadingNext}
       isEntries={false}
       searchSpecifier={'title'}
-      showSearch={false}
     >
       <div className='flex flex-wrap px-3 pb-4'>
         {/* admin licenses */}

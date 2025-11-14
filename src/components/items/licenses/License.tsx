@@ -22,8 +22,8 @@ const License = ({ license }: ILicenseParams) => {
 
     try {
       (async () => {
-        const { response } = await getEntryDetail(license.entry_id);
-        setTitle(response.title);
+        const entry = await getEntryDetail(license.entry_id);
+        setTitle(entry.title);
       })();
     } catch {
       setTitle('Unobtained');

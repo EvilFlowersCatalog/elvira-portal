@@ -75,12 +75,19 @@ export default function AcquisitionsButton({
     </div>
   );
 
-  const ActiveLicenseButton = ({ lcp_license_id }: { lcp_license_id: string }) => (
-    <div className={twMerge(ActionButtonStyle, "w-full cursor-pointer")} onClick={() => {
-      downloadLicense(lcp_license_id).catch((err) => {
-        toast.error(t('notifications.license.download.error'));
-      })
-    }}>
+  const ActiveLicenseButton = ({ lcp_license_id }: { lcp_license_id?: string }) => (
+    <div
+      className={twMerge(ActionButtonStyle, "w-full cursor-pointer")}
+      onClick={() => {
+        if (!lcp_license_id) {
+          toast.error(t('notifications.license.download.error'));
+          return;
+        }
+        downloadLicense(lcp_license_id).catch((err) => {
+          toast.error(t('notifications.license.download.error'));
+        });
+      }}
+    >
       <BiDownload size={24} className="flex-shrink-0" />
       {t("entry.detail.activeLicense")}
     </div>

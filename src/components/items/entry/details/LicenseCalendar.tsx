@@ -53,11 +53,13 @@ export default function LicenseCalendar({ }: {}) {
         (async () => {
             try {
                 const availabilityData = await getAvailability(start, end, entryId);
-                setAvailability((prev) => {
+                setAvailability((prev: IAvailabilityResponse | null) => {
                     if (prev == null) return availabilityData;
-                    prev.available = availabilityData.available;
-                    prev.calendar = [...prev.calendar, ...availabilityData.calendar];
-                    return prev;
+                    return {
+                        ...prev,
+                        available: availabilityData.available,
+                        calendar: [...prev.calendar, ...availabilityData.calendar],
+                    } as IAvailabilityResponse;
                 });
             } catch {
                 setAvailability(null);

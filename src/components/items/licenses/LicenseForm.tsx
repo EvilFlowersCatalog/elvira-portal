@@ -125,7 +125,7 @@ const licenseForm = ({
           <DatePicker
             className={`bg-transparent w-full text-black dark:text-white cursor-pointer text-center border-2 py-2 rounded-md ${stuBorder}`}
             selected={startDate}
-            onChange={(date) => setStartDate(date)}
+            onChange={(date: Date | null) => setStartDate(date)}
             minDate={new Date()}
             dateFormat='yyyy-MM-dd'
             placeholderText={t('modal.licenseForm.startDate')}

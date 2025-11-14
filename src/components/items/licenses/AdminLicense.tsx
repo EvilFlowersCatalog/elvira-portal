@@ -31,7 +31,7 @@ const AdminLicense = ({
 
     try {
       (async () => {
-        const { response } = await getEntryDetail(license.entry_id);
+        const response = await getEntryDetail(license.entry_id);
         setTitle(response.title);
       })();
     } catch {
