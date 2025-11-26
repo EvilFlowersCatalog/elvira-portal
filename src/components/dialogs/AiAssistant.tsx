@@ -5,6 +5,7 @@ import {
     IconButton,
     TextField,
     InputAdornment,
+    CircularProgress,
 } from "@mui/material";
 import { FaX, FaPaperPlane } from "react-icons/fa6";
 import { useEffect, useState } from "react";
@@ -15,10 +16,17 @@ import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
 import { IEntry, IEntryDetail } from "../../utils/interfaces/entry";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
+import useAuth from "../../hooks/contexts/useAuthContext";
 
 interface MessageContent {
-    type: "message" | 'entries'
+    type: "message" | 'entries' | 'loading'
     data: any
+}
+
+interface StreamEvent {
+    type: 'chunk' | 'message' | 'entries' | 'done' | 'error';
+    data?: string | string[];
+    msg_id?: string;
 }
 
 function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, handleSuggestion: (suggestion: string) => void }) {
@@ -35,13 +43,14 @@ function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, ha
 }
 
 
-function MessageElement({ msg }: { msg: { role: string; content: MessageContent } }) {
+function MessageElement({ msg, msgIndex }: { msg: { role: string; content: MessageContent }, msgIndex: number }) {
     const [books, setBooks] = useState<any[]>([]);
     const getEntryDetail = useGetEntryDetail();
 
     useEffect(() => {
-        if (msg.content.type === "entries") {
+        if (msg.content.type === "entries" && Array.isArray(msg.content.data)) {
             const entryIds = msg.content.data;
+            setBooks([]); // Reset books first
             (async () => {
                 const details = await Promise.all(
                     entryIds.map((id: string) => getEntryDetail(id))
@@ -53,7 +62,7 @@ function MessageElement({ msg }: { msg: { role: string; content: MessageContent 
                 setBooks(entries);
             })();
         }
-    }, [])
+    }, [msg.content.type, JSON.stringify(msg.content.data)])
 
     switch (msg.content.type) {
         case "message":
@@ -72,6 +81,17 @@ function MessageElement({ msg }: { msg: { role: string; content: MessageContent 
                     <EntryItem entry={entry} key={"ai-" + entry.id} id={'ai-' + entry.id} type="ai-recommendation" />
                 ))}
             </Box>
+        case "loading":
+            return <Box className="mb-2 p-2 rounded-lg max-w-[80%] flex items-center gap-2"
+                sx={{
+                    backgroundColor: "grey.200",
+                    alignSelf: "flex-start",
+                }}>
+                <CircularProgress size={16} />
+                <Typography variant="body2" className="text-gray-600">
+                    {msg.content.data || "Generating response..."}
+                </Typography>
+            </Box>;
         default:
             return <p className="dark:text-white text-center">404</p>
     }
@@ -79,6 +99,7 @@ function MessageElement({ msg }: { msg: { role: string; content: MessageContent 
 
 export default function AiAssistant() {
     const { t } = useTranslation();
+    const { auth } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
     const { showAiAssistant, setShowAiAssistant, umamiTrack } = useAppContext();
     const getEntryDetail = useGetEntryDetail();
@@ -89,7 +110,7 @@ export default function AiAssistant() {
     const [isGeneratingResponse, setGeneratingResponse] = useState(false);
 
     const [showSuggestions, setShowSuggestions] = useState(true);
-    const [messages, setMessages] = useState<{ role: string; content: any }[]>([]);
+    const [messages, setMessages] = useState<{ role: string; content: any; id?: string }[]>([]);
     const [assistantEntry, setAssistantEntry] = useState<IEntryDetail | null>(null);
 
 
@@ -132,66 +153,162 @@ export default function AiAssistant() {
         }]);
         setGeneratingResponse(true);
 
+        // Add loading indicator
+        const loadingMsgId = `loading-${Date.now()}`;
+        setMessages((prev) => [...prev, {
+            role: "assistant",
+            content: {
+                type: "loading",
+                data: "Generating response..."
+            },
+            id: loadingMsgId
+        }]);
+
         try {
             var currentChatId = chatId;
             if (!currentChatId) {
-                console.log(import.meta.env.ELVIRA_ASSISTANT_URL);
                 const response = await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/startchat`, {
                     entryId: assistantEntry?.id || null,
+                    apiKey: auth?.token || null
                 });
                 currentChatId = response.data.chatId;
                 setChatId(currentChatId);
             }
 
-            const response = await axios.post<{ messages: { type: 'string', data: string | string[] }[] }>(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/sendchat`, {
-                chatId: currentChatId,
-                message: message,
-                entryId: assistantEntry?.id || null
+            const response = await fetch(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/sendchat-stream`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chatId: currentChatId,
+                    message: message,
+                    entryId: assistantEntry?.id || null,
+                    apiKey: auth?.token || null
+                })
             });
 
-            for (const msg of response.data.messages) {
-                setMessages((prev) => [...prev, {
-                    role: "assistant", content: {
-                        type: msg.type,
-                        data: msg.data
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Request failed');
+            }
+
+            const reader = response.body!.getReader();
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let currentMessageText = '';
+            let hasReceivedFirstChunk = false;
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || '';
+
+                for (const line of lines) {
+                    if (line.startsWith('data: ')) {
+                        const data: StreamEvent = JSON.parse(line.slice(6));
+
+                        switch (data.type) {
+                            case 'chunk':
+                                if (!hasReceivedFirstChunk) {
+                                    // Remove loading indicator and start streaming message
+                                    hasReceivedFirstChunk = true;
+                                    const streamingMsgId = `streaming-${Date.now()}`;
+                                    setMessages((prev) => {
+                                        const filtered = prev.filter(m => m.id !== loadingMsgId);
+                                        return [...filtered, {
+                                            role: "assistant",
+                                            content: {
+                                                type: "message",
+                                                data: data.data as string
+                                            },
+                                            id: streamingMsgId
+                                        }];
+                                    });
+                                    currentMessageText = data.data as string;
+                                } else {
+                                    // Append chunk to existing message
+                                    currentMessageText += data.data;
+                                    setMessages((prev) => {
+                                        const newMessages = [...prev];
+                                        const lastMsgIndex = newMessages.length - 1;
+                                        if (newMessages[lastMsgIndex] && newMessages[lastMsgIndex].content.type === 'message') {
+                                            newMessages[lastMsgIndex] = {
+                                                ...newMessages[lastMsgIndex],
+                                                content: {
+                                                    ...newMessages[lastMsgIndex].content,
+                                                    data: currentMessageText
+                                                }
+                                            };
+                                        }
+                                        return newMessages;
+                                    });
+                                }
+                                break;
+                            case 'message':
+                                // Final message received (if no chunks were sent)
+                                if (!hasReceivedFirstChunk) {
+                                    setMessages((prev) => {
+                                        const filtered = prev.filter(m => m.id !== loadingMsgId);
+                                        return [...filtered, {
+                                            role: "assistant",
+                                            content: {
+                                                type: "message",
+                                                data: data.data as string
+                                            },
+                                            id: `message-${Date.now()}`
+                                        }];
+                                    });
+                                }
+                                break;
+                            case 'entries':
+                                setMessages((prev) => [...prev, {
+                                    role: "assistant",
+                                    content: {
+                                        type: "entries",
+                                        data: data.data as string[]
+                                    },
+                                    id: `entries-${Date.now()}`
+                                }]);
+                                break;
+                            case 'done':
+                                setGeneratingResponse(false);
+                                break;
+                            case 'error':
+                                setMessages((prev) => {
+                                    const filtered = prev.filter(m => m.id !== loadingMsgId);
+                                    return [...filtered, {
+                                        role: "assistant",
+                                        content: {
+                                            type: "message",
+                                            data: `Error: ${data.data}`
+                                        },
+                                        id: `error-${Date.now()}`
+                                    }];
+                                });
+                                setGeneratingResponse(false);
+                                break;
+                        }
                     }
-                }]);
+                }
             }
         } catch (err) {
-            setMessages((prev) => [...prev, {
-                role: "assistant", content: {
-                    type: 'message',
-                    data: "An error occurred while processing your request."
-                }
-            }]);
+            setMessages((prev) => {
+                const filtered = prev.filter(m => m.id !== loadingMsgId);
+                return [...filtered, {
+                    role: "assistant",
+                    content: {
+                        type: 'message',
+                        data: "An error occurred while processing your request."
+                    },
+                    id: `error-${Date.now()}`
+                }];
+            });
+            setGeneratingResponse(false);
         }
 
-        setGeneratingResponse(false);
         setInput("");
-    }
-
-    /* todo: response: AiResponse interface  */
-    function receiveMessage(response: string) {
-        // Simulate AI response
-        setMessages((prev) => [
-            ...prev,
-            {
-                role: "assistant",
-                content: {
-                    type: "message",
-                    data: response,
-                },
-            },
-            {
-                role: "assistant",
-                content: {
-                    type: "entries",
-                    data: {
-                        entryIds: ['ce40e042-1491-434f-a0b4-593c0a867b99', 'b623e984-a8e7-4d9d-ade0-15084faaccb5'],
-                    },
-                },
-            },
-        ]);
     }
 
     const handleSuggestion = (suggestion: string) => {
@@ -258,7 +375,7 @@ export default function AiAssistant() {
                 {/* Body */}
                 <Box id="chat" className="flex flex-col grow overflow-y-auto">
                     {messages.map((msg, index) => (
-                        <MessageElement key={index} msg={msg} />
+                        <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} msgIndex={index} />
                     ))}
                 </Box>
 
