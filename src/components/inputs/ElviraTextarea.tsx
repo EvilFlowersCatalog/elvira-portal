@@ -28,7 +28,7 @@ const ElviraTextarea = forwardRef<HTMLTextAreaElement, CustomTextareaProps>(
         <textarea
           ref={ref}
           {...props}
-          className={`w-full h-full p-2 rounded-md bg-transparent border-2 ${
+          className={`w-full h-full min-h-20 p-2 rounded-md bg-transparent border-2 ${
             value
               ? `${stuBorder}`
               : `${stuBorderFocus} border-black dark:border-white`

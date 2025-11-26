@@ -10,6 +10,7 @@ import useGetFeedDetail from '../../../../hooks/api/feeds/useGetFeedDetail';
 import { toast } from 'react-toastify';
 import FormModal from '../../../../components/modals/FormModal';
 import ElviraInput from '../../../../components/inputs/ElviraInput';
+import ElviraTextarea from '../../../../components/inputs/ElviraTextarea';
 import { MUISelectStyle } from '../../../inputs/ElviraSelect';
 import FeedAutofill from '../../../autofills/FeedAutofill';
 import { MdRemoveCircle } from 'react-icons/md';
@@ -56,7 +57,7 @@ const FeedForm = ({
     }));
   };
   // set conent
-  const handleContentChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     e.target.setCustomValidity('');
     setForm((prevForm) => ({
       ...prevForm, // Preserve existing properties of feedForm
@@ -163,7 +164,7 @@ const FeedForm = ({
         />
 
         {/* Content */}
-        <ElviraInput
+        <ElviraTextarea
           onChange={handleContentChange}
           placeholder={t('modal.feedForm.content')}
           value={form.content}

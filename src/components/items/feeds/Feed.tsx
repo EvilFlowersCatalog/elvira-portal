@@ -93,7 +93,7 @@ const Feed = ({ feed }: IFeedParams) => {
           }
         >
           <span className={'text-xl font-bold'}>{feed.title}</span>
-          <span className={'text-xs'}>{feed.content}</span>
+          <span className={'text-xs line-clamp-3 text-overflow-ellipsis'}>{feed.content}</span>
         </div>
         <div
           className={

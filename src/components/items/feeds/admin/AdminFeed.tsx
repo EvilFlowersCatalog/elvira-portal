@@ -73,7 +73,13 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
           >
             <div className="w-full">
               <span className="block text-lg font-bold">{feed.title}</span>
-              <span className="block text-sm opacity-80 mt-1">{feed.content}</span>
+              <span className="block text-sm opacity-80 mt-1" style={{
+                display: '-webkit-box',
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}>{feed.content}</span>
             </div>
             <div className="flex justify-end w-full text-white">
               {isNavigationFeed() ? (

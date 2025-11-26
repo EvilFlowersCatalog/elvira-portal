@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { IFeed } from '../../utils/interfaces/feed';
 import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
+import useGetFeedDetail from '../../hooks/api/feeds/useGetFeedDetail';
 import ItemContainer from '../../components/items/container/ItemContainer';
 import Feed from '../../components/items/feeds/Feed';
 import LoadNext from '../../components/items/loadings/LoadNext';
@@ -20,6 +21,9 @@ const Feeds = () => {
 
   const { t } = useTranslation();
   const getFeeds = useGetFeeds();
+  const getFeedDetail = useGetFeedDetail();
+  const [currentFeedDescription, setCurrentFeedDescription] = useState<string>('');
+  const [currentFeedTitle, setCurrentFeedTitle] = useState<string>('');
 
   useEffect(() => {
     setSearchParams((prev) => {
@@ -37,6 +41,7 @@ const Feeds = () => {
 
     (async () => {
       const fp = searchParams.get('parent-id')?.split('&') ?? [];
+      const currentFeedId = fp.length > 0 ? fp[fp.length - 1] : null;
 
       var title = searchParams.get('query') ?? '';
       var parentId = fp.length > 0 ? fp[fp.length - 1] : 'null'
@@ -60,6 +65,21 @@ const Feeds = () => {
         // Set items and metadata
         setMaxPage(metadata.pages);
         setFeeds([...(feeds ?? []), ...items]);
+        
+        // Fetch and set description from current parent feed
+        if (currentFeedId && currentFeedId !== 'null') {
+          try {
+            const feedDetail = await getFeedDetail(currentFeedId);
+            setCurrentFeedDescription(feedDetail.content || '');
+            setCurrentFeedTitle(feedDetail.title || '');
+          } catch {
+            setCurrentFeedDescription('');
+            setCurrentFeedTitle('');
+          }
+        } else {
+          setCurrentFeedDescription('');
+          setCurrentFeedTitle('');
+        }
       } catch {
         // if there was error set to true
         setIsError(true);
@@ -85,7 +105,8 @@ const Feeds = () => {
       setLoadingNext={setLoadingNext}
       isEntries={false}
       searchSpecifier={'query'}
-      title={t('navbarMenu.feeds')}
+      title={`${t('navbarMenu.feeds')} ${ currentFeedTitle ? ` - ${currentFeedTitle}` : ''}`}
+      description={currentFeedDescription}
       customFilters={
         <div className="flex items-center gap-2">
           <FormControlLabel control={<Checkbox sx={{
