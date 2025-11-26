@@ -351,7 +351,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
       window.removeEventListener('resize', handleResize);
       window.removeEventListener('keydown', handleESC);
     };
-  }, []);
+  }, [searchParams]);
 
   // track searchParam for umami
   useEffect(() => {
