@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import Modal from "../../../dialogs/Modal";
+import DetailModal from "../../../modals/DetailModal";
 import Calendar from "../../../inputs/Calendar";
 import { IEntryDetail } from "../../../../utils/interfaces/entry";
 import useGetEntryDetail from "../../../../hooks/api/entries/useGetEntryDetail";
@@ -119,7 +119,7 @@ export default function LicenseCalendar({ }: {}) {
     }
 
     return (
-        <Modal
+        <DetailModal
             title={t('license.calendar.title')}
             onClose={closeCalendar}
             isOpen={!!entryId}
@@ -170,6 +170,6 @@ export default function LicenseCalendar({ }: {}) {
                 )}
 
             </div>
-        </Modal >
+        </DetailModal >
     );
 }

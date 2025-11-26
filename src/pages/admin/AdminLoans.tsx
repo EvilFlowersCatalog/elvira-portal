@@ -17,7 +17,7 @@ import EntryDetail from '../../components/items/entry/details/EntryDetail';
 
 import { Menu, MenuItem } from '@mui/material';
 import { TFunction } from 'i18next';
-import useUpdateLiceseState from '../../hooks/api/licenses/useUpdateLicense';
+import useUpdateLicenseState from '../../hooks/api/licenses/useUpdateLicense';
 import useGetUserDetails from '../../hooks/api/users/useGetUserDetails';
 
 interface StateSelectorProps {
@@ -98,7 +98,7 @@ function StateSelector({ item, t, onStateChange }: StateSelectorProps) {
 const AdminLoans = () => {
     const { t } = useTranslation();
     const getLoans = useGetLicenses();
-    const updateLoan = useUpdateLiceseState();
+    const updateLoan = useUpdateLicenseState();
     const [searchParams, setSearchParams] = useSearchParams();
 
     const [data, setData] = useState<any>([]);

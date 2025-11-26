@@ -1,23 +1,29 @@
 import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef } from 'react';
-import { IoMdClose } from 'react-icons/io';
-import Button from '../buttons/Button';
-import { IModalParams } from '../../utils/interfaces/general/general';
-import useAppContext from '../../hooks/contexts/useAppContext';
 import { useTranslation } from 'react-i18next';
+import useAppContext from '../../hooks/contexts/useAppContext';
+import { IModalParams } from '../../utils/interfaces/general/general';
+import Button from '../buttons/Button';
 
-interface IModalWrapperParams extends IModalParams {
+/**
+ * FormModal - A modal component specifically designed for forms
+ * Used for: Authentication forms, feed forms, category forms, license forms, confirmation dialogs
+ * Features: Backdrop click to close, ESC key to close, action button support
+ * For large detail modals, use DetailModal instead
+ */
+
+interface IFormModalParams extends IModalParams {
   title: string;
   children: ReactNode;
   buttonLabel: string;
 }
 
-const ModalWrapper = ({
+const FormModal = ({
   close,
   title,
   children,
   buttonLabel,
   yes,
-}: IModalWrapperParams) => {
+}: IFormModalParams) => {
   const { stuText, umamiTrack } = useAppContext();
   const { t } = useTranslation();
 
@@ -29,6 +35,8 @@ const ModalWrapper = ({
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.code.toLocaleLowerCase() === 'escape') {
+      event.preventDefault();
+      event.stopPropagation();
       close(false);
     }
   };
@@ -76,4 +84,4 @@ const ModalWrapper = ({
   );
 };
 
-export default ModalWrapper;
+export default FormModal;

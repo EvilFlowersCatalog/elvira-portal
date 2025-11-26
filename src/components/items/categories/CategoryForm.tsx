@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { ICategory, ICategoryNew } from '../../../utils/interfaces/category';
 import useEditCategory from '../../../hooks/api/categories/useEditCategory';
 import useCreateCategory from '../../../hooks/api/categories/useCreateCategory';
-import ModalWrapper from '../../modal/ModalWrapper';
+import FormModal from '../../modals/FormModal';
 import ElviraInput from '../../inputs/ElviraInput';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 
@@ -88,7 +88,7 @@ const CategoryForm = ({
   };
 
   return (
-    <ModalWrapper
+    <FormModal
       title={
         category
           ? t('modal.categoryForm.editCategory')
@@ -125,7 +125,7 @@ const CategoryForm = ({
         />
         <button ref={buttonRef} type='submit' className='hidden'></button>
       </form>
-    </ModalWrapper>
+    </FormModal>
   );
 };
 

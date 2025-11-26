@@ -1,5 +1,5 @@
 import { FormEvent, useRef, useState } from 'react';
-import ModalWrapper from '../../modal/ModalWrapper';
+import FormModal from '../../modals/FormModal';
 import { useTranslation } from 'react-i18next';
 import DatePicker from 'react-datepicker';
 import useAppContext from '../../../hooks/contexts/useAppContext';
@@ -88,7 +88,7 @@ const licenseForm = ({
   };
 
   return (
-    <ModalWrapper
+    <FormModal
       title={
         license
           ? t('modal.licenseForm.title.edit')
@@ -155,7 +155,7 @@ const licenseForm = ({
         </div>
         <button ref={buttonRef} type='submit' className='hidden'></button>
       </form>
-    </ModalWrapper>
+    </FormModal>
   );
 };
 

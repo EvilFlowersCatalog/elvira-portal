@@ -1,5 +1,5 @@
 import React from 'react';
-import ModalWrapper from '../modal/ModalWrapper';
+import FormModal from '../modals/FormModal';
 import { useTranslation } from 'react-i18next';
 
 interface ILicenseTermsParams {
@@ -10,7 +10,7 @@ const LicenseTerms = ({ setOpenLicenseModal }: ILicenseTermsParams) => {
   const { t } = useTranslation();
 
   return (
-    <ModalWrapper
+    <FormModal
       title={t('login.licenseTitle')}
       buttonLabel=''
       close={setOpenLicenseModal}
@@ -54,7 +54,7 @@ const LicenseTerms = ({ setOpenLicenseModal }: ILicenseTermsParams) => {
           prístupu k niektorému z Dokumentov.
         </p>
       </div>
-    </ModalWrapper>
+    </FormModal>
   );
 };
 

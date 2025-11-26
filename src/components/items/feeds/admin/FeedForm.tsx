@@ -8,7 +8,7 @@ import useUploadFeed from '../../../../hooks/api/feeds/useUploadFeed';
 import useEditFeed from '../../../../hooks/api/feeds/useEditFeed';
 import useGetFeedDetail from '../../../../hooks/api/feeds/useGetFeedDetail';
 import { toast } from 'react-toastify';
-import ModalWrapper from '../../../../components/modal/ModalWrapper';
+import FormModal from '../../../../components/modals/FormModal';
 import ElviraInput from '../../../../components/inputs/ElviraInput';
 import { MUISelectStyle } from '../../../inputs/ElviraSelect';
 import FeedAutofill from '../../../autofills/FeedAutofill';
@@ -139,7 +139,7 @@ const FeedForm = ({
   };
 
   return (
-    <ModalWrapper
+    <FormModal
       title={
         feedId ? t('modal.feedForm.editFeed') : t('modal.feedForm.addFeed')
       }
@@ -221,7 +221,7 @@ const FeedForm = ({
         </div>
         <button ref={buttonRef} type='submit' className='hidden'></button>
       </form>
-    </ModalWrapper>
+    </FormModal>
   );
 };
 

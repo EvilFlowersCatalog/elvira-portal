@@ -13,7 +13,7 @@ import { CircleLoader } from 'react-spinners';
 import ElviraInput from '../../components/inputs/ElviraInput';
 import { Checkbox } from '@mui/material';
 import useCookiesContext from '../../hooks/contexts/useCookiesContext';
-import ModalWrapper from '../../components/modal/ModalWrapper';
+import FormModal from '../../components/modals/FormModal';
 import LicenseTerms from '../../components/dialogs/LicenseTerms';
 
 const Auth = () => {

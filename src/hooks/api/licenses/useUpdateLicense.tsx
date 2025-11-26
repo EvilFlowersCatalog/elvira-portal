@@ -1,7 +1,11 @@
 import { DurationValidation, ILicense, InterfaceState } from '../../../utils/interfaces/license';
 import useAxios from '../useAxios';
 
-const useUpdateLiceseState = () => {
+/**
+ * Hook to update a license state and optionally extend its duration
+ * @returns A function that updates the license state
+ */
+const useUpdateLicenseState = () => {
     const axios = useAxios();
 
     const updateLicenseState = async (license_id:string, state: InterfaceState, duration?: string): Promise<ILicense> => {
@@ -22,4 +26,4 @@ const useUpdateLiceseState = () => {
     return updateLicenseState;
 };
 
-export default useUpdateLiceseState;
+export default useUpdateLicenseState;

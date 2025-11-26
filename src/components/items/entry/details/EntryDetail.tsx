@@ -20,7 +20,7 @@ import { DetailHeader } from './DetailHeader';
 import { ActionButtonStyle, ActionsButton, ActionsWrapper } from './DetailActions';
 import { AcceptedLanguage, getLanguage } from '../../../../hooks/api/languages/languages';
 import AcquisitionsButton from '../../../buttons/AcqusitionsButton';
-import Modal from '../../../dialogs/Modal';
+import DetailModal from '../../../modals/DetailModal';
 import useGetAvailability from '../../../../hooks/api/licenses/useGetAvailability';
 import { IAvailabilityResponse } from '../../../../utils/interfaces/license';
 import { Tooltip } from '@mui/material';
@@ -195,7 +195,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   if (!entryId) return <></>;
 
   return (
-    <Modal title={t('entry.detail.title')}
+    <DetailModal title={t('entry.detail.title')}
       onClose={() => {
         umamiTrack('Close Entry Detail Button');
         searchParams.delete('entry-detail-id');
@@ -360,7 +360,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
         </div>
       )
       }
-    </Modal >
+    </DetailModal >
   );
 };
 
