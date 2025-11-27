@@ -142,7 +142,7 @@ const Calendar: React.FC<CalendarProps> = ({ availability, requestAvailability, 
                         `${isEndDate ? 'bg-blue-200 rounded-r-lg' : ''}`)}
                 >
                     <div className={twMerge(`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold`,
-                        `${isBooked ? 'text-black dark:text-white' : `text-black dark:text-white group-hover:text-white`}`,
+                        `${isBooked ? 'text-black dark:text-white' : `text-black dark:text-white group-hover:text-primary`}`,
                         `${isPast ? 'text-gray-500/50 dark:text-white/60' : ''}`,
                         `${isToday(day) ? `bg-blue-500 text-white dark:text-white group-hover:bg-white group-hover:text-black` : ''}`,
                         `${isWithinSelection || isStartDate ? 'dark:text-black' : ''}`)}>

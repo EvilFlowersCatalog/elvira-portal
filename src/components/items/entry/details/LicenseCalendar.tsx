@@ -20,8 +20,7 @@ import { NAVIGATION_PATHS } from "../../../../utils/interfaces/general/general";
 // http://localhost:3000/?licensing-entry-id=ce40e042-1491-434f-a0b4-593c0a867b99
 
 export default function LicenseCalendar({ }: {}) {
-    const { stuColor } = useAppContext();
-    const { t } = useTranslation();
+  const { t } = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
     const getEntryDetail = useGetEntryDetail();
     const getAvailability = useGetAvailability();
@@ -163,9 +162,10 @@ export default function LicenseCalendar({ }: {}) {
                             {t('license.calendar.noAvailability')}
                         </div>
                     )}
-                </>) : (
+                </>)
+                 : (
                     <div className={'flex justify-center h-full items-center'}>
-                        <CircleLoader color={stuColor} size={50} />
+                        <CircleLoader color={'var(--color-primary)'} size={50} />
                     </div>
                 )}
 

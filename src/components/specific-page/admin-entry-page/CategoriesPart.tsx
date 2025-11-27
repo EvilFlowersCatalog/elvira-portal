@@ -9,7 +9,7 @@ import { IoMdAdd } from 'react-icons/io';
 
 const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
   const { t } = useTranslation();
-  const { stuText, stuBg, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
 
   const [open, setOpen] = useState<boolean>(false);
 
@@ -29,7 +29,7 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
             <div key={index} className={`h-fit`}>
               <button
                 type='button'
-                className={`${stuBg} p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md`}
+                className={`bg-primary p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md`}
                 onClick={() => {
                   umamiTrack('Entry Remove Category Button', {
                     categoryId: item.id,

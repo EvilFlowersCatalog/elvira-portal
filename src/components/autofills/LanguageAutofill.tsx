@@ -23,7 +23,6 @@ const LanguageAutofill = ({
   defaultLanguageCode,
   isRequired
 }: ILanguageAutofillParams) => {
-  const { stuBorder } = useAppContext();
   const { i18n, t } = useTranslation();
 
   const [inputValue, setInputValue] = useState<string>('');

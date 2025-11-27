@@ -24,7 +24,7 @@ const FormModal = ({
   buttonLabel,
   yes,
 }: IFormModalParams) => {
-  const { stuText, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
   const { t } = useTranslation();
 
   const ref = useRef<HTMLDivElement | null>(null);
@@ -61,7 +61,7 @@ const FormModal = ({
           {/* Header */}
           <div className='flex w-full justify-center items-center gap-5'>
             <h2
-              className={`text-xl text-primary dark:text-primaryLight font-bold ${stuText} uppercase text-center`}
+              className={`text-xl text-primary dark:text-primaryLight font-bold text-primary uppercase text-center`}
             >
               {title}
             </h2>

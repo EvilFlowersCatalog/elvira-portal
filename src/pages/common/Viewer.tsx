@@ -31,7 +31,7 @@ import useDeleteAnotationItem from "../../hooks/api/anotations/anotation-items/u
 const rootId = "elvira-viewer-app";
 
 const Viewer = () => {
-  const { lang, theme, titleLogoDark, titleLogoLight, stuBg } = useAppContext();
+  const { lang, theme, titleLogoDark, titleLogoLight } = useAppContext();
   const { auth } = useAuthContext();
   const { "entry-id": id, index } = useParams();
   const { t } = useTranslation();
@@ -323,7 +323,7 @@ const Viewer = () => {
           />
           <div className="w-[80%] max-w-96 h-4 bg-zinc-300 dark:bg-strongDarkGray rounded-md overflow-hidden">
             <div
-              className={`h-full ${stuBg} duration-500 rounded-md`}
+              className={`h-full bg-primary duration-500 rounded-md`}
               style={{ width: `${progressBar}%` }}
             ></div>
           </div>

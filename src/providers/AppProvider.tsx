@@ -58,12 +58,6 @@ export interface IAppContext {
   stuLogoLight: string;
   editingEntryTitle: string;
   setEditingEntryTitle: (editingEntryTitle: string) => void;
-  stuBorder: string;
-  stuBorderFocus: string;
-  stuBg: string;
-  stuBgHover: string;
-  stuText: string;
-  stuColor: string;
   umamiTrack: (title: string, data?: Object) => void;
 }
 
@@ -120,69 +114,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     languageCode: '',
     orderBy: '',
   });
-  // check main.css
-  const [stuColors] = useState<{ [key: string]: string }[]>([
-    // backgournd 0
-    {
-      fiit: 'fiit-bg',
-      fchpt: 'fchpt-bg',
-      fei: 'fei-bg',
-      mtf: 'mtf-bg',
-      fad: 'fad-bg',
-      svf: 'svf-bg',
-      sjf: 'sjf-bg',
-    },
-    // border 1
-    {
-      fiit: 'fiit-border',
-      fchpt: 'fchpt-border',
-      fei: 'fei-border',
-      mtf: 'mtf-border',
-      fad: 'fad-border',
-      svf: 'svf-border',
-      sjf: 'sjf-border',
-    },
-    // background hover 2
-    {
-      fiit: 'fiit-bg-hover',
-      fchpt: 'fchpt-bg-hover',
-      fei: 'fei-bg-hover',
-      mtf: 'mtf-bg-hover',
-      fad: 'fad-bg-hover',
-      svf: 'svf-bg-hover',
-      sjf: 'sjf-bg-hover',
-    },
-    // border focus 3
-    {
-      fiit: 'fiit-border-focus',
-      fchpt: 'fchpt-border-focus',
-      fei: 'fei-border-focus',
-      mtf: 'mtf-border-focus',
-      fad: 'fad-border-focus',
-      svf: 'svf-border-focus',
-      sjf: 'sjf-border-focus',
-    },
-    // text 4
-    {
-      fiit: 'fiit-text',
-      fchpt: 'fchpt-text',
-      fei: 'fei-text',
-      mtf: 'mtf-text',
-      fad: 'fad-text',
-      svf: 'svf-text',
-      sjf: 'sjf-text',
-    },
-    // hash colors 5
-    {
-      fiit: '#01a9e0',
-      mtf: '#e62b1e',
-      svf: '#e5722a',
-      sjf: '#4c5b60',
-      fei: '#0c4a8e',
-      fchpt: '#ffda1c',
-      fad: '#009d4a',
-    },
-  ]);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -310,6 +241,11 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     document.body.classList.add(theme);
   }, [theme]);
 
+  // Set data-theme attribute on HTML root for CSS variables
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', elviraTheme);
+  }, []);
+
   useEffect(() => {
     // Set languege based on given language
     if (lang === LANG_TYPE.sk) {
@@ -420,12 +356,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         logoLight,
         editingEntryTitle,
         setEditingEntryTitle,
-        stuBg: stuColors[0][elviraTheme],
-        stuBorder: stuColors[1][elviraTheme],
-        stuBgHover: stuColors[2][elviraTheme],
-        stuBorderFocus: stuColors[3][elviraTheme],
-        stuText: stuColors[4][elviraTheme],
-        stuColor: stuColors[5][elviraTheme],
         umamiTrack,
       }}
     >

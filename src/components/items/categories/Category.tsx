@@ -15,7 +15,7 @@ interface ICategoryParam {
 }
 
 const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
-  const { stuBg, stuBgHover, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
   const { t } = useTranslation();
 
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -39,7 +39,7 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
   return (
     <>
       <div className='flex flex-col rounded-xl overflow-hidden shadow-md bg-white dark:bg-darkGray border border-zinc-300 dark:border-zinc-700'>
-        <div className={`w-full h-full flex flex-col gap-3 select-none ${stuBg} text-white p-5`}>
+        <div className={`w-full h-full flex flex-col gap-3 select-none bg-primary text-white p-5`}>
           <h3 className="text-lg font-bold uppercase tracking-wide mb-2">{t('administration.categoriesPage.info')}</h3>
 
           <div className="flex justify-between items-center border-b border-white/20 pb-2">
@@ -61,7 +61,7 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
         {/* Action Buttons */}
         <div className='grid grid-cols-2'>
           <button
-            className={`py-2 flex items-center justify-center text-sm font-medium bg-green text-white hover:brightness-110 transition-colors ${stuBgHover}`}
+            className={`py-2 flex items-center justify-center text-sm font-medium bg-green text-white hover:brightness-110 transition-colors hover:bg-primary`}
             onClick={() => {
               umamiTrack('Edit Category Button', {
                 categoryId: category.id,
@@ -73,7 +73,7 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
             {t('administration.categoriesPage.edit')}
           </button>
           <button
-            className={`py-2 flex items-center justify-center text-sm font-medium bg-red text-white hover:brightness-110 transition-colors ${stuBgHover}`}
+            className={`py-2 flex items-center justify-center text-sm font-medium bg-red text-white hover:brightness-110 transition-colors hover:bg-primary`}
             onClick={() => {
               umamiTrack('Delete Category Button', {
                 categoryId: category.id,

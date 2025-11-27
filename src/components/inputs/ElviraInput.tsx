@@ -16,8 +16,6 @@ interface CustomInputProps extends InputHTMLAttributes<HTMLInputElement> {
 // Custom input used in step forms in ADMIN
 const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
   ({ invalidMessage, paddingLeft = 7, ...props }, ref) => {
-    const { stuText, stuBorderFocus, stuBorder } = useAppContext();
-
     const id = uuid();
     const [isInvalid, setIsInvalid] = useState<boolean>(false);
     const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -52,7 +50,7 @@ const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
           <span
             className={`absolute font-light
                 ${isFocused || value 
-                  ? `top-0 text-[12px] ${isInvalid ? 'text-red' : `${stuText}`}`
+                  ? `top-0 text-[12px] ${isInvalid ? 'text-red' : 'text-primary'}`
                   : `top-1/2 -translate-y-[1px]`}
                 duration-200 pointer-events-none select-none`}
                 style={{ paddingLeft: isFocused || value ? 0 : `${paddingLeft}px` }}
@@ -64,10 +62,10 @@ const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
             {...props}
             className={twMerge(`w-full p-2 border-none 
               ${value
-                ? `${stuBorder}`
+                ? 'border-primary'
                 : isInvalid
                   ? 'border-red dark:border-red'
-                  : `${stuBorderFocus} border-black dark:border-white`
+                  : 'focus:border-primary border-black dark:border-white'
               }
               bg-white shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A] dark:bg-strongDarkGray outline-none rounded-md`, className)}
             style={{ paddingLeft: `${paddingLeft}px` }}  

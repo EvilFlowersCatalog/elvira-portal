@@ -42,25 +42,16 @@ export default {
       colors: {
         // Extend Tailwind's default colors instead of replacing them
         ...require('tailwindcss/defaultTheme').colors,
-        // Your custom colors
-        primary: '#0077CC',
-        primaryLight: '#E6F3FF',
-        secondary: '#15384E',
-        secondaryLight: '#A8D0E6',
-        lightGray: "#F5F7FA",
-        darkGray: '#333333',
-        identity: {
-          fiit: '#01a9e0',
-          mtf: '#e62b1e',
-          svf: '#e5722a',
-          sjf: '#4c5b60',
-          fei: '#0c4a8e',
-          fchpt: '#ffda1c',
-          fad: '#009d4a',
-        },
-        red: '#ff2129',
-        green: '#77dd77',
-        strongDarkGray: '#141414',
+        // Dynamic colors based on faculty theme (CSS variables)
+        primary: 'var(--color-primary)',
+        primaryLight: 'var(--color-primary-light)',
+        secondary: 'var(--color-secondary)',
+        secondaryLight: 'var(--color-secondary-light)',
+        lightGray: 'var(--color-light-gray)',
+        darkGray: 'var(--color-dark-gray)',
+        red: 'var(--color-red)',
+        green: 'var(--color-green)',
+        strongDarkGray: 'var(--color-strong-dark-gray)',
       },
       flex: {
         2: '2 2 0%',

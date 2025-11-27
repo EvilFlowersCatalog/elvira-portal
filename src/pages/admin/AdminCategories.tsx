@@ -9,7 +9,7 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 import { useTranslation } from 'react-i18next';
 
 const AdminCategories = () => {
-  const { stuBorder, stuBg, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
 
   const [categories, setCategories] = useState<any[]>([]);
   const [searchParams] = useSearchParams();

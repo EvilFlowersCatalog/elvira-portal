@@ -11,7 +11,6 @@ interface IEntryBoxParams {
 
 const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
   const { auth } = useAuthContext();
-  const { stuBg } = useAppContext();
 
   const [isScale, setIsScale] = useState<boolean>(false);
   const [isUnderLine, setIsUnderLine] = useState<boolean>(false);
@@ -44,7 +43,7 @@ const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
     >
       <button
         className={`flex flex-col justify-center p-4 w-full gap-2 rounded-md text-left ${
-          isActive ? `${stuBg}` : 'hover:bg-zinc-100 dark:hover:bg-darkGray'
+          isActive ? 'bg-primary' : 'hover:bg-zinc-100 dark:hover:bg-darkGray'
         }`}
         onMouseEnter={handelMouseEnter}
         onMouseLeave={handelMouseLeave}
@@ -68,7 +67,7 @@ const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
           {entry.feeds.map((feed) => (
             <div
               key={feed.id}
-              className={`px-2 py-1 text-sm ${stuBg} text-white rounded-md`}
+              className={`px-2 py-1 text-sm bg-primary text-white rounded-md`}
             >
               {feed.title}
             </div>

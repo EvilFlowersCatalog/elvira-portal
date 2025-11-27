@@ -18,7 +18,7 @@ interface IFeedParams {
 
 const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
   const { t } = useTranslation();
-  const { stuBgHover, stuBg, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [isHovering, setIsHovering] = useState<boolean>(false);
@@ -65,7 +65,7 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
         <div className="flex flex-col rounded-xl overflow-hidden shadow-md bg-white dark:bg-darkGray border border-zinc-300 dark:border-zinc-700">
           <button
             className={`p-6 gap-4 flex flex-col items-start justify-between text-left h-full transition-colors 
-        ${stuBg} text-white hover:brightness-110 duration-200 
+        bg-primary text-white hover:brightness-110 duration-200 
         ${isNavigationFeed() ? 'cursor-pointer' : 'cursor-default'}`}
             onClick={setParent}
             onMouseEnter={() => setIsHovering(true)}
@@ -93,7 +93,7 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
           {/* Action Buttons */}
           <div className="grid grid-cols-2">
             <button
-              className={`py-2 flex items-center justify-center text-sm font-medium bg-green text-white hover:brightness-110 transition-colors ${stuBgHover}`}
+              className={`py-2 flex items-center justify-center text-sm font-medium bg-green text-white hover:brightness-110 transition-colors hover:bg-primary`}
               onClick={() => {
                 umamiTrack('Edit Feed Button', { feedId: feed.id });
                 setShowForm(true);
@@ -102,7 +102,7 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
               <MdEdit size={18} className="mr-1" /> {t('administration.feedsPage.edit')}
             </button>
             <button
-              className={`py-2 flex items-center justify-center text-sm font-medium bg-red text-white hover:brightness-110 transition-colors ${stuBgHover}`}
+              className={`py-2 flex items-center justify-center text-sm font-medium bg-red text-white hover:brightness-110 transition-colors hover:bg-primary`}
               onClick={() => {
                 umamiTrack('Delete Feed Button', { feedId: feed.id });
                 setShowDeleteMenu(true);

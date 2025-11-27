@@ -12,7 +12,6 @@ interface NumberInputProps extends InputHTMLAttributes<HTMLInputElement> {
 
 const ElviraNumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
   ({ step = 1, value = '', onChange, ...props }, ref) => {
-    const { stuText, stuBorderFocus, stuBorder } = useAppContext();
     const [isFocused, setIsFocused] = useState(false);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -55,7 +54,7 @@ const ElviraNumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             onClick={() => adjustValue(step)}
             className="w-4 h-4 flex items-center justify-center text-xs hover:text-primary"
           >
-            <BiChevronUp size={16} className={twMerge(isFocused ? stuText : 'text-gray-500')} />
+            <BiChevronUp size={16} className={twMerge(isFocused ? 'text-primary' : 'text-gray-500')} />
           </button>
           <button
             type="button"
@@ -63,7 +62,7 @@ const ElviraNumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             onClick={() => adjustValue(-step)}
             className="w-4 h-4 flex items-center justify-center text-xs hover:text-primary"
           >
-            <BiChevronDown size={16} className={twMerge(isFocused ? stuText : 'text-gray-500')} />
+            <BiChevronDown size={16} className={twMerge(isFocused ? 'text-primary' : 'text-gray-500')} />
           </button>
         </div>
       </div>

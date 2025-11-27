@@ -29,7 +29,7 @@ const FeedForm = ({
   setReloadPage,
 }: IFeedForm) => {
   const { t } = useTranslation();
-  const { stuBg, stuText, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
 
   const [form, setForm] = useState<IFeedNew>({
     catalog_id: import.meta.env.ELVIRA_CATALOG_ID,
@@ -184,7 +184,7 @@ const FeedForm = ({
             <div className='w-full md:w-1/2 lg:w-1/3 flex p-1' key={index}>
               <button
                 type='button'
-                className={`${stuBg} p-2 text-sm hover:bg-red flex w-full gap-2 justify-between items-center text-white rounded-md`}
+                className={`bg-primary p-2 text-sm hover:bg-red flex w-full gap-2 justify-between items-center text-white rounded-md`}
                 onClick={() => {
                   setParentFeeds((prev) => ({
                     feeds: prev.feeds.filter(
@@ -202,7 +202,7 @@ const FeedForm = ({
 
         {/* Kind */}
         <div className='flex w-full flex-col text-left'>
-          <label htmlFor='selection-kind' className={`text-sm pl-1 ${stuText}`}>
+          <label htmlFor='selection-kind' className={`text-sm pl-1 text-primary`}>
             {t('modal.feedForm.kind')}
           </label>
             <Select

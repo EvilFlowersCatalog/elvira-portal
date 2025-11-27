@@ -16,7 +16,7 @@ import { IoMdTrash } from 'react-icons/io';
 
 export default function AdminEntriesTable({ }) {
     const navigate = useNavigate();
-    const { umamiTrack, stuBorder, stuBg } = useAppContext();
+    const { umamiTrack } = useAppContext();
     const getEntries = useGetEntries();
     const { t } = useTranslation();
 
@@ -76,7 +76,7 @@ export default function AdminEntriesTable({ }) {
             id: item.id,
             title: <SubText text={item.title} subtext={`${item.authors[0]?.name} ${item.authors[0]?.name}`} />,
             feeds: <div className='flex flex-wrap gap-x-4 gap-y-2'>{item.feeds?.map(feed => (
-                <BubbleText key={feed.id} text={feed.title} className='bg-blue-500' onClick={() => {
+                <BubbleText key={feed.id} text={feed.title} className='bg-primary' onClick={() => {
                     searchParams.set('feed-id', feed.id);
                     setSearchParams(searchParams);
                 }} />

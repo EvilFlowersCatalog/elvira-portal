@@ -10,7 +10,7 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 import { useTranslation } from 'react-i18next';
 
 const AdminFeeds = () => {
-  const { stuBg, stuBorder, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingNext, setLoadingNext] = useState<boolean>(false);

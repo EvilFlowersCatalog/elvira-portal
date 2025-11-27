@@ -12,7 +12,7 @@ import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 
 const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
-  const { stuColor, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
   const { t } = useTranslation();
 
   const [loadingInfo, setLoadingInfo] = useState<boolean>(false);
@@ -63,7 +63,7 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
       <span>{t('entry.wizard.identifiers')}</span>
       {loadingInfo ? (
         <div className={'flex h-full justify-center items-center'}>
-          <CircleLoader color={stuColor} size={30} />
+          <CircleLoader color={'var(--color-primary)'} size={30} />
         </div>
       ) : (
         <div className='flex flex-col gap-4'>
@@ -84,7 +84,7 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
                   handleIdentifier(IDENTIFIERS_TYPE.doi, entry.identifiers.doi);
                 }
               }}
-              color={stuColor}
+              color={'var(--color-primary)'}
             />
           </div>
           <div className='w-full flex gap-2 relative items-center'>
@@ -107,7 +107,7 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
                   );
                 }
               }}
-              color={stuColor}
+              color={'var(--color-primary)'}
             />
           </div>
         </div>

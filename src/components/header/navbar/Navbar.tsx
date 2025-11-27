@@ -33,7 +33,7 @@ const NavbarButton = ({
   isActive,
   onClick = null,
 }: INavbarButtonParams) => {
-  const { specialNavigation, stuBorder, umamiTrack } = useAppContext();
+  const { specialNavigation, umamiTrack } = useAppContext();
 
   return (
     <button
@@ -72,7 +72,6 @@ const Navbar = () => {
     umamiTrack,
   } = useAppContext();
   const { auth, logout } = useAuthContext();
-  const { stuBg } = useAppContext();
 
   const { t } = useTranslation();
   const location = useLocation();
@@ -84,6 +83,7 @@ const Navbar = () => {
     ['fei']: 'https://www.fei.stuba.sk/',
     ['sjf']: 'https://www.sjf.stuba.sk/',
     ['svf']: 'https://www.svf.stuba.sk/',
+    ['ku']: 'https://www.ku.sk/'
   };
 
   // Function for returning if theme is dark cuz of lot of usage
@@ -132,7 +132,7 @@ const Navbar = () => {
         </button>
         {isSmallDevice && (
           <button
-            className={`${stuBg} h-full flex items-center text-white w-fit rounded-md px-1`}
+            className={`bg-primary h-full flex items-center text-white w-fit rounded-md px-1`}
             onClick={() => setShowNavbar(false)}
           >
             <RiArrowLeftDoubleFill size={18} />

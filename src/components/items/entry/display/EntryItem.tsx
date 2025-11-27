@@ -123,8 +123,8 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
                  ${isOnShelf ? 'bg-primaryLight border-2 border-primary' : 'bg-white'}`}>
                 <svg width="16" height="21" viewBox="0 0 14 18" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path
-                        stroke={isOnShelf ? "#0077CCB2" : "#333333"}
-                        fill={isOnShelf ? "#0077CC" : "none"}
+                        stroke={isOnShelf ? "var(--color-primary)" : "#333333"}
+                        fill={isOnShelf ? "var(--color-primary)" : "none"}
                         d="M12.8333 16.5L6.99999 12.3333L1.16666 16.5V3.16667C1.16666 2.72464 1.34225 2.30072 1.65481 1.98816C1.96737 1.67559 2.3913 1.5 2.83332 1.5H11.1667C11.6087 1.5 12.0326 1.67559 12.3452 1.98816C12.6577 2.30072 12.8333 2.72464 12.8333 3.16667V16.5Z"
                         strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>

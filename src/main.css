@@ -59,114 +59,68 @@ body,
   }
 }
 
-@layer components {
-  .fiit-border {
-    @apply border-identity-fiit dark:border-identity-fiit;
-  }
-  .fad-border {
-    @apply border-identity-fad dark:border-identity-fad;
-  }
-  .fchpt-border {
-    @apply border-identity-fchpt dark:border-identity-fchpt;
-  }
-  .fei-border {
-    @apply border-identity-fei dark:border-identity-fei;
-  }
-  .mtf-border {
-    @apply border-identity-mtf dark:border-identity-mtf;
-  }
-  .sjf-border {
-    @apply border-identity-sjf dark:border-identity-sjf;
-  }
-  .svf-border {
-    @apply border-identity-svf dark:border-identity-svf;
-  }
+/* CSS Variables for faculty themes */
+:root[data-theme="fiit"] {
+  --color-primary: #01a9e0;
+  --color-primary-light: #E6F3FF;
+  --color-secondary: #15384E;
+  --color-secondary-light: #A8D0E6;
+}
 
-  .fiit-bg {
-    @apply bg-identity-fiit;
-  }
-  .fad-bg {
-    @apply bg-identity-fad;
-  }
-  .fchpt-bg {
-    @apply bg-identity-fchpt;
-  }
-  .fei-bg {
-    @apply bg-identity-fei;
-  }
-  .mtf-bg {
-    @apply bg-identity-mtf;
-  }
-  .sjf-bg {
-    @apply bg-identity-sjf;
-  }
-  .svf-bg {
-    @apply bg-identity-svf;
-  }
+:root[data-theme="mtf"] {
+  --color-primary: #E62B1E;
+  --color-primary-light: #FDE9E8; 
+  --color-secondary: #4B1C1C;     
+  --color-secondary-light: #D8B4B4; 
+}
 
-  .fiit-text {
-    @apply text-identity-fiit;
-  }
-  .fad-text {
-    @apply text-identity-fad;
-  }
-  .fchpt-text {
-    @apply text-identity-fchpt;
-  }
-  .fei-text {
-    @apply text-identity-fei;
-  }
-  .mtf-text {
-    @apply text-identity-mtf;
-  }
-  .sjf-text {
-    @apply text-identity-sjf;
-  }
-  .svf-text {
-    @apply text-identity-svf;
-  }
+:root[data-theme="svf"] {
+  --color-primary: #E5722A;
+  --color-primary-light: #FDEEE3;
+  --color-secondary: #4A2E17;       
+  --color-secondary-light: #D7C0AE; 
+}
 
-  .fiit-bg-hover {
-    @apply hover:bg-identity-fiit dark:hover:bg-identity-fiit;
-  }
-  .fad-bg-hover {
-    @apply hover:bg-identity-fad dark:hover:bg-identity-fad;
-  }
-  .fchpt-bg-hover {
-    @apply hover:bg-identity-fchpt dark:hover:bg-identity-fchpt;
-  }
-  .fei-bg-hover {
-    @apply hover:bg-identity-fei dark:hover:bg-identity-fei;
-  }
-  .mtf-bg-hover {
-    @apply hover:bg-identity-mtf dark:hover:bg-identity-mtf;
-  }
-  .sjf-bg-hover {
-    @apply hover:bg-identity-sjf dark:hover:bg-identity-sjf;
-  }
-  .svf-bg-hover {
-    @apply hover:bg-identity-svf dark:hover:bg-identity-svf;
-  }
+:root[data-theme="sjf"] {
+  --color-primary: #4C5B60;
+  --color-primary-light: #E7EEF0;
+  --color-secondary: #1F2A2D;       
+  --color-secondary-light: #B8C5C9; 
+}
 
-  .fiit-border-focus {
-    @apply focus:border-identity-fiit dark:focus:border-identity-fiit;
-  }
-  .fad-border-focus {
-    @apply focus:border-identity-fad dark:focus:border-identity-fad;
-  }
-  .fchpt-border-focus {
-    @apply focus:border-identity-fchpt dark:focus:border-identity-fchpt;
-  }
-  .fei-border-focus {
-    @apply focus:border-identity-fei dark:focus:border-identity-fei;
-  }
-  .mtf-border-focus {
-    @apply focus:border-identity-mtf dark:focus:border-identity-mtf;
-  }
-  .sjf-border-focus {
-    @apply focus:border-identity-sjf dark:focus:border-identity-sjf;
-  }
-  .svf-border-focus {
-    @apply focus:border-identity-svf dark:focus:border-identity-svf;
-  }
+:root[data-theme="fei"] {
+  --color-primary: #0C4A8E;
+  --color-primary-light: #E4EEF9;
+  --color-secondary: #0D2238;      
+  --color-secondary-light: #B7C5D5; 
+}
+
+:root[data-theme="fchpt"] {
+  --color-primary: #FFDA1C;
+  --color-primary-light: #FFF8D9; 
+  --color-secondary: #4A3F0F;       
+  --color-secondary-light: #D8CDA5;
+}
+
+:root[data-theme="fad"] {
+  --color-primary: #009D4A;
+  --color-primary-light: #E2F4EA;
+  --color-secondary: #143724;        /* deep forest slate */
+  --color-secondary-light: #B8CEC2;
+}
+
+:root[data-theme="ku"] {
+  --color-primary: #D1A619;
+  --color-primary-light: #FAF2D5;
+  --color-secondary: #3A320D;        /* muted dark ochre slate */
+  --color-secondary-light: #CFC6A3;
+}
+
+/* Global color variables */
+:root {
+  --color-light-gray: #F5F7FA;
+  --color-dark-gray: #333333;
+  --color-red: #ff2129;
+  --color-green: #77dd77;
+  --color-strong-dark-gray: #141414;
 }

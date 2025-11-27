@@ -9,8 +9,6 @@ interface IPageLoadingParams {
 }
 
 const PageLoading = ({ entries = false, size = 100 }: IPageLoadingParams) => {
-  const { stuColor } = useAppContext();
-
   return (
     <div className={'flex flex-1 h-full flex-wrap px-4 pb-4'}>
       {entries ? (
@@ -19,7 +17,7 @@ const PageLoading = ({ entries = false, size = 100 }: IPageLoadingParams) => {
         ))
       ) : (
         <div className={'flex flex-1 h-full justify-center items-center'}>
-          <CircleLoader color={stuColor} size={size} />
+          <CircleLoader color={'var(--color-primary)'} size={size} />
         </div>
       )}
     </div>

@@ -23,7 +23,7 @@ const AdditionalDataPart = ({
 }: IAdditionalDataPartParams) => {
   const { t } = useTranslation();
   const { auth } = useAuthContext();
-  const { stuText, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
 
   const [image, setImage] = useState<File | null>(null);
   const [languageCode, setLanguageCode] = useState<string>(entry.language_code || '');

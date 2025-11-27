@@ -32,7 +32,7 @@ interface IEntryDetailParams {
 }
 
 const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
-  const { stuColor, setShowAiAssistant, umamiTrack } = useAppContext();
+  const { setShowAiAssistant, umamiTrack } = useAppContext();
   const { auth } = useAuthContext();
   const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -206,7 +206,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     >
       {!entry ? (
         <div className={'flex justify-center h-full items-center'}>
-          <CircleLoader color={stuColor} size={50} />
+          <CircleLoader color={'var(--color-primary)'} size={50} />
         </div>
       ) : (
         <div className={'flex h-full flex-col mdlg:flex-row'}>

@@ -18,7 +18,7 @@ import LicenseTerms from '../../components/dialogs/LicenseTerms';
 
 const Auth = () => {
   const { login } = useAuthContext();
-  const { stuColor, theme, titleLogoDark, titleLogoLight, umamiTrack } =
+  const { theme, titleLogoDark, titleLogoLight, umamiTrack } =
     useAppContext();
   const { cookies, setCookie } = useCookiesContext();
 
@@ -97,7 +97,7 @@ const Auth = () => {
           <div className='flex w-full h-fit justify-center items-start'>
             {loading ? (
               <div className='flex h-full justify-center items-center'>
-                <CircleLoader color={stuColor} size={50} />
+                <CircleLoader color={'var(--color-primary)'} size={50} />
               </div>
             ) : (
               <form
@@ -141,9 +141,9 @@ const Auth = () => {
                     onChange={handleCheckChange}
                     onInvalid={handleCheckkInvalid}
                     sx={{
-                      color: checkInvalid ? 'red' : stuColor,
+                      color: checkInvalid ? 'red' : 'var(--color-primary)',
                       '&.Mui-checked': {
-                        color: checkInvalid ? 'red' : stuColor,
+                        color: checkInvalid ? 'red' : 'var(--color-primary)',
                       },
                     }}
                   />

@@ -21,7 +21,6 @@ const AuthorsAutofill = ({
   type,
 }: IAuthorsAutofillParams) => {
   const { t } = useTranslation();
-  const { stuBorder } = useAppContext();
 
   const [inputValue, setInputValue] = useState<string>('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -126,7 +125,7 @@ const AuthorsAutofill = ({
       />
       {suggestions.length > 0 && (
         <ul
-         className={`absolute top-[60px] rounded-md rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-darkGray z-20 w-full
+         className={`absolute top-[60px] rounded-md rounded-t-none border-primary list-none max-h-40 overflow-y-scroll bg-white dark:bg-darkGray z-20 w-full
           shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A]`}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}

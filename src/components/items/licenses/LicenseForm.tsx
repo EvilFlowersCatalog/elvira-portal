@@ -25,7 +25,6 @@ const licenseForm = ({
   setReloadPage,
 }: ILicenseForm) => {
   const { t } = useTranslation();
-  const { stuBorder } = useAppContext();
   const [state, setState] = useState<LICENSE_STATE>(
     license?.state ?? LICENSE_STATE.active
   );
@@ -123,7 +122,7 @@ const licenseForm = ({
         ) : (
           // Start Date Picker
           <DatePicker
-            className={`bg-transparent w-full text-black dark:text-white cursor-pointer text-center border-2 py-2 rounded-md ${stuBorder}`}
+            className={`bg-transparent w-full text-black dark:text-white cursor-pointer text-center border-2 py-2 rounded-md border-primary`}
             selected={startDate}
             onChange={(date: Date | null) => setStartDate(date)}
             minDate={new Date()}

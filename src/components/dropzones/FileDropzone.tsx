@@ -29,7 +29,7 @@ const FileDropzone = ({
   setFiles = null,
 }: IFilesDropzoneParams) => {
   const { t } = useTranslation();
-  const { stuBg, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
 
   const [acquisitions, setAcquisitions] = useState<IAcquisition[]>([]);
   const [reload, setReload] = useState<boolean>(false);
@@ -143,7 +143,7 @@ const FileDropzone = ({
         <div
           {...getRootProps({
             className: `relative flex-2 min-h-60 max-h-[500px] overflow-auto rounded-md p-4 border-4 border-dashed duration-200 cursor-pointer ${isDragActive
-              ? `${stuBg} bg-opacity-50 border-white`
+              ? 'bg-primary bg-opacity-50 border-white'
               : 'bg-slate-200 dark:bg-darkGray border-transparent'
               }`,
           })}

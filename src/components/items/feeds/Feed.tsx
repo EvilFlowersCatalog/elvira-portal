@@ -13,7 +13,7 @@ interface IFeedParams {
 }
 
 const Feed = ({ feed }: IFeedParams) => {
-  const { stuBg, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
   var getFeedDetails = useGetFeedDetail();
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -82,7 +82,7 @@ const Feed = ({ feed }: IFeedParams) => {
   return (
     <div className={'relative flex p-2 w-full md:w-1/2 xl:w-1/4'}>
       <button
-        className={`p-5 py-10 gap-5 w-full h-full flex text-center justify-between items-center ${stuBg} text-white rounded-md duration-200`}
+        className={`p-5 py-10 gap-5 w-full h-full flex text-center justify-between items-center bg-primary text-white rounded-md duration-200`}
         onClick={() => handleFeedClick()}
         onMouseEnter={() => setIsHovering(true)}
         onMouseOut={() => setIsHovering(false)}
