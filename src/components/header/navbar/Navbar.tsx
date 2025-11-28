@@ -196,12 +196,14 @@ const Navbar = () => {
             icon={<PiBooks size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.shelf}
           />
-          <NavbarButton
-            name={t('navbarMenu.loan')}
-            path={NAVIGATION_PATHS.loans}
-            icon={<IoDocumentsOutline size={23} />}
-            isActive={location.pathname === NAVIGATION_PATHS.loans}
-          />
+          { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+            <NavbarButton
+              name={t('navbarMenu.loan')}
+              path={NAVIGATION_PATHS.loans}
+              icon={<IoDocumentsOutline size={23} />}
+              isActive={location.pathname === NAVIGATION_PATHS.loans}
+            />
+          )}
         </div>
       )}
 

@@ -52,7 +52,8 @@ export default function AcquisitionsButton({
   };
 
   // Early return if no relevant actions
-  if (acquisitions.length === 0 && !availability?.available) return null;
+  const isExperimental = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
+  if (acquisitions.length === 0 && (!isExperimental || !availability?.available)) return null;
 
   // === Subcomponents ===
 
@@ -121,8 +122,8 @@ export default function AcquisitionsButton({
             </div>
           </PDFButton>
         ))}
-        {availability?.available && !activeLicense && <BorrowButton />}
-        {availability?.available && activeLicense && <ActiveLicenseButton lcp_license_id={activeLicense.lcp_license_id} />}
+        {isExperimental && availability?.available && !activeLicense && <BorrowButton />}
+        {isExperimental && availability?.available && activeLicense && <ActiveLicenseButton lcp_license_id={activeLicense.lcp_license_id} />}
       </div>
     </div>
   );
@@ -133,11 +134,11 @@ export default function AcquisitionsButton({
     return <SinglePDFButton />;
   }
 
-  if (acquisitions.length === 0 && availability?.available && !activeLicense) {
+  if (isExperimental && acquisitions.length === 0 && availability?.available && !activeLicense) {
     return <BorrowButton />;
   }
 
-  if (acquisitions.length === 0 && activeLicense) {
+  if (isExperimental && acquisitions.length === 0 && activeLicense) {
     return <ActiveLicenseButton lcp_license_id={activeLicense.lcp_license_id} />;
   }
 

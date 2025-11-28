@@ -251,11 +251,15 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               umamiTrack={umamiTrack}
             />
 
-            <StatGroup>
-              <StatItem value={999} label={t('entry.detail.pages')} />
-              <StatItem value={9.9} label={t('entry.detail.rating')} />
-              <StatItem value={entry.popularity} label={t('entry.detail.views')} />
-            </StatGroup>
+              <StatGroup>
+              {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+                <>
+                  <StatItem value={999} label={t('entry.detail.pages')} />
+                  <StatItem value={9.9} label={t('entry.detail.rating')} />
+                </>
+              )}
+                <StatItem value={entry.popularity} label={t('entry.detail.views')} />
+              </StatGroup>
 
             {/* Summary */}
             <SummaryText
@@ -308,54 +312,56 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
             </Tooltip>
 
             {/* TABS */}
-            <TabsComponent defaultTab='contents'>
-              <TabsHeader>
-                <TabTitle id="contents">{t('entry.detail.tabs.contents')}</TabTitle>
-                <TabTitle id="reviews">{t('entry.detail.tabs.reviews')}</TabTitle>
-                <TabTitle id="related">{t('entry.detail.tabs.related')}</TabTitle>
-              </TabsHeader>
-              <Tabs>
-                <TabContent id="contents">
-                  <span className="text-gray-600 dark:text-gray-300">
-                    {chapters.map((chapter, index) => (
-                      <p key={index} className={twMerge('font-medium text-black dark:text-white text-lg mb-2 ', index != chapters.length ? 'border-b border-gray-300 dark:border-gray-700 pb-2' : '')}>
-                        <span className="text-primary dark:text-primaryLight font-semibold mr-2">
-                          {index + 1}.
-                        </span>
-                        {chapter}
-                      </p>
-                    ))}
-                  </span>
-                </TabContent>
-                <TabContent id="reviews">
-                  <span className="text-gray-600 dark:text-gray-300">
-                    {reviews.map((review, index) => (
-                      <div
-                        key={index}
-                        className={twMerge(
-                          'mb-2 pb-2',
-                          index !== reviews.length - 1 ? 'border-b border-gray-300 dark:border-gray-700' : ''
-                        )}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="font-semibold text-primary dark:text-primaryLight">{review.name}</span>
+            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+              <TabsComponent defaultTab='contents'>
+                <TabsHeader>
+                  <TabTitle id="contents">{t('entry.detail.tabs.contents')}</TabTitle>
+                  <TabTitle id="reviews">{t('entry.detail.tabs.reviews')}</TabTitle>
+                  <TabTitle id="related">{t('entry.detail.tabs.related')}</TabTitle>
+                </TabsHeader>
+                <Tabs>
+                  <TabContent id="contents">
+                    <span className="text-gray-600 dark:text-gray-300">
+                      {chapters.map((chapter, index) => (
+                        <p key={index} className={twMerge('font-medium text-black dark:text-white text-lg mb-2 ', index != chapters.length ? 'border-b border-gray-300 dark:border-gray-700 pb-2' : '')}>
+                          <span className="text-primary dark:text-primaryLight font-semibold mr-2">
+                            {index + 1}.
+                          </span>
+                          {chapter}
+                        </p>
+                      ))}
+                    </span>
+                  </TabContent>
+                  <TabContent id="reviews">
+                    <span className="text-gray-600 dark:text-gray-300">
+                      {reviews.map((review, index) => (
+                        <div
+                          key={index}
+                          className={twMerge(
+                            'mb-2 pb-2',
+                            index !== reviews.length - 1 ? 'border-b border-gray-300 dark:border-gray-700' : ''
+                          )}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="font-semibold text-primary dark:text-primaryLight">{review.name}</span>
+                          </div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(review.date).toLocaleDateString()}</p>
+                          <p className="mt-2">{review.content}</p>
                         </div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(review.date).toLocaleDateString()}</p>
-                        <p className="mt-2">{review.content}</p>
-                      </div>
-                    ))}
-                  </span>
-                </TabContent>
-                <TabContent id="related">
-                  <span className="text-gray-600 dark:text-gray-300 flex flex-wrap gap-4">
-                    <EntryItem entry={entry} />
-                    <EntryItem entry={entry} />
-                    <EntryItem entry={entry} />
-                    <EntryItem entry={entry} />
-                  </span>
-                </TabContent>
-              </Tabs>
-            </TabsComponent>
+                      ))}
+                    </span>
+                  </TabContent>
+                  <TabContent id="related">
+                    <span className="text-gray-600 dark:text-gray-300 flex flex-wrap gap-4">
+                      <EntryItem entry={entry} />
+                      <EntryItem entry={entry} />
+                      <EntryItem entry={entry} />
+                      <EntryItem entry={entry} />
+                    </span>
+                  </TabContent>
+                </Tabs>
+              </TabsComponent>
+            )}
           </div>
         </div>
       )

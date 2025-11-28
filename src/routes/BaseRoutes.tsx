@@ -48,7 +48,9 @@ const BaseRoutes = () => {
           <Route index element={<Home />} />
           <Route path='library' element={<Library />} />
           <Route path='shelf' element={<Shelf />} />
-          <Route path='loans' element={<Loans />} />
+          { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+            <Route path='loans' element={<Loans />} />
+          ) }
           <Route path='feeds' element={<Feeds />} />
           <Route path='viewer/:entry-id/:index' element={<Viewer />} />
 
@@ -63,7 +65,9 @@ const BaseRoutes = () => {
             <Route path='feeds' element={<AdminFeeds />} />
             <Route path='categories' element={<AdminCategories />} />
             <Route path="users" element={<AdminUsers />} />
-            <Route path='loans' element={<AdminLoans />} />
+            { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+              <Route path='loans' element={<AdminLoans />} />
+            ) }
           </Route>
         </Route>
       </Route>

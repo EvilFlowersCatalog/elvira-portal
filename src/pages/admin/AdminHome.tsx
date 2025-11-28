@@ -33,13 +33,16 @@ const buttonConfig = [
     textKey: 'administration.homePage.users.text',
     path: NAVIGATION_PATHS.adminUsers,
   },
-  {
-    icon: <MdInventory size={25} />,
-    titleKey: 'administration.homePage.loans.title',
-    textKey: 'administration.homePage.loans.text',
-    path: NAVIGATION_PATHS.adminLoans,
-  }
 ];
+
+if(import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
+  buttonConfig.push({
+      icon: <MdInventory size={25} />,
+      titleKey: 'administration.homePage.loans.title',
+      textKey: 'administration.homePage.loans.text',
+      path: NAVIGATION_PATHS.adminLoans,
+    });
+}
 
 const AdminHome = () => {
   const { specialNavigation, umamiTrack } = useAppContext();

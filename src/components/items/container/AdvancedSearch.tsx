@@ -192,41 +192,48 @@ export function AdvancedSearch() {
                 setLanguageCode={setLanguageCode}
                 setIsSelectionOpen={() => { }}
                 isRequired={false} />
-            {/* <CategoryAutofill
-                defaultCategoryId={defaultCategoryId}
-                entryForm={activeCategory}
-                setEntryForm={setActiveCategory}
-                setIsSelectionOpen={() => { }}
-                single
-            />
             
-            <FeedAutofill
-                defaultFeedId={defaultFeedId}
-                entryForm={activeFeeds}
-                setEntryForm={setActiveFeeds}
-                single
-            /> */}
-
-            <AdvancedCheckboxes
-                title={t('searchBar.categories')}
-                options={allCategories.map(cat => ({ label: cat.term, value: cat.id }))}
-                selected={activeCategories.map(cat => cat.id)}
-                setSelected={(selected) => {
-                    const selectedCategories = allCategories.filter(cat => selected.includes(cat.id));
-                    setActiveCategories(selectedCategories);
-                }}
+            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' ? (
+              <>
+                <AdvancedCheckboxes
+                    title={t('searchBar.categories')}
+                    options={allCategories.map(cat => ({ label: cat.term, value: cat.id }))}
+                    selected={activeCategories.map(cat => cat.id)}
+                    setSelected={(selected) => {
+                        const selectedCategories = allCategories.filter(cat => selected.includes(cat.id));
+                        setActiveCategories(selectedCategories);
+                    }}
+                    />
+               
+                <AdvancedCheckboxes
+                    title={t('searchBar.feeds')}
+                    enableSearch
+                    options={allFeeds.map(feed => ({ label: feed.title, value: feed.id }))}
+                    selected={activeFeeds.map(feed => feed.id)}
+                    setSelected={(selected) => {
+                        const selectedFeeds = allFeeds.filter(feed => selected.includes(feed.id));
+                        setActiveFeeds(selectedFeeds);
+                    }}
                 />
-           
-            <AdvancedCheckboxes
-                title={t('searchBar.feeds')}
-                enableSearch
-                options={allFeeds.map(feed => ({ label: feed.title, value: feed.id }))}
-                selected={activeFeeds.map(feed => feed.id)}
-                setSelected={(selected) => {
-                    const selectedFeeds = allFeeds.filter(feed => selected.includes(feed.id));
-                    setActiveFeeds(selectedFeeds);
-                }}
-            />
+              </>
+            ) : (
+              <>
+                <CategoryAutofill
+                    defaultCategoryId={defaultCategoryId}
+                    entryForm={activeCategory}
+                    setEntryForm={setActiveCategory}
+                    setIsSelectionOpen={() => { }}
+                    single
+                />
+                
+                <FeedAutofill
+                    defaultFeedId={defaultFeedId}
+                    entryForm={activeFeeds}
+                    setEntryForm={setActiveFeeds}
+                    single
+                />
+              </>
+            )}
         </div>
 
         <div className='flex justify-end mt-5'>
