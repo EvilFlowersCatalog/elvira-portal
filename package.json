@@ -33,7 +33,9 @@
     "react-spinners": "^0.13.8",
     "react-toastify": "^10.0.4",
     "swiper": "^11.1.1",
-    "tailwind-merge": "^3.3.1"
+    "tailwind-merge": "^3.3.1",
+    "react-markdown": "^8.0.7",
+    "remark-gfm": "^3.0.1"
   },
   "devDependencies": {
     "@types/jwt-encode": "^1.0.3",

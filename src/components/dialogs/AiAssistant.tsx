@@ -9,6 +9,8 @@ import {
 } from "@mui/material";
 import { FaX, FaPaperPlane } from "react-icons/fa6";
 import { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { useTranslation } from "react-i18next";
 import useAppContext from "../../hooks/contexts/useAppContext";
 import EntryItem from "../items/entry/display/EntryItem";
@@ -72,7 +74,7 @@ function MessageElement({ msg, msgIndex }: { msg: { role: string; content: Messa
                     color: msg.role === "user" ? "white" : "text.primary",
                     alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
                 }}>
-                {msg.content.data}
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content.data as string}</ReactMarkdown>
             </Box>;
         case "entries":
             return <Box className="flex gap-3 mb-2 py-2 shrink-0"
@@ -175,7 +177,7 @@ export default function AiAssistant() {
                 setChatId(currentChatId);
             }
 
-            const response = await fetch(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/sendchat-stream`, {
+            const response = await fetch(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/sendchat`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
