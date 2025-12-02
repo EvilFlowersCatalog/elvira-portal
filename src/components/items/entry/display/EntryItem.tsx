@@ -99,7 +99,7 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
         setIsFallbackImage(true);
     }
 
-    return <div className="group rounded-lg overflow-hidden relative w-full mb-8 h-68 max-w-[200px] hover:shadow-[0_6px_20px_rgba(0,0,0,0.4)] dark:hover:shadow-strongDarkGray transition-shadow duration-300 ">
+    return <div className="group rounded-lg overflow-hidden relative w-full h-68 max-w-[200px] hover:shadow-[0_6px_20px_rgba(0,0,0,0.4)] dark:hover:shadow-strongDarkGray transition-shadow duration-300 ">
         <div className="h-40">
             <div onClick={openEntryDetail}
                 className='relative w-full h-full object-cover select-none cursor-pointer'
