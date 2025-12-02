@@ -171,7 +171,8 @@ export default function AiAssistant() {
             if (!currentChatId) {
                 const response = await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/startchat`, {
                     entryId: assistantEntry?.id || null,
-                    apiKey: auth?.token || null
+                    apiKey: auth?.token || null,
+                    catalogId: import.meta.env.ELVIRA_CATALOG_ID
                 });
                 currentChatId = response.data.chatId;
                 setChatId(currentChatId);
