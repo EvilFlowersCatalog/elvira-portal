@@ -17,6 +17,17 @@ import { IContextProviderParams } from '../utils/interfaces/contexts';
 import i18next from '../utils/i18n/i18next';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
 
+export interface AiMessageContent {
+  type: "message" | 'entries' | 'loading';
+  data: any;
+}
+
+export interface AiMessage {
+  role: string;
+  content: AiMessageContent;
+  id?: string;
+}
+
 export interface IAppContext {
   theme: THEME_TYPE;
   updateTheme: (theme: THEME_TYPE) => void;
@@ -35,6 +46,14 @@ export interface IAppContext {
   setShowAdvancedSearch: (showAdvancedSearch: boolean) => void;
   showAiAssistant: boolean;
   setShowAiAssistant: (showAiAssistant: boolean) => void;
+  // AI Assistant persistent state
+  aiChatId: string | null;
+  setAiChatId: (chatId: string | null) => void;
+  aiMessages: AiMessage[];
+  setAiMessages: React.Dispatch<React.SetStateAction<AiMessage[]>>;
+  aiShowSuggestions: boolean;
+  setAiShowSuggestions: (show: boolean) => void;
+  clearAiChat: () => void;
   isParamsEmpty: () => boolean;
   searchParamsEqual: (
     prevSearchParams: URLSearchParams | null,
@@ -85,6 +104,17 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState<boolean>(false);
   const [showAiAssistant, setShowAiAssistant] = useState<boolean>(false);
   const [editingEntryTitle, setEditingEntryTitle] = useState<string>('');
+  
+  // AI Assistant persistent state
+  const [aiChatId, setAiChatId] = useState<string | null>(null);
+  const [aiMessages, setAiMessages] = useState<AiMessage[]>([]);
+  const [aiShowSuggestions, setAiShowSuggestions] = useState<boolean>(true);
+  
+  const clearAiChat = () => {
+    setAiChatId(null);
+    setAiMessages([]);
+    setAiShowSuggestions(true);
+  };
   const [isSmallDevice, setIsSmallDevice] = useState<boolean>(
     window.innerWidth < 959
   );
@@ -342,6 +372,13 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         setShowAdvancedSearch,
         showAiAssistant,
         setShowAiAssistant,
+        aiChatId,
+        setAiChatId,
+        aiMessages,
+        setAiMessages,
+        aiShowSuggestions,
+        setAiShowSuggestions,
+        clearAiChat,
         specialNavigation,
         clearFilters,
         isSmallDevice,

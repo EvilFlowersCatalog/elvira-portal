@@ -19,11 +19,7 @@ import { IEntry, IEntryDetail } from "../../utils/interfaces/entry";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../../hooks/contexts/useAuthContext";
-
-interface MessageContent {
-    type: "message" | 'entries' | 'loading'
-    data: any
-}
+import { AiMessage, AiMessageContent } from "../../providers/AppProvider";
 
 interface StreamEvent {
     type: 'chunk' | 'message' | 'entries' | 'done' | 'error';
@@ -45,7 +41,7 @@ function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, ha
 }
 
 
-function MessageElement({ msg, msgIndex }: { msg: { role: string; content: MessageContent }, msgIndex: number }) {
+function MessageElement({ msg, msgIndex }: { msg: AiMessage, msgIndex: number }) {
     const [books, setBooks] = useState<any[]>([]);
     const getEntryDetail = useGetEntryDetail();
 
@@ -103,16 +99,21 @@ export default function AiAssistant() {
     const { t } = useTranslation();
     const { auth } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
-    const { showAiAssistant, setShowAiAssistant, umamiTrack } = useAppContext();
+    const { 
+        showAiAssistant, 
+        setShowAiAssistant, 
+        umamiTrack,
+        aiChatId,
+        setAiChatId,
+        aiMessages,
+        setAiMessages,
+        aiShowSuggestions,
+        setAiShowSuggestions,
+    } = useAppContext();
     const getEntryDetail = useGetEntryDetail();
-
-    const [chatId, setChatId] = useState<string | null>(null);
 
     const [input, setInput] = useState("");
     const [isGeneratingResponse, setGeneratingResponse] = useState(false);
-
-    const [showSuggestions, setShowSuggestions] = useState(true);
-    const [messages, setMessages] = useState<{ role: string; content: any; id?: string }[]>([]);
     const [assistantEntry, setAssistantEntry] = useState<IEntryDetail | null>(null);
 
 
@@ -134,7 +135,7 @@ export default function AiAssistant() {
             top: document.getElementById("chat")?.scrollHeight,
             behavior: "smooth",
         });
-    }, [messages]);
+    }, [aiMessages]);
 
     useEffect(() => {
         var assistantEntryId = searchParams.get('assistant-entry-id');
@@ -147,7 +148,7 @@ export default function AiAssistant() {
     }, [searchParams]);
 
     async function sendMessage(message: string) {
-        setMessages((prev) => [...prev, {
+        setAiMessages((prev) => [...prev, {
             role: "user", content: {
                 type: "message",
                 data: message
@@ -157,7 +158,7 @@ export default function AiAssistant() {
 
         // Add loading indicator
         const loadingMsgId = `loading-${Date.now()}`;
-        setMessages((prev) => [...prev, {
+        setAiMessages((prev) => [...prev, {
             role: "assistant",
             content: {
                 type: "loading",
@@ -167,7 +168,7 @@ export default function AiAssistant() {
         }]);
 
         try {
-            var currentChatId = chatId;
+            var currentChatId = aiChatId;
             if (!currentChatId) {
                 const response = await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/startchat`, {
                     entryId: assistantEntry?.id || null,
@@ -175,7 +176,7 @@ export default function AiAssistant() {
                     catalogId: import.meta.env.ELVIRA_CATALOG_ID
                 });
                 currentChatId = response.data.chatId;
-                setChatId(currentChatId);
+                setAiChatId(currentChatId);
             }
 
             const response = await fetch(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/sendchat`, {
@@ -218,7 +219,7 @@ export default function AiAssistant() {
                                     // Remove loading indicator and start streaming message
                                     hasReceivedFirstChunk = true;
                                     const streamingMsgId = `streaming-${Date.now()}`;
-                                    setMessages((prev) => {
+                                    setAiMessages((prev) => {
                                         const filtered = prev.filter(m => m.id !== loadingMsgId);
                                         return [...filtered, {
                                             role: "assistant",
@@ -233,7 +234,7 @@ export default function AiAssistant() {
                                 } else {
                                     // Append chunk to existing message
                                     currentMessageText += data.data;
-                                    setMessages((prev) => {
+                                    setAiMessages((prev) => {
                                         const newMessages = [...prev];
                                         const lastMsgIndex = newMessages.length - 1;
                                         if (newMessages[lastMsgIndex] && newMessages[lastMsgIndex].content.type === 'message') {
@@ -252,7 +253,7 @@ export default function AiAssistant() {
                             case 'message':
                                 // Final message received (if no chunks were sent)
                                 if (!hasReceivedFirstChunk) {
-                                    setMessages((prev) => {
+                                    setAiMessages((prev) => {
                                         const filtered = prev.filter(m => m.id !== loadingMsgId);
                                         return [...filtered, {
                                             role: "assistant",
@@ -266,7 +267,7 @@ export default function AiAssistant() {
                                 }
                                 break;
                             case 'entries':
-                                setMessages((prev) => [...prev, {
+                                setAiMessages((prev) => [...prev, {
                                     role: "assistant",
                                     content: {
                                         type: "entries",
@@ -279,7 +280,7 @@ export default function AiAssistant() {
                                 setGeneratingResponse(false);
                                 break;
                             case 'error':
-                                setMessages((prev) => {
+                                setAiMessages((prev) => {
                                     const filtered = prev.filter(m => m.id !== loadingMsgId);
                                     return [...filtered, {
                                         role: "assistant",
@@ -297,7 +298,7 @@ export default function AiAssistant() {
                 }
             }
         } catch (err) {
-            setMessages((prev) => {
+            setAiMessages((prev) => {
                 const filtered = prev.filter(m => m.id !== loadingMsgId);
                 return [...filtered, {
                     role: "assistant",
@@ -316,13 +317,13 @@ export default function AiAssistant() {
 
     const handleSuggestion = (suggestion: string) => {
         sendMessage(suggestion);
-        setShowSuggestions(false);
+        setAiShowSuggestions(false);
     };
 
     const handleSubmit = (e?: React.FormEvent) => {
         e?.preventDefault();
         if (!input.trim()) return;
-        setShowSuggestions(false);
+        setAiShowSuggestions(false);
         sendMessage(input);
         setInput("");
     };
@@ -377,14 +378,14 @@ export default function AiAssistant() {
 
                 {/* Body */}
                 <Box id="chat" className="flex flex-col grow overflow-y-auto">
-                    {messages.map((msg, index) => (
+                    {aiMessages.map((msg, index) => (
                         <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} msgIndex={index} />
                     ))}
                 </Box>
 
                 {/* Input */}
                 <Box component="form" onSubmit={handleSubmit}>
-                    {!assistantEntry && showSuggestions ? <Box className="flex gap-2 mb-2">
+                    {!assistantEntry && aiShowSuggestions ? <Box className="flex gap-2 mb-2">
                         <AiSuggestion suggestion={t("assistant.suggestion1")} handleSuggestion={handleSuggestion} />
                         <AiSuggestion suggestion={t("assistant.suggestion2")} handleSuggestion={handleSuggestion} />
                     </Box> : null}
