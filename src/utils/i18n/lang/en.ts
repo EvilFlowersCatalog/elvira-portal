@@ -258,6 +258,7 @@ export const en = {
       lightMode: 'Light Mode',
       user: 'Student',
       superUser: 'Admin',
+      aiAssistant: 'AI Assistant',
     },
 
     // PAGE

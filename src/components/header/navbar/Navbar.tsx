@@ -8,7 +8,7 @@ import {
 import { ReactElement } from 'react';
 import { IoDocumentsOutline, IoMoonOutline, IoSunnyOutline } from 'react-icons/io5';
 import { MdOutlineFeed } from 'react-icons/md';
-import { RiAdminLine, RiArrowLeftDoubleFill } from 'react-icons/ri';
+import { RiAdminLine, RiAiGenerate, RiArrowLeftDoubleFill } from 'react-icons/ri';
 import { PiBooks } from 'react-icons/pi';
 import { HiOutlineLanguage } from 'react-icons/hi2';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
@@ -67,8 +67,7 @@ const Navbar = () => {
     titleLogoDark,
     titleLogoLight,
     setShowNavbar,
-    stuLogoDark,
-    stuLogoLight,
+    setShowAiAssistant,
     umamiTrack,
   } = useAppContext();
   const { auth, logout } = useAuthContext();
@@ -161,6 +160,14 @@ const Navbar = () => {
             path={NAVIGATION_PATHS.feeds}
             icon={<MdOutlineFeed size={23} />}
             isActive={location.pathname === NAVIGATION_PATHS.feeds}
+          />
+          <NavbarButton 
+            name={t('navbarMenu.aiAssistant')}
+            icon={<RiAiGenerate size={23}/>}
+            onClick={(e)=>{
+              setShowAiAssistant(true);
+            }}
+            isActive={false}
           />
           {/* <NavbarButton
             name={t('navbarMenu.about')}

@@ -251,6 +251,7 @@ export const sk = {
       lightMode: 'Svetlý Režim',
       user: 'Študent',
       superUser: 'Admin',
+      aiAssistant: 'AI Asistent',
     },
 
     // PAGE
