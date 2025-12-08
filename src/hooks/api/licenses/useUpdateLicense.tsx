@@ -9,16 +9,14 @@ const useUpdateLicenseState = () => {
     const axios = useAxios();
 
     const updateLicenseState = async (license_id:string, state: InterfaceState, duration?: string): Promise<ILicense> => {
-        const params = new URLSearchParams();
-
         if (duration && !DurationValidation.test(duration)) 
             throw new Error('Invalid duration format. Use ISO 8601 duration, e.g. "P1Y2M10DT2H30M"');
 
-        params.set('state', state);
-        if (duration) params.set('duration', duration);
-
         const UPDATE_LICENCES_URL = `/readium/v1/licenses/${license_id}`;
-        const { data } = await axios.put<ILicense>(UPDATE_LICENCES_URL, { params });
+        const { data } = await axios.put<ILicense>(UPDATE_LICENCES_URL, { 
+            state,
+            duration
+         });
 
         return data;
     };
