@@ -3,14 +3,13 @@ import useAuth from '../../contexts/useAuthContext';
 import { IChatMessage } from './useGetChatHistory';
 
 export interface IChat {
-  id: string;
+  chatId: string;
   title: string;
   userId: string;
   entryId: string | null;
   messageCount: number;
   lastMessage: IChatMessage;
-  createdAt: string;
-  updatedAt: string;
+  startedAt: string;
 }
 
 const useGetUserChats = () => {

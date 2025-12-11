@@ -46,42 +46,41 @@ const AiChatHistory = () => {
   };
 
   const handleChatClick = async (chat: IChat) => {
-    try {
-      umamiTrack("Resume AI Chat", { chatId: chat.id });
-      
+    try {      
       // Resume the chat session on the backend
       await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/resumechat`, {
-        chatId: chat.id,
-        apiKey: auth?.token || null
+        chatId: chat.chatId,
+        apiKey: auth?.token || null,
+        catalogId: import.meta.env.ELVIRA_CATALOG_ID || null
       });
 
       // Load chat history
-      const history = await getChatHistory(chat.id);
-      
+      const history = await getChatHistory(chat.chatId);
+
       // Transform history to AiMessage format
-      const messages: AiMessage[] = history.map((msg, index) => {
-        if (msg.entryIds && msg.entryIds.length > 0) {
-          return {
-            role: msg.role,
-            content: {
-              type: 'entries',
-              data: msg.entryIds
-            },
-            id: `history-${index}`
-          };
-        }
+      const messages: AiMessage[] = history.messages.map((msg, index) => {
+        // if (msg.entryIds && msg.entryIds.length > 0) {
+        //   return {
+        //     role: msg.role,
+        //     content: {
+        //       type: 'entries',
+        //       data: msg.entryIds
+        //     },
+        //     id: `history-${index}`
+        //   };
+        // }
         return {
-          role: msg.role,
+          role: msg.sender,
           content: {
             type: 'message',
-            data: msg.content
+            data: msg.text
           },
           id: `history-${index}`
         };
       });
 
       // Set the chat state
-      setAiChatId(chat.id);
+      setAiChatId(chat.chatId);
       setAiMessages(messages);
       setAiShowSuggestions(false);
 
@@ -175,7 +174,7 @@ const AiChatHistory = () => {
           <Box className="flex flex-col gap-3">
             {chats.map((chat) => (
               <Card
-                key={chat.id}
+                key={chat.chatId}
                 onClick={() => handleChatClick(chat)}
                 className="cursor-pointer transition-all hover:shadow-lg"
                 sx={{
