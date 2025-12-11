@@ -18,15 +18,13 @@ document.dispatchEvent(
 );
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <CookiesProvider>
-        <AppProvider>
-          <AuthProvider>
-            <BaseRoutes />
-          </AuthProvider>
-        </AppProvider>
-      </CookiesProvider>
-    </BrowserRouter>
-  </React.StrictMode>
+  <BrowserRouter>
+    <CookiesProvider>
+      <AppProvider>
+        <AuthProvider>
+          <BaseRoutes />
+        </AuthProvider>
+      </AppProvider>
+    </CookiesProvider>
+  </BrowserRouter>
 );

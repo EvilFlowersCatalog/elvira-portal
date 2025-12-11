@@ -8,6 +8,17 @@ export const en = {
       suggestion1: 'How do I learn programming?',
       suggestion2: 'Find a book about mathematics',
       entryAssistant: "Reference to the book {{x}}",
+      welcomeMessage: 'Ask me anything about the library catalog. I can help you find books, answer questions, and provide recommendations.',
+      chatHistory: 'Chat History',
+      chatHistoryError: 'Failed to load chat history',
+      noChats: 'No chat history yet',
+      startFirstChat: 'Start your first conversation with the AI assistant',
+      newChat: 'New Chat',
+      untitledChat: 'Untitled Chat',
+      messages: '{{count}} messages',
+      today: 'Today',
+      yesterday: 'Yesterday',
+      daysAgo: '{{count}} days ago',
     },
     // NOTIFICATIONS
     notifications: {

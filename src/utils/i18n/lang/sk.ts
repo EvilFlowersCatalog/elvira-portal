@@ -6,6 +6,17 @@ export const sk = {
       suggestion1: 'Ako sa naučím programovať?',
       suggestion2: 'Nájdi knihu o matematike',
       entryAssistant: "Referencia na knihu {{x}}",
+      welcomeMessage: 'Spýtajte sa ma na čokoľvek o knižničnom katalógu. Môžem vám pomôcť nájsť knihy, odpovedať na otázky a poskytnúť odporúčania.',
+      chatHistory: 'História konverzácií',
+      chatHistoryError: 'Nepodarilo sa načítať históriu konverzácií',
+      noChats: 'Zatiaľ žiadna história konverzácií',
+      startFirstChat: 'Začnite svoju prvú konverzáciu s AI asistentom',
+      newChat: 'Nová konverzácia',
+      untitledChat: 'Nepomenovaná konverzácia',
+      messages: '{{count}} správ',
+      today: 'Dnes',
+      yesterday: 'Včera',
+      daysAgo: 'Pred {{count}} dňami',
     },
     // NOTIFICATIONS
     notifications: {

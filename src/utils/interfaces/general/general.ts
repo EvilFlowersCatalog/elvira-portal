@@ -10,6 +10,8 @@ export enum NAVIGATION_PATHS {
   feeds = '/feeds',
   licenses = '/licenses',
   viewer = '/viewer/',
+  aiAssistant = '/ai-assistant',
+  aiChatHistory = '/ai-chat-history',
   adminHome = '/administration',
   adminEntries = '/administration/entries',
   adminAddEntries = '/administration/entries/add',

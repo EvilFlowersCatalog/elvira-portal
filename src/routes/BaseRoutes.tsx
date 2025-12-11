@@ -20,6 +20,8 @@ import Auth from '../pages/auth/Auth';
 import Loans from '../pages/common/Loans';
 import AdminUsers from '../pages/admin/AdminUsers';
 import AdminLoans from '../pages/admin/AdminLoans';
+import AiAssistantPage from '../pages/common/AiAssistant';
+import AiChatHistory from '../pages/common/AiChatHistory';
 
 const BaseRoutes = () => {
   const { auth } = useAuthContext();
@@ -52,6 +54,8 @@ const BaseRoutes = () => {
             <Route path='loans' element={<Loans />} />
           ) }
           <Route path='feeds' element={<Feeds />} />
+          <Route path='ai-assistant' element={<AiAssistantPage />} />
+          <Route path='ai-chat-history' element={<AiChatHistory />} />
           <Route path='viewer/:entry-id/:index' element={<Viewer />} />
 
           {/* Only with admin role */}

@@ -163,11 +163,9 @@ const Navbar = () => {
           />
           <NavbarButton 
             name={t('navbarMenu.aiAssistant')}
+            path={NAVIGATION_PATHS.aiChatHistory}
             icon={<RiAiGenerate size={23}/>}
-            onClick={(e)=>{
-              setShowAiAssistant(true);
-            }}
-            isActive={false}
+            isActive={location.pathname === NAVIGATION_PATHS.aiAssistant || location.pathname === NAVIGATION_PATHS.aiChatHistory}
           />
           {/* <NavbarButton
             name={t('navbarMenu.about')}
