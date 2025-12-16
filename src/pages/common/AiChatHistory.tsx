@@ -59,16 +59,16 @@ const AiChatHistory = () => {
 
       // Transform history to AiMessage format
       const messages: AiMessage[] = history.messages.map((msg, index) => {
-        // if (msg.entryIds && msg.entryIds.length > 0) {
-        //   return {
-        //     role: msg.role,
-        //     content: {
-        //       type: 'entries',
-        //       data: msg.entryIds
-        //     },
-        //     id: `history-${index}`
-        //   };
-        // }
+        if (msg.bookIds && msg.bookIds.length > 0) {
+          return {
+            role: msg.sender,
+            content: {
+              type: 'entries',
+              data: msg.bookIds
+            },
+            id: `history-${index}`
+          };
+        }
         return {
           role: msg.sender,
           content: {
@@ -165,7 +165,7 @@ const AiChatHistory = () => {
             </Typography>
             <button
               onClick={handleNewChat}
-              className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition-colors"
+              className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition-colors mt-5"
             >
               {t('assistant.newChat')}
             </button>

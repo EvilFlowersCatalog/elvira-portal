@@ -20,6 +20,7 @@ import axios from "axios";
 import useAuth from "../../hooks/contexts/useAuthContext";
 import { AiMessage } from "../../providers/AppProvider";
 import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
+import EntryDetail from "../../components/items/entry/details/EntryDetail";
 
 interface StreamEvent {
     type: 'chunk' | 'message' | 'entries' | 'done' | 'error';
@@ -76,10 +77,12 @@ function MessageElement({ msg }: { msg: AiMessage }) {
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content.data as string}</ReactMarkdown>
             </Box>;
         case "entries":
-            return <Box className="flex gap-3 mb-4 py-2 shrink-0"
+            return <Box className="flex gap-3 mb-4 py-2 shrink-0 overflow-x-auto flex-nowrap"
             >
                 {books.map((entry: IEntry) => (
-                    <EntryItem entry={entry} key={"ai-" + entry.id} id={'ai-' + entry.id} type="ai-recommendation" />
+                    <Box key={"ai-" + entry.id} className="flex-shrink-0">
+                        <EntryItem entry={entry} id={'ai-' + entry.id} type="ai-recommendation" />
+                    </Box>
                 ))}
             </Box>
         case "loading":
@@ -321,6 +324,7 @@ export default function AiAssistantPage() {
 
     return (
         <Box className="flex flex-col h-full w-full bg-white dark:bg-zinc-900">
+            <EntryDetail  />
             {/* Main Chat Container */}
             <Box className="flex-1 flex flex-col items-center w-full overflow-hidden">
                 {/* Chat Messages Area */}

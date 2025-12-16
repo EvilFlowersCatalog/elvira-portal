@@ -7,6 +7,7 @@ export interface IChatMessage {
   sender: 'user' | 'agent';
   text: string;
   timestamp: string;
+  bookIds?: string[];
 }
 
 const useGetChatHistory = () => {

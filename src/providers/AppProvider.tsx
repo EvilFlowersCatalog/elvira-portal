@@ -26,6 +26,7 @@ export interface AiMessage {
   role: string;
   content: AiMessageContent;
   id?: string;
+  bookIds?: string[];
 }
 
 export interface IAppContext {
