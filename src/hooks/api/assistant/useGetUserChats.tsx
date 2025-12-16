@@ -16,7 +16,7 @@ const useGetUserChats = () => {
   const { auth } = useAuth();
 
   const getUserChats = async (): Promise<{chats: IChat[], total: number}> => {
-    const response = await axios.get(`${import.meta.env.ELVIRA_ASSISTANT_URL}/user/chats`, {
+    const response = await axios.get(`${import.meta.env.ELVIRA_ASSISTANT_URL}/user/chats?catalogId=${import.meta.env.ELVIRA_CATALOG_ID}`, {
       headers: {
         'Authorization': auth?.token ? `Bearer ${auth.token}` : '',
         'Content-Type': 'application/json'

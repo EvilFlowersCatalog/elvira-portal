@@ -14,7 +14,7 @@ const useGetChatHistory = () => {
   const { auth } = useAuth();
 
   const getChatHistory = async (chatId: string): Promise<{chatId:string, messagesCount: number, messages: IChatMessage[]}> => {
-    const response = await axios.get(`${import.meta.env.ELVIRA_ASSISTANT_URL}/user/chats/${chatId}`, {
+    const response = await axios.get(`${import.meta.env.ELVIRA_ASSISTANT_URL}/user/chats/${chatId}?catalogId=${import.meta.env.ELVIRA_CATALOG_ID}`, {
       headers: {
         'Authorization': auth?.token ? `Bearer ${auth.token}` : '',
         'Content-Type': 'application/json'
