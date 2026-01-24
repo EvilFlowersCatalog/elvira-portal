@@ -4,10 +4,9 @@ import useAxios from '../useAxios';
 const useEditEntry = () => {
   const axios = useAxios();
 
-  const editEntry = async (entryId: string, editedEntry: IEntryNew) => {
-    const EDIT_ENTRY_URL = `/api/v1/catalogs/${
-      import.meta.env.ELVIRA_CATALOG_ID
-    }/entries/${entryId}`;
+  const editEntry = async (entryId: string, editedEntry: IEntryNew, catalogId?: string) => {
+    const effectiveCatalogId = catalogId || import.meta.env.ELVIRA_CATALOG_ID;
+    const EDIT_ENTRY_URL = `/api/v1/catalogs/${effectiveCatalogId}/entries/${entryId}`;
     await axios.put(EDIT_ENTRY_URL, editedEntry);
   };
   return editEntry;

@@ -17,7 +17,7 @@ export function Title({ entryId }: { entryId: string }) {
     const [title, setTitle] = useState<string>('Loading...');
 
     function getTitle(entryId: string): Promise<string> {
-        return getEntryDetail(entryId).then((entry) => {
+        return getEntryDetail(entryId, undefined).then((entry) => {
             return entry.title;
         }).catch(() => {
             return 'Unknown Entry';

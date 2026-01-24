@@ -35,10 +35,12 @@ const Viewer = () => {
   const { auth } = useAuthContext();
   const { "entry-id": id, index } = useParams();
   const { t } = useTranslation();
+  const location = useLocation();
   const [loading, setLoading] = useState<boolean>(true);
   const [progressBar, setProgressBar] = useState<number>(0);
-
-  const location = useLocation();
+  const [entryCatalogId, setEntryCatalogId] = useState<string | null>(
+    (location.state as { catalogId?: string })?.catalogId || null
+  );
 
   const navigate = useNavigate();
   const createUserAcquisition = useCreateUserAcquisition();
@@ -80,10 +82,11 @@ const Viewer = () => {
     navigate(NAVIGATION_PATHS.home);
   };
   const closeFunction = () => {
+    const catalogParam = entryCatalogId ? `&entry-catalog-id=${entryCatalogId}` : '';
     const path =
       location.state?.from === "shelf"
-        ? `${NAVIGATION_PATHS.shelf}?entry-detail-id=${id}`
-        : `${NAVIGATION_PATHS.library}?entry-detail-id=${id}`;
+        ? `${NAVIGATION_PATHS.shelf}?entry-detail-id=${id}${catalogParam}`
+        : `${NAVIGATION_PATHS.library}?entry-detail-id=${id}${catalogParam}`;
 
     navigate(path);
   };
@@ -201,7 +204,12 @@ const Viewer = () => {
         setProgressBar(30);
 
         // Fetch entry details and process acquisition
-        const entryDetail = await getEntryDetail(id!);
+        console.log(entryCatalogId);
+        const entryDetail = await getEntryDetail(id!, entryCatalogId || undefined);
+        // Cache catalog_id from entry for subsequent operations
+        if (entryDetail.catalog_id && !entryCatalogId) {
+          setEntryCatalogId(entryDetail.catalog_id);
+        }
         const userAcquisition = await createUserAcquisition({
           acquisition_id: entryDetail.acquisitions[parseInt(index || "0")].id,
           type: "personal",

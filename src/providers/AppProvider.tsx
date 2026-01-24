@@ -78,6 +78,8 @@ export interface IAppContext {
   stuLogoLight: string;
   editingEntryTitle: string;
   setEditingEntryTitle: (editingEntryTitle: string) => void;
+  selectedCatalogId: string | null;
+  setSelectedCatalogId: (catalogId: string | null) => void;
   umamiTrack: (title: string, data?: Object) => void;
 }
 
@@ -105,6 +107,9 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const [showAdvancedSearch, setShowAdvancedSearch] = useState<boolean>(false);
   const [showAiAssistant, setShowAiAssistant] = useState<boolean>(false);
   const [editingEntryTitle, setEditingEntryTitle] = useState<string>('');
+  const [selectedCatalogId, setSelectedCatalogId] = useState<string | null>(
+    import.meta.env.ELVIRA_CATALOG_ID || null
+  );
   
   // AI Assistant persistent state
   const [aiChatId, setAiChatId] = useState<string | null>(null);
@@ -394,6 +399,8 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         logoLight,
         editingEntryTitle,
         setEditingEntryTitle,
+        selectedCatalogId,
+        setSelectedCatalogId,
         umamiTrack,
       }}
     >

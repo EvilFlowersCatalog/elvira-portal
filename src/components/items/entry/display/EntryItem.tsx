@@ -75,6 +75,7 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
         }
 
         params.set('entry-detail-id', entry.id);
+        params.set('entry-catalog-id', entry.catalog_id);
 
         setSearchParams(params);
     };

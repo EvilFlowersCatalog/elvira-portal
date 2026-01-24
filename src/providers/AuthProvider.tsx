@@ -81,10 +81,10 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
       const { response: user } = await verifyCredentials(loginForm);
 
       // If needed and determine isSuperUser status
+      const catalogId = import.meta.env.ELVIRA_CATALOG_ID;
       const isSuperUser =
         user.user.is_superuser ||
-        user.user.catalog_permissions[import.meta.env.ELVIRA_CATALOG_ID] ===
-          'manage';
+        (catalogId && user.user.catalog_permissions[catalogId] === 'manage');
 
       // Set authentication context
       setAuth({

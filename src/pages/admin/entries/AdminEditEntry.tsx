@@ -11,11 +11,12 @@ import AdminEntryForm from './AdminEntryForm';
 
 const AdminEditEntry = () => {
   const { t } = useTranslation();
-  const { setEditingEntryTitle, umamiTrack } = useAppContext();
+  const { setEditingEntryTitle, umamiTrack, selectedCatalogId } = useAppContext();
   const { 'entry-id': id } = useParams();
   const [entry, setEntry] = useState<IEntryNewForm | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [stringImage, setStringImage] = useState<string>('');
+  const [entryCatalogId, setEntryCatalogId] = useState<string | null>(null);
 
   const getEntryDetail = useGetEntryDetail();
   const navigate = useNavigate();
@@ -26,9 +27,10 @@ const AdminEditEntry = () => {
       (async () => {
         setIsLoading(true);
         if (id) {
-          const entryDetail  = await getEntryDetail(id);
+          const entryDetail  = await getEntryDetail(id, selectedCatalogId || undefined);
           setEditingEntryTitle(entryDetail.title);
           setStringImage(entryDetail.thumbnail || '');
+          setEntryCatalogId(entryDetail.catalog_id);
 
           setEntry({
             title: entryDetail.title,
@@ -93,7 +95,7 @@ const AdminEditEntry = () => {
       // Upload
       try {
         setIsLoading(true);
-        await editEntry(id!, newEntry);
+        await editEntry(id!, newEntry, entryCatalogId || selectedCatalogId || undefined);
         toast.success(t('notifications.entry.edit.success'));
         navigate(NAVIGATION_PATHS.adminEntries, { replace: true });
       } catch {
@@ -111,7 +113,8 @@ const AdminEditEntry = () => {
     setEntry,
     isLoading,
     stringImage,
-    setStringImage
+    setStringImage,
+    catalogId: entryCatalogId || undefined,
   });
 };
 

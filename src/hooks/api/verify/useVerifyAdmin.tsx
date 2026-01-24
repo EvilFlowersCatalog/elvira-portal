@@ -11,10 +11,10 @@ const useVerifyAdmin = () => {
     const VERIFY_URL = `/api/v1/users/${auth?.userId}`;
     const { data: user } = await axios.get<IVerifyAdminResponse>(VERIFY_URL);
 
+    const catalogId = import.meta.env.ELVIRA_CATALOG_ID;
     const isSuperUser =
       user.response.is_superuser ||
-      user.response.catalog_permissions[import.meta.env.ELVIRA_CATALOG_ID] ===
-        'manage';
+      (catalogId && user.response.catalog_permissions[catalogId] === 'manage');
     // return response
     return isSuperUser;
   };

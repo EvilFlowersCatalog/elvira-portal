@@ -31,8 +31,13 @@ const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
     const params = new URLSearchParams(searchParams);
     const id = searchParams.get('entry-detail-id');
 
-    if (id === entry.id) params.delete('entry-detail-id');
-    else params.set('entry-detail-id', entry.id);
+    if (id === entry.id) {
+      params.delete('entry-detail-id');
+      params.delete('entry-catalog-id');
+    } else {
+      params.set('entry-detail-id', entry.id);
+      params.set('entry-catalog-id', entry.catalog_id);
+    }
 
     setSearchParams(params);
   };

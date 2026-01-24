@@ -159,6 +159,12 @@ export const sk = {
 
     // ADMINISTRATION PAGE
     administration: {
+      catalog: {
+        select: 'Vybrať Katalóg',
+        loading: 'Načítavam katalógy...',
+        loadError: 'Nepodarilo sa načítať katalógy',
+        noCatalogs: 'Žiadne dostupné katalógy',
+      },
       homePage: {
         entries: {
           title: 'Publikácie',

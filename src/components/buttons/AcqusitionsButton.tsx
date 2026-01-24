@@ -48,6 +48,9 @@ export default function AcquisitionsButton({
   const openBorrowModal = () => {
     const params = new URLSearchParams(searchParams);
     params.set("licensing-entry-id", entry.id);
+    if (entry.catalog_id) {
+      params.set("licensing-catalog-id", entry.catalog_id);
+    }
     setSearchParams(params);
   };
 
@@ -58,7 +61,7 @@ export default function AcquisitionsButton({
   // === Subcomponents ===
 
   const SinglePDFButton = () => (
-    <PDFButton acquisition={acquisitions[0]} index={0} entryId={entry.id}>
+    <PDFButton acquisition={acquisitions[0]} index={0} entryId={entry.id} catalogId={entry.catalog_id}>
       <div className={ActionButtonStyle}>
         <BiBookOpen size={24} />
         {t("entry.detail.read")}
@@ -115,7 +118,7 @@ export default function AcquisitionsButton({
         style={{ zIndex: 10 }}
       >
         {acquisitions.map((acq, i) => (
-          <PDFButton key={i} index={i} acquisition={acq} entryId={entry.id}>
+          <PDFButton key={i} index={i} acquisition={acq} entryId={entry.id} catalogId={entry.catalog_id}>
             <div className={twMerge(ActionButtonStyle, "w-full")}>
               <BiBookOpen size={24} />
               {t("entry.detail.read")} {i + 1}

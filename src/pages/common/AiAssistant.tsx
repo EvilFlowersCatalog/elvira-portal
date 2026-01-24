@@ -51,7 +51,7 @@ function MessageElement({ msg }: { msg: AiMessage }) {
             setBooks([]);
             (async () => {
                 const details = await Promise.all(
-                    entryIds.map((id: string) => getEntryDetail(id))
+                    entryIds.map((id: string) => getEntryDetail(id, undefined))
                 );
                 const entries: IEntry[] = details.map(entryDetail => ({
                     ...entryDetail,
@@ -135,7 +135,7 @@ export default function AiAssistantPage() {
         // Check if there's an entry-id in the URL params
         const entryId = searchParams.get('entry-id');
         if (entryId) {
-            getEntryDetail(entryId).then((entry) => {
+            getEntryDetail(entryId, undefined).then((entry) => {
                 setAssistantEntry(entry);
             });
         }

@@ -161,6 +161,12 @@ export const en = {
 
     // ADMINISTRATION PAGE
     administration: {
+      catalog: {
+        select: 'Select Catalog',
+        loading: 'Loading catalogs...',
+        loadError: 'Failed to load catalogs',
+        noCatalogs: 'No catalogs available',
+      },
       homePage: {
         entries: {
           title: 'Entries',

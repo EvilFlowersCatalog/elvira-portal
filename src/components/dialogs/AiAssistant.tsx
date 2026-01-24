@@ -51,7 +51,7 @@ function MessageElement({ msg, msgIndex }: { msg: AiMessage, msgIndex: number })
             setBooks([]); // Reset books first
             (async () => {
                 const details = await Promise.all(
-                    entryIds.map((id: string) => getEntryDetail(id))
+                    entryIds.map((id: string) => getEntryDetail(id, undefined))
                 );
                 const entries: IEntry[] = details.map(entryDetail => ({
                     ...entryDetail,
@@ -140,7 +140,7 @@ export default function AiAssistant() {
     useEffect(() => {
         var assistantEntryId = searchParams.get('assistant-entry-id');
         if (assistantEntryId) {
-            getEntryDetail(assistantEntryId).then((entry) => {
+            getEntryDetail(assistantEntryId, undefined).then((entry) => {
                 setAssistantEntry(entry);
             });
         }
