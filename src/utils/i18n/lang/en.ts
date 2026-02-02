@@ -261,6 +261,8 @@ export const en = {
       home: 'Home',
       library: 'Library',
       myShelf: 'Shelf',
+      history: 'History',
+      help: 'Help',
       loan: 'Loans',
       loanHistory: 'Loans Histroy',
       feeds: 'Feeds',
