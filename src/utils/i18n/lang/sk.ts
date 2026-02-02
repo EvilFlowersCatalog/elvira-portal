@@ -1,5 +1,9 @@
 export const sk = {
   translation: {
+    common: {
+      showMore: 'Ďalších {{count}}',
+      showLess: 'Zobraziť menej',
+    },
     assistant: {
       title: 'AI Asistent',
       inputPlaceholder: 'Spýtajte sa ma na čokoľvek...',
@@ -270,12 +274,13 @@ export const sk = {
     // PAGE
     page: {
       notFound: 'Nič nebolo nájdené',
+      noResults: "Žiadne výsledky pre vaše vyhľadávanie.",
       shelfEmpty: 'Vaša polička je prázdna',
       error: 'Nastala chyba pri načítavaní dát',
       scrollUp: 'Posunúť nahor',
       removeFilters: 'Odstrániť filtre',
       results: 'Výsledky',
-      resultsQuery: 'Výsledky pre vyhľadávanie "{{x}}"',
+      resultsQuery: 'Výsledky pre:',
     },
 
     // HOME PAGE
@@ -294,6 +299,7 @@ export const sk = {
       feeds: 'Skupiny',
       search: 'Hľadať',
       searchAll: "Prehľadávať všetko",
+      yearFromTo: 'Rok vydania',
       yearFrom: 'Rok od',
       yearTo: 'Rok do',
     },
@@ -476,12 +482,12 @@ export const sk = {
       search: 'Hľadať',
       advancedSearch: 'Pokročilé Vyhľadávanie',
       orderBy: {
-        createdAtAsc: 'Dátum publikovania ↑',
-        createdAtDesc: 'Dátum publikovania ↓',
-        titleAsc: 'Názov ↑',
-        titleDesc: 'Názov ↓',
-        popularityAsc: 'Popularita ↑',
-        popularityDesc: 'Popularita ↓',
+        createdAtAsc: 'Najnovšie',
+        createdAtDesc: 'Najstaršie',
+        titleAsc: 'A-Z',
+        titleDesc: 'Z-A',
+        popularityAsc: 'Najmenej populárne',
+        popularityDesc: 'Najpopulárnejšie',
       },
     },
 

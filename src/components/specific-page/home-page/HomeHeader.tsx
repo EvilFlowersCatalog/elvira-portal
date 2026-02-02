@@ -74,7 +74,7 @@ const HomeHeader = () => {
           value={searchInput}
           placeholder={t('home.search')}
           onChange={handleSearchInput}
-          className='border-none pr-32'
+          className='border-none md:pr-32'
           paddingLeft={40}
         />
         <button type='submit' className={'absolute left-2 top-[31px]'}>

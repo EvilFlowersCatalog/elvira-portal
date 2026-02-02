@@ -108,10 +108,11 @@ const ItemContainer = ({
 
         <AdvancedSearchWrapper>
           <>
-            <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-bold text-left mb-4'>
+            <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-medium text-left mb-4'>
               {searchParams.get('query')
-                ? t('page.resultsQuery', { x: searchParams.get('query') })
+                ? t('page.resultsQuery')
                 : t('page.results')}
+                {searchParams.get('query') && <span className="font-bold ml-1">"{searchParams.get('query')}"</span>}
             </h2>
 
             {isLoading && (
@@ -123,33 +124,12 @@ const ItemContainer = ({
 
             {!isLoading && !isError && (
               <>
-                {showEmpty ? (
-                  <>
-                    {items.length > 0 && children}
-                    {items.length === 0 && (
-                      <PageMessage
-                        message={
-                          isParamsEmpty()
-                            ? location.pathname === NAVIGATION_PATHS.shelf
-                              ? t('page.shelfEmpty')
-                              : t('page.notFound')
-                            : t('page.notFound')
-                        }
-                        clearParams={!isParamsEmpty() ? clearFilters : undefined}
-                      />
-                    )}
-                  </>
+                {items.length > 0 ? (
+                  children
                 ) : (
-                  <>
-                    {(items.length === 0 && isParamsEmpty()) || items.length > 0 ? (
-                      children
-                    ) : (
-                      <PageMessage
-                        message={t('page.notFound')}
-                        clearParams={clearFilters}
-                      />
-                    )}
-                  </>
+                  <p className='text-center px-4 py-10'>
+                    {t('page.noResults')}
+                  </p>
                 )}
               </>
             )}

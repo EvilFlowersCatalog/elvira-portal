@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 import useAppContext from "../../../hooks/contexts/useAppContext"
 import { useTranslation } from "react-i18next";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { ICategory } from "../../../utils/interfaces/category";
 import ElviraInput from "../../inputs/ElviraInput";
 import LanguageAutofill from "../../autofills/LanguageAutofill";
@@ -18,7 +18,7 @@ import { IFeed } from "../../../utils/interfaces/feed";
 export function AdvancedSearchWrapper({ children }: { children: React.ReactNode }) {
     const { showAdvancedSearch, setShowAdvancedSearch } = useAppContext();
     return (
-        <div className="flex flex-col md:flex-row border-t-2 border-gray-300 dark:border-gray-700">
+        <div className="flex flex-col md:flex-row">
             {/* Desktop sidebar */}
             <div
                 className={`
@@ -95,9 +95,7 @@ export function AdvancedSearch() {
         })();
     }, []);
 
-    const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-
+    const performSearch = () => {
         if (title) searchParams.set('title', title);
         else searchParams.delete('title');
 
@@ -155,91 +153,86 @@ export function AdvancedSearch() {
         setAuthor(e.target.value);
     };
 
-    return <form
-        onSubmit={onSubmit}>
-        <div className='flex flex-col gap-2'>
-            <ElviraInput
-                placeholder={t('searchBar.title')}
-                value={title}
-                onChange={handleTitleChange}
+    // Trigger search when advanced options change
+    useEffect(() => {
+        performSearch();
+    }, [languageCode, activeCategories, activeFeeds]);
+
+    return <div className='flex flex-col gap-2'>
+        <h2 className="text-[15px] capitalize font-bold">{t('searchBar.yearFromTo')}</h2>
+        <div className='flex gap-2'>
+            <ElviraNumberInput
+                placeholder={t('searchBar.yearFrom')}
+                value={year[0].toString()} 
+                onChange={function (e: ChangeEvent<HTMLInputElement>): void {
+                    setYear([e.target.value, year[1]]);
+                }}
+                onBlur={performSearch}
             />
-            <ElviraInput
-                placeholder={t('searchBar.author')}
-                value={author}
-                onChange={handleAuthorChange}
+
+            <ElviraNumberInput
+                placeholder={t('searchBar.yearTo')}
+                value={year[1].toString()}
+                onChange={function (e: ChangeEvent<HTMLInputElement>): void {
+                    setYear([year[0], e.target.value]);
+                }}
+                onBlur={performSearch}
             />
+        </div>
 
-            <div className='flex gap-2'>
+        <div className="h-[1px] w-full bg-gray-300 my-4"></div>
 
-                <ElviraNumberInput
-                    placeholder={t('searchBar.yearFrom')}
-                    value={year[0].toString()} onChange={function (e: ChangeEvent<HTMLInputElement>): void {
-                        setYear([e.target.value, year[1]]);
-                    }} />
-
-                <ElviraNumberInput
-                    placeholder={t('searchBar.yearTo')}
-                    value={year[1].toString()}
-                    onChange={function (e: ChangeEvent<HTMLInputElement>): void {
-                        setYear([year[0], e.target.value]);
-                    }}
+        <LanguageAutofill
+            defaultLanguageCode={defaultLanguageCode}
+            languageCode={languageCode}
+            setLanguageCode={setLanguageCode}
+            setIsSelectionOpen={() => { }}
+            isRequired={false} />
+        
+        {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' ? (
+            <>
+            <div className="h-[1px] w-full bg-gray-300 my-4"></div>
+            <AdvancedCheckboxes
+                title={t('searchBar.categories')}
+                options={allCategories.map(cat => ({ label: cat.term, value: cat.id }))}
+                selected={activeCategories.map(cat => cat.id)}
+                setSelected={(selected) => {
+                    const selectedCategories = allCategories.filter(cat => selected.includes(cat.id));
+                    setActiveCategories(selectedCategories);
+                }}
                 />
-            </div>
-
-            <LanguageAutofill
-                defaultLanguageCode={defaultLanguageCode}
-                languageCode={languageCode}
-                setLanguageCode={setLanguageCode}
+           
+        <div className="h-[1px] w-full bg-gray-300 my-4"></div>
+            <AdvancedCheckboxes
+                title={t('searchBar.feeds')}
+                enableSearch
+                options={allFeeds.map(feed => ({ label: feed.title, value: feed.id }))}
+                selected={activeFeeds.map(feed => feed.id)}
+                setSelected={(selected) => {
+                    const selectedFeeds = allFeeds.filter(feed => selected.includes(feed.id));
+                    setActiveFeeds(selectedFeeds);
+                }}
+            />
+          </>
+        ) : (
+          <>
+        <div className="h-[1px] w-full bg-gray-300 my-4"></div>
+            <CategoryAutofill
+                defaultCategoryId={defaultCategoryId}
+                entryForm={activeCategory}
+                setEntryForm={setActiveCategory}
                 setIsSelectionOpen={() => { }}
-                isRequired={false} />
+                single
+            />
             
-            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' ? (
-              <>
-                <AdvancedCheckboxes
-                    title={t('searchBar.categories')}
-                    options={allCategories.map(cat => ({ label: cat.term, value: cat.id }))}
-                    selected={activeCategories.map(cat => cat.id)}
-                    setSelected={(selected) => {
-                        const selectedCategories = allCategories.filter(cat => selected.includes(cat.id));
-                        setActiveCategories(selectedCategories);
-                    }}
-                    />
-               
-                <AdvancedCheckboxes
-                    title={t('searchBar.feeds')}
-                    enableSearch
-                    options={allFeeds.map(feed => ({ label: feed.title, value: feed.id }))}
-                    selected={activeFeeds.map(feed => feed.id)}
-                    setSelected={(selected) => {
-                        const selectedFeeds = allFeeds.filter(feed => selected.includes(feed.id));
-                        setActiveFeeds(selectedFeeds);
-                    }}
-                />
-              </>
-            ) : (
-              <>
-                <CategoryAutofill
-                    defaultCategoryId={defaultCategoryId}
-                    entryForm={activeCategory}
-                    setEntryForm={setActiveCategory}
-                    setIsSelectionOpen={() => { }}
-                    single
-                />
-                
-                <FeedAutofill
-                    defaultFeedId={defaultFeedId}
-                    entryForm={activeFeeds}
-                    setEntryForm={setActiveFeeds}
-                    single
-                />
-              </>
-            )}
-        </div>
-
-        <div className='flex justify-end mt-5'>
-            <Button type='submit'  className='!bg-secondary !text-white dark:!bg-primaryLight dark:!text-primary'>
-                {t('searchBar.search')}
-            </Button>
-        </div>
-    </form>
+        <div className="h-[1px] w-full bg-gray-300 my-4"></div>
+            <FeedAutofill
+                defaultFeedId={defaultFeedId}
+                entryForm={activeFeeds}
+                setEntryForm={setActiveFeeds}
+                single
+            />
+          </>
+        )}
+    </div>
 }

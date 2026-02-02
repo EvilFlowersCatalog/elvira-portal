@@ -12,6 +12,10 @@ export const MUISelectStyle = {
   '&:hover:not(.Mui-disabled):before': { borderBottom: '0px' },
   '.MuiSelect-icon': { color: 'black' },
   '.dark & .MuiSelect-icon': { color: 'white' },
+  '&:after': { display: 'none' },
+  'ul': {
+    paddingBottom: 0, paddingTop: 0
+  }
 }
 
 const ElviraSelect = ({

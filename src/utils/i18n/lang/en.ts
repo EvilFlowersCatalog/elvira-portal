@@ -2,6 +2,10 @@ import { title } from "process";
 
 export const en = {
   translation: {
+    common: {
+      showMore: '{{count}} more',
+      showLess: 'Show less',
+    },
     assistant: {
       title: 'AI Assistant',
       inputPlaceholder: 'Ask me anything...',
@@ -277,12 +281,13 @@ export const en = {
     // PAGE
     page: {
       notFound: 'Nothing was found',
+      noResults: 'No results for your search.',
       shelfEmpty: 'Your shelf is empty',
       error: 'An error occurred while loading data',
       scrollUp: 'Scroll up',
       removeFilters: 'Remove filters',
       results: 'Results',
-      resultsQuery: 'Results for search "{{x}}"',
+      resultsQuery: 'Results for:',
     },
 
     // HOME PAGE

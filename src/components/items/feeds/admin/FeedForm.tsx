@@ -208,6 +208,7 @@ const FeedForm = ({
             <Select
               className="dark:text-white"
               sx={MUISelectStyle}
+              MenuProps={{ PaperProps: { sx: { "& .MuiList-root": { paddingBottom: 0, paddingTop: 0}}}}}
               label={"Selection Kind"}
               value={form.kind}
               labelId='selection-kind'
