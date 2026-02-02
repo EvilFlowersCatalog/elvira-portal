@@ -99,7 +99,7 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
         setIsFallbackImage(true);
     }
 
-    return <div className="group rounded-lg overflow-hidden relative w-full h-68 max-w-[200px] hover:shadow-[0_6px_20px_rgba(0,0,0,0.4)] dark:hover:shadow-strongDarkGray transition-shadow duration-300 ">
+    return <div className="group rounded-lg overflow-hidden relative w-full min-h-[17rem] max-w-[200px] hover:shadow-[0_6px_20px_rgba(0,0,0,0.4)] dark:hover:shadow-strongDarkGray transition-shadow duration-300">
         <div className="h-40">
             <div onClick={openEntryDetail}
                 className='relative w-full h-full object-cover select-none cursor-pointer'
@@ -130,7 +130,7 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
                 </svg>
             </div>
         </div>
-        <div className="bg-white dark:bg-strongDarkGray relative p-2 h-full">
+        <div className="bg-white dark:bg-strongDarkGray relative p-2 h-[7rem] flex flex-col">
             <div className="mb-2">
                 {entry.feeds.map(feed => (
                     <span key={id ? `${id}-${feed.id}` : feed.id} onClick={() => {
@@ -141,7 +141,7 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
                 ))}
             </div>
             <h3 onClick={openEntryDetail} className="group-hover:underline transition-udnerline duration-300 cursor-pointer font-bold text-secondary dark:text-white text-sm line-clamp-2 overflow-hidden text-ellipsis mb-2">{entry.title}</h3>
-            <p className="text-xs cursor-pointer dark:text-white" onClick={() => {
+            <p className="text-xs cursor-pointer dark:text-white mt-auto" onClick={() => {
                 handleParamClick('author', entry.authors[0]?.name + ' ' + entry.authors[0]?.surname);
             }}>
                 {entry.authors.length > 0

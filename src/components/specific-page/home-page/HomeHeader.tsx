@@ -42,7 +42,7 @@ const HomeHeader = () => {
   };
 
   return (
-    <div className='flex flex-col gap-5 py-12'>
+    <div className='flex flex-col gap-5 py-6'>
       <div className='text-center'>
         <H1 className='px-0'>{t('about.title')}</H1>
       </div>

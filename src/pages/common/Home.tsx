@@ -63,10 +63,9 @@ const Home = () => {
           limitRows={true}
         />
 
-        <div className='h-3'></div>
 
         {/* LAST ADDED */}
-        <div className='flex justify-between items-center mb-5 flex-wrap'>
+        <div className='flex justify-between items-center mb-5 flex-wrap mt-12'>
           <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>{t('home.lastAdded')}</h2>
           <a href="/library?order-by=-created_at" className='text-sm text-primary cursor-pointer'>Zobraziť všetko</a>
         </div>

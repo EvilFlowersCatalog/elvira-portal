@@ -52,7 +52,7 @@ const NavbarButton = ({
       className={`text-sm flex gap-2 items-center ${textVisible ? 'px-4 w-full' : 'px-2 justify-center w-fit mx-auto'} py-1 rounded-md ${
         isActive
           ? "bg-primaryLight text-primary"
-          : "bg-zinc-100 dark:dark:bg-zinc-800"
+          : "bg-white dark:dark:bg-zinc-800"
       } hover:bg-zinc-200 dark:hover:bg-strongDarkGray hover:text-black dark:hover:text-white`}
       onClick={
         onClick
@@ -131,7 +131,7 @@ const Navbar = () => {
   };
   
   return (
-    <div className={`${isCollapsed ? 'w-20' : 'lg:w-64 w-full'} h-screen bg-zinc-100 dark:bg-zinc-800 pt-4 ${isCollapsed ? 'px-3' : 'px-5'} flex flex-col transition-all duration-300`}>
+    <div className={`${isCollapsed ? 'w-20' : 'lg:w-64 w-full'} h-screen bg-white dark:bg-zinc-800 pt-4 ${isCollapsed ? 'px-3' : 'px-5'} flex flex-col transition-all duration-300`}>
         {/* Logos */}
         <div className="flex mb-6 flex-shrink-0">
           {!isCollapsed ? (
@@ -162,7 +162,7 @@ const Navbar = () => {
             </>
           ) : (
             <button
-              className="flex items-center w-7 h-7 justify-center bg-zinc-200 dark:bg-zinc-700 text-black dark:text-white rounded-md mx-auto"
+              className="flex items-center w-7 h-7 justify-center bg-zinc-100 dark:bg-zinc-700 text-black dark:text-white rounded-md mx-auto"
               onClick={toggleNavbar}
             >
               <RiArrowLeftDoubleFill size={18} className="rotate-180" />
@@ -353,7 +353,7 @@ const Navbar = () => {
                   umamiTrack("Logout Button");
                   logout();
                 }}
-                className="bg-zinc-200 dark:bg-zinc-700 text-black dark:text-white hover:bg-zinc-300 dark:hover:bg-zinc-600 p-2 rounded-md"
+                className="bg-zinc-100 dark:bg-zinc-700 text-black dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-600 p-2 rounded-md"
               >
                 <FiLogOut size={20} />
               </Button>
