@@ -45,7 +45,7 @@ const App = () => {
         theme={'dark'}
       />
       {!informed && <CookiesInformation />}
-      <div className='h-screen flex w-screen bg-white dark:bg-darkGray text-black dark:text-white'>
+      <div className='h-screen flex w-screen text-black dark:text-white'>
         {show() && (
           <>
             <NavbarContainer />

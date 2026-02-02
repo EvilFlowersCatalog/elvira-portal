@@ -6,7 +6,7 @@ const NavbarContainer = () => {
 
   return isSmallDevice ? (
     showNavbar && (
-      <div className='fixed top-0 left-0 flex w-full h-full bg-darkGray bg-opacity-50 dark:bg-opacity-80 z-50 overflow-auto'>
+      <div className='fixed top-0 left-0 flex w-full h-full z-50 overflow-auto'>
         <Navbar />
         <div onClick={() => setShowNavbar(false)} className='flex-1'></div>
       </div>
