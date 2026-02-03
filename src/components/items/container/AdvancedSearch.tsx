@@ -1,7 +1,7 @@
 import { useSearchParams } from "react-router-dom";
 import useAppContext from "../../../hooks/contexts/useAppContext"
 import { useTranslation } from "react-i18next";
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { ICategory } from "../../../utils/interfaces/category";
 import ElviraInput from "../../inputs/ElviraInput";
 import LanguageAutofill from "../../autofills/LanguageAutofill";
@@ -61,6 +61,7 @@ export function AdvancedSearch() {
 
     const [year, setYear] = useState<string[]>(["", ""]);
     const [languageCode, setLanguageCode] = useState<string>('');
+    const yearDebounceTimeout = useRef<NodeJS.Timeout | null>(null);
 
     const getCategories = useGetCategories();
     const [allCategories, setAllCategories] = useState<ICategory[]>([]);
@@ -161,10 +162,29 @@ export function AdvancedSearch() {
         }
     }, [searchParams, allFeeds, allCategories]);
 
-    // Trigger search when advanced options change
+    // Trigger search when advanced options change (debounced for checkbox/select changes)
     useEffect(() => {
-        performSearch();
+        const debounce = setTimeout(() => {
+            performSearch();
+        }, 300);
+        return () => clearTimeout(debounce);
     }, [languageCode, activeCategories, activeFeeds]);
+
+    // Debounce year changes
+    useEffect(() => {
+        if (yearDebounceTimeout.current) {
+            clearTimeout(yearDebounceTimeout.current);
+        }
+        yearDebounceTimeout.current = setTimeout(() => {
+            performSearch();
+        }, 500);
+        
+        return () => {
+            if (yearDebounceTimeout.current) {
+                clearTimeout(yearDebounceTimeout.current);
+            }
+        };
+    }, [year]);
 
     // Memoize options to prevent unnecessary re-renders in AdvancedCheckboxes
     const categoryOptions = useMemo(() => 
@@ -177,6 +197,21 @@ export function AdvancedSearch() {
         [allFeeds]
     );
 
+    const handleYearChange = (index: 0 | 1, value: string) => {
+        const newYear = [...year];
+        newYear[index] = value;
+        setYear(newYear);
+    };
+
+    const onYearFinish = () => {
+        // Cancel pending debounce and search immediately
+        if (yearDebounceTimeout.current) {
+            clearTimeout(yearDebounceTimeout.current);
+            yearDebounceTimeout.current = null;
+        }
+        performSearch();
+    };
+
     return <div className='flex flex-col gap-2'>
         <h2 className="text-[15px] capitalize font-bold">{t('searchBar.yearFromTo')}</h2>
         <div className='flex gap-2'>
@@ -184,18 +219,18 @@ export function AdvancedSearch() {
                 placeholder={t('searchBar.yearFrom')}
                 value={year[0].toString()} 
                 onChange={function (e: ChangeEvent<HTMLInputElement>): void {
-                    setYear([e.target.value, year[1]]);
+                    handleYearChange(0, e.target.value);
                 }}
-                onBlur={performSearch}
+                onBlur={onYearFinish}
             />
 
             <ElviraNumberInput
                 placeholder={t('searchBar.yearTo')}
                 value={year[1].toString()}
                 onChange={function (e: ChangeEvent<HTMLInputElement>): void {
-                    setYear([year[0], e.target.value]);
+                    handleYearChange(1, e.target.value);
                 }}
-                onBlur={performSearch}
+                onBlur={onYearFinish}
             />
         </div>
 
