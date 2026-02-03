@@ -3,6 +3,7 @@ export const sk = {
     common: {
       showMore: 'Ďalších {{count}}',
       showLess: 'Zobraziť menej',
+      loading: 'Načítavanie',
     },
     assistant: {
       title: 'AI Asistent',
@@ -481,6 +482,8 @@ export const sk = {
     tools: {
       search: 'Hľadať',
       advancedSearch: 'Pokročilé Vyhľadávanie',
+      clearFilters: 'Zrušiť filtre',
+      activeFilters: 'Aktívne filtre:',
       orderBy: {
         createdAtAsc: 'Najnovšie',
         createdAtDesc: 'Najstaršie',

@@ -6,8 +6,18 @@ import useAppContext from "../../hooks/contexts/useAppContext";
 import ElviraInput from "../inputs/ElviraInput";
 import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
 import { MUISelectStyle } from "../inputs/ElviraSelect";
-import { MdFilterListOff } from "react-icons/md";
+import { RiCloseLine } from "react-icons/ri";
 import AiAssistant from "../dialogs/AiAssistant";
+import SearchSuggestions from "./SearchSuggestions";
+import {
+  AcceptedLanguage,
+  getLanguage,
+} from "../../hooks/api/languages/languages";
+import useGetCategories from "../../hooks/api/categories/useGetCategories";
+import useGetFeeds from "../../hooks/api/feeds/useGetFeeds";
+import { ICategory } from "../../utils/interfaces/category";
+import { IFeed } from "../../utils/interfaces/feed";
+import i18next from "../../utils/i18n/i18next";
 
 interface IToolsContainerParams {
   advancedSearch?: boolean;
@@ -37,12 +47,29 @@ const ToolsContainer = ({
   const [searchParams, setSearchParams] = useSearchParams();
   const orderBy = searchParams.get("order-by") || "-created_at";
   const [input, setInput] = useState<string>("");
+  const [isFocused, setIsFocused] = useState<boolean>(false);
+  const [categories, setCategories] = useState<ICategory[]>([]);
+  const [feeds, setFeeds] = useState<IFeed[]>([]);
+
+  const getCategories = useGetCategories();
+  const getFeeds = useGetFeeds();
 
   useEffect(() => {
     if (!advancedSearch) {
       setShowAdvancedSearch(false);
     }
   }, [advancedSearch]);
+
+  useEffect(() => {
+    (async () => {
+      const { items: itemsCategories } = await getCategories({
+        paginate: false,
+      });
+      const { items: itemsFeeds } = await getFeeds({ paginate: false });
+      setCategories(itemsCategories);
+      setFeeds(itemsFeeds);
+    })();
+  }, []);
 
   // submit input (search title)
   const submit = (e: FormEvent<HTMLFormElement>) => {
@@ -78,10 +105,104 @@ const ToolsContainer = ({
     clearFilters();
   };
 
+  const removeFilter = (paramName: string, itemId?: string) => {
+    if (itemId && (paramName === "categories" || paramName === "feeds")) {
+      // Remove individual item from comma-separated list
+      const currentValue = searchParams.get(paramName);
+      if (currentValue) {
+        const items = currentValue.split(",");
+        const updatedItems = items.filter((id) => id !== itemId);
+
+        if (updatedItems.length > 0) {
+          searchParams.set(paramName, updatedItems.join(","));
+        } else {
+          searchParams.delete(paramName);
+        }
+      }
+    } else {
+      // Remove entire param
+      searchParams.delete(paramName);
+      if (paramName === param) {
+        setInput("");
+      }
+    }
+    setSearchParams(searchParams);
+  };
+
+  const getActiveFilters = () => {
+    const filters: {
+      key: string;
+      value: string;
+      label: string;
+      itemId?: string;
+    }[] = [];
+    const excludedParams = [
+      "order-by",
+      "dialog-priority",
+      "assistant-entry-id",
+    ];
+
+    searchParams.forEach((value, key) => {
+      if (!excludedParams.includes(key) && value.trim() !== "") {
+        // Handle categories and feeds separately - create a chip for each item
+        if (key === "categories") {
+          const categoryIds = value.split(",");
+          categoryIds.forEach((categoryId) => {
+            const category = categories.find((cat) => cat.id === categoryId);
+            if (category) {
+              filters.push({
+                key,
+                value: categoryId,
+                label: category.term,
+                itemId: categoryId,
+              });
+            }
+          });
+        } else if (key === "feeds") {
+          const feedIds = value.split(",");
+          feedIds.forEach((feedId) => {
+            const feed = feeds.find((f) => f.id === feedId);
+            if (feed) {
+              filters.push({
+                key,
+                value: feedId,
+                label: feed.title,
+                itemId: feedId,
+              });
+            }
+          });
+        } else {
+          // Handle other filter types normally
+          let displayLabel = value;
+
+          if (key === "languageCode") {
+            const lang = getLanguage(value);
+            displayLabel =
+              lang?.name[i18next.language as AcceptedLanguage] || value;
+          } else if (key === "category-id") {
+            const category = categories.find((cat) => cat.id === value);
+            displayLabel = category?.term || value;
+          } else if (key === "feed-id") {
+            const feed = feeds.find((f) => f.id === value);
+            displayLabel = feed?.title || value;
+          } else if (key === "publishedAtGte") {
+            displayLabel = `${t("searchBar.yearFrom")}: ${value}`;
+          } else if (key === "publishedAtLte") {
+            displayLabel = `${t("searchBar.yearTo")}: ${value}`;
+          }
+
+          filters.push({ key, value, label: displayLabel });
+        }
+      }
+    });
+
+    return filters;
+  };
+
+  const activeFilters = getActiveFilters();
+
   return (
-    <div
-      className={`flex gap-4 px-4 item-start flex-col md:flex-row z-10`}
-    >
+    <div className={`flex gap-4 px-4 item-start flex-col md:flex-row z-10`}>
       <div className="w-full pl-1 pb-2 border-b-2 border-gray-300 dark:border-gray-700">
         <div className="flex gap-4 items-center">
           <form
@@ -93,6 +214,8 @@ const ToolsContainer = ({
               value={input}
               placeholder={t("tools.search")}
               onChange={handleSearchInput}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setTimeout(() => setIsFocused(false), 200)}
               className={`border-none ${aiEnabled ? "md:pr-32" : "pr-10"}`}
               paddingLeft={40}
             />
@@ -100,6 +223,13 @@ const ToolsContainer = ({
             <button type="submit" className={"absolute left-2 top-[31px]"}>
               <IoSearchOutline size={25} />
             </button>
+
+            {isFocused && (
+              <SearchSuggestions 
+                searchQuery={input} 
+                onClose={() => setIsFocused(false)} 
+              />
+            )}
 
             {aiEnabled && (
               <>
@@ -129,22 +259,13 @@ const ToolsContainer = ({
               </>
             )}
           </form>
-
-          {!isParamsEmpty() && (
-            <button
-              className="text-gray-500 dark:text-white hover:text-primary dark:hover:text-primaryLight pt-6"
-              onClick={handleClear}
-            >
-              <MdFilterListOff size={25} />
-            </button>
-          )}
         </div>
 
         <div className={`transition-all duration-400 w-full mt-2`}>
-          <div className="flex flex-wrap gap-3 w-full text-[15px] items-center">
+          <div className="grid lg:grid-cols-[auto_1fr_auto] grid-cols-2 gap-3 w-full text-[15px] items-start">
             {advancedSearch && (
               <button
-                className="text-sm text-secondary font-medium hover:underline"
+                className="text-sm text-secondary dark:text-secondaryLight font-medium hover:underline whitespace-nowrap w-fit"
                 onClick={() => {
                   umamiTrack("Advanced Search Button");
                   setShowAdvancedSearch(!showAdvancedSearch);
@@ -154,11 +275,44 @@ const ToolsContainer = ({
               </button>
             )}
             {customFilters}
+            <div className="flex flex-wrap gap-2 w-full max-lg:order-3 max-lg:col-span-2">
+              {activeFilters.length > 0 && activeFilters.map((filter, index) => (
+                    <div
+                      key={`${filter.key}-${filter.itemId || filter.value}-${index}`}
+                      className="flex items-center gap-1 px-3 py-1 rounded-md bg-primaryLight dark:bg-primaryDark text-primary dark:text-primaryDark font-medium text-xs"
+                    >
+                      <span>{filter.label}</span>
+                      <button
+                        onClick={() => removeFilter(filter.key, filter.itemId)}
+                        className="hover:opacity-70 transition-opacity"
+                        aria-label={`Remove ${filter.label} filter`}
+                      >
+                        <RiCloseLine size={18} />
+                      </button>
+                    </div>
+                  ))}
+
+              {activeFilters.length > 0 && (
+                <button
+                  className="text-sm text-secondary dark:text-secondaryLight font-semibold hover:underline"
+                  onClick={handleClear}
+                >
+                  {t("tools.clearFilters")}
+                </button>
+              )}
+            </div>
+
             {enableSort && (
               <Select
                 className="ml-auto dark:text-white"
                 sx={MUISelectStyle}
-                MenuProps={{ PaperProps: { sx: { "& .MuiList-root": { paddingBottom: 0, paddingTop: 0}}}}}
+                MenuProps={{
+                  PaperProps: {
+                    sx: {
+                      "& .MuiList-root": { paddingBottom: 0, paddingTop: 0 },
+                    },
+                  },
+                }}
                 label={"Sort By"}
                 value={orderBy}
                 labelId="sort-label"

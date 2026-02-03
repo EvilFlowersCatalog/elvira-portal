@@ -112,7 +112,7 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
                 />
                 {isFallbackImage && (
                     <img
-                        className={`absolute w-[80%] z-10 top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 transition-opacity duration-300 opacity-1 group-hover:scale-110 transition-transform duration-300`}
+                        className={`absolute w-[80%] z-2 top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 transition-opacity duration-300 opacity-1 group-hover:scale-110 transition-transform duration-300`}
                         src={titleLogoDark}
                         alt='Elvira Logo'
                     />

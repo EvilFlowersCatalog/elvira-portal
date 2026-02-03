@@ -5,6 +5,7 @@ export const en = {
     common: {
       showMore: '{{count}} more',
       showLess: 'Show less',
+      loading: 'Loading',
     },
     assistant: {
       title: 'AI Assistant',
@@ -494,6 +495,8 @@ export const en = {
     tools: {
       search: 'Search',
       advancedSearch: 'Advanced Search',
+      clearFilters: 'Clear Filters',
+      activeFilters: 'Active filters:',
       orderBy: {
         createdAtAsc: 'Created at ↑',
         createdAtDesc: 'Created at ↓',

@@ -35,8 +35,10 @@ const LanguageAutofill = ({
       const lang = getLanguage(defaultLanguageCode)
       if (!lang) return;
       setInputValue(lang.name[i18n.language as AcceptedLanguage]);
+    } else {
+      setInputValue('');
     }
-  }, [defaultLanguageCode])
+  }, [defaultLanguageCode, i18n.language])
 
   useEffect(()=>{
     setLanguages(getLanguages(i18n.language as AcceptedLanguage));
