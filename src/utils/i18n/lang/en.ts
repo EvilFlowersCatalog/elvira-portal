@@ -542,5 +542,22 @@ export const en = {
         'This website uses cookies to enhance your experience. We use cookies to remember your layout preferences, selected theme and language to provide a better experience.',
       accept: 'I understand',
     },
+
+    // HISTORY
+    history: {
+      description: 'Your recent activity in Elvira portal',
+      empty: 'You don\'t have any history yet',
+      loadMore: 'Load more',
+      actions: {
+        viewed: 'Viewed',
+        bookmarked: 'Bookmarked',
+        removedBookmark: 'Removed bookmark',
+      },
+      timeAgo: {
+        minutes: 'minutes ago',
+        hours: 'hours ago',
+        days: 'days ago',
+      },
+    },
   },
 };

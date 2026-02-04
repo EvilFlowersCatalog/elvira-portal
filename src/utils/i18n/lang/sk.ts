@@ -529,5 +529,22 @@ export const sk = {
         'Táto webová stránka používa cookies na zlepšenie vášho zážitku. Používame cookies na zapamätanie si vašich preferencií rozloženia, vybraného režimu alebo jazyka, aby sme vám poskytli lepší zážitok.',
       accept: 'Rozumiem',
     },
+
+    // HISTORY
+    history: {
+      description: 'Vaša nedávna aktivita v Elvira portáli',
+      empty: 'Zatiaľ nemáte žiadnu históriu',
+      loadMore: 'Načítať viac',
+      actions: {
+        viewed: 'Zobrazené',
+        bookmarked: 'Pridané do záložiek',
+        removedBookmark: 'Odstránené zo záložiek',
+      },
+      timeAgo: {
+        minutes: 'minút',
+        hours: 'hodín',
+        days: 'dní',
+      },
+    },
   },
 };

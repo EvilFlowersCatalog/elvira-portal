@@ -140,6 +140,9 @@ const ToolsContainer = ({
       "order-by",
       "dialog-priority",
       "assistant-entry-id",
+      "feed-id-step",
+      "parent-id",
+      "search-all",
     ];
 
     searchParams.forEach((value, key) => {
