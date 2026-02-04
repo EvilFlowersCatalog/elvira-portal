@@ -13,7 +13,7 @@ const AdminEntries = () => {
     <div className='overflow-auto pb-10'>
       <Breadcrumb />
       <H1>{t('administration.homePage.entries.title')}</H1>
-      <ToolsContainer param={'query'} advancedSearch={true} enableSort={false} />
+      <ToolsContainer param={'query'} advancedSearch={true} enableSort={false} enableSuggestions={false} />
       <AdvancedSearchWrapper>
         <AdminEntriesTable></AdminEntriesTable>
       </AdvancedSearchWrapper>

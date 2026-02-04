@@ -1,21 +1,24 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import useAuthContext from "../../hooks/contexts/useAuthContext";
 import useGetEntries from "../../hooks/api/entries/useGetEntries";
 import { IEntry } from "../../utils/interfaces/entry";
 import { ICategory } from "../../utils/interfaces/category";
 import { IFeed } from "../../utils/interfaces/feed";
+import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
 
 interface SearchSuggestionsProps {
   searchQuery: string;
   onClose: () => void;
+  shouldRedirect?: boolean;
 }
 
-const SearchSuggestions = ({ searchQuery, onClose }: SearchSuggestionsProps) => {
+const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: SearchSuggestionsProps) => {
   const { t } = useTranslation();
   const { auth } = useAuthContext();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   
   const [entries, setEntries] = useState<IEntry[]>([]);
   const [authors, setAuthors] = useState<string[]>([]);
@@ -92,13 +95,27 @@ const SearchSuggestions = ({ searchQuery, onClose }: SearchSuggestionsProps) => 
 
   const handleBookClick = (entryId: string) => {
     searchParams.set('entry-detail-id', entryId);
-    setSearchParams(searchParams);
+    if (shouldRedirect) {
+      navigate({
+        pathname: NAVIGATION_PATHS.library,
+        search: searchParams.toString(),
+      });
+    } else {
+      setSearchParams(searchParams);
+    }
     onClose();
   };
 
   const handleAuthorClick = (authorName: string) => {
     searchParams.set('author', authorName);
-    setSearchParams(searchParams);
+    if (shouldRedirect) {
+      navigate({
+        pathname: NAVIGATION_PATHS.library,
+        search: searchParams.toString(),
+      });
+    } else {
+      setSearchParams(searchParams);
+    }
     onClose();
   };
 
@@ -112,7 +129,14 @@ const SearchSuggestions = ({ searchQuery, onClose }: SearchSuggestionsProps) => 
     } else {
       searchParams.set('categories', categoryId);
     }
-    setSearchParams(searchParams);
+    if (shouldRedirect) {
+      navigate({
+        pathname: NAVIGATION_PATHS.library,
+        search: searchParams.toString(),
+      });
+    } else {
+      setSearchParams(searchParams);
+    }
     onClose();
   };
 
@@ -126,7 +150,14 @@ const SearchSuggestions = ({ searchQuery, onClose }: SearchSuggestionsProps) => 
     } else {
       searchParams.set('feeds', feedId);
     }
-    setSearchParams(searchParams);
+    if (shouldRedirect) {
+      navigate({
+        pathname: NAVIGATION_PATHS.library,
+        search: searchParams.toString(),
+      });
+    } else {
+      setSearchParams(searchParams);
+    }
     onClose();
   };
 
@@ -179,7 +210,7 @@ const SearchSuggestions = ({ searchQuery, onClose }: SearchSuggestionsProps) => 
           </div>
 
           {/* Right sidebar - 4 columns */}
-          <div className="col-span-12 lg:col-span-4 flex flex-col px-4 py-1 bg-lightGray">
+          <div className="col-span-12 lg:col-span-4 flex flex-col px-4 py-1 bg-lightGray dark:bg-strongDarkGray">
             {/* Authors */}
             {authors.length > 0 && (
               <div className="rounded-md p-3">

@@ -59,7 +59,7 @@ const AdminEntries = () => {
         <div className='overflow-auto pb-10'>
             <Breadcrumb />
             <H1>{t('administration.usersPage.title')}</H1>
-            <ToolsContainer param={'name'} advancedSearch={false} enableSort={false} />
+            <ToolsContainer param={'name'} advancedSearch={false} enableSort={false} enableSuggestions={false} />
             <ElviraTable title={t('administration.usersPage.tableTitle', { x: metadata.total })}
                 header={[
                     { label: t('administration.usersPage.username'), selector: 'username', disableHide: true },

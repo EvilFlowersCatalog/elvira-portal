@@ -107,6 +107,7 @@ const Feeds = () => {
       searchSpecifier={'query'}
       title={`${t('navbarMenu.feeds')} ${ currentFeedTitle ? ` - ${currentFeedTitle}` : ''}`}
       description={currentFeedDescription}
+      shouldRedirectSuggestions={true}
       customFilters={
         <div className="flex items-center gap-2">
           <FormControlLabel control={<Checkbox sx={{

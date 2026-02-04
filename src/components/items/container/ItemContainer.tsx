@@ -35,6 +35,7 @@ interface IItemContainer {
   title?: string;
   customFilters?: ReactNode;
   description?: string;
+  shouldRedirectSuggestions?: boolean;
 }
 
 const ItemContainer = ({
@@ -56,7 +57,8 @@ const ItemContainer = ({
   showEmpty = true,
   title,
   customFilters,
-  description
+  description,
+  shouldRedirectSuggestions = false,
 }: IItemContainer) => {
   const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty } = useAppContext();
   const { t } = useTranslation();
@@ -104,7 +106,12 @@ const ItemContainer = ({
         <Breadcrumb />
         {title && <H1>{title}</H1>}
         {description && <p className="px-4 text-secondary dark:text-secondaryLight text-sm mb-4">{description}</p>}
-        <ToolsContainer param={searchSpecifier} advancedSearch={isEntries} customFilters={customFilters} />
+        <ToolsContainer 
+          param={searchSpecifier} 
+          advancedSearch={isEntries} 
+          customFilters={customFilters}
+          shouldRedirectSuggestions={shouldRedirectSuggestions}
+        />
 
         <AdvancedSearchWrapper>
           <>

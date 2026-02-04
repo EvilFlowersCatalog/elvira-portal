@@ -25,6 +25,8 @@ interface IToolsContainerParams {
   aiEnabled?: boolean;
   enableSort?: boolean;
   customFilters?: React.ReactNode;
+  enableSuggestions?: boolean;
+  shouldRedirectSuggestions?: boolean;
 }
 
 const ToolsContainer = ({
@@ -33,6 +35,8 @@ const ToolsContainer = ({
   enableSort = true,
   param,
   customFilters,
+  enableSuggestions = true,
+  shouldRedirectSuggestions = false,
 }: IToolsContainerParams) => {
   const { t } = useTranslation();
   const {
@@ -227,10 +231,11 @@ const ToolsContainer = ({
               <IoSearchOutline size={25} />
             </button>
 
-            {isFocused && (
+            {enableSuggestions && isFocused && (
               <SearchSuggestions 
                 searchQuery={input} 
-                onClose={() => setIsFocused(false)} 
+                onClose={() => setIsFocused(false)}
+                shouldRedirect={shouldRedirectSuggestions}
               />
             )}
 

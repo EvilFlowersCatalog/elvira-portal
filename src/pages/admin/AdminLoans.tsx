@@ -146,7 +146,7 @@ const AdminLoans = () => {
         <div className='overflow-auto pb-10'>
             <Breadcrumb />
             <H1>{t('administration.loansPage.title')}</H1>
-            <ToolsContainer param={'name'} advancedSearch={false} enableSort={false} />
+            <ToolsContainer param={'name'} advancedSearch={false} enableSort={false} enableSuggestions={false} />
             <EntryDetail />
             <ElviraTable title={t('administration.loansPage.tableTitle', { x: metadata.total })}
                 header={[

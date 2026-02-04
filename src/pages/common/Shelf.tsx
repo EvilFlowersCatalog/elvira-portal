@@ -91,6 +91,7 @@ const Shelf = () => {
       showLayout
       searchSpecifier={'query'}
       title={t('navbarMenu.myShelf')}
+      shouldRedirectSuggestions={true}
     >
       <EntriesWrapper>
         {entries.map((entry, index) => (
