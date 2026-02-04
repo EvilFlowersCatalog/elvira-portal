@@ -51,3 +51,19 @@ export interface IVerifyAdminResponse {
     catalog_permissions: { [key: string]: string };
   };
 }
+
+export interface IGetMeResponse {
+  response: {
+    id: string;
+    username: string;
+    name: string;
+    surname: string;
+    is_superuser: boolean;
+    is_active: boolean;
+    last_login: string;
+    created_at: string;
+    updated_at: string;
+    permissions: string[];
+    catalog_permissions: { [key: string]: string };
+  };
+}
