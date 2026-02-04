@@ -95,14 +95,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
 
   const handleBookClick = (entryId: string) => {
     searchParams.set('entry-detail-id', entryId);
-    if (shouldRedirect) {
-      navigate({
-        pathname: NAVIGATION_PATHS.library,
-        search: searchParams.toString(),
-      });
-    } else {
-      setSearchParams(searchParams);
-    }
+    setSearchParams(searchParams);
     onClose();
   };
 
