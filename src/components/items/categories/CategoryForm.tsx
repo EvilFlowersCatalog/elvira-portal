@@ -21,12 +21,12 @@ const CategoryForm = ({
   reloadPage,
   setReloadPage,
 }: ICategoryFormParam) => {
-  const { umamiTrack } = useAppContext();
+  const { umamiTrack, selectedCatalogId } = useAppContext();
   const { t } = useTranslation();
 
   const [form, setForm] = useState<ICategoryNew>({
     term: category?.term ?? '',
-    catalog_id: category?.catalog_id ?? import.meta.env.ELVIRA_CATALOG_ID,
+    catalog_id: category?.catalog_id ?? selectedCatalogId ?? import.meta.env.ELVIRA_CATALOG_ID,
     label: category?.label ?? '',
     scheme: category?.scheme ?? '',
   });

@@ -10,7 +10,7 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 import { useTranslation } from 'react-i18next';
 
 const AdminFeeds = () => {
-  const { umamiTrack } = useAppContext();
+  const { umamiTrack, selectedCatalogId } = useAppContext();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingNext, setLoadingNext] = useState<boolean>(false);
@@ -24,6 +24,13 @@ const AdminFeeds = () => {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const getFeeds = useGetFeeds();
+
+  // Reload feeds when catalog changes
+  useEffect(() => {
+    setPage(0);
+    setFeeds([]);
+    setIsLoading(true);
+  }, [selectedCatalogId]);
 
   // When searchParams change or is triggered reload -> Reset page
   useEffect(() => {

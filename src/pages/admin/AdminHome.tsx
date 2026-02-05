@@ -7,7 +7,6 @@ import AdminButton from '../../components/buttons/AdminButton';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 import { RiKey2Line } from 'react-icons/ri';
 import { H1 } from '../../components/primitives/Heading';
-import CatalogSwitcher from '../../components/admin/CatalogSwitcher';
 
 const buttonConfig = [
   {
@@ -46,13 +45,12 @@ if(import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
 }
 
 const AdminHome = () => {
-  const { specialNavigation, umamiTrack } = useAppContext();
+  const { specialNavigation, umamiTrack, selectedCatalogId } = useAppContext();
   const { t } = useTranslation();
 
   return (
     <div className='w-full overflow-auto'>
       <Breadcrumb />
-      {!import.meta.env.ELVIRA_CATALOG_ID && <CatalogSwitcher />}
 
       <H1>{t('navbarMenu.administration')}</H1>
 

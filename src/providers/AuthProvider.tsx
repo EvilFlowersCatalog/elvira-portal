@@ -18,6 +18,7 @@ import {
   COOKIES_TYPE,
   NAVIGATION_PATHS,
 } from '../utils/interfaces/general/general';
+import useAppContext from '../hooks/contexts/useAppContext';
 import useVerifyCredentials from '../hooks/api/verify/useVerifyCredentials';
 import axios, { CancelTokenSource } from 'axios';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
@@ -37,6 +38,7 @@ const BROADCAST_MESSAGE = 'logout';
 const AuthProvider = ({ children }: IContextProviderParams) => {
   const { t } = useTranslation();
   const { cookies, setCookie, removeCookie } = useCookiesContext();
+  const { selectedCatalogId} = useAppContext(); 
 
   const [auth, setAuth] = useState<IAuth | null>(
     cookies[COOKIES_TYPE.AUTH_KEY] ?? null
@@ -81,7 +83,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
       const { response: user } = await verifyCredentials(loginForm);
 
       // If needed and determine isSuperUser status
-      const catalogId = import.meta.env.ELVIRA_CATALOG_ID;
+      const catalogId = selectedCatalogId || import.meta.env.ELVIRA_CATALOG_ID;
       const isSuperUser =
         user.user.is_superuser ||
         (catalogId && user.user.catalog_permissions[catalogId] === 'manage');

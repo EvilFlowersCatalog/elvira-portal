@@ -67,6 +67,11 @@ export default function AdminEntriesTable({ }) {
         });
     };
 
+    // Reload entries when catalog changes
+    useEffect(() => {
+        fetchEntries({ page: 1, limit: metadata.limit, sortBy: '' });
+    }, [selectedCatalogId]);
+
     useEffect(() => {
         fetchEntries({ page: metadata.page, limit: metadata.limit, sortBy: '' });
     }, [searchParams]);

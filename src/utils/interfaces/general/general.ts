@@ -48,6 +48,7 @@ export enum COOKIES_TYPE {
   AUTH_KEY = 'elvira-auth',
   THEME_KEY = 'elvira-theme',
   LANG_KEY = 'elvira-lang',
+  CATALOG_KEY = 'elvira-catalog',
   LAYOUT_KEY = 'elvira-layout',
   INFOMED_KEY = 'elvira-cookie-informed',
   LICENSE_KEY = 'elvira-license-terms',

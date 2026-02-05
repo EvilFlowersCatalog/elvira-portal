@@ -1,17 +1,19 @@
 import { IVerifyAdminResponse } from '../../../utils/interfaces/auth';
 import useAuth from '../../contexts/useAuthContext';
 import useAxios from '../useAxios';
+import useAppContext from '../../contexts/useAppContext';
 
 const useVerifyAdmin = () => {
   const { auth } = useAuth();
   const axios = useAxios();
+  const { selectedCatalogId } = useAppContext();
 
   const verifyAdmin = async (): Promise<boolean> => {
     // Get info about user
     const VERIFY_URL = `/api/v1/users/${auth?.userId}`;
     const { data: user } = await axios.get<IVerifyAdminResponse>(VERIFY_URL);
 
-    const catalogId = import.meta.env.ELVIRA_CATALOG_ID;
+    const catalogId = selectedCatalogId || import.meta.env.ELVIRA_CATALOG_ID;
     const isSuperUser =
       user.response.is_superuser ||
       (catalogId && user.response.catalog_permissions[catalogId] === 'manage');

@@ -7,9 +7,11 @@ import HomeHeader from '../../components/specific-page/home-page/HomeHeader';
 import EntryDetail from '../../components/items/entry/details/EntryDetail';
 import EntryDisplay from '../../components/items/entry/display/EntryDisplay';
 import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 const Home = () => {
   const { t } = useTranslation();
+  const { selectedCatalogId } = useAppContext();
 
   const [popularEntries, setPopularEntries] = useState<IEntry[]>([]);
   const [clickedEntry, setClickedEntry] = useState<
@@ -20,6 +22,13 @@ const Home = () => {
   const [searchParams] = useSearchParams();
 
   const getEntries = useGetEntries();
+
+  // Reload entries when catalog changes
+  useEffect(() => {
+    setPopularEntries([]);
+    setLastAddedEntries([]);
+    setIsLoading(true);
+  }, [selectedCatalogId]);
 
   useEffect(() => {
     (async () => {
@@ -44,7 +53,7 @@ const Home = () => {
         setIsLoading(false);
       }
     })();
-  }, []);
+  }, [selectedCatalogId]);
 
   return (
     <>

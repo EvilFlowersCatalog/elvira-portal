@@ -3,9 +3,11 @@ import {
   IListCategory,
 } from '../../../utils/interfaces/category';
 import useAxios from '../useAxios';
+import useAppContext from '../../contexts/useAppContext';
 
 const useGetCategories = () => {
   const axios = useAxios();
+  const { selectedCatalogId } = useAppContext();
 
   const getCategory = async ({
     page,
@@ -19,7 +21,7 @@ const useGetCategories = () => {
     const params = new URLSearchParams();
     if (page) params.set('page', page.toString());
     if (limit) params.set('limit', limit.toString());
-    params.set('catalog_id', import.meta.env.ELVIRA_CATALOG_ID);
+    if (selectedCatalogId) params.set('catalog_id', selectedCatalogId);
     if (orderBy) params.set('order_by', orderBy);
 
     if (query) params.set('query', query);

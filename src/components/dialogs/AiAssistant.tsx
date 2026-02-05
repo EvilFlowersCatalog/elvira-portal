@@ -115,13 +115,14 @@ export default function AiAssistant() {
         setAiBookCatalogs,
         aiShowSuggestions,
         setAiShowSuggestions,
+        selectedCatalogId,
     } = useAppContext();
     const getEntryDetail = useGetEntryDetail();
 
     const [input, setInput] = useState("");
     const [isGeneratingResponse, setGeneratingResponse] = useState(false);
     const [assistantEntry, setAssistantEntry] = useState<IEntryDetail | null>(null);
-    const [currentCatalogId] = useState<string | undefined>(import.meta.env.ELVIRA_CATALOG_ID || undefined);
+    const [currentCatalogId] = useState<string | undefined>(selectedCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined);
 
 
     function clearAssistantEntry() {

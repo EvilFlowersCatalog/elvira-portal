@@ -8,8 +8,10 @@ import Feed from '../../components/items/feeds/Feed';
 import LoadNext from '../../components/items/loadings/LoadNext';
 import { useTranslation } from 'react-i18next';
 import { Checkbox, FormControlLabel } from '@mui/material';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 const Feeds = () => {
+  const { selectedCatalogId } = useAppContext();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [loadingNext, setLoadingNext] = useState<boolean>(true);
   const [isError, setIsError] = useState<boolean>(false);
@@ -24,6 +26,13 @@ const Feeds = () => {
   const getFeedDetail = useGetFeedDetail();
   const [currentFeedDescription, setCurrentFeedDescription] = useState<string>('');
   const [currentFeedTitle, setCurrentFeedTitle] = useState<string>('');
+
+  // Reload feeds when catalog changes
+  useEffect(() => {
+    setPage(0);
+    setFeeds([]);
+    setIsLoading(true);
+  }, [selectedCatalogId]);
 
   useEffect(() => {
     setSearchParams((prev) => {
