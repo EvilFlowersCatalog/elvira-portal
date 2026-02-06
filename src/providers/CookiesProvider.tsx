@@ -24,6 +24,7 @@ const CookiesProvider = ({ children }: IContextProviderParams) => {
     COOKIES_TYPE.LANG_KEY,
     COOKIES_TYPE.LAYOUT_KEY,
     COOKIES_TYPE.THEME_KEY,
+    COOKIES_TYPE.CATALOG_KEY,
     COOKIES_TYPE.INFOMED_KEY,
     COOKIES_TYPE.LICENSE_KEY,
   ]);
