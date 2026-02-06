@@ -17,13 +17,16 @@ const AiChatHistory = () => {
   const { auth } = useAuth();
   const { 
     setAiChatId, 
-    setAiMessages, 
+    setAiMessages,
+    setAiBookCatalogs,
     setAiShowSuggestions,
     clearAiChat,
-    umamiTrack 
+    umamiTrack ,
+    selectedCatalogId
   } = useAppContext();
   const getUserChats = useGetUserChats();
   const getChatHistory = useGetChatHistory();
+
 
   const [chats, setChats] = useState<IChat[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -51,11 +54,19 @@ const AiChatHistory = () => {
       await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/resumechat`, {
         chatId: chat.chatId,
         apiKey: auth?.token || null,
-        catalogId: import.meta.env.ELVIRA_CATALOG_ID || null
+        catalogId: selectedCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined  // Use undefined instead of null for optional field
       });
 
       // Load chat history
       const history = await getChatHistory(chat.chatId);
+
+      // Extract and merge all bookCatalogs from history
+      const mergedBookCatalogs: Record<string, string> = {};
+      history.messages.forEach(msg => {
+        if (msg.bookCatalogs) {
+          Object.assign(mergedBookCatalogs, msg.bookCatalogs);
+        }
+      });
 
       // Transform history to AiMessage format
       const messages: AiMessage[] = history.messages.map((msg, index) => {
@@ -82,6 +93,7 @@ const AiChatHistory = () => {
       // Set the chat state
       setAiChatId(chat.chatId);
       setAiMessages(messages);
+      setAiBookCatalogs(mergedBookCatalogs);
       setAiShowSuggestions(false);
 
       // Navigate to assistant page

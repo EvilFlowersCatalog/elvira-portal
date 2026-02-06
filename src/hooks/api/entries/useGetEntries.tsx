@@ -1,8 +1,10 @@
 import { IEntriesList, IEntryQuery } from '../../../utils/interfaces/entry';
 import useAxios from '../useAxios';
+import useAppContext from '../../contexts/useAppContext';
 
 const useGetEntries = () => {
   const axios = useAxios();
+  const { selectedCatalogId } = useAppContext();
 
   const getEntries = async ({
     page,
@@ -21,7 +23,7 @@ const useGetEntries = () => {
     const params = new URLSearchParams();
     params.set('page', page.toString());
     params.set('limit', limit.toString());
-    params.set('catalog_id', import.meta.env.ELVIRA_CATALOG_ID);
+    if (selectedCatalogId) params.set('catalog_id', selectedCatalogId);
 
     if (orderBy) params.set('order_by', orderBy);
     else params.set('order_by', '-created_at');

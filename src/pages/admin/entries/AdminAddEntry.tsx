@@ -10,7 +10,7 @@ import useAppContext from '../../../hooks/contexts/useAppContext';
 import AdminEntryForm from './AdminEntryForm';
 
 const AdminAddEntry = () => {
-  const { umamiTrack } = useAppContext();
+  const { umamiTrack, selectedCatalogId } = useAppContext();
   const { t } = useTranslation();
 
   const [entry, setEntry] = useState<IEntryNewForm | null>({
@@ -81,7 +81,7 @@ const AdminAddEntry = () => {
       // Upload
       try {
         setIsLoading(true);
-        const info = await uploadEntry(newEntry);
+        const info = await uploadEntry(newEntry, selectedCatalogId || undefined);
 
         await Promise.all(
           files.map(async (item) => {
@@ -95,7 +95,7 @@ const AdminAddEntry = () => {
               entryAcquisition.append('content', item.file);
               entryAcquisition.append('metadata', JSON.stringify(metadata));
 
-              await createEntryAcquisition(entryAcquisition, info.id);
+              await createEntryAcquisition(entryAcquisition, info.id, selectedCatalogId || undefined);
             } catch {
               // Show error notification
               toast.error(

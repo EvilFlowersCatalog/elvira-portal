@@ -16,7 +16,7 @@ import { IoMdTrash } from 'react-icons/io';
 
 export default function AdminEntriesTable({ }) {
     const navigate = useNavigate();
-    const { umamiTrack } = useAppContext();
+    const { umamiTrack, selectedCatalogId } = useAppContext();
     const getEntries = useGetEntries();
     const { t } = useTranslation();
 
@@ -39,7 +39,7 @@ export default function AdminEntriesTable({ }) {
         try {
             // remove entry by id
             if (!deleteMenuEntry) return;
-            await deleteEntry(deleteMenuEntry.id);
+            await deleteEntry(deleteMenuEntry.id, deleteMenuEntry.catalog_id || selectedCatalogId || undefined);
             toast.success(t('notifications.entry.remove.success')); // notify success
         } catch {
             toast.error(t('notifications.entry.remove.error')); // notify error
@@ -66,6 +66,11 @@ export default function AdminEntriesTable({ }) {
             setMetadata(metadata);
         });
     };
+
+    // Reload entries when catalog changes
+    useEffect(() => {
+        fetchEntries({ page: 1, limit: metadata.limit, sortBy: '' });
+    }, [selectedCatalogId]);
 
     useEffect(() => {
         fetchEntries({ page: metadata.page, limit: metadata.limit, sortBy: '' });

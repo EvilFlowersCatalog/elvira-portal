@@ -29,10 +29,10 @@ const FeedForm = ({
   setReloadPage,
 }: IFeedForm) => {
   const { t } = useTranslation();
-  const { umamiTrack } = useAppContext();
+  const { umamiTrack, selectedCatalogId } = useAppContext();
 
   const [form, setForm] = useState<IFeedNew>({
-    catalog_id: import.meta.env.ELVIRA_CATALOG_ID,
+    catalog_id: selectedCatalogId ?? import.meta.env.ELVIRA_CATALOG_ID,
     url_name: uuid(),
     title: '',
     content: '',

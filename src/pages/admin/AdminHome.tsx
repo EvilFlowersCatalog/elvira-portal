@@ -45,7 +45,7 @@ if(import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
 }
 
 const AdminHome = () => {
-  const { specialNavigation, umamiTrack } = useAppContext();
+  const { specialNavigation, umamiTrack, selectedCatalogId } = useAppContext();
   const { t } = useTranslation();
 
   return (

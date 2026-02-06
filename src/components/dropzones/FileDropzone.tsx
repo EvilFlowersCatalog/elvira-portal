@@ -14,6 +14,7 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface IFilesDropzoneParams {
   entryId?: string;
+  catalogId?: string;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
   files?: { id: string; relation: string; file: File }[] | null;
@@ -23,6 +24,7 @@ interface IFilesDropzoneParams {
 }
 const FileDropzone = ({
   entryId,
+  catalogId,
   isLoading,
   setIsLoading,
   files = null,
@@ -77,7 +79,7 @@ const FileDropzone = ({
               entryAcquisition.append('metadata', JSON.stringify(metadata));
 
               // Try to create acquisition
-              await createEntryAcquisition(entryAcquisition, entryId);
+              await createEntryAcquisition(entryAcquisition, entryId, catalogId);
               toast.success(
                 t('notifications.acquisition.add.success', { x: file.name })
               );

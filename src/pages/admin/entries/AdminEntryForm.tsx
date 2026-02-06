@@ -25,6 +25,7 @@ interface IAdminEntryFormProps {
     setEntry: React.Dispatch<React.SetStateAction<IEntryNewForm | null>>;
     stringImage: string;
     setStringImage: React.Dispatch<React.SetStateAction<string>>;
+    catalogId?: string;
     files?: { id: string; relation: string; file: File }[];
     setFiles?: React.Dispatch<React.SetStateAction<{ id: string; relation: string; file: File }[]>>;
 }
@@ -37,6 +38,7 @@ export default function AdminEntryForm({
     setEntry,
     stringImage,
     setStringImage,
+    catalogId,
     files,
     setFiles,
 }: IAdminEntryFormProps) {
@@ -109,6 +111,7 @@ export default function AdminEntryForm({
                                     setIsLoading={setIsFilesLoading} />
                                 : <FileDropzone
                                     entryId={id!}
+                                    catalogId={catalogId}
                                     isLoading={isFilesLoading}
                                     setIsLoading={setIsFilesLoading}
                                 />}

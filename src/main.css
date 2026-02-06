@@ -116,6 +116,13 @@ body,
   --color-secondary-light: #CFC6A3;
 }
 
+:root[data-theme="default"] {
+  --color-primary: #01a9e0;
+  --color-primary-light: #E6F3FF;
+  --color-secondary: #15384E;
+  --color-secondary-light: #A8D0E6;
+}
+
 /* Global color variables */
 :root {
   --color-light-gray: #F5F7FA;

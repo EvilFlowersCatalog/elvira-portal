@@ -9,7 +9,7 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 import { useTranslation } from 'react-i18next';
 
 const AdminCategories = () => {
-  const { umamiTrack } = useAppContext();
+  const { umamiTrack, selectedCatalogId } = useAppContext();
 
   const [categories, setCategories] = useState<any[]>([]);
   const [searchParams] = useSearchParams();
@@ -23,6 +23,13 @@ const AdminCategories = () => {
 
   const { t } = useTranslation();
   const getCategories = useGetCategories();
+
+  // Reload categories when catalog changes
+  useEffect(() => {
+    setPage(0);
+    setCategories([]);
+    setIsLoading(true);
+  }, [selectedCatalogId]);
 
   // When searchParams change or is triggered reload -> Reset page
   useEffect(() => {

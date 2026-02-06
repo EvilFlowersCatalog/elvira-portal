@@ -25,6 +25,7 @@ interface StreamEvent {
     type: 'chunk' | 'message' | 'entries' | 'done' | 'error';
     data?: string | string[];
     msg_id?: string;
+    bookCatalogs?: Record<string, string>;  // bookId -> catalogId mapping
 }
 
 function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, handleSuggestion: (suggestion: string) => void }) {
@@ -41,7 +42,7 @@ function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, ha
 }
 
 
-function MessageElement({ msg, msgIndex }: { msg: AiMessage, msgIndex: number }) {
+function MessageElement({ msg, msgIndex, bookCatalogs }: { msg: AiMessage, msgIndex: number, bookCatalogs: Record<string, string> }) {
     const [books, setBooks] = useState<any[]>([]);
     const getEntryDetail = useGetEntryDetail();
 
@@ -51,7 +52,10 @@ function MessageElement({ msg, msgIndex }: { msg: AiMessage, msgIndex: number })
             setBooks([]); // Reset books first
             (async () => {
                 const details = await Promise.all(
-                    entryIds.map((id: string) => getEntryDetail(id))
+                    entryIds.map((id: string) => {
+                        const catalogId = bookCatalogs[id];
+                        return getEntryDetail(id, catalogId || undefined);
+                    })
                 );
                 const entries: IEntry[] = details.map(entryDetail => ({
                     ...entryDetail,
@@ -60,7 +64,7 @@ function MessageElement({ msg, msgIndex }: { msg: AiMessage, msgIndex: number })
                 setBooks(entries);
             })();
         }
-    }, [msg.content.type, JSON.stringify(msg.content.data)])
+    }, [msg.content.type, JSON.stringify(msg.content.data), JSON.stringify(bookCatalogs)])
 
     switch (msg.content.type) {
         case "message":
@@ -107,14 +111,18 @@ export default function AiAssistant() {
         setAiChatId,
         aiMessages,
         setAiMessages,
+        aiBookCatalogs,
+        setAiBookCatalogs,
         aiShowSuggestions,
         setAiShowSuggestions,
+        selectedCatalogId,
     } = useAppContext();
     const getEntryDetail = useGetEntryDetail();
 
     const [input, setInput] = useState("");
     const [isGeneratingResponse, setGeneratingResponse] = useState(false);
     const [assistantEntry, setAssistantEntry] = useState<IEntryDetail | null>(null);
+    const [currentCatalogId] = useState<string | undefined>(selectedCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined);
 
 
     function clearAssistantEntry() {
@@ -140,7 +148,7 @@ export default function AiAssistant() {
     useEffect(() => {
         var assistantEntryId = searchParams.get('assistant-entry-id');
         if (assistantEntryId) {
-            getEntryDetail(assistantEntryId).then((entry) => {
+            getEntryDetail(assistantEntryId, undefined).then((entry) => {
                 setAssistantEntry(entry);
             });
         }
@@ -171,9 +179,9 @@ export default function AiAssistant() {
             var currentChatId = aiChatId;
             if (!currentChatId) {
                 const response = await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/startchat`, {
-                    entryId: assistantEntry?.id || null,
                     apiKey: auth?.token || null,
-                    catalogId: import.meta.env.ELVIRA_CATALOG_ID
+                    catalogId: currentCatalogId,
+                    entryId: assistantEntry?.id || undefined
                 });
                 currentChatId = response.data.chatId;
                 setAiChatId(currentChatId);
@@ -185,7 +193,6 @@ export default function AiAssistant() {
                 body: JSON.stringify({
                     chatId: currentChatId,
                     message: message,
-                    entryId: assistantEntry?.id || null,
                     apiKey: auth?.token || null
                 })
             });
@@ -267,6 +274,13 @@ export default function AiAssistant() {
                                 }
                                 break;
                             case 'entries':
+                                // Store book-to-catalog mapping
+                                if (data.bookCatalogs) {
+                                    setAiBookCatalogs(prev => ({
+                                        ...prev,
+                                        ...data.bookCatalogs
+                                    }));
+                                }
                                 setAiMessages((prev) => [...prev, {
                                     role: "assistant",
                                     content: {
@@ -379,7 +393,7 @@ export default function AiAssistant() {
                 {/* Body */}
                 <Box id="chat" className="flex flex-col grow overflow-y-auto">
                     {aiMessages.map((msg, index) => (
-                        <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} msgIndex={index} />
+                        <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} msgIndex={index} bookCatalogs={aiBookCatalogs} />
                     ))}
                 </Box>
 

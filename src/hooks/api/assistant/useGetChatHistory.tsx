@@ -8,13 +8,14 @@ export interface IChatMessage {
   text: string;
   timestamp: string;
   bookIds?: string[];
+  bookCatalogs?: Record<string, string>;  // bookId -> catalogId mapping
 }
 
 const useGetChatHistory = () => {
   const { auth } = useAuth();
 
   const getChatHistory = async (chatId: string): Promise<{chatId:string, messagesCount: number, messages: IChatMessage[]}> => {
-    const response = await axios.get(`${import.meta.env.ELVIRA_ASSISTANT_URL}/user/chats/${chatId}?catalogId=${import.meta.env.ELVIRA_CATALOG_ID}`, {
+    const response = await axios.get(`${import.meta.env.ELVIRA_ASSISTANT_URL}/user/chats/${chatId}`, {
       headers: {
         'Authorization': auth?.token ? `Bearer ${auth.token}` : '',
         'Content-Type': 'application/json'

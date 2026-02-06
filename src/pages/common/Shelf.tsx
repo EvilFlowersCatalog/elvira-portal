@@ -7,6 +7,7 @@ import EntryBoxLoading from '../../components/items/entry/EntryBoxLoading';
 import EntryItem from '../../components/items/entry/display/EntryItem';
 import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper';
 import { useTranslation } from 'react-i18next';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 const Shelf = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -17,8 +18,16 @@ const Shelf = () => {
   const [entries, setEntries] = useState<IEntry[]>([]);
 
   const { t } = useTranslation();
+  const { selectedCatalogId } = useAppContext();
   const [searchParams] = useSearchParams();
   const getShelf = useGetShelf();
+
+  // Reset when catalog or search params change
+  useEffect(() => {
+    setPage(0);
+    setEntries([]);
+    setIsLoading(true);
+  }, [selectedCatalogId, searchParams]);
 
   useEffect(() => {
     // skip nitialization

@@ -1,6 +1,5 @@
 
 import { useTranslation } from 'react-i18next';
-import useGetUsers from '../../hooks/api/users/useGetUsers';
 import { useEffect, useState } from 'react';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import { H1 } from '../../components/primitives/Heading';
@@ -8,7 +7,7 @@ import ToolsContainer from '../../components/tools/ToolsContainer';
 import ElviraTable, { ElviraTableFetchFunction } from '../../components/table/ElviraTable';
 import { useSearchParams } from 'react-router-dom';
 import { Metadata } from '../../utils/interfaces/general/general';
-import { ActionButton, BubbleText } from '../../components/table/Cells';
+import { BubbleText } from '../../components/table/Cells';
 import useGetLicenses from '../../hooks/api/licenses/useGetLicenses';
 import { ILicense, InterfaceState } from '../../utils/interfaces/license';
 import { stateStyle, Title, translateState } from '../../components/items/loans/LoansTable';
@@ -114,7 +113,8 @@ const AdminLoans = () => {
         const { items, metadata } = await getLoans({
             page,
             limit,
-            sortBy
+            sortBy,
+            user_mode: 'all',
         });
 
         setItems(items);

@@ -26,6 +26,7 @@ interface StreamEvent {
     type: 'chunk' | 'message' | 'entries' | 'done' | 'error';
     data?: string | string[];
     msg_id?: string;
+    bookCatalogs?: Record<string, string>;  // bookId -> catalogId mapping
 }
 
 function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, handleSuggestion: (suggestion: string) => void }) {
@@ -41,7 +42,7 @@ function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, ha
     );
 }
 
-function MessageElement({ msg }: { msg: AiMessage }) {
+function MessageElement({ msg, bookCatalogs }: { msg: AiMessage, bookCatalogs: Record<string, string> }) {
     const [books, setBooks] = useState<any[]>([]);
     const getEntryDetail = useGetEntryDetail();
 
@@ -51,7 +52,10 @@ function MessageElement({ msg }: { msg: AiMessage }) {
             setBooks([]);
             (async () => {
                 const details = await Promise.all(
-                    entryIds.map((id: string) => getEntryDetail(id))
+                    entryIds.map((id: string) => {
+                        const catalogId = bookCatalogs[id];
+                        return getEntryDetail(id, catalogId || undefined);
+                    })
                 );
                 const entries: IEntry[] = details.map(entryDetail => ({
                     ...entryDetail,
@@ -60,7 +64,7 @@ function MessageElement({ msg }: { msg: AiMessage }) {
                 setBooks(entries);
             })();
         }
-    }, [msg.content.type, JSON.stringify(msg.content.data)])
+    }, [msg.content.type, JSON.stringify(msg.content.data), JSON.stringify(bookCatalogs)])
 
     switch (msg.content.type) {
         case "message":
@@ -115,14 +119,18 @@ export default function AiAssistantPage() {
         setAiChatId,
         aiMessages,
         setAiMessages,
+        aiBookCatalogs,
+        setAiBookCatalogs,
         aiShowSuggestions,
         setAiShowSuggestions,
+        selectedCatalogId,
     } = useAppContext();
     const getEntryDetail = useGetEntryDetail();
 
     const [input, setInput] = useState("");
     const [isGeneratingResponse, setGeneratingResponse] = useState(false);
     const [assistantEntry, setAssistantEntry] = useState<any>(null);
+    const [currentCatalogId] = useState<string | undefined>(selectedCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -135,7 +143,7 @@ export default function AiAssistantPage() {
         // Check if there's an entry-id in the URL params
         const entryId = searchParams.get('entry-id');
         if (entryId) {
-            getEntryDetail(entryId).then((entry) => {
+            getEntryDetail(entryId, undefined).then((entry) => {
                 setAssistantEntry(entry);
             });
         }
@@ -168,9 +176,9 @@ export default function AiAssistantPage() {
             var currentChatId = aiChatId;
             if (!currentChatId) {
                 const response = await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/startchat`, {
-                    entryId: null,
                     apiKey: auth?.token || null,
-                    catalogId: import.meta.env.ELVIRA_CATALOG_ID
+                    catalogId: currentCatalogId,
+                    entryId: undefined
                 });
                 currentChatId = response.data.chatId;
                 setAiChatId(currentChatId);
@@ -182,7 +190,6 @@ export default function AiAssistantPage() {
                 body: JSON.stringify({
                     chatId: currentChatId,
                     message: message,
-                    entryId: null,
                     apiKey: auth?.token || null
                 })
             });
@@ -261,6 +268,13 @@ export default function AiAssistantPage() {
                                 }
                                 break;
                             case 'entries':
+                                // Store book-to-catalog mapping
+                                if (data.bookCatalogs) {
+                                    setAiBookCatalogs(prev => ({
+                                        ...prev,
+                                        ...data.bookCatalogs
+                                    }));
+                                }
                                 setAiMessages((prev) => [...prev, {
                                     role: "assistant",
                                     content: {
@@ -341,7 +355,7 @@ export default function AiAssistantPage() {
                             </Box>
                         ) : (
                             aiMessages.map((msg, index) => (
-                                <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} />
+                                <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} bookCatalogs={aiBookCatalogs} />
                             ))
                         )}
                         <div ref={chatEndRef} />

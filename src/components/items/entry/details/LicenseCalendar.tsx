@@ -28,6 +28,7 @@ export default function LicenseCalendar({ }: {}) {
     const navigate = useNavigate();
 
     const [entryId, setEntryId] = useState<string | null>(null);
+    const [catalogId, setCatalogId] = useState<string | null>(null);
     const [entry, setEntry] = useState<IEntryDetail | null>(null);
 
     const [selectionDayStart, setSelectionDayStart] = useState<Date | null>(null);
@@ -42,7 +43,9 @@ export default function LicenseCalendar({ }: {}) {
 
     useEffect(() => {
         const paramEntryId = searchParams.get('licensing-entry-id');
+        const paramCatalogId = searchParams.get('licensing-catalog-id');
         setEntryId(paramEntryId);
+        setCatalogId(paramCatalogId);
         setAvailability(null);
     }, [searchParams]);
 
@@ -82,6 +85,9 @@ export default function LicenseCalendar({ }: {}) {
             toast.success(t('notifications.license.create.success'));
             const params = new URLSearchParams();
             params.set('entry-detail-id', entryId);
+            if (entry?.catalog_id) {
+              params.set('entry-catalog-id', entry.catalog_id);
+            }
             navigate({
                 pathname: NAVIGATION_PATHS.loans,
                 search: params.toString(),
@@ -98,7 +104,7 @@ export default function LicenseCalendar({ }: {}) {
 
         (async () => {
             try {
-                const entryDetail = await getEntryDetail(entryId);
+                const entryDetail = await getEntryDetail(entryId, catalogId || undefined);
                 setEntry(entryDetail);
             } catch {
                 setEntry(null);
@@ -112,9 +118,11 @@ export default function LicenseCalendar({ }: {}) {
         setSearchParams((prev) => {
             const newParams = new URLSearchParams(prev);
             newParams.delete('licensing-entry-id');
+            newParams.delete('licensing-catalog-id');
             return newParams;
         });
         setEntryId(null);
+        setCatalogId(null);
     }
 
     return (

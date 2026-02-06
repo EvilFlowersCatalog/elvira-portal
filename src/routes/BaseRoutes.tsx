@@ -23,12 +23,17 @@ import AdminLoans from '../pages/admin/AdminLoans';
 import AiAssistantPage from '../pages/common/AiAssistant';
 import AiChatHistory from '../pages/common/AiChatHistory';
 import History from '../pages/common/History';
+import CatalogInitializer from '../components/catalog/CatalogInitializer';
 
 const BaseRoutes = () => {
   const { auth } = useAuthContext();
 
   return (
-    <Routes>
+    <>
+      {/* Fetch catalogs from API after authentication is available */}
+      {auth && <CatalogInitializer />}
+      
+      <Routes>
       <Route element={<App />}>
         {/* Public */}
         <Route path='404' element={<NotFound />} />
@@ -78,6 +83,7 @@ const BaseRoutes = () => {
         </Route>
       </Route>
     </Routes>
+    </>
   );
 };
 
