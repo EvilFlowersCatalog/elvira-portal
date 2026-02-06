@@ -252,7 +252,7 @@ const Navbar = () => {
       {/* Portal container */}
       {auth && (
         <div className="flex gap-2 flex-col items-start">
-          <span className="font-bold uppercase font-medium">
+          <span className="uppercase font-medium">
             {t("navbarMenu.portal")}
           </span>
           <NavbarButton
