@@ -18,6 +18,24 @@ export const MUISelectStyle = {
   }
 }
 
+export const CatalogSelectStyle = {
+  ...MUISelectStyle,
+  '.nav_collapsed &': {
+    '.MuiSelect-select': {
+      paddingRight: '0 !important',
+    },
+    'div': {
+      justifyContent: 'center',
+    },
+    'span': {
+      display: 'none',
+    },
+    '.MuiSvgIcon-root': {
+      display: 'none',
+    }
+  }
+}
+
 const ElviraSelect = ({
   name,
   value,

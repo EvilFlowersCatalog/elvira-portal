@@ -5,7 +5,6 @@ import {
   THEME_TYPE,
 } from "../../../utils/interfaces/general/general";
 
-import { MdOutlineFeed } from "react-icons/md";
 import {
   RiAdminLine,
   RiAiGenerate,
@@ -24,13 +23,15 @@ import {
 import useAuthContext from "../../../hooks/contexts/useAuthContext";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
-import { FiBookOpen, FiLogOut } from "react-icons/fi";
+import { FiLogOut } from "react-icons/fi";
 import Gravatar from "react-gravatar";
 import Button from "../../buttons/Button";
-import { FaHome } from "react-icons/fa";
 import { MenuItem, Select } from "@mui/material";
-import { MUISelectStyle } from "../../inputs/ElviraSelect";
-import { CATALOG_ICON_MAP, DEFAULT_CATALOG_ICON } from "../../../utils/catalogIcons";
+import { CatalogSelectStyle } from "../../inputs/ElviraSelect";
+import {
+  CATALOG_ICON_MAP,
+  DEFAULT_CATALOG_ICON,
+} from "../../../utils/catalogIcons";
 import { ReactElement, useState } from "react";
 import { IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
 
@@ -102,7 +103,7 @@ interface INavbarButtonParams {
   icon: ReactElement;
   isActive: boolean;
   onClick?: ((...args: any) => void) | null;
-  textVisible?: boolean;  
+  textVisible?: boolean;
 }
 const NavbarButton = ({
   name,
@@ -116,7 +117,7 @@ const NavbarButton = ({
 
   return (
     <button
-      className={`text-sm flex gap-2 items-center ${textVisible ? 'px-4 w-full' : 'px-2 justify-center w-fit mx-auto'} py-1 rounded-md ${
+      className={`text-sm flex gap-2 items-center ${textVisible ? "px-4 w-full" : "px-2 justify-center w-fit mx-auto"} py-1 rounded-md ${
         isActive
           ? "bg-primaryLight text-primary"
           : "bg-white dark:dark:bg-zinc-800"
@@ -200,78 +201,89 @@ const Navbar = () => {
       setShowNavbar(!showNavbar);
     }
   };
-  
+
   return (
-    <div className={`${isCollapsed ? 'w-20' : 'lg:w-64 w-full'} h-screen bg-white dark:bg-zinc-800 pt-4 ${isCollapsed ? 'px-3' : 'px-5'} flex flex-col transition-all duration-300`}>
-        {/* Logos */}
-        <div className="flex mb-6 flex-shrink-0">
-          {!isCollapsed ? (
-            <>
-              <button
-                className={auth ? "cursor-pointer" : "cursor-default"}
-                onClick={
-                  auth
-                    ? (e) => {
-                        umamiTrack("Logo Home Button");
-                        specialNavigation(e, NAVIGATION_PATHS.home);
-                      }
-                    : undefined
-                }
-              >
-                <img
-                  className={`h-auto w-36`}
-                  src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
-                  alt="Elvira Logo"
-                />
-              </button>
-              <button
-                className={`h-full flex items-center text-gray w-fit rounded-md px-1 ml-auto`}
-                onClick={toggleNavbar}
-              >
-                <RiArrowLeftDoubleFill size={18} />
-              </button>
-            </>
-          ) : (
+    <div
+      className={`${isCollapsed ? "w-20 nav_collapsed" : "lg:w-64 w-full"} h-screen bg-white dark:bg-zinc-800 pt-4 ${isCollapsed ? "px-3" : "px-5"} flex flex-col transition-all duration-300`}
+    >
+      {/* Logos */}
+      <div className="flex mb-4 flex-shrink-0">
+        {!isCollapsed ? (
+          <>
             <button
-              className="flex items-center w-7 h-7 justify-center bg-zinc-100 dark:bg-zinc-700 text-black dark:text-white rounded-md mx-auto"
+              className={auth ? "cursor-pointer" : "cursor-default"}
+              onClick={
+                auth
+                  ? (e) => {
+                      umamiTrack("Logo Home Button");
+                      specialNavigation(e, NAVIGATION_PATHS.home);
+                    }
+                  : undefined
+              }
+            >
+              <img
+                className={`h-auto w-36`}
+                src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
+                alt="Elvira Logo"
+              />
+            </button>
+            <button
+              className={`h-full flex items-center text-gray w-fit rounded-md px-1 ml-auto`}
               onClick={toggleNavbar}
             >
-              <RiArrowLeftDoubleFill size={18} className="rotate-180" />
+              <RiArrowLeftDoubleFill size={18} />
             </button>
-          )}
+          </>
+        ) : (
+          <button
+            className="flex items-center w-7 h-7 justify-center bg-zinc-100 dark:bg-zinc-700 text-black dark:text-white rounded-md mx-auto"
+            onClick={toggleNavbar}
+          >
+            <RiArrowLeftDoubleFill size={18} className="rotate-180" />
+          </button>
+        )}
+      </div>
+      {auth ? (
+        <div className="mb-3">
+        <Select
+          className="ml-auto dark:text-white w-full"
+          sx={CatalogSelectStyle}
+          label={"Catalog"}
+          labelId="catalog-label"
+          value={selectedCatalog?.value || ""}
+          id="catalog-select"
+          variant="standard"
+          onChange={(e) => {
+            switchCatalog(e.target.value);
+          }}
+        >
+          {availableCatalogs.map((catalog) => {
+            const iconConfig =
+              CATALOG_ICON_MAP[catalog.value] || DEFAULT_CATALOG_ICON;
+
+            return (
+              <MenuItem key={catalog.catalogId} value={catalog.value}>
+                <div className="flex gap-3 items-center overflow-hidden">
+                  {iconConfig.type === "stuDots" && iconConfig.color && (
+                    <StuDots color={iconConfig.color} />
+                  )}
+                  {iconConfig.type === "customSvg" && iconConfig.svgUrl && (
+                    <img
+                      src={iconConfig.svgUrl}
+                      alt=""
+                      width="19"
+                      height="13"
+                    />
+                  )}
+                  <span className="truncate">{catalog.label}</span>
+                </div>
+              </MenuItem>
+            );
+          })}
+        </Select>
         </div>
- { auth ? ( <Select
-        className="ml-auto dark:text-white w-full"
-        sx={MUISelectStyle}
-        label={"Catalog"}
-        labelId="catalog-label"
-        value={selectedCatalog?.value || ""}
-        id="catalog-select"
-        variant="standard"
-        onChange={(e) => {
-          switchCatalog(e.target.value);
-        }}
-      >
-        {availableCatalogs.map((catalog) => {
-          const iconConfig = CATALOG_ICON_MAP[catalog.value] || DEFAULT_CATALOG_ICON;
-          
-          return (
-            <MenuItem key={catalog.catalogId} value={catalog.value}>
-              <div className="flex gap-3 items-center overflow-hidden">
-                {iconConfig.type === 'stuDots' && iconConfig.color && (
-                  <StuDots color={iconConfig.color} />
-                )}
-                {iconConfig.type === 'customSvg' && iconConfig.svgUrl && (
-                  <img src={iconConfig.svgUrl} alt="" width="19" height="13" />
-                )}
-                <span className="truncate">
-                {catalog.label}
-                </span>
-              </div>
-            </MenuItem>
-          );
-        })}
-      </Select>) : null}
+      ) : null}
+
       <div className="flex flex-col gap-6 overflow-auto flex-1">
         {/* Portal container */}
         {auth && (
