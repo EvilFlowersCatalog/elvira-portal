@@ -216,7 +216,7 @@ const Navbar = () => {
         )}
       </div>
 
-      <Select
+     { auth ? ( <Select
         className="ml-auto dark:text-white w-full"
         sx={MUISelectStyle}
         label={"Catalog"}
@@ -247,7 +247,7 @@ const Navbar = () => {
             </MenuItem>
           );
         })}
-      </Select>
+      </Select>) : null}
 
       {/* Portal container */}
       {auth && (
