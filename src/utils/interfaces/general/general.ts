@@ -23,6 +23,7 @@ export enum NAVIGATION_PATHS {
   adminCategories = '/administration/categories',
   adminUsers = '/administration/users',
   adminLoans = '/administration/loans',
+  adminAIUsers = '/administration/ai-users',
 }
 
 export enum THEME_TYPE {

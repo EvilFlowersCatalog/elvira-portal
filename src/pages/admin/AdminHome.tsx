@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { FaBook } from 'react-icons/fa';
+import { FaBook, FaRobot } from 'react-icons/fa';
 import { MdCategory, MdFeed, MdInventory, MdPerson } from 'react-icons/md';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import useAppContext from '../../hooks/contexts/useAppContext';
@@ -32,6 +32,12 @@ const buttonConfig = [
     titleKey: 'administration.homePage.users.title',
     textKey: 'administration.homePage.users.text',
     path: NAVIGATION_PATHS.adminUsers,
+  },
+  {
+    icon: <FaRobot size={25} />,
+    titleKey: 'administration.homePage.aiUsers.title',
+    textKey: 'administration.homePage.aiUsers.text',
+    path: NAVIGATION_PATHS.adminAIUsers,
   },
 ];
 

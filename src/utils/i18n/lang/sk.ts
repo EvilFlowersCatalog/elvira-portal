@@ -187,6 +187,10 @@ export const sk = {
           title: 'Používatelia',
           text: 'Spravujte a zobrazujte všetkých používateľov v systéme.',
         },
+        aiUsers: {
+          title: 'AI Používatelia',
+          text: 'Monitorujte a spravujte používateľov AI asistenta a ich využitie.',
+        },
         loans: {
           title: 'Výpožičky',
           text: 'Spravujte a zobrazujte všetky výpožičky v systéme.',

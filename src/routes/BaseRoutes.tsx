@@ -19,6 +19,7 @@ import AdminAddEntry from '../pages/admin/entries/AdminAddEntry';
 import Auth from '../pages/auth/Auth';
 import Loans from '../pages/common/Loans';
 import AdminUsers from '../pages/admin/AdminUsers';
+import AdminAIUsers from '../pages/admin/AdminAIUsers';
 import AdminLoans from '../pages/admin/AdminLoans';
 import AiAssistantPage from '../pages/common/AiAssistant';
 import AiChatHistory from '../pages/common/AiChatHistory';
@@ -76,6 +77,7 @@ const BaseRoutes = () => {
             <Route path='feeds' element={<AdminFeeds />} />
             <Route path='categories' element={<AdminCategories />} />
             <Route path="users" element={<AdminUsers />} />
+            <Route path="ai-users" element={<AdminAIUsers />} />
             { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
               <Route path='loans' element={<AdminLoans />} />
             ) }

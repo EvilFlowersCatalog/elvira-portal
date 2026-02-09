@@ -189,6 +189,10 @@ export const en = {
           title: 'Users',
           text: 'Manage and view all users in the system.',
         },
+        aiUsers: {
+          title: 'AI Users',
+          text: 'Monitor and manage AI assistant users and their usage.',
+        },
         loans: {
           title: 'Loans',
           text: 'Manage and view all loans in the system.',
