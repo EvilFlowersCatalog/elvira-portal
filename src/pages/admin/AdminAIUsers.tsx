@@ -148,11 +148,11 @@ const AdminAIUsers = () => {
                       </div>
                       <div>
                         <div className='text-xs text-gray-500'>Chats</div>
-                        <div>{user.totalChats ?? 0}</div>
+                        <div>{user.chatCount ?? 0}</div>
                       </div>
                       <div>
                         <div className='text-xs text-gray-500'>Messages</div>
-                        <div>{user.totalMessages ?? 0}</div>
+                        <div>{user.messageCount ?? 0}</div>
                       </div>
                       <div>
                         <div className='text-xs text-gray-500'>Tokens</div>
@@ -168,8 +168,8 @@ const AdminAIUsers = () => {
                       onClick={() => handleBlockToggle(user.id, user.blocked)}
                       className={`px-4 py-2 rounded flex items-center gap-2 ${
                         user.blocked 
-                          ? 'bg-green-500 hover:bg-green-600 text-white' 
-                          : 'bg-red-500 hover:bg-red-600 text-white'
+                          ? 'bg-green-500 hover:bg-green-600 text-black' 
+                          : 'bg-red-500 hover:bg-red-600 text-black'
                       }`}
                     >
                       {user.blocked ? <><MdCheckCircle /> Unblock</> : <><MdBlock /> Block</>}
@@ -195,7 +195,7 @@ const AdminAIUsers = () => {
                             </button>
                             <div className='flex gap-4 text-sm text-gray-600 dark:text-gray-400'>
                               <span>{chat.messageCount ?? 0} msgs</span>
-                              <span>{chat.tokenUsage ?? 0} tokens</span>
+                              <span>{chat.totalTokens ?? 0} tokens</span>
                               <span>{chat.startedAt ? new Date(chat.startedAt).toLocaleDateString() : 'N/A'}</span>
                             </div>
                           </div>

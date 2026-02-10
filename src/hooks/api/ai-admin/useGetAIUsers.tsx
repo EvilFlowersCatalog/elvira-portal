@@ -4,8 +4,8 @@ import useAuth from '../../contexts/useAuthContext';
 export interface IAIUser {
   id: string;
   username: string;
-  totalChats: number;
-  totalMessages: number;
+  chatCount: number;
+  messageCount: number;
   totalTokens: number;
   lastActivity: string | null;
   blocked: boolean;

@@ -5,7 +5,7 @@ export interface IAIUserChat {
   chatId: string;
   title: string;
   messageCount: number;
-  tokenUsage: number;
+  totalTokens: number;
   startedAt: string;
   lastMessageAt: string;
 }
