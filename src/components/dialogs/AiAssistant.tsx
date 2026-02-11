@@ -148,7 +148,7 @@ export default function AiAssistant() {
     useEffect(() => {
         var assistantEntryId = searchParams.get('assistant-entry-id');
         if (assistantEntryId) {
-            getEntryDetail(assistantEntryId, undefined).then((entry) => {
+            getEntryDetail(assistantEntryId, currentCatalogId).then((entry) => {
                 setAssistantEntry(entry);
             });
         }
@@ -342,13 +342,24 @@ export default function AiAssistant() {
         setInput("");
     };
 
-    function handleCloseDrawer() {
+    const handleCloseDrawer = (event: {}, reason: "backdropClick" | "escapeKeyDown") => {
+        if (reason === "backdropClick") {
+            setTimeout(() => {
+                setShowAiAssistant(false);
+                const params = new URLSearchParams(searchParams);
+                params.delete('dialog-priority');
+                params.delete('assistant-entry-id');
+                setSearchParams(params);
+            });
+            return;
+        }
+
         setShowAiAssistant(false);
         const params = new URLSearchParams(searchParams);
         params.delete('dialog-priority');
         params.delete('assistant-entry-id');
         setSearchParams(params);
-    }
+    };
 
     return (
         <Drawer
@@ -384,7 +395,7 @@ export default function AiAssistant() {
                     </Typography>
                     <IconButton onClick={(e) => {
                         e.stopPropagation();
-                        handleCloseDrawer();
+                        handleCloseDrawer({}, "escapeKeyDown");
                     }}>
                         <FaX size={16} className="text-black dark:text-white" />
                     </IconButton>
