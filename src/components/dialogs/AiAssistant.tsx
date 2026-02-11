@@ -8,6 +8,7 @@ import {
     CircularProgress,
 } from "@mui/material";
 import { FaX, FaPaperPlane } from "react-icons/fa6";
+import { FiPlus } from "react-icons/fi";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -20,7 +21,6 @@ import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../../hooks/contexts/useAuthContext";
 import { AiMessage, AiMessageContent } from "../../providers/AppProvider";
-import { FaPlus } from "react-icons/fa";
 
 interface StreamEvent {
     type: 'chunk' | 'message' | 'entries' | 'done' | 'error';
@@ -401,15 +401,34 @@ export default function AiAssistant() {
                     <Typography variant="h6" fontWeight={600} className="text-black dark:text-white">
                         {t("assistant.title")}
                     </Typography>
-                    <Box>
-                        <IconButton onClick={newSession} disabled={isGeneratingResponse} className="mr-2">
-                            <FaPlus size={16} className={`${isGeneratingResponse ? 'text-gray-400' : 'text-black dark:text-white'}`} />
+                    <Box className="flex gap-1">
+                        <IconButton 
+                            onClick={newSession} 
+                            disabled={isGeneratingResponse}
+                            sx={{
+                                backgroundColor: isGeneratingResponse ? 'action.disabledBackground' : 'primary.main',
+                                color: 'white',
+                                '&:hover': {
+                                    backgroundColor: isGeneratingResponse ? 'action.disabledBackground' : 'primary.dark',
+                                },
+                                '&.Mui-disabled': {
+                                    backgroundColor: 'action.disabledBackground',
+                                    color: 'action.disabled',
+                                }
+                            }}
+                        >
+                            <FiPlus size={18} />
                         </IconButton>
-                        <IconButton onClick={(e) => {
-                            e.stopPropagation();
-                            handleCloseDrawer({}, "escapeKeyDown");
-                        }}>
-                            <FaX size={16} className="text-black dark:text-white" />
+                        <IconButton 
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleCloseDrawer({}, "escapeKeyDown");
+                            }}
+                            sx={{
+                                color: 'text.primary',
+                            }}
+                        >
+                            <FaX size={14} className="text-black dark:text-white" />
                         </IconButton>
                     </Box>
                 </Box>

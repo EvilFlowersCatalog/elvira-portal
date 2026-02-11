@@ -7,6 +7,7 @@ import {
     CircularProgress,
 } from "@mui/material";
 import { FaPaperPlane } from "react-icons/fa6";
+import { FiClock, FiPlus } from "react-icons/fi";
 import { useEffect, useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -336,8 +337,79 @@ export default function AiAssistantPage() {
         setInput("");
     };
 
+    function handleNewChat(){
+        umamiTrack("Start New AI Chat");
+        setAiChatId(null);
+        setAiMessages([]);
+        setAiBookCatalogs({});
+        setAiShowSuggestions(true);
+        navigate(NAVIGATION_PATHS.aiAssistant);
+    }
+
     return (
         <Box className="flex flex-col h-full w-full bg-white dark:bg-zinc-900">
+            {/* Desktop Header */}
+            <Box className="hidden lg:flex justify-between items-center p-6">
+                <Typography variant="h4" className="font-bold text-black dark:text-white">
+                    Elvira AI
+                </Typography>
+                <Box className="flex gap-2">
+                    <IconButton 
+                        href={NAVIGATION_PATHS.aiChatHistory}
+                        sx={{
+                            color: 'text.primary',
+                            '&:hover': {
+                                backgroundColor: 'action.hover',
+                            }
+                        }}
+                    >
+                        <FiClock size={20} className="text-black dark:text-white" />
+                    </IconButton>
+                    <IconButton 
+                        onClick={handleNewChat}
+                        sx={{
+                            backgroundColor: 'primary.main',
+                            color: 'white',
+                            '&:hover': {
+                                backgroundColor: 'primary.dark',
+                            }
+                        }}
+                    >
+                        <FiPlus size={20} />
+                    </IconButton>
+                </Box>
+            </Box>
+            
+            {/* Mobile Header */}
+            <Box className="flex lg:hidden justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-zinc-700">
+                <Typography variant="h6" className="font-bold text-black dark:text-white">
+                    Elvira AI
+                </Typography>
+                <Box className="flex gap-1">
+                    <IconButton 
+                        href={NAVIGATION_PATHS.aiChatHistory}
+                        size="small"
+                        sx={{
+                            color: 'text.primary',
+                        }}
+                    >
+                        <FiClock size={18} className="text-black dark:text-white" />
+                    </IconButton>
+                    <IconButton 
+                        onClick={handleNewChat}
+                        size="small"
+                        sx={{
+                            backgroundColor: 'primary.main',
+                            color: 'white',
+                            '&:hover': {
+                                backgroundColor: 'primary.dark',
+                            }
+                        }}
+                    >
+                        <FiPlus size={18} />
+                    </IconButton>
+                </Box>
+            </Box>
             <EntryDetail  />
             {/* Main Chat Container */}
             <Box className="flex-1 flex flex-col items-center w-full overflow-hidden">
