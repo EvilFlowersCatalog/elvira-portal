@@ -20,6 +20,7 @@ import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../../hooks/contexts/useAuthContext";
 import { AiMessage, AiMessageContent } from "../../providers/AppProvider";
+import { FaPlus } from "react-icons/fa";
 
 interface StreamEvent {
     type: 'chunk' | 'message' | 'entries' | 'done' | 'error';
@@ -193,7 +194,8 @@ export default function AiAssistant() {
                 body: JSON.stringify({
                     chatId: currentChatId,
                     message: message,
-                    apiKey: auth?.token || null
+                    apiKey: auth?.token || null,
+                    entryId: assistantEntry?.id || undefined
                 })
             });
 
@@ -342,6 +344,12 @@ export default function AiAssistant() {
         setInput("");
     };
 
+    const newSession = () => {
+        setAiChatId(null);
+        setAiMessages([]);
+        setAiBookCatalogs({});
+    }
+
     const handleCloseDrawer = (event: {}, reason: "backdropClick" | "escapeKeyDown") => {
         if (reason === "backdropClick") {
             setTimeout(() => {
@@ -393,12 +401,17 @@ export default function AiAssistant() {
                     <Typography variant="h6" fontWeight={600} className="text-black dark:text-white">
                         {t("assistant.title")}
                     </Typography>
-                    <IconButton onClick={(e) => {
-                        e.stopPropagation();
-                        handleCloseDrawer({}, "escapeKeyDown");
-                    }}>
-                        <FaX size={16} className="text-black dark:text-white" />
-                    </IconButton>
+                    <Box>
+                        <IconButton onClick={newSession} disabled={isGeneratingResponse} className="mr-2">
+                            <FaPlus size={16} className={`${isGeneratingResponse ? 'text-gray-400' : 'text-black dark:text-white'}`} />
+                        </IconButton>
+                        <IconButton onClick={(e) => {
+                            e.stopPropagation();
+                            handleCloseDrawer({}, "escapeKeyDown");
+                        }}>
+                            <FaX size={16} className="text-black dark:text-white" />
+                        </IconButton>
+                    </Box>
                 </Box>
 
                 {/* Body */}
