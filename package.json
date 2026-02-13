@@ -13,6 +13,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@evilflowers/evilflowersviewer": "^0.5.16",
     "@mui/material": "^6.0.2",
     "@mui/x-date-pickers": "^8.8.0",
     "@popperjs/core": "^2.11.8",
@@ -20,7 +21,6 @@
     "axios": "^1.6.7",
     "broadcast-channel": "^7.0.0",
     "date-fns": "^4.1.0",
-    "evil-flowers-viewer": "^1.0.0",
     "react": "^18.2.0",
     "react-cookie": "^7.2.0",
     "react-dom": "^18.2.0",
@@ -28,14 +28,14 @@
     "react-gravatar": "^2.6.3",
     "react-i18next": "^14.1.0",
     "react-icons": "^5.0.1",
+    "react-markdown": "^8.0.7",
     "react-router-dom": "^6.22.2",
     "react-simple-wysiwyg": "^3.1.1",
     "react-spinners": "^0.13.8",
     "react-toastify": "^10.0.4",
+    "remark-gfm": "^3.0.1",
     "swiper": "^11.1.1",
-    "tailwind-merge": "^3.3.1",
-    "react-markdown": "^8.0.7",
-    "remark-gfm": "^3.0.1"
+    "tailwind-merge": "^3.3.1"
   },
   "devDependencies": {
     "@types/jwt-encode": "^1.0.3",

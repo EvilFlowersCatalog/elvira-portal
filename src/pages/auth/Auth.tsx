@@ -85,7 +85,7 @@ const Auth = () => {
         <LicenseTerms setOpenLicenseModal={setOpenLicenseModal} />
       )}
       <div className='flex w-full flex-1 flex-col justify-center items-center p-4'>
-        <div className='flex flex-col p-5 h-[500px] w-full max-w-[700px] bg-zinc-100 dark:bg-darkGray justify-evenly items-center rounded-md'>
+        <div className='flex flex-col p-5 h-[500px] w-full max-w-[700px] justify-evenly items-center rounded-md'>
           <div className='flex flex-col items-center justify-center gap-2'>
             <img
               className='w-96'

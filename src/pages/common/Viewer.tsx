@@ -11,10 +11,10 @@ import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
 import useGetUserAcquisition from "../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisition";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import renderViewer from "evil-flowers-viewer";
+import renderViewer from "@evilflowers/evilflowersviewer";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import viewerStyles from "evil-flowers-viewer/dist/style.css?inline";
+import viewerStyles from "@evilflowers/evilflowersviewer/dist/style.css?inline";
 import useAppContext from "../../hooks/contexts/useAppContext";
 import { toast } from "react-toastify";
 import { updateMetaTag } from "../../utils/func/functions";
