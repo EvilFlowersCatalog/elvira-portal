@@ -19,6 +19,8 @@ import {
   LoansIcon,
   LanguageIcon,
   HelpIcon,
+  AdministrationIcon,
+  ChatIcon,
 } from "./NavbarIcons";
 import useAuthContext from "../../../hooks/contexts/useAuthContext";
 import { useTranslation } from "react-i18next";
@@ -319,7 +321,7 @@ const Navbar = () => {
             <NavbarButton
               name={t("navbarMenu.aiAssistant")}
               path={NAVIGATION_PATHS.aiChatHistory}
-              icon={<RiAiGenerate size={20} />}
+              icon={<ChatIcon size={20} />}
               isActive={
                 location.pathname === NAVIGATION_PATHS.aiAssistant ||
                 location.pathname === NAVIGATION_PATHS.aiChatHistory
@@ -336,7 +338,7 @@ const Navbar = () => {
               <NavbarButton
                 name={t("navbarMenu.administration")}
                 path={NAVIGATION_PATHS.adminHome}
-                icon={<RiAdminLine size={20} />}
+                icon={<AdministrationIcon size={20} />}
                 isActive={location.pathname.includes("administration")}
                 textVisible={!isCollapsed}
                 onClick={(e) => {

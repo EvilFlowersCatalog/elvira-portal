@@ -116,9 +116,9 @@ const ItemContainer = ({
         <AdvancedSearchWrapper>
           <>
             <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-medium text-left mb-4'>
-              {searchParams.get('query')
-                ? t('page.resultsQuery')
-                : t('page.results')}
+              {searchParams.get('author') && !searchParams.get('query') ? searchParams.get('author') :
+              searchParams.get('query')  ? t('page.resultsQuery'): 
+              t('page.results')}
                 {searchParams.get('query') && <span className="font-bold ml-1">"{searchParams.get('query')}"</span>}
             </h2>
 

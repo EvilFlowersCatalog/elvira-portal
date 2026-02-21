@@ -9,6 +9,7 @@ import EntryItem from '../../components/items/entry/display/EntryItem';
 import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import FilterSuggestions from '../../components/tools/FilterSuggestions';
 
 const Library = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -92,6 +93,9 @@ const Library = () => {
       searchSpecifier={'query'}
       title={t('navbarMenu.library')}
     >
+      {!isLoading && entries.length > 0 && searchParams.get('query') && (
+        <FilterSuggestions searchQuery={searchParams.get('query') || ''} />
+      )}
       <EntriesWrapper>
         {entries.map((entry, index) => (
           <EntryItem key={entry.id} entry={entry} />
