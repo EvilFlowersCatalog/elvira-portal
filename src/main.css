@@ -67,10 +67,17 @@ body,
   --color-secondary-light: #A8D0E6;
 }
 
+:root[data-theme="stu"] {
+  --color-primary: #a80331;
+  --color-primary-light: #FDEEE3;
+  --color-secondary: #4A2E17;       
+  --color-secondary-light: #D7C0AE; 
+}
+
 :root[data-theme="mtf"] {
   --color-primary: #E62B1E;
   --color-primary-light: #FDE9E8; 
-  --color-secondary: #4B1C1C;     
+  --color-secondary: #560006;
   --color-secondary-light: #D8B4B4; 
 }
 
