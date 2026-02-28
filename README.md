@@ -38,7 +38,7 @@ export  ELVIRA_CATALOG_ID=catalog_id
 export  ELVIRA_THEME=theme
 export  ELVIRA_UMAMI_SERVER=server_url
 export  ELVIRA_UMAMI_WEBSITE=website_id
-export  ELIVRA_EXPERIMENTAL_FEATURES=boolean
+export  ELVIRA_EXPERIMENTAL_FEATURES=boolean
 
 npm  run  build:key
 ```
@@ -53,7 +53,7 @@ unset  ELVIRA_CATALOG_ID
 unset  ELVIRA_THEME
 unset  ELVIRA_UMAMI_SERVER
 unset  ELVIRA_UMAMI_WEBSITE
-unset  ELIVRA_EXPERIMENTAL_FEATURES
+unset  ELVIRA_EXPERIMENTAL_FEATURES
 ```
 
 ## Preview your build
