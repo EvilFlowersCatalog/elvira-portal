@@ -17,7 +17,9 @@ const useGetEntries = () => {
     authors,
     categoryId,
     query,
-    languageCode
+    languageCode,
+    categories,
+    feeds,
   }: IEntryQuery): Promise<IEntriesList> => {
     // Set params
     const params = new URLSearchParams();
@@ -37,6 +39,9 @@ const useGetEntries = () => {
     if (categoryId) params.set('category_id', categoryId);
     if (query) params.set('query', query);
     if (languageCode) params.set('language_code', languageCode);
+
+    // if (categories) params.set('categories', categories);
+    // if (feeds) params.set('feeds', feeds);
 
     // Get entries by params
     const GET_ENTRIES_URL = '/api/v1/entries';

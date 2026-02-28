@@ -311,23 +311,27 @@ const Navbar = () => {
               isActive={location.pathname === NAVIGATION_PATHS.library}
               textVisible={!isCollapsed}
             />
-            <NavbarButton
-              name={t("navbarMenu.feeds")}
-              path={NAVIGATION_PATHS.feeds}
-              icon={<FeedsIcon size={20} />}
-              isActive={location.pathname === NAVIGATION_PATHS.feeds}
-              textVisible={!isCollapsed}
-            />
-            <NavbarButton
-              name={t("navbarMenu.aiAssistant")}
-              path={NAVIGATION_PATHS.aiChatHistory}
-              icon={<ChatIcon size={20} />}
-              isActive={
-                location.pathname === NAVIGATION_PATHS.aiAssistant ||
-                location.pathname === NAVIGATION_PATHS.aiChatHistory
-              }
-              textVisible={!isCollapsed}
-            />
+            { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
+              <>
+                <NavbarButton
+                  name={t("navbarMenu.feeds")}
+                  path={NAVIGATION_PATHS.feeds}
+                  icon={<FeedsIcon size={20} />}
+                  isActive={location.pathname === NAVIGATION_PATHS.feeds}
+                  textVisible={!isCollapsed}
+                />
+                <NavbarButton
+                  name={t("navbarMenu.aiAssistant")}
+                  path={NAVIGATION_PATHS.aiChatHistory}
+                  icon={<ChatIcon size={20} />}
+                  isActive={
+                    location.pathname === NAVIGATION_PATHS.aiAssistant ||
+                    location.pathname === NAVIGATION_PATHS.aiChatHistory
+                  }
+                  textVisible={!isCollapsed}
+                />
+              </>
+            )}
             {/* <NavbarButton
             name={t('navbarMenu.about')}
             path={NAVIGATION_PATHS.about}
@@ -422,13 +426,14 @@ const Navbar = () => {
             isActive={false}
             textVisible={!isCollapsed}
           />
+          { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
           <NavbarButton
             name={t("navbarMenu.help")}
             path={NAVIGATION_PATHS.help}
             icon={<HelpIcon size={20} />}
             isActive={false}
             textVisible={!isCollapsed}
-          />
+          />)}
         </div>
       </div>
       {/* Logout */}

@@ -56,7 +56,9 @@ export interface IEntryQuery {
   page: number;
   limit: number;
   title?: string;
+  /** Single category ID — current production API (category_id) */
   categoryId?: string;
+  /** Single feed ID — current production API (feed_id) */
   feedId?: string;
   authors?: string;
   publishedAtGte?: string;
@@ -65,6 +67,10 @@ export interface IEntryQuery {
   query?: string;
   config__readium_enabled?: boolean;
   languageCode?: string;
+  /** Comma-separated category IDs — experimental multi-filter API (param name TBD) */
+  categories?: string;
+  /** Comma-separated feed IDs — experimental multi-filter API (param name TBD) */
+  feeds?: string;
 }
 
 export interface IEntryNew {

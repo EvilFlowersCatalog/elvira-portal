@@ -6,9 +6,17 @@ import ElviraInput from '../inputs/ElviraInput';
 import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface ICategoryAutofillParams {
+  /**
+   * single=false (admin): full entry object with a `.categories` array inside.
+   * single=true  (portal): the currently selected ICategory item, or undefined.
+   */
   entryForm: any;
   defaultCategoryId?: string;
   setEntryForm: (entryForm: any) => void;
+  /**
+   * single=false (admin): pushes to the entry's category list (multi-select).
+   * single=true  (portal): setEntryForm is called with [category] or [] directly.
+   */
   single?: boolean;
   setIsSelectionOpen: (isOpen: boolean) => void;
 }
@@ -42,6 +50,12 @@ const CategoryAutofill = ({
     })();
   }, []);
 
+  // Portal (single=true) mode: sync display value when the selected item changes externally
+  useEffect(() => {
+    if (!single) return;
+    setInputValue(entryForm?.term ?? '');
+  }, [single, entryForm?.term]);
+
   useEffect(() => {
     if (defaultCategoryId && categories) {
       const defaultCategory = categories.find((category: ICategory) => category.id === defaultCategoryId);
@@ -69,13 +83,11 @@ const CategoryAutofill = ({
 
   const handleSuggestionClick = (category: ICategory) => {
     if (single) {
-      setEntryForm({
-        ...entryForm,
-        categories: [category],
-      });
+      // Portal mode: setEntryForm is a direct array setter — call with [category]
+      setEntryForm([category]);
       setInputValue(category.term);
       setIsHovering(false);
-      setSuggestions([]); // Hide suggestions after selection
+      setSuggestions([]);
       return;
     }
 
@@ -129,6 +141,8 @@ const CategoryAutofill = ({
           );
           if (category.length === 0) {
             setInputValue('');
+            // Portal mode: clear the selection when input is emptied
+            if (single) setEntryForm([]);
           } else {
             setInputValue('');
             handleSuggestionClick(category[0]);

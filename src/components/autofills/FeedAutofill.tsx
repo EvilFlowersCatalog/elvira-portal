@@ -6,9 +6,17 @@ import ElviraInput from '../inputs/ElviraInput';
 import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface IFeedAutofillParams {
+  /**
+   * single=false (admin): full entry object with a `.feeds` array inside.
+   * single=true  (portal): the currently selected IFeed item, or undefined.
+   */
   entryForm: any;
   defaultFeedId?: string;
   setEntryForm: (entryForm: any) => void;
+  /**
+   * single=false (admin): pushes to the entry's feed list (multi-select).
+   * single=true  (portal): setEntryForm is called with [feed] or [] directly.
+   */
   single?: boolean;
   kind?: 'acquisition' | 'navigation';
   placeholder?: string;
@@ -26,7 +34,11 @@ const FeedAutofill = ({
 }: IFeedAutofillParams) => {
   const { t } = useTranslation();
 
-  const [inputValue, setInputValue] = useState<string>(entryForm.feeds?.[0]?.title || '');
+  const [inputValue, setInputValue] = useState<string>(
+    // Portal (single=true): entryForm is the IFeed item itself
+    // Admin (single=false): entryForm is the full entry object with a .feeds array
+    single ? (entryForm?.title || '') : (entryForm?.feeds?.[0]?.title || '')
+  );
   const [suggestions, setSuggestions] = useState<IFeed[]>([]);
   const [feeds, setFeeds] = useState<IFeed[]>([]);
   const [isHovering, setIsHovering] = useState<boolean>(false);
@@ -52,13 +64,23 @@ const FeedAutofill = ({
       const defaultFeed = feeds.find((feed: IFeed) => feed.id === defaultFeedId);
       if (defaultFeed) {
         setInputValue(defaultFeed.title);
-        setEntryForm({
-          ...entryForm,
-          feeds: [{ title: defaultFeed.title, id: defaultFeed.id }],
-        });
+        if (single) {
+          setEntryForm([defaultFeed]);
+        } else {
+          setEntryForm({
+            ...entryForm,
+            feeds: [{ title: defaultFeed.title, id: defaultFeed.id }],
+          });
+        }
       }
     }
-  }, [defaultFeedId, feeds])
+  }, [defaultFeedId, feeds]);
+
+  // Portal (single=true) mode: sync display value when the selected item changes externally
+  useEffect(() => {
+    if (!single) return;
+    setInputValue(entryForm?.title ?? '');
+  }, [single, entryForm?.title]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -74,13 +96,11 @@ const FeedAutofill = ({
 
   const handleSuggestionClick = (feed: IFeed) => {
     if (single) {
-      setEntryForm({
-        ...entryForm,
-        feeds: [feed],
-      });
+      // Portal mode: setEntryForm is a direct array setter — call with [feed]
+      setEntryForm([feed]);
       setInputValue(feed.title);
       setIsHovering(false);
-      setSuggestions([]); // Hide suggestions after selection
+      setSuggestions([]);
       return;
     }
 
@@ -133,6 +153,8 @@ const FeedAutofill = ({
           );
           if (feed.length === 0) {
             setInputValue('');
+            // Portal mode: clear the selection when input is emptied
+            if (single) setEntryForm([]);
           } else {
             handleSuggestionClick(feed[0]);
           }

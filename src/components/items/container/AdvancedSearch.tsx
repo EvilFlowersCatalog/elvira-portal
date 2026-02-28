@@ -86,15 +86,37 @@ export function AdvancedSearch() {
 
     const performSearch = () => {
         // Only handle filters that exist in AdvancedSearch component
-        if (activeCategories.length > 0) {
-            searchParams.set('categories', activeCategories.map(cat => cat.id).join(','));
-        } else {
-            searchParams.delete('categories');
-        }
+        if (import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
+            // Experimental: multi-select IDs sent as comma-separated lists (new API, TBD param names)
+            if (activeCategories.length > 0) {
+                searchParams.set('categories', activeCategories.map(cat => cat.id).join(','));
+            } else {
+                searchParams.delete('categories');
+            }
+            searchParams.delete('category-id');
 
-        if (activeFeeds.length > 0) {
-            searchParams.set('feeds', activeFeeds.map(feed => feed.id).join(','));
+            if (activeFeeds.length > 0) {
+                searchParams.set('feeds', activeFeeds.map(feed => feed.id).join(','));
+            } else {
+                searchParams.delete('feeds');
+            }
+            searchParams.delete('feed-id');
         } else {
+            // Current: single selection mapped to the existing API params
+            const singleCategory = activeCategories[0];
+            if (singleCategory) {
+                searchParams.set('category-id', singleCategory.id);
+            } else {
+                searchParams.delete('category-id');
+            }
+            searchParams.delete('categories');
+
+            const singleFeed = activeFeeds[0];
+            if (singleFeed) {
+                searchParams.set('feed-id', singleFeed.id);
+            } else {
+                searchParams.delete('feed-id');
+            }
             searchParams.delete('feeds');
         }
 
@@ -122,10 +144,17 @@ export function AdvancedSearch() {
     useEffect(() => {
         const publishedAtGte = searchParams.get('publishedAtGte') || '';
         const publishedAtLte = searchParams.get('publishedAtLte') || '';
-        const feeds = searchParams.get('feeds') || '';
-        const categories = searchParams.get('categories') || '';
         const languageCodeParam = searchParams.get('languageCode') || '';
-        
+
+        // Read the correct param keys depending on the mode
+        const isExperimental = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
+        const feedsParam     = isExperimental
+            ? (searchParams.get('feeds') || '')
+            : (searchParams.get('feed-id') || '');
+        const categoriesParam = isExperimental
+            ? (searchParams.get('categories') || '')
+            : (searchParams.get('category-id') || '');
+
         // Only update if values actually changed
         if (year[0] !== publishedAtGte || year[1] !== publishedAtLte) {
             setYear([publishedAtGte, publishedAtLte]);
@@ -136,12 +165,12 @@ export function AdvancedSearch() {
         }
 
         // Update feeds only if the IDs actually changed
-        const feedIds = feeds ? feeds.split(',') : [];
+        const feedIds = feedsParam ? feedsParam.split(',') : [];
         const currentFeedIds = activeFeeds.map(f => f.id).sort().join(',');
-        const newFeedIds = feedIds.sort().join(',');
+        const newFeedIds = [...feedIds].sort().join(',');
         
         if (currentFeedIds !== newFeedIds) {
-            if (feeds) {
+            if (feedsParam) {
                 setActiveFeeds(allFeeds.filter(feed => feedIds.includes(feed.id)));
             } else {
                 setActiveFeeds([]);
@@ -149,12 +178,12 @@ export function AdvancedSearch() {
         }
 
         // Update categories only if the IDs actually changed
-        const categoryIds = categories ? categories.split(',') : [];
+        const categoryIds = categoriesParam ? categoriesParam.split(',') : [];
         const currentCategoryIds = activeCategories.map(c => c.id).sort().join(',');
-        const newCategoryIds = categoryIds.sort().join(',');
+        const newCategoryIds = [...categoryIds].sort().join(',');
         
         if (currentCategoryIds !== newCategoryIds) {
-            if (categories) {
+            if (categoriesParam) {
                 setActiveCategories(allCategories.filter(cat => categoryIds.includes(cat.id)));
             } else {
                 setActiveCategories([]);
@@ -268,6 +297,20 @@ export function AdvancedSearch() {
                 }}
             />
           </>
-        ) : null}
+        ) : <>
+            <FeedAutofill
+                entryForm={activeFeeds[0]}
+                setEntryForm={setActiveFeeds}
+                single
+            />
+            <CategoryAutofill  
+                entryForm={activeCategories[0]}
+                setEntryForm={setActiveCategories}
+                single
+                setIsSelectionOpen={()=>{
+                    
+                }}
+             />
+        </>}
     </div>
 }

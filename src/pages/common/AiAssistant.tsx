@@ -346,6 +346,8 @@ export default function AiAssistantPage() {
         navigate(NAVIGATION_PATHS.aiAssistant);
     }
 
+    if (import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES !== "true") { return null }
+
     return (
         <Box className="flex flex-col h-full w-full bg-white dark:bg-zinc-900">
             {/* Desktop Header */}

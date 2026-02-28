@@ -45,6 +45,7 @@ const Library = () => {
           page,
           limit: 30,
           title: searchParams.get('title') ?? '',
+          // Current API: single ID params
           categoryId: searchParams.get('category-id') ?? '',
           feedId:
             searchParams.get('feed-id') ??
@@ -56,6 +57,9 @@ const Library = () => {
           orderBy: searchParams.get('order-by') ?? '',
           query: searchParams.get('query') ?? '',
           languageCode: searchParams.get('languageCode') ?? '',
+          // Experimental API: comma-separated multi-ID params (server param names TBD)
+          categories: searchParams.get('categories') ?? '',
+          feeds: searchParams.get('feeds') ?? '',
         });
 
         const allEntries = [...(entries ?? []), ...items];

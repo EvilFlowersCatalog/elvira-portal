@@ -130,7 +130,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   // assets / LOGOS - dynamically generated based on elviraTheme
   // Use 'default' as fallback for unknown catalog values
   const getAssetPath = (catalog: string) => {
-    const knownCatalogs = ['fiit', 'mtf', 'fad', 'fchpt', 'fei', 'sjf', 'svf', 'ku'];
+    const knownCatalogs = ['fiit', 'mtf', 'fad', 'fchpt', 'fei', 'sjf', 'svf', 'ku', 'stu'];
     return knownCatalogs.includes(catalog) ? catalog : 'default';
   };
   
