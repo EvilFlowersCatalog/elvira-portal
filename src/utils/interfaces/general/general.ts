@@ -19,7 +19,7 @@ export enum NAVIGATION_PATHS {
   adminAddEntries = '/administration/entries/add',
   adminEditEntries = '/administration/entries/edit/',
   adminFeeds = '/administration/feeds',
-  adminLicencies = '/administration/licenses',
+  adminLicenses = '/administration/licenses',
   adminCategories = '/administration/categories',
   adminUsers = '/administration/users',
   adminLoans = '/administration/loans',
