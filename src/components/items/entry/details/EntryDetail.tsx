@@ -177,13 +177,15 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     (async () => {
       try {
         const entryDetail = await getEntryDetail(entryId, catalogId || undefined);
-        const entryAvailability = await getAvailability(new Date(), new Date(), entryId);
         setEntry(entryDetail);
-        setAvailability(entryAvailability);
-      } catch {
-        setEntry(null);
-      }
-    })();
+        if(import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
+          const entryAvailability = await getAvailability(new Date(), new Date(), entryId);
+          setAvailability(entryAvailability);
+        }
+        } catch (error) {
+          setEntry(null);
+        }
+      })();
   }, [entryId, update]);
 
   const askAi = () => {
