@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import { H1 } from '../../components/primitives/Heading';
 import ToolsContainer from '../../components/tools/ToolsContainer';
-import OpenFiltersButton from '../../components/buttons/OpenFiltersButton';
 import ElviraTable, { ElviraTableFetchFunction } from '../../components/table/ElviraTable';
 import { useSearchParams } from 'react-router-dom';
 import { IUser } from '../../utils/interfaces/user';

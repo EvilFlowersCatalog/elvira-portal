@@ -1,5 +1,4 @@
 import { Metadata } from '../../../utils/interfaces/general/general';
-import { IMyShelfPostResponse } from '../../../utils/interfaces/my-shelf';
 import { IUser } from '../../../utils/interfaces/user';
 import useAxios from '../useAxios';
 
@@ -19,7 +18,7 @@ interface IUserParams {
 const useGetUsers = () => {
     const axios = useAxios();
 
-    const addToShelf = async (options: IUserParams): Promise<{items: IUser[], metadata: Metadata}> => {
+    const getUsers = async (options: IUserParams): Promise<{items: IUser[], metadata: Metadata}> => {
         const params = new URLSearchParams();
 
         if (options.page) {
@@ -42,7 +41,7 @@ const useGetUsers = () => {
         return { items: data.items, metadata: data.metadata };
     };
 
-    return addToShelf;
+    return getUsers;
 };
 
 export default useGetUsers;

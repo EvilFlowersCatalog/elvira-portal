@@ -3,7 +3,6 @@ import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import { IEntry } from '../../utils/interfaces/entry';
 import { useSearchParams } from 'react-router-dom';
 import ItemContainer from '../../components/items/container/ItemContainer';
-import EntryBox from '../../components/items/entry/EntryBox';
 import EntryBoxLoading from '../../components/items/entry/EntryBoxLoading';
 import EntryItem from '../../components/items/entry/display/EntryItem';
 import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper';
@@ -69,7 +68,6 @@ const Library = () => {
         setEntries(uniqueEntries);
 
         setMaxPage(metadata.pages);
-        setEntries([...(entries ?? []), ...items]);
       } catch {
         // if there was error set to true
         setIsError(true);
