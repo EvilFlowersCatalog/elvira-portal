@@ -48,7 +48,7 @@ const AdminEntries = () => {
             username: <span> {item.is_superuser? <strong>{item.username}</strong> : item.username}</span>,
             name: item.name,
             surname: item.surname,
-            is_active: <BubbleText className={`cursor-default select-none bg-${item.is_active ? 'green' : 'red'}`} text={item.is_active ? t('administration.usersPage.active') : t('administration.usersPage.inactive')} />,
+            is_active: <BubbleText className={`cursor-default select-none ${item.is_active ? 'bg-green-500' : 'bg-red-500'}`} text={item.is_active ? t('administration.usersPage.active') : t('administration.usersPage.inactive')} />,
             last_login: item.last_login ? new Date(item.last_login).toLocaleString() : '',
             created_at: item.created_at ? new Date(item.created_at).toLocaleString() : '',
             updated_at: item.updated_at ? new Date(item.updated_at).toLocaleString() : '',
