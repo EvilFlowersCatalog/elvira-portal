@@ -6,7 +6,6 @@ import EntryItem from "./EntryItem";
 interface IEntryDisplayParams {
     isLoading: boolean;
     entries: IEntry[];
-    type: 'popular' | 'lastAdded';
     limitRows?: boolean;
 }
 

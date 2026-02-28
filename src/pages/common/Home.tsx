@@ -14,12 +14,8 @@ const Home = () => {
   const { selectedCatalogId } = useAppContext();
 
   const [popularEntries, setPopularEntries] = useState<IEntry[]>([]);
-  const [clickedEntry, setClickedEntry] = useState<
-    'popular' | 'lastAdded' | ''
-  >('');
   const [lastAddedEntries, setLastAddedEntries] = useState<IEntry[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [searchParams] = useSearchParams();
 
   const getEntries = useGetEntries();
 
@@ -68,7 +64,6 @@ const Home = () => {
         <EntryDisplay
           isLoading={isLoading}
           entries={popularEntries}
-          type='popular'
           limitRows={true}
         />
 
@@ -81,7 +76,6 @@ const Home = () => {
         <EntryDisplay
           isLoading={isLoading}
           entries={lastAddedEntries}
-          type='popular'
           limitRows={true}
         />
       </div>
