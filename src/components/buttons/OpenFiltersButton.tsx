@@ -15,7 +15,8 @@ const OpenFiltersButton = () => {
     };
 
     useEffect(() => {
-        var outlet = document.getElementById('outlet-wrapper')?.childNodes[0] as HTMLElement;
+        const outlet = document.getElementById('outlet-wrapper');
+        if (!outlet) return;
         const handleScroll = () => { setShowButton(outlet.scrollTop > 150); };
         outlet.addEventListener('scroll', handleScroll);
         return () => outlet.removeEventListener('scroll', handleScroll);
