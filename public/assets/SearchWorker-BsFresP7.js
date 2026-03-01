@@ -1,0 +1,1 @@
+(function(){"use strict";self.onmessage=s=>{let e=[];const o=s.data[0],n=s.data[1],g=new RegExp(".{0,20}"+o+".{0,20}","gimu");n.sort((a,t)=>a.page<t.page?-1:1),n.map(a=>{a.textItems.map(t=>{const r=t.str.match(g);r&&r.map(i=>{e=[...e,{page:a.page,text:i,transform:t.transform,width:t.width,height:t.height}]})})}).filter(Boolean),postMessage(e)}})();

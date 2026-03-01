@@ -20,7 +20,7 @@ const EntrySwiper = ({
   clickedEntry,
 }: IEntrySwiperParams) => {
   const { auth } = useAuthContext();
-  const { stuBg, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
 
   const [isScale, setIsScale] = useState<boolean>(false);
   const [isUnderLine, setIsUnderLine] = useState<boolean>(false);
@@ -62,14 +62,14 @@ const EntrySwiper = ({
     <div className={'flex h-96 w-52'}>
       <button
         className={`flex flex-col justify-center p-4 w-full gap-2 rounded-md text-left ${
-          isActive ? `${stuBg}` : 'hover:bg-zinc-100 dark:hover:bg-darkGray'
+          isActive ? 'bg-primary' : 'hover:bg-zinc-100 dark:hover:bg-darkGray'
         }`}
         onMouseEnter={handelMouseEnter}
         onMouseLeave={handelMouseLeave}
         onClick={openEntryDetail}
       >
         <div
-          className={`w-full rounded-md border border-gray dark:border-zinc-200 ${
+              className={`w-full rounded-md border border-gray-300 dark:border-zinc-200 ${
             imageLoaded ? 'h-auto my-auto' : 'h-72'
           } overflow-hidden max-h-72`}
         >
@@ -86,7 +86,7 @@ const EntrySwiper = ({
           {entry.feeds.map((feed) => (
             <div
               key={feed.id}
-              className={`px-2 py-1 text-sm ${stuBg} text-white rounded-md`}
+              className={`px-2 py-1 text-sm bg-primary text-white rounded-md`}
             >
               {feed.title}
             </div>
@@ -104,7 +104,7 @@ const EntrySwiper = ({
         {entry.authors.length > 0 && (
           <span
             className={`text-xs ${
-              isActive ? 'text-zinc-200' : 'text-gray dark:text-zinc-200'
+              isActive ? 'text-zinc-200' : 'text-gray-500 dark:text-zinc-200'
             }`}
           >
             {entry.authors[0].name} {entry.authors[0].surname}

@@ -1,5 +1,4 @@
 import { useTranslation } from 'react-i18next';
-import { IEntryNewForm } from '../../../../utils/interfaces/entry';
 import ConfigItem from './ConfigItem';
 import { IPartParams } from '../../../../utils/interfaces/general/general';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
@@ -11,7 +10,7 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
   return (
     <div className='flex flex-col flex-2 gap-2'>
       <span>{t('entry.wizard.configuration')}</span>
-      <div className='bg-white dark:bg-gray flex-1 rounded-md grid grid-cols-2 xxl:grid-cols-3 gap-4'>
+      <div className='flex-1 rounded-md flex flex-wrap gap-4'>
         <ConfigItem
           name={t('entry.wizard.download')}
           checked={entry.config?.evilflowres_metadata_fetch ?? false}
@@ -88,6 +87,22 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
               config: {
                 ...entry?.config!,
                 evilflowers_ocr_rewrite: e.target.checked,
+              },
+            });
+          }}
+        />
+        <ConfigItem
+          name={'RDM'}
+          checked={entry.config?.readium_enabled ?? false}
+          onChange={(e) => {
+            umamiTrack('RDM Config Button', {
+              checked: e.target.checked,
+            });
+            setEntry({
+              ...entry,
+              config: {
+                ...entry?.config!,
+                readium_enabled: e.target.checked,
               },
             });
           }}

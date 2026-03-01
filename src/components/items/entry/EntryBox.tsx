@@ -11,7 +11,6 @@ interface IEntryBoxParams {
 
 const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
   const { auth } = useAuthContext();
-  const { showSearchBar, isSmallDevice, stuBg } = useAppContext();
 
   const [isScale, setIsScale] = useState<boolean>(false);
   const [isUnderLine, setIsUnderLine] = useState<boolean>(false);
@@ -32,23 +31,24 @@ const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
     const params = new URLSearchParams(searchParams);
     const id = searchParams.get('entry-detail-id');
 
-    if (id === entry.id) params.delete('entry-detail-id');
-    else params.set('entry-detail-id', entry.id);
+    if (id === entry.id) {
+      params.delete('entry-detail-id');
+      params.delete('entry-catalog-id');
+    } else {
+      params.set('entry-detail-id', entry.id);
+      params.set('entry-catalog-id', entry.catalog_id);
+    }
 
     setSearchParams(params);
   };
 
   return (
     <div
-      className={`flex w-full sm:w-1/2 md:w-1/4 ${
-        !isSmallDevice && showSearchBar
-          ? 'lg:w-1/3 xl:w-1/4 xxl:w-1/6'
-          : 'xl:w-1/5 xxl:w-[14.28%]'
-      }`}
+      className={`flex w-full sm:w-1/2 md:w-1/4 xl:w-1/5 xxl:w-[14.28%]`}
     >
       <button
         className={`flex flex-col justify-center p-4 w-full gap-2 rounded-md text-left ${
-          isActive ? `${stuBg}` : 'hover:bg-zinc-100 dark:hover:bg-darkGray'
+          isActive ? 'bg-primary' : 'hover:bg-zinc-100 dark:hover:bg-darkGray'
         }`}
         onMouseEnter={handelMouseEnter}
         onMouseLeave={handelMouseLeave}
@@ -57,7 +57,7 @@ const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
         <div
           className={`w-full flex ${
             imageLoaded ? 'h-auto my-auto' : 'h-64'
-          } rounded-md border border-gray dark:border-zinc-200 overflow-hidden`}
+          } rounded-md border border-gray-300 dark:border-zinc-200 overflow-hidden`}
         >
           <img
             className={`w-full h-full ${
@@ -72,7 +72,7 @@ const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
           {entry.feeds.map((feed) => (
             <div
               key={feed.id}
-              className={`px-2 py-1 text-sm ${stuBg} text-white rounded-md`}
+              className={`px-2 py-1 text-sm bg-primary text-white rounded-md`}
             >
               {feed.title}
             </div>
@@ -90,7 +90,7 @@ const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
         {entry.authors.length > 0 && (
           <span
             className={`text-xs ${
-              isActive ? 'text-zinc-200' : 'text-gray dark:text-zinc-200'
+              isActive ? 'text-zinc-200' : 'text-gray-500 dark:text-zinc-200'
             }`}
           >
             {entry.authors[0].name} {entry.authors[0].surname}

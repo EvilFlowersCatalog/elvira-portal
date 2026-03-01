@@ -1,5 +1,28 @@
 export const sk = {
   translation: {
+    common: {
+      showMore: 'Ďalších {{count}}',
+      showLess: 'Zobraziť menej',
+      loading: 'Načítavanie',
+    },
+    assistant: {
+      title: 'AI Asistent',
+      inputPlaceholder: 'Spýtajte sa ma na čokoľvek...',
+      suggestion1: 'Ako sa naučím programovať?',
+      suggestion2: 'Nájdi knihu o matematike',
+      entryAssistant: "Referencia na knihu {{x}}",
+      welcomeMessage: 'Spýtajte sa ma na čokoľvek o knižničnom katalógu. Môžem vám pomôcť nájsť knihy, odpovedať na otázky a poskytnúť odporúčania.',
+      chatHistory: 'História konverzácií',
+      chatHistoryError: 'Nepodarilo sa načítať históriu konverzácií',
+      noChats: 'Zatiaľ žiadna história konverzácií',
+      startFirstChat: 'Začnite svoju prvú konverzáciu s AI asistentom',
+      newChat: 'Nová konverzácia',
+      untitledChat: 'Nepomenovaná konverzácia',
+      messages: '{{count}} správ',
+      today: 'Dnes',
+      yesterday: 'Včera',
+      daysAgo: 'Pred {{count}} dňami',
+    },
     // NOTIFICATIONS
     notifications: {
       myShelf: {
@@ -108,6 +131,21 @@ export const sk = {
       },
       logout: 'Boli ste odhlásený.',
       fileFailed: 'Niečo sa pokazilo pri čítaní súboru.',
+      citation: {
+        noCite: 'Citácia nie je dostupná.',
+        copySuccess: 'Citácia bola skopírovaná do schránky.',
+        copyError: 'Nepodarilo sa skopírovať citáciu.',
+      },
+      shareSuccess: 'Adresa bola skopírovaná.',
+      license: {
+        create: {
+          success: 'Publikácia bola úspešne vypožičaná.',
+          error: 'Nepodarilo sa vypožičať publikáciu.',
+        },
+        download: {
+          error: 'Nepodarilo sa stiahnuť výpožičku.',
+        },
+      },
     },
 
     // LOGIN PAGE
@@ -126,11 +164,87 @@ export const sk = {
 
     // ADMINISTRATION PAGE
     administration: {
-      homePage: {
-        entries: 'Publikácie',
-        feeds: 'Skupiny',
-        categories: 'Kategórie',
+      catalog: {
+        select: 'Vybrať Katalóg',
+        loading: 'Načítavam katalógy...',
+        loadError: 'Nepodarilo sa načítať katalógy',
+        noCatalogs: 'Žiadne dostupné katalógy',
       },
+      homePage: {
+        entries: {
+          title: 'Publikácie',
+          text: 'Spravujte a zobrazujte všetky publikácie v systéme.',
+        },
+        feeds: {
+          title: 'Skupiny',
+          text: 'Spravujte a organizujte skupiny pre distribúciu obsahu.',
+        },
+        categories: {
+          title: 'Kategórie',
+          text: 'Spravujte a upravujte kategórie pre lepšiu organizáciu.',
+        },
+        users: {
+          title: 'Používatelia',
+          text: 'Spravujte a zobrazujte všetkých používateľov v systéme.',
+        },
+        aiUsers: {
+          title: 'AI Používatelia',
+          text: 'Monitorujte a spravujte používateľov AI asistenta a ich využitie.',
+        },
+        loans: {
+          title: 'Výpožičky',
+          text: 'Spravujte a zobrazujte všetky výpožičky v systéme.',
+        }
+      },
+      feedsPage: {
+        add: 'Pridať Skupinu',
+        edit: 'Upraviť',
+        delete: 'Odstrániť',
+      },
+      categoriesPage: {
+        info: 'Informácie o kategórii',
+        term: 'Termín',
+        label: 'Popis',
+        scheme: 'Schéma',
+        none: 'Žiadna',
+        add: 'Pridať kategóriu',
+        edit: 'Upraviť',
+        delete: 'Odstrániť'
+      },
+      entriesPage: {
+        tableTitle: 'Publikácie',
+        detail: 'Detail',
+        feeds: 'Skupina',
+        categories: 'Kategória',
+        actions: 'Akcie',
+      },
+      usersPage: {
+        title: 'Správa používateľov',
+        tableTitle: 'Používatelia ({{x}})',
+        detail: 'Detail',
+        username: 'Používateľské meno',
+        name: 'Meno',
+        surname: 'Priezvisko',
+        isActive: 'Aktívny',
+        active: "Aktívny",
+        inactive: "Neaktívny",
+        lastLogin: 'Posledné prihlásenie',
+        createdAt: 'Vytvorené',
+        updatedAt: 'Aktualizované',
+        actions: 'Akcie',
+      },
+      loansPage: {
+        title: 'Správa výpožičiek',
+        tableTitle: 'Výpožičky ({{x}})',
+        table: {
+          entry: 'Publikácia',
+          state: 'Stav',
+          starts_at: 'Začiatok',
+          ends_at: 'Koniec',
+          actions: 'Akcie',
+          user: 'Používateľ',
+        }
+      }
     },
 
     general: {
@@ -148,29 +262,36 @@ export const sk = {
 
     // NAVBAR MENU
     navbarMenu: {
-      portal: 'Portál',
+      portal: 'Hlavné Menu',
       personal: 'Osobné',
       settings: 'Nastavenia',
       catalog: 'Katalóg',
       home: 'Domov',
       about: 'O Projekte',
       library: 'Knižnica',
-      myShelf: 'Polička',
+      myShelf: 'Uložené',
+      history: 'História',
+      help: 'Pomoc',
       loan: 'Výpožičky',
       feeds: 'Skupiny',
       administration: 'Administrácia',
       darkMode: 'Tmavý Režim',
       lightMode: 'Svetlý Režim',
-      logout: 'Odhlásiť sa',
+      user: 'Študent',
+      superUser: 'Admin',
+      aiAssistant: 'AI Asistent',
     },
 
     // PAGE
     page: {
       notFound: 'Nič nebolo nájdené',
+      noResults: "Žiadne výsledky pre vaše vyhľadávanie.",
       shelfEmpty: 'Vaša polička je prázdna',
       error: 'Nastala chyba pri načítavaní dát',
       scrollUp: 'Posunúť nahor',
       removeFilters: 'Odstrániť filtre',
+      results: 'Výsledky',
+      resultsQuery: 'Výsledky pre:',
     },
 
     // HOME PAGE
@@ -185,25 +306,47 @@ export const sk = {
       advancedSearch: 'Pokročilé Vyhľadávanie',
       title: 'Názov publikácie',
       author: 'Autorové Meno',
-      category: 'Kategória',
-      feeds: 'Skupina',
+      categories: 'Kategórie',
+      feeds: 'Skupiny',
       search: 'Hľadať',
+      searchAll: "Prehľadávať všetko",
+      yearFromTo: 'Rok vydania',
+      yearFrom: 'Rok od',
+      yearTo: 'Rok do',
     },
 
     // ENTRY COMPONENT
     entry: {
       detail: {
         close: 'Zavrieť',
-        add: '+ Pridať do poličky',
-        remove: '- Odstrániť z poličky',
-        pages: 'Strany',
-        views: 'Zobrazenia',
+        add: 'Uložiť',
+        remove: 'Odstrániť',
+        pages: 'Strán',
+        rating: 'Hodnotenie',
+        views: 'Čitateľov',
         lang: 'Jazyk',
         feeds: 'Skupiny',
         categories: 'Kategórie',
+        publisher: 'Vydavateľ',
+        publishDate: 'Dátum vydania',
         summary: 'Zhrnutie',
         read: 'Čítať',
+        more: 'Prístup',
+        borrow: 'Vypožičať',
+        activeLicense: 'Výpožička',
+        cite: 'Citovať',
+        share: 'Zdieľať',
         relation: 'Relácia',
+        noAuthor: 'Neznámy autor',
+        title: 'Detail knihy',
+        readMore: 'Čítať Viac',
+        readLess: 'Zobraziť Menej',
+        tabs: {
+          contents: 'Obsah',
+          reviews: 'Recenzie',
+          related: 'Súvisiace',
+        },
+        askAi: 'Spýtať sa AI',
       },
       wizard: {
         requiredMessages: {
@@ -251,6 +394,35 @@ export const sk = {
         print: 'Tlač',
         annotations: 'Anotácie',
       },
+    },
+
+    license: {
+      calendar: {
+        title: 'Kalendár výpožičiek',
+        periodBooked: 'Vybraný časový úsek je už obsadený.',
+        noAvailability: 'Táto kniha nie je k dispozícii.',
+        lend: 'Vypožičať',
+      },
+      loansPage: {
+        title: 'Výpožičky',
+
+        table: {
+          title: 'Počet výpožičiek: {{x}}',
+          entry: 'Publikácia',
+          state: 'Stav',
+          states: {
+            ready: 'Pripravené',
+            active: 'Aktívne',
+            returned: 'Vrátené',
+            expired: 'Expirujúce',
+            revoked: 'Odvolané',
+            cancelled: 'Zrušené',
+          },
+          starts_at: 'Začiatok',
+          ends_at: 'Koniec',
+          actions: 'Akcie',
+        },
+      }
     },
 
     dropzone: {
@@ -320,11 +492,15 @@ export const sk = {
     tools: {
       search: 'Hľadať',
       advancedSearch: 'Pokročilé Vyhľadávanie',
+      clearFilters: 'Zrušiť filtre',
+      activeFilters: 'Aktívne filtre:',
       orderBy: {
-        createdAtAsc: 'Dátum publikovania ↑',
-        createdAtDesc: 'Dátum publikovania ↓',
-        titleAsc: 'Názov ↑',
-        titleDesc: 'Názov ↓',
+        createdAtAsc: 'Najnovšie',
+        createdAtDesc: 'Najstaršie',
+        titleAsc: 'A-Z',
+        titleDesc: 'Z-A',
+        popularityAsc: 'Najmenej populárne',
+        popularityDesc: 'Najpopulárnejšie',
       },
     },
 
@@ -334,6 +510,11 @@ export const sk = {
       subTitle:
         'Otvorené a jednoducho použiteľné nástroje pre distribúciu dokumentov',
       readMore: 'Čítať viac',
+      banner: {
+        title: 'Využite Elvira AI asistenta',
+        description: 'Spýtajte sa na odporúčania, vyhľadávajte informácie alebo generujte súhrny kníh',
+        action: 'Vyskúšať asistenta'
+      },
       read: {
         title: 'Čítanie',
         descriptionPart1: 'Vytvorili sme open-source čítačku PDF s názvom ',
@@ -357,6 +538,23 @@ export const sk = {
       information:
         'Táto webová stránka používa cookies na zlepšenie vášho zážitku. Používame cookies na zapamätanie si vašich preferencií rozloženia, vybraného režimu alebo jazyka, aby sme vám poskytli lepší zážitok.',
       accept: 'Rozumiem',
+    },
+
+    // HISTORY
+    history: {
+      description: 'Vaša nedávna aktivita v Elvira portáli',
+      empty: 'Zatiaľ nemáte žiadnu históriu',
+      loadMore: 'Načítať viac',
+      actions: {
+        viewed: 'Zobrazené',
+        bookmarked: 'Pridané do záložiek',
+        removedBookmark: 'Odstránené zo záložiek',
+      },
+      timeAgo: {
+        minutes: 'minút',
+        hours: 'hodín',
+        days: 'dní',
+      },
     },
   },
 };

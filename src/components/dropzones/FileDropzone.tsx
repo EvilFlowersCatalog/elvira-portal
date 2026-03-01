@@ -14,22 +14,24 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface IFilesDropzoneParams {
   entryId?: string;
+  catalogId?: string;
   isLoading: boolean;
   setIsLoading: (isLoading: boolean) => void;
   files?: { id: string; relation: string; file: File }[] | null;
   setFiles?:
-    | ((files: { id: string; relation: string; file: File }[]) => void)
-    | null;
+  | ((files: { id: string; relation: string; file: File }[]) => void)
+  | null;
 }
 const FileDropzone = ({
   entryId,
+  catalogId,
   isLoading,
   setIsLoading,
   files = null,
   setFiles = null,
 }: IFilesDropzoneParams) => {
   const { t } = useTranslation();
-  const { stuBg, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
 
   const [acquisitions, setAcquisitions] = useState<IAcquisition[]>([]);
   const [reload, setReload] = useState<boolean>(false);
@@ -77,13 +79,13 @@ const FileDropzone = ({
               entryAcquisition.append('metadata', JSON.stringify(metadata));
 
               // Try to create acquisition
-              await createEntryAcquisition(entryAcquisition, entryId);
+              await createEntryAcquisition(entryAcquisition, entryId, catalogId);
               toast.success(
                 t('notifications.acquisition.add.success', { x: file.name })
               );
             } catch {
               // Show error notification
-              toast.error(t('notifications.acquisition.add.error', file.name));
+              toast.error(t('notifications.acquisition.add.error', { x: file.name }));
             }
           })
         );
@@ -122,6 +124,7 @@ const FileDropzone = ({
       setFiles!(files!.filter((file) => file.id !== id));
     }
   };
+
   const handleEditFile = (e: MouseEvent<SVGElement>, id: string) => {
     e.stopPropagation();
   };
@@ -135,26 +138,26 @@ const FileDropzone = ({
   return (
     <>
       {isLoading ? (
-        <div className='flex-2 min-h-60 max-h-[500px] rounded-md p-4 bg-zinc-100 dark:bg-darkGray cursor-pointer'>
+        <div className='flex-2 min-h-60 max-h-[500px] rounded-md p-4 bg-slate-200 dark:bg-darkGray cursor-pointer'>
           <PageLoading />
         </div>
       ) : (
         <div
           {...getRootProps({
-            className: `relative flex-2 min-h-60 max-h-[500px] overflow-auto rounded-md p-4 border-4 border-dashed duration-200 cursor-pointer ${
-              isDragActive
-                ? `${stuBg} bg-opacity-50 border-white`
-                : 'bg-zinc-100 dark:bg-darkGray border-transparent'
-            }`,
+            className: `relative flex-2 min-h-60 max-h-[500px] overflow-auto rounded-md p-4 border-4 border-dashed duration-200 cursor-pointer ${isDragActive
+              ? 'bg-primary bg-opacity-50 border-white'
+              : 'bg-slate-200 dark:bg-darkGray border-transparent'
+              }`,
           })}
         >
+          <h2 className='text-lg'>{t('entry.wizard.files')}</h2>
           <input {...getInputProps()} />
           {isDragActive && (
             <div className='absolute top-0 left-0 w-full h-full flex justify-center items-center'>
               {((files && files?.length !== 0) ||
                 acquisitions.length !== 0) && (
-                <GoPlus color='white' size={100} />
-              )}
+                  <GoPlus color='white' size={100} />
+                )}
             </div>
           )}
           {files === null ? (

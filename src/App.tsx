@@ -2,7 +2,6 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { NAVIGATION_PATHS } from './utils/interfaces/general/general';
 import { ToastContainer } from 'react-toastify';
 import NavbarContainer from './components/header/navbar/NavbarContainer';
-import SearchBarContainer from './components/search-bar/SearchBarContainer';
 import useCookiesContext from './hooks/contexts/useCookiesContext';
 import CookiesInformation from './components/dialogs/CookiesInformation';
 import { useEffect } from 'react';
@@ -46,7 +45,7 @@ const App = () => {
         theme={'dark'}
       />
       {!informed && <CookiesInformation />}
-      <div className='h-screen flex w-screen bg-white dark:bg-gray text-black dark:text-white'>
+      <div className='h-screen flex w-screen text-black dark:text-white'>
         {show() && (
           <>
             <NavbarContainer />
@@ -55,14 +54,12 @@ const App = () => {
         )}
 
         <div
-          className={`flex flex-1 h-screen flex-col overflow-hidden ${
-            show() ? 'max-lg:pt-14' : ''
-          }`}
+          id="outlet-wrapper"
+          className={`flex flex-1 h-screen flex-col overflow-hidden bg-lightGray dark:bg-darkGray ${show() ? 'max-lg:pt-14' : ''}`}
         >
           <Outlet />
         </div>
 
-        <SearchBarContainer />
       </div>
     </>
   );

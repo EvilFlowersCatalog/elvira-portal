@@ -8,11 +8,13 @@ import useUploadFeed from '../../../../hooks/api/feeds/useUploadFeed';
 import useEditFeed from '../../../../hooks/api/feeds/useEditFeed';
 import useGetFeedDetail from '../../../../hooks/api/feeds/useGetFeedDetail';
 import { toast } from 'react-toastify';
-import ModalWrapper from '../../../../components/modal/ModalWrapper';
+import FormModal from '../../../../components/modals/FormModal';
 import ElviraInput from '../../../../components/inputs/ElviraInput';
-import ElviraSelect from '../../../inputs/ElviraSelect';
+import ElviraTextarea from '../../../../components/inputs/ElviraTextarea';
+import { MUISelectStyle } from '../../../inputs/ElviraSelect';
 import FeedAutofill from '../../../autofills/FeedAutofill';
 import { MdRemoveCircle } from 'react-icons/md';
+import { MenuItem, Select } from '@mui/material';
 
 interface IFeedForm {
   setOpen: (open: boolean) => void;
@@ -27,10 +29,10 @@ const FeedForm = ({
   setReloadPage,
 }: IFeedForm) => {
   const { t } = useTranslation();
-  const { stuBg, stuText, umamiTrack } = useAppContext();
+  const { umamiTrack, selectedCatalogId } = useAppContext();
 
   const [form, setForm] = useState<IFeedNew>({
-    catalog_id: import.meta.env.ELVIRA_CATALOG_ID,
+    catalog_id: selectedCatalogId ?? import.meta.env.ELVIRA_CATALOG_ID,
     url_name: uuid(),
     title: '',
     content: '',
@@ -55,7 +57,7 @@ const FeedForm = ({
     }));
   };
   // set conent
-  const handleContentChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleContentChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     e.target.setCustomValidity('');
     setForm((prevForm) => ({
       ...prevForm, // Preserve existing properties of feedForm
@@ -63,9 +65,9 @@ const FeedForm = ({
     }));
   };
   // set kind
-  const handleKindChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  const handleKindChange = (e: any) => {
     setForm((prevForm) => ({
-      ...prevForm, // Preserve existing properties of feedForm
+      ...prevForm,
       kind: e.target.value,
     }));
   };
@@ -83,7 +85,7 @@ const FeedForm = ({
     if (parentId) {
       (async () => {
         try {
-          const { response } = await getFeedDetail(parentId);
+          const response  = await getFeedDetail(parentId);
           setParentFeeds({
             feeds: [{ id: response.id, title: response.title }],
           });
@@ -96,7 +98,7 @@ const FeedForm = ({
     try {
       if (feedId) {
         (async () => {
-          const { response } = await getFeedDetail(feedId);
+          const response  = await getFeedDetail(feedId);
 
           setForm({
             catalog_id: response.catalog_id,
@@ -138,7 +140,7 @@ const FeedForm = ({
   };
 
   return (
-    <ModalWrapper
+    <FormModal
       title={
         feedId ? t('modal.feedForm.editFeed') : t('modal.feedForm.addFeed')
       }
@@ -162,7 +164,7 @@ const FeedForm = ({
         />
 
         {/* Content */}
-        <ElviraInput
+        <ElviraTextarea
           onChange={handleContentChange}
           placeholder={t('modal.feedForm.content')}
           value={form.content}
@@ -182,7 +184,7 @@ const FeedForm = ({
             <div className='w-full md:w-1/2 lg:w-1/3 flex p-1' key={index}>
               <button
                 type='button'
-                className={`${stuBg} p-2 text-sm hover:bg-red flex w-full gap-2 justify-between items-center text-white rounded-md`}
+                className={`bg-primary p-2 text-sm hover:bg-red flex w-full gap-2 justify-between items-center text-white rounded-md`}
                 onClick={() => {
                   setParentFeeds((prev) => ({
                     feeds: prev.feeds.filter(
@@ -200,23 +202,28 @@ const FeedForm = ({
 
         {/* Kind */}
         <div className='flex w-full flex-col text-left'>
-          <label htmlFor='selection-kind' className={`text-sm pl-1 ${stuText}`}>
+          <label htmlFor='selection-kind' className={`text-sm pl-1 text-primary`}>
             {t('modal.feedForm.kind')}
           </label>
-          <ElviraSelect
-            name='selection-kind'
-            value={form.kind}
-            onChange={handleKindChange}
-          >
-            <option value='acquisition'>
-              {t('modal.feedForm.acquistion')}
-            </option>
-            <option value='navigation'>{t('modal.feedForm.navigation')}</option>
-          </ElviraSelect>
+            <Select
+              className="dark:text-white"
+              sx={MUISelectStyle}
+              MenuProps={{ PaperProps: { sx: { "& .MuiList-root": { paddingBottom: 0, paddingTop: 0}}}}}
+              label={"Selection Kind"}
+              value={form.kind}
+              labelId='selection-kind'
+              id="selectionKind"
+              onChange={handleKindChange}
+              variant="standard"
+            >
+                <MenuItem value="acquisition">{t('modal.feedForm.acquistion')}</MenuItem>
+                <MenuItem value="navigation">{t('modal.feedForm.navigation')}</MenuItem>
+            </Select>
+            
         </div>
         <button ref={buttonRef} type='submit' className='hidden'></button>
       </form>
-    </ModalWrapper>
+    </FormModal>
   );
 };
 

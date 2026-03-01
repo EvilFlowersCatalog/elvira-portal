@@ -1,40 +1,46 @@
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useEffect, useState } from 'react';
-import { IUserAcquisitionShare } from '../../utils/interfaces/acquisition';
-import useCreateUserAcquisition from '../../hooks/api/acquisitiions/user-acquistions/useCreateUserAcquisition';
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useEffect, useState } from "react";
+import { IUserAcquisitionShare } from "../../utils/interfaces/acquisition";
+import useCreateUserAcquisition from "../../hooks/api/acquisitiions/user-acquistions/useCreateUserAcquisition";
 import {
   NAVIGATION_PATHS,
   THEME_TYPE,
-} from '../../utils/interfaces/general/general';
-import useGetEntryDetail from '../../hooks/api/entries/useGetEntryDetail';
-import useGetUserAcquisition from '../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisition';
+} from "../../utils/interfaces/general/general";
+import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
+import useGetUserAcquisition from "../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisition";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import { renderViewer } from '@evilflowers/evilflowersviewer';
-import useAppContext from '../../hooks/contexts/useAppContext';
-import { toast } from 'react-toastify';
-import { updateMetaTag } from '../../utils/func/functions';
-import useAuthContext from '../../hooks/contexts/useAuthContext';
-import useGetAnotations from '../../hooks/api/anotations/useGetAnotations';
-import useGetAnotationItem from '../../hooks/api/anotations/anotation-items/useGetAnotationItem';
-import useCreateAnotation from '../../hooks/api/anotations/useCreateAnotation';
-import useDeleteAnotation from '../../hooks/api/anotations/useDeleteAnotation';
-import useUpdateAnotation from '../../hooks/api/anotations/useUpdateAnotation';
-import useUpdateAnotationItem from '../../hooks/api/anotations/anotation-items/useUpdateAnotationItem';
-import useCreateAnotationItem from '../../hooks/api/anotations/anotation-items/useCreateAnotationItem';
-import useDeleteAnotationItem from '../../hooks/api/anotations/anotation-items/useDeleteAnotationItem';
+import renderViewer from "@evilflowers/evilflowersviewer";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import viewerStyles from "@evilflowers/evilflowersviewer/dist/style.css?inline";
+import useAppContext from "../../hooks/contexts/useAppContext";
+import { toast } from "react-toastify";
+import { updateMetaTag } from "../../utils/func/functions";
+import useAuthContext from "../../hooks/contexts/useAuthContext";
+import useGetAnotations from "../../hooks/api/anotations/useGetAnotations";
+import useGetAnotationItem from "../../hooks/api/anotations/anotation-items/useGetAnotationItem";
+import useCreateAnotation from "../../hooks/api/anotations/useCreateAnotation";
+import useDeleteAnotation from "../../hooks/api/anotations/useDeleteAnotation";
+import useUpdateAnotation from "../../hooks/api/anotations/useUpdateAnotation";
+import useUpdateAnotationItem from "../../hooks/api/anotations/anotation-items/useUpdateAnotationItem";
+import useCreateAnotationItem from "../../hooks/api/anotations/anotation-items/useCreateAnotationItem";
+import useDeleteAnotationItem from "../../hooks/api/anotations/anotation-items/useDeleteAnotationItem";
 
-const rootId = 'pdf-viewer-page';
+const rootId = "elvira-viewer-app";
 
 const Viewer = () => {
-  const { lang, theme, titleLogoDark, titleLogoLight, stuBg } = useAppContext();
+  const { lang, theme, titleLogoDark, titleLogoLight } = useAppContext();
   const { auth } = useAuthContext();
-  const { 'entry-id': id, index } = useParams();
+  const { "entry-id": id, index } = useParams();
   const { t } = useTranslation();
+  const location = useLocation();
   const [loading, setLoading] = useState<boolean>(true);
   const [progressBar, setProgressBar] = useState<number>(0);
-
-  const location = useLocation();
+  const [entryCatalogId, setEntryCatalogId] = useState<string | null>(
+    (location.state as { catalogId?: string })?.catalogId || null
+  );
 
   const navigate = useNavigate();
   const createUserAcquisition = useCreateUserAcquisition();
@@ -49,28 +55,26 @@ const Viewer = () => {
   const createAnotationItem = useCreateAnotationItem();
   const deleteAnotationItem = useDeleteAnotationItem();
 
-  let acquisition_id = '';
-  let user_acquisition_id = '';
+  let acquisition_id = "";
+  let user_acquisition_id = "";
 
   const shareFunction = async (pages: string | null, expireDate: string) => {
     // creat share user acquistion object
     const userAcquisitionShare: IUserAcquisitionShare = {
       acquisition_id,
-      range: pages ?? '',
-      type: 'shared',
+      range: pages ?? "",
+      type: "shared",
       expires_at: expireDate,
     };
 
     try {
-      const { response: response } = await createUserAcquisition(
-        userAcquisitionShare
-      );
+      const response = await createUserAcquisition(userAcquisitionShare);
 
       // Return given url
       return response.url;
     } catch {
       // return empty string
-      return '';
+      return "";
     }
   };
   // Home function for viewer to navigate home
@@ -78,10 +82,11 @@ const Viewer = () => {
     navigate(NAVIGATION_PATHS.home);
   };
   const closeFunction = () => {
+    const catalogParam = entryCatalogId ? `&entry-catalog-id=${entryCatalogId}` : '';
     const path =
-      location.state?.from === 'shelf'
-        ? `${NAVIGATION_PATHS.shelf}?entry-detail-id=${id}`
-        : `${NAVIGATION_PATHS.library}?entry-detail-id=${id}`;
+      location.state?.from === "shelf"
+        ? `${NAVIGATION_PATHS.shelf}?entry-detail-id=${id}${catalogParam}`
+        : `${NAVIGATION_PATHS.library}?entry-detail-id=${id}${catalogParam}`;
 
     navigate(path);
   };
@@ -91,15 +96,15 @@ const Viewer = () => {
     page: number
   ): Promise<{ id: string; svg: string } | null> => {
     try {
-      const { response } = await createAnotationItem({
+      const response = await createAnotationItem({
         annotation_id: groupId,
         page,
         content: svg,
       });
-      toast.success(t('notifications.editPage.layer.save.success'));
+      toast.success(t("notifications.editPage.layer.save.success"));
       return { id: response.id, svg: response.content };
     } catch {
-      toast.error(t('notifications.editPage.layer.save.error'));
+      toast.error(t("notifications.editPage.layer.save.error"));
       return null;
     }
   };
@@ -109,9 +114,9 @@ const Viewer = () => {
         user_acquisition_id,
         title: name,
       });
-      toast.success(t('notifications.editPage.group.add.success'));
+      toast.success(t("notifications.editPage.group.add.success"));
     } catch {
-      toast.error(t('notifications.editPage.group.add.error'));
+      toast.error(t("notifications.editPage.group.add.error"));
     }
   };
   const updateLayerFunc = async (
@@ -126,33 +131,33 @@ const Viewer = () => {
         page,
         content: svg,
       });
-      toast.success(t('notifications.editPage.layer.edit.success'));
+      toast.success(t("notifications.editPage.layer.edit.success"));
     } catch {
-      toast.error(t('notifications.editPage.layer.edit.error'));
+      toast.error(t("notifications.editPage.layer.edit.error"));
     }
   };
   const updateGroupFunc = async (id: string, name: string) => {
     try {
       await updateAnotation(id, { title: name });
-      toast.success(t('notifications.editPage.group.edit.success'));
+      toast.success(t("notifications.editPage.group.edit.success"));
     } catch {
-      toast.error(t('notifications.editPage.group.edit.error'));
+      toast.error(t("notifications.editPage.group.edit.error"));
     }
   };
   const deleteLayerFunc = async (id: string) => {
     try {
       await deleteAnotationItem(id);
-      toast.success(t('notifications.editPage.layer.delete.success'));
+      toast.success(t("notifications.editPage.layer.delete.success"));
     } catch {
-      toast.error(t('notifications.editPage.layer.delete.error'));
+      toast.error(t("notifications.editPage.layer.delete.error"));
     }
   };
   const deleteGroupFunc = async (id: string) => {
     try {
       await deleteAnotation(id);
-      toast.success(t('notifications.editPage.group.remove.success'));
+      toast.success(t("notifications.editPage.group.remove.success"));
     } catch {
-      toast.error(t('notifications.editPage.group.remove.error'));
+      toast.error(t("notifications.editPage.group.remove.error"));
     }
   };
   const getLayerFunc = async (
@@ -184,26 +189,34 @@ const Viewer = () => {
   useEffect(() => {
     if (!id) return;
 
+    // Load and scope the viewer CSS by wrapping everything in #pdf-viewer-page
+    const styleElement = document.createElement("style");
+    styleElement.id = "pdf-viewer-styles";
+    
+    // Simply wrap all CSS rules within the #pdf-viewer-page selector
+    const scopedCss = `#${rootId} { ${viewerStyles} }`;
+    
+    styleElement.textContent = scopedCss;
+    document.head.appendChild(styleElement);
+
     (async () => {
       try {
         setProgressBar(30);
 
         // Fetch entry details and process acquisition
-        const [{ response: entryDetail }, { response: userAcquisition }] =
-          await Promise.all([
-            getEntryDetail(id!),
-            getEntryDetail(id!).then(({ response }) =>
-              createUserAcquisition({
-                acquisition_id:
-                  response.acquisitions[parseInt(index || '0')].id,
-                type: 'personal',
-              })
-            ),
-          ]);
+        console.log(entryCatalogId);
+        const entryDetail = await getEntryDetail(id!, entryCatalogId || undefined);
+        // Cache catalog_id from entry for subsequent operations
+        if (entryDetail.catalog_id && !entryCatalogId) {
+          setEntryCatalogId(entryDetail.catalog_id);
+        }
+        const userAcquisition = await createUserAcquisition({
+          acquisition_id: entryDetail.acquisitions[parseInt(index || "0")].id,
+          type: "personal",
+        });
 
-        acquisition_id = entryDetail.acquisitions[parseInt(index || '0')].id;
+        acquisition_id = entryDetail.acquisitions[parseInt(index || "0")].id;
         user_acquisition_id = userAcquisition.id;
-
         setProgressBar(50);
 
         // Update metatags if properties exist
@@ -214,9 +227,9 @@ const Viewer = () => {
           citation_isbn: entryDetail.identifiers.isbn,
           citation_authors: entryDetail.authors
             .map((author) => `${author.name}, ${author.surname}`)
-            .join('; '),
+            .join("; "),
           citation_title: entryDetail.title,
-          citation_first_page: '1',
+          citation_first_page: "1",
           citation_pdf_url: `${userAcquisition.url}?access_token=${auth?.token}`,
         };
 
@@ -234,7 +247,7 @@ const Viewer = () => {
 
         // Render viewer with the provided options and configurations
         renderViewer({
-          rootId,
+          rootId: `#${rootId}`,
           data: pdf,
           options: {
             theme,
@@ -263,29 +276,35 @@ const Viewer = () => {
         });
       } catch (error) {
         navigate(NAVIGATION_PATHS.home, { replace: true });
-        toast.error(t('notifications.fileFailed'));
+        toast.error(t("notifications.fileFailed"));
       } finally {
         setProgressBar(100);
       }
     })();
 
     return () => {
+      // Remove the scoped styles
+      const styleElement = document.getElementById("pdf-viewer-styles");
+      if (styleElement) {
+        styleElement.remove();
+      }
+
       const metaTags = [
-        'citation_title',
-        'citation_year',
-        'citation_journal_title',
-        'citation_first_page',
-        'citation_last_page',
-        'citation_publisher',
-        'citation_doi',
-        'citation_isbn',
-        'citation_abstract',
-        'citation_authors',
-        'citation_pdf_url',
+        "citation_title",
+        "citation_year",
+        "citation_journal_title",
+        "citation_first_page",
+        "citation_last_page",
+        "citation_publisher",
+        "citation_doi",
+        "citation_isbn",
+        "citation_abstract",
+        "citation_authors",
+        "citation_pdf_url",
       ];
 
       metaTags.forEach((name) => {
-        updateMetaTag(name, '');
+        updateMetaTag(name, "");
       });
     };
   }, [id]);
@@ -302,17 +321,17 @@ const Viewer = () => {
       {loading && (
         <div
           className={
-            'fixed top-0 bottom-0 left-0 right-0 bg-white dark:bg-gray bg-opacity-80 dark:bg-opacity-80 z-50 flex flex-col gap-10 justify-center items-center'
+            "fixed top-0 bottom-0 left-0 right-0 bg-white dark:bg-darkGray bg-opacity-80 dark:bg-opacity-80 z-50 flex flex-col gap-10 justify-center items-center"
           }
         >
           <img
-            className='w-52 md:w-96'
+            className="w-52 md:w-96"
             src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
-            alt='Elvira Logo'
+            alt="Elvira Logo"
           />
-          <div className='w-[80%] max-w-96 h-4 bg-zinc-300 dark:bg-strongDarkGray rounded-md overflow-hidden'>
+          <div className="w-[80%] max-w-96 h-4 bg-zinc-300 dark:bg-strongDarkGray rounded-md overflow-hidden">
             <div
-              className={`h-full ${stuBg} duration-500 rounded-md`}
+              className={`h-full bg-primary duration-500 rounded-md`}
               style={{ width: `${progressBar}%` }}
             ></div>
           </div>

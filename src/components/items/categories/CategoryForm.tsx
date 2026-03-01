@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { ICategory, ICategoryNew } from '../../../utils/interfaces/category';
 import useEditCategory from '../../../hooks/api/categories/useEditCategory';
 import useCreateCategory from '../../../hooks/api/categories/useCreateCategory';
-import ModalWrapper from '../../modal/ModalWrapper';
+import FormModal from '../../modals/FormModal';
 import ElviraInput from '../../inputs/ElviraInput';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 
@@ -21,12 +21,12 @@ const CategoryForm = ({
   reloadPage,
   setReloadPage,
 }: ICategoryFormParam) => {
-  const { umamiTrack } = useAppContext();
+  const { umamiTrack, selectedCatalogId } = useAppContext();
   const { t } = useTranslation();
 
   const [form, setForm] = useState<ICategoryNew>({
     term: category?.term ?? '',
-    catalog_id: category?.catalog_id ?? import.meta.env.ELVIRA_CATALOG_ID,
+    catalog_id: category?.catalog_id ?? selectedCatalogId ?? import.meta.env.ELVIRA_CATALOG_ID,
     label: category?.label ?? '',
     scheme: category?.scheme ?? '',
   });
@@ -88,7 +88,7 @@ const CategoryForm = ({
   };
 
   return (
-    <ModalWrapper
+    <FormModal
       title={
         category
           ? t('modal.categoryForm.editCategory')
@@ -125,7 +125,7 @@ const CategoryForm = ({
         />
         <button ref={buttonRef} type='submit' className='hidden'></button>
       </form>
-    </ModalWrapper>
+    </FormModal>
   );
 };
 

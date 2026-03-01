@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import ModalWrapper from '../modal/ModalWrapper';
+import FormModal from '../modals/FormModal';
 import { IModalParams } from '../../utils/interfaces/general/general';
 
 interface IConfirmationDialogParams extends IModalParams {
@@ -15,7 +15,7 @@ const ConfirmationDialog = ({
   const { t } = useTranslation();
 
   return (
-    <ModalWrapper
+    <FormModal
       close={close}
       title={t('modal.confirmation.title')}
       buttonLabel={t('modal.confirmation.label')}
@@ -30,9 +30,9 @@ const ConfirmationDialog = ({
               : type === 'entry'
               ? t('modal.confirmation.entry')
               : t('modal.confirmation.category'),
-        })}
+        })}?
       </span>
-    </ModalWrapper>
+    </FormModal>
   );
 };
 

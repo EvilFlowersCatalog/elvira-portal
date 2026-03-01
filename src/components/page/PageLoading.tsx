@@ -5,11 +5,10 @@ import EntryBoxLoading from '../items/entry/EntryBoxLoading';
 interface IPageLoadingParams {
   entries?: boolean;
   showLayout?: boolean;
+  size?: number;
 }
 
-const PageLoading = ({ entries = false }: IPageLoadingParams) => {
-  const { stuColor } = useAppContext();
-
+const PageLoading = ({ entries = false, size = 100 }: IPageLoadingParams) => {
   return (
     <div className={'flex flex-1 h-full flex-wrap px-4 pb-4'}>
       {entries ? (
@@ -17,8 +16,8 @@ const PageLoading = ({ entries = false }: IPageLoadingParams) => {
           <EntryBoxLoading key={index} />
         ))
       ) : (
-        <div className={'flex flex-1 justify-center items-center'}>
-          <CircleLoader color={stuColor} size={100} />
+        <div className={'flex flex-1 h-full justify-center items-center'}>
+          <CircleLoader color={'var(--color-primary)'} size={size} />
         </div>
       )}
     </div>

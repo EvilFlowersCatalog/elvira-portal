@@ -1,42 +1,72 @@
 import { useTranslation } from 'react-i18next';
-import { FaBook } from 'react-icons/fa';
-import { MdCategory, MdFeed } from 'react-icons/md';
+import { FaBook, FaRobot } from 'react-icons/fa';
+import { MdCategory, MdFeed, MdInventory, MdPerson } from 'react-icons/md';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import AdminButton from '../../components/buttons/AdminButton';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
+import { RiKey2Line } from 'react-icons/ri';
+import { H1 } from '../../components/primitives/Heading';
 
 const buttonConfig = [
   {
     icon: <FaBook size={25} />,
-    textKey: 'administration.homePage.entries',
+    titleKey: 'administration.homePage.entries.title',
+    textKey: 'administration.homePage.entries.text',
     path: NAVIGATION_PATHS.adminEntries,
   },
   {
     icon: <MdFeed size={25} />,
-    textKey: 'administration.homePage.feeds',
+    titleKey: 'administration.homePage.feeds.title',
+    textKey: 'administration.homePage.feeds.text',
     path: NAVIGATION_PATHS.adminFeeds,
   },
   {
     icon: <MdCategory size={25} />,
-    textKey: 'administration.homePage.categories',
+    titleKey: 'administration.homePage.categories.title',
+    textKey: 'administration.homePage.categories.text',
     path: NAVIGATION_PATHS.adminCategories,
+  },
+  {
+    icon: <MdPerson size={25} />,
+    titleKey: 'administration.homePage.users.title',
+    textKey: 'administration.homePage.users.text',
+    path: NAVIGATION_PATHS.adminUsers,
+  },
+  {
+    icon: <FaRobot size={25} />,
+    titleKey: 'administration.homePage.aiUsers.title',
+    textKey: 'administration.homePage.aiUsers.text',
+    path: NAVIGATION_PATHS.adminAIUsers,
   },
 ];
 
+if(import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
+  buttonConfig.push({
+      icon: <MdInventory size={25} />,
+      titleKey: 'administration.homePage.loans.title',
+      textKey: 'administration.homePage.loans.text',
+      path: NAVIGATION_PATHS.adminLoans,
+    });
+}
+
 const AdminHome = () => {
-  const { specialNavigation, umamiTrack } = useAppContext();
+  const { specialNavigation, umamiTrack, selectedCatalogId } = useAppContext();
   const { t } = useTranslation();
 
   return (
     <div className='w-full overflow-auto'>
       <Breadcrumb />
-      <div className='flex flex-wrap px-2'>
-        {buttonConfig.map(({ icon, textKey, path }, index) => (
+
+      <H1>{t('navbarMenu.administration')}</H1>
+
+      <div className='grid xl:grid-cols-4 md:grid-cols-2 px-2'>
+        {buttonConfig.map(({ icon, titleKey, textKey, path }, index) => (
           <AdminButton
             key={index}
             icon={icon}
             text={t(textKey)}
+            title={t(titleKey)}
             onClick={(event) => {
               umamiTrack('Admin Home Button', {
                 path,

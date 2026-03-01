@@ -4,17 +4,36 @@ import {
   MouseEvent,
   RefObject,
   useEffect,
-} from 'react';
+  useRef,
+} from "react";
 import {
   COOKIES_TYPE,
   LANG_TYPE,
   NAVIGATION_PATHS,
   THEME_TYPE,
-} from '../utils/interfaces/general/general';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { IContextProviderParams } from '../utils/interfaces/contexts';
-import i18next from '../utils/i18n/i18next';
-import useCookiesContext from '../hooks/contexts/useCookiesContext';
+} from "../utils/interfaces/general/general";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { IContextProviderParams } from "../utils/interfaces/contexts";
+import i18next from "../utils/i18n/i18next";
+import useCookiesContext from "../hooks/contexts/useCookiesContext";
+
+export interface AiMessageContent {
+  type: "message" | "entries" | "loading";
+  data: any;
+}
+
+export interface AiMessage {
+  role: string;
+  content: AiMessageContent;
+  id?: string;
+  bookIds?: string[];
+}
+
+export interface ICatalogOption {
+  label: string;
+  value: string;
+  catalogId: string;
+}
 
 export interface IAppContext {
   theme: THEME_TYPE;
@@ -25,17 +44,31 @@ export interface IAppContext {
   specialNavigation: (
     event: MouseEvent<HTMLButtonElement>,
     path: NAVIGATION_PATHS | string,
-    viewerFrom?: string
+    viewerFrom?: string,
   ) => void;
   isSmallDevice: boolean;
   showNavbar: boolean;
   setShowNavbar: (showNavbar: boolean) => void;
-  showSearchBar: boolean;
-  setShowSearchBar: (showSearchBar: boolean) => void;
+  showAdvancedSearch: boolean;
+  setShowAdvancedSearch: (showAdvancedSearch: boolean) => void;
+  showAiAssistant: boolean;
+  setShowAiAssistant: (showAiAssistant: boolean) => void;
+  // AI Assistant persistent state
+  aiChatId: string | null;
+  setAiChatId: (chatId: string | null) => void;
+  aiMessages: AiMessage[];
+  setAiMessages: React.Dispatch<React.SetStateAction<AiMessage[]>>;
+  aiBookCatalogs: Record<string, string>;
+  setAiBookCatalogs: React.Dispatch<
+    React.SetStateAction<Record<string, string>>
+  >;
+  aiShowSuggestions: boolean;
+  setAiShowSuggestions: (show: boolean) => void;
+  clearAiChat: () => void;
   isParamsEmpty: () => boolean;
   searchParamsEqual: (
     prevSearchParams: URLSearchParams | null,
-    currentSearchParams: URLSearchParams
+    currentSearchParams: URLSearchParams,
   ) => boolean;
   handleScroll: (
     scrollRef: RefObject<HTMLDivElement>,
@@ -45,7 +78,7 @@ export interface IAppContext {
     loadingNext: boolean,
     setLoadingNext: (loadingNext: boolean) => void,
     showScrollUp: boolean,
-    setShowScrollUp: (showScrollUp: boolean) => void
+    setShowScrollUp: (showScrollUp: boolean) => void,
   ) => void;
   logoDark: string;
   logoLight: string;
@@ -55,115 +88,103 @@ export interface IAppContext {
   stuLogoLight: string;
   editingEntryTitle: string;
   setEditingEntryTitle: (editingEntryTitle: string) => void;
-  stuBorder: string;
-  stuBorderFocus: string;
-  stuBg: string;
-  stuBgHover: string;
-  stuText: string;
-  stuColor: string;
+  selectedCatalogId: string | null;
+  selectedCatalog: ICatalogOption | null;
+  availableCatalogs: ICatalogOption[];
+  initializeCatalogs: (catalogs: ICatalogOption[]) => void;
+  switchCatalog: (catalogValue: string) => void;
   umamiTrack: (title: string, data?: Object) => void;
 }
 
 export const AppContext = createContext<IAppContext | null>(null);
-const elviraTheme = import.meta.env.ELVIRA_THEME;
-
-// assets / LOGOS
-const logoDark = `/assets/${elviraTheme}/elvira/logo-dark.png`;
-const logoLight = `/assets/${elviraTheme}/elvira/logo-light.png`;
-const titleLogoDark = `/assets/${elviraTheme}/elvira/title-logo-dark.png`;
-const titleLogoLight = `/assets/${elviraTheme}/elvira/title-logo-light.png`;
-const stuLogoDark = `/assets/${elviraTheme}/stu/logo-dark.png`;
-const stuLogoLight = `/assets/${elviraTheme}/stu/logo-light.png`;
 
 const AppProvider = ({ children }: IContextProviderParams) => {
   const { cookies, setCookie } = useCookiesContext();
 
   const [theme, setTheme] = useState<THEME_TYPE>(
-    cookies[COOKIES_TYPE.THEME_KEY] ?? THEME_TYPE.light
+    cookies[COOKIES_TYPE.THEME_KEY] ?? THEME_TYPE.light,
   );
   const [lang, setLang] = useState<LANG_TYPE>(
-    cookies[COOKIES_TYPE.LANG_KEY] ?? LANG_TYPE.sk
+    cookies[COOKIES_TYPE.LANG_KEY] ?? LANG_TYPE.sk,
   );
   const [showNavbar, setShowNavbar] = useState<boolean>(false);
-  const [editingEntryTitle, setEditingEntryTitle] = useState<string>('');
-  const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
+  const [showAdvancedSearch, setShowAdvancedSearch] = useState<boolean>(false);
+  const [showAiAssistant, setShowAiAssistant] = useState<boolean>(false);
+  const [editingEntryTitle, setEditingEntryTitle] = useState<string>("");
+  
+  // Get initial catalog from cookies or env
+  const getInitialCatalog = (): ICatalogOption | null => {
+    const savedCatalogValue = cookies[COOKIES_TYPE.CATALOG_KEY];
+    const envCatalogId = import.meta.env.ELVIRA_CATALOG_ID;
+    
+    // Return null initially, will be set when catalogs are fetched
+    return null;
+  };
+  
+  const [selectedCatalog, setSelectedCatalog] = useState<ICatalogOption | null>(getInitialCatalog());
+  const [availableCatalogs, setAvailableCatalogs] = useState<ICatalogOption[]>([]);
+  const [elviraTheme, setElviraTheme] = useState<string>(
+    import.meta.env.ELVIRA_THEME || cookies[COOKIES_TYPE.CATALOG_KEY] || 'default'
+  );
+
+  // assets / LOGOS - dynamically generated based on elviraTheme
+  // Use 'default' as fallback for unknown catalog values
+  const getAssetPath = (catalog: string) => {
+    const knownCatalogs = ['fiit', 'mtf', 'fad', 'fchpt', 'fei', 'sjf', 'svf', 'ku', 'stu'];
+    return knownCatalogs.includes(catalog) ? catalog : 'default';
+  };
+  
+  const assetTheme = getAssetPath(elviraTheme);
+  const logoDark = `/assets/${assetTheme}/elvira/logo-dark.png`;
+  const logoLight = `/assets/${assetTheme}/elvira/logo-light.png`;
+  const titleLogoDark = `/assets/${assetTheme}/elvira/title-logo-dark.png`;
+  const titleLogoLight = `/assets/${assetTheme}/elvira/title-logo-light.png`;
+  const stuLogoDark = `/assets/${assetTheme}/stu/logo-dark.png`;
+  const stuLogoLight = `/assets/${assetTheme}/stu/logo-light.png`;
+
+  // AI Assistant persistent state
+  const [aiChatId, setAiChatId] = useState<string | null>(null);
+  const [aiMessages, setAiMessages] = useState<AiMessage[]>([]);
+  const [aiBookCatalogs, setAiBookCatalogs] = useState<Record<string, string>>(
+    {},
+  );
+  const [aiShowSuggestions, setAiShowSuggestions] = useState<boolean>(true);
+
+  const clearAiChat = () => {
+    setAiChatId(null);
+    setAiMessages([]);
+    setAiBookCatalogs({});
+    setAiShowSuggestions(true);
+  };
   const [isSmallDevice, setIsSmallDevice] = useState<boolean>(
-    window.innerWidth < 959
+    window.innerWidth < 959,
   );
   const [searchParams, setSearchParams] = useSearchParams();
 
   // umami
-  const [entryDetailId, setEntryDetailId] = useState<string | null>(null);
-  const [parentId, setParentId] = useState<string | null>(null);
-  const [query, setQuery] = useState<string | null>(null);
-  const [title, setTitle] = useState<string | null>(null);
-  const [feedId, setFeedId] = useState<string | null>(null);
-  const [orderBy, setOrderBy] = useState<string | null>(null);
-  const [categoryId, setCategoryId] = useState<string | null>(null);
-  const [author, setAuthor] = useState<string | null>(null);
-  // check main.css
-  const [stuColors] = useState<{ [key: string]: string }[]>([
-    // backgournd 0
-    {
-      fiit: 'fiit-bg',
-      fchpt: 'fchpt-bg',
-      fei: 'fei-bg',
-      mtf: 'mtf-bg',
-      fad: 'fad-bg',
-      svf: 'svf-bg',
-      sjf: 'sjf-bg',
-    },
-    // border 1
-    {
-      fiit: 'fiit-border',
-      fchpt: 'fchpt-border',
-      fei: 'fei-border',
-      mtf: 'mtf-border',
-      fad: 'fad-border',
-      svf: 'svf-border',
-      sjf: 'sjf-border',
-    },
-    // background hover 2
-    {
-      fiit: 'fiit-bg-hover',
-      fchpt: 'fchpt-bg-hover',
-      fei: 'fei-bg-hover',
-      mtf: 'mtf-bg-hover',
-      fad: 'fad-bg-hover',
-      svf: 'svf-bg-hover',
-      sjf: 'sjf-bg-hover',
-    },
-    // border focus 3
-    {
-      fiit: 'fiit-border-focus',
-      fchpt: 'fchpt-border-focus',
-      fei: 'fei-border-focus',
-      mtf: 'mtf-border-focus',
-      fad: 'fad-border-focus',
-      svf: 'svf-border-focus',
-      sjf: 'sjf-border-focus',
-    },
-    // text 4
-    {
-      fiit: 'fiit-text',
-      fchpt: 'fchpt-text',
-      fei: 'fei-text',
-      mtf: 'mtf-text',
-      fad: 'fad-text',
-      svf: 'svf-text',
-      sjf: 'sjf-text',
-    },
-    // hash colors 5
-    {
-      fiit: '#01a9e0',
-      mtf: '#e62b1e',
-      svf: '#e5722a',
-      sjf: '#4c5b60',
-      fei: '#0c4a8e',
-      fchpt: '#ffda1c',
-      fad: '#009d4a',
-    },
-  ]);
+  const [umamiParameters, setUmamiParameters] = useState<{
+    query: string;
+    parentId: string;
+    title: string;
+    author: string;
+    categories: string[];
+    feeds: string[];
+    publishedAtGte: string;
+    publishedAtLte: string;
+    languageCode: string;
+    orderBy: string;
+  }>({
+    query: "",
+    parentId: "",
+    title: "",
+    author: "",
+    categories: [],
+    feeds: [],
+    publishedAtGte: "",
+    publishedAtLte: "",
+    languageCode: "",
+    orderBy: "",
+  });
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -174,24 +195,75 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     setCookie(COOKIES_TYPE.THEME_KEY, theme, { maxAge: 60 * 60 * 24 * 365 }); // year
   };
 
-  // Update lang and localstorage
   const updateLang = (lang: LANG_TYPE) => {
     setLang(lang);
     setCookie(COOKIES_TYPE.LANG_KEY, lang, { maxAge: 60 * 60 * 24 * 365 }); // year
+  };
+
+  // Initialize catalogs from API response
+  const initializeCatalogs = (catalogs: ICatalogOption[]) => {
+    setAvailableCatalogs(catalogs);
+    
+    const savedCatalogValue = cookies[COOKIES_TYPE.CATALOG_KEY];
+    const envCatalogId = import.meta.env.ELVIRA_CATALOG_ID;
+    
+    let initialCatalog: ICatalogOption | null = null;
+    
+    // Try to find saved catalog
+    if (savedCatalogValue) {
+      initialCatalog = catalogs.find(c => c.value === savedCatalogValue) || null;
+    }
+    
+    // Try to find env catalog
+    if (!initialCatalog && envCatalogId) {
+      initialCatalog = catalogs.find(c => c.catalogId === envCatalogId) || null;
+    }
+    
+    // Default to first catalog
+    if (!initialCatalog && catalogs.length > 0) {
+      initialCatalog = catalogs[0];
+    }
+    
+    if (initialCatalog) {
+      setSelectedCatalog(initialCatalog);
+      setElviraTheme(initialCatalog.value);
+         
+      document.documentElement.setAttribute('data-theme', getAssetPath(initialCatalog.value));
+    }
+  };
+
+  // Switch catalog - accepts catalog value (e.g., 'fiit', 'mtf')
+  const switchCatalog = (catalogValue: string) => {
+    const catalog = availableCatalogs.find((c) => c.value === catalogValue);
+    if (!catalog) return;
+    
+    setSelectedCatalog(catalog);
+    setElviraTheme(catalog.value);
+   
+    document.documentElement.setAttribute('data-theme', getAssetPath(catalog.value));
+    
+    // Save to cookies (session)
+    setCookie(COOKIES_TYPE.CATALOG_KEY, catalog.value);
+    
+    umamiTrack("Catalog Switch", { 
+      catalogId: catalog.catalogId,
+      catalogValue: catalog.value,
+      catalogLabel: catalog.label 
+    });
   };
 
   // Special navigation stands for navigation that can open new window tab with holding ctr/cmd
   const specialNavigation = (
     event: MouseEvent<HTMLButtonElement>,
     path: NAVIGATION_PATHS | string,
-    viewerFrom?: string
+    viewerFrom?: string,
   ) => {
-    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+    const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
     event.preventDefault();
 
     // If ctrl or meta && is on mac open new tab
-    if (event.ctrlKey || (event.metaKey && isMac) || event.button === 2)
-      window.open(path, '_blank');
+    if (event.ctrlKey || (event.metaKey && isMac) || event.button === 1)
+      window.open(path, "_blank");
     else {
       if (viewerFrom) navigate(path, { state: { from: viewerFrom } });
       else navigate(path);
@@ -199,14 +271,14 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   };
 
   const umamiTrack = (title: string, data?: Object) => {
-    if (typeof umami !== 'undefined') umami.track(title, data);
+    if (typeof umami !== "undefined") umami.track(title, data);
   };
 
   const clearFilters = () => {
     const params = new URLSearchParams();
 
-    const entryDetailId = searchParams.get('entry-detail-id');
-    if (entryDetailId) params.set('entry-detail-id', entryDetailId);
+    const entryDetailId = searchParams.get("entry-detail-id");
+    if (entryDetailId) params.set("entry-detail-id", entryDetailId);
 
     setSearchParams(params);
   };
@@ -214,7 +286,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const isParamsEmpty = () => {
     // do not count entry-detail-id
     for (let [key] of searchParams.entries()) {
-      if (key !== 'entry-detail-id' && key !== 'parent-id') {
+      if (key !== "entry-detail-id" && key !== "parent-id") {
         return false;
       }
     }
@@ -224,19 +296,19 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   // Function for ignoring entry-detail-id
   const searchParamsEqual = (
     prevSearchParams: URLSearchParams | null,
-    currentSearchParams: URLSearchParams
+    currentSearchParams: URLSearchParams,
   ) => {
     // If we do not have prev return false
     if (!prevSearchParams) return false;
 
     // Get prev params except entry-detail-id
-    const { 'entry-detail-id': prevId, ...prevRest } = Object.fromEntries(
-      prevSearchParams.entries()
+    const { "entry-detail-id": prevId, ...prevRest } = Object.fromEntries(
+      prevSearchParams.entries(),
     );
 
     // Get current params except entry-detail-id
-    const { 'entry-detail-id': currId, ...currRest } = Object.fromEntries(
-      currentSearchParams.entries()
+    const { "entry-detail-id": currId, ...currRest } = Object.fromEntries(
+      currentSearchParams.entries(),
     );
 
     // Chcek prev
@@ -263,7 +335,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     loadingNext: boolean,
     setLoadingNext: (loadingNext: boolean) => void,
     showScrollUp: boolean,
-    setShowScrollUp: (showScrollUp: boolean) => void
+    setShowScrollUp: (showScrollUp: boolean) => void,
   ) => {
     if (scrollRef.current) {
       const { scrollTop, scrollHeight, clientHeight } = scrollRef.current;
@@ -287,26 +359,31 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   };
 
   useEffect(() => {
-    document.body.classList.remove('light', 'dark');
+    document.body.classList.remove("light", "dark");
     document.body.classList.add(theme);
   }, [theme]);
+
+  // Set data-theme attribute on HTML root for CSS variables
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", getAssetPath(elviraTheme));
+  }, [elviraTheme]);
 
   useEffect(() => {
     // Set languege based on given language
     if (lang === LANG_TYPE.sk) {
-      i18next.changeLanguage('sk');
+      i18next.changeLanguage("sk");
     } else if (lang === LANG_TYPE.en) {
-      i18next.changeLanguage('en');
+      i18next.changeLanguage("en");
     } else {
-      i18next.changeLanguage('en');
+      i18next.changeLanguage("en");
     }
   }, [lang]);
 
   // Each page change reset
   useEffect(() => {
     setShowNavbar(false);
-    setShowSearchBar(false);
-    setEditingEntryTitle('');
+    setEditingEntryTitle("");
+    setShowAdvancedSearch(false);
   }, [location.pathname]);
 
   useEffect(() => {
@@ -318,74 +395,68 @@ const AppProvider = ({ children }: IContextProviderParams) => {
 
     // handle esc
     const handleESC = (e?: KeyboardEvent) => {
-      if (e?.code?.toLocaleLowerCase() === 'escape') {
-        searchParams.delete('entry-detail-id');
+      if (e?.code?.toLocaleLowerCase() === "escape") {
+        searchParams.delete("entry-detail-id");
         setSearchParams(searchParams);
-        setShowSearchBar(false);
       }
     };
 
     // Attach the event listener when the component mounts
-    window.addEventListener('resize', handleResize);
-    window.addEventListener('keydown', handleESC);
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("keydown", handleESC);
     // Clean up the event listener when the component unmounts
     return () => {
-      window.removeEventListener('resize', handleResize);
-      window.removeEventListener('keydown', handleESC);
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("keydown", handleESC);
     };
-  }, []);
+  }, [searchParams]);
 
   // track searchParam for umami
   useEffect(() => {
-    setEntryDetailId(searchParams.get('entry-detail-id'));
-    setParentId(searchParams.get('parent-id'));
-    setQuery(searchParams.get('query'));
-    setTitle(searchParams.get('title'));
-    setFeedId(searchParams.get('feed-id'));
-    setOrderBy(searchParams.get('order-by'));
-    setCategoryId(searchParams.get('category-id'));
-    setAuthor(searchParams.get('author'));
+    setUmamiParameters({
+      query: searchParams.get("query") || "",
+      parentId: searchParams.get("parent-id") || "",
+      title: searchParams.get("title") || "",
+      author: searchParams.get("author") || "",
+      categories: searchParams.get("categories")?.split(",") || [],
+      feeds: searchParams.get("feeds")?.split(",") || [],
+      publishedAtGte: searchParams.get("publishedAtGte") || "",
+      publishedAtLte: searchParams.get("publishedAtLte") || "",
+      languageCode: searchParams.get("languageCode") || "",
+      orderBy: searchParams.get("orderBy") || "",
+    });
   }, [searchParams]);
+  const previousParams = useRef<{ [K in keyof typeof umamiParameters]?: any }>(
+    {},
+  );
+  const paramEventMap: { [K in keyof typeof umamiParameters]: string } = {
+    title: "Title Param",
+    parentId: "Parent Param",
+    query: "Query Param",
+    feeds: "Feed Params",
+    orderBy: "Order By Param",
+    categories: "Category Param",
+    author: "Author Param",
+    publishedAtGte: "Published At GTE Param",
+    publishedAtLte: "Published At LTE Param",
+    languageCode: "Language Code Param",
+  };
   useEffect(() => {
-    if (entryDetailId !== null) {
-      umamiTrack('Entry Detail Param', { entryId: entryDetailId });
-    }
-  }, [entryDetailId]);
-  useEffect(() => {
-    if (parentId !== null) {
-      umamiTrack('Parent Param', { parentId });
-    }
-  }, [parentId]);
-  useEffect(() => {
-    if (query !== null) {
-      umamiTrack('Query Param', { query });
-    }
-  }, [query]);
-  useEffect(() => {
-    if (title !== null) {
-      umamiTrack('Title Param', { title });
-    }
-  }, [title]);
-  useEffect(() => {
-    if (feedId !== null) {
-      umamiTrack('Feed Param', { feedId });
-    }
-  }, [feedId]);
-  useEffect(() => {
-    if (orderBy !== null) {
-      umamiTrack('Order By Param', { orderBy });
-    }
-  }, [orderBy]);
-  useEffect(() => {
-    if (categoryId !== null) {
-      umamiTrack('Category Param', { categoryId });
-    }
-  }, [categoryId]);
-  useEffect(() => {
-    if (author !== null) {
-      umamiTrack('Author Param', { author: author });
-    }
-  }, [author]);
+    (
+      Object.entries(paramEventMap) as [keyof typeof umamiParameters, string][]
+    ).forEach(([key, eventName]) => {
+      const value = umamiParameters[key];
+      if (
+        value !== null &&
+        value.length > 0 &&
+        previousParams.current[key] !== value
+      ) {
+        umamiTrack(eventName, { [key]: value });
+      }
+    });
+
+    previousParams.current = { ...umamiParameters };
+  }, [umamiParameters]);
 
   return (
     <AppContext.Provider
@@ -396,8 +467,19 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         updateLang,
         showNavbar,
         setShowNavbar,
-        showSearchBar,
-        setShowSearchBar,
+        showAdvancedSearch,
+        setShowAdvancedSearch,
+        showAiAssistant,
+        setShowAiAssistant,
+        aiChatId,
+        setAiChatId,
+        aiMessages,
+        setAiMessages,
+        aiBookCatalogs,
+        setAiBookCatalogs,
+        aiShowSuggestions,
+        setAiShowSuggestions,
+        clearAiChat,
         specialNavigation,
         clearFilters,
         isSmallDevice,
@@ -412,12 +494,11 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         logoLight,
         editingEntryTitle,
         setEditingEntryTitle,
-        stuBg: stuColors[0][elviraTheme],
-        stuBorder: stuColors[1][elviraTheme],
-        stuBgHover: stuColors[2][elviraTheme],
-        stuBorderFocus: stuColors[3][elviraTheme],
-        stuText: stuColors[4][elviraTheme],
-        stuColor: stuColors[5][elviraTheme],
+        selectedCatalogId: selectedCatalog?.catalogId || null,
+        selectedCatalog,
+        availableCatalogs,
+        initializeCatalogs,
+        switchCatalog,
         umamiTrack,
       }}
     >

@@ -6,17 +6,28 @@ import ElviraInput from '../inputs/ElviraInput';
 import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface ICategoryAutofillParams {
+  /**
+   * single=false (admin): full entry object with a `.categories` array inside.
+   * single=true  (portal): the currently selected ICategory item, or undefined.
+   */
   entryForm: any;
+  defaultCategoryId?: string;
   setEntryForm: (entryForm: any) => void;
+  /**
+   * single=false (admin): pushes to the entry's category list (multi-select).
+   * single=true  (portal): setEntryForm is called with [category] or [] directly.
+   */
   single?: boolean;
+  setIsSelectionOpen: (isOpen: boolean) => void;
 }
 
 const CategoryAutofill = ({
   entryForm,
   setEntryForm,
+  defaultCategoryId,
   single = false,
+  setIsSelectionOpen
 }: ICategoryAutofillParams) => {
-  const { stuBorder } = useAppContext();
   const { t } = useTranslation();
 
   const [inputValue, setInputValue] = useState<string>('');
@@ -39,6 +50,25 @@ const CategoryAutofill = ({
     })();
   }, []);
 
+  // Portal (single=true) mode: sync display value when the selected item changes externally
+  useEffect(() => {
+    if (!single) return;
+    setInputValue(entryForm?.term ?? '');
+  }, [single, entryForm?.term]);
+
+  useEffect(() => {
+    if (defaultCategoryId && categories) {
+      const defaultCategory = categories.find((category: ICategory) => category.id === defaultCategoryId);
+      if (defaultCategory) {
+        setInputValue(defaultCategory.term);
+        setEntryForm({
+          ...entryForm,
+          categories: [{ term: defaultCategory.term, id: defaultCategory.id }],
+        });
+      }
+    }
+  }, [defaultCategoryId, categories]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setInputValue(value);
@@ -53,13 +83,11 @@ const CategoryAutofill = ({
 
   const handleSuggestionClick = (category: ICategory) => {
     if (single) {
-      setEntryForm({
-        ...entryForm,
-        categories: [category],
-      });
+      // Portal mode: setEntryForm is a direct array setter — call with [category]
+      setEntryForm([category]);
       setInputValue(category.term);
       setIsHovering(false);
-      setSuggestions([]); // Hide suggestions after selection
+      setSuggestions([]);
       return;
     }
 
@@ -86,9 +114,8 @@ const CategoryAutofill = ({
   return (
     <div className='w-full relative'>
       <ElviraInput
-        className={`bg-white dark:bg-gray ${
-          suggestions.length > 0 ? 'rounded-b-none' : ''
-        }`}
+        className={`bg-white ${suggestions.length > 0 ? 'rounded-b-none' : ''
+          }`}
         type='text'
         value={inputValue}
         onChange={handleInputChange}
@@ -104,6 +131,7 @@ const CategoryAutofill = ({
           );
 
           setSuggestions(filteredSuggestions);
+          setIsSelectionOpen(true);
         }}
         onBlur={() => {
           const category = categories.filter(
@@ -113,24 +141,30 @@ const CategoryAutofill = ({
           );
           if (category.length === 0) {
             setInputValue('');
+            // Portal mode: clear the selection when input is emptied
+            if (single) setEntryForm([]);
           } else {
             setInputValue('');
             handleSuggestionClick(category[0]);
           }
           // if we click outside out input no on suggestions
-          if (!isHovering) setSuggestions([]);
+          if (!isHovering) {
+            setSuggestions([]);
+            setIsSelectionOpen(false);
+          }
         }}
       />
       {suggestions.length > 0 && (
         <ul
-          className={`absolute top-[60px] border-2 rounded-md rounded-t-none ${stuBorder} list-none max-h-40 overflow-y-scroll bg-white dark:bg-gray z-20 w-full`}
+          className={`absolute top-[60px] rounded-md rounded-t-none border-primary list-none max-h-40 overflow-y-scroll bg-white dark:bg-darkGray z-20 w-full
+          shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A]`}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
           {suggestions.map((category, index) => (
             <li
               key={index}
-              className='bg-white dark:bg-gray hover:bg-zinc-200 dark:hover:bg-darkGray'
+              className='bg-white dark:bg-darkGray hover:bg-zinc-200 dark:hover:bg-darkGray'
               onClick={() => handleSuggestionClick(category)}
               style={{ padding: '5px', cursor: 'pointer' }}
             >

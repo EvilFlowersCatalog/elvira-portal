@@ -8,14 +8,22 @@ export enum NAVIGATION_PATHS {
   shelf = '/shelf',
   loans = '/loans',
   feeds = '/feeds',
-  about = '/about',
+  history = '/history',
+  licenses = '/licenses',
   viewer = '/viewer/',
+  aiAssistant = '/ai-assistant',
+  help = '/help',
+  aiChatHistory = '/ai-chat-history',
   adminHome = '/administration',
   adminEntries = '/administration/entries',
   adminAddEntries = '/administration/entries/add',
   adminEditEntries = '/administration/entries/edit/',
   adminFeeds = '/administration/feeds',
+  adminLicenses = '/administration/licenses',
   adminCategories = '/administration/categories',
+  adminUsers = '/administration/users',
+  adminLoans = '/administration/loans',
+  adminAIUsers = '/administration/ai-users',
 }
 
 export enum THEME_TYPE {
@@ -43,6 +51,7 @@ export enum COOKIES_TYPE {
   AUTH_KEY = 'elvira-auth',
   THEME_KEY = 'elvira-theme',
   LANG_KEY = 'elvira-lang',
+  CATALOG_KEY = 'elvira-catalog',
   LAYOUT_KEY = 'elvira-layout',
   INFOMED_KEY = 'elvira-cookie-informed',
   LICENSE_KEY = 'elvira-license-terms',
@@ -61,6 +70,7 @@ export interface IConfig {
   evilflowres_metadata_fetch: boolean;
   evilflowers_annotations_create: boolean;
   evilflowers_ocr_rewrite: boolean;
+  readium_enabled: boolean;
 }
 
 export interface IModalParams {
@@ -78,4 +88,11 @@ export interface IWizardParams {
 export interface IPartParams {
   entry: IEntryNewForm;
   setEntry: (entry: IEntryNewForm) => void;
+}
+
+export interface Metadata {
+  page: number;
+  limit: number;
+  pages: number;
+  total: number;
 }

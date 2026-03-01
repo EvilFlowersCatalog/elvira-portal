@@ -1,5 +1,5 @@
 import React from 'react';
-import ModalWrapper from '../modal/ModalWrapper';
+import FormModal from '../modals/FormModal';
 import { useTranslation } from 'react-i18next';
 
 interface ILicenseTermsParams {
@@ -10,14 +10,14 @@ const LicenseTerms = ({ setOpenLicenseModal }: ILicenseTermsParams) => {
   const { t } = useTranslation();
 
   return (
-    <ModalWrapper
+    <FormModal
       title={t('login.licenseTitle')}
       buttonLabel=''
       close={setOpenLicenseModal}
     >
       <div className='flex flex-col gap-2 text-black dark:text-white text-left'>
-        <h1 className='font-bold text-lg'>LICENCIA NA DOKUMENTY</h1>
-        <span>
+        <h3 className='font-bold text-lg mt-5'>LICENCIA NA DOKUMENTY</h3>
+        <p>
           V prípade Dokumentov uvedených v Digitálnej knižnici ELVIRA STU (ďalej
           len ELVIRA) týmto udeľuje používateľovi neprenosnú (okrem prípadu, ak
           je to inak stanovené v týchto Podmienkách), nevýhradnú, obmedzenú
@@ -31,9 +31,9 @@ const LicenseTerms = ({ setOpenLicenseModal }: ILicenseTermsParams) => {
           združenie a (ii) v prípade Dokumentov s Permanentným prístupom na
           permanentnej báze, pochádzajúcim z vydavateľstva SPEKTRUM, príp. iných
           Dokumentov s voľným DRM.
-        </span>
-        <h1 className='font-bold text-lg'>PRÍSTUP</h1>
-        <span>
+        </p>
+        <h3 className='font-bold text-lg mt-5'>PRÍSTUP</h3>
+        <p>
           Držiteľ licencie môže získať prístup k Dokumentom prostredníctvom
           príslušnej platformi ELVIRA použitím (i) jedného alebo viacerých
           identifikačných hesiel vydaných zo strany STU; (ii) overením IP
@@ -52,9 +52,9 @@ const LicenseTerms = ({ setOpenLicenseModal }: ILicenseTermsParams) => {
           overovania používateľov. Používate je povinný okamžite informovať
           Administrátora STU, pokiaľ sa nazdáva, že došlo k neoprávnenému
           prístupu k niektorému z Dokumentov.
-        </span>
+        </p>
       </div>
-    </ModalWrapper>
+    </FormModal>
   );
 };
 

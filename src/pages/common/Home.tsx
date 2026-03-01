@@ -4,22 +4,27 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import HomeHeader from '../../components/specific-page/home-page/HomeHeader';
-import SwiperContainer from '../../components/specific-page/home-page/swiper/SwiperContainer';
-import EntryDetail from '../../components/items/entry/EntryDetail';
+import EntryDetail from '../../components/items/entry/details/EntryDetail';
+import EntryDisplay from '../../components/items/entry/display/EntryDisplay';
+import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
+import useAppContext from '../../hooks/contexts/useAppContext';
 
 const Home = () => {
   const { t } = useTranslation();
+  const { selectedCatalogId } = useAppContext();
 
   const [popularEntries, setPopularEntries] = useState<IEntry[]>([]);
-  const [clickedEntry, setClickedEntry] = useState<
-    'popular' | 'lastAdded' | ''
-  >('');
   const [lastAddedEntries, setLastAddedEntries] = useState<IEntry[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
-  const [searchParams] = useSearchParams();
 
   const getEntries = useGetEntries();
+
+  // Reload entries when catalog changes
+  useEffect(() => {
+    setPopularEntries([]);
+    setLastAddedEntries([]);
+    setIsLoading(true);
+  }, [selectedCatalogId]);
 
   useEffect(() => {
     (async () => {
@@ -44,13 +49,7 @@ const Home = () => {
         setIsLoading(false);
       }
     })();
-  }, []);
-
-  useEffect(() => {
-    const entryDetailId = searchParams.get('entry-detail-id');
-    if (entryDetailId) setActiveEntryId(entryDetailId);
-    else setActiveEntryId(null);
-  }, [searchParams]);
+  }, [selectedCatalogId]);
 
   return (
     <>
@@ -58,32 +57,30 @@ const Home = () => {
         <HomeHeader />
 
         {/* POPULAR */}
-        <h1 className='text-lg mb-2 font-medium'>{t('home.popular')}</h1>
-        <SwiperContainer
+        <div className='flex justify-between items-center mb-5 flex-wrap'>
+          <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>{t('home.popular')}</h2>
+          <a href="/library?order-by=-popularity" className='text-sm text-primary cursor-pointer'>Zobraziť všetko</a>
+        </div>
+        <EntryDisplay
           isLoading={isLoading}
           entries={popularEntries}
-          setClickedEntry={setClickedEntry}
-          clickedEntry={clickedEntry}
-          activeEntryId={activeEntryId}
-          type='popular'
+          limitRows={true}
         />
 
-        <div className='h-10'></div>
 
         {/* LAST ADDED */}
-        <h1 className='text-lg mb-2 font-medium'>{t('home.lastAdded')}</h1>
-        <SwiperContainer
+        <div className='flex justify-between items-center mb-5 flex-wrap mt-12'>
+          <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>{t('home.lastAdded')}</h2>
+          <a href="/library?order-by=-created_at" className='text-sm text-primary cursor-pointer'>Zobraziť všetko</a>
+        </div>
+        <EntryDisplay
           isLoading={isLoading}
           entries={lastAddedEntries}
-          setClickedEntry={setClickedEntry}
-          clickedEntry={clickedEntry}
-          activeEntryId={activeEntryId}
-          type='lastAdded'
+          limitRows={true}
         />
-
-        <div className='h-4'></div>
       </div>
-      {activeEntryId && <EntryDetail />}
+      <EntryDetail />
+      <LicenseCalendar />
     </>
   );
 };

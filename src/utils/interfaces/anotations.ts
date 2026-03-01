@@ -29,7 +29,8 @@ export interface IAnotationItem {
 }
 
 export interface ICreateAnotationItemResponse {
-  response: { id: string; content: any };
+  id: string;
+  content: any;
 }
 
 export interface IListAnitation {

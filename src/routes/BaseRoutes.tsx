@@ -10,7 +10,6 @@ import useAuthContext from '../hooks/contexts/useAuthContext';
 import RequireAdmin from './guards/AdminGuard';
 import Viewer from '../pages/common/Viewer';
 import Home from '../pages/common/Home';
-import About from '../pages/common/About';
 import AdminEditEntry from '../pages/admin/entries/AdminEditEntry';
 import AdminEntries from '../pages/admin/entries/AdminEntries';
 import AdminCategories from '../pages/admin/AdminCategories';
@@ -18,12 +17,24 @@ import Feeds from '../pages/common/Feeds';
 import AdminHome from '../pages/admin/AdminHome';
 import AdminAddEntry from '../pages/admin/entries/AdminAddEntry';
 import Auth from '../pages/auth/Auth';
+import Loans from '../pages/common/Loans';
+import AdminUsers from '../pages/admin/AdminUsers';
+import AdminAIUsers from '../pages/admin/AdminAIUsers';
+import AdminLoans from '../pages/admin/AdminLoans';
+import AiAssistantPage from '../pages/common/AiAssistant';
+import AiChatHistory from '../pages/common/AiChatHistory';
+import History from '../pages/common/History';
+import CatalogInitializer from '../components/catalog/CatalogInitializer';
 
 const BaseRoutes = () => {
   const { auth } = useAuthContext();
 
   return (
-    <Routes>
+    <>
+      {/* Fetch catalogs from API after authentication is available */}
+      {auth && <CatalogInitializer />}
+      
+      <Routes>
       <Route element={<App />}>
         {/* Public */}
         <Route path='404' element={<NotFound />} />
@@ -44,11 +55,19 @@ const BaseRoutes = () => {
         {/* Only authorized */}
         <Route element={<RequireAuth />}>
           <Route index element={<Home />} />
-          {/* <Route path='about' element={<About />} /> */}
           <Route path='library' element={<Library />} />
           <Route path='shelf' element={<Shelf />} />
-          {/* <Route path='loans' element={<Loans />} /> */}
+          <Route path='history' element={<History />} />
+          { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+            <Route path='loans' element={<Loans />} />
+          ) }
           <Route path='feeds' element={<Feeds />} />
+          {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+            <>
+              <Route path='ai-assistant' element={<AiAssistantPage />} />
+              <Route path='ai-chat-history' element={<AiChatHistory />} />
+            </>
+          )}
           <Route path='viewer/:entry-id/:index' element={<Viewer />} />
 
           {/* Only with admin role */}
@@ -61,10 +80,16 @@ const BaseRoutes = () => {
             </Route>
             <Route path='feeds' element={<AdminFeeds />} />
             <Route path='categories' element={<AdminCategories />} />
+            <Route path="users" element={<AdminUsers />} />
+            <Route path="ai-users" element={<AdminAIUsers />} />
+            { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+              <Route path='loans' element={<AdminLoans />} />
+            ) }
           </Route>
         </Route>
       </Route>
     </Routes>
+    </>
   );
 };
 

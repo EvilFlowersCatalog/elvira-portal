@@ -13,12 +13,12 @@ import { CircleLoader } from 'react-spinners';
 import ElviraInput from '../../components/inputs/ElviraInput';
 import { Checkbox } from '@mui/material';
 import useCookiesContext from '../../hooks/contexts/useCookiesContext';
-import ModalWrapper from '../../components/modal/ModalWrapper';
+import FormModal from '../../components/modals/FormModal';
 import LicenseTerms from '../../components/dialogs/LicenseTerms';
 
 const Auth = () => {
   const { login } = useAuthContext();
-  const { stuColor, theme, titleLogoDark, titleLogoLight, umamiTrack } =
+  const { theme, titleLogoDark, titleLogoLight, umamiTrack } =
     useAppContext();
   const { cookies, setCookie } = useCookiesContext();
 
@@ -85,7 +85,7 @@ const Auth = () => {
         <LicenseTerms setOpenLicenseModal={setOpenLicenseModal} />
       )}
       <div className='flex w-full flex-1 flex-col justify-center items-center p-4'>
-        <div className='flex flex-col p-5 h-[500px] w-full md:w-2/3 lg:w-4/6 xl:w-3/5 xxl:w-2/5 bg-zinc-100 dark:bg-darkGray justify-evenly items-center rounded-md'>
+        <div className='flex flex-col p-5 h-[500px] w-full max-w-[700px] justify-evenly items-center rounded-md'>
           <div className='flex flex-col items-center justify-center gap-2'>
             <img
               className='w-96'
@@ -97,11 +97,11 @@ const Auth = () => {
           <div className='flex w-full h-fit justify-center items-start'>
             {loading ? (
               <div className='flex h-full justify-center items-center'>
-                <CircleLoader color={stuColor} size={50} />
+                <CircleLoader color={'var(--color-primary)'} size={50} />
               </div>
             ) : (
               <form
-                className='flex flex-col gap-4 w-3/4 items-center'
+                className='flex flex-col gap-4 md:w-3/4 items-center'
                 onSubmit={submit}
               >
                 <ElviraInput
@@ -119,9 +119,10 @@ const Auth = () => {
                     placeholder={t('login.password')}
                     invalidMessage={t('login.requiredMessage.password')}
                     required
+                    className='pr-12'
                   />
                   <button
-                    className='absolute top-[31px] -right-7'
+                    className='absolute top-[26px] right-1 p-2'
                     type='button'
                     onClick={() => setShowPassword((prevShow) => !prevShow)}
                   >
@@ -140,9 +141,9 @@ const Auth = () => {
                     onChange={handleCheckChange}
                     onInvalid={handleCheckkInvalid}
                     sx={{
-                      color: checkInvalid ? 'red' : stuColor,
+                      color: checkInvalid ? 'red' : 'var(--color-primary)',
                       '&.Mui-checked': {
-                        color: checkInvalid ? 'red' : stuColor,
+                        color: checkInvalid ? 'red' : 'var(--color-primary)',
                       },
                     }}
                   />
@@ -156,7 +157,7 @@ const Auth = () => {
                     {t('login.license')}
                   </button>
                 </div>
-                <Button type='submit' title={t('login.loginBtn')} />
+                <Button type='submit'>{t('login.loginBtn')}</Button>
               </form>
             )}
           </div>

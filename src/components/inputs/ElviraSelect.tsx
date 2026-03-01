@@ -7,6 +7,35 @@ interface IElviraSelectParams {
   children: ReactNode;
 }
 
+export const MUISelectStyle = {
+  '&:before': { borderBottom: '0px' },
+  '&:hover:not(.Mui-disabled):before': { borderBottom: '0px' },
+  '.MuiSelect-icon': { color: 'black' },
+  '.dark & .MuiSelect-icon': { color: 'white' },
+  '&:after': { display: 'none' },
+  'ul': {
+    paddingBottom: 0, paddingTop: 0
+  }
+}
+
+export const CatalogSelectStyle = {
+  ...MUISelectStyle,
+  '.nav_collapsed &': {
+    '.MuiSelect-select': {
+      paddingRight: '0 !important',
+    },
+    'div': {
+      justifyContent: 'center',
+    },
+    'span': {
+      display: 'none',
+    },
+    '.MuiSvgIcon-root': {
+      display: 'none',
+    }
+  }
+}
+
 const ElviraSelect = ({
   name,
   value,

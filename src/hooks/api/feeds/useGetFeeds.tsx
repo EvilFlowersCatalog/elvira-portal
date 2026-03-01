@@ -1,8 +1,10 @@
 import { IFeedQuery, IFeedsList } from '../../../utils/interfaces/feed';
 import useAxios from '../useAxios';
+import useAppContext from '../../contexts/useAppContext';
 
 const useGetFeeds = () => {
   const axios = useAxios();
+  const { selectedCatalogId } = useAppContext();
 
   const getFeeds = async ({
     page,
@@ -15,7 +17,7 @@ const useGetFeeds = () => {
   }: IFeedQuery): Promise<IFeedsList> => {
     // Set params
     const params = new URLSearchParams();
-    params.set('catalog_id', import.meta.env.ELVIRA_CATALOG_ID);
+    if (selectedCatalogId) params.set('catalog_id', selectedCatalogId);
 
     if (orderBy) params.set('order_by', orderBy);
     else params.set('order_by', '-created_at');

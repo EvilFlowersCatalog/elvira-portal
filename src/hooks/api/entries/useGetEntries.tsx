@@ -1,8 +1,10 @@
 import { IEntriesList, IEntryQuery } from '../../../utils/interfaces/entry';
 import useAxios from '../useAxios';
+import useAppContext from '../../contexts/useAppContext';
 
 const useGetEntries = () => {
   const axios = useAxios();
+  const { selectedCatalogId } = useAppContext();
 
   const getEntries = async ({
     page,
@@ -15,12 +17,15 @@ const useGetEntries = () => {
     authors,
     categoryId,
     query,
+    languageCode,
+    categories,
+    feeds,
   }: IEntryQuery): Promise<IEntriesList> => {
     // Set params
     const params = new URLSearchParams();
     params.set('page', page.toString());
     params.set('limit', limit.toString());
-    params.set('catalog_id', import.meta.env.ELVIRA_CATALOG_ID);
+    if (selectedCatalogId) params.set('catalog_id', selectedCatalogId);
 
     if (orderBy) params.set('order_by', orderBy);
     else params.set('order_by', '-created_at');
@@ -28,11 +33,15 @@ const useGetEntries = () => {
     // Check if there is param, if yes set it
     if (title) params.set('title', title);
     if (feedId) params.set('feed_id', feedId);
-    if (publishedAtGte) params.set('published_at_gte', publishedAtGte);
-    if (publishedAtLte) params.set('published_at_lte', publishedAtLte);
+    if (publishedAtGte) params.set('published_at__gte', publishedAtGte);
+    if (publishedAtLte) params.set('published_at__lte', publishedAtLte);
     if (authors) params.set('author', authors);
     if (categoryId) params.set('category_id', categoryId);
     if (query) params.set('query', query);
+    if (languageCode) params.set('language_code', languageCode);
+
+    // if (categories) params.set('categories', categories);
+    // if (feeds) params.set('feeds', feeds);
 
     // Get entries by params
     const GET_ENTRIES_URL = '/api/v1/entries';

@@ -12,7 +12,7 @@ import useAppContext from '../../hooks/contexts/useAppContext';
  * @returns not found page, when user goes somewhere where he should not
  */
 const NotFound = () => {
-  const { theme, titleLogoDark, titleLogoLight, stuText } = useAppContext();
+  const { theme, titleLogoDark, titleLogoLight } = useAppContext();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
@@ -24,7 +24,7 @@ const NotFound = () => {
           src={theme === THEME_TYPE.light ? titleLogoDark : titleLogoLight}
           alt='Elvira Logo'
         />
-        <h1 className={`text-[100px] md:text-[200px] font-bold ${stuText}`}>
+        <h1 className={`text-[100px] md:text-[200px] font-bold text-primary`}>
           {t('notFound.oops')}
         </h1>
         <p className={'text-2xl md:text-4xl text-center text-bold font-bold'}>
@@ -35,9 +35,7 @@ const NotFound = () => {
           <span>{t('notFound.infoPart2')}</span>
         </div>
         <Button
-          onClick={() => navigate(NAVIGATION_PATHS.home)}
-          title={t('notFound.goBack')}
-        />
+          onClick={() => navigate(NAVIGATION_PATHS.home)}>{t('notFound.goBack')}</Button>
       </div>
     </div>
   );

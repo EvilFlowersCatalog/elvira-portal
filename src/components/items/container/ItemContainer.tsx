@@ -5,16 +5,17 @@ import PageLoading from '../../page/PageLoading';
 import PageMessage from '../../page/PageMessage';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../../hooks/contexts/useAppContext';
-import ScrollUpButton from '../../buttons/ScrollUpButton';
 import ToolsContainer from '../../tools/ToolsContainer';
-import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
-import EntryDetail from '../entry/EntryDetail';
+import EntryDetail from '../entry/details/EntryDetail';
+import { H1 } from '../../primitives/Heading';
+import { AdvancedSearchWrapper } from './AdvancedSearch';
+import OpenFiltersButton from '../../buttons/OpenFiltersButton';
+import LicenseCalendar from '../entry/details/LicenseCalendar';
 
 interface IItemContainer {
   children: ReactNode;
-  activeEntryId?: string | null;
-  setActiveEntryId?: ((activeEntryId: string | null) => void) | null;
   isLoading: boolean;
+  showSearch?: boolean;
   showLayout?: boolean;
   setIsLoading: (isLoading: boolean) => void;
   isError: boolean;
@@ -29,12 +30,14 @@ interface IItemContainer {
   setLoadingNext: (loadingNext: boolean) => void;
   searchSpecifier: string;
   showEmpty?: boolean;
+  title?: string;
+  customFilters?: ReactNode;
+  description?: string;
+  shouldRedirectSuggestions?: boolean;
 }
 
 const ItemContainer = ({
   children,
-  activeEntryId = null,
-  setActiveEntryId = null,
   isLoading,
   isError,
   items,
@@ -50,9 +53,12 @@ const ItemContainer = ({
   isEntries = true,
   searchSpecifier,
   showEmpty = true,
+  title,
+  customFilters,
+  description,
+  shouldRedirectSuggestions = false,
 }: IItemContainer) => {
-  const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty } =
-    useAppContext();
+  const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty } = useAppContext();
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [showScrollUp, setShowScrollUp] = useState<boolean>(false);
@@ -75,10 +81,6 @@ const ItemContainer = ({
     previousSearchParamsRef.current = searchParams;
 
     const entryDetailId = searchParams.get('entry-detail-id');
-    if (setActiveEntryId) {
-      if (entryDetailId) setActiveEntryId(entryDetailId);
-      else setActiveEntryId(null);
-    }
   }, [searchParams]);
 
   return (
@@ -100,50 +102,48 @@ const ItemContainer = ({
         }
       >
         <Breadcrumb />
+        {title && <H1>{title}</H1>}
+        {description && <p className="px-4 text-secondary dark:text-secondaryLight text-sm mb-4">{description}</p>}
+        <ToolsContainer 
+          param={searchSpecifier} 
+          advancedSearch={isEntries} 
+          customFilters={customFilters}
+          shouldRedirectSuggestions={shouldRedirectSuggestions}
+        />
 
-        <ToolsContainer param={searchSpecifier} advancedSearch={isEntries} />
-
-        {isLoading && (
-          <PageLoading entries={isEntries} showLayout={showLayout} />
-        )}
-
-        {!isLoading && isError && <PageMessage message={t('page.error')} />}
-
-        {!isLoading && !isError && (
+        <AdvancedSearchWrapper>
           <>
-            {showEmpty ? (
+            <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-medium text-left mb-4'>
+              {searchParams.get('author') && !searchParams.get('query') ? searchParams.get('author') :
+              searchParams.get('query')  ? t('page.resultsQuery'): 
+              t('page.results')}
+                {searchParams.get('query') && <span className="font-bold ml-1">"{searchParams.get('query')}"</span>}
+            </h2>
+
+            {isLoading && (
+              <PageLoading entries={isEntries} showLayout={showLayout} />
+            )}
+
+            {!isLoading && isError && <PageMessage message={t('page.error')} />}
+
+
+            {!isLoading && !isError && (
               <>
-                {items.length > 0 && children}
-                {items.length === 0 && (
-                  <PageMessage
-                    message={
-                      isParamsEmpty()
-                        ? location.pathname === NAVIGATION_PATHS.shelf
-                          ? t('page.shelfEmpty')
-                          : t('page.notFound')
-                        : t('page.notFound')
-                    }
-                    clearParams={!isParamsEmpty() ? clearFilters : undefined}
-                  />
-                )}
-              </>
-            ) : (
-              <>
-                {(items.length === 0 && isParamsEmpty()) || items.length > 0 ? (
+                {items.length > 0 ? (
                   children
                 ) : (
-                  <PageMessage
-                    message={t('page.notFound')}
-                    clearParams={clearFilters}
-                  />
+                  <p className='text-center px-4 py-10'>
+                    {t('page.noResults')}
+                  </p>
                 )}
               </>
             )}
+            <OpenFiltersButton />
+            <EntryDetail triggerReload={triggerReload} />
+            <LicenseCalendar />
           </>
-        )}
+        </AdvancedSearchWrapper >
       </div>
-      {showScrollUp && <ScrollUpButton scrollRef={scrollRef} />}
-      {activeEntryId && <EntryDetail triggerReload={triggerReload} />}
     </>
   );
 };

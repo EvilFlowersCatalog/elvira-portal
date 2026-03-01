@@ -1,35 +1,24 @@
-import { useState } from 'react';
-import { IEntry } from '../../utils/interfaces/entry';
-import ItemContainer from '../../components/items/container/ItemContainer';
+import { useTranslation } from 'react-i18next';
+import { AdvancedSearchWrapper } from '../../components/items/container/AdvancedSearch';
+import LoansTable from '../../components/items/loans/LoansTable';
+import Breadcrumb from '../../components/buttons/Breadcrumb';
+import { H1 } from '../../components/primitives/Heading';
+import EntryDetail from '../../components/items/entry/details/EntryDetail';
+import AiAssistant from '../../components/dialogs/AiAssistant';
+import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
 
 const Loans = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [loadingNext, setLoadingNext] = useState<boolean>(false);
-  const [isError, setIsError] = useState<boolean>(false);
-  const [page, setPage] = useState<number>(0);
-  const [maxPage, setMaxPage] = useState<number>(0);
-  const [entries, setEntries] = useState<IEntry[]>([]);
-  const [activeEntryId, setActiveEntryId] = useState<string | null>(null);
-
-  return (
-    <ItemContainer
-      activeEntryId={activeEntryId}
-      setActiveEntryId={setActiveEntryId}
-      isLoading={isLoading}
-      setIsLoading={setIsLoading}
-      isError={isError}
-      items={entries}
-      setItems={setEntries}
-      page={page}
-      setPage={setPage}
-      maxPage={maxPage}
-      loadingNext={loadingNext}
-      setLoadingNext={setLoadingNext}
-      showLayout
-      searchSpecifier={'query'}
-    >
-      <div className='flex flex-wrap px-4 pb-4'>Loans</div>
-    </ItemContainer>
+  const { t } = useTranslation();
+  return (<>
+    <Breadcrumb />
+    <H1>{t('license.loansPage.title')}</H1>
+    <AdvancedSearchWrapper>
+      <LoansTable></LoansTable>
+    </AdvancedSearchWrapper>
+    <EntryDetail />
+    <AiAssistant />
+    <LicenseCalendar />
+  </>
   );
 };
 

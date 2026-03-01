@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,6 +12,7 @@
   margin: 0;
   scrollbar-width: thin !important; /* For Firefox */
   scrollbar-color: #555 transparent !important; /* For Firefox */
+  font-family: "Inter", sans-serif !important; /* !important since evilflowersviewer is overriding * selector */
 }
 
 /* Custom Scrollbar for WebKit Browsers */
@@ -56,114 +59,82 @@ body,
   }
 }
 
-@layer components {
-  .fiit-border {
-    @apply border-primary-fiit dark:border-primary-fiit;
-  }
-  .fad-border {
-    @apply border-primary-fad dark:border-primary-fad;
-  }
-  .fchpt-border {
-    @apply border-primary-fchpt dark:border-primary-fchpt;
-  }
-  .fei-border {
-    @apply border-primary-fei dark:border-primary-fei;
-  }
-  .mtf-border {
-    @apply border-primary-mtf dark:border-primary-mtf;
-  }
-  .sjf-border {
-    @apply border-primary-sjf dark:border-primary-sjf;
-  }
-  .svf-border {
-    @apply border-primary-svf dark:border-primary-svf;
-  }
+/* CSS Variables for faculty themes */
+:root[data-theme="fiit"] {
+  --color-primary: #01a9e0;
+  --color-primary-light: #E6F3FF;
+  --color-secondary: #15384E;
+  --color-secondary-light: #A8D0E6;
+}
 
-  .fiit-bg {
-    @apply bg-primary-fiit;
-  }
-  .fad-bg {
-    @apply bg-primary-fad;
-  }
-  .fchpt-bg {
-    @apply bg-primary-fchpt;
-  }
-  .fei-bg {
-    @apply bg-primary-fei;
-  }
-  .mtf-bg {
-    @apply bg-primary-mtf;
-  }
-  .sjf-bg {
-    @apply bg-primary-sjf;
-  }
-  .svf-bg {
-    @apply bg-primary-svf;
-  }
+:root[data-theme="stu"] {
+  --color-primary: #a80331;
+  --color-primary-light: #FDEEE3;
+  --color-secondary: #4A2E17;       
+  --color-secondary-light: #D7C0AE; 
+}
 
-  .fiit-text {
-    @apply text-primary-fiit;
-  }
-  .fad-text {
-    @apply text-primary-fad;
-  }
-  .fchpt-text {
-    @apply text-primary-fchpt;
-  }
-  .fei-text {
-    @apply text-primary-fei;
-  }
-  .mtf-text {
-    @apply text-primary-mtf;
-  }
-  .sjf-text {
-    @apply text-primary-sjf;
-  }
-  .svf-text {
-    @apply text-primary-svf;
-  }
+:root[data-theme="mtf"] {
+  --color-primary: #E62B1E;
+  --color-primary-light: #FDE9E8; 
+  --color-secondary: #560006;
+  --color-secondary-light: #D8B4B4; 
+}
 
-  .fiit-bg-hover {
-    @apply hover:bg-primary-fiit dark:hover:bg-primary-fiit;
-  }
-  .fad-bg-hover {
-    @apply hover:bg-primary-fad dark:hover:bg-primary-fad;
-  }
-  .fchpt-bg-hover {
-    @apply hover:bg-primary-fchpt dark:hover:bg-primary-fchpt;
-  }
-  .fei-bg-hover {
-    @apply hover:bg-primary-fei dark:hover:bg-primary-fei;
-  }
-  .mtf-bg-hover {
-    @apply hover:bg-primary-mtf dark:hover:bg-primary-mtf;
-  }
-  .sjf-bg-hover {
-    @apply hover:bg-primary-sjf dark:hover:bg-primary-sjf;
-  }
-  .svf-bg-hover {
-    @apply hover:bg-primary-svf dark:hover:bg-primary-svf;
-  }
+:root[data-theme="svf"] {
+  --color-primary: #E5722A;
+  --color-primary-light: #FDEEE3;
+  --color-secondary: #4A2E17;       
+  --color-secondary-light: #D7C0AE; 
+}
 
-  .fiit-border-focus {
-    @apply focus:border-primary-fiit dark:focus:border-primary-fiit;
-  }
-  .fad-border-focus {
-    @apply focus:border-primary-fad dark:focus:border-primary-fad;
-  }
-  .fchpt-border-focus {
-    @apply focus:border-primary-fchpt dark:focus:border-primary-fchpt;
-  }
-  .fei-border-focus {
-    @apply focus:border-primary-fei dark:focus:border-primary-fei;
-  }
-  .mtf-border-focus {
-    @apply focus:border-primary-mtf dark:focus:border-primary-mtf;
-  }
-  .sjf-border-focus {
-    @apply focus:border-primary-sjf dark:focus:border-primary-sjf;
-  }
-  .svf-border-focus {
-    @apply focus:border-primary-svf dark:focus:border-primary-svf;
-  }
+:root[data-theme="sjf"] {
+  --color-primary: #4C5B60;
+  --color-primary-light: #E7EEF0;
+  --color-secondary: #1F2A2D;       
+  --color-secondary-light: #B8C5C9; 
+}
+
+:root[data-theme="fei"] {
+  --color-primary: #0C4A8E;
+  --color-primary-light: #E4EEF9;
+  --color-secondary: #0D2238;      
+  --color-secondary-light: #B7C5D5; 
+}
+
+:root[data-theme="fchpt"] {
+  --color-primary: #FFDA1C;
+  --color-primary-light: #FFF8D9; 
+  --color-secondary: #4A3F0F;       
+  --color-secondary-light: #D8CDA5;
+}
+
+:root[data-theme="fad"] {
+  --color-primary: #009D4A;
+  --color-primary-light: #E2F4EA;
+  --color-secondary: #143724;        /* deep forest slate */
+  --color-secondary-light: #B8CEC2;
+}
+
+:root[data-theme="ku"] {
+  --color-primary: #D1A619;
+  --color-primary-light: #FAF2D5;
+  --color-secondary: #3A320D;        /* muted dark ochre slate */
+  --color-secondary-light: #CFC6A3;
+}
+
+:root[data-theme="default"] {
+  --color-primary: #01a9e0;
+  --color-primary-light: #E6F3FF;
+  --color-secondary: #15384E;
+  --color-secondary-light: #A8D0E6;
+}
+
+/* Global color variables */
+:root {
+  --color-light-gray: #F5F7FA;
+  --color-dark-gray: #333333;
+  --color-red: #ff2129;
+  --color-green: #77dd77;
+  --color-strong-dark-gray: #141414;
 }
