@@ -393,6 +393,7 @@ export const sk = {
         share: 'Zdielanie',
         print: 'Tlač',
         annotations: 'Anotácie',
+        intranetIpRestriction: 'Obmedzenie IP pre intranet',
       },
     },
 

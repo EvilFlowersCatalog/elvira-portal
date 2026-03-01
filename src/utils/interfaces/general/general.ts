@@ -70,6 +70,7 @@ export interface IConfig {
   evilflowres_metadata_fetch: boolean;
   evilflowers_annotations_create: boolean;
   evilflowers_ocr_rewrite: boolean;
+  evilflowers_ip_block: boolean;
   readium_enabled: boolean;
 }
 

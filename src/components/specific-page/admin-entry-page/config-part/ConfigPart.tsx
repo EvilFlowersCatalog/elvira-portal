@@ -107,6 +107,21 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
             });
           }}
         />
+        <ConfigItem name={t('entry.wizard.intranetIpRestriction')}
+          checked={entry.config?.evilflowers_ip_block ?? false}
+          onChange={(e) => {
+            umamiTrack('Intranet IP Block Config Button', {
+              checked: e.target.checked,
+            });
+            setEntry({
+              ...entry,
+              config: {
+                ...entry?.config!,
+                evilflowers_ip_block: e.target.checked,
+              },
+            });
+          }}
+        />
       </div>
     </div>
   );

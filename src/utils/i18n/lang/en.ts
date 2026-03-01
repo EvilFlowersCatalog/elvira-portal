@@ -406,6 +406,7 @@ export const en = {
         share: 'Share',
         print: 'Print',
         annotations: 'Annotations',
+        intranetIpRestriction: 'Intranet IP Restriction',
       },
     },
 
