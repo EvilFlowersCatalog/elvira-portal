@@ -57,7 +57,9 @@ const BaseRoutes = () => {
           <Route index element={<Home />} />
           <Route path='library' element={<Library />} />
           <Route path='shelf' element={<Shelf />} />
-          <Route path='history' element={<History />} />
+          { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+            <Route path='history' element={<History />} />
+          ) }
           { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
             <Route path='loans' element={<Loans />} />
           ) }

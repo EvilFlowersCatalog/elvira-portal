@@ -374,13 +374,14 @@ const Navbar = () => {
               isActive={location.pathname === NAVIGATION_PATHS.shelf}
               textVisible={!isCollapsed}
             />
+            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
             <NavbarButton
               name={t("navbarMenu.history")}
               path={NAVIGATION_PATHS.history}
               icon={<ClockIcon size={20} />}
               isActive={location.pathname === NAVIGATION_PATHS.history}
               textVisible={!isCollapsed}
-            />
+            />)}
             {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
               <NavbarButton
                 name={t("navbarMenu.loan")}
