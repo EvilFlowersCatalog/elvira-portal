@@ -132,7 +132,7 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
             </div>
         </div>
         <div className="bg-white dark:bg-strongDarkGray relative p-2 h-[7rem] flex flex-col">
-            <div className="mb-2">
+            <div className="mb-2 whitespace-nowrap overflow-hidden text-ellipsis text-primary">
                 {entry.feeds.map(feed => (
                     <span key={id ? `${id}-${feed.id}` : feed.id} onClick={() => {
                         handleParamClick('feed-id', feed.id);
