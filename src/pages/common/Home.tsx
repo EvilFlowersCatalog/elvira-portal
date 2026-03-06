@@ -8,6 +8,7 @@ import EntryDetail from '../../components/items/entry/details/EntryDetail';
 import EntryDisplay from '../../components/items/entry/display/EntryDisplay';
 import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import StepEntryDisplay from '../../components/items/entry/display/StepEntryDisplay';
 
 const Home = () => {
   const { t } = useTranslation();
@@ -78,6 +79,20 @@ const Home = () => {
           entries={lastAddedEntries}
           limitRows={true}
         />
+
+
+
+        {/* <div className='flex justify-between items-center mb-5 flex-wrap mt-12'>
+          <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>Learn Data science in 6 books</h2>
+          <a href="/library" className='text-sm text-primary cursor-pointer'>Zobraziť všetko</a>
+        </div>
+        <StepEntryDisplay
+          isLoading={isLoading}
+          entries={lastAddedEntries}
+        />
+
+         */}
+
       </div>
       <EntryDetail />
       <LicenseCalendar />
