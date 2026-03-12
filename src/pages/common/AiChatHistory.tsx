@@ -143,7 +143,7 @@ const AiChatHistory = () => {
   }
 
   return (
-    <Box className="flex flex-col h-full w-full bg-white dark:bg-zinc-900 p-6">
+    <Box className="flex flex-col h-full w-full bg-white dark:bg-zinc-900 p-6 overflow-auto">
       <Box className="max-w-4xl w-full mx-auto">
         {/* Header */}
         <Box className="flex justify-between items-center mb-6">
