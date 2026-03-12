@@ -320,18 +320,18 @@ const Navbar = () => {
                   isActive={location.pathname === NAVIGATION_PATHS.feeds}
                   textVisible={!isCollapsed}
                 />
-                <NavbarButton
-                  name={t("navbarMenu.aiAssistant")}
-                  path={NAVIGATION_PATHS.aiChatHistory}
-                  icon={<ChatIcon size={20} />}
-                  isActive={
-                    location.pathname === NAVIGATION_PATHS.aiAssistant ||
-                    location.pathname === NAVIGATION_PATHS.aiChatHistory
-                  }
-                  textVisible={!isCollapsed}
-                />
               </>
             )}
+            <NavbarButton
+              name={t("navbarMenu.aiAssistant")}
+              path={NAVIGATION_PATHS.aiChatHistory}
+              icon={<ChatIcon size={20} />}
+              isActive={
+                location.pathname === NAVIGATION_PATHS.aiAssistant ||
+                location.pathname === NAVIGATION_PATHS.aiChatHistory
+              }
+              textVisible={!isCollapsed}
+            />
             {/* <NavbarButton
             name={t('navbarMenu.about')}
             path={NAVIGATION_PATHS.about}

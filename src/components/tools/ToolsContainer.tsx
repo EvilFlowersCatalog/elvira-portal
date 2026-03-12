@@ -223,7 +223,7 @@ const ToolsContainer = ({
               onChange={handleSearchInput}
               onFocus={() => setIsFocused(true)}
               onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-              className={`border-none ${import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES == "true" && aiEnabled ? "md:pr-32" : "pr-10"}`}
+              className={`border-none ${aiEnabled ? "md:pr-32" : "pr-10"}`}
               paddingLeft={40}
             />
 
@@ -239,7 +239,7 @@ const ToolsContainer = ({
               />
             )}
 
-            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES == "true" && aiEnabled && (
+            {aiEnabled && (
               <>
                 <button
                   onClick={() => {

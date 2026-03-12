@@ -64,12 +64,8 @@ const BaseRoutes = () => {
             <Route path='loans' element={<Loans />} />
           ) }
           <Route path='feeds' element={<Feeds />} />
-          {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
-            <>
-              <Route path='ai-assistant' element={<AiAssistantPage />} />
-              <Route path='ai-chat-history' element={<AiChatHistory />} />
-            </>
-          )}
+          <Route path='ai-assistant' element={<AiAssistantPage />} />
+          <Route path='ai-chat-history' element={<AiChatHistory />} />
           <Route path='viewer/:entry-id/:index' element={<Viewer />} />
 
           {/* Only with admin role */}
