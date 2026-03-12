@@ -407,6 +407,9 @@ export const en = {
         print: 'Print',
         annotations: 'Annotations',
         intranetIpRestriction: 'Intranet IP Restriction',
+        readiumAmount: 'Readium Amount',
+        readiumEnabled: 'Readium',
+        ocrRewrite: 'OCR Rewrite',
       },
     },
 

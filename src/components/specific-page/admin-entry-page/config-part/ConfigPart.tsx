@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import ConfigItem from './ConfigItem';
 import { IPartParams } from '../../../../utils/interfaces/general/general';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
+import ElviraNumberInput from '../../../inputs/ElviraNumberInput';
 
 const ConfigPart = ({ entry, setEntry }: IPartParams) => {
   const { umamiTrack } = useAppContext();
@@ -76,10 +77,10 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
           }}
         />
         <ConfigItem
-          name={'DRM'}
+          name={t('entry.wizard.ocrRewrite')}
           checked={entry.config?.evilflowers_ocr_rewrite ?? false}
           onChange={(e) => {
-            umamiTrack('DRM Config Button', {
+            umamiTrack('OCR Rewrite Config Button', {
               checked: e.target.checked,
             });
             setEntry({
@@ -92,10 +93,10 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
           }}
         />
         <ConfigItem
-          name={'RDM'}
+          name={t('entry.wizard.readiumEnabled')}
           checked={entry.config?.readium_enabled ?? false}
           onChange={(e) => {
-            umamiTrack('RDM Config Button', {
+            umamiTrack('Readium Config Button', {
               checked: e.target.checked,
             });
             setEntry({
@@ -123,6 +124,21 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
           }}
         />
       </div>
+      {entry.config?.readium_enabled && (
+        <ElviraNumberInput
+          placeholder={t('entry.wizard.readiumAmount')}
+          value={entry.config?.readium_amount ?? 0}
+          onChange={(e) => {
+            setEntry({
+              ...entry,
+              config: {
+                ...entry?.config!,
+                readium_amount: parseInt(e.target.value) || 0,
+              },
+            });
+          }}
+        />
+      )}
     </div>
   );
 };

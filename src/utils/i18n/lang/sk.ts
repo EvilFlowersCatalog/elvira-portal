@@ -394,6 +394,9 @@ export const sk = {
         print: 'Tlač',
         annotations: 'Anotácie',
         intranetIpRestriction: 'Obmedzenie IP pre intranet',
+        readiumAmount: 'Počet Readium',
+        readiumEnabled: 'Readium',
+        ocrRewrite: 'Prepis textu',
       },
     },
 

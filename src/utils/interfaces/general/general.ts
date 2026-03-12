@@ -65,13 +65,21 @@ export interface IMetadata {
 }
 
 export interface IConfig {
+  evilflowers_ocr_enable: boolean;
+  evilflowers_ocr_rewrite: boolean;
+  
+  evilflowers_annotations_create: boolean;
   evilflowers_viewer_print: boolean;
+  
+  evilflowers_render_type: "page" | "document";
+
   evilflowers_share_enabled: boolean;
   evilflowres_metadata_fetch: boolean;
-  evilflowers_annotations_create: boolean;
-  evilflowers_ocr_rewrite: boolean;
+
   evilflowers_ip_block: boolean;
+
   readium_enabled: boolean;
+  readium_amount: number;
 }
 
 export interface IModalParams {
