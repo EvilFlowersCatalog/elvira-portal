@@ -132,14 +132,24 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
             </div>
         </div>
         <div className="bg-white dark:bg-strongDarkGray relative p-2 h-[7rem] flex flex-col">
-            <div className="mb-2 whitespace-nowrap overflow-hidden text-ellipsis text-primary">
-                {entry.feeds.map(feed => (
-                    <span key={id ? `${id}-${feed.id}` : feed.id} onClick={() => {
-                        handleParamClick('feed-id', feed.id);
-                    }} className="cursor-pointer font-semibold px-2 py-1 text-xs bg-primaryLight text-primary rounded-md mr-1">
-                        {feed.title}
+            <div className="mb-2 flex items-center gap-1 overflow-hidden text-primary">
+                {entry.feeds.length > 0 && (
+                    <span
+                        key={id ? `${id}-${entry.feeds[0].id}` : entry.feeds[0].id}
+                        onClick={() => handleParamClick('feed-id', entry.feeds[0].id)}
+                        className="cursor-pointer font-semibold px-2 py-1 text-xs bg-primaryLight text-primary rounded-md truncate min-w-0 shrink"
+                    >
+                        {entry.feeds[0].title}
                     </span>
-                ))}
+                )}
+                {entry.feeds.length > 1 && (
+                    <span
+                        title={entry.feeds.slice(1).map(f => f.title).join(', ')}
+                        className="cursor-pointer font-semibold px-2 py-1 text-xs bg-primaryLight text-primary rounded-md flex-shrink-0 whitespace-nowrap"
+                    >
+                        +{entry.feeds.length - 1}
+                    </span>
+                )}
             </div>
             <h3 onClick={openEntryDetail} className="group-hover:underline transition-udnerline duration-300 cursor-pointer font-bold text-secondary dark:text-white text-sm line-clamp-2 overflow-hidden text-ellipsis mb-2">{entry.title}</h3>
             <p className="text-xs cursor-pointer dark:text-white mt-auto" onClick={() => {
