@@ -23,12 +23,21 @@ const AdminAddEntry = () => {
       isbn: '',
     },
     config: {
+      evilflowers_ocr_enable: false,
+      evilflowers_ocr_rewrite: false,
+
+      evilflowers_annotations_create: true,
       evilflowers_viewer_print: false,
+
+      evilflowers_render_type: "page",
+      
       evilflowers_share_enabled: false,
       evilflowres_metadata_fetch: false,
-      evilflowers_annotations_create: false,
-      evilflowers_ocr_rewrite: false,
+      
+      evilflowers_ip_block: false,
+      
       readium_enabled: false,
+      readium_amount: 1,
     },
     categories: [],
     citation: '',
