@@ -152,7 +152,7 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
                 )}
             </div>
             <h3 onClick={openEntryDetail} className="group-hover:underline transition-udnerline duration-300 cursor-pointer font-bold text-secondary dark:text-white text-sm line-clamp-2 overflow-hidden text-ellipsis mb-2">{entry.title}</h3>
-            <p className="text-xs cursor-pointer dark:text-white mt-auto" onClick={() => {
+            <p className="text-xs cursor-pointer dark:text-white mt-auto overflow-hidden text-ellipsis whitespace-nowrap" onClick={() => {
                 handleParamClick('author', entry.authors[0]?.name + ' ' + entry.authors[0]?.surname);
             }}>
                 {entry.authors.length > 0
