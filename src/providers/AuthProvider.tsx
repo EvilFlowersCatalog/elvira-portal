@@ -29,6 +29,8 @@ export interface IAuthContext {
   login: (loginForm: IAuthCredentials) => Promise<void>;
   logout: () => void;
   cancelTokenSource: MutableRefObject<CancelTokenSource>;
+  staySigned: boolean;
+  setStaySigned: (value: boolean) => void;
 }
 
 export const AuthContext = createContext<IAuthContext | null>(null);
@@ -40,6 +42,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
   const { cookies, setCookie, removeCookie } = useCookiesContext();
   const { selectedCatalogId} = useAppContext(); 
 
+  const [staySigned, setStaySigned] = useState<boolean>(false);
   const [auth, setAuth] = useState<IAuth | null>(
     cookies[COOKIES_TYPE.AUTH_KEY] ?? null
   );
@@ -115,9 +118,10 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
 
   useEffect(() => {
     if (auth) {
-      setCookie(COOKIES_TYPE.AUTH_KEY, auth, {
-        maxAge: 60 * 60 * 24, // 1 day
-      });
+      var maxAge = staySigned 
+      ? 365 * 60 * 60 * 24 // 1 Year (Forever)
+      : 30 * 60; // 30 minutes of inactivity
+      setCookie(COOKIES_TYPE.AUTH_KEY, auth, { maxAge });
     } else {
       removeCookie(COOKIES_TYPE.AUTH_KEY);
       logoutChannel?.postMessage(BROADCAST_MESSAGE);
@@ -144,7 +148,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
 
   return (
     <AuthContext.Provider
-      value={{ auth, updateAuth, login, logout, cancelTokenSource }}
+      value={{ auth, updateAuth, login, logout, cancelTokenSource, staySigned, setStaySigned }}
     >
       {children}
     </AuthContext.Provider>

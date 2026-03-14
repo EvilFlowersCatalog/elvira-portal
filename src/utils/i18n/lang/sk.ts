@@ -160,6 +160,7 @@ export const sk = {
       loginBtn: 'Prihlásiť sa',
       license: 'Prihlasením súhlasím s licenčnými podmienkami',
       licenseTitle: 'Licenčné podmienky',
+      stayLogged: "Zostať Prihlásený"
     },
 
     // ADMINISTRATION PAGE

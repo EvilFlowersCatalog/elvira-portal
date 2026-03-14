@@ -162,6 +162,7 @@ export const en = {
       loginBtn: 'Login',
       license: 'By logging in, I agree to the license terms',
       licenseTitle: 'License terms',
+      stayLogged: "Stay logged in"
     },
 
     // ADMINISTRATION PAGE

@@ -17,7 +17,7 @@ import FormModal from '../../components/modals/FormModal';
 import LicenseTerms from '../../components/dialogs/LicenseTerms';
 
 const Auth = () => {
-  const { login } = useAuthContext();
+  const { login , staySigned, setStaySigned} = useAuthContext();
   const { theme, titleLogoDark, titleLogoLight, umamiTrack } =
     useAppContext();
   const { cookies, setCookie } = useCookiesContext();
@@ -29,10 +29,10 @@ const Auth = () => {
   });
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-  const [checked, setChecked] = useState<boolean>(
+  const [licenseChecked, setLicenseChecked] = useState<boolean>(
     cookies[COOKIES_TYPE.LICENSE_KEY] ?? false
   );
-  const [checkInvalid, setCheckInvalid] = useState<boolean>(false);
+  const [checLicensekInvalid, setCheckLicenseInvalid] = useState<boolean>(false);
   const [openLicenseModal, setOpenLicenseModal] = useState<boolean>(false);
 
   // Handle usernamen input change
@@ -66,17 +66,17 @@ const Auth = () => {
     setLoading(false); // hide loader
   };
 
-  const handleCheckChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setCheckInvalid(false);
+  const handleLicenseCheckChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setCheckLicenseInvalid(false);
     setCookie(COOKIES_TYPE.LICENSE_KEY, e.target.checked, {
       maxAge: 60 * 60 * 24 * 365, // year
     });
-    setChecked(e.target.checked);
+    setLicenseChecked(e.target.checked);
   };
 
-  const handleCheckkInvalid = (e: FormEvent<HTMLButtonElement>) => {
+  const handleLicenseCheckInvalid = (e: FormEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    setCheckInvalid(true);
+    setCheckLicenseInvalid(true);
   };
 
   return (
@@ -133,29 +133,51 @@ const Auth = () => {
                     )}
                   </button>
                 </div>
-                <div className='flex w-full gap-2 items-center'>
-                  <Checkbox
-                    size='small'
-                    required
-                    checked={checked}
-                    onChange={handleCheckChange}
-                    onInvalid={handleCheckkInvalid}
-                    sx={{
-                      color: checkInvalid ? 'red' : 'var(--color-primary)',
-                      '&.Mui-checked': {
-                        color: checkInvalid ? 'red' : 'var(--color-primary)',
-                      },
-                    }}
-                  />
-                  <button
-                    type='button'
-                    onClick={() => setOpenLicenseModal(true)}
-                    className={`hover:underline text-sm cursor-pointer text-left ${
-                      checkInvalid ? 'text-red' : 'text-black dark:text-white'
-                    }`}
-                  >
-                    {t('login.license')}
-                  </button>
+                <div className='w-full'>
+
+                  <div className='flex w-full gap-2 items-center'>
+                    <Checkbox
+                      size='small'
+                      required
+                      checked={licenseChecked}
+                      onChange={handleLicenseCheckChange}
+                      onInvalid={handleLicenseCheckInvalid}
+                      sx={{
+                        color: checLicensekInvalid ? 'red' : 'var(--color-primary)',
+                        '&.Mui-checked': {
+                          color: checLicensekInvalid ? 'red' : 'var(--color-primary)',
+                        },
+                      }}
+                    />
+                    <button
+                      type='button'
+                      onClick={() => setOpenLicenseModal(true)}
+                      className={`hover:underline text-sm cursor-pointer text-left ${
+                        checLicensekInvalid ? 'text-red' : 'text-black dark:text-white'
+                      }`}
+                    >
+                      {t('login.license')}
+                    </button>
+                  </div>
+                  <div className='flex w-full gap-2 items-center'>
+                    <Checkbox
+                      size='small'
+                      checked={staySigned}
+                      onChange={(e, checked)=>setStaySigned(checked)}
+                      sx={{
+                        color: 'var(--color-primary)',
+                        '&.Mui-checked': {
+                          color: 'var(--color-primary)',
+                        },
+                      }}
+                    />
+                    <p onClick={()=>{setStaySigned(!staySigned)}}
+                      className={`text-sm cursor-pointer text-left text-black dark:text-white`}
+                    >
+                      {t('login.stayLogged')}
+                    </p>
+                  </div>
+
                 </div>
                 <Button type='submit'>{t('login.loginBtn')}</Button>
               </form>
