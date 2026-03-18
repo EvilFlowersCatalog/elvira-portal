@@ -6,6 +6,7 @@ export enum NAVIGATION_PATHS {
   home = '/',
   library = '/library',
   shelf = '/shelf',
+  profile = '/profile',
   loans = '/loans',
   feeds = '/feeds',
   history = '/history',

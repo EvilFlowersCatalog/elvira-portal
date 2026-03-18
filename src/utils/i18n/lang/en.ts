@@ -277,6 +277,7 @@ export const en = {
       home: 'Home',
       library: 'Library',
       myShelf: 'Shelf',
+      profile: 'Profile',
       history: 'History',
       help: 'Help',
       loan: 'Loans',
@@ -307,6 +308,39 @@ export const en = {
       popular: 'Popular',
       lastAdded: 'Last Added',
       search: 'Search in Elvira',
+    },
+
+    profile: {
+      title: 'Profile',
+      activity: {
+        title: 'Account Activity',
+      },
+      fields: {
+        id: 'User ID',
+        username: 'Username',
+        name: 'Name',
+        surname: 'Surname',
+        email: 'Email',
+        active: 'Active',
+        firstLogin: 'First Time Login',
+        lastLogin: 'Last Login',
+        createdAt: 'Created At',
+        updatedAt: 'Updated At',
+      },
+      values: {
+        yes: 'Yes',
+        no: 'No',
+      },
+      passphrase: {
+        title: 'Passphrase',
+        description: 'Set a passphrase for your account.',
+        placeholder: 'Passphrase',
+        required: 'Passphrase is required.',
+        saveButton: 'Save Passphrase',
+        saving: 'Saving...',
+        success: 'Passphrase was successfully saved.',
+        notImplemented: 'Passphrase update endpoint is not implemented yet.',
+      },
     },
 
     // SEARCH BAR COMPONENT

@@ -271,6 +271,7 @@ export const sk = {
       about: 'O Projekte',
       library: 'Knižnica',
       myShelf: 'Uložené',
+      profile: 'Profil',
       history: 'História',
       help: 'Pomoc',
       loan: 'Výpožičky',
@@ -300,6 +301,39 @@ export const sk = {
       popular: 'Populárne',
       lastAdded: 'Naposledy Pridané',
       search: 'Hľadať v Elvíre',
+    },
+
+    profile: {
+      title: 'Profil',
+      activity: {
+        title: 'Aktivita účtu',
+      },
+      fields: {
+        id: 'ID používateľa',
+        username: 'Prihlasovacie meno',
+        name: 'Meno',
+        surname: 'Priezvisko',
+        email: 'E-mail',
+        active: 'Aktívny',
+        firstLogin: 'Prvé prihlásenie',
+        lastLogin: 'Posledné prihlásenie',
+        createdAt: 'Vytvorené',
+        updatedAt: 'Aktualizované',
+      },
+      values: {
+        yes: 'Áno',
+        no: 'Nie',
+      },
+      passphrase: {
+        title: 'Prístupová fráza',
+        description: 'Nastavte prístupovú frázu pre svoj účet.',
+        placeholder: 'Prístupová fráza',
+        required: 'Prístupová fráza je povinná.',
+        saveButton: 'Uložiť prístupovú frázu',
+        saving: 'Ukladám...',
+        success: 'Prístupová fráza bola úspešne uložená.',
+        notImplemented: 'Endpoint na zmenu prístupovej frázy zatiaľ nie je implementovaný.',
+      },
     },
 
     // SEARCH BAR COMPONENT

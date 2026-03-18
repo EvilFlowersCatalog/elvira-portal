@@ -25,7 +25,7 @@ import {
 import useAuthContext from "../../../hooks/contexts/useAuthContext";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
-import { FiLogOut } from "react-icons/fi";
+import { FiLogOut, FiUser } from "react-icons/fi";
 import Gravatar from "react-gravatar";
 import Button from "../../buttons/Button";
 import { MenuItem, Select } from "@mui/material";
@@ -374,6 +374,14 @@ const Navbar = () => {
               isActive={location.pathname === NAVIGATION_PATHS.shelf}
               textVisible={!isCollapsed}
             />
+            <NavbarButton
+              name={t("navbarMenu.profile")}
+              path={NAVIGATION_PATHS.profile}
+              icon={<FiUser size={20} />}
+              isActive={location.pathname === NAVIGATION_PATHS.profile}
+              textVisible={!isCollapsed}
+            />
+            
             {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
             <NavbarButton
               name={t("navbarMenu.history")}
