@@ -6,8 +6,7 @@ import Calendar from "../../../inputs/Calendar";
 import { IEntryDetail } from "../../../../utils/interfaces/entry";
 import useGetEntryDetail from "../../../../hooks/api/entries/useGetEntryDetail";
 import { CircleLoader } from "react-spinners";
-import useAppContext from "../../../../hooks/contexts/useAppContext";
-import { DetailHeader } from "./DetailHeader";
+import useAuthContext from "../../../../hooks/contexts/useAuthContext";
 import { formatDate } from "date-fns";
 import { FaRegCalendarXmark, FaRegCalendarPlus } from "react-icons/fa6";
 import { IAvailabilityResponse } from "../../../../utils/interfaces/license";
@@ -20,7 +19,8 @@ import { NAVIGATION_PATHS } from "../../../../utils/interfaces/general/general";
 // http://localhost:3000/?licensing-entry-id=ce40e042-1491-434f-a0b4-593c0a867b99
 
 export default function LicenseCalendar({ }: {}) {
-  const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
+    const { auth } = useAuthContext();
     const [searchParams, setSearchParams] = useSearchParams();
     const getEntryDetail = useGetEntryDetail();
     const getAvailability = useGetAvailability();
@@ -33,6 +33,15 @@ export default function LicenseCalendar({ }: {}) {
 
     const [selectionDayStart, setSelectionDayStart] = useState<Date | null>(null);
     const [selectionDayEnd, setSelectionDayEnd] = useState<Date | null>(null);
+
+    const formatLocalizedDate = (date: Date | null) => {
+        if (!date) return '-';
+        return new Intl.DateTimeFormat(i18n.language || undefined, {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+        }).format(date);
+    };
 
     function onSelectionChange(start: Date | null, end: Date | null) {
         setSelectionDayStart(start);
@@ -132,51 +141,106 @@ export default function LicenseCalendar({ }: {}) {
             isOpen={!!entryId}
             zIndex={50}
         >
-            <div className="p-2 lg:p-8 overflow-auto grid grid-cols-1 md:grid-cols-2 gap-4 h-full">
-                {entry ? (<>
-                    <div className="flex flex-col mb-4 px-4 pt-2">
-                        <DetailHeader entry={entry} feedsDisabled />
-
-                        {selectionDayStart ? <>
-                            <div className="border rounded-lg mt-5 grid grid-cols-1 lg:grid-cols-2 justify-between">
-                                <div className="p-4 flex gap-4">
-                                    <FaRegCalendarPlus size={24} />
-                                    <p>
-                                        {selectionDayStart ? formatDate(selectionDayStart, 'dd.MM.yyyy') : '-'}
-                                    </p>
+            <div className="p-3 mdlg:p-5 overflow-auto h-full min-h-0 flex flex-col gap-4 relative">
+                {entry ? (
+                    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-4 h-full min-h-0 items-stretch relative">
+                        {/* Calendar */}
+                        <div className="order-2 lg:order-1 min-h-[22rem] lg:min-h-0 h-full max-h-full min-w-0 overflow-hidden relative">
+                            {availability == null || availability?.available ? (
+                                <div className="h-full max-h-full min-h-0 min-w-0">
+                                    <Calendar
+                                        onSelectionChanged={onSelectionChange}
+                                        availability={availability}
+                                        requestAvailability={requestAvailability}
+                                    />
                                 </div>
-                                <div className="p-4 flex gap-4 lg:border-l max-lg:border-t">
-                                    <FaRegCalendarXmark size={24} />
-                                    <p>
-                                        {selectionDayEnd ? formatDate(selectionDayEnd, 'dd.MM.yyyy') : '-'}
-                                    </p>
+                            ) : (
+                                <div className="flex justify-center items-center h-full bg-red/5 dark:bg-red/10 border border-red/20 dark:border-red/30 rounded-lg">
+                                    <div className="text-center">
+                                        <p className="text-red font-medium">{t('license.calendar.noAvailability')}</p>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Right Column: book + dates + action */}
+                        <div className="order-1 lg:order-2 w-full min-w-0 flex flex-col gap-3 relative pb-6 lg:pb-0">
+                            <div className="flex gap-3 min-w-0 pb-3 border-b border-lightGray dark:border-strongDarkGray">
+                                <div className="w-20 h-28 sm:w-24 sm:h-32 rounded-md overflow-hidden flex-shrink-0">
+                                    <img
+                                        className="w-full h-full object-cover"
+                                        src={entry.thumbnail + `?access_token=${auth?.token}`}
+                                        alt={entry.title}
+                                    />
+                                </div>
+
+                                <div className="min-w-0 flex-1">
+                                    <h2 className="text-base sm:text-lg font-bold text-secondary dark:text-secondaryLight line-clamp-2">
+                                        {entry.title}
+                                    </h2>
+
+                                    {entry.authors.length > 0 && (
+                                        <p className="mt-1 text-sm text-darkGray dark:text-lightGray truncate">
+                                            {entry.authors[0].name} {entry.authors[0].surname}
+                                            {entry.authors.length > 1 ? ` (+${entry.authors.length - 1} ${t('entry.detail.more')})` : ''}
+                                        </p>
+                                    )}
+
+                                    {entry.publisher && (
+                                        <p className="mt-1 text-xs text-darkGray dark:text-lightGray opacity-75 truncate">
+                                            {t('entry.detail.publisher')}: {entry.publisher}
+                                        </p>
+                                    )}
                                 </div>
                             </div>
-                            <Button
-                                className="mt-4"
-                                onClick={lendBook}
-                                disabled={!selectionDayStart || !selectionDayEnd}
-                            >
-                                {t('license.calendar.lend')}
-                            </Button>
-                        </> : null}
-                    </div>
 
-                    {/* The calendar will request availability for the selected date range */}
-                    {availability == null || availability?.available ? (
-                        <Calendar onSelectionChanged={onSelectionChange} availability={availability} requestAvailability={requestAvailability} />
-                    ) : (
-                        <div className="flex justify-center items-center h-full">
-                            {t('license.calendar.noAvailability')}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-2">
+                                <div className="flex items-center gap-2 border border-lightGray dark:border-strongDarkGray rounded-md p-2">
+                                    <FaRegCalendarPlus className="text-primary dark:text-primaryLight flex-shrink-0" size={14} />
+                                    <div className="min-w-0">
+                                        <p className="text-[11px] text-darkGray dark:text-lightGray opacity-70">
+                                            {t('license.calendar.from', { defaultValue: 'From' })}
+                                        </p>
+                                        <p className="text-sm font-semibold text-secondary dark:text-secondaryLight truncate">
+                                            {formatLocalizedDate(selectionDayStart)}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2 border border-lightGray dark:border-strongDarkGray rounded-md p-2">
+                                    <FaRegCalendarXmark className="text-primary dark:text-primaryLight flex-shrink-0" size={14} />
+                                    <div className="min-w-0">
+                                        <p className="text-[11px] text-darkGray dark:text-lightGray opacity-70">
+                                            {t('license.calendar.to', { defaultValue: 'To' })}
+                                        </p>
+                                        <p className="text-sm font-semibold text-secondary dark:text-secondaryLight truncate">
+                                            {formatLocalizedDate(selectionDayEnd)}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {selectionDayStart && selectionDayEnd && (
+                                <p className="text-xs text-darkGray dark:text-lightGray">
+                                    {t('license.calendar.duration', { defaultValue: 'Duration' })}: {Math.ceil((selectionDayEnd.getTime() - selectionDayStart.getTime()) / (1000 * 60 * 60 * 24)) + 1} {t('license.calendar.days', { defaultValue: 'days' })}
+                                </p>
+                            )}
+
+                            {selectionDayStart && selectionDayEnd && (
+                                <Button
+                                    onClick={lendBook}
+                                    className="w-full"
+                                >
+                                    {t('license.calendar.lend')}
+                                </Button>
+                            )}
                         </div>
-                    )}
-                </>)
-                 : (
-                    <div className={'flex justify-center h-full items-center'}>
+                    </div>
+                ) : (
+                    <div className="flex justify-center items-center h-full">
                         <CircleLoader color={'var(--color-primary)'} size={50} />
                     </div>
                 )}
-
             </div>
         </DetailModal >
     );
