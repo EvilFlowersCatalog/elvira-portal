@@ -10,7 +10,7 @@ import { Metadata } from '../../utils/interfaces/general/general';
 import { BubbleText } from '../../components/table/Cells';
 import useGetLicenses from '../../hooks/api/licenses/useGetLicenses';
 import { ILicense, InterfaceState } from '../../utils/interfaces/license';
-import { stateStyle, Title, translateState } from '../../components/items/loans/LoansTable';
+import { stateStyle, translateState } from '../../components/items/loans/LoansTable';
 import { formatDate } from 'date-fns/format';
 import EntryDetail from '../../components/items/entry/details/EntryDetail';
 
@@ -129,7 +129,7 @@ const AdminLoans = () => {
     useEffect(() => {
         setData(items.map((item) => ({
             entry_id: item.entry_id,
-            title: <Title entryId={item.entry_id} />,
+            title: item.entry?.title || 'Unknown Entry',
             user: <UserName userId={item.user_id} />,
             state: <StateSelector item={item} t={t} onStateChange={(newState: InterfaceState) => {
                setItems((prevItems) => prevItems.map((prevItem) => 

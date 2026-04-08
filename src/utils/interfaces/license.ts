@@ -3,6 +3,12 @@ export const DurationValidation = /^P(?!P)(?:(\d+Y)?(\d+M)?(\d+D)?(T(?:(\d+H)?(\
 
 export type InterfaceState = import('./licenses').LICENSE_STATE;
 
+export interface ILicenseEntry {
+	id: string;
+	title: string;
+	catalog_id?: string;
+}
+
 export interface ILicense {
 	id: string;
 	entry_id: string;
@@ -15,7 +21,9 @@ export interface ILicense {
 	// Some parts of the codebase expect either a download `url` or an
 	// `lcp_license_id` field — make both optional to be compatible.
 	lcp_license_id?: string;
-	url: string;
+	url?: string;
+	download_url?: string;
+	entry?: ILicenseEntry;
 }
 
 export interface INewLicense {

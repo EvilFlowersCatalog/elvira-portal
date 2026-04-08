@@ -31,7 +31,12 @@ export interface ILicense {
   user_id: string;
   entry_id: string;
   state: LICENSE_STATE;
-  url: string;
+  url?: string;
+  download_url?: string;
+  entry?: {
+    id: string;
+    title: string;
+  };
   lcp_license_id?: string;
   starts_at: string;
   expires_at: string;

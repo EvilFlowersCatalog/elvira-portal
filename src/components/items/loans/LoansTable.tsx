@@ -9,27 +9,6 @@ import { formatDate } from 'date-fns';
 import useDownloadLicense from '../../../hooks/api/licenses/useDownloadLicense';
 import { toast } from 'react-toastify';
 import { FaDownload } from 'react-icons/fa';
-import useGetEntryDetail from '../../../hooks/api/entries/useGetEntryDetail';
-
-
-export function Title({ entryId }: { entryId: string }) {
-    const getEntryDetail = useGetEntryDetail();
-    const [title, setTitle] = useState<string>('Loading...');
-
-    function getTitle(entryId: string): Promise<string> {
-        return getEntryDetail(entryId, undefined).then((entry) => {
-            return entry.title;
-        }).catch(() => {
-            return 'Unknown Entry';
-        });
-    }
-
-    useEffect(() => {
-        getTitle(entryId).then(setTitle);
-    }, [entryId]);
-
-    return <span>{title}</span>;
-}
 
 export function translateState(state: string, t: any): string {
     switch (state) {
@@ -91,21 +70,7 @@ export default function LoansTable({ }) {
             limit,
             sortBy
         }).then(({ items: data, metadata }) => {
-            console.log(data);
             setItems(data);
-            // setItems([ // TEMP-BE
-            //     {
-            //         id: 'e0b6bede-d678-4b64-9415-e7243a0489f7',
-            //         entry_id: 'e0b6bede-d678-4b64-9415-e7243a0489f7',
-            //         lcp_license_id: 'lcp-1',
-            //         user_id: 'user-1',
-            //         state: 'active',
-            //         created_at: new Date().toISOString(),
-            //         updated_at: new Date().toISOString(),
-            //         starts_at: new Date().toISOString(),
-            //         expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30).toISOString(),
-            //     }
-            // ]);
             setMetadata(metadata);
         });
     };
@@ -118,7 +83,8 @@ export default function LoansTable({ }) {
     useEffect(() => {
         setData(items.map((item) => ({
             entry_id: item.entry_id,
-            title: <Title entryId={item.entry_id} />,
+            catalog_id: item.entry?.catalog_id || '',
+            title: item.entry?.title || 'Unknown Entry',
             state: <BubbleText className='cursor-default' text={translateState(item.state, t)} style={stateStyle(item.state, t)} />,
             starts_at: formatDate(item.starts_at, 'dd.MM.yyyy'),
             ends_at: formatDate(item.expires_at, 'dd.MM.yyyy'),
@@ -135,6 +101,7 @@ export default function LoansTable({ }) {
             { label: t('license.loansPage.table.entry'), selector: 'title', onClick(row){
                 setSearchParams((prev)=>{
                     prev.set("entry-detail-id", row.entry_id);
+                    prev.set("entry-catalog-id", row.catalog_id);
                     return prev;
                 })
             }, width: '500px'},

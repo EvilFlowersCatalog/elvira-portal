@@ -79,15 +79,11 @@ export default function AcquisitionsButton({
     </div>
   );
 
-  const ActiveLicenseButton = ({ lcp_license_id }: { lcp_license_id?: string }) => (
+  const ActiveLicenseButton = ({ lcp_license_id, id }: { lcp_license_id?: string; id: string }) => (
     <div
       className={twMerge(ActionButtonStyle, "w-full cursor-pointer")}
       onClick={() => {
-        if (!lcp_license_id) {
-          toast.error(t('notifications.license.download.error'));
-          return;
-        }
-        downloadLicense(lcp_license_id).catch((err) => {
+        downloadLicense(lcp_license_id || id).catch((err) => {
           toast.error(t('notifications.license.download.error'));
         });
       }}
@@ -126,7 +122,7 @@ export default function AcquisitionsButton({
           </PDFButton>
         ))}
         {isExperimental && availability?.available && !activeLicense && <BorrowButton />}
-        {isExperimental && availability?.available && activeLicense && <ActiveLicenseButton lcp_license_id={activeLicense.lcp_license_id} />}
+        {isExperimental && availability?.available && activeLicense && <ActiveLicenseButton lcp_license_id={activeLicense.lcp_license_id} id={activeLicense.id} />}
       </div>
     </div>
   );
@@ -142,7 +138,7 @@ export default function AcquisitionsButton({
   }
 
   if (isExperimental && acquisitions.length === 0 && activeLicense) {
-    return <ActiveLicenseButton lcp_license_id={activeLicense.lcp_license_id} />;
+    return <ActiveLicenseButton lcp_license_id={activeLicense.lcp_license_id} id={activeLicense.id} />;
   }
 
   return <MultipleAcquisitionsDropdown />;
