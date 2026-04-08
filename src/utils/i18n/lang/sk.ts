@@ -328,11 +328,12 @@ export const sk = {
         title: 'Prístupová fráza',
         description: 'Nastavte prístupovú frázu pre svoj účet.',
         placeholder: 'Prístupová fráza',
+        hintPlaceholder: 'Nápoveda k prístupovej fráze (voliteľné)',
         required: 'Prístupová fráza je povinná.',
         saveButton: 'Uložiť prístupovú frázu',
         saving: 'Ukladám...',
         success: 'Prístupová fráza bola úspešne uložená.',
-        notImplemented: 'Endpoint na zmenu prístupovej frázy zatiaľ nie je implementovaný.',
+        error: 'Nepodarilo sa uložiť prístupovú frázu.',
       },
     },
 

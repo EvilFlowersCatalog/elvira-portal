@@ -2,7 +2,12 @@ import useAxios from '../useAxios';
 
 interface ISetUserPassphraseParams {
   userId: string;
-  passphrase: string;
+  name: string;
+  surname: string;
+  is_active: boolean;
+  lcp_passphrase: string;
+  lcp_passphrase_hint: string;
+  password?: string;
 }
 
 const useSetUserPassphrase = () => {
@@ -10,18 +15,11 @@ const useSetUserPassphrase = () => {
 
   const setUserPassphrase = async ({
     userId,
-    passphrase,
+    ...payload
   }: ISetUserPassphraseParams) => {
-    const SET_USER_PASSPHRASE_URL = '';
+    const SET_USER_PASSPHRASE_URL = `/api/v1/users/${userId}`;
 
-    if (!SET_USER_PASSPHRASE_URL) {
-      throw new Error('Not implemented: missing passphrase endpoint URL.');
-    }
-
-    await axios.post(SET_USER_PASSPHRASE_URL, {
-      user_id: userId,
-      passphrase,
-    });
+    await axios.put(SET_USER_PASSPHRASE_URL, payload);
   };
 
   return setUserPassphrase;

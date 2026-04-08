@@ -1,5 +1,3 @@
-import { title } from "process";
-
 export const en = {
   translation: {
     common: {
@@ -335,11 +333,12 @@ export const en = {
         title: 'Passphrase',
         description: 'Set a passphrase for your account.',
         placeholder: 'Passphrase',
+        hintPlaceholder: 'Passphrase hint (optional)',
         required: 'Passphrase is required.',
         saveButton: 'Save Passphrase',
         saving: 'Saving...',
         success: 'Passphrase was successfully saved.',
-        notImplemented: 'Passphrase update endpoint is not implemented yet.',
+        error: 'Failed to save passphrase.',
       },
     },
 

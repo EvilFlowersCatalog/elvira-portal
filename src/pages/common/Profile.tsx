@@ -24,6 +24,7 @@ const Profile = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [userDetails, setUserDetails] = useState<IUser | null>(null);
   const [passphrase, setPassphrase] = useState<string>('');
+  const [passphraseHint, setPassphraseHint] = useState<string>('');
 
   useEffect(() => {
     if (!auth) {
@@ -55,6 +56,10 @@ const Profile = () => {
     };
   }, [auth?.userId]);
 
+  useEffect(() => {
+    setPassphraseHint(userDetails?.lcp_passphrase_hint || '');
+  }, [userDetails?.lcp_passphrase_hint]);
+
   const userEmail = useMemo(() => {
     if (userDetails?.username) {
       return `${userDetails.username}@stuba.sk`;
@@ -82,18 +87,26 @@ const Profile = () => {
   const handleSetPassphrase = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    if (!passphrase.trim()) {
+      return;
+    }
+
     try {
       setIsSubmitting(true);
 
       await setUserPassphrase({
         userId: auth.userId,
-        passphrase,
+        name: userDetails?.name || auth.name,
+        surname: userDetails?.surname || auth.surname,
+        is_active: userDetails?.is_active ?? true,
+        lcp_passphrase: passphrase,
+        lcp_passphrase_hint: passphraseHint,
       });
 
       toast.success(t('profile.passphrase.success'));
       setPassphrase('');
     } catch {
-      toast.error(t('profile.passphrase.notImplemented'));
+      toast.error(t('profile.passphrase.error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -171,6 +184,14 @@ const Profile = () => {
                 maxLength={256}
                 value={passphrase}
                 onChange={(e) => setPassphrase(e.target.value)}
+              />
+
+              <ElviraInput
+                type='text'
+                placeholder={t('profile.passphrase.hintPlaceholder')}
+                maxLength={256}
+                value={passphraseHint}
+                onChange={(e) => setPassphraseHint(e.target.value)}
               />
 
               <Button type='submit' disabled={isSubmitting} className='mt-1'>
