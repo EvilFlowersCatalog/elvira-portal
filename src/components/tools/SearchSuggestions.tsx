@@ -95,6 +95,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
 
   const handleBookClick = (entryId: string) => {
     searchParams.set('entry-detail-id', entryId);
+    searchParams.set('entry-catalog-id', entries.find(e => e.id === entryId)?.catalog_id || '');
     setSearchParams(searchParams);
     onClose();
   };

@@ -145,7 +145,7 @@ export default function LicenseCalendar({ }: {}) {
                 {entry ? (
                     <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] gap-4 h-full min-h-0 items-stretch relative">
                         {/* Calendar */}
-                        <div className="order-2 lg:order-1 min-h-[22rem] lg:min-h-0 h-full max-h-full min-w-0 overflow-hidden relative">
+                        <div className="order-2 lg:order-1 min-h-[22rem] lg:min-h-0 h-full max-h-full min-w-0 relative">
                             {availability == null || availability?.available ? (
                                 <div className="h-full max-h-full min-h-0 min-w-0">
                                     <Calendar
