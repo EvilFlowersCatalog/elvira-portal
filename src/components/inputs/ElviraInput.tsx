@@ -21,6 +21,7 @@ const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
     const [isFocused, setIsFocused] = useState<boolean>(false);
 
     const { onChange, onFocus, onBlur, value, required, placeholder, className } = props;
+    const hasValue = value !== undefined && value !== null && value !== '';
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
       e.target.setCustomValidity('');
@@ -49,11 +50,11 @@ const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
         <div className='relative w-full h-16 flex flex-col justify-end gap-2'>
           <span
             className={`absolute font-light
-                ${isFocused || value 
+                ${isFocused || hasValue 
                   ? `top-0 text-[12px] ${isInvalid ? 'text-red' : 'text-primary'}`
                   : `top-1/2 -translate-y-[1px]`}
                 duration-200 pointer-events-none select-none`}
-                style={{ paddingLeft: isFocused || value ? 0 : `${paddingLeft}px` }}
+                style={{ paddingLeft: isFocused || hasValue ? 0 : `${paddingLeft}px` }}
           >
             {`${placeholder} ${required ? '*' : ''}`}
           </span>
@@ -61,7 +62,7 @@ const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
             ref={ref}
             {...props}
             className={twMerge(`w-full p-2 border-none 
-              ${value
+              ${hasValue
                 ? 'border-primary'
                 : isInvalid
                   ? 'border-red dark:border-red'
