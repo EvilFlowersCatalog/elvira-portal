@@ -51,7 +51,7 @@ export function stateStyle(state: string, t: any): React.CSSProperties {
 export default function LoansTable({ }) {
     const { t } = useTranslation();
     const getUserLoans = useGetLicenses();
-    const downloadLcpLicense = useDownloadLicense();
+    const { openInThorium, downloadDirect } = useDownloadLicense();
 
     const [items, setItems] = useState<ILicense[]>([]);
     const [data, setData] = useState<Array<Record<string, string | JSX.Element>>>([]);
@@ -88,10 +88,18 @@ export default function LoansTable({ }) {
             state: <BubbleText className='cursor-default' text={translateState(item.state, t)} style={stateStyle(item.state, t)} />,
             starts_at: formatDate(item.starts_at, 'dd.MM.yyyy'),
             ends_at: formatDate(item.expires_at, 'dd.MM.yyyy'),
-            actions: <ActionButton onClick={()=>{
-                downloadLcpLicense(item.lcp_license_id || item.id).catch((error) => {
-                    toast.error(t('notifications.license.download.error', { error: error.message }));
-                });
+            actions: <ActionButton onClick={() => {
+                const licenseId = item.lcp_license_id || item.id;
+                openInThorium(licenseId);
+                toast.info(
+                    <div className="flex flex-col gap-1">
+                        <span>{t('notifications.license.download.thoriumOpened', { defaultValue: 'Opening in Thorium...' })}</span>
+                        <button className="text-xs underline text-left" onClick={() => downloadDirect(licenseId)}>
+                            {t('notifications.license.download.fallback', { defaultValue: 'Not opening? Download file directly' })}
+                        </button>
+                    </div>,
+                    { autoClose: 8000 }
+                );
             }} icon={<FaDownload />} />
         })));
     }, [items])

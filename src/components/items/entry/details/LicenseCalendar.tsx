@@ -12,6 +12,7 @@ import { FaRegCalendarXmark, FaRegCalendarPlus } from "react-icons/fa6";
 import { IAvailabilityResponse } from "../../../../utils/interfaces/license";
 import useGetAvailability from "../../../../hooks/api/licenses/useGetAvailability";
 import useCreateLicense from "../../../../hooks/api/licenses/useCreateLicense";
+import useDownloadLicense from "../../../../hooks/api/licenses/useDownloadLicense";
 import { toast } from "react-toastify";
 import Button from "../../../buttons/Button";
 import { NAVIGATION_PATHS } from "../../../../utils/interfaces/general/general";
@@ -25,6 +26,7 @@ export default function LicenseCalendar({}: {}) {
   const getEntryDetail = useGetEntryDetail();
   const getAvailability = useGetAvailability();
   const createLicense = useCreateLicense();
+  const { openInThorium, downloadDirect } = useDownloadLicense();
   const navigate = useNavigate();
 
   const [entryId, setEntryId] = useState<string | null>(null);
@@ -99,19 +101,19 @@ export default function LicenseCalendar({}: {}) {
         return;
     }
     
-    // start download 
-    const { download_url } = license!;
-    if(download_url) {
-        const link = document.createElement("a");
-        link.href = download_url;
-        link.setAttribute("download", `license_${entryId}.lcpl`);
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
+    const licenseId = license!.lcp_license_id || license!.id;
+    openInThorium(licenseId);
 
     closeCalendar();
-    toast.success(t("notifications.license.create.success"));
+    toast.success(
+      <div className="flex flex-col gap-1">
+        <span>{t("notifications.license.create.success")}</span>
+        <button className="text-xs underline text-left" onClick={() => downloadDirect(licenseId)}>
+          {t("notifications.license.download.fallback", { defaultValue: "Not opening in Thorium? Download file directly" })}
+        </button>
+      </div>,
+      { autoClose: 8000 }
+    );
     // const params = new URLSearchParams();
     // params.set("entry-detail-id", entryId);
     // if (entry?.catalog_id) {

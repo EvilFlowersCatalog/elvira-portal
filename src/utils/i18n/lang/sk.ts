@@ -144,6 +144,8 @@ export const sk = {
         },
         download: {
           error: 'Nepodarilo sa stiahnuť výpožičku.',
+          thoriumOpened: 'Otváranie v aplikácii Thorium...',
+          fallback: 'Neotvorilo sa v Thorium? Stiahnuť súbor priamo',
         },
       },
     },

@@ -144,6 +144,8 @@ export const en = {
         },
         download:{
           error: 'Failed to download the license.',
+          thoriumOpened: 'Opening in Thorium...',
+          fallback: 'Not opening in Thorium? Download file directly',
         }
       }
     },
