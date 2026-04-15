@@ -15,7 +15,6 @@ import useCreateLicense from "../../../../hooks/api/licenses/useCreateLicense";
 import useDownloadLicense from "../../../../hooks/api/licenses/useDownloadLicense";
 import { toast } from "react-toastify";
 import Button from "../../../buttons/Button";
-import { NAVIGATION_PATHS } from "../../../../utils/interfaces/general/general";
 
 // http://localhost:3000/?licensing-entry-id=ce40e042-1491-434f-a0b4-593c0a867b99
 

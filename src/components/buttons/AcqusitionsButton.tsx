@@ -1,6 +1,5 @@
 import {
   BiBookAdd,
-  BiBookAlt,
   BiBookOpen,
   BiCalendar,
   BiDownload,
@@ -17,7 +16,6 @@ import { IEntryAcquisition } from "../../utils/interfaces/acquisition";
 import { IAvailabilityResponse, ILicense } from "../../utils/interfaces/license";
 import useDownloadLicense from "../../hooks/api/licenses/useDownloadLicense";
 import { toast } from "react-toastify";
-import { FaDownload } from "react-icons/fa";
 
 export default function AcquisitionsButton({
   entry,
@@ -32,7 +30,7 @@ export default function AcquisitionsButton({
   const [isOpen, setIsOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
   const getUserLicenses = useGetLicenses();
-  const downloadLicense = useDownloadLicense();
+  const { openInThorium, downloadDirect } = useDownloadLicense();
 
   const [activeLicense, setActiveLicense] = useState<ILicense | null>(null);
 
@@ -83,9 +81,17 @@ export default function AcquisitionsButton({
     <div
       className={twMerge(ActionButtonStyle, "w-full cursor-pointer")}
       onClick={() => {
-        downloadLicense(lcp_license_id || id).catch((err) => {
-          toast.error(t('notifications.license.download.error'));
-        });
+        const licenseId = lcp_license_id || id;
+        openInThorium(licenseId);
+        toast.info(
+          <div className="flex flex-col gap-1">
+            <span>{t('notifications.license.download.thoriumOpened', { defaultValue: 'Opening in Thorium...' })}</span>
+            <button className="text-xs underline text-left" onClick={() => downloadDirect(licenseId)}>
+              {t('notifications.license.download.fallback', { defaultValue: 'Not opening? Download file directly' })}
+            </button>
+          </div>,
+          { autoClose: 8000 }
+        );
       }}
     >
       <BiDownload size={24} className="flex-shrink-0" />
