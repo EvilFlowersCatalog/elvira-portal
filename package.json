@@ -14,7 +14,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
-    "@evilflowers/evilflowersviewer": "^0.5.17",
+    "@evilflowers/evilflowersviewer": "^0.5.18",
     "@mui/material": "^6.0.2",
     "@mui/x-date-pickers": "^8.8.0",
     "@popperjs/core": "^2.11.8",
