@@ -27,12 +27,15 @@ export default function AcquisitionsButton({
 
   useEffect(() => {
     getUserLicenses({pagination: false, entry_id: entry.id}).then((res) => {
-      const found = res.items.find(
-        (l) => ["active", "ready"].includes(l.state)
-      );
+      const now = new Date();
+      const found = res.items.find((l) => {
+        if (!["active", "ready"].includes(l.state)) return false;
+        if (!l.expires_at) return true;
+        return new Date(l.expires_at).getTime() > now.getTime();
+      });
       setActiveLicense(found || null);
     });
-  }, []);
+  }, [entry.id]);
 
   const openBorrowModal = () => {
     const params = new URLSearchParams(searchParams);
