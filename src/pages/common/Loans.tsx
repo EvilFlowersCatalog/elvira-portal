@@ -9,16 +9,17 @@ import LicenseCalendar from '../../components/items/entry/details/LicenseCalenda
 
 const Loans = () => {
   const { t } = useTranslation();
-  return (<>
-    <Breadcrumb />
-    <H1>{t('license.loansPage.title')}</H1>
-    <AdvancedSearchWrapper>
-      <LoansTable></LoansTable>
-    </AdvancedSearchWrapper>
-    <EntryDetail />
-    <AiAssistant />
-    <LicenseCalendar />
-  </>
+  return (
+    <div className="h-screen overflow-auto">
+      <Breadcrumb />
+      <H1>{t('license.loansPage.title')}</H1>
+      <AdvancedSearchWrapper>
+        <LoansTable></LoansTable>
+      </AdvancedSearchWrapper>
+      <EntryDetail />
+      <AiAssistant />
+      <LicenseCalendar />
+    </div>
   );
 };
 

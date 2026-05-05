@@ -6,7 +6,7 @@ import useAddToShelf from "../../../../hooks/api/my-shelf/useAddToShelf";
 import useRemoveFromShelf from "../../../../hooks/api/my-shelf/useRemoveFromShelf";
 import { toast } from 'react-toastify';
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { NAVIGATION_PATHS, THEME_TYPE } from "../../../../utils/interfaces/general/general";
+import { NAVIGATION_PATHS } from "../../../../utils/interfaces/general/general";
 import useAppContext from "../../../../hooks/contexts/useAppContext";
 
 
@@ -15,9 +15,11 @@ interface IEntryItem {
     triggerReload?: () => void;
     id?: string;
     type?: 'ai-recommendation' | 'library-item';
+    nextLendWindowDays?: number | null;
+    hasActiveLoan?: boolean;
 }
 
-export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem) {
+export default function EntryItem({ entry, triggerReload, id, type, nextLendWindowDays, hasActiveLoan }: IEntryItem) {
     const { titleLogoDark } = useAppContext();
     const { auth } = useAuthContext();
     const { t } = useTranslation();
@@ -100,11 +102,53 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
         setIsFallbackImage(true);
     }
 
+    const readiumEnabled = Boolean((entry as IEntryDetail).config?.readium_enabled);
+    const hasAcquisitions = entry.acquisitions?.length > 0;
+
+    const badge = (() => {
+        if (hasActiveLoan) {
+            return {
+                label: t('entry.badge.download', { defaultValue: 'Download' }),
+                className: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+            };
+        }
+
+        if (readiumEnabled) {
+            if (typeof nextLendWindowDays === 'number' && nextLendWindowDays > 0) {
+                return {
+                    label: t('entry.badge.lendInDays', { defaultValue: 'Lend in {{days}} days', days: nextLendWindowDays }),
+                    className: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
+                };
+            }
+
+            return {
+                label: t('entry.badge.lend', { defaultValue: 'Lend' }),
+                className: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
+            };
+        }
+
+        if (hasAcquisitions) {
+            return {
+                label: t('entry.badge.read', { defaultValue: 'Read' }),
+                className: 'bg-green text-white'
+            };
+        }
+
+        return null;
+    })();
+
     return <div className="group rounded-lg overflow-hidden relative w-full min-h-[17rem] max-w-[200px] hover:shadow-[0_6px_20px_rgba(0,0,0,0.4)] dark:hover:shadow-strongDarkGray transition-shadow duration-300">
         <div className="h-40">
             <div onClick={openEntryDetail}
                 className='relative w-full h-full object-cover select-none cursor-pointer'
             >
+                {badge && (
+                    <div
+                        className={`absolute top-2 left-2 z-10 rounded-md px-2 py-1 text-[10px] font-semibold uppercase tracking-wide shadow ${badge.className}`}
+                    >
+                        {badge.label}
+                    </div>
+                )}
                 <img
                     className="w-full h-full object-cover select-none cursor-pointer"
                     src={entry.thumbnail + `?access_token=${auth?.token}`}

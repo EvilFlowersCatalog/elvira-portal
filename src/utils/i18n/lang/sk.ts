@@ -386,6 +386,12 @@ export const sk = {
         },
         askAi: 'Spýtať sa AI',
       },
+      badge: {
+        read: 'Čítať',
+        lend: 'Vypožičať',
+        lendInDays: 'Vypožičať o {{days}} dní',
+        download: 'Stiahnuť',
+      },
       wizard: {
         requiredMessages: {
           title: 'Názov je povinný. Pred pokračovaním je potrebné ho vyplniť.',
@@ -439,6 +445,18 @@ export const sk = {
     },
 
     license: {
+      queue: {
+        title: 'Front výpožičiek',
+        status: 'Stav rady',
+        alreadyBorrowed: 'Už vypožičané. Pripravené na stiahnutie.',
+        download: 'Stiahnuť výpožičku',
+        loading: 'Kontrolujem dostupnosť...',
+        availableIn: 'Dostupné na výpožičku o {{days}} dní',
+        availableNow: 'Dostupné na výpožičku teraz',
+        borrow: 'Vypožičať na 7 dní',
+        noWindow: 'V najbližších {{days}} dňoch nie je dostupné 7-dňové okno',
+        note: 'Výpožičky sú na 7-dňové okná. Ak je najbližší termín v budúcnosti, počkajte, kým sa otvorí.',
+      },
       calendar: {
         title: 'Kalendár výpožičiek',
         periodBooked: 'Vybraný časový úsek je už obsadený.',

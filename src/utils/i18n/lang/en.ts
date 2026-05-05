@@ -391,6 +391,12 @@ export const en = {
         },
         askAi: 'Ask AI',
       },
+      badge: {
+        read: 'Read',
+        lend: 'Lend',
+        lendInDays: 'Lend in {{days}} days',
+        download: 'Download',
+      },
       wizard: {
         requiredMessages: {
           title:
@@ -450,6 +456,18 @@ export const en = {
     },
 
     license: {
+      queue: {
+        title: 'Borrow queue',
+        status: 'Queue status',
+        alreadyBorrowed: 'Already borrowed. Ready to download.',
+        download: 'Download loan',
+        loading: 'Checking availability...',
+        availableIn: 'Available to lend in {{days}} days',
+        availableNow: 'Available to lend now',
+        borrow: 'Borrow for 7 days',
+        noWindow: 'No 7-day window in the next {{days}} days',
+        note: 'Loans are issued in 7-day windows. If the closest slot is in the future, wait until it opens to borrow.',
+      },
       calendar: {
         title: 'License Calendar',
         periodBooked: 'The selected period is already booked.',
