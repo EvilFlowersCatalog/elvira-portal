@@ -307,6 +307,9 @@ export const sk = {
 
     profile: {
       title: 'Profil',
+      personalInfo: {
+        title: 'Osobné údaje',
+      },
       activity: {
         title: 'Aktivita účtu',
       },
@@ -315,8 +318,10 @@ export const sk = {
         username: 'Prihlasovacie meno',
         name: 'Meno',
         surname: 'Priezvisko',
-        email: 'E-mail',
+        email: 'E-mailová adresa',
         active: 'Aktívny',
+        accountType: 'Typ účtu',
+        memberSince: 'Členstvo od',
         firstLogin: 'Prvé prihlásenie',
         lastLogin: 'Posledné prihlásenie',
         createdAt: 'Vytvorené',
@@ -326,16 +331,31 @@ export const sk = {
         yes: 'Áno',
         no: 'Nie',
       },
+      stats: {
+        readBooks: 'Prečítané knihy',
+        savedBooks: 'Uložené knihy',
+        borrowedBooks: 'Požičané knihy',
+        readingHours: 'Hodín čítania',
+      },
       passphrase: {
         title: 'Prístupová fráza',
         description: 'Nastavte prístupovú frázu pre svoj účet.',
         placeholder: 'Prístupová fráza',
-        hintPlaceholder: 'Nápoveda k prístupovej fráze (voliteľné)',
+        hintPlaceholder: 'Nápoveda k prístupovej fráze',
         required: 'Prístupová fráza je povinná.',
-        saveButton: 'Uložiť prístupovú frázu',
+        saveButton: 'Uložiť',
         saving: 'Ukladám...',
         success: 'Prístupová fráza bola úspešne uložená.',
         error: 'Nepodarilo sa uložiť prístupovú frázu.',
+      },
+      notifications: {
+        title: 'Notifikácie',
+        loanEnd: 'Koniec výpožičky',
+        loanEndDesc: 'Upozorniť 1 deň pred koncom výpožičky',
+        newBooks: 'Novinky v knižnici',
+        newBooksDesc: 'Dostávať upozornenia o nových knihách',
+        reservationChange: 'Zmena rezervácie',
+        reservationChangeDesc: 'Upozorniť na zmenu dostupnosti rezervovanej knihy',
       },
     },
 

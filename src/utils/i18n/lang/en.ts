@@ -312,6 +312,9 @@ export const en = {
 
     profile: {
       title: 'Profile',
+      personalInfo: {
+        title: 'Personal Data',
+      },
       activity: {
         title: 'Account Activity',
       },
@@ -320,8 +323,10 @@ export const en = {
         username: 'Username',
         name: 'Name',
         surname: 'Surname',
-        email: 'Email',
+        email: 'Email Address',
         active: 'Active',
+        accountType: 'Account Type',
+        memberSince: 'Member Since',
         firstLogin: 'First Time Login',
         lastLogin: 'Last Login',
         createdAt: 'Created At',
@@ -331,16 +336,31 @@ export const en = {
         yes: 'Yes',
         no: 'No',
       },
+      stats: {
+        readBooks: 'Read Books',
+        savedBooks: 'Saved Books',
+        borrowedBooks: 'Borrowed Books',
+        readingHours: 'Reading Hours',
+      },
       passphrase: {
         title: 'Passphrase',
         description: 'Set a passphrase for your account.',
         placeholder: 'Passphrase',
-        hintPlaceholder: 'Passphrase hint (optional)',
+        hintPlaceholder: 'Passphrase hint',
         required: 'Passphrase is required.',
-        saveButton: 'Save Passphrase',
+        saveButton: 'Save',
         saving: 'Saving...',
         success: 'Passphrase was successfully saved.',
         error: 'Failed to save passphrase.',
+      },
+      notifications: {
+        title: 'Notifications',
+        loanEnd: 'Loan End',
+        loanEndDesc: 'Notify 1 day before the loan ends',
+        newBooks: 'Library News',
+        newBooksDesc: 'Receive notifications about new books',
+        reservationChange: 'Reservation Change',
+        reservationChangeDesc: 'Notify on availability change of a reserved book',
       },
     },
 
