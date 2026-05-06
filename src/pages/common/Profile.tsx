@@ -12,6 +12,8 @@ import useSetUserPassphrase from '../../hooks/api/users/useSetUserPassphrase';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { IUser } from '../../utils/interfaces/user';
 
+type NotificationKey = 'loanEnd' | 'newBooks' | 'reservationChange';
+
 const Profile = () => {
   const { t } = useTranslation();
   const { auth } = useAuthContext();
@@ -25,29 +27,25 @@ const Profile = () => {
   const [userDetails, setUserDetails] = useState<IUser | null>(null);
   const [passphrase, setPassphrase] = useState<string>('');
   const [passphraseHint, setPassphraseHint] = useState<string>('');
+  const [notifications, setNotifications] = useState<Record<NotificationKey, boolean>>({
+    loanEnd: false,
+    newBooks: false,
+    reservationChange: false,
+  });
 
   useEffect(() => {
-    if (!auth) {
-      return;
-    }
+    if (!auth) return;
 
     let mounted = true;
 
     (async () => {
       try {
         const details = await getUserDetails(auth.userId);
-
-        if (mounted) {
-          setUserDetails(details);
-        }
+        if (mounted) setUserDetails(details);
       } catch {
-        if (mounted) {
-          setIsError(true);
-        }
+        if (mounted) setIsError(true);
       } finally {
-        if (mounted) {
-          setIsLoading(false);
-        }
+        if (mounted) setIsLoading(false);
       }
     })();
 
@@ -61,39 +59,27 @@ const Profile = () => {
   }, [userDetails?.lcp_passphrase_hint]);
 
   const userEmail = useMemo(() => {
-    if (userDetails?.username) {
-      return `${userDetails.username}@stuba.sk`;
-    }
-
-    if (auth?.username) {
-      return `${auth.username}@stuba.sk`;
-    }
-
+    if (userDetails?.username) return `${userDetails.username}@stuba.sk`;
+    if (auth?.username) return `${auth.username}@stuba.sk`;
     return '-';
   }, [auth?.username, userDetails?.username]);
 
-  if (!auth) {
-    return null;
-  }
+  if (!auth) return null;
+
+  const userName = userDetails?.username || auth?.username || '';
+  const userInitial = (auth.name?.[0] || auth.username?.[0] || 'U').toUpperCase();
 
   const formatDate = (value: string | undefined) => {
-    if (!value) {
-      return '-';
-    }
-
-    return new Date(value).toLocaleString();
+    if (!value) return '-';
+    return new Date(value).toLocaleDateString();
   };
 
   const handleSetPassphrase = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (!passphrase.trim()) {
-      return;
-    }
+    if (!passphrase.trim()) return;
 
     try {
       setIsSubmitting(true);
-
       await setUserPassphrase({
         userId: auth.userId,
         name: userDetails?.name || auth.name,
@@ -102,7 +88,6 @@ const Profile = () => {
         lcp_passphrase: passphrase,
         lcp_passphrase_hint: passphraseHint,
       });
-
       toast.success(t('profile.passphrase.success'));
       setPassphrase('');
     } catch {
@@ -111,6 +96,16 @@ const Profile = () => {
       setIsSubmitting(false);
     }
   };
+
+  const toggleNotification = (key: NotificationKey) => {
+    setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  const notificationItems: { key: NotificationKey; label: string; desc: string }[] = [
+    { key: 'loanEnd', label: t('profile.notifications.loanEnd'), desc: t('profile.notifications.loanEndDesc') },
+    { key: 'newBooks', label: t('profile.notifications.newBooks'), desc: t('profile.notifications.newBooksDesc') },
+    { key: 'reservationChange', label: t('profile.notifications.reservationChange'), desc: t('profile.notifications.reservationChangeDesc') },
+  ];
 
   return (
     <div className='w-full h-full overflow-auto pb-10'>
@@ -122,85 +117,130 @@ const Profile = () => {
 
       {!isLoading && !isError && (
         <div className='px-4 flex flex-col gap-5'>
+          {/* Personal info card */}
           <section className='rounded-xl p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A]'>
-            <div className='flex flex-wrap gap-4 items-center'>
-              <div className='w-16 h-16 rounded-full bg-primaryLight dark:bg-zinc-700 text-primary dark:text-secondaryLight text-2xl font-bold flex items-center justify-center'>
-                {(auth.name?.[0] || auth.username?.[0] || 'U').toUpperCase()}
-              </div>
-              <div className='min-w-[220px]'>
-                <p className='text-lg font-bold text-secondary dark:text-secondaryLight'>
-                  {auth.name} {auth.surname}
-                </p>
-                <p className='text-sm text-zinc-600 dark:text-zinc-300'>{userEmail}</p>
-              </div>
-              <div className='ml-auto px-3 py-1 rounded-full text-xs font-medium bg-primaryLight text-primary dark:bg-zinc-700 dark:text-secondaryLight'>
-                {auth.isSuperUser
-                  ? t('navbarMenu.superUser')
-                  : t('navbarMenu.user')}
-              </div>
-            </div>
-
-            <div className='mt-5 pt-5 border-t border-zinc-200 dark:border-zinc-700'>
-              <h2 className='text-base font-semibold text-secondary dark:text-secondaryLight mb-3'>
-                {t('profile.activity.title')}
-              </h2>
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
-                <div className='rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/30 px-4 py-3'>
-                  <p className='text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400'>
-                    {t('profile.fields.firstLogin')}
-                  </p>
-                  <p className='text-sm font-medium text-zinc-800 dark:text-zinc-200 mt-1'>
-                    {formatDate(userDetails?.created_at)}
-                  </p>
-                </div>
-
-                <div className='rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/30 px-4 py-3'>
-                  <p className='text-xs uppercase tracking-wide text-zinc-500 dark:text-zinc-400'>
-                    {t('profile.fields.lastLogin')}
-                  </p>
-                  <p className='text-sm font-medium text-zinc-800 dark:text-zinc-200 mt-1'>
-                    {formatDate(userDetails?.last_login)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          <section className='rounded-xl p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A]'>
-            <h2 className='text-xl font-bold text-secondary dark:text-secondaryLight'>
-              {t('profile.passphrase.title')}
+            <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight mb-4'>
+              {t('profile.personalInfo.title')}
             </h2>
-            <p className='text-sm text-zinc-600 dark:text-zinc-300 mt-1 mb-4'>
-              {t('profile.passphrase.description')}
-            </p>
-
-            <form className='max-w-lg flex flex-col gap-3' onSubmit={handleSetPassphrase}>
-              <ElviraInput
-                type='password'
-                placeholder={t('profile.passphrase.placeholder')}
-                invalidMessage={t('profile.passphrase.required')}
-                required
-                minLength={4}
-                maxLength={256}
-                value={passphrase}
-                onChange={(e) => setPassphrase(e.target.value)}
-              />
-
-              <ElviraInput
-                type='text'
-                placeholder={t('profile.passphrase.hintPlaceholder')}
-                maxLength={256}
-                value={passphraseHint}
-                onChange={(e) => setPassphraseHint(e.target.value)}
-              />
-
-              <Button type='submit' disabled={isSubmitting} className='mt-1'>
-                {isSubmitting
-                  ? t('profile.passphrase.saving')
-                  : t('profile.passphrase.saveButton')}
-              </Button>
-            </form>
+            <div className='flex flex-wrap items-start gap-5'>
+              <div className='w-16 h-16 rounded-full bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center flex-shrink-0'>
+                <span className='text-2xl font-bold text-zinc-500 dark:text-zinc-300'>{userInitial}</span>
+              </div>
+              <div className='flex-1 min-w-[240px]'>
+                <p className='text-xl font-bold text-secondary dark:text-secondaryLight mb-3'>{userName}</p>
+                <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-10 gap-y-4'>
+                  <div className='flex flex-col gap-1'>
+                    <span className='text-xs text-zinc-500 dark:text-zinc-400'>{t('profile.fields.email')}</span>
+                    <span className='text-sm font-medium text-secondary dark:text-secondaryLight'>{userEmail}</span>
+                  </div>
+                  <div className='flex flex-col gap-1'>
+                    <span className='text-xs text-zinc-500 dark:text-zinc-400'>{t('profile.fields.accountType')}</span>
+                    <span className='text-sm font-medium text-secondary dark:text-secondaryLight'>
+                      {auth.isSuperUser ? t('navbarMenu.superUser') : t('navbarMenu.user')}
+                    </span>
+                  </div>
+                  <div className='flex flex-col gap-1'>
+                    <span className='text-xs text-zinc-500 dark:text-zinc-400'>{t('profile.fields.memberSince')}</span>
+                    <span className='text-sm font-medium text-secondary dark:text-secondaryLight'>{formatDate(userDetails?.created_at)}</span>
+                  </div>
+                  <div className='flex flex-col gap-1'>
+                    <span className='text-xs text-zinc-500 dark:text-zinc-400'>{t('profile.fields.lastLogin')}</span>
+                    <span className='text-sm font-medium text-secondary dark:text-secondaryLight'>{formatDate(userDetails?.last_login)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </section>
+
+          {/* Stats row */}
+          <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
+            {([
+              { labelKey: 'profile.stats.readBooks', value: '-' },
+              { labelKey: 'profile.stats.savedBooks', value: '-' },
+              { labelKey: 'profile.stats.borrowedBooks', value: '-' },
+              { labelKey: 'profile.stats.readingHours', value: '-' },
+            ] as const).map(({ labelKey, value }) => (
+              <div
+                key={labelKey}
+                className='bg-white dark:bg-zinc-800 rounded-lg shadow-[0px_4px_6px_rgba(0,0,0,0.1)] dark:shadow-[0px_4px_6px_rgba(0,0,0,0.3)] p-4 flex items-center gap-3'
+              >
+                <div className='w-10 h-10 rounded-md bg-primaryLight dark:bg-zinc-700 flex-shrink-0' />
+                <div>
+                  <p className='text-xs text-secondary dark:text-secondaryLight opacity-70'>{t(labelKey)}</p>
+                  <p className='text-xl font-extrabold text-secondary dark:text-secondaryLight'>{value}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom two-column section */}
+          <div className='grid grid-cols-1 lg:grid-cols-2 gap-5'>
+            {/* Passphrase section */}
+            <section className='rounded-xl p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A]'>
+              <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight mb-1'>
+                {t('profile.passphrase.title')}
+              </h2>
+              <p className='text-sm text-zinc-600 dark:text-zinc-300 mt-1 mb-4'>
+                {t('profile.passphrase.description')}
+              </p>
+              <form className='flex flex-col gap-3' onSubmit={handleSetPassphrase}>
+                <ElviraInput
+                  type='password'
+                  placeholder={t('profile.passphrase.placeholder')}
+                  invalidMessage={t('profile.passphrase.required')}
+                  required
+                  minLength={4}
+                  maxLength={256}
+                  value={passphrase}
+                  onChange={(e) => setPassphrase(e.target.value)}
+                />
+                <ElviraInput
+                  type='text'
+                  placeholder={t('profile.passphrase.hintPlaceholder')}
+                  maxLength={256}
+                  value={passphraseHint}
+                  onChange={(e) => setPassphraseHint(e.target.value)}
+                />
+                <div className='flex justify-center mt-1'>
+                  <Button type='submit' disabled={isSubmitting}>
+                    {isSubmitting ? t('profile.passphrase.saving') : t('profile.passphrase.saveButton')}
+                  </Button>
+                </div>
+              </form>
+            </section>
+
+            {/* Notifications section */}
+            <section className='rounded-xl p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A]'>
+              <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight mb-4'>
+                {t('profile.notifications.title')}
+              </h2>
+              <div className='flex flex-col divide-y divide-zinc-100 dark:divide-zinc-700'>
+                {notificationItems.map(({ key, label, desc }) => (
+                  <div key={key} className='flex items-center justify-between py-4 first:pt-0 last:pb-0'>
+                    <div className='mr-4'>
+                      <p className='text-sm font-semibold text-secondary dark:text-secondaryLight'>{label}</p>
+                      <p className='text-xs text-zinc-500 dark:text-zinc-400 mt-0.5'>{desc}</p>
+                    </div>
+                    <button
+                      type='button'
+                      role='switch'
+                      aria-checked={notifications[key]}
+                      onClick={() => toggleNotification(key)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
+                        notifications[key] ? 'bg-primary' : 'bg-zinc-300 dark:bg-zinc-600'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-[18px] w-[18px] transform rounded-full bg-white shadow transition-transform ${
+                          notifications[key] ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
         </div>
       )}
     </div>
