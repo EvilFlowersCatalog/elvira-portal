@@ -18,7 +18,7 @@ const AdminEditEntry = () => {
   const [stringImage, setStringImage] = useState<string>('');
   const [entryCatalogId, setEntryCatalogId] = useState<string | null>(null);
 
-  const getEntryDetail = useGetEntryDetail();
+  const { getEntryDetail } = useGetEntryDetail();
   const navigate = useNavigate();
   const editEntry = useEditEntry();
 

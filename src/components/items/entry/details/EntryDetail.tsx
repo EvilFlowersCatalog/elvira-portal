@@ -7,6 +7,7 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
 import useAuthContext from '../../../../hooks/contexts/useAuthContext';
 import { IEntryDetail } from '../../../../utils/interfaces/entry';
+import { ILicense } from '../../../../utils/interfaces/license';
 import useGetEntryDetail from '../../../../hooks/api/entries/useGetEntryDetail';
 import useAddToShelf from '../../../../hooks/api/my-shelf/useAddToShelf';
 import useRemoveFromShelf from '../../../../hooks/api/my-shelf/useRemoveFromShelf';
@@ -59,12 +60,13 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     },
   ]
 
+  const [activeLicense, setActiveLicense] = useState<ILicense | null>(null);
   const [update, setUpdate] = useState<boolean>(false);
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  const getEntryDetail = useGetEntryDetail();
+  const { getEntryDetailWithLicense } = useGetEntryDetail();
   const addToShelf = useAddToShelf();
   const removeFromShelf = useRemoveFromShelf();
 
@@ -172,12 +174,14 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
 
     (async () => {
       try {
-        const entryDetail = await getEntryDetail(entryId, catalogId || undefined);
+        const { entry: entryDetail, activeLicense: license } = await getEntryDetailWithLicense(entryId, catalogId || undefined);
         setEntry(entryDetail);
-        } catch (error) {
-          setEntry(null);
-        }
-      })();
+        setActiveLicense(license);
+      } catch {
+        setEntry(null);
+        setActiveLicense(null);
+      }
+    })();
   }, [entryId, update]);
 
   const askAi = () => {
@@ -217,7 +221,9 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
             </div>
 
             <ActionsWrapper>
-              <AcquisitionsButton acquisitions={entry.acquisitions} entry={entry} />
+              <div className="col-span-2">
+                <AcquisitionsButton acquisitions={entry.acquisitions} entry={entry} activeLicense={activeLicense} onRefresh={() => setUpdate(u => !u)} />
+              </div>
               <ShelfButton
                 isLoading={isLoading}
                 entryId={entryId!}

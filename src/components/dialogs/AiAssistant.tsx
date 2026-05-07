@@ -45,7 +45,7 @@ function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, ha
 
 function MessageElement({ msg, msgIndex, bookCatalogs }: { msg: AiMessage, msgIndex: number, bookCatalogs: Record<string, string> }) {
     const [books, setBooks] = useState<any[]>([]);
-    const getEntryDetail = useGetEntryDetail();
+    const { getEntryDetail } = useGetEntryDetail();
 
     useEffect(() => {
         if (msg.content.type === "entries" && Array.isArray(msg.content.data)) {
@@ -118,7 +118,7 @@ export default function AiAssistant() {
         setAiShowSuggestions,
         selectedCatalogId,
     } = useAppContext();
-    const getEntryDetail = useGetEntryDetail();
+    const { getEntryDetail } = useGetEntryDetail();
 
     const [input, setInput] = useState("");
     const [isGeneratingResponse, setGeneratingResponse] = useState(false);

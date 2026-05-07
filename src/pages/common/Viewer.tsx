@@ -44,7 +44,7 @@ const Viewer = () => {
 
   const navigate = useNavigate();
   const createUserAcquisition = useCreateUserAcquisition();
-  const getEntryDetail = useGetEntryDetail();
+  const { getEntryDetail } = useGetEntryDetail();
   const getUserAcquisition = useGetUserAcquisition();
   const getAnotations = useGetAnotations();
   const updateAnotation = useUpdateAnotation();

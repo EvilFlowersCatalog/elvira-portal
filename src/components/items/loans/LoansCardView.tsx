@@ -12,6 +12,9 @@ import { useTranslation } from 'react-i18next';
 import { ILicense } from '../../../utils/interfaces/license';
 import useGetLicenses from '../../../hooks/api/licenses/useGetLicenses';
 import useDownloadLicense from '../../../hooks/api/licenses/useDownloadLicense';
+import ExtendLoanModal from '../../modals/ExtendLoanModal';
+import ReturnBookModal from '../../modals/ReturnBookModal';
+import CancelReservationModal from '../../modals/CancelReservationModal';
 
 function BorrowedDateBadge({ date }: { date: string }) {
   return (
@@ -108,16 +111,20 @@ function ActionBtn({
 function BorrowedCard({
   license,
   onDownload,
+  onExtend,
+  onReturn,
 }: {
   license: ILicense;
   onDownload: (id: string) => void;
+  onExtend: (license: ILicense) => void;
+  onReturn: (license: ILicense) => void;
 }) {
   const expiresAt = parseISO(license.expires_at);
   const startsAt = parseISO(license.starts_at);
   const daysLeft = differenceInDays(expiresAt, new Date());
   const borrowedFrom = format(startsAt, 'dd.MM.yyyy');
   const dueDate = format(expiresAt, 'dd.MM.yyyy');
-  // Placeholder – not returned by API yet
+  // Placeholder – extension count not yet returned by API
   const PLACEHOLDER_EXTENSIONS = 0;
   const canExtend = PLACEHOLDER_EXTENSIONS < 2;
 
@@ -125,71 +132,54 @@ function BorrowedCard({
     <div className="h-[109px] relative w-full">
       <div className="absolute inset-0 bg-white border border-[#e5e5e5] rounded-[6px]" />
 
-      {/* Book cover */}
       <div className="absolute left-[14px] top-1/2 -translate-y-1/2 w-[55px] h-[78px] rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden shrink-0">
-        <img
-          alt={license.entry?.title}
-          src="/assets/thumbnail.webp"
-          className="w-full h-full object-cover rounded-[4px]"
-        />
+        <img alt={license.entry?.title} src="/assets/thumbnail.webp" className="w-full h-full object-cover rounded-[4px]" />
       </div>
 
-      {/* Title */}
       <div className="absolute left-[82px] right-[253px] top-[calc(50%-22px)] -translate-y-1/2">
         <p className="font-semibold text-[14px] text-[#15384e] tracking-[0.1px] truncate leading-normal">
           {license.entry?.title || 'Neznámy titul'}
         </p>
       </div>
 
-      {/* Author – placeholder */}
       <div className="absolute left-[82px] right-[253px] top-[calc(50%+2px)] -translate-y-1/2">
-        <p className="font-light text-[12px] text-[#15384e] tracking-[0.1px] truncate leading-normal">
-          Autor
-        </p>
+        <p className="font-light text-[12px] text-[#15384e] tracking-[0.1px] truncate leading-normal">Autor</p>
       </div>
 
-      {/* Status badges */}
       <div className="absolute left-[82px] top-[78px] flex items-center gap-[23px]">
         <BorrowedDateBadge date={borrowedFrom} />
         <DaysLeftBadge daysLeft={daysLeft} />
         <ExtensionsBadge count={PLACEHOLDER_EXTENSIONS} />
       </div>
 
-      {/* Due date chip */}
       <div className="absolute right-[17px] top-[calc(50%-25.5px)] -translate-y-1/2 w-[218px] h-[28px] rounded-[6px] overflow-hidden flex items-center justify-center gap-[11px] px-2">
         <div className="absolute inset-0 bg-[#cce6fe] rounded-[6px] shadow-[inset_-1px_-1px_2.8px_0px_rgba(0,0,0,0.1)]" />
         <span className="relative w-[7px] h-[7px] rounded-full bg-[#1e6cb4] shrink-0" />
         <span className="relative text-[13px] text-[#1e6cb4] tracking-[0.1px] whitespace-nowrap">
-          Požičané do:{' '}
-          <strong>{dueDate}</strong>
+          Požičané do: <strong>{dueDate}</strong>
         </span>
       </div>
 
-      {/* Action buttons */}
       <div className="absolute right-[17px] bottom-[13.76%] top-[55.05%] flex items-center gap-[18px]">
-        <ActionBtn
-          icon={<MdMoreTime size={20} />}
-          label="Predĺžiť"
-          disabled={!canExtend}
-        />
-        <ActionBtn icon={<BsArrowReturnLeft size={20} />} label="Vrátiť" />
-        <ActionBtn
-          icon={<LuDownload size={20} />}
-          label="Stiahnuť"
-          filled
-          onClick={() => onDownload(license.lcp_license_id || license.id)}
-        />
+        <ActionBtn icon={<MdMoreTime size={20} />} label="Predĺžiť" disabled={!canExtend} onClick={() => onExtend(license)} />
+        <ActionBtn icon={<BsArrowReturnLeft size={20} />} label="Vrátiť" onClick={() => onReturn(license)} />
+        <ActionBtn icon={<LuDownload size={20} />} label="Stiahnuť" filled onClick={() => onDownload(license.lcp_license_id || license.id)} />
       </div>
     </div>
   );
 }
 
-function ReservedCard({ license }: { license: ILicense }) {
+function ReservedCard({
+  license,
+  onCancel,
+}: {
+  license: ILicense;
+  onCancel: (license: ILicense) => void;
+}) {
   const startsAt = parseISO(license.starts_at);
   const expiresAt = parseISO(license.expires_at);
   const reservedDate = format(startsAt, 'dd.MM');
   const availableFrom = format(expiresAt, 'dd.MM.yyyy');
-  // Placeholder queue info – not returned by API yet
   const PLACEHOLDER_QUEUE_POSITION = 1;
   const PLACEHOLDER_QUEUE_TOTAL = 3;
 
@@ -197,48 +187,35 @@ function ReservedCard({ license }: { license: ILicense }) {
     <div className="h-[109px] relative w-full">
       <div className="absolute inset-0 bg-white border border-[#e5e5e5] rounded-[6px]" />
 
-      {/* Book cover */}
       <div className="absolute left-[14px] top-1/2 -translate-y-1/2 w-[55px] h-[78px] rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden shrink-0">
-        <img
-          alt={license.entry?.title}
-          src="/assets/thumbnail.webp"
-          className="w-full h-full object-cover rounded-[4px]"
-        />
+        <img alt={license.entry?.title} src="/assets/thumbnail.webp" className="w-full h-full object-cover rounded-[4px]" />
       </div>
 
-      {/* Title */}
       <div className="absolute left-[82px] right-[135px] top-[calc(50%-22px)] -translate-y-1/2">
         <p className="font-semibold text-[14px] text-[#15384e] tracking-[0.1px] truncate leading-normal">
           {license.entry?.title || 'Neznámy titul'}
         </p>
       </div>
 
-      {/* Author – placeholder */}
       <div className="absolute left-[82px] right-[135px] top-[calc(50%+2px)] -translate-y-1/2">
-        <p className="font-light text-[12px] text-[#15384e] tracking-[0.1px] truncate leading-normal">
-          Autor
-        </p>
+        <p className="font-light text-[12px] text-[#15384e] tracking-[0.1px] truncate leading-normal">Autor</p>
       </div>
 
-      {/* Status badges */}
       <div className="absolute left-[82px] top-[78px] flex items-center gap-[23px]">
         <ReservedDateBadge date={reservedDate} />
         <QueueBadge position={PLACEHOLDER_QUEUE_POSITION} total={PLACEHOLDER_QUEUE_TOTAL} />
       </div>
 
-      {/* Available from chip */}
       <div className="absolute right-[17px] top-[calc(50%-25.5px)] -translate-y-1/2 w-[218px] h-[28px] rounded-[6px] overflow-hidden flex items-center justify-center gap-[11px] px-2">
         <div className="absolute inset-0 bg-[#feeecc] rounded-[6px] shadow-[inset_-1px_-1px_2.8px_0px_rgba(0,0,0,0.1)]" />
         <span className="relative w-[7px] h-[7px] rounded-full bg-[#9f6c00] shrink-0" />
         <span className="relative text-[13px] text-[#9f6c00] tracking-[0.1px] whitespace-nowrap">
-          Dostupné od:{' '}
-          <strong>{availableFrom}</strong>
+          Dostupné od: <strong>{availableFrom}</strong>
         </span>
       </div>
 
-      {/* Cancel button */}
       <div className="absolute right-[17px] top-[calc(50%+22.5px)] -translate-y-1/2">
-        <ActionBtn icon={<IoClose size={20} />} label="Zrušiť" />
+        <ActionBtn icon={<IoClose size={20} />} label="Zrušiť" onClick={() => onCancel(license)} />
       </div>
     </div>
   );
@@ -254,7 +231,11 @@ export default function LoansCardView() {
   const [reserved, setReserved] = useState<ILicense[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const [extendLicense, setExtendLicense] = useState<ILicense | null>(null);
+  const [returnLicense, setReturnLicense] = useState<ILicense | null>(null);
+  const [cancelLicense, setCancelLicense] = useState<ILicense | null>(null);
+
+  const loadLicenses = () => {
     setLoading(true);
     getLicenses({ page: 1, limit: 50 })
       .then(({ items }) => {
@@ -262,6 +243,10 @@ export default function LoansCardView() {
         setReserved(items.filter((l) => l.state === 'draft' || (l.state as string) === 'ready'));
       })
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    loadLicenses();
   }, [searchParams]);
 
   const handleDownload = (licenseId: string) => {
@@ -282,38 +267,68 @@ export default function LoansCardView() {
   }
 
   return (
-    <div className="flex flex-col w-full">
-      {/* Borrowed section */}
-      <div className="flex flex-col gap-[20px] py-[20px]">
-        <p className="text-[18px] font-bold text-secondary tracking-[0.1px]">
-          Požičané{' '}
-          <span className="text-[16px] font-light text-[#15384e]">({borrowed.length})</span>
-        </p>
-        <div className="flex flex-col gap-[12px] w-full">
-          {borrowed.length === 0 ? (
-            <p className="text-[14px] text-darkGray">Nemáte žiadne aktívne výpožičky.</p>
-          ) : (
-            borrowed.map((license) => (
-              <BorrowedCard key={license.id} license={license} onDownload={handleDownload} />
-            ))
-          )}
-        </div>
-      </div>
-
-      {/* Reserved section */}
-      {reserved.length > 0 && (
+    <>
+      <div className="flex flex-col w-full">
+        {/* Borrowed section */}
         <div className="flex flex-col gap-[20px] py-[20px]">
           <p className="text-[18px] font-bold text-secondary tracking-[0.1px]">
-            Rezervované{' '}
-            <span className="text-[16px] font-light text-[#15384e]">({reserved.length})</span>
+            Požičané <span className="text-[16px] font-light text-[#15384e]">({borrowed.length})</span>
           </p>
           <div className="flex flex-col gap-[12px] w-full">
-            {reserved.map((license) => (
-              <ReservedCard key={license.id} license={license} />
-            ))}
+            {borrowed.length === 0 ? (
+              <p className="text-[14px] text-darkGray">Nemáte žiadne aktívne výpožičky.</p>
+            ) : (
+              borrowed.map((license) => (
+                <BorrowedCard
+                  key={license.id}
+                  license={license}
+                  onDownload={handleDownload}
+                  onExtend={setExtendLicense}
+                  onReturn={setReturnLicense}
+                />
+              ))
+            )}
           </div>
         </div>
+
+        {/* Reserved section */}
+        {reserved.length > 0 && (
+          <div className="flex flex-col gap-[20px] py-[20px]">
+            <p className="text-[18px] font-bold text-secondary tracking-[0.1px]">
+              Rezervované <span className="text-[16px] font-light text-[#15384e]">({reserved.length})</span>
+            </p>
+            <div className="flex flex-col gap-[12px] w-full">
+              {reserved.map((license) => (
+                <ReservedCard key={license.id} license={license} onCancel={setCancelLicense} />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {extendLicense && (
+        <ExtendLoanModal
+          license={extendLicense}
+          onClose={() => setExtendLicense(null)}
+          onSuccess={loadLicenses}
+        />
       )}
-    </div>
+
+      {returnLicense && (
+        <ReturnBookModal
+          license={returnLicense}
+          onClose={() => setReturnLicense(null)}
+          onSuccess={loadLicenses}
+        />
+      )}
+
+      {cancelLicense && (
+        <CancelReservationModal
+          license={cancelLicense}
+          onClose={() => setCancelLicense(null)}
+          onSuccess={loadLicenses}
+        />
+      )}
+    </>
   );
 }

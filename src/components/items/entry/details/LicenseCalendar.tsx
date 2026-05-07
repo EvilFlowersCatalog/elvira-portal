@@ -1,149 +1,91 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { addDays, differenceInCalendarDays, formatDate, startOfDay } from "date-fns";
+import { useSearchParams } from "react-router-dom";
+import { addDays, format } from "date-fns";
 import { CircleLoader } from "react-spinners";
 import { toast } from "react-toastify";
-import DetailModal from "../../../modals/DetailModal";
+import { FiCheckCircle, FiEye, FiEyeOff, FiInfo } from "react-icons/fi";
+import { LuDownload } from "react-icons/lu";
+import { RiArrowLeftLine, RiCloseLine } from "react-icons/ri";
+import { BsQuestionCircle } from "react-icons/bs";
+import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import { IEntryDetail } from "../../../../utils/interfaces/entry";
 import useGetEntryDetail from "../../../../hooks/api/entries/useGetEntryDetail";
 import useAuthContext from "../../../../hooks/contexts/useAuthContext";
-import { IAvailabilityResponse, ILicense } from "../../../../utils/interfaces/license";
-import useGetAvailability from "../../../../hooks/api/licenses/useGetAvailability";
+import { ILicense } from "../../../../utils/interfaces/license";
 import useCreateLicense from "../../../../hooks/api/licenses/useCreateLicense";
 import useDownloadLicense from "../../../../hooks/api/licenses/useDownloadLicense";
-import useGetLicenses from "../../../../hooks/api/licenses/useGetLicenses";
 import Button from "../../../buttons/Button";
-import { NAVIGATION_PATHS } from "../../../../utils/interfaces/general/general";
 
-const WINDOW_DAYS = 7;
-const LOOKAHEAD_DAYS = 60;
+const PASSPHRASE_KEY = 'elvira-passphrase';
 
-const findNextAvailableWindow = (
-  calendar: IAvailabilityResponse["calendar"],
-  startDate: Date,
-  windowDays: number,
-  lookaheadDays: number,
-) => {
-  const availabilityByDate = new Map<string, boolean>();
-  calendar.forEach((slot) => availabilityByDate.set(slot.date, slot.is_available));
+type View = 'main' | 'passphrase' | 'success';
+type Duration = '1week' | '2weeks';
 
-  for (let offset = 0; offset <= lookaheadDays - windowDays; offset += 1) {
-    const windowStart = addDays(startDate, offset);
-    let isAvailable = true;
+function mimeToFormat(mime: string): string {
+  if (mime.includes('epub')) return 'EPUB';
+  if (mime.includes('pdf')) return 'PDF';
+  return mime.split('/').pop()?.toUpperCase() ?? 'EPUB';
+}
 
-    for (let dayOffset = 0; dayOffset < windowDays; dayOffset += 1) {
-      const day = addDays(windowStart, dayOffset);
-      const key = formatDate(day, "yyyy-MM-dd");
-      if (availabilityByDate.get(key) !== true) {
-        isAvailable = false;
-        break;
-      }
-    }
-
-    if (isAvailable) {
-      return {
-        start: windowStart,
-        end: addDays(windowStart, windowDays - 1),
-      };
-    }
-  }
-
-  return null;
-};
-
-export default function LicenseCalendar({}: {}) {
-  const { t, i18n } = useTranslation();
+export default function LicenseCalendar() {
+  const { t } = useTranslation();
   const { auth } = useAuthContext();
   const [searchParams, setSearchParams] = useSearchParams();
-  const getEntryDetail = useGetEntryDetail();
-  const getAvailability = useGetAvailability();
+  const { getEntryDetail } = useGetEntryDetail();
   const createLicense = useCreateLicense();
-  const getUserLicenses = useGetLicenses();
   const { openInThorium, downloadDirect } = useDownloadLicense();
-  const navigate = useNavigate();
 
   const [entryId, setEntryId] = useState<string | null>(null);
   const [catalogId, setCatalogId] = useState<string | null>(null);
   const [entry, setEntry] = useState<IEntryDetail | null>(null);
-  const [activeLicense, setActiveLicense] = useState<ILicense | null>(null);
-  const [nextWindow, setNextWindow] = useState<{ start: Date; end: Date } | null>(null);
-  const [isLoadingAvailability, setIsLoadingAvailability] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [isCreatingLicense, setIsCreatingLicense] = useState(false);
+  const [view, setView] = useState<View>('main');
+  const [createdLicense, setCreatedLicense] = useState<ILicense | null>(null);
+  const [selectedDuration, setSelectedDuration] = useState<Duration>('1week');
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
 
-  const formatLocalizedDate = (date: Date) =>
-    new Intl.DateTimeFormat(i18n.language || undefined, {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-    }).format(date);
+  const [passphrase, setPassphrase] = useState('');
+  const [passphraseHint, setPassphraseHint] = useState('');
+  const [showPassphrase, setShowPassphrase] = useState(false);
 
   useEffect(() => {
     const paramEntryId = searchParams.get("licensing-entry-id");
     const paramCatalogId = searchParams.get("licensing-catalog-id");
     setEntryId(paramEntryId);
     setCatalogId(paramCatalogId);
-    setNextWindow(null);
-    setActiveLicense(null);
+    setView('main');
+    setCreatedLicense(null);
+    setSelectedDuration('1week');
+    setShowHowItWorks(false);
+    setPassphrase('');
+    setPassphraseHint('');
   }, [searchParams]);
 
   useEffect(() => {
     setEntry(null);
     if (!entryId) return;
-
-    (async () => {
-      try {
-        const entryDetail = await getEntryDetail(entryId, catalogId || undefined);
-        setEntry(entryDetail);
-      } catch {
-        setEntry(null);
-        closeCalendar();
-        return;
-      }
-
-      let hasActiveLicense = false;
-      try {
-        const licenses = await getUserLicenses({ pagination: false, entry_id: entryId });
-        const found = licenses.items.find((l) => ["active", "ready"].includes(l.state));
-        setActiveLicense(found || null);
-        hasActiveLicense = Boolean(found);
-      } catch {
-        setActiveLicense(null);
-      }
-
-      if (hasActiveLicense) return;
-
-      setIsLoadingAvailability(true);
-      try {
-        const today = startOfDay(new Date());
-        const rangeEnd = addDays(today, LOOKAHEAD_DAYS);
-        const availabilityData = await getAvailability(today, rangeEnd, entryId);
-        setNextWindow(
-          findNextAvailableWindow(
-            availabilityData.calendar || [],
-            today,
-            WINDOW_DAYS,
-            LOOKAHEAD_DAYS,
-          ),
-        );
-      } catch {
-        setNextWindow(null);
-      } finally {
-        setIsLoadingAvailability(false);
-      }
-    })();
+    setIsLoading(true);
+    getEntryDetail(entryId, catalogId || undefined)
+      .then(setEntry)
+      .catch(() => { setEntry(null); closeModal(); })
+      .finally(() => setIsLoading(false));
   }, [entryId]);
 
-  const closeCalendar = () => {
+  const closeModal = () => {
     setSearchParams((prev) => {
-      const newParams = new URLSearchParams(prev);
-      newParams.delete("licensing-entry-id");
-      newParams.delete("licensing-catalog-id");
-      return newParams;
+      const p = new URLSearchParams(prev);
+      p.delete("licensing-entry-id");
+      p.delete("licensing-catalog-id");
+      return p;
     });
-    setEntryId(null);
-    setCatalogId(null);
   };
+
+  const today = new Date();
+  const endDate1Week = addDays(today, 7);
+  const endDate2Weeks = addDays(today, 14);
+  const selectedEndDate = selectedDuration === '1week' ? endDate1Week : endDate2Weeks;
 
   const downloadLoan = (license: ILicense) => {
     const licenseId = license.lcp_license_id || license.id;
@@ -159,20 +101,19 @@ export default function LicenseCalendar({}: {}) {
     );
   };
 
-  const lendBook = async () => {
-    if (!entryId || !nextWindow) return;
+  const doLendBook = async () => {
+    if (!entryId) return;
     setIsCreatingLicense(true);
-
     try {
-      await createLicense({
+      const duration = selectedDuration === '1week' ? 'P7D' : 'P14D';
+      const license = await createLicense({
         entry_id: entryId,
         state: "active",
-        starts_at: formatDate(nextWindow.start, "yyyy-MM-dd"),
-        duration: `P${WINDOW_DAYS}D`,
+        starts_at: format(today, "yyyy-MM-dd"),
+        duration,
       });
-      toast.success(t("notifications.license.create.success"));
-      closeCalendar();
-      navigate(NAVIGATION_PATHS.loans);
+      setCreatedLicense(license);
+      setView('success');
     } catch {
       toast.error(t("notifications.license.create.error"));
     } finally {
@@ -180,122 +121,290 @@ export default function LicenseCalendar({}: {}) {
     }
   };
 
-  const today = startOfDay(new Date());
-  const daysUntilWindow = nextWindow
-    ? differenceInCalendarDays(nextWindow.start, today)
-    : null;
+  const savePassphraseAndBorrow = () => {
+    if (!passphrase.trim()) {
+      toast.error('Zadajte prístupovú frázu.');
+      return;
+    }
+    localStorage.setItem(PASSPHRASE_KEY, passphrase.trim());
+    if (passphraseHint.trim()) {
+      localStorage.setItem(`${PASSPHRASE_KEY}-hint`, passphraseHint.trim());
+    }
+    doLendBook();
+  };
+
+  const handleBorrow = () => {
+    if (!localStorage.getItem(PASSPHRASE_KEY)) {
+      setView('passphrase');
+      return;
+    }
+    doLendBook();
+  };
+
+  const fileFormat = entry?.acquisitions?.[0]?.mime ? mimeToFormat(entry.acquisitions[0].mime) : 'EPUB';
+
+  if (!entryId) return null;
 
   return (
-    <DetailModal
-      title={t("license.queue.title", { defaultValue: "Borrow queue" })}
-      onClose={closeCalendar}
-      isOpen={!!entryId}
-      zIndex={50}
+    <div
+      className="fixed inset-0 z-[50] bg-black/60 flex items-center justify-center p-4"
+      onClick={(e) => { if (e.target === e.currentTarget) closeModal(); }}
     >
-      <div className="p-4 mdlg:p-6 overflow-auto h-full min-h-0 flex flex-col gap-6 relative bg-slate-50 dark:bg-darkGray">
-        {entry ? (
-          <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-6 h-full min-h-0 items-stretch relative">
-            <div className="order-1 w-full min-w-0 flex flex-col gap-3 relative">
-              <div className="flex gap-3 min-w-0 pb-4 border-b border-lightGray dark:border-strongDarkGray">
-                <div className="w-20 h-28 sm:w-24 sm:h-32 rounded-md overflow-hidden flex-shrink-0">
+      <div
+        className="bg-white dark:bg-zinc-800 rounded-xl shadow-xl w-full max-w-[600px] max-h-[90vh] overflow-y-auto flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center px-4 py-3 border-b border-lightGray dark:border-zinc-700 shrink-0">
+          {view === 'passphrase' ? (
+            <button
+              className="text-secondary dark:text-secondaryLight p-1"
+              onClick={() => setView('main')}
+            >
+              <RiArrowLeftLine size={20} />
+            </button>
+          ) : (
+            <div className="w-7" />
+          )}
+          <h2 className="flex-1 text-center text-base font-bold text-secondary dark:text-secondaryLight">
+            {view === 'passphrase'
+              ? t('license.passphrase.title', { defaultValue: 'Nastavenie prístupovej frázy' })
+              : view === 'success'
+              ? t('license.success.title', { defaultValue: 'Výpožička úspešná!' })
+              : t('license.borrow.title', { defaultValue: 'Výpožička knihy' })}
+          </h2>
+          <button className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1" onClick={closeModal}>
+            <RiCloseLine size={22} />
+          </button>
+        </div>
+
+        {/* Body */}
+        <div className="flex flex-col gap-5 p-6">
+          {isLoading && (
+            <div className="flex justify-center py-10">
+              <CircleLoader color="var(--color-primary)" size={40} />
+            </div>
+          )}
+
+          {/* ── MAIN VIEW ── */}
+          {!isLoading && entry && view === 'main' && (
+            <>
+              {/* Book info card */}
+              <div className="bg-lightGray dark:bg-zinc-700 rounded-[10px] p-4 flex gap-5 items-start">
+                <div className="w-[73px] h-[103px] rounded-[5px] overflow-hidden shrink-0 bg-gray-200">
                   <img
                     className="w-full h-full object-cover"
                     src={entry.thumbnail + `?access_token=${auth?.token}`}
                     alt={entry.title}
                   />
                 </div>
-
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-base sm:text-lg font-bold text-secondary dark:text-secondaryLight line-clamp-2">
+                <div className="flex flex-col gap-2 min-w-0 flex-1 pt-1">
+                  <p className="font-semibold text-base text-secondary dark:text-secondaryLight line-clamp-2 leading-snug">
                     {entry.title}
-                  </h2>
-
+                  </p>
                   {entry.authors.length > 0 && (
-                    <p className="mt-1 text-sm text-darkGray dark:text-lightGray truncate">
-                      {entry.authors[0].name} {entry.authors[0].surname}
-                      {entry.authors.length > 1
-                        ? ` (+${entry.authors.length - 1} ${t("entry.detail.more")})`
-                        : ""}
+                    <p className="text-sm text-darkGray dark:text-lightGray">
+                      {entry.authors.map(a => `${a.name} ${a.surname}`).join(', ')}
                     </p>
                   )}
-
-                  {entry.publisher && (
-                    <p className="mt-1 text-xs text-darkGray dark:text-lightGray opacity-75 truncate">
-                      {t("entry.detail.publisher")}: {entry.publisher}
-                    </p>
-                  )}
+                  <div className="flex gap-3 flex-wrap mt-1">
+                    <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-[7px] bg-[#cfffd8] border border-[#008b19] text-[#005e11]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#008b19] shrink-0" />
+                      {t('license.available', { defaultValue: 'Dostupné' })}
+                    </span>
+                    <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-[7px] border border-gray-300 dark:border-zinc-500 text-darkGray dark:text-lightGray">
+                      {t('license.format', { defaultValue: 'Formát:' })} <strong>{fileFormat}</strong>
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              <div className="rounded-xl border border-lightGray dark:border-strongDarkGray bg-white dark:bg-strongDarkGray p-5 flex flex-col gap-4 shadow-sm">
-                <p className="text-xs font-semibold uppercase tracking-wide text-primary dark:text-primaryLight">
-                  {t("license.queue.status", { defaultValue: "Queue status" })}
-                </p>
+              {/* Duration selector */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-sm font-semibold text-secondary dark:text-secondaryLight">
+                    {t('license.borrow.duration', { defaultValue: 'Doba výpožičky:' })}
+                  </span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">
+                    {t('license.borrow.extendNote', { defaultValue: 'Výpožičku môžete neskôr predĺžiť.' })}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-3">
+                  {([
+                    { val: '1week' as Duration, label: t('license.borrow.oneWeek', { defaultValue: '1 týždeň' }), endDate: endDate1Week },
+                    { val: '2weeks' as Duration, label: t('license.borrow.twoWeeks', { defaultValue: '2 týždne' }), endDate: endDate2Weeks },
+                  ] as const).map((opt) => (
+                    <button
+                      key={opt.val}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-[7px] border text-left transition-colors ${
+                        selectedDuration === opt.val
+                          ? 'bg-[#e6f3ff] border-primary'
+                          : 'bg-white dark:bg-zinc-700 border-[#e5e5e5] dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-600'
+                      }`}
+                      onClick={() => setSelectedDuration(opt.val)}
+                    >
+                      <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${
+                        selectedDuration === opt.val ? 'border-primary' : 'border-gray-400'
+                      }`}>
+                        {selectedDuration === opt.val && <span className="w-2 h-2 rounded-full bg-primary" />}
+                      </span>
+                      <div>
+                        <p className="text-xs font-semibold text-secondary dark:text-secondaryLight">{opt.label}</p>
+                        <p className="text-[11px] text-gray-500">
+                          {t('license.borrow.borrowedUntil', { defaultValue: 'Požičané do:' })} <strong>{format(opt.endDate, 'd.M.yyyy')}</strong>
+                        </p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-                {activeLicense ? (
-                  <>
-                    <p className="text-sm text-darkGray dark:text-lightGray">
-                      {t("license.queue.alreadyBorrowed", { defaultValue: "Already borrowed. Ready to download." })}
-                    </p>
-                    <Button onClick={() => downloadLoan(activeLicense)}>
-                      {t("license.queue.download", { defaultValue: "Download loan" })}
-                    </Button>
-                  </>
-                ) : isLoadingAvailability ? (
-                  <div className="flex items-center gap-3 text-sm text-darkGray dark:text-lightGray">
-                    <CircleLoader color={"var(--color-primary)"} size={22} />
-                    {t("license.queue.loading", { defaultValue: "Checking availability..." })}
+              {/* How it works accordion */}
+              <button
+                className="w-full flex items-center justify-between bg-lightGray dark:bg-zinc-700 px-3 py-2 rounded-[5px] text-sm"
+                onClick={() => setShowHowItWorks(v => !v)}
+              >
+                <span className="flex items-center gap-2 font-semibold text-secondary dark:text-secondaryLight text-xs">
+                  <BsQuestionCircle size={16} />
+                  {t('license.howItWorks.label', { defaultValue: 'Ako to funguje?' })}
+                </span>
+                {showHowItWorks ? <MdExpandLess size={20} /> : <MdExpandMore size={20} />}
+              </button>
+              {showHowItWorks && (
+                <div className="bg-lightGray dark:bg-zinc-700 rounded-[5px] px-4 py-3 -mt-3 text-xs text-darkGray dark:text-lightGray flex flex-col gap-1.5">
+                  <p>{t('license.howItWorks.step1', { defaultValue: 'Po požičaní dostanete odkaz na stiahnutie súboru.' })}</p>
+                  <p>{t('license.howItWorks.step2', { defaultValue: 'Na čítanie odporúčame Thorium Reader (zadarmo, Windows/macOS/Linux).' })}</p>
+                  <p>{t('license.howItWorks.step3', { defaultValue: 'Súbor je chránený prístupovou frázou – zadáte ju pri prvom otvorení.' })}</p>
+                  <p>{t('license.howItWorks.step4', { defaultValue: 'Výpožičku môžete predĺžiť (max. 2×) alebo vrátiť kedykoľvek.' })}</p>
+                </div>
+              )}
+
+              {/* Borrow button */}
+              <div className="flex justify-center pt-2">
+                <button
+                  disabled={isCreatingLicense}
+                  onClick={handleBorrow}
+                  className="h-[35px] w-[150px] rounded-[7px] bg-primary text-white text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60 shadow"
+                >
+                  {isCreatingLicense ? '...' : t('license.borrow.action', { defaultValue: 'Požičať' })}
+                </button>
+              </div>
+            </>
+          )}
+
+          {/* ── PASSPHRASE VIEW ── */}
+          {!isLoading && view === 'passphrase' && (
+            <div className="flex flex-col items-center gap-4 max-w-lg mx-auto w-full py-2">
+              <p className="text-sm font-semibold text-secondary dark:text-secondaryLight text-center">
+                {t('license.passphrase.description', { defaultValue: 'Pre vypožičanie knihy musíte nastaviť prístupovú frázu.' })}
+              </p>
+              <div className="w-full bg-lightGray dark:bg-zinc-700 rounded-xl p-5 flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-secondary dark:text-secondaryLight">
+                    {t('license.passphrase.field', { defaultValue: 'Prístupová fráza' })} *
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassphrase ? 'text' : 'password'}
+                      value={passphrase}
+                      onChange={(e) => setPassphrase(e.target.value)}
+                      placeholder={t('license.passphrase.field', { defaultValue: 'Prístupová fráza' })}
+                      className="w-full bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 rounded px-3 py-2 text-sm outline-none focus:border-primary pr-10"
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                      onClick={() => setShowPassphrase(v => !v)}
+                    >
+                      {showPassphrase ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                    </button>
                   </div>
-                ) : nextWindow ? (
-                  <>
-                    <p className="text-sm text-darkGray dark:text-lightGray">
-                      {daysUntilWindow && daysUntilWindow > 0
-                        ? t("license.queue.availableIn", {
-                            defaultValue: "Available to lend in {{days}} days",
-                            days: daysUntilWindow,
-                          })
-                        : t("license.queue.availableNow", { defaultValue: "Available to lend now" })}
-                    </p>
-                    <div className="inline-flex w-fit items-center rounded-full bg-primary/10 dark:bg-primary/20 px-3 py-1 text-xs font-semibold text-primary dark:text-primaryLight">
-                      {formatLocalizedDate(nextWindow.start)} - {formatLocalizedDate(nextWindow.end)}
-                    </div>
-                    {daysUntilWindow !== null && daysUntilWindow <= 0 && (
-                      <Button
-                        onClick={lendBook}
-                        className={isCreatingLicense ? "opacity-70 cursor-not-allowed" : ""}
-                        disabled={isCreatingLicense}
-                      >
-                        {t("license.queue.borrow", { defaultValue: "Borrow for 7 days" })}
-                      </Button>
-                    )}
-                  </>
-                ) : (
-                  <p className="text-sm text-darkGray dark:text-lightGray">
-                    {t("license.queue.noWindow", {
-                      defaultValue: "No 7-day window in the next {{days}} days",
-                      days: LOOKAHEAD_DAYS,
-                    })}
-                  </p>
-                )}
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="text-xs font-medium text-secondary dark:text-secondaryLight">
+                    {t('license.passphrase.hint', { defaultValue: 'Nápoveda k prístupovej fráze' })}
+                  </label>
+                  <input
+                    type="text"
+                    value={passphraseHint}
+                    onChange={(e) => setPassphraseHint(e.target.value)}
+                    placeholder={t('license.passphrase.hintPlaceholder', { defaultValue: 'Nápoveda' })}
+                    className="w-full bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 rounded px-3 py-2 text-sm outline-none focus:border-primary"
+                  />
+                </div>
+                <div className="flex items-start gap-2 text-xs text-gray-500">
+                  <FiInfo size={15} className="shrink-0 mt-0.5" />
+                  <span>{t('license.passphrase.info', { defaultValue: 'Prístupová fráza slúži na odomknutie požičanej knihy.' })}</span>
+                </div>
+              </div>
+              <div className="flex justify-center pt-2">
+                <button
+                  disabled={isCreatingLicense}
+                  onClick={savePassphraseAndBorrow}
+                  className="h-[35px] w-[150px] rounded-[7px] bg-primary text-white text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60 shadow"
+                >
+                  {isCreatingLicense ? '...' : t('license.passphrase.save', { defaultValue: 'Uložiť a požičať' })}
+                </button>
               </div>
             </div>
+          )}
 
-            <div className="order-2 w-full min-w-0 flex flex-col gap-3 relative">
-              <div className="rounded-xl border border-lightGray dark:border-strongDarkGray bg-white dark:bg-strongDarkGray p-5 shadow-sm">
-                <p className="text-sm text-darkGray dark:text-lightGray leading-relaxed">
-                  {t("license.queue.note", {
-                    defaultValue: "Loans are issued in 7-day windows. If the closest slot is in the future, wait until it opens to borrow.",
-                  })}
-                </p>
+          {/* ── SUCCESS VIEW ── */}
+          {!isLoading && entry && view === 'success' && (
+            <div className="flex flex-col items-center gap-5 max-w-xl mx-auto w-full py-2">
+              <FiCheckCircle size={66} className="text-[#008B19]" />
+              <div className="w-full bg-lightGray dark:bg-zinc-700 rounded-xl p-4 flex gap-3 items-center">
+                <div className="w-[55px] h-[78px] rounded-[5px] overflow-hidden shrink-0 bg-gray-200">
+                  <img
+                    className="w-full h-full object-cover"
+                    src={entry.thumbnail + `?access_token=${auth?.token}`}
+                    alt={entry.title}
+                  />
+                </div>
+                <div className="flex flex-col gap-2 min-w-0">
+                  <p className="font-semibold text-sm text-secondary dark:text-secondaryLight line-clamp-2">
+                    {entry.title}
+                  </p>
+                  {createdLicense?.expires_at && (
+                    <span className="text-xs px-2 py-0.5 w-fit rounded-[7px] bg-[#cfffd8] border border-[#008b19] text-[#005e11]">
+                      {t('license.success.borrowedUntil', { defaultValue: 'Požičané do:' })} {format(new Date(createdLicense.expires_at), 'd.M.yyyy')}
+                    </span>
+                  )}
+                </div>
               </div>
+              <div className="w-full">
+                <p className="flex items-center gap-1.5 text-xs font-semibold text-secondary dark:text-secondaryLight mb-2">
+                  <FiInfo size={15} />
+                  {t('license.success.nextSteps', { defaultValue: 'Ďalšie kroky:' })}
+                </p>
+                <ul className="list-disc ml-5 flex flex-col gap-2 text-xs text-gray-600 dark:text-gray-300">
+                  <li>{t('license.success.step1', { defaultValue: 'Bol vám vygenerovaný odkaz na stiahnutie súboru.' })}</li>
+                  <li>
+                    {t('license.success.step2prefix', { defaultValue: 'Na otvorenie súboru odporúčame' })}{' '}
+                    <a href="https://thorium.edrlab.org/en/" target="_blank" rel="noopener noreferrer" className="underline font-semibold text-secondary dark:text-secondaryLight">
+                      Thorium Reader
+                    </a>
+                    {t('license.success.step2suffix', { defaultValue: ', ktorý je bezplatný a dostupný pre Windows, macOS aj Linux.' })}
+                  </li>
+                  <li>{t('license.success.step3', { defaultValue: 'Súbor je chránený prístupovou frázou — zadáte ju pri prvom otvorení v čítačke.' })}</li>
+                  <li>{t('license.success.step4', { defaultValue: 'Na stránke výpožičiek môžete knihu predĺžiť (max. 2×) alebo ju kedykoľvek vrátiť.' })}</li>
+                </ul>
+              </div>
+              {createdLicense && (
+                <div className="flex justify-center pt-2">
+                  <button
+                    onClick={() => downloadLoan(createdLicense)}
+                    className="h-[35px] px-6 rounded-[7px] bg-primary text-white text-sm font-semibold hover:bg-blue-700 transition-colors shadow flex items-center gap-2"
+                  >
+                    <LuDownload size={16} />
+                    {t('license.success.download', { defaultValue: 'Stiahnuť' })}
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
-        ) : (
-          <div className="flex justify-center items-center h-full">
-            <CircleLoader color={"var(--color-primary)"} size={50} />
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </DetailModal>
+    </div>
   );
 }
