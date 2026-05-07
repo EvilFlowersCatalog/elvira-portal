@@ -39,6 +39,7 @@ const Breadcrumb = () => {
     ['about']: isEn() ? 'About' : 'O Projekte',
     ['administration']: isEn() ? 'Administration' : 'Administrácia',
     ['shelf']: isEn() ? 'Shelf' : 'Polička',
+    ['help']: isEn() ? 'Help' : 'Pomoc',
     ['loans']: isEn() ? 'Loans' : 'Výpožičky',
     ['entries']: isEn() ? 'Entries' : 'Publikácie',
     ['users']: isEn() ? 'Users' : 'Používatelia',

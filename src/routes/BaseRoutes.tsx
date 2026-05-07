@@ -18,6 +18,8 @@ import AdminHome from '../pages/admin/AdminHome';
 import AdminAddEntry from '../pages/admin/entries/AdminAddEntry';
 import Auth from '../pages/auth/Auth';
 import Loans from '../pages/common/Loans';
+import Help from '../pages/common/Help';
+import HelpLoans from '../pages/common/HelpLoans';
 import AdminUsers from '../pages/admin/AdminUsers';
 import AdminAIUsers from '../pages/admin/AdminAIUsers';
 import AdminLoans from '../pages/admin/AdminLoans';
@@ -64,6 +66,12 @@ const BaseRoutes = () => {
           ) }
           { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
             <Route path='loans' element={<Loans />} />
+          ) }
+          { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+            <>
+              <Route path='help' element={<Help />} />
+              <Route path='help/loans' element={<HelpLoans />} />
+            </>
           ) }
           <Route path='feeds' element={<Feeds />} />
           <Route path='ai-assistant' element={<AiAssistantPage />} />
