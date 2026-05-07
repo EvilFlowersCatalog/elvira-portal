@@ -12,6 +12,7 @@ export interface IUser {
     catalog_permissions?: Record<string, string>;
     lcp_passphrase_hash?: string | null;
     lcp_passphrase_hint?: string | null;
+    has_lcp_passphrase?: boolean;
 }
 
 export interface IUpdateUserPayload {

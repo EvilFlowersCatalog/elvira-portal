@@ -10,14 +10,14 @@ import { RiArrowLeftLine, RiCloseLine } from "react-icons/ri";
 import { BsQuestionCircle } from "react-icons/bs";
 import { MdExpandMore, MdExpandLess } from "react-icons/md";
 import { IEntryDetail } from "../../../../utils/interfaces/entry";
+import { IUser } from "../../../../utils/interfaces/user";
 import useGetEntryDetail from "../../../../hooks/api/entries/useGetEntryDetail";
+import useGetUserDetails from "../../../../hooks/api/users/useGetUserDetails";
+import useSetUserPassphrase from "../../../../hooks/api/users/useSetUserPassphrase";
 import useAuthContext from "../../../../hooks/contexts/useAuthContext";
 import { ILicense } from "../../../../utils/interfaces/license";
 import useCreateLicense from "../../../../hooks/api/licenses/useCreateLicense";
 import useDownloadLicense from "../../../../hooks/api/licenses/useDownloadLicense";
-import Button from "../../../buttons/Button";
-
-const PASSPHRASE_KEY = 'elvira-passphrase';
 
 type View = 'main' | 'passphrase' | 'success';
 type Duration = '1week' | '2weeks';
@@ -33,12 +33,15 @@ export default function LicenseCalendar() {
   const { auth } = useAuthContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const { getEntryDetail } = useGetEntryDetail();
+  const getUserDetails = useGetUserDetails();
+  const setUserPassphrase = useSetUserPassphrase();
   const createLicense = useCreateLicense();
   const { openInThorium, downloadDirect } = useDownloadLicense();
 
   const [entryId, setEntryId] = useState<string | null>(null);
   const [catalogId, setCatalogId] = useState<string | null>(null);
   const [entry, setEntry] = useState<IEntryDetail | null>(null);
+  const [userDetails, setUserDetails] = useState<IUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingLicense, setIsCreatingLicense] = useState(false);
   const [view, setView] = useState<View>('main');
@@ -46,9 +49,11 @@ export default function LicenseCalendar() {
   const [selectedDuration, setSelectedDuration] = useState<Duration>('1week');
   const [showHowItWorks, setShowHowItWorks] = useState(false);
 
+
   const [passphrase, setPassphrase] = useState('');
   const [passphraseHint, setPassphraseHint] = useState('');
   const [showPassphrase, setShowPassphrase] = useState(false);
+  const [isSavingPassphrase, setIsSavingPassphrase] = useState(false);
 
   useEffect(() => {
     const paramEntryId = searchParams.get("licensing-entry-id");
@@ -65,11 +70,18 @@ export default function LicenseCalendar() {
 
   useEffect(() => {
     setEntry(null);
-    if (!entryId) return;
+    setUserDetails(null);
+    if (!entryId || !auth) return;
     setIsLoading(true);
-    getEntryDetail(entryId, catalogId || undefined)
-      .then(setEntry)
-      .catch(() => { setEntry(null); closeModal(); })
+    Promise.all([
+      getEntryDetail(entryId, catalogId || undefined),
+      getUserDetails(auth.userId),
+    ])
+      .then(([entryData, userData]) => {
+        setEntry(entryData);
+        setUserDetails(userData);
+      })
+      .catch(() => closeModal())
       .finally(() => setIsLoading(false));
   }, [entryId]);
 
@@ -85,7 +97,6 @@ export default function LicenseCalendar() {
   const today = new Date();
   const endDate1Week = addDays(today, 7);
   const endDate2Weeks = addDays(today, 14);
-  const selectedEndDate = selectedDuration === '1week' ? endDate1Week : endDate2Weeks;
 
   const downloadLoan = (license: ILicense) => {
     const licenseId = license.lcp_license_id || license.id;
@@ -105,12 +116,11 @@ export default function LicenseCalendar() {
     if (!entryId) return;
     setIsCreatingLicense(true);
     try {
-      const duration = selectedDuration === '1week' ? 'P7D' : 'P14D';
       const license = await createLicense({
         entry_id: entryId,
         state: "active",
         starts_at: format(today, "yyyy-MM-dd"),
-        duration,
+        duration: selectedDuration === '1week' ? 'P7D' : 'P14D',
       });
       setCreatedLicense(license);
       setView('success');
@@ -121,29 +131,47 @@ export default function LicenseCalendar() {
     }
   };
 
-  const savePassphraseAndBorrow = () => {
-    if (!passphrase.trim()) {
-      toast.error('Zadajte prístupovú frázu.');
+  const handleBorrow = () => {
+    // User already has a passphrase set on their account → borrow immediately
+    if (userDetails?.has_lcp_passphrase) {
+      doLendBook();
       return;
     }
-    localStorage.setItem(PASSPHRASE_KEY, passphrase.trim());
-    if (passphraseHint.trim()) {
-      localStorage.setItem(`${PASSPHRASE_KEY}-hint`, passphraseHint.trim());
-    }
-    doLendBook();
+    setView('passphrase');
   };
 
-  const handleBorrow = () => {
-    if (!localStorage.getItem(PASSPHRASE_KEY)) {
-      setView('passphrase');
+  const handleSavePassphraseAndBorrow = async () => {
+    if (!passphrase.trim()) {
+      toast.error(t('license.passphrase.required', { defaultValue: 'Zadajte prístupovú frázu.' }));
       return;
     }
-    doLendBook();
+    if (!auth || !userDetails) return;
+
+    setIsSavingPassphrase(true);
+    try {
+      await setUserPassphrase({
+        userId: auth.userId,
+        name: userDetails.name,
+        surname: userDetails.surname,
+        is_active: userDetails.is_active,
+        lcp_passphrase: passphrase.trim(),
+        lcp_passphrase_hint: passphraseHint.trim(),
+      });
+      // Optimistically mark passphrase as set so future borrows skip this screen
+      setUserDetails(prev => prev ? { ...prev, has_lcp_passphrase: true, lcp_passphrase_hint: passphraseHint.trim() } : prev);
+      await doLendBook();
+    } catch {
+      toast.error(t('license.passphrase.error', { defaultValue: 'Ukladanie zlyhalo. Skúste to znova.' }));
+    } finally {
+      setIsSavingPassphrase(false);
+    }
   };
 
   const fileFormat = entry?.acquisitions?.[0]?.mime ? mimeToFormat(entry.acquisitions[0].mime) : 'EPUB';
 
   if (!entryId) return null;
+
+  const isSubmitting = isCreatingLicense || isSavingPassphrase;
 
   return (
     <div
@@ -158,7 +186,7 @@ export default function LicenseCalendar() {
         <div className="flex items-center px-4 py-3 border-b border-lightGray dark:border-zinc-700 shrink-0">
           {view === 'passphrase' ? (
             <button
-              className="text-secondary dark:text-secondaryLight p-1"
+              className="text-secondary dark:text-secondaryLight p-1 hover:opacity-70 transition-opacity"
               onClick={() => setView('main')}
             >
               <RiArrowLeftLine size={20} />
@@ -213,7 +241,7 @@ export default function LicenseCalendar() {
                       {t('license.available', { defaultValue: 'Dostupné' })}
                     </span>
                     <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-[7px] border border-gray-300 dark:border-zinc-500 text-darkGray dark:text-lightGray">
-                      {t('license.format', { defaultValue: 'Formát:' })} <strong>{fileFormat}</strong>
+                      {t('license.format', { defaultValue: 'Formát:' })} <strong className="ml-1">{fileFormat}</strong>
                     </span>
                   </div>
                 </div>
@@ -233,7 +261,7 @@ export default function LicenseCalendar() {
                   {([
                     { val: '1week' as Duration, label: t('license.borrow.oneWeek', { defaultValue: '1 týždeň' }), endDate: endDate1Week },
                     { val: '2weeks' as Duration, label: t('license.borrow.twoWeeks', { defaultValue: '2 týždne' }), endDate: endDate2Weeks },
-                  ] as const).map((opt) => (
+                  ]).map((opt) => (
                     <button
                       key={opt.val}
                       className={`flex items-center gap-3 px-4 py-3 rounded-[7px] border text-left transition-colors ${
@@ -282,11 +310,11 @@ export default function LicenseCalendar() {
               {/* Borrow button */}
               <div className="flex justify-center pt-2">
                 <button
-                  disabled={isCreatingLicense}
+                  disabled={isSubmitting}
                   onClick={handleBorrow}
                   className="h-[35px] w-[150px] rounded-[7px] bg-primary text-white text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60 shadow"
                 >
-                  {isCreatingLicense ? '...' : t('license.borrow.action', { defaultValue: 'Požičať' })}
+                  {isSubmitting ? '...' : t('license.borrow.action', { defaultValue: 'Požičať' })}
                 </button>
               </div>
             </>
@@ -294,9 +322,9 @@ export default function LicenseCalendar() {
 
           {/* ── PASSPHRASE VIEW ── */}
           {!isLoading && view === 'passphrase' && (
-            <div className="flex flex-col items-center gap-4 max-w-lg mx-auto w-full py-2">
-              <p className="text-sm font-semibold text-secondary dark:text-secondaryLight text-center">
-                {t('license.passphrase.description', { defaultValue: 'Pre vypožičanie knihy musíte nastaviť prístupovú frázu.' })}
+            <div className="flex flex-col gap-4 max-w-lg mx-auto w-full py-2">
+              <p className="text-sm text-gray-600 dark:text-gray-300 text-center">
+                {t('license.passphrase.description', { defaultValue: 'Nastavte prístupovú frázu pre ochranu vašich vypožičaných kníh. Budete ju zadávať pri otváraní súborov v čítačke.' })}
               </p>
               <div className="w-full bg-lightGray dark:bg-zinc-700 rounded-xl p-5 flex flex-col gap-4">
                 <div className="flex flex-col gap-1">
@@ -328,22 +356,22 @@ export default function LicenseCalendar() {
                     type="text"
                     value={passphraseHint}
                     onChange={(e) => setPassphraseHint(e.target.value)}
-                    placeholder={t('license.passphrase.hintPlaceholder', { defaultValue: 'Nápoveda' })}
+                    placeholder={t('license.passphrase.hintPlaceholder', { defaultValue: 'Nápoveda (voliteľné)' })}
                     className="w-full bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 rounded px-3 py-2 text-sm outline-none focus:border-primary"
                   />
                 </div>
                 <div className="flex items-start gap-2 text-xs text-gray-500">
                   <FiInfo size={15} className="shrink-0 mt-0.5" />
-                  <span>{t('license.passphrase.info', { defaultValue: 'Prístupová fráza slúži na odomknutie požičanej knihy.' })}</span>
+                  <span>{t('license.passphrase.info', { defaultValue: 'Prístupovú frázu si zapamätajte – bez nej nebudete môcť otvoriť vypožičané knihy.' })}</span>
                 </div>
               </div>
               <div className="flex justify-center pt-2">
                 <button
-                  disabled={isCreatingLicense}
-                  onClick={savePassphraseAndBorrow}
-                  className="h-[35px] w-[150px] rounded-[7px] bg-primary text-white text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60 shadow"
+                  disabled={isSubmitting}
+                  onClick={handleSavePassphraseAndBorrow}
+                  className="h-[35px] w-[170px] rounded-[7px] bg-primary text-white text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60 shadow"
                 >
-                  {isCreatingLicense ? '...' : t('license.passphrase.save', { defaultValue: 'Uložiť a požičať' })}
+                  {isSubmitting ? '...' : t('license.passphrase.saveAndBorrow', { defaultValue: 'Uložiť a požičať' })}
                 </button>
               </div>
             </div>
