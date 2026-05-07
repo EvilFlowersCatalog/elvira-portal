@@ -308,6 +308,11 @@ export const en = {
       popular: 'Popular',
       lastAdded: 'Last Added',
       search: 'Search in Elvira',
+      searchSmart: '"books about artificial intelligence", "difference between IPv4 and IPv6"',
+    },
+    search: {
+      smartOn: 'Enable smart search',
+      smartOff: 'Disable smart search',
     },
 
     profile: {

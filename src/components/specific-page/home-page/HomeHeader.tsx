@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { IoSearchOutline } from "react-icons/io5";
+import { PiSparkle } from "react-icons/pi";
 import {
   NAVIGATION_PATHS,
   THEME_TYPE,
@@ -17,25 +18,23 @@ const HomeHeader = () => {
   const { t } = useTranslation();
   const [searchInput, setSearchInput] = useState<string>("");
   const [isFocused, setIsFocused] = useState<boolean>(false);
+  const [isSmartSearch, setIsSmartSearch] = useState<boolean>(false);
   const { setShowAiAssistant } = useAppContext();
 
   const navigate = useNavigate();
 
-  // input handler
   const handleSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchInput(e.target.value);
   };
 
-  // submit handler
   const submit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // prevent
+    e.preventDefault();
 
-    // set new params
     const params = new URLSearchParams();
     if (searchInput) {
       params.set("query", searchInput);
+      if (isSmartSearch) params.set("smart", "1");
 
-      // navigate and search
       navigate({
         pathname: NAVIGATION_PATHS.library,
         search: params.toString(),
@@ -96,14 +95,44 @@ const HomeHeader = () => {
           type={"text"}
           value={searchInput}
           placeholder={t("home.search")}
+          nativePlaceholder={isSmartSearch ? t("home.searchSmart") : undefined}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           onChange={handleSearchInput}
           className="border-none md:pr-32"
-          paddingLeft={40}
+          paddingLeft={58}
         />
-        <button type="submit" className={"absolute left-2 top-[31px]"}>
-          <IoSearchOutline size={25} />
+        <button
+          type="button"
+          onClick={() => setIsSmartSearch((prev) => !prev)}
+          className="absolute left-2 top-[32px]"
+          aria-label={isSmartSearch ? t("search.smartOff") : t("search.smartOn")}
+        >
+          <div
+            className="relative w-[44px] h-[24px] rounded-[15px] transition-all duration-200"
+            style={{
+              background: isSmartSearch
+                ? "rgba(177,217,255,0.2)"
+                : "rgba(217,217,217,0.2)",
+              boxShadow: isSmartSearch
+                ? "inset -1px 1px 2.5px 0px rgba(0,0,0,0.25)"
+                : "inset 1px 1px 2.5px 0px rgba(0,0,0,0.25)",
+            }}
+          >
+            <div
+              className="absolute top-[2px] size-[20px] flex items-center justify-center transition-all duration-200"
+              style={{ left: isSmartSearch ? "22px" : "2px" }}
+            >
+              <IoSearchOutline
+                size={18}
+                className={`transition-colors duration-200 ${isSmartSearch ? "text-primary" : "text-darkGray dark:text-white"}`}
+              />
+              <PiSparkle
+                size={9}
+                className={`absolute -top-0.5 -right-0.5 text-primary transition-opacity duration-200 ${isSmartSearch ? "opacity-100" : "opacity-0"}`}
+              />
+            </div>
+          </div>
         </button>
 
         {isFocused && (

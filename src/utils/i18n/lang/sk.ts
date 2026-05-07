@@ -303,6 +303,11 @@ export const sk = {
       popular: 'Populárne',
       lastAdded: 'Naposledy Pridané',
       search: 'Hľadať v Elvíre',
+      searchSmart: '"knihy o umelej inteligencii", "rozdiel medzi IPv4 a IPv6"',
+    },
+    search: {
+      smartOn: 'Zapnúť inteligentné vyhľadávanie',
+      smartOff: 'Vypnúť inteligentné vyhľadávanie',
     },
 
     profile: {

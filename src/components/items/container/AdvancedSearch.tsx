@@ -61,7 +61,7 @@ export function AdvancedSearch() {
 
     const [year, setYear] = useState<string[]>(["", ""]);
     const [languageCode, setLanguageCode] = useState<string>('');
-    const yearDebounceTimeout = useRef<NodeJS.Timeout | null>(null);
+    const yearDebounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const getCategories = useGetCategories();
     const [allCategories, setAllCategories] = useState<ICategory[]>([]);
