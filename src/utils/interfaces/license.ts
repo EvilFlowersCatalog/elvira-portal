@@ -7,6 +7,7 @@ export interface ILicenseEntry {
 	id: string;
 	title: string;
 	catalog_id?: string;
+	thumbnail?: string;
 }
 
 export interface ILicense {
