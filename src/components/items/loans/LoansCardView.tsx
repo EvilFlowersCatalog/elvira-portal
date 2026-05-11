@@ -12,6 +12,7 @@ import { RiBookmarkLine } from 'react-icons/ri';
 import { useTranslation } from 'react-i18next';
 import { ILicense, LICENSE_STATE } from '../../../utils/interfaces/license';
 import useGetLicenses from '../../../hooks/api/licenses/useGetLicenses';
+import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import useDownloadLicense from '../../../hooks/api/licenses/useDownloadLicense';
 import ExtendLoanModal from '../../modals/ExtendLoanModal';
 import ReturnBookModal from '../../modals/ReturnBookModal';
@@ -111,11 +112,13 @@ function ActionBtn({
 
 function BorrowedCard({
   license,
+  token,
   onDownload,
   onExtend,
   onReturn,
 }: {
   license: ILicense;
+  token?: string;
   onDownload: (id: string) => void;
   onExtend: (license: ILicense) => void;
   onReturn: (license: ILicense) => void;
@@ -131,7 +134,11 @@ function BorrowedCard({
   return (
     <div className="w-full bg-white border border-[#e5e5e5] rounded-[6px] p-3 flex gap-3">
       <div className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden">
-        <img alt={license.entry?.title} src="/assets/thumbnail.webp" className="w-full h-full object-cover" />
+        <img
+          alt={license.entry?.title}
+          src={license.entry?.thumbnail ? `${license.entry.thumbnail}?access_token=${token}` : '/assets/thumbnail.webp'}
+          className="w-full h-full object-cover"
+        />
       </div>
 
       <div className="flex-1 min-w-0 flex flex-col gap-2 justify-between py-0.5">
@@ -169,9 +176,11 @@ function BorrowedCard({
 
 function ReservedCard({
   license,
+  token,
   onCancel,
 }: {
   license: ILicense;
+  token?: string;
   onCancel: (license: ILicense) => void;
 }) {
   const startsAt = parseISO(license.starts_at);
@@ -184,7 +193,11 @@ function ReservedCard({
   return (
     <div className="w-full bg-white border border-[#e5e5e5] rounded-[6px] p-3 flex gap-3">
       <div className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden">
-        <img alt={license.entry?.title} src="/assets/thumbnail.webp" className="w-full h-full object-cover" />
+        <img
+          alt={license.entry?.title}
+          src={license.entry?.thumbnail ? `${license.entry.thumbnail}?access_token=${token}` : '/assets/thumbnail.webp'}
+          className="w-full h-full object-cover"
+        />
       </div>
 
       <div className="flex-1 min-w-0 flex flex-col gap-2 justify-between py-0.5">
@@ -217,9 +230,11 @@ function ReservedCard({
 
 function PastCard({
   license,
+  token,
   onViewDetail,
 }: {
   license: ILicense;
+  token?: string;
   onViewDetail: (entryId: string, catalogId?: string) => void;
 }) {
   const { t } = useTranslation();
@@ -231,7 +246,11 @@ function PastCard({
   return (
     <div className="w-full bg-white border border-[#e5e5e5] rounded-[6px] p-3 flex gap-3 opacity-75">
       <div className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden grayscale">
-        <img alt={license.entry?.title} src="/assets/thumbnail.webp" className="w-full h-full object-cover" />
+        <img
+          alt={license.entry?.title}
+          src={license.entry?.thumbnail ? `${license.entry.thumbnail}?access_token=${token}` : '/assets/thumbnail.webp'}
+          className="w-full h-full object-cover"
+        />
       </div>
 
       <div className="flex-1 min-w-0 flex flex-col gap-2 justify-between py-0.5">
@@ -264,6 +283,7 @@ function PastCard({
 
 export default function LoansCardView() {
   const { t } = useTranslation();
+  const { auth } = useAuthContext();
   const getLicenses = useGetLicenses();
   const { openInThorium, downloadDirect } = useDownloadLicense();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -357,6 +377,7 @@ export default function LoansCardView() {
                 <BorrowedCard
                   key={license.id}
                   license={license}
+                  token={auth?.token}
                   onDownload={handleDownload}
                   onExtend={setExtendLicense}
                   onReturn={setReturnLicense}
@@ -374,7 +395,7 @@ export default function LoansCardView() {
             </p>
             <div className="flex flex-col gap-[12px] w-full">
               {reserved.map((license) => (
-                <ReservedCard key={license.id} license={license} onCancel={setCancelLicense} />
+                <ReservedCard key={license.id} license={license} token={auth?.token} onCancel={setCancelLicense} />
               ))}
             </div>
           </div>
@@ -388,7 +409,7 @@ export default function LoansCardView() {
             </p>
             <div className="flex flex-col gap-[12px] w-full">
               {past.map((license) => (
-                <PastCard key={license.id} license={license} onViewDetail={openEntryDetail} />
+                <PastCard key={license.id} license={license} token={auth?.token} onViewDetail={openEntryDetail} />
               ))}
             </div>
           </div>

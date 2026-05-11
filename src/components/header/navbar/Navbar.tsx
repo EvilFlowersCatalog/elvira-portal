@@ -34,7 +34,7 @@ import {
   CATALOG_ICON_MAP,
   DEFAULT_CATALOG_ICON,
 } from "../../../utils/catalogIcons";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
 
 function StuDots({ color }: { color: string }) {
@@ -196,6 +196,18 @@ const Navbar = () => {
   };
 
   const [isCollapsed, setIsCollapsed] = useState(!isSmallDevice);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const toggleNavbar = () => {
     setIsCollapsed(!isCollapsed);
@@ -374,14 +386,6 @@ const Navbar = () => {
               isActive={location.pathname === NAVIGATION_PATHS.shelf}
               textVisible={!isCollapsed}
             />
-            <NavbarButton
-              name={t("navbarMenu.profile")}
-              path={NAVIGATION_PATHS.profile}
-              icon={<FiUser size={20} />}
-              isActive={location.pathname === NAVIGATION_PATHS.profile}
-              textVisible={!isCollapsed}
-            />
-            
             {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
             <NavbarButton
               name={t("navbarMenu.history")}
@@ -445,48 +449,71 @@ const Navbar = () => {
           />)}
         </div>
       </div>
-      {/* Logout */}
+      {/* Profile */}
       {auth && (
-        <div className="relative w-full pb-4 pt-2">
+        <div className="relative w-full pb-4 pt-2" ref={profileRef}>
+          {profileDropdownOpen && (
+            <div className="absolute bottom-full mb-2 left-0 w-[162px] bg-lightGray dark:bg-zinc-800 rounded-lg shadow-[0px_2px_2.5px_rgba(0,0,0,0.25)] border border-[#e5e5e5] dark:border-zinc-700 overflow-hidden z-50">
+              <button
+                className="w-full flex items-center gap-3 px-4 h-8 text-secondary dark:text-white text-[12px] font-medium hover:brightness-95 dark:hover:bg-zinc-700 text-left"
+                onClick={(e) => {
+                  umamiTrack("Profile Button");
+                  specialNavigation(e, NAVIGATION_PATHS.profile);
+                  setProfileDropdownOpen(false);
+                }}
+              >
+                <FiUser size={15} />
+                {t("navbarMenu.profile")}
+              </button>
+              <div className="w-full h-px bg-[#e5e5e5] dark:bg-zinc-700" />
+              <button
+                className="w-full flex items-center gap-3 px-4 h-8 text-primary text-[12px] font-medium hover:brightness-95 dark:hover:bg-zinc-700 text-left"
+                onClick={() => {
+                  umamiTrack("Logout Button");
+                  logout();
+                  setProfileDropdownOpen(false);
+                }}
+              >
+                <FiLogOut size={15} />
+                {t("navbarMenu.logout")}
+              </button>
+            </div>
+          )}
           {!isCollapsed ? (
-            <div className="w-full flex py-2 mt-auto items-center gap-2 rounded-lg px-3 bg-slate-200 dark:bg-darkGray">
+            <button
+              className="w-full flex h-10 items-center gap-3 rounded-lg px-3 bg-lightGray dark:bg-darkGray shadow-[0px_4px_6px_rgba(0,0,0,0.1)] hover:brightness-95 dark:hover:brightness-110 transition-all"
+              onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+            >
               <Gravatar
                 email={`${auth.username}@stuba.sk`}
-                size={30}
-                className="rounded-full"
+                size={28}
+                className="rounded-full shrink-0"
                 default="monsterid"
               />
-              <div className="flex flex-col items-start">
-                <p className="text-[12px] font-medium overflow-hidden text-ellipsis whitespace-nowrap max-w-[100px]">
-                  {auth.name} {auth.surname}
+              <div className="flex flex-col items-start overflow-hidden">
+                <p className="text-[12px] font-medium overflow-hidden text-ellipsis whitespace-nowrap w-full">
+                  {auth.username}
                 </p>
-                <p className="text-[10px] font-medium shrink-0">
+                <p className="text-[9px] font-light shrink-0">
                   {auth.isSuperUser
                     ? t("navbarMenu.superUser")
                     : t("navbarMenu.user")}
                 </p>
               </div>
-              <Button
-                onClick={() => {
-                  umamiTrack("Logout Button");
-                  logout();
-                }}
-                className="bg-transparent text-black dark:text-white ml-auto hover:text-white p-2"
-              >
-                <FiLogOut />
-              </Button>
-            </div>
+            </button>
           ) : (
-            <div className="w-full flex flex-col gap-2 items-center">
-              <Button
-                onClick={() => {
-                  umamiTrack("Logout Button");
-                  logout();
-                }}
-                className="bg-zinc-100 dark:bg-zinc-700 text-black dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-600 p-2 rounded-md"
+            <div className="w-full flex justify-center">
+              <button
+                className="flex items-center justify-center w-11 h-10 bg-lightGray dark:bg-zinc-700 shadow-[0px_4px_6px_rgba(0,0,0,0.1)] rounded-lg hover:brightness-95 dark:hover:brightness-110 transition-all"
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
               >
-                <FiLogOut size={20} />
-              </Button>
+                <Gravatar
+                  email={`${auth.username}@stuba.sk`}
+                  size={28}
+                  className="rounded-full"
+                  default="monsterid"
+                />
+              </button>
             </div>
           )}
         </div>

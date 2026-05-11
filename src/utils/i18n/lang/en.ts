@@ -289,6 +289,7 @@ export const en = {
       user: 'Student',
       superUser: 'Admin',
       aiAssistant: 'AI Assistant',
+      logout: 'Logout',
     },
 
     // PAGE

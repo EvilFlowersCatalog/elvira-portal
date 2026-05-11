@@ -284,6 +284,7 @@ export const sk = {
       user: 'Študent',
       superUser: 'Admin',
       aiAssistant: 'AI Asistent',
+      logout: 'Odhlásiť sa',
     },
 
     // PAGE
