@@ -490,7 +490,14 @@ export const sk = {
       },
       loansPage: {
         title: 'Výpožičky',
-
+        card: {
+          borrowedSection: 'Požičané',
+          reservedSection: 'Rezervované',
+          pastSection: 'Znovu rezervovať',
+          noBorrowed: 'Nemáte žiadne aktívne výpožičky.',
+          noReserved: 'Nemáte žiadne rezervácie.',
+          viewDetail: 'Zobraziť detail',
+        },
         table: {
           title: 'Počet výpožičiek: {{x}}',
           entry: 'Publikácia',

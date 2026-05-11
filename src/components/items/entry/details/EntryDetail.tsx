@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CircleLoader } from 'react-spinners';
 import { RiAddLine, RiBookmarkFill, RiBookmarkLine, RiChatQuoteLine, RiCloseLine, RiShareLine } from 'react-icons/ri';
 import { useTranslation } from 'react-i18next';
@@ -62,6 +62,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
 
   const [activeLicense, setActiveLicense] = useState<ILicense | null>(null);
   const [update, setUpdate] = useState<boolean>(false);
+  const prevLicensingEntryId = useRef<string | null>(null);
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -162,8 +163,14 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   useEffect(() => {
     const paramEntryId = searchParams.get('entry-detail-id');
     const paramCatalogId = searchParams.get('entry-catalog-id');
+    const paramLicensingId = searchParams.get('licensing-entry-id');
     setEntryId(paramEntryId);
     setCatalogId(paramCatalogId);
+    // When the borrow modal closes for this entry, trigger a license refetch
+    if (prevLicensingEntryId.current === paramEntryId && !paramLicensingId && paramEntryId) {
+      setUpdate((u) => !u);
+    }
+    prevLicensingEntryId.current = paramLicensingId;
   }, [searchParams]);
 
   // If entryId is changed

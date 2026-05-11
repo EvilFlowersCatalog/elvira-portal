@@ -46,8 +46,9 @@ export default function AcquisitionsButton({
     getUserLicenses({ pagination: false, entry_id: entry.id }).then((res) => {
       const now = new Date();
       const found = res.items.find((l) => {
-        if (l.state === LICENSE_STATE.active) return !l.expires_at || new Date(l.expires_at) > now;
-        return (l.state as string) === 'ready' || l.state === LICENSE_STATE.draft;
+        const notExpired = !l.expires_at || new Date(l.expires_at) > now;
+        if (l.state === LICENSE_STATE.active || (l.state as string) === 'ready') return notExpired;
+        return l.state === LICENSE_STATE.draft;
       });
       setActiveLicense(found || null);
     });
@@ -62,7 +63,9 @@ export default function AcquisitionsButton({
 
   const isReadiumEnabled = Boolean(entry.config?.readium_enabled);
   const hasAcquisitions = acquisitions.length > 0;
-  const isActiveLoan = activeLicense?.state === LICENSE_STATE.active || (activeLicense?.state as string) === 'ready';
+  const isActiveLoan =
+    (activeLicense?.state === LICENSE_STATE.active || (activeLicense?.state as string) === 'ready') &&
+    (!activeLicense?.expires_at || new Date(activeLicense.expires_at) > new Date());
   const isReserved = activeLicense?.state === LICENSE_STATE.draft;
 
   if (isActiveLoan && activeLicense) {

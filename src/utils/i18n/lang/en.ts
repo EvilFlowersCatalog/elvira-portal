@@ -501,6 +501,14 @@ export const en = {
       },
       loansPage: {
         title: 'Loans',
+        card: {
+          borrowedSection: 'Borrowed',
+          reservedSection: 'Reserved',
+          pastSection: 'Re-reserve',
+          noBorrowed: 'You have no active loans.',
+          noReserved: 'You have no reservations.',
+          viewDetail: 'View detail',
+        },
         table: {
           title: 'Amount of loans: {{x}}',
           entry: 'Entry',

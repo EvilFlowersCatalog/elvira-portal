@@ -42,10 +42,11 @@ const useGetEntryDetail = () => {
     if (licenseRes.status === 'fulfilled') {
       const now = new Date();
       activeLicense = licenseRes.value.data.items.find((l) => {
-        if (l.state === LICENSE_STATE.active) {
-          return !l.expires_at || new Date(l.expires_at) > now;
+        const notExpired = !l.expires_at || new Date(l.expires_at) > now;
+        if (l.state === LICENSE_STATE.active || (l.state as string) === 'ready') {
+          return notExpired;
         }
-        return (l.state as string) === 'ready' || l.state === LICENSE_STATE.draft;
+        return l.state === LICENSE_STATE.draft;
       }) ?? null;
     }
 
