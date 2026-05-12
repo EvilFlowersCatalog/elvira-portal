@@ -8,59 +8,46 @@ import Feed from '../../components/items/feeds/Feed';
 import LoadNext from '../../components/items/loadings/LoadNext';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import useItemContainer from '../../hooks/useItemContainer';
 
 const Feeds = () => {
   const { selectedCatalogId } = useAppContext();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [loadingNext, setLoadingNext] = useState<boolean>(true);
-  const [isError, setIsError] = useState<boolean>(false);
-  const [page, setPage] = useState<number>(0);
-  const [maxPage, setMaxPage] = useState<number>(0);
-  const [feeds, setFeeds] = useState<IFeed[]>([]);
+  const list = useItemContainer<IFeed>();
   const [searchParams] = useSearchParams();
+  const [currentFeedDescription, setCurrentFeedDescription] = useState<string>('');
+  const [currentFeedTitle, setCurrentFeedTitle] = useState<string>('');
 
   const { t } = useTranslation();
   const getFeeds = useGetFeeds();
   const getFeedDetail = useGetFeedDetail();
-  const [currentFeedDescription, setCurrentFeedDescription] = useState<string>('');
-  const [currentFeedTitle, setCurrentFeedTitle] = useState<string>('');
 
-  // Reload feeds when catalog changes
   useEffect(() => {
-    setPage(0);
-    setFeeds([]);
-    setIsLoading(true);
+    list.reset();
   }, [selectedCatalogId]);
 
   useEffect(() => {
-    if (page === 0) {
-      setPage(1);
+    if (list.page === 0) {
+      list.setPage(1);
       return;
     }
 
     (async () => {
       const fp = searchParams.get('parent-id')?.split('&') ?? [];
       const currentFeedId = fp.length > 0 ? fp[fp.length - 1] : null;
-
       const title = searchParams.get('query') ?? '';
-
-      // When searching, go global; otherwise drill down into the current parent
-      const parentId = title.length > 0 ? '' : (fp.length > 0 ? fp[fp.length - 1] : 'null');
-
-      const options = {
-        paginate: false,
-        orderBy: searchParams.get('order-by') ?? '',
-        title,
-        parentId,
-      };
+      const parentId = title.length > 0 ? '' : fp.length > 0 ? fp[fp.length - 1] : 'null';
 
       try {
-        const { items, metadata } = await getFeeds(options);
+        const { items, metadata } = await getFeeds({
+          paginate: false,
+          orderBy: searchParams.get('order-by') ?? '',
+          title,
+          parentId,
+        });
 
-        setMaxPage(metadata.pages);
-        setFeeds([...(feeds ?? []), ...items]);
+        list.setMaxPage(metadata.pages);
+        list.setItems([...(list.items ?? []), ...items]);
 
-        // Fetch parent feed title for section heading when navigated into a subfeed
         if (currentFeedId && currentFeedId !== 'null') {
           try {
             const feedDetail = await getFeedDetail(currentFeedId);
@@ -75,28 +62,19 @@ const Feeds = () => {
           setCurrentFeedTitle('');
         }
       } catch {
-        setIsError(true);
+        list.setIsError(true);
       } finally {
-        setIsLoading(false);
-        setLoadingNext(false);
+        list.setIsLoading(false);
+        list.setLoadingNext(false);
       }
     })();
-  }, [page]);
+  }, [list.page]);
 
   return (
     <ItemContainer
-      isLoading={isLoading}
-      setIsLoading={setIsLoading}
-      isError={isError}
-      items={feeds}
-      setItems={setFeeds}
-      page={page}
-      setPage={setPage}
-      maxPage={maxPage}
-      loadingNext={loadingNext}
-      setLoadingNext={setLoadingNext}
+      list={list}
       isEntries={true}
-      searchSpecifier={'query'}
+      searchSpecifier="query"
       title={t('navbarMenu.feeds')}
       description={currentFeedDescription}
       shouldRedirectSuggestions={true}
@@ -109,10 +87,10 @@ const Feeds = () => {
           </h2>
         )}
         <div className='flex flex-wrap'>
-          {feeds.map((feed, index) => (
+          {list.items.map((feed, index) => (
             <Feed key={index} feed={feed} />
           ))}
-          {loadingNext && <LoadNext />}
+          {list.loadingNext && <LoadNext />}
         </div>
       </div>
     </ItemContainer>

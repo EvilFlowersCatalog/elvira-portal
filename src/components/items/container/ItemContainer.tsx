@@ -11,25 +11,15 @@ import { H1 } from '../../primitives/Heading';
 import { AdvancedSearchWrapper } from './AdvancedSearch';
 import OpenFiltersButton from '../../buttons/OpenFiltersButton';
 import LicenseCalendar from '../entry/details/LicenseCalendar';
+import { IItemContainerList } from '../../../hooks/useItemContainer';
 
 interface IItemContainer {
   children: ReactNode;
-  isLoading: boolean;
-  showSearch?: boolean;
+  list: IItemContainerList;
   showLayout?: boolean;
-  setIsLoading: (isLoading: boolean) => void;
-  isError: boolean;
-  items: any[];
   isEntries?: boolean;
-  setItems: (entries: any[]) => void;
   triggerReload?: (() => void) | null;
-  page: number;
-  setPage: (page: number) => void;
-  maxPage: number;
-  loadingNext: boolean;
-  setLoadingNext: (loadingNext: boolean) => void;
   searchSpecifier: string;
-  showEmpty?: boolean;
   title?: string;
   customFilters?: ReactNode;
   description?: string;
@@ -39,76 +29,58 @@ interface IItemContainer {
 
 const ItemContainer = ({
   children,
-  isLoading,
-  isError,
-  items,
-  setItems,
+  list,
   triggerReload = null,
-  setIsLoading,
-  page,
-  loadingNext,
-  setLoadingNext,
-  setPage,
-  maxPage,
   showLayout = false,
   isEntries = true,
   searchSpecifier,
-  showEmpty = true,
   title,
   customFilters,
   description,
   shouldRedirectSuggestions = false,
   showResultsHeading = true,
 }: IItemContainer) => {
-  const { handleScroll, searchParamsEqual, clearFilters, isParamsEmpty } = useAppContext();
+  const { handleScroll, searchParamsEqual } = useAppContext();
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [showScrollUp, setShowScrollUp] = useState<boolean>(false);
 
-  const location = useLocation();
-
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const previousSearchParamsRef = useRef<URLSearchParams | null>(null);
 
-  // Check search params if there is entry-detail-id
   useEffect(() => {
-    // If they are not equal reset
     if (!searchParamsEqual(previousSearchParamsRef.current, searchParams)) {
-      setPage(0);
-      setItems([]);
-      setIsLoading(true);
+      list.setPage(0);
+      list.setItems([]);
+      list.setIsLoading(true);
     }
-
-    // Set previous to current
     previousSearchParamsRef.current = searchParams;
-
-    const entryDetailId = searchParams.get('entry-detail-id');
   }, [searchParams]);
 
   return (
     <>
       <div
         ref={scrollRef}
-        className='flex h-screen flex-col w-full overflow-auto'
+        className='flex h-screen flex-col w-full overflow-auto pt-4'
         onScroll={() =>
           handleScroll(
             scrollRef,
-            page,
-            setPage,
-            maxPage,
-            loadingNext,
-            setLoadingNext,
+            list.page,
+            list.setPage,
+            list.maxPage,
+            list.loadingNext,
+            list.setLoadingNext,
             showScrollUp,
             setShowScrollUp
           )
         }
       >
-        <Breadcrumb />
-        {title && <H1>{title}</H1>}
+        <Breadcrumb/>
+        {title && <H1 className='pt-3'>{title}</H1>}
         {description && <p className="px-4 text-secondary dark:text-secondaryLight text-sm mb-4">{description}</p>}
-        <ToolsContainer 
-          param={searchSpecifier} 
-          advancedSearch={isEntries} 
+        <ToolsContainer
+          param={searchSpecifier}
+          advancedSearch={isEntries}
           customFilters={customFilters}
           shouldRedirectSuggestions={shouldRedirectSuggestions}
         />
@@ -118,27 +90,22 @@ const ItemContainer = ({
             {showResultsHeading && (
               <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-medium text-left mb-4'>
                 {searchParams.get('author') && !searchParams.get('query') ? searchParams.get('author') :
-                searchParams.get('query')  ? t('page.resultsQuery'):
+                searchParams.get('query') ? t('page.resultsQuery') :
                 t('page.results')}
-                  {searchParams.get('query') && <span className="font-bold ml-1">"{searchParams.get('query')}"</span>}
+                {searchParams.get('query') && <span className="font-bold ml-1">"{searchParams.get('query')}"</span>}
               </h2>
             )}
 
-            {isLoading && (
-              <PageLoading entries={isEntries} showLayout={showLayout} />
-            )}
+            {list.isLoading && <PageLoading entries={isEntries} showLayout={showLayout} />}
 
-            {!isLoading && isError && <PageMessage message={t('page.error')} />}
+            {!list.isLoading && list.isError && <PageMessage message={t('page.error')} />}
 
-
-            {!isLoading && !isError && (
+            {!list.isLoading && !list.isError && (
               <>
-                {items.length > 0 ? (
+                {list.items.length > 0 ? (
                   children
                 ) : (
-                  <p className='text-center px-4 py-10'>
-                    {t('page.noResults')}
-                  </p>
+                  <p className='text-center px-4 py-10'>{t('page.noResults')}</p>
                 )}
               </>
             )}
@@ -146,7 +113,7 @@ const ItemContainer = ({
             <EntryDetail triggerReload={triggerReload} />
             <LicenseCalendar />
           </>
-        </AdvancedSearchWrapper >
+        </AdvancedSearchWrapper>
       </div>
     </>
   );
