@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
+import PopupInfo from '../../components/common/PopupInfo';
 import Button from '../../components/buttons/Button';
 import ElviraInput from '../../components/inputs/ElviraInput';
 import PageLoading from '../../components/page/PageLoading';
@@ -9,8 +10,12 @@ import PageMessage from '../../components/page/PageMessage';
 import { H1 } from '../../components/primitives/Heading';
 import useGetUserDetails from '../../hooks/api/users/useGetUserDetails';
 import useSetUserPassphrase from '../../hooks/api/users/useSetUserPassphrase';
+import useGetShelf from '../../hooks/api/my-shelf/useGetShelf';
+import useGetLicenses from '../../hooks/api/licenses/useGetLicenses';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { IUser } from '../../utils/interfaces/user';
+import { LICENSE_STATE } from '../../utils/interfaces/license';
+import { BookmarkIcon, ClockIcon, LibraryIcon, LoansIcon } from '../../components/header/navbar/NavbarIcons';
 
 type NotificationKey = 'loanEnd' | 'newBooks' | 'reservationChange';
 
@@ -20,6 +25,8 @@ const Profile = () => {
 
   const getUserDetails = useGetUserDetails();
   const setUserPassphrase = useSetUserPassphrase();
+  const getShelf = useGetShelf();
+  const getLicenses = useGetLicenses();
 
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isError, setIsError] = useState<boolean>(false);
@@ -27,6 +34,8 @@ const Profile = () => {
   const [userDetails, setUserDetails] = useState<IUser | null>(null);
   const [passphrase, setPassphrase] = useState<string>('');
   const [passphraseHint, setPassphraseHint] = useState<string>('');
+  const [bookmarksCount, setBookmarksCount] = useState<number>(0);
+  const [loansCount, setLoansCount] = useState<number>(0);
   const [notifications, setNotifications] = useState<Record<NotificationKey, boolean>>({
     loanEnd: false,
     newBooks: false,
@@ -35,7 +44,6 @@ const Profile = () => {
 
   useEffect(() => {
     if (!auth) return;
-
     let mounted = true;
 
     (async () => {
@@ -49,9 +57,35 @@ const Profile = () => {
       }
     })();
 
-    return () => {
-      mounted = false;
-    };
+    return () => { mounted = false; };
+  }, [auth?.userId]);
+
+  useEffect(() => {
+    if (!auth) return;
+    let mounted = true;
+
+    (async () => {
+      try {
+        const [shelfData, licenseData] = await Promise.all([
+          getShelf({ page: 1, limit: 1 }),
+          getLicenses({ user_mode: 'current', page: 1, limit: 50 }),
+        ]);
+        if (!mounted) return;
+
+        setBookmarksCount(shelfData.metadata.total);
+
+        const now = new Date();
+        const active = licenseData.items.filter((l) => {
+          const isActiveState = l.state === LICENSE_STATE.active || (l.state as string) === 'ready';
+          return isActiveState && new Date(l.starts_at) <= now && new Date(l.expires_at) > now;
+        });
+        setLoansCount(active.length);
+      } catch {
+        // counts stay 0 on error
+      }
+    })();
+
+    return () => { mounted = false; };
   }, [auth?.userId]);
 
   useEffect(() => {
@@ -107,6 +141,13 @@ const Profile = () => {
     { key: 'reservationChange', label: t('profile.notifications.reservationChange'), desc: t('profile.notifications.reservationChangeDesc') },
   ];
 
+  const stats = [
+    { labelKey: 'profile.stats.readBooks', value: 0, icon: <LibraryIcon size={22} className='text-secondary dark:text-secondaryLight' /> },
+    { labelKey: 'profile.stats.savedBooks', value: bookmarksCount, icon: <BookmarkIcon size={22} className='text-secondary dark:text-secondaryLight' /> },
+    { labelKey: 'profile.stats.borrowedBooks', value: loansCount, icon: <LoansIcon size={22} className='text-secondary dark:text-secondaryLight' /> },
+    { labelKey: 'profile.stats.readingHours', value: 0, icon: <ClockIcon size={22} className='text-secondary dark:text-secondaryLight' /> },
+  ] as const;
+
   return (
     <div className='w-full h-full overflow-auto pb-10'>
       <Breadcrumb />
@@ -118,7 +159,7 @@ const Profile = () => {
       {!isLoading && !isError && (
         <div className='px-4 flex flex-col gap-5'>
           {/* Personal info card */}
-          <section className='rounded-xl p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A]'>
+          <section className='rounded-[9px] p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] dark:shadow-[0px_4px_12px_0px_rgba(0,0,0,0.3)] border border-[#e5e5e5] dark:border-zinc-700'>
             <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight mb-4'>
               {t('profile.personalInfo.title')}
             </h2>
@@ -154,20 +195,17 @@ const Profile = () => {
 
           {/* Stats row */}
           <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
-            {([
-              { labelKey: 'profile.stats.readBooks', value: '-' },
-              { labelKey: 'profile.stats.savedBooks', value: '-' },
-              { labelKey: 'profile.stats.borrowedBooks', value: '-' },
-              { labelKey: 'profile.stats.readingHours', value: '-' },
-            ] as const).map(({ labelKey, value }) => (
+            {stats.map(({ labelKey, value, icon }) => (
               <div
                 key={labelKey}
-                className='bg-white dark:bg-zinc-800 rounded-lg shadow-[0px_4px_6px_rgba(0,0,0,0.1)] dark:shadow-[0px_4px_6px_rgba(0,0,0,0.3)] p-4 flex items-center gap-3'
+                className='bg-white dark:bg-zinc-800 rounded-[8px] shadow-[0px_4px_6px_rgba(0,0,0,0.1)] dark:shadow-[0px_4px_6px_rgba(0,0,0,0.3)] h-[69px] flex items-center px-3 gap-3'
               >
-                <div className='w-10 h-10 rounded-md bg-primaryLight dark:bg-zinc-700 flex-shrink-0' />
+                <div className='w-10 h-10 rounded-[6px] bg-primaryLight dark:bg-zinc-700 flex items-center justify-center flex-shrink-0'>
+                  {icon}
+                </div>
                 <div>
-                  <p className='text-xs text-secondary dark:text-secondaryLight opacity-70'>{t(labelKey)}</p>
-                  <p className='text-xl font-extrabold text-secondary dark:text-secondaryLight'>{value}</p>
+                  <p className='text-[12px] font-light text-secondary dark:text-secondaryLight'>{t(labelKey)}</p>
+                  <p className='text-[20px] font-extrabold text-secondary dark:text-secondaryLight leading-tight'>{value}</p>
                 </div>
               </div>
             ))}
@@ -176,13 +214,19 @@ const Profile = () => {
           {/* Bottom two-column section */}
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-5'>
             {/* Passphrase section */}
-            <section className='rounded-xl p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A]'>
-              <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight mb-1'>
-                {t('profile.passphrase.title')}
-              </h2>
-              <p className='text-sm text-zinc-600 dark:text-zinc-300 mt-1 mb-4'>
-                {t('profile.passphrase.description')}
-              </p>
+            <section className='rounded-[7px] p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] dark:shadow-[0px_4px_12px_0px_rgba(0,0,0,0.3)] border border-[#e5e5e5] dark:border-zinc-700'>
+              <div className='flex items-center gap-2 mb-4'>
+                <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>
+                  {t('profile.passphrase.title')}
+                </h2>
+                <PopupInfo label='Info o prístupovej fráze'>
+                  Knihy sú dostupné vo formáte PDF. Na ich otvorenie odporúčame aplikáciu{' '}
+                  <a href='https://thorium.edrlab.org/en/' target='_blank' rel='noopener noreferrer' className='text-primary underline'>
+                    Thorium Reader
+                  </a>
+                  , ktorá je bezplatná a dostupná pre Windows, macOS aj Linux. Pri prvom otvorení súboru vás čítačka požiada o zadanie prístupovej frázy na odomknutie.
+                </PopupInfo>
+              </div>
               <form className='flex flex-col gap-3' onSubmit={handleSetPassphrase}>
                 <ElviraInput
                   type='password'
@@ -210,7 +254,7 @@ const Profile = () => {
             </section>
 
             {/* Notifications section */}
-            <section className='rounded-xl p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A]'>
+            <section className='rounded-[7px] p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] dark:shadow-[0px_4px_12px_0px_rgba(0,0,0,0.3)] border border-[#e5e5e5] dark:border-zinc-700'>
               <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight mb-4'>
                 {t('profile.notifications.title')}
               </h2>
@@ -219,7 +263,7 @@ const Profile = () => {
                   <div key={key} className='flex items-center justify-between py-4 first:pt-0 last:pb-0'>
                     <div className='mr-4'>
                       <p className='text-sm font-semibold text-secondary dark:text-secondaryLight'>{label}</p>
-                      <p className='text-xs text-zinc-500 dark:text-zinc-400 mt-0.5'>{desc}</p>
+                      <p className='text-xs font-light text-secondary dark:text-zinc-400 mt-0.5'>{desc}</p>
                     </div>
                     <button
                       type='button'

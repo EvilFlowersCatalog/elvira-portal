@@ -1,10 +1,10 @@
 import { FaHome } from 'react-icons/fa';
+import { MdChevronRight } from 'react-icons/md';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import {
   LANG_TYPE,
   NAVIGATION_PATHS,
 } from '../../utils/interfaces/general/general';
-import { MdOutlineKeyboardDoubleArrowRight } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import useGetFeedDetail from '../../hooks/api/feeds/useGetFeedDetail';
@@ -46,6 +46,9 @@ const Breadcrumb = () => {
     ['add']: isEn() ? 'Add' : 'Pridanie',
     ['categories']: isEn() ? 'Categories' : 'Kategórie',
     ['edit']: editingEntryTitle,
+    ['profile']: isEn() ? 'Profile' : 'Profil',
+    ['history']: isEn() ? 'History' : 'História',
+    ['ai-chat']: isEn() ? 'AI Assistant' : 'AI Asistent',
   };
 
   const location = useLocation();
@@ -238,26 +241,31 @@ const Breadcrumb = () => {
   }, [location.search]);
 
   return (
-    <div className='flex gap-3 flex-wrap items-center p-4 pl-5'>
-      <button onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.home)}>
-        <FaHome size={20} />
+    <div className='flex flex-wrap items-center gap-[7px] px-5 h-10'>
+      <button
+        className='text-darkGray hover:text-secondary dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors shrink-0'
+        onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.home)}
+      >
+        <FaHome size={18} />
       </button>
       {breadcrumbs.map((breadcrumb, index) => (
-        <button
-          className={`flex gap-3 w-fit items-center text-sm text-left ${index === breadcrumbs.length - 1
-            ? 'cursor-default'
-            : 'cursor-pointer'
+        <span key={index} className='flex items-center gap-[7px]'>
+          <MdChevronRight size={13} className='text-darkGray dark:text-zinc-500 shrink-0' />
+          <button
+            className={`text-[13px] tracking-[0.1px] text-darkGray dark:text-zinc-400 whitespace-nowrap ${
+              index === breadcrumbs.length - 1
+                ? 'cursor-default'
+                : 'cursor-pointer hover:text-secondary dark:hover:text-zinc-200 transition-colors'
             }`}
-          key={index}
-          onClick={
-            index !== breadcrumbs.length - 1
-              ? (e) => specialNavigation(e, breadcrumb.path)
-              : undefined
-          }
-        >
-          <MdOutlineKeyboardDoubleArrowRight size={15} />
-          <span>{breadcrumb.label}</span>
-        </button>
+            onClick={
+              index !== breadcrumbs.length - 1
+                ? (e) => specialNavigation(e, breadcrumb.path)
+                : undefined
+            }
+          >
+            {breadcrumb.label}
+          </button>
+        </span>
       ))}
     </div>
   );

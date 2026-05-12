@@ -72,7 +72,7 @@ const HelpLoans = () => {
 
           <h3 id="format" className="text-base font-semibold text-secondary mb-2">Formát a čítačka</h3>
           <p className="text-sm text-gray-600 leading-relaxed mb-5">
-            Knihy sú dostupné vo formáte PDF. Na ich otvorenie odporúčame aplikáciu <strong><u>Thorium Reader</u></strong>, ktorá je bezplatná a dostupná pre Windows, macOS aj Linux. Pri prvom otvorení súboru vás čítačka požiada o zadanie prístupovej frázy na odomknutie.
+            Knihy sú dostupné vo formáte PDF. Na ich otvorenie odporúčame aplikáciu <a href="https://thorium.edrlab.org/en/" target="_blank" rel="noopener noreferrer" className="underline">Thorium Reader</a>, ktorá je bezplatná a dostupná pre Windows, macOS aj Linux. Pri prvom otvorení súboru vás čítačka požiada o zadanie prístupovej frázy na odomknutie.
           </p>
 
           <h3 id="pristupova-fraza" className="text-base font-semibold text-secondary mb-2">Prístupová fráza</h3>
