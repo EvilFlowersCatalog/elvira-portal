@@ -1,7 +1,7 @@
 export const sk = {
   translation: {
     common: {
-      showMore: 'Ďalších {{count}}',
+      showMore: '{{count}} ďalších',
       showLess: 'Zobraziť menej',
       loading: 'Načítavanie',
     },
@@ -375,8 +375,10 @@ export const sk = {
       search: 'Hľadať',
       searchAll: "Prehľadávať všetko",
       yearFromTo: 'Rok vydania',
-      yearFrom: 'Rok od',
-      yearTo: 'Rok do',
+      yearFrom: 'Od',
+      yearTo: 'Do',
+      language: 'Jazyk',
+      availability: 'Dostupnosť',
     },
 
     // ENTRY COMPONENT

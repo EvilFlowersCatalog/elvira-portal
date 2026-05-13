@@ -3,17 +3,29 @@ import useAppContext from "../../../hooks/contexts/useAppContext"
 import { useTranslation } from "react-i18next";
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { ICategory } from "../../../utils/interfaces/category";
-import ElviraInput from "../../inputs/ElviraInput";
 import LanguageAutofill from "../../autofills/LanguageAutofill";
 import CategoryAutofill from "../../autofills/CategoryAutofill";
 import FeedAutofill from "../../autofills/FeedAutofill";
-import { Button } from "@mui/material";
 import ElviraNumberInput from "../../inputs/ElviraNumberInput";
 import { IoClose } from "react-icons/io5";
 import AdvancedCheckboxes from "../../inputs/AdvancedCheckboxes";
 import useGetCategories from "../../../hooks/api/categories/useGetCategories";
 import useGetFeeds from "../../../hooks/api/feeds/useGetFeeds";
 import { IFeed } from "../../../utils/interfaces/feed";
+import { AvailabilityState } from "../entry/details/AvailabilityBadge";
+
+type AvailabilityOption = { value: AvailabilityState; labelKey: string };
+
+const AVAILABILITY_OPTIONS: AvailabilityOption[] = [
+    { value: 'available',   labelKey: 'entry.detail.availability.available' },
+    { value: 'unavailable', labelKey: 'entry.detail.availability.unavailable' },
+    { value: 'borrowed',    labelKey: 'entry.detail.availability.borrowed' },
+    { value: 'reserved',    labelKey: 'entry.detail.availability.reserved' },
+];
+
+function SectionDivider() {
+    return <div className="h-px w-full bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)]" />;
+}
 
 export function AdvancedSearchWrapper({ children }: { children: React.ReactNode }) {
     const { showAdvancedSearch, setShowAdvancedSearch } = useAppContext();
@@ -23,9 +35,9 @@ export function AdvancedSearchWrapper({ children }: { children: React.ReactNode 
             <div
                 className={`
                     hidden md:block
-                    border-r-2 border-gray-300 dark:border-gray-700
-                    transition-all duration-500 ease-in-out 
-                    overflow-auto ${showAdvancedSearch ? 'max-w-[300px] opacity-100 p-3' : 'max-w-0 opacity-0'} w-full
+                    border-r border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.08)]
+                    transition-all duration-500 ease-in-out
+                    overflow-auto ${showAdvancedSearch ? 'max-w-[260px] opacity-100 p-4' : 'max-w-0 opacity-0'} w-full
                     sticky top-0 z-2 pb-32 h-screen
                 `}
             >
@@ -39,11 +51,11 @@ export function AdvancedSearchWrapper({ children }: { children: React.ReactNode 
                     transition-all duration-500 ease-in-out
                     bg-slate-200 dark:bg-darkGray
                     z-30
-                    ${showAdvancedSearch ? 'top-0 bottom-0 opacity-100 p-3' : '-top-full opacity-0 pointer-events-none'}
-                    rounded-none h-screen
+                    ${showAdvancedSearch ? 'top-0 bottom-0 opacity-100 p-4' : '-top-full opacity-0 pointer-events-none'}
+                    rounded-none h-screen overflow-y-auto
                 `}
             >
-                <div className="pt-4">
+                <div className="pt-4 mb-2">
                     <IoClose size={24} className="absolute top-3 right-3 cursor-pointer" onClick={() => setShowAdvancedSearch(false)} />
                 </div>
                 <AdvancedSearch />
@@ -61,6 +73,7 @@ export function AdvancedSearch() {
 
     const [year, setYear] = useState<string[]>(["", ""]);
     const [languageCode, setLanguageCode] = useState<string>('');
+    const [availability, setAvailability] = useState<AvailabilityState[]>([]);
     const yearDebounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const getCategories = useGetCategories();
@@ -73,21 +86,15 @@ export function AdvancedSearch() {
 
     useEffect(() => {
         (async () => {
-            const { items: itemsCategories } = await getCategories({
-                paginate: false,
-            });
-            const { items: itemsFeeds } = await getFeeds({
-                paginate: false,
-            });
+            const { items: itemsCategories } = await getCategories({ paginate: false });
+            const { items: itemsFeeds } = await getFeeds({ paginate: false });
             setAllFeeds(itemsFeeds);
             setAllCategories(itemsCategories);
         })();
     }, []);
 
     const performSearch = () => {
-        // Only handle filters that exist in AdvancedSearch component
         if (import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
-            // Experimental: multi-select IDs sent as comma-separated lists (new API, TBD param names)
             if (activeCategories.length > 0) {
                 searchParams.set('categories', activeCategories.map(cat => cat.id).join(','));
             } else {
@@ -102,7 +109,6 @@ export function AdvancedSearch() {
             }
             searchParams.delete('feed-id');
         } else {
-            // Current: single selection mapped to the existing API params
             const singleCategory = activeCategories[0];
             if (singleCategory) {
                 searchParams.set('category-id', singleCategory.id);
@@ -120,23 +126,17 @@ export function AdvancedSearch() {
             searchParams.delete('feeds');
         }
 
-        if (year[0]) {
-            searchParams.set('publishedAtGte', year[0].toString());
-        } else {
-            searchParams.delete('publishedAtGte');
-        }
+        if (year[0]) searchParams.set('publishedAtGte', year[0].toString());
+        else searchParams.delete('publishedAtGte');
 
-        if (year[1]) {
-            searchParams.set('publishedAtLte', year[1].toString());
-        } else {
-            searchParams.delete('publishedAtLte');
-        }
+        if (year[1]) searchParams.set('publishedAtLte', year[1].toString());
+        else searchParams.delete('publishedAtLte');
 
-        if (languageCode) {
-            searchParams.set('languageCode', languageCode);
-        } else {
-            searchParams.delete('languageCode');
-        }
+        if (languageCode) searchParams.set('languageCode', languageCode);
+        else searchParams.delete('languageCode');
+
+        if (availability.length > 0) searchParams.set('availability', availability.join(','));
+        else searchParams.delete('availability');
 
         setSearchParams(searchParams);
     };
@@ -145,83 +145,58 @@ export function AdvancedSearch() {
         const publishedAtGte = searchParams.get('publishedAtGte') || '';
         const publishedAtLte = searchParams.get('publishedAtLte') || '';
         const languageCodeParam = searchParams.get('languageCode') || '';
+        const availabilityParam = searchParams.get('availability') || '';
 
-        // Read the correct param keys depending on the mode
         const isExperimental = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
-        const feedsParam     = isExperimental
+        const feedsParam = isExperimental
             ? (searchParams.get('feeds') || '')
             : (searchParams.get('feed-id') || '');
         const categoriesParam = isExperimental
             ? (searchParams.get('categories') || '')
             : (searchParams.get('category-id') || '');
 
-        // Only update if values actually changed
         if (year[0] !== publishedAtGte || year[1] !== publishedAtLte) {
             setYear([publishedAtGte, publishedAtLte]);
         }
-        
-        if (languageCode !== languageCodeParam) {
-            setLanguageCode(languageCodeParam);
+        if (languageCode !== languageCodeParam) setLanguageCode(languageCodeParam);
+
+        const newAvailability = availabilityParam
+            ? (availabilityParam.split(',') as AvailabilityState[])
+            : [];
+        if (availability.sort().join(',') !== newAvailability.sort().join(',')) {
+            setAvailability(newAvailability);
         }
 
-        // Update feeds only if the IDs actually changed
         const feedIds = feedsParam ? feedsParam.split(',') : [];
         const currentFeedIds = activeFeeds.map(f => f.id).sort().join(',');
-        const newFeedIds = [...feedIds].sort().join(',');
-        
-        if (currentFeedIds !== newFeedIds) {
-            if (feedsParam) {
-                setActiveFeeds(allFeeds.filter(feed => feedIds.includes(feed.id)));
-            } else {
-                setActiveFeeds([]);
-            }
+        if (currentFeedIds !== [...feedIds].sort().join(',')) {
+            setActiveFeeds(feedsParam ? allFeeds.filter(feed => feedIds.includes(feed.id)) : []);
         }
 
-        // Update categories only if the IDs actually changed
         const categoryIds = categoriesParam ? categoriesParam.split(',') : [];
         const currentCategoryIds = activeCategories.map(c => c.id).sort().join(',');
-        const newCategoryIds = [...categoryIds].sort().join(',');
-        
-        if (currentCategoryIds !== newCategoryIds) {
-            if (categoriesParam) {
-                setActiveCategories(allCategories.filter(cat => categoryIds.includes(cat.id)));
-            } else {
-                setActiveCategories([]);
-            }
+        if (currentCategoryIds !== [...categoryIds].sort().join(',')) {
+            setActiveCategories(categoriesParam ? allCategories.filter(cat => categoryIds.includes(cat.id)) : []);
         }
     }, [searchParams, allFeeds, allCategories]);
 
-    // Trigger search when advanced options change (debounced for checkbox/select changes)
     useEffect(() => {
-        const debounce = setTimeout(() => {
-            performSearch();
-        }, 300);
+        const debounce = setTimeout(() => { performSearch(); }, 300);
         return () => clearTimeout(debounce);
-    }, [languageCode, activeCategories, activeFeeds]);
+    }, [languageCode, activeCategories, activeFeeds, availability]);
 
-    // Debounce year changes
     useEffect(() => {
-        if (yearDebounceTimeout.current) {
-            clearTimeout(yearDebounceTimeout.current);
-        }
-        yearDebounceTimeout.current = setTimeout(() => {
-            performSearch();
-        }, 500);
-        
-        return () => {
-            if (yearDebounceTimeout.current) {
-                clearTimeout(yearDebounceTimeout.current);
-            }
-        };
+        if (yearDebounceTimeout.current) clearTimeout(yearDebounceTimeout.current);
+        yearDebounceTimeout.current = setTimeout(() => { performSearch(); }, 500);
+        return () => { if (yearDebounceTimeout.current) clearTimeout(yearDebounceTimeout.current); };
     }, [year]);
 
-    // Memoize options to prevent unnecessary re-renders in AdvancedCheckboxes
-    const categoryOptions = useMemo(() => 
+    const categoryOptions = useMemo(() =>
         allCategories.map(cat => ({ label: cat.term, value: cat.id })),
         [allCategories]
     );
 
-    const feedOptions = useMemo(() => 
+    const feedOptions = useMemo(() =>
         allFeeds.map(feed => ({ label: feed.title, value: feed.id })),
         [allFeeds]
     );
@@ -233,7 +208,6 @@ export function AdvancedSearch() {
     };
 
     const onYearFinish = () => {
-        // Cancel pending debounce and search immediately
         if (yearDebounceTimeout.current) {
             clearTimeout(yearDebounceTimeout.current);
             yearDebounceTimeout.current = null;
@@ -241,76 +215,120 @@ export function AdvancedSearch() {
         performSearch();
     };
 
-    return <div className='flex flex-col gap-2'>
-        <h2 className="text-[15px] capitalize font-bold">{t('searchBar.yearFromTo')}</h2>
-        <div className='flex gap-2'>
-            <ElviraNumberInput
-                placeholder={t('searchBar.yearFrom')}
-                value={year[0].toString()} 
-                onChange={function (e: ChangeEvent<HTMLInputElement>): void {
-                    handleYearChange(0, e.target.value);
-                }}
-                onBlur={onYearFinish}
-            />
+    const availabilityOptions = AVAILABILITY_OPTIONS.map(o => ({
+        label: t(o.labelKey),
+        value: o.value,
+    }));
 
-            <ElviraNumberInput
-                placeholder={t('searchBar.yearTo')}
-                value={year[1].toString()}
-                onChange={function (e: ChangeEvent<HTMLInputElement>): void {
-                    handleYearChange(1, e.target.value);
-                }}
-                onBlur={onYearFinish}
-            />
-        </div>
+    return (
+        <div className="flex flex-col gap-5 pt-3">
+            {/* Dostupnosť */}
+            <div className="flex flex-col gap-3">
+                <p className="text-[14px] font-medium text-darkGray dark:text-white tracking-[0.1px]">
+                    {t('searchBar.availability')}
+                </p>
+                <div className="flex flex-col gap-[7px]">
+                    {availabilityOptions.map(opt => (
+                        <label key={opt.value} className="flex items-center gap-[5px] cursor-pointer select-none">
+                            <input
+                                type="checkbox"
+                                checked={availability.includes(opt.value as AvailabilityState)}
+                                onChange={e => {
+                                    const val = opt.value as AvailabilityState;
+                                    setAvailability(e.target.checked
+                                        ? [...availability, val]
+                                        : availability.filter(v => v !== val)
+                                    );
+                                }}
+                                className="w-[18px] h-[18px] accent-primary cursor-pointer flex-shrink-0"
+                            />
+                            <span className={`text-[14px] tracking-[0.1px] leading-[20px] ${availability.includes(opt.value as AvailabilityState) ? 'font-medium' : 'font-normal'} text-darkGray dark:text-white`}>
+                                {opt.label}
+                            </span>
+                        </label>
+                    ))}
+                </div>
+            </div>
 
-        <div className="h-[1px] w-full bg-gray-300 my-4"></div>
+            <SectionDivider />
 
-        <LanguageAutofill
-            defaultLanguageCode={languageCode}
-            languageCode={languageCode}
-            setLanguageCode={setLanguageCode}
-            setIsSelectionOpen={() => { }}
-            isRequired={false} />
-        
-        {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' ? (
-            <>
-            <div className="h-[1px] w-full bg-gray-300 my-4"></div>
-            <AdvancedCheckboxes
-                title={t('searchBar.categories')}
-                options={categoryOptions}
-                selected={activeCategories.map(cat => cat.id)}
-                setSelected={(selected) => {
-                    const selectedCategories = allCategories.filter(cat => selected.includes(cat.id));
-                    setActiveCategories(selectedCategories);
-                }}
+            {/* Rok vydania */}
+            <div className="flex flex-col gap-3">
+                <p className="text-[14px] font-medium text-darkGray dark:text-white tracking-[0.1px]">
+                    {t('searchBar.yearFromTo')}
+                </p>
+                <div className="flex items-center gap-2">
+                    <ElviraNumberInput
+                        placeholder={t('searchBar.yearFrom')}
+                        value={year[0].toString()}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => handleYearChange(0, e.target.value)}
+                        onBlur={onYearFinish}
+                    />
+                    <span className="text-[14px] font-medium text-darkGray dark:text-white flex-shrink-0">-</span>
+                    <ElviraNumberInput
+                        placeholder={t('searchBar.yearTo')}
+                        value={year[1].toString()}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => handleYearChange(1, e.target.value)}
+                        onBlur={onYearFinish}
+                    />
+                </div>
+            </div>
+
+            <SectionDivider />
+
+            {/* Jazyk */}
+            <div className="flex flex-col gap-3">
+                <p className="text-[14px] font-medium text-darkGray dark:text-white tracking-[0.1px]">
+                    {t('searchBar.language')}
+                </p>
+                <LanguageAutofill
+                    defaultLanguageCode={languageCode}
+                    languageCode={languageCode}
+                    setLanguageCode={setLanguageCode}
+                    setIsSelectionOpen={() => {}}
+                    isRequired={false}
                 />
-           
-        <div className="h-[1px] w-full bg-gray-300 my-4"></div>
-            <AdvancedCheckboxes
-                title={t('searchBar.feeds')}
-                enableSearch
-                options={feedOptions}
-                selected={activeFeeds.map(feed => feed.id)}
-                setSelected={(selected) => {
-                    const selectedFeeds = allFeeds.filter(feed => selected.includes(feed.id));
-                    setActiveFeeds(selectedFeeds);
-                }}
-            />
-          </>
-        ) : <>
-            <FeedAutofill
-                entryForm={activeFeeds[0]}
-                setEntryForm={setActiveFeeds}
-                single
-            />
-            <CategoryAutofill  
-                entryForm={activeCategories[0]}
-                setEntryForm={setActiveCategories}
-                single
-                setIsSelectionOpen={()=>{
-                    
-                }}
-             />
-        </>}
-    </div>
+            </div>
+
+            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' ? (
+                <>
+                    <SectionDivider />
+                    <AdvancedCheckboxes
+                        title={t('searchBar.categories')}
+                        options={categoryOptions}
+                        selected={activeCategories.map(cat => cat.id)}
+                        setSelected={selected => {
+                            setActiveCategories(allCategories.filter(cat => selected.includes(cat.id)));
+                        }}
+                    />
+
+                    <SectionDivider />
+                    <AdvancedCheckboxes
+                        title={t('searchBar.feeds')}
+                        enableSearch
+                        options={feedOptions}
+                        selected={activeFeeds.map(feed => feed.id)}
+                        setSelected={selected => {
+                            setActiveFeeds(allFeeds.filter(feed => selected.includes(feed.id)));
+                        }}
+                    />
+                </>
+            ) : (
+                <>
+                    <SectionDivider />
+                    <FeedAutofill
+                        entryForm={activeFeeds[0]}
+                        setEntryForm={setActiveFeeds}
+                        single
+                    />
+                    <CategoryAutofill
+                        entryForm={activeCategories[0]}
+                        setEntryForm={setActiveCategories}
+                        single
+                        setIsSelectionOpen={() => {}}
+                    />
+                </>
+            )}
+        </div>
+    );
 }

@@ -379,8 +379,10 @@ export const en = {
       feeds: 'Feeds',
       search: 'Search',
       searchAll: 'Search All',
-      yearFrom: 'Year from',
-      yearTo: 'Year to',
+      yearFrom: 'From',
+      yearTo: 'To',
+      language: 'Language',
+      availability: 'Availability',
     },
 
     // ENTRY COMPONENT

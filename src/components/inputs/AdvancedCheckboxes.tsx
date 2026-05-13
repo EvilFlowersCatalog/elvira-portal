@@ -1,11 +1,7 @@
-import { Checkbox, FormControlLabel } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { IoClose } from "react-icons/io5";
+import { IoSearch } from "react-icons/io5";
 
-/**
- * Used for advanced search options in the search bar.
- */
 export default function AdvancedCheckboxes({
     options,
     selected,
@@ -21,87 +17,91 @@ export default function AdvancedCheckboxes({
 }) {
     const { t } = useTranslation();
     const [showMore, setShowMore] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
     const [filteredOptions, setFilteredOptions] = useState(options);
 
-    useEffect(()=>{
+    useEffect(() => {
         setFilteredOptions(options);
-        setShowMore(false); // Reset showMore when options change
-    }, [options])
+        setShowMore(false);
+        setSearchQuery('');
+    }, [options]);
 
     const displayedOptions = showMore ? filteredOptions : filteredOptions.slice(0, 5);
     const remainingCount = filteredOptions.length - 5;
 
-    return <div className="relative flex flex-col">
-        <div className={`relative overflow-y-hidden`}>
-            <div className="flex flex-col">
-                <h2 className="text-[15px] capitalize font-bold mt-2 mb-1">{title}
-                    {selected.length > 0 ? <span className="text-sm text-gray-400 ml-1">({selected.length})</span> : null}</h2>
+    const handleSearch = (value: string) => {
+        setSearchQuery(value);
+        setFilteredOptions(
+            value
+                ? options.filter(o => o.label.toLowerCase().includes(value.toLowerCase()))
+                : options
+        );
+        setShowMore(false);
+    };
 
-                {enableSearch ?
-                    <input className="dark:bg-strongDarkGray dark border-gray-300 dark:border-none rounded-md px-2 py-1 mb-2 placeholder:text-gray dark:placeholder:text-lightGray" placeholder={t('searchBar.search')}
-                        onChange={(e) => {
-                            const searchValue = e.target.value.toLowerCase();
-                            if (!searchValue) {
-                                setFilteredOptions(options);
-                            } else {
-                                setFilteredOptions(options.filter(option => option.label.toLowerCase().includes(searchValue)));
-                            }
-                            setShowMore(false); // Reset showMore when searching
-                        }}
+    const toggle = (value: string, checked: boolean) => {
+        setSelected(checked ? [...selected, value] : selected.filter(v => v !== value));
+    };
+
+    return (
+        <div className="flex flex-col gap-3">
+            {title && (
+                <p className="text-[14px] font-medium text-darkGray dark:text-white tracking-[0.1px]">
+                    {title}
+                    {selected.length > 0 && (
+                        <span className="text-[13px] text-[#b1b1b1] ml-1">({selected.length})</span>
+                    )}
+                </p>
+            )}
+
+            {enableSearch && (
+                <div className="relative">
+                    <input
+                        className="w-full bg-white dark:bg-strongDarkGray rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] px-2 py-[5px] pr-7 text-[11px] text-[#b1b1b1] placeholder:text-[#b1b1b1] focus:outline-none"
+                        placeholder={t('searchBar.search')}
+                        value={searchQuery}
+                        onChange={e => handleSearch(e.target.value)}
                     />
-                    : null}
+                    <IoSearch size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-[#b1b1b1]" />
+                </div>
+            )}
 
-                {displayedOptions.map((option, index) => {
-                    return <div key={option.value}>
-                        <FormControlLabel sx={{
-                            "& .MuiFormControlLabel-label": {
-                                marginLeft: '0.5rem',
-                                userSelect: 'none',
-                            }
-                        }} control={<Checkbox sx={{
-                            "&.MuiCheckbox-root": {
-                                'padding': '1px 0',
-                                'marginLeft': '1rem',
-                            },
-                            ".dark & .MuiSvgIcon-root": {
-                                color: 'white',
-                            }
-                        }}
-                            onChange={(e) => {
-                                if (e.target.checked) {
-                                    setSelected([...selected, option.value]);
-                                } else {
-                                    setSelected(selected.filter(item => item !== option.value));
-                                }
-                            }}
+            <div className="flex flex-col gap-[7px]">
+                {displayedOptions.map(option => (
+                    <label
+                        key={option.value}
+                        className="flex items-center gap-[5px] cursor-pointer select-none"
+                    >
+                        <input
+                            type="checkbox"
                             checked={selected.includes(option.value)}
-                            />}
-                            label={option.label} />
-                    </div>;
-                })}
+                            onChange={e => toggle(option.value, e.target.checked)}
+                            className="w-[18px] h-[18px] accent-primary cursor-pointer flex-shrink-0"
+                        />
+                        <span className={`text-[14px] tracking-[0.1px] leading-[20px] ${selected.includes(option.value) ? 'font-medium' : 'font-normal'} text-darkGray dark:text-white`}>
+                            {option.label}
+                        </span>
+                    </label>
+                ))}
             </div>
+
+            {!showMore && remainingCount > 0 && (
+                <button
+                    onClick={() => setShowMore(true)}
+                    className="text-[14px] font-medium text-primary text-center tracking-[0.1px] leading-[20px] cursor-pointer"
+                >
+                    {t('common.showMore', { count: remainingCount })}
+                </button>
+            )}
+
+            {showMore && filteredOptions.length > 5 && (
+                <button
+                    onClick={() => setShowMore(false)}
+                    className="text-[14px] font-medium text-primary text-center tracking-[0.1px] leading-[20px] cursor-pointer"
+                >
+                    {t('common.showLess')}
+                </button>
+            )}
         </div>
-        
-        {!showMore && filteredOptions.length > 5 && (
-            <div 
-                onClick={(e) => {
-                    e.stopPropagation();
-                    setShowMore(true);
-                }}
-                className="mt-2 text-center w-full font-semibold text-primary dark:text-primaryLight cursor-pointer select-none px-4 py-1 rounded whitespace-nowrap">
-                {t('common.showMore', { count: remainingCount })}
-            </div>
-        )}
-        
-        {showMore && filteredOptions.length > 5 && (
-            <div
-                onClick={(e) => {
-                    e.stopPropagation();
-                    setShowMore(false);
-                }}
-                className="mt-2 flex gap-2 items-center justify-center w-full text-center font-semibold cursor-pointer select-none px-4 text-primary dark:text-primaryLight">
-                <IoClose size={24} /> {t('common.showLess')}
-            </div>
-        )}
-    </div>
+    );
 }
