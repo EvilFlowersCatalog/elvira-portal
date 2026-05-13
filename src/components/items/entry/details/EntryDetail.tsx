@@ -7,8 +7,9 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
 import useAuthContext from '../../../../hooks/contexts/useAuthContext';
 import { IEntryDetail } from '../../../../utils/interfaces/entry';
-import { ILicense } from '../../../../utils/interfaces/license';
+import { IAvailabilityResponse, ILicense, LICENSE_STATE } from '../../../../utils/interfaces/license';
 import useGetEntryDetail from '../../../../hooks/api/entries/useGetEntryDetail';
+import useGetAvailability from '../../../../hooks/api/licenses/useGetAvailability';
 import useAddToShelf from '../../../../hooks/api/my-shelf/useAddToShelf';
 import useRemoveFromShelf from '../../../../hooks/api/my-shelf/useRemoveFromShelf';
 import { NAVIGATION_PATHS } from '../../../../utils/interfaces/general/general';
@@ -25,6 +26,7 @@ import DetailModal from '../../../modals/DetailModal';
 import { Tooltip } from '@mui/material';
 import { twMerge } from 'tailwind-merge';
 import EntryItem from '../display/EntryItem';
+import { AvailabilityBadge, AvailabilityState } from './AvailabilityBadge';
 
 interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
@@ -61,6 +63,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   ]
 
   const [activeLicense, setActiveLicense] = useState<ILicense | null>(null);
+  const [availability, setAvailability] = useState<{ available: boolean; firstAvailableDate: string | null } | null>(null);
   const [update, setUpdate] = useState<boolean>(false);
   const prevLicensingEntryId = useRef<string | null>(null);
 
@@ -68,6 +71,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const navigate = useNavigate();
 
   const { getEntryDetailWithLicense } = useGetEntryDetail();
+  const getAvailability = useGetAvailability();
   const addToShelf = useAddToShelf();
   const removeFromShelf = useRemoveFromShelf();
 
@@ -177,6 +181,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   useEffect(() => {
     // Reset
     setEntry(null);
+    setAvailability(null);
     if (!entryId) return;
 
     (async () => {
@@ -191,6 +196,26 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     })();
   }, [entryId, update]);
 
+  useEffect(() => {
+    if (!entry?.config?.readium_enabled) return;
+
+    const isActiveLoan =
+      (activeLicense?.state === LICENSE_STATE.active || (activeLicense?.state as string) === 'ready') &&
+      (!activeLicense?.expires_at || new Date(activeLicense.expires_at) > new Date());
+    if (isActiveLoan) return;
+
+    const start = new Date();
+    const end = new Date();
+    end.setDate(end.getDate() + 60);
+
+    getAvailability(start, end, entry.id)
+      .then((res) => {
+        const firstAvailable = res.calendar.find((c) => c.is_available);
+        setAvailability({ available: res.available, firstAvailableDate: firstAvailable?.date ?? null });
+      })
+      .catch(() => setAvailability(null));
+  }, [entry?.id, activeLicense?.id]);
+
   const askAi = () => {
     setShowAiAssistant(true);
     const params = new URLSearchParams(searchParams);
@@ -199,6 +224,30 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     setSearchParams(params);
   };
 
+
+  const getAvailabilityBadge = (): { state: AvailabilityState; date: string | null } | null => {
+    if (!entry?.config?.readium_enabled) return null;
+
+    const isActiveLoan =
+      (activeLicense?.state === LICENSE_STATE.active || (activeLicense?.state as string) === 'ready') &&
+      (!activeLicense?.expires_at || new Date(activeLicense.expires_at) > new Date());
+
+    if (isActiveLoan && activeLicense) {
+      return { state: 'borrowed', date: activeLicense.expires_at };
+    }
+
+    if (activeLicense?.state === LICENSE_STATE.draft) {
+      return { state: 'reserved', date: activeLicense.starts_at };
+    }
+
+    if (!availability) return null;
+
+    if (availability.available) return { state: 'available', date: null };
+
+    return { state: 'unavailable', date: availability.firstAvailableDate };
+  };
+
+  const availabilityBadge = getAvailabilityBadge();
 
   if (!entryId) return <></>;
 
@@ -226,6 +275,12 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                 alt='Entry Thumbnail'
               />
             </div>
+
+            {availabilityBadge && (
+              <div className="flex justify-center mt-2">
+                <AvailabilityBadge state={availabilityBadge.state} date={availabilityBadge.date} />
+              </div>
+            )}
 
             <ActionsWrapper>
               <div className="col-span-2">

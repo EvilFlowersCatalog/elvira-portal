@@ -42,9 +42,7 @@ const PDFButton = ({ acquisition, index, entryId, catalogId, children }: IPDFBut
   };
 
   return (
-    <button onClick={(e)=>{
-      handleRead(e)
-    }}>
+    <button className="w-full" onClick={(e) => handleRead(e)}>
       {children}
     </button>
   );

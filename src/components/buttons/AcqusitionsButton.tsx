@@ -97,14 +97,14 @@ export default function AcquisitionsButton({
               onClick={() => setShowExtend(true)}
             >
               <LuRepeat2 size={20} className="flex-shrink-0" />
-              Predĺžiť
+              {t('entry.detail.extend')}
             </button>
             <button
               className={`${ActionButtonStyle} flex-1 cursor-pointer`}
               onClick={() => setShowReturn(true)}
             >
               <MdOutlineKeyboardReturn size={20} className="flex-shrink-0" />
-              Vrátiť
+              {t('entry.detail.return')}
             </button>
           </div>
         </div>
@@ -134,7 +134,7 @@ export default function AcquisitionsButton({
           onClick={() => setShowCancel(true)}
         >
           <HiOutlineUsers size={24} className="flex-shrink-0" />
-          Zrušiť rezerváciu
+          {t('entry.detail.cancelReservation')}
         </button>
         {showCancel && (
           <CancelReservationModal

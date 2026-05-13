@@ -416,6 +416,16 @@ export const en = {
           related: 'Related',
         },
         askAi: 'Ask AI',
+        availability: {
+          available: 'Available',
+          borrowed: 'Borrowed',
+          borrowedUntil: 'Borrowed until',
+          reserved: 'Reserved',
+          unavailable: 'Unavailable',
+        },
+        cancelReservation: 'Cancel',
+        extend: 'Extend',
+        return: 'Return',
       },
       badge: {
         read: 'Read',

@@ -411,6 +411,16 @@ export const sk = {
           related: 'Súvisiace',
         },
         askAi: 'Spýtať sa AI',
+        availability: {
+          available: 'Dostupné',
+          borrowed: 'Požičané',
+          borrowedUntil: 'Požičané do',
+          reserved: 'Rezervované',
+          unavailable: 'Nedostupné',
+        },
+        cancelReservation: 'Zrušiť',
+        extend: 'Predĺžiť',
+        return: 'Vrátiť',
       },
       badge: {
         read: 'Čítať',
