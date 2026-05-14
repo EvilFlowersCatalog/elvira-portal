@@ -5,6 +5,7 @@ import { format, parseISO, differenceInDays } from 'date-fns';
 import { toast } from 'react-toastify';
 import { ILicense, LICENSE_STATE } from '../../utils/interfaces/license';
 import useUpdateLicenseState from '../../hooks/api/licenses/useUpdateLicense';
+import useAuthContext from '../../hooks/contexts/useAuthContext';
 
 interface Props {
   license: ILicense;
@@ -15,6 +16,7 @@ interface Props {
 export default function ReturnBookModal({ license, onClose, onSuccess }: Props) {
   const [loading, setLoading] = useState(false);
   const updateLicense = useUpdateLicenseState();
+  const { auth } = useAuthContext();
 
   const expiresAt = parseISO(license.expires_at);
   const daysLeft = differenceInDays(expiresAt, new Date());
@@ -50,7 +52,15 @@ export default function ReturnBookModal({ license, onClose, onSuccess }: Props) 
 
         {/* Book info card */}
         <div className="bg-lightGray dark:bg-zinc-700 rounded-xl p-4 flex gap-3 items-center mb-8">
-          <div className="w-[55px] h-[78px] rounded-[5px] bg-gray-300 shrink-0" />
+          {license.entry?.thumbnail ? (
+            <img
+              src={`${license.entry.thumbnail}?access_token=${auth?.token}`}
+              alt={license.entry.title}
+              className="w-[55px] h-[78px] rounded-[5px] object-cover shrink-0"
+            />
+          ) : (
+            <div className="w-[55px] h-[78px] rounded-[5px] bg-gray-300 shrink-0" />
+          )}
           <div className="flex flex-col gap-2 min-w-0 flex-1">
             <p className="font-semibold text-sm text-secondary dark:text-secondaryLight truncate">
               {license.entry?.title || 'Neznámy titul'}
