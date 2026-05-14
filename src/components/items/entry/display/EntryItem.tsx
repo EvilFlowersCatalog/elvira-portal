@@ -8,6 +8,7 @@ import { toast } from 'react-toastify';
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { NAVIGATION_PATHS } from "../../../../utils/interfaces/general/general";
 import useAppContext from "../../../../hooks/contexts/useAppContext";
+import { AvailabilityBadge, AvailabilityState } from "../details/AvailabilityBadge";
 
 
 interface IEntryItem {
@@ -15,11 +16,10 @@ interface IEntryItem {
     triggerReload?: () => void;
     id?: string;
     type?: 'ai-recommendation' | 'library-item';
-    nextLendWindowDays?: number | null;
     hasActiveLoan?: boolean;
 }
 
-export default function EntryItem({ entry, triggerReload, id, type, nextLendWindowDays, hasActiveLoan }: IEntryItem) {
+export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoan }: IEntryItem) {
     const { titleLogoDark } = useAppContext();
     const { auth } = useAuthContext();
     const { t } = useTranslation();
@@ -102,42 +102,15 @@ export default function EntryItem({ entry, triggerReload, id, type, nextLendWind
         setIsFallbackImage(true);
     }
 
-    const readiumEnabled = Boolean((entry as IEntryDetail).config?.readium_enabled);
     const hasAcquisitions = entry.acquisitions?.length > 0;
+    const readiumEnabled = Boolean((entry as IEntryDetail).config?.readium_enabled);
+    const lcpState = entry.lcp_state;
 
-    const badge = (() => {
-        if (hasActiveLoan) {
-            return {
-                label: t('entry.badge.download', { defaultValue: 'Download' }),
-                dotClass: 'bg-blue-700 dark:bg-blue-300',
-                pillClass: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-            };
-        }
-
-        if (readiumEnabled) {
-            if (typeof nextLendWindowDays === 'number' && nextLendWindowDays > 0) {
-                return {
-                    label: t('entry.badge.lendInDays', { defaultValue: 'Lend in {{days}} days', days: nextLendWindowDays }),
-                    dotClass: 'bg-amber-700 dark:bg-amber-300',
-                    pillClass: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
-                };
-            }
-
-            return {
-                label: t('entry.badge.lend', { defaultValue: 'Lend' }),
-                dotClass: 'bg-amber-700 dark:bg-amber-300',
-                pillClass: 'bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
-            };
-        }
-
-        if (hasAcquisitions) {
-            return {
-                label: t('entry.badge.read', { defaultValue: 'Read' }),
-                dotClass: 'bg-emerald-600 dark:bg-emerald-300',
-                pillClass: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900 dark:text-emerald-200'
-            };
-        }
-
+    const availabilityState = ((): AvailabilityState | null => {
+        if (hasActiveLoan || lcpState === 'active_loan_for_user' || !!entry.user_active_license_id) return 'borrowed';
+        if (entry.user_reservation_id) return 'reserved';
+        if (lcpState === 'fully_borrowed' || lcpState === 'available_in_days') return 'unavailable';
+        if (lcpState === 'available_now' || readiumEnabled) return 'available';
         return null;
     })();
 
@@ -220,14 +193,20 @@ export default function EntryItem({ entry, triggerReload, id, type, nextLendWind
             </div>
 
             {/* Badge */}
-            {badge && (
-                <div className="shrink-0 px-[7.5px]">
-                    <div className={`inline-flex items-center gap-[4px] h-[12px] px-[7px] rounded-[6px] ${badge.pillClass}`}>
-                        <div className={`rounded-full size-[4.5px] shrink-0 ${badge.dotClass}`} />
-                        <span className="text-[9px] tracking-[0.1px] whitespace-nowrap leading-none">{badge.label}</span>
+            <div className="shrink-0 px-[7.5px]">
+                {availabilityState ? (
+                    <AvailabilityBadge state={availabilityState} size="small" />
+                ) : hasAcquisitions ? (
+                    <div className="inline-flex items-center gap-[4px] h-[12px] px-[7px] rounded-[6px] bg-[#cfffd8]">
+                        <div className="rounded-full size-[4.5px] shrink-0 bg-[#005e11]" />
+                        <span className="text-[9px] text-[#005e11] tracking-[0.1px] whitespace-nowrap leading-none">
+                            {t('entry.badge.read', { defaultValue: 'Read' })}
+                        </span>
                     </div>
-                </div>
-            )}
+                ) : (
+                    <div className="inline-block h-[12px] w-[72px] rounded-[6px] bg-zinc-200 dark:bg-zinc-700 animate-pulse" />
+                )}
+            </div>
         </div>
     );
 }

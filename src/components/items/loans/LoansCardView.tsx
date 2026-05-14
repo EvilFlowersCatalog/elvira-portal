@@ -3,10 +3,9 @@ import { useSearchParams } from 'react-router-dom';
 import { differenceInDays, format, parseISO } from 'date-fns';
 import { toast } from 'react-toastify';
 import { RxCalendar } from 'react-icons/rx';
-import { LuDownload, LuRepeat2, LuClock } from 'react-icons/lu';
+import { LuDownload, LuClock } from 'react-icons/lu';
 import { BsArrowReturnLeft } from 'react-icons/bs';
 import { MdMoreTime } from 'react-icons/md';
-import { HiOutlineUsers } from 'react-icons/hi';
 import { IoClose } from 'react-icons/io5';
 import { RiBookmarkLine } from 'react-icons/ri';
 import { useTranslation } from 'react-i18next';
@@ -45,35 +44,12 @@ function DaysLeftBadge({ daysLeft }: { daysLeft: number }) {
   );
 }
 
-function ExtensionsBadge({ count }: { count: number }) {
-  const word = count === 1 ? 'predĺženie' : count >= 2 && count <= 4 ? 'predĺženia' : 'predĺžení';
-  return (
-    <span className="flex items-center gap-[5px] h-[16px] px-2 rounded-[4px] bg-[#e0fff2] shrink-0">
-      <LuRepeat2 size={11} className="text-[#005e11] shrink-0" />
-      <span className="text-[10px] text-[#005e11] tracking-[0.1px] whitespace-nowrap">
-        <strong>{count}</strong> {word}
-      </span>
-    </span>
-  );
-}
-
 function ReservedDateBadge({ date }: { date: string }) {
   return (
     <span className="flex items-center gap-[5px] h-[16px] px-2 rounded-[4px] bg-[#feeecc] shrink-0">
       <RxCalendar size={11} className="text-[#9f6c00] shrink-0" />
       <span className="text-[10px] text-[#9f6c00] tracking-[0.1px] whitespace-nowrap">
         Rezervované: {date}
-      </span>
-    </span>
-  );
-}
-
-function QueueBadge({ position, total }: { position: number; total: number }) {
-  return (
-    <span className="flex items-center gap-[5px] h-[16px] px-2 rounded-[4px] bg-[#feeecc] shrink-0">
-      <HiOutlineUsers size={11} className="text-[#9f6c00] shrink-0" />
-      <span className="text-[10px] text-[#9f6c00] tracking-[0.1px] whitespace-nowrap">
-        Poradie: <strong>{position}.</strong> /{total}
       </span>
     </span>
   );
@@ -116,24 +92,27 @@ function BorrowedCard({
   onDownload,
   onExtend,
   onReturn,
+  onOpenDetail,
 }: {
   license: ILicense;
   token?: string;
   onDownload: (id: string) => void;
   onExtend: (license: ILicense) => void;
   onReturn: (license: ILicense) => void;
+  onOpenDetail: (entryId: string, catalogId?: string) => void;
 }) {
   const expiresAt = parseISO(license.expires_at);
   const startsAt = parseISO(license.starts_at);
   const daysLeft = differenceInDays(expiresAt, new Date());
   const borrowedFrom = format(startsAt, 'dd.MM.yyyy');
   const dueDate = format(expiresAt, 'dd.MM.yyyy');
-  const PLACEHOLDER_EXTENSIONS = 0;
-  const canExtend = PLACEHOLDER_EXTENSIONS < 2;
 
   return (
     <div className="w-full bg-white border border-[#e5e5e5] rounded-[6px] p-3 flex gap-3">
-      <div className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden">
+      <div
+        className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden cursor-pointer"
+        onClick={() => onOpenDetail(license.entry_id, license.entry?.catalog_id)}
+      >
         <img
           alt={license.entry?.title}
           src={license.entry?.thumbnail ? `${license.entry.thumbnail}?access_token=${token}` : '/assets/thumbnail.webp'}
@@ -144,7 +123,10 @@ function BorrowedCard({
       <div className="flex-1 min-w-0 flex flex-col gap-2 justify-between py-0.5">
         <div className="flex items-start justify-between gap-2 flex-wrap">
           <div className="min-w-0">
-            <p className="font-semibold text-[14px] text-[#15384e] tracking-[0.1px] truncate leading-normal">
+            <p
+              className="font-semibold text-[14px] text-[#15384e] tracking-[0.1px] truncate leading-normal cursor-pointer hover:underline"
+              onClick={() => onOpenDetail(license.entry_id, license.entry?.catalog_id)}
+            >
               {license.entry?.title || 'Neznámy titul'}
             </p>
             <p className="font-light text-[12px] text-[#15384e] tracking-[0.1px]">Autor</p>
@@ -161,10 +143,9 @@ function BorrowedCard({
           <div className="flex flex-wrap gap-[6px]">
             <BorrowedDateBadge date={borrowedFrom} />
             <DaysLeftBadge daysLeft={daysLeft} />
-            <ExtensionsBadge count={PLACEHOLDER_EXTENSIONS} />
           </div>
           <div className="flex gap-[10px] flex-wrap">
-            <ActionBtn icon={<MdMoreTime size={20} />} label="Predĺžiť" disabled={!canExtend} onClick={() => onExtend(license)} />
+            <ActionBtn icon={<MdMoreTime size={20} />} label="Predĺžiť" onClick={() => onExtend(license)} />
             <ActionBtn icon={<BsArrowReturnLeft size={20} />} label="Vrátiť" onClick={() => onReturn(license)} />
             <ActionBtn icon={<LuDownload size={20} />} label="Stiahnuť" filled onClick={() => onDownload(license.lcp_license_id || license.id)} />
           </div>
@@ -178,21 +159,24 @@ function ReservedCard({
   license,
   token,
   onCancel,
+  onOpenDetail,
 }: {
   license: ILicense;
   token?: string;
   onCancel: (license: ILicense) => void;
+  onOpenDetail: (entryId: string, catalogId?: string) => void;
 }) {
   const startsAt = parseISO(license.starts_at);
   const expiresAt = parseISO(license.expires_at);
   const reservedDate = format(startsAt, 'dd.MM');
   const availableFrom = format(expiresAt, 'dd.MM.yyyy');
-  const PLACEHOLDER_QUEUE_POSITION = 1;
-  const PLACEHOLDER_QUEUE_TOTAL = 3;
 
   return (
     <div className="w-full bg-white border border-[#e5e5e5] rounded-[6px] p-3 flex gap-3">
-      <div className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden">
+      <div
+        className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden cursor-pointer"
+        onClick={() => onOpenDetail(license.entry_id, license.entry?.catalog_id)}
+      >
         <img
           alt={license.entry?.title}
           src={license.entry?.thumbnail ? `${license.entry.thumbnail}?access_token=${token}` : '/assets/thumbnail.webp'}
@@ -203,7 +187,10 @@ function ReservedCard({
       <div className="flex-1 min-w-0 flex flex-col gap-2 justify-between py-0.5">
         <div className="flex items-start justify-between gap-2 flex-wrap">
           <div className="min-w-0">
-            <p className="font-semibold text-[14px] text-[#15384e] tracking-[0.1px] truncate leading-normal">
+            <p
+              className="font-semibold text-[14px] text-[#15384e] tracking-[0.1px] truncate leading-normal cursor-pointer hover:underline"
+              onClick={() => onOpenDetail(license.entry_id, license.entry?.catalog_id)}
+            >
               {license.entry?.title || 'Neznámy titul'}
             </p>
             <p className="font-light text-[12px] text-[#15384e] tracking-[0.1px]">Autor</p>
@@ -219,7 +206,6 @@ function ReservedCard({
         <div className="flex items-center justify-between gap-2 flex-wrap">
           <div className="flex flex-wrap gap-[6px]">
             <ReservedDateBadge date={reservedDate} />
-            <QueueBadge position={PLACEHOLDER_QUEUE_POSITION} total={PLACEHOLDER_QUEUE_TOTAL} />
           </div>
           <ActionBtn icon={<IoClose size={20} />} label="Zrušiť" onClick={() => onCancel(license)} />
         </div>
@@ -381,6 +367,7 @@ export default function LoansCardView() {
                   onDownload={handleDownload}
                   onExtend={setExtendLicense}
                   onReturn={setReturnLicense}
+                  onOpenDetail={openEntryDetail}
                 />
               ))
             )}
@@ -395,7 +382,7 @@ export default function LoansCardView() {
             </p>
             <div className="flex flex-col gap-[12px] w-full">
               {reserved.map((license) => (
-                <ReservedCard key={license.id} license={license} token={auth?.token} onCancel={setCancelLicense} />
+                <ReservedCard key={license.id} license={license} token={auth?.token} onCancel={setCancelLicense} onOpenDetail={openEntryDetail} />
               ))}
             </div>
           </div>

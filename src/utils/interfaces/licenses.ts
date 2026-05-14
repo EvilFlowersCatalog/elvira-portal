@@ -36,6 +36,8 @@ export interface ILicense {
   entry?: {
     id: string;
     title: string;
+    catalog_id?: string;
+    thumbnail?: string;
   };
   lcp_license_id?: string;
   starts_at: string;

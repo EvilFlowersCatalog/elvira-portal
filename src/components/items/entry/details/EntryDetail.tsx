@@ -276,9 +276,13 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               />
             </div>
 
-            {availabilityBadge && (
+            {entry?.config?.readium_enabled && (
               <div className="flex justify-center mt-2">
-                <AvailabilityBadge state={availabilityBadge.state} date={availabilityBadge.date} />
+                {availabilityBadge ? (
+                  <AvailabilityBadge state={availabilityBadge.state} date={availabilityBadge.date} />
+                ) : (
+                  <div className="w-full h-[24px] rounded-md bg-zinc-200 dark:bg-zinc-700 animate-pulse" />
+                )}
               </div>
             )}
 

@@ -394,6 +394,8 @@ export const en = {
         pages: 'Pages',
         rating: 'Rating',
         views: 'Views',
+        availableSlots: 'Available slots',
+        activeSlots: 'Borrowed/Total',
         lang: 'Language',
         feeds: 'Feeds',
         categories: 'Categories',
@@ -434,6 +436,7 @@ export const en = {
         lend: 'Lend',
         lendInDays: 'Lend in {{days}} days',
         download: 'Download',
+        reserve: 'Reserve',
       },
       wizard: {
         requiredMessages: {

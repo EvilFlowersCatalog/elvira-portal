@@ -5,6 +5,8 @@ import { IFeed } from './feed';
 import { IConfig, IMetadata } from './general/general';
 import { ILanguage } from './language';
 
+export type LcpState = 'not_lcp' | 'available_now' | 'active_loan_for_user' | 'fully_borrowed' | 'available_in_days';
+
 export interface IEntriesList {
   items: IEntry[];
   metadata: IMetadata;
@@ -26,6 +28,16 @@ export interface IEntry {
   updated_at: string;
   shelf_record_id: string;
   thumbnail: string;
+  lcp_state: LcpState;
+  available_slots: number;
+  total_slots: number;
+  active_count: number;
+  over_saturated: boolean;
+  next_available_at: string | null;
+  user_active_license_id: string | null;
+  queue_length: number;
+  user_reservation_id: string | null;
+  user_position: number | null;
 }
 
 export interface IEntryDetail {
@@ -50,6 +62,16 @@ export interface IEntryDetail {
   citation: string;
   shelf_record_id: string;
   thumbnail: string;
+  lcp_state: LcpState;
+  available_slots: number;
+  total_slots: number;
+  active_count: number;
+  over_saturated: boolean;
+  next_available_at: string | null;
+  user_active_license_id: string | null;
+  queue_length: number;
+  user_reservation_id: string | null;
+  user_position: number | null;
 }
 
 export interface IEntryQuery {

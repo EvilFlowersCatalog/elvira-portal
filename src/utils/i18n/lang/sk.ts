@@ -390,6 +390,8 @@ export const sk = {
         pages: 'Strán',
         rating: 'Hodnotenie',
         views: 'Čitateľov',
+        availableSlots: 'Voľné miesta',
+        activeSlots: 'Požičané/Celkom',
         lang: 'Jazyk',
         feeds: 'Skupiny',
         categories: 'Kategórie',
@@ -429,6 +431,7 @@ export const sk = {
         lend: 'Vypožičať',
         lendInDays: 'Vypožičať o {{days}} dní',
         download: 'Stiahnuť',
+        reserve: 'Rezervovať',
       },
       wizard: {
         requiredMessages: {

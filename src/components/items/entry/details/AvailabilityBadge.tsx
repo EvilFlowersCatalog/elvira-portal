@@ -6,6 +6,7 @@ export type AvailabilityState = 'available' | 'borrowed' | 'reserved' | 'unavail
 interface AvailabilityBadgeProps {
   state: AvailabilityState;
   date?: string | null;
+  size?: 'small' | 'big';
 }
 
 const CONFIGS = {
@@ -21,23 +22,34 @@ const CONFIGS = {
   },
   reserved: {
     bg: 'bg-[#feeecc]',
-    dot: 'bg-[#efb230]',
+    dot: 'bg-[#9f6c00]',
     text: 'text-[#9f6c00]',
   },
   unavailable: {
     bg: 'bg-[#ebebeb] dark:bg-neutral-700',
-    dot: 'bg-[#8a8a8a]',
+    dot: 'bg-[#575757]',
     text: 'text-[#575757] dark:text-neutral-300',
   },
 } as const;
 
-export function AvailabilityBadge({ state, date }: AvailabilityBadgeProps) {
+export function AvailabilityBadge({ state, date, size = 'big' }: AvailabilityBadgeProps) {
   const { t } = useTranslation();
   const config = CONFIGS[state];
 
   const formattedDate = date
     ? new Date(date).toLocaleDateString('sk-SK', { day: 'numeric', month: 'numeric' })
     : null;
+
+  if (size === 'small') {
+    return (
+      <div className={`inline-flex items-center gap-[4px] h-[12px] px-[7px] rounded-[6px] ${config.bg} ${config.text}`}>
+        <span className={`rounded-full size-[4.5px] shrink-0 ${config.dot}`} />
+        <span className="text-[9px] tracking-[0.1px] whitespace-nowrap leading-none">
+          {t(`entry.detail.availability.${state}`)}
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div

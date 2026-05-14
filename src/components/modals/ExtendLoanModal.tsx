@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { RiCloseLine } from 'react-icons/ri';
-import { LuRepeat2 } from 'react-icons/lu';
 import { FiCheckCircle } from 'react-icons/fi';
 import { format, parseISO, addDays, differenceInDays } from 'date-fns';
 import { toast } from 'react-toastify';
-import { ILicense, LICENSE_STATE } from '../../utils/interfaces/license';
-import useUpdateLicenseState from '../../hooks/api/licenses/useUpdateLicense';
+import { ILicense } from '../../utils/interfaces/license';
+import useRenewLicense from '../../hooks/api/licenses/useRenewLicense';
 
 interface Props {
   license: ILicense;
@@ -17,7 +16,7 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
   const [selected, setSelected] = useState<1 | 2>(1);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const updateLicense = useUpdateLicenseState();
+  const renewLicense = useRenewLicense();
 
   const expiresAt = parseISO(license.expires_at);
   const daysLeft = differenceInDays(expiresAt, new Date());
@@ -29,7 +28,7 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
   const handleExtend = async () => {
     setLoading(true);
     try {
-      await updateLicense(license.id, LICENSE_STATE.active, selected === 1 ? 'P7D' : 'P14D');
+      await renewLicense(license.id, selected === 1 ? 'P7D' : 'P14D');
       setSuccess(true);
       onSuccess();
     } catch {
@@ -100,10 +99,6 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-sm font-semibold text-secondary dark:text-secondaryLight">Doba predĺženia:</span>
-                <span className="flex items-center gap-1 text-xs text-gray-500">
-                  <LuRepeat2 size={13} />
-                  Počet predĺžení: 0/2
-                </span>
               </div>
               <div className="flex flex-col gap-2">
                 {[

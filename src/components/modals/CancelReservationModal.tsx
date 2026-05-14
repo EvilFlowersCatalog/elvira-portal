@@ -4,8 +4,8 @@ import { RxCalendar } from 'react-icons/rx';
 import { HiOutlineUsers } from 'react-icons/hi';
 import { format, parseISO } from 'date-fns';
 import { toast } from 'react-toastify';
-import { ILicense, LICENSE_STATE } from '../../utils/interfaces/license';
-import useUpdateLicenseState from '../../hooks/api/licenses/useUpdateLicense';
+import { ILicense } from '../../utils/interfaces/license';
+import useCancelReservation from '../../hooks/api/reservations/useCancelReservation';
 
 interface Props {
   license: ILicense;
@@ -17,14 +17,14 @@ interface Props {
 
 export default function CancelReservationModal({ license, onClose, onSuccess, queuePosition = 1, queueTotal = 3 }: Props) {
   const [loading, setLoading] = useState(false);
-  const updateLicense = useUpdateLicenseState();
+  const cancelReservation = useCancelReservation();
 
   const expiresAt = license.expires_at ? parseISO(license.expires_at) : null;
 
   const handleCancel = async () => {
     setLoading(true);
     try {
-      await updateLicense(license.id, LICENSE_STATE.cancelled);
+      await cancelReservation(license.id);
       toast.success('Rezervácia bola zrušená.');
       onSuccess();
       onClose();
