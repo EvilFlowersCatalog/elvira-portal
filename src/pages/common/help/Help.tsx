@@ -3,10 +3,10 @@ import { FiChevronDown, FiChevronUp, FiSearch, FiUser, FiFileText, FiBook } from
 import { HiOutlineMail } from 'react-icons/hi';
 import { RiAiGenerate } from 'react-icons/ri';
 import { BsDiscord } from 'react-icons/bs';
-import Breadcrumb from '../../components/buttons/Breadcrumb';
-import { LoansIcon, LibraryIcon } from '../../components/header/navbar/NavbarIcons';
-import useAppContext from '../../hooks/contexts/useAppContext';
-import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
+import Breadcrumb from '../../../components/buttons/Breadcrumb';
+import { LoansIcon, LibraryIcon } from '../../../components/header/navbar/NavbarIcons';
+import useAppContext from '../../../hooks/contexts/useAppContext';
+import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 
 interface TopicCard {
   title: string;
@@ -35,11 +35,13 @@ const Help = () => {
       title: 'Knihy',
       description: 'Informácie o knihách a licenciách v našom katalógu.',
       icon: <LibraryIcon size={30} />,
+      path: NAVIGATION_PATHS.helpBooks,
     },
     {
       title: 'Vyhľadávanie v katalógu',
       description: 'Všetko o keyword a sémantickom vyhľadávaní v katalógu kníh.',
       icon: <FiSearch size={30} />,
+      path: NAVIGATION_PATHS.helpSearch,
     },
     {
       title: 'Výpožičky a rezervácie',
@@ -51,16 +53,19 @@ const Help = () => {
       title: 'PDF Viewer',
       description: 'Informácie o používaní PDF čítačky a riešenie problémov.',
       icon: <FiFileText size={30} />,
+      path: NAVIGATION_PATHS.helpViewer,
     },
     {
       title: 'AI Asistent',
       description: 'Využite AI Asistenta pri vyhľadávaní, učení, prehľadávaní kníh...',
       icon: <RiAiGenerate size={30} />,
+      path: NAVIGATION_PATHS.helpAi,
     },
     {
       title: 'Profil',
       description: 'Spravujte svoj účet, nastavenia a notifikácie.',
       icon: <FiUser size={30} />,
+      path: NAVIGATION_PATHS.helpProfile,
     },
   ];
 

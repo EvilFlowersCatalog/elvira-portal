@@ -18,8 +18,13 @@ import AdminHome from '../pages/admin/AdminHome';
 import AdminAddEntry from '../pages/admin/entries/AdminAddEntry';
 import Auth from '../pages/auth/Auth';
 import Loans from '../pages/common/Loans';
-import Help from '../pages/common/Help';
-import HelpLoans from '../pages/common/HelpLoans';
+import Help from '../pages/common/help/Help';
+import HelpLoans from '../pages/common/help/HelpLoans';
+import HelpBooks from '../pages/common/help/HelpBooks';
+import HelpSearch from '../pages/common/help/HelpSearch';
+import HelpViewer from '../pages/common/help/HelpViewer';
+import HelpAi from '../pages/common/help/HelpAi';
+import HelpProfile from '../pages/common/help/HelpProfile';
 import AdminUsers from '../pages/admin/AdminUsers';
 import AdminAIUsers from '../pages/admin/AdminAIUsers';
 import AdminLoans from '../pages/admin/AdminLoans';
@@ -55,6 +60,19 @@ const BaseRoutes = () => {
           element={<Navigate to={NAVIGATION_PATHS.notFound} replace />}
         ></Route>
 
+        {/* Help — public, reachable without login */}
+        { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+          <>
+            <Route path='help' element={<Help />} />
+            <Route path='help/books' element={<HelpBooks />} />
+            <Route path='help/search' element={<HelpSearch />} />
+            <Route path='help/loans' element={<HelpLoans />} />
+            <Route path='help/viewer' element={<HelpViewer />} />
+            <Route path='help/ai' element={<HelpAi />} />
+            <Route path='help/profile' element={<HelpProfile />} />
+          </>
+        ) }
+
         {/* Only authorized */}
         <Route element={<RequireAuth />}>
           <Route index element={<Home />} />
@@ -66,12 +84,6 @@ const BaseRoutes = () => {
           ) }
           { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
             <Route path='loans' element={<Loans />} />
-          ) }
-          { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
-            <>
-              <Route path='help' element={<Help />} />
-              <Route path='help/loans' element={<HelpLoans />} />
-            </>
           ) }
           <Route path='feeds' element={<Feeds />} />
           <Route path='ai-assistant' element={<AiAssistantPage />} />
