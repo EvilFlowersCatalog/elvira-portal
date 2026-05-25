@@ -1,28 +1,35 @@
-import useAuth from '../../contexts/useAuthContext';
+import { ILicense } from '../../../utils/interfaces/license';
+import useAxios from '../useAxios';
 
 const useDownloadLicense = () => {
-    const { auth } = useAuth();
+    const axios = useAxios();
 
-    const getLicenseUrls = (license_id: string) => {
-        const base = import.meta.env.ELVIRA_BASE_URL;
-        return {
-            thorium: `${base.replace("https://", "thorium://")}/readium/v1/licenses/${license_id}.lcpl?access_token=${auth?.token}`,
-            download: `${base}/readium/v1/licenses/${license_id}.lcpl?access_token=${auth?.token}`,
-        };
+    const resolveDownloadUrl = async (license: Pick<ILicense, 'id'> & { download_url?: string }): Promise<string> => {
+        if (license.download_url) return license.download_url;
+
+        const { data } = await axios.get<{ response?: ILicense } & Partial<ILicense>>(
+            `/readium/v1/licenses/${license.id}`,
+        );
+        const fresh = data.response ?? (data as ILicense);
+        if (!fresh.download_url) {
+            throw new Error('License response is missing a download_url');
+        }
+        return fresh.download_url;
     };
 
-    const openInThorium = (license_id: string): void => {
-        const { thorium } = getLicenseUrls(license_id);
-        const iframe = document.createElement("iframe");
-        iframe.style.display = "none";
+    const openInThorium = async (license: Pick<ILicense, 'id'> & { download_url?: string }): Promise<void> => {
+        const url = await resolveDownloadUrl(license);
+        const thorium = url.replace(/^https?:\/\//, 'thorium://');
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
         document.body.appendChild(iframe);
         iframe.src = thorium;
         setTimeout(() => document.body.removeChild(iframe), 5000);
     };
 
-    const downloadDirect = (license_id: string): void => {
-        const { download } = getLicenseUrls(license_id);
-        window.location.href = download;
+    const downloadDirect = async (license: Pick<ILicense, 'id'> & { download_url?: string }): Promise<void> => {
+        const url = await resolveDownloadUrl(license);
+        window.location.href = url;
     };
 
     return { openInThorium, downloadDirect };

@@ -76,8 +76,7 @@ const Profile = () => {
 
         const now = new Date();
         const active = licenseData.items.filter((l) => {
-          const isActiveState = l.state === LICENSE_STATE.active || (l.state as string) === 'ready';
-          return isActiveState && new Date(l.starts_at) <= now && new Date(l.expires_at) > now;
+          return l.state === LICENSE_STATE.active && new Date(l.starts_at) <= now && new Date(l.expires_at) > now;
         });
         setLoansCount(active.length);
       } catch {

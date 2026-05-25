@@ -2,6 +2,7 @@
 export const DurationValidation = /^P(?!P)(?:(\d+Y)?(\d+M)?(\d+D)?(T(?:(\d+H)?(\d+M)?(\d+S)?))?)?$/;
 
 export type InterfaceState = import('./licenses').LICENSE_STATE;
+export type InterfaceAction = import('./licenses').LICENSE_ACTION;
 
 export interface ILicenseEntry {
 	id: string;
@@ -19,12 +20,12 @@ export interface ILicense {
 	updated_at: string;
 	starts_at: string;
 	expires_at: string;
-	// Some parts of the codebase expect either a download `url` or an
-	// `lcp_license_id` field — make both optional to be compatible.
 	lcp_license_id?: string;
 	url?: string;
 	download_url?: string;
 	entry?: ILicenseEntry;
+	renewal_count: number;
+	renewals_remaining: number | null;
 }
 
 export interface INewLicense {
@@ -45,4 +46,4 @@ export interface IAvailabilityResponse {
 	}[];
 }
 
-export { LICENSE_STATE } from './licenses';
+export { LICENSE_STATE, LICENSE_ACTION } from './licenses';

@@ -200,7 +200,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     if (!entry?.config?.readium_enabled) return;
 
     const isActiveLoan =
-      (activeLicense?.state === LICENSE_STATE.active || (activeLicense?.state as string) === 'ready') &&
+      activeLicense?.state === LICENSE_STATE.active &&
       (!activeLicense?.expires_at || new Date(activeLicense.expires_at) > new Date());
     if (isActiveLoan) return;
 
@@ -229,14 +229,14 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     if (!entry?.config?.readium_enabled) return null;
 
     const isActiveLoan =
-      (activeLicense?.state === LICENSE_STATE.active || (activeLicense?.state as string) === 'ready') &&
+      activeLicense?.state === LICENSE_STATE.active &&
       (!activeLicense?.expires_at || new Date(activeLicense.expires_at) > new Date());
 
     if (isActiveLoan && activeLicense) {
       return { state: 'borrowed', date: activeLicense.expires_at };
     }
 
-    if (activeLicense?.state === LICENSE_STATE.draft) {
+    if (activeLicense?.state === LICENSE_STATE.ready) {
       return { state: 'reserved', date: activeLicense.starts_at };
     }
 

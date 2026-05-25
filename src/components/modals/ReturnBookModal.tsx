@@ -3,7 +3,7 @@ import { RiCloseLine } from 'react-icons/ri';
 import { RxCalendar } from 'react-icons/rx';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { toast } from 'react-toastify';
-import { ILicense, LICENSE_STATE } from '../../utils/interfaces/license';
+import { ILicense, LICENSE_ACTION } from '../../utils/interfaces/license';
 import useUpdateLicenseState from '../../hooks/api/licenses/useUpdateLicense';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 
@@ -25,7 +25,7 @@ export default function ReturnBookModal({ license, onClose, onSuccess }: Props) 
   const handleReturn = async () => {
     setLoading(true);
     try {
-      await updateLicense(license.id, LICENSE_STATE.returned);
+      await updateLicense(license.id, LICENSE_ACTION.returned);
       toast.success('Kniha bola úspešne vrátená.');
       onSuccess();
       onClose();

@@ -299,12 +299,11 @@ export default function LoansCardView() {
         const now = new Date();
         setBorrowed(
           items.filter((l) => {
-            const isActiveState = l.state === LICENSE_STATE.active || (l.state as string) === 'ready';
-            return isActiveState && new Date(l.starts_at) <= now && new Date(l.expires_at) > now;
+            return l.state === LICENSE_STATE.active && new Date(l.starts_at) <= now && new Date(l.expires_at) > now;
           }),
         );
         setReserved(
-          items.filter((l) => l.state === LICENSE_STATE.draft && new Date(l.starts_at) > now),
+          items.filter((l) => l.state === LICENSE_STATE.ready && new Date(l.starts_at) > now),
         );
         setPast(
           items.filter((l) => {
@@ -315,11 +314,10 @@ export default function LoansCardView() {
               LICENSE_STATE.revoked,
             ].includes(l.state);
             const isExpiredActive =
-              (l.state === LICENSE_STATE.active || (l.state as string) === 'ready') &&
-              new Date(l.expires_at) <= now;
-            const isStaleDraft =
-              l.state === LICENSE_STATE.draft && new Date(l.starts_at) <= now;
-            return isTerminal || isExpiredActive || isStaleDraft;
+              l.state === LICENSE_STATE.active && new Date(l.expires_at) <= now;
+            const isStaleReady =
+              l.state === LICENSE_STATE.ready && new Date(l.starts_at) <= now;
+            return isTerminal || isExpiredActive || isStaleReady;
           }),
         );
       })
@@ -331,11 +329,12 @@ export default function LoansCardView() {
   }, [searchParams]);
 
   const handleDownload = (licenseId: string) => {
-    openInThorium(licenseId);
+    const ref = { id: licenseId };
+    openInThorium(ref);
     toast.info(
       <div className="flex flex-col gap-1">
         <span>{t('notifications.license.download.thoriumOpened', { defaultValue: 'Opening in Thorium...' })}</span>
-        <button className="text-xs underline text-left" onClick={() => downloadDirect(licenseId)}>
+        <button className="text-xs underline text-left" onClick={() => downloadDirect(ref)}>
           {t('notifications.license.download.fallback', { defaultValue: 'Not opening? Download file directly' })}
         </button>
       </div>,

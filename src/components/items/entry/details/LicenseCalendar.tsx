@@ -99,12 +99,12 @@ export default function LicenseCalendar() {
   const endDate2Weeks = addDays(today, 14);
 
   const downloadLoan = (license: ILicense) => {
-    const licenseId = license.lcp_license_id || license.id;
-    openInThorium(licenseId);
+    const licenseRef = { id: license.lcp_license_id || license.id, download_url: license.download_url };
+    openInThorium(licenseRef);
     toast.info(
       <div className="flex flex-col gap-1">
         <span>{t("notifications.license.download.thoriumOpened", { defaultValue: "Opening in Thorium..." })}</span>
-        <button className="text-xs underline text-left" onClick={() => downloadDirect(licenseId)}>
+        <button className="text-xs underline text-left" onClick={() => downloadDirect(licenseRef)}>
           {t("notifications.license.download.fallback", { defaultValue: "Not opening? Download file directly" })}
         </button>
       </div>,
