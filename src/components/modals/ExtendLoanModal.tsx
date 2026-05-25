@@ -30,7 +30,7 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
   const handleExtend = async () => {
     setLoading(true);
     try {
-      await renewLicense(license.id, selected === 1 ? 'P7D' : 'P14D');
+      await renewLicense(license.id, newExpiry.toISOString());
       setSuccess(true);
       onSuccess();
     } catch {

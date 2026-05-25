@@ -1,10 +1,11 @@
 import useAxios from '../useAxios';
+import { LICENSE_ACTION } from '../../../utils/interfaces/licenses';
 
 const useCancelReservation = () => {
   const axios = useAxios();
 
-  const cancelReservation = async (reservationId: string): Promise<void> => {
-    await axios.patch(`/readium/v1/reservations/${reservationId}`, { status: 'cancelled' });
+  const cancelReservation = async (licenseId: string): Promise<void> => {
+    await axios.put(`/readium/v1/licenses/${licenseId}`, { action: LICENSE_ACTION.cancelled });
   };
 
   return cancelReservation;
