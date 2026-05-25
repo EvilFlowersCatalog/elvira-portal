@@ -100,14 +100,13 @@ export default function LicenseCalendar({}: {}) {
         return;
     }
     
-    const licenseId = license!.lcp_license_id || license!.id;
-    openInThorium(licenseId);
+    openInThorium(license);
 
     closeCalendar();
     toast.success(
       <div className="flex flex-col gap-1">
         <span>{t("notifications.license.create.success")}</span>
-        <button className="text-xs underline text-left" onClick={() => downloadDirect(licenseId)}>
+        <button className="text-xs underline text-left" onClick={() => downloadDirect(license)}>
           {t("notifications.license.download.fallback", { defaultValue: "Not opening in Thorium? Download file directly" })}
         </button>
       </div>,

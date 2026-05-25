@@ -9,20 +9,21 @@ import { useSearchParams } from 'react-router-dom';
 import { Metadata } from '../../utils/interfaces/general/general';
 import { BubbleText } from '../../components/table/Cells';
 import useGetLicenses from '../../hooks/api/licenses/useGetLicenses';
-import { ILicense, InterfaceState } from '../../utils/interfaces/license';
+import { ILicense, InterfaceAction, LICENSE_ACTION } from '../../utils/interfaces/license';
 import { stateStyle, translateState } from '../../components/items/loans/LoansTable';
 import { formatDate } from 'date-fns/format';
 import EntryDetail from '../../components/items/entry/details/EntryDetail';
 
 import { Menu, MenuItem } from '@mui/material';
 import { TFunction } from 'i18next';
+import { toast } from 'react-toastify';
 import useUpdateLicenseState from '../../hooks/api/licenses/useUpdateLicense';
 import useGetUserDetails from '../../hooks/api/users/useGetUserDetails';
 
 interface StateSelectorProps {
     item: ILicense;
     t: TFunction;
-    onStateChange: (newState: InterfaceState) => void;
+    onActionSelect: (action: InterfaceAction) => void;
 }
 
 function UserName({ userId }: { userId: string }) {
@@ -40,7 +41,7 @@ function UserName({ userId }: { userId: string }) {
 }
 
 
-function StateSelector({ item, t, onStateChange }: StateSelectorProps) {
+function StateSelector({ item, t, onActionSelect }: StateSelectorProps) {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
 
     const handleOpen = (event: React.MouseEvent<HTMLElement>) => {
@@ -51,11 +52,12 @@ function StateSelector({ item, t, onStateChange }: StateSelectorProps) {
         setAnchorEl(null);
     };
 
-    const handleStateSelect = (newState: InterfaceState) => {
-        onStateChange(newState);
+    const handleActionSelect = (action: InterfaceAction) => {
+        onActionSelect(action);
         handleClose();
     };
 
+    const renewDisabled = item.renewals_remaining === 0;
     const open = Boolean(anchorEl);
 
     return (
@@ -83,9 +85,14 @@ function StateSelector({ item, t, onStateChange }: StateSelectorProps) {
                     },
                 }}
             >
-                {['ready', 'active', 'returned', 'expired', 'revoked', 'cancelled'].map((state) => (
-                    <MenuItem key={state} selected={state === item.state} onClick={() => handleStateSelect(state as InterfaceState)}>
-                        {translateState(state, t)}
+                {Object.values(LICENSE_ACTION).map((action) => (
+                    <MenuItem
+                        key={action}
+                        disabled={action === LICENSE_ACTION.renewed && renewDisabled}
+                        title={action === LICENSE_ACTION.renewed && renewDisabled ? t('license.renew.capReached', { defaultValue: 'Renewal limit reached' }) : undefined}
+                        onClick={() => handleActionSelect(action)}
+                    >
+                        {translateState(action, t)}
                     </MenuItem>
                 ))}
             </Menu>
@@ -131,12 +138,22 @@ const AdminLoans = () => {
             entry_id: item.entry_id,
             title: item.entry?.title || 'Unknown Entry',
             user: <UserName userId={item.user_id} />,
-            state: <StateSelector item={item} t={t} onStateChange={(newState: InterfaceState) => {
-               setItems((prevItems) => prevItems.map((prevItem) => 
-                    prevItem.id === item.id ? { ...prevItem, state: newState as typeof prevItem.state } : prevItem
-                ));
-                updateLoan(item.id, newState, 'P1Y'); 
-             }} />,
+            state: <StateSelector item={item} t={t} onActionSelect={(action: InterfaceAction) => {
+                const requested_end =
+                    action === LICENSE_ACTION.renewed
+                        ? new Date(Date.now() + 7 * 86_400_000).toISOString()
+                        : undefined;
+                updateLoan(item.id, action, requested_end)
+                    .then((updated) => {
+                        setItems((prevItems) => prevItems.map((prevItem) =>
+                            prevItem.id === item.id ? { ...prevItem, ...updated } : prevItem
+                        ));
+                    })
+                    .catch((e: any) => {
+                        const detail = e?.response?.data?.detail;
+                        toast.error(detail || t('notifications.license.edit.error'));
+                    });
+            }} />,
             starts_at: formatDate(item.starts_at, 'dd.MM.yyyy'),
             ends_at: formatDate(item.expires_at, 'dd.MM.yyyy'),
         })));

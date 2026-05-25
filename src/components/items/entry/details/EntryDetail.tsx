@@ -21,8 +21,6 @@ import { ActionButtonStyle, ActionsButton, ActionsWrapper } from './DetailAction
 import { AcceptedLanguage, getLanguage } from '../../../../hooks/api/languages/languages';
 import AcquisitionsButton from '../../../buttons/AcqusitionsButton';
 import DetailModal from '../../../modals/DetailModal';
-import useGetAvailability from '../../../../hooks/api/licenses/useGetAvailability';
-import { IAvailabilityResponse } from '../../../../utils/interfaces/license';
 import { Tooltip } from '@mui/material';
 import { twMerge } from 'tailwind-merge';
 import EntryItem from '../display/EntryItem';
@@ -42,7 +40,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const [catalogId, setCatalogId] = useState<string | null>(null);
 
   const [entry, setEntry] = useState<IEntryDetail | null>(null);
-  const [availability, setAvailability] = useState<IAvailabilityResponse | null>(null);
   const chapters = ["Introduction", "Chapter 1", "Chapter 2"];
   const reviews = [
     {
@@ -68,7 +65,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const navigate = useNavigate();
 
   const getEntryDetail = useGetEntryDetail();
-  const getAvailability = useGetAvailability();
   const addToShelf = useAddToShelf();
   const removeFromShelf = useRemoveFromShelf();
 
@@ -178,14 +174,10 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       try {
         const entryDetail = await getEntryDetail(entryId, catalogId || undefined);
         setEntry(entryDetail);
-        if(import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
-          const entryAvailability = await getAvailability(new Date(), new Date(), entryId);
-          setAvailability(entryAvailability);
-        }
-        } catch (error) {
-          setEntry(null);
-        }
-      })();
+      } catch (error) {
+        setEntry(null);
+      }
+    })();
   }, [entryId, update]);
 
   const askAi = () => {
@@ -225,7 +217,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
             </div>
 
             <ActionsWrapper>
-              <AcquisitionsButton acquisitions={entry.acquisitions} availability={availability} entry={entry} />
+              <AcquisitionsButton acquisitions={entry.acquisitions} entry={entry} />
               <ShelfButton
                 isLoading={isLoading}
                 entryId={entryId!}

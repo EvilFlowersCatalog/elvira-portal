@@ -80,6 +80,15 @@ export default function LoansTable({ }) {
     }, [searchParams]);
 
 
+    const renewalsLabel = (item: ILicense): string => {
+        const count = item.renewal_count ?? 0;
+        const remaining = item.renewals_remaining;
+        const base = t('license.loansPage.table.renewalsCount', { count, defaultValue: `${count}×` });
+        if (remaining === null || remaining === undefined) return base;
+        if (remaining === 0) return `${base} · ${t('license.renew.capReached', { defaultValue: 'limit reached' })}`;
+        return `${base} · ${t('license.loansPage.table.renewalsRemaining', { count: remaining, defaultValue: `${remaining} remaining` })}`;
+    };
+
     useEffect(() => {
         setData(items.map((item) => ({
             entry_id: item.entry_id,
@@ -88,13 +97,13 @@ export default function LoansTable({ }) {
             state: <BubbleText className='cursor-default' text={translateState(item.state, t)} style={stateStyle(item.state, t)} />,
             starts_at: formatDate(item.starts_at, 'dd.MM.yyyy'),
             ends_at: formatDate(item.expires_at, 'dd.MM.yyyy'),
+            renewals: renewalsLabel(item),
             actions: <ActionButton onClick={() => {
-                const licenseId = item.lcp_license_id || item.id;
-                openInThorium(licenseId);
+                openInThorium(item);
                 toast.info(
                     <div className="flex flex-col gap-1">
                         <span>{t('notifications.license.download.thoriumOpened', { defaultValue: 'Opening in Thorium...' })}</span>
-                        <button className="text-xs underline text-left" onClick={() => downloadDirect(licenseId)}>
+                        <button className="text-xs underline text-left" onClick={() => downloadDirect(item)}>
                             {t('notifications.license.download.fallback', { defaultValue: 'Not opening? Download file directly' })}
                         </button>
                     </div>,
@@ -116,6 +125,7 @@ export default function LoansTable({ }) {
             { label: t('license.loansPage.table.state'), selector: 'state' },
             { label: t('license.loansPage.table.starts_at'), selector: 'starts_at' },
             { label: t('license.loansPage.table.ends_at'), selector: 'ends_at' },
+            { label: t('license.loansPage.table.renewals', { defaultValue: 'Renewals' }), selector: 'renewals' },
             { label: t('license.loansPage.table.actions'), selector: 'actions', align: 'center' }
 
         ]} data={data} metadata={metadata} fetchFunction={fetchEntries} rowsPerPageOptions={[5, 10, 25, 50]} />

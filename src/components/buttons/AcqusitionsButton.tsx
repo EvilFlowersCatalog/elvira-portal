@@ -4,44 +4,33 @@ import {
   BiCalendar,
   BiDownload,
 } from "react-icons/bi";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { twMerge } from "tailwind-merge";
-import useGetLicenses from "../../hooks/api/licenses/useGetLicenses";
 import PDFButton from "./PDFButtons";
 import { ActionButtonStyle } from "../items/entry/details/DetailActions";
 import { IEntryDetail } from "../../utils/interfaces/entry";
 import { IEntryAcquisition } from "../../utils/interfaces/acquisition";
-import { IAvailabilityResponse, ILicense } from "../../utils/interfaces/license";
 import useDownloadLicense from "../../hooks/api/licenses/useDownloadLicense";
 import { toast } from "react-toastify";
 
 export default function AcquisitionsButton({
   entry,
   acquisitions,
-  availability,
 }: {
   entry: IEntryDetail;
   acquisitions: IEntryAcquisition[];
-  availability: IAvailabilityResponse | null;
 }) {
   const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [searchParams, setSearchParams] = useSearchParams();
-  const getUserLicenses = useGetLicenses();
   const { openInThorium, downloadDirect } = useDownloadLicense();
 
-  const [activeLicense, setActiveLicense] = useState<ILicense | null>(null);
-
-  useEffect(() => {
-    getUserLicenses({pagination: false, entry_id: entry.id}).then((res) => {
-      const found = res.items.find(
-        (l) => ["active", "ready"].includes(l.state)
-      );
-      setActiveLicense(found || null);
-    });
-  }, []);
+  const lcpState = entry.lcp_state;
+  const userLicenseId = entry.user_active_license_id ?? null;
+  const lcpAvailable = lcpState != null && lcpState !== 'not_lcp';
+  const canBorrow = lcpState === 'available_now';
 
   const openBorrowModal = () => {
     const params = new URLSearchParams(searchParams);
@@ -52,11 +41,8 @@ export default function AcquisitionsButton({
     setSearchParams(params);
   };
 
-  // Early return if no relevant actions
   const isExperimental = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
-  if (acquisitions.length === 0 && (!isExperimental || !availability?.available)) return null;
-
-  // === Subcomponents ===
+  if (acquisitions.length === 0 && (!isExperimental || !lcpAvailable)) return null;
 
   const SinglePDFButton = () => (
     <PDFButton acquisition={acquisitions[0]} index={0} entryId={entry.id} catalogId={entry.catalog_id}>
@@ -77,16 +63,15 @@ export default function AcquisitionsButton({
     </div>
   );
 
-  const ActiveLicenseButton = ({ lcp_license_id, id }: { lcp_license_id?: string; id: string }) => (
+  const ActiveLicenseButton = ({ licenseId }: { licenseId: string }) => (
     <div
       className={twMerge(ActionButtonStyle, "w-full cursor-pointer")}
       onClick={() => {
-        const licenseId = lcp_license_id || id;
-        openInThorium(licenseId);
+        openInThorium({ id: licenseId });
         toast.info(
           <div className="flex flex-col gap-1">
             <span>{t('notifications.license.download.thoriumOpened', { defaultValue: 'Opening in Thorium...' })}</span>
-            <button className="text-xs underline text-left" onClick={() => downloadDirect(licenseId)}>
+            <button className="text-xs underline text-left" onClick={() => downloadDirect({ id: licenseId })}>
               {t('notifications.license.download.fallback', { defaultValue: 'Not opening? Download file directly' })}
             </button>
           </div>,
@@ -127,24 +112,22 @@ export default function AcquisitionsButton({
             </div>
           </PDFButton>
         ))}
-        {isExperimental && availability?.available && !activeLicense && <BorrowButton />}
-        {isExperimental && availability?.available && activeLicense && <ActiveLicenseButton lcp_license_id={activeLicense.lcp_license_id} id={activeLicense.id} />}
+        {isExperimental && userLicenseId && <ActiveLicenseButton licenseId={userLicenseId} />}
+        {isExperimental && !userLicenseId && canBorrow && <BorrowButton />}
       </div>
     </div>
   );
 
-  // === Render Decision Tree ===
-
-  if (acquisitions.length === 1 && !availability?.available) {
+  if (acquisitions.length === 1 && !lcpAvailable) {
     return <SinglePDFButton />;
   }
 
-  if (isExperimental && acquisitions.length === 0 && availability?.available && !activeLicense) {
-    return <BorrowButton />;
+  if (isExperimental && acquisitions.length === 0 && userLicenseId) {
+    return <ActiveLicenseButton licenseId={userLicenseId} />;
   }
 
-  if (isExperimental && acquisitions.length === 0 && activeLicense) {
-    return <ActiveLicenseButton lcp_license_id={activeLicense.lcp_license_id} id={activeLicense.id} />;
+  if (isExperimental && acquisitions.length === 0 && canBorrow) {
+    return <BorrowButton />;
   }
 
   return <MultipleAcquisitionsDropdown />;

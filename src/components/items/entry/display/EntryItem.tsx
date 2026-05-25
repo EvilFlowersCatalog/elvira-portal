@@ -100,6 +100,29 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
         setIsFallbackImage(true);
     }
 
+    const lcpBadge = (() => {
+        const state = entry.lcp_state;
+        if (!state || state === 'not_lcp') return null;
+        if (state === 'active_loan_for_user') {
+            return { text: t('entry.lcp.borrowedByYou', { defaultValue: 'Borrowed' }), bg: 'bg-blue-600' };
+        }
+        if (state === 'fully_borrowed') {
+            const pos = entry.user_position;
+            const label = pos != null
+                ? t('entry.lcp.queuePosition', { position: pos, defaultValue: `Queue #${pos}` })
+                : t('entry.lcp.full', { defaultValue: 'Full' });
+            return { text: label, bg: 'bg-red-600' };
+        }
+        if (state === 'available_in_days' && entry.next_available_at) {
+            const days = Math.max(0, Math.ceil((new Date(entry.next_available_at).getTime() - Date.now()) / 86_400_000));
+            return { text: t('entry.lcp.availableIn', { days, defaultValue: `~${days}d` }), bg: 'bg-amber-500' };
+        }
+        if (state === 'available_now') {
+            return { text: t('entry.lcp.availableNow', { defaultValue: 'Available' }), bg: 'bg-green-600' };
+        }
+        return null;
+    })();
+
     return <div className="group rounded-lg overflow-hidden relative w-full min-h-[17rem] max-w-[200px] hover:shadow-[0_6px_20px_rgba(0,0,0,0.4)] dark:hover:shadow-strongDarkGray transition-shadow duration-300">
         <div className="h-40">
             <div onClick={openEntryDetail}
@@ -119,6 +142,11 @@ export default function EntryItem({ entry, triggerReload, id, type }: IEntryItem
                     />
                 )}
             </div>
+            {lcpBadge && (
+                <div className={`absolute top-2 left-2 text-white text-[10px] font-semibold px-2 py-0.5 rounded-md shadow-md ${lcpBadge.bg}`}>
+                    {lcpBadge.text}
+                </div>
+            )}
             <div onClick={handleBookmarkToggle}
                 className={`cursor-pointer absolute top-2 right-2 w-10 h-8 rounded-lg p-2 flex items-center justify-center shadow-md
                  ${isOnShelf ? 'bg-primaryLight border-2 border-primary' : 'bg-white'}`}>

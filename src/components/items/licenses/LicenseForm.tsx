@@ -5,7 +5,7 @@ import DatePicker from 'react-datepicker';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import useUploadLicense from '../../../hooks/api/licenses/useUploadLicense';
 import { toast } from 'react-toastify';
-import { ILicense, LICENSE_STATE } from '../../../utils/interfaces/licenses';
+import { ILicense, LICENSE_ACTION, LICENSE_STATE } from '../../../utils/interfaces/licenses';
 import useEditLicense from '../../../hooks/api/licenses/useEditLicense';
 import { Duration } from 'luxon';
 
@@ -25,9 +25,7 @@ const licenseForm = ({
   setReloadPage,
 }: ILicenseForm) => {
   const { t } = useTranslation();
-  const [state, setState] = useState<LICENSE_STATE>(
-    license?.state ?? LICENSE_STATE.active
-  );
+  const [action, setAction] = useState<LICENSE_ACTION>(LICENSE_ACTION.active);
 
   const buttonRef = useRef<HTMLButtonElement | null>(null);
 
@@ -46,15 +44,13 @@ const licenseForm = ({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const duration = Duration.fromObject({ days: period });
-
-    const isoDuration = duration.toISO();
+    const isoDuration = Duration.fromObject({ days: period }).toISO();
 
     if (entryId) {
       try {
         await createLicense({
           entry_id: entryId,
-          state: LICENSE_STATE.active,
+          state: LICENSE_STATE.ready,
           duration: isoDuration,
           starts_at: startDate!.toISOString(),
         });
@@ -68,18 +64,19 @@ const licenseForm = ({
       }
     } else if (license) {
       try {
-        await editLicense(license.id, {
-          state,
-          duration: isoDuration,
-        });
+        const requested_end =
+          action === LICENSE_ACTION.renewed
+            ? new Date(Date.now() + period * 86_400_000).toISOString()
+            : undefined;
+        await editLicense(license.id, { action, requested_end });
 
-        // Exist when editing
         setReloadPage!(!reloadPage!);
 
         toast.success(t('notifications.license.edit.success'));
         setOpen(false);
-      } catch {
-        toast.error(t('notifications.license.edit.error'));
+      } catch (e: any) {
+        const detail = e?.response?.data?.detail;
+        toast.error(detail || t('notifications.license.edit.error'));
         setStartDate(null);
         setPeriod(7);
       }
@@ -106,15 +103,15 @@ const licenseForm = ({
       <form onSubmit={handleSubmit} className='mb-10 flex flex-col gap-5'>
         {license ? (
           <div className='flex flex-col gap-2'>
-            <span className='text-lg font-bold'>State</span>
+            <span className='text-lg font-bold'>Action</span>
             <select
-              value={state}
-              onChange={(e: any) => setState(e.target.value)}
+              value={action}
+              onChange={(e: any) => setAction(e.target.value as LICENSE_ACTION)}
               className='rounded-md bg-transparent outline-none'
             >
-              {Object.values(LICENSE_STATE).map((state) => (
-                <option key={state} value={state}>
-                  {state.toUpperCase()}
+              {Object.values(LICENSE_ACTION).map((value) => (
+                <option key={value} value={value}>
+                  {value.toUpperCase()}
                 </option>
               ))}
             </select>
