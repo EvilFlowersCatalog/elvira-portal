@@ -7,6 +7,8 @@ interface AvailabilityBadgeProps {
   state: AvailabilityState;
   date?: string | null;
   size?: 'small' | 'big';
+  position?: number | null;
+  days?: number | null;
 }
 
 const CONFIGS = {
@@ -32,7 +34,7 @@ const CONFIGS = {
   },
 } as const;
 
-export function AvailabilityBadge({ state, date, size = 'big' }: AvailabilityBadgeProps) {
+export function AvailabilityBadge({ state, date, size = 'big', position, days }: AvailabilityBadgeProps) {
   const { t } = useTranslation();
   const config = CONFIGS[state];
 
@@ -40,12 +42,22 @@ export function AvailabilityBadge({ state, date, size = 'big' }: AvailabilityBad
     ? new Date(date).toLocaleDateString('sk-SK', { day: 'numeric', month: 'numeric' })
     : null;
 
+  const positionLabel = position != null
+    ? t('entry.detail.availability.queuePosition', { position, defaultValue: `#${position}` })
+    : null;
+  const daysLabel = days != null
+    ? t('entry.detail.availability.availableInDays', { days, defaultValue: `~${days}d` })
+    : null;
+
+  const baseLabel = t(`entry.detail.availability.${state}`);
+  const smallLabel = [baseLabel, positionLabel, daysLabel].filter(Boolean).join(' · ');
+
   if (size === 'small') {
     return (
       <div className={`inline-flex items-center gap-[4px] h-[12px] px-[7px] rounded-[6px] ${config.bg} ${config.text}`}>
         <span className={`rounded-full size-[4.5px] shrink-0 ${config.dot}`} />
         <span className="text-[9px] tracking-[0.1px] whitespace-nowrap leading-none">
-          {t(`entry.detail.availability.${state}`)}
+          {smallLabel}
         </span>
       </div>
     );
@@ -63,7 +75,19 @@ export function AvailabilityBadge({ state, date, size = 'big' }: AvailabilityBad
         </span>
       ) : (
         <>
-          <span className="whitespace-nowrap">{t(`entry.detail.availability.${state}`)}</span>
+          <span className="whitespace-nowrap">{baseLabel}</span>
+          {positionLabel && (
+            <>
+              <span>|</span>
+              <strong className="font-semibold whitespace-nowrap">{positionLabel}</strong>
+            </>
+          )}
+          {daysLabel && (
+            <>
+              <span>|</span>
+              <strong className="font-semibold whitespace-nowrap">{daysLabel}</strong>
+            </>
+          )}
           {formattedDate && (
             <>
               <span>|</span>

@@ -114,6 +114,11 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
         return null;
     })();
 
+    const daysUntilAvailable = lcpState === 'available_in_days' && entry.next_available_at
+        ? Math.max(0, Math.ceil((new Date(entry.next_available_at).getTime() - Date.now()) / 86_400_000))
+        : null;
+    const queuePosition = availabilityState === 'reserved' ? entry.user_position ?? null : null;
+
     return (
         <div className="group rounded-[8px] relative w-full bg-white dark:bg-strongDarkGray shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.25)] dark:hover:shadow-strongDarkGray transition-shadow duration-300 flex flex-col gap-[7px] pb-[10px]">
             {/* Book cover */}
@@ -195,7 +200,7 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
             {/* Badge */}
             <div className="shrink-0 px-[7.5px]">
                 {availabilityState ? (
-                    <AvailabilityBadge state={availabilityState} size="small" />
+                    <AvailabilityBadge state={availabilityState} size="small" position={queuePosition} days={daysUntilAvailable} />
                 ) : hasAcquisitions ? (
                     <div className="inline-flex items-center gap-[4px] h-[12px] px-[7px] rounded-[6px] bg-[#cfffd8]">
                         <div className="rounded-full size-[4.5px] shrink-0 bg-[#005e11]" />

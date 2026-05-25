@@ -7,9 +7,8 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
 import useAuthContext from '../../../../hooks/contexts/useAuthContext';
 import { IEntryDetail } from '../../../../utils/interfaces/entry';
-import { IAvailabilityResponse, ILicense, LICENSE_STATE } from '../../../../utils/interfaces/license';
+import { ILicense, LICENSE_STATE } from '../../../../utils/interfaces/license';
 import useGetEntryDetail from '../../../../hooks/api/entries/useGetEntryDetail';
-import useGetAvailability from '../../../../hooks/api/licenses/useGetAvailability';
 import useAddToShelf from '../../../../hooks/api/my-shelf/useAddToShelf';
 import useRemoveFromShelf from '../../../../hooks/api/my-shelf/useRemoveFromShelf';
 import { NAVIGATION_PATHS } from '../../../../utils/interfaces/general/general';
@@ -63,7 +62,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   ]
 
   const [activeLicense, setActiveLicense] = useState<ILicense | null>(null);
-  const [availability, setAvailability] = useState<{ available: boolean; firstAvailableDate: string | null } | null>(null);
   const [update, setUpdate] = useState<boolean>(false);
   const prevLicensingEntryId = useRef<string | null>(null);
 
@@ -71,7 +69,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const navigate = useNavigate();
 
   const { getEntryDetailWithLicense } = useGetEntryDetail();
-  const getAvailability = useGetAvailability();
   const addToShelf = useAddToShelf();
   const removeFromShelf = useRemoveFromShelf();
 
@@ -179,9 +176,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
 
   // If entryId is changed
   useEffect(() => {
-    // Reset
     setEntry(null);
-    setAvailability(null);
     if (!entryId) return;
 
     (async () => {
@@ -196,26 +191,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     })();
   }, [entryId, update]);
 
-  useEffect(() => {
-    if (!entry?.config?.readium_enabled) return;
-
-    const isActiveLoan =
-      activeLicense?.state === LICENSE_STATE.active &&
-      (!activeLicense?.expires_at || new Date(activeLicense.expires_at) > new Date());
-    if (isActiveLoan) return;
-
-    const start = new Date();
-    const end = new Date();
-    end.setDate(end.getDate() + 60);
-
-    getAvailability(start, end, entry.id)
-      .then((res) => {
-        const firstAvailable = res.calendar.find((c) => c.is_available);
-        setAvailability({ available: res.available, firstAvailableDate: firstAvailable?.date ?? null });
-      })
-      .catch(() => setAvailability(null));
-  }, [entry?.id, activeLicense?.id]);
-
   const askAi = () => {
     setShowAiAssistant(true);
     const params = new URLSearchParams(searchParams);
@@ -225,7 +200,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   };
 
 
-  const getAvailabilityBadge = (): { state: AvailabilityState; date: string | null } | null => {
+  const getAvailabilityBadge = (): { state: AvailabilityState; date: string | null; position?: number | null; days?: number | null } | null => {
     if (!entry?.config?.readium_enabled) return null;
 
     const isActiveLoan =
@@ -237,14 +212,24 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     }
 
     if (activeLicense?.state === LICENSE_STATE.ready) {
-      return { state: 'reserved', date: activeLicense.starts_at };
+      return { state: 'reserved', date: activeLicense.starts_at, position: entry.user_position ?? null };
     }
 
-    if (!availability) return null;
+    const lcpState = entry.lcp_state;
+    if (lcpState === 'available_now') return { state: 'available', date: null };
 
-    if (availability.available) return { state: 'available', date: null };
+    if (lcpState === 'available_in_days') {
+      const days = entry.next_available_at
+        ? Math.max(0, Math.ceil((new Date(entry.next_available_at).getTime() - Date.now()) / 86_400_000))
+        : null;
+      return { state: 'unavailable', date: entry.next_available_at ?? null, days };
+    }
 
-    return { state: 'unavailable', date: availability.firstAvailableDate };
+    if (lcpState === 'fully_borrowed') {
+      return { state: 'unavailable', date: null, position: entry.user_position ?? null };
+    }
+
+    return null;
   };
 
   const availabilityBadge = getAvailabilityBadge();
@@ -279,7 +264,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
             {entry?.config?.readium_enabled && (
               <div className="flex justify-center mt-2">
                 {availabilityBadge ? (
-                  <AvailabilityBadge state={availabilityBadge.state} date={availabilityBadge.date} />
+                  <AvailabilityBadge state={availabilityBadge.state} date={availabilityBadge.date} position={availabilityBadge.position} days={availabilityBadge.days} />
                 ) : (
                   <div className="w-full h-[24px] rounded-md bg-zinc-200 dark:bg-zinc-700 animate-pulse" />
                 )}

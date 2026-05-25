@@ -43,6 +43,11 @@ export default function AcquisitionsButton({
       setActiveLicense(propActiveLicense);
       return;
     }
+    // Skip the lookup when the entry already tells us there's no active or reserved license.
+    if (!entry.user_active_license_id && !entry.user_reservation_id) {
+      setActiveLicense(null);
+      return;
+    }
     getUserLicenses({ pagination: false, entry_id: entry.id }).then((res) => {
       const now = new Date();
       const found = res.items.find((l) => {
@@ -52,7 +57,7 @@ export default function AcquisitionsButton({
       });
       setActiveLicense(found || null);
     });
-  }, [entry.id, propActiveLicense]);
+  }, [entry.id, propActiveLicense, entry.user_active_license_id, entry.user_reservation_id]);
 
   const openBorrowModal = () => {
     const params = new URLSearchParams(searchParams);
