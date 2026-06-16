@@ -74,21 +74,21 @@ const Help = () => {
       <Breadcrumb />
 
       {/* Hero header */}
-      <div className="relative bg-primaryLight overflow-hidden flex flex-col items-center justify-end pb-6 pt-10" style={{ minHeight: 200 }}>
+      <div className="relative bg-primaryLight dark:bg-strongDarkGray overflow-hidden flex flex-col items-center justify-end pb-6 pt-10" style={{ minHeight: 200 }}>
         <div className="absolute -top-16 -left-16 w-64 h-64 rounded-full bg-primary opacity-10 blur-3xl pointer-events-none" />
         <div className="absolute -bottom-10 -right-10 w-48 h-48 rounded-full bg-primary opacity-10 blur-3xl pointer-events-none" />
-        <h1 className="relative text-3xl font-extrabold text-secondary text-center mb-6 leading-tight">
+        <h1 className="relative text-3xl font-extrabold text-secondary dark:text-secondaryLight text-center mb-6 leading-tight">
           Dokumentácia a často kladené otázky
         </h1>
         <div className="relative w-full max-w-2xl mx-auto px-4">
-          <div className="flex items-center bg-white rounded-xl shadow-md px-4 py-2 gap-3">
-            <FiSearch size={18} className="text-gray-400 shrink-0" />
+          <div className="flex items-center bg-white dark:bg-darkGray rounded-xl shadow-md px-4 py-2 gap-3">
+            <FiSearch size={18} className="text-gray-400 dark:text-zinc-500 shrink-0" />
             <input
-              className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 font-light"
+              className="flex-1 text-sm outline-none bg-transparent placeholder-gray-400 dark:placeholder-zinc-500 dark:text-white font-light"
               placeholder="Hľadať v dokumentácii..."
             />
             <button
-              className="flex items-center gap-1.5 bg-primaryLight text-primary text-xs font-medium px-3 py-1.5 rounded-lg shrink-0"
+              className="flex items-center gap-1.5 bg-primaryLight dark:bg-zinc-700 text-primary dark:text-white text-xs font-medium px-3 py-1.5 rounded-lg shrink-0"
               onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.aiChatHistory)}
             >
               <RiAiGenerate size={14} />
@@ -104,14 +104,14 @@ const Help = () => {
           {topicCards.slice(0, 3).map((card) => (
             <button
               key={card.title}
-              className={`bg-white rounded-xl shadow p-5 flex flex-col text-left transition-shadow hover:shadow-md ${card.path ? 'cursor-pointer' : 'cursor-default'}`}
+              className={`bg-white dark:bg-strongDarkGray rounded-xl shadow p-5 flex flex-col text-left transition-shadow hover:shadow-md ${card.path ? 'cursor-pointer' : 'cursor-default'}`}
               onClick={card.path ? (e) => specialNavigation(e, card.path!) : undefined}
             >
               <div className="flex justify-between items-start mb-4">
-                <span className="font-bold text-base text-secondary">{card.title}</span>
-                <span className="text-secondary opacity-70">{card.icon}</span>
+                <span className="font-bold text-base text-secondary dark:text-secondaryLight">{card.title}</span>
+                <span className="text-secondary dark:text-secondaryLight opacity-70">{card.icon}</span>
               </div>
-              <p className="text-xs text-gray-600 leading-relaxed">{card.description}</p>
+              <p className="text-xs text-gray-600 dark:text-zinc-400 leading-relaxed">{card.description}</p>
             </button>
           ))}
         </div>
@@ -121,34 +121,34 @@ const Help = () => {
           {topicCards.slice(3).map((card) => (
             <button
               key={card.title}
-              className={`bg-white rounded-xl shadow p-5 flex flex-col text-left transition-shadow hover:shadow-md ${card.path ? 'cursor-pointer' : 'cursor-default'}`}
+              className={`bg-white dark:bg-strongDarkGray rounded-xl shadow p-5 flex flex-col text-left transition-shadow hover:shadow-md ${card.path ? 'cursor-pointer' : 'cursor-default'}`}
               onClick={card.path ? (e) => specialNavigation(e, card.path!) : undefined}
             >
               <div className="flex justify-between items-start mb-4">
-                <span className="font-bold text-base text-secondary">{card.title}</span>
-                <span className="text-secondary opacity-70">{card.icon}</span>
+                <span className="font-bold text-base text-secondary dark:text-secondaryLight">{card.title}</span>
+                <span className="text-secondary dark:text-secondaryLight opacity-70">{card.icon}</span>
               </div>
-              <p className="text-xs text-gray-600 leading-relaxed">{card.description}</p>
+              <p className="text-xs text-gray-600 dark:text-zinc-400 leading-relaxed">{card.description}</p>
             </button>
           ))}
         </div>
 
         {/* FAQ */}
-        <h2 className="text-3xl font-bold text-secondary text-center mb-6">FAQ</h2>
+        <h2 className="text-3xl font-bold text-secondary dark:text-secondaryLight text-center mb-6">FAQ</h2>
         <div className="flex flex-col gap-3 mb-12">
           {faqItems.map((item, i) => (
-            <div key={i} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+            <div key={i} className="bg-white dark:bg-strongDarkGray border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">
               <button
                 className="w-full flex items-center justify-between px-5 py-4 text-left"
                 onClick={() => setOpenFaq(openFaq === i ? null : i)}
               >
-                <span className="font-medium text-sm text-secondary">{item.q}</span>
-                <span className="ml-3 shrink-0 w-6 h-6 flex items-center justify-center bg-lightGray rounded-full">
+                <span className="font-medium text-sm text-secondary dark:text-secondaryLight">{item.q}</span>
+                <span className="ml-3 shrink-0 w-6 h-6 flex items-center justify-center bg-lightGray dark:bg-darkGray rounded-full">
                   {openFaq === i ? <FiChevronUp size={14} /> : <FiChevronDown size={14} />}
                 </span>
               </button>
               {openFaq === i && (
-                <div className="px-5 pb-4 text-sm text-gray-600 leading-relaxed border-t border-gray-100 pt-3">
+                <div className="px-5 pb-4 text-sm text-gray-600 dark:text-zinc-400 leading-relaxed border-t border-gray-100 dark:border-zinc-700 pt-3">
                   {item.a}
                 </div>
               )}
@@ -157,22 +157,22 @@ const Help = () => {
         </div>
 
         {/* Contact */}
-        <div className="bg-primaryLight rounded-xl shadow-sm p-8 text-center">
-          <h3 className="text-xl font-bold text-secondary mb-2">Kontakt</h3>
-          <p className="text-sm text-gray-600 mb-6">
+        <div className="bg-primaryLight dark:bg-strongDarkGray rounded-xl shadow-sm p-8 text-center">
+          <h3 className="text-xl font-bold text-secondary dark:text-secondaryLight mb-2">Kontakt</h3>
+          <p className="text-sm text-gray-600 dark:text-zinc-400 mb-6">
             V prípade problémov alebo otázok nás môžete kontaktovať tu:
           </p>
           <div className="flex flex-wrap justify-center gap-10">
-            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <HiOutlineMail size={20} className="text-secondary" />
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-zinc-300">
+              <HiOutlineMail size={20} className="text-secondary dark:text-secondaryLight" />
               elvira-mail@stuba.sk
             </div>
-            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <FiBook size={20} className="text-secondary" />
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-zinc-300">
+              <FiBook size={20} className="text-secondary dark:text-secondaryLight" />
               ais-mail@is.stuba.sk
             </div>
-            <div className="flex items-center gap-2 text-sm font-medium text-gray-700">
-              <BsDiscord size={20} className="text-secondary" />
+            <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-zinc-300">
+              <BsDiscord size={20} className="text-secondary dark:text-secondaryLight" />
               elviradiscord
             </div>
           </div>

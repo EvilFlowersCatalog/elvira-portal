@@ -28,20 +28,20 @@ const HelpLoremArticle = ({ title, heading, sections }: HelpLoremArticleProps) =
       title={title}
       toc={[{ heading, items: sections.map(({ id, label }) => ({ id, label })) }]}
     >
-      <h2 className="text-xl font-bold text-secondary mb-4">{heading}</h2>
+      <h2 className="text-xl font-bold text-secondary dark:text-secondaryLight mb-4">{heading}</h2>
 
       {sections.map((section, sectionIndex) => (
         <div key={section.id}>
           <h3
             id={section.id}
-            className="text-base font-semibold text-secondary mb-2"
+            className="text-base font-semibold text-secondary dark:text-secondaryLight mb-2"
           >
             {section.label}
           </h3>
           {Array.from({ length: section.paragraphs ?? 2 }).map((_, i) => (
             <p
               key={i}
-              className={`text-sm text-gray-600 leading-relaxed ${
+              className={`text-sm text-gray-600 dark:text-zinc-400 leading-relaxed ${
                 i === (section.paragraphs ?? 2) - 1 &&
                 sectionIndex === sections.length - 1
                   ? ''
