@@ -6,9 +6,11 @@ import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import HomeHeader from '../../components/specific-page/home-page/HomeHeader';
 import EntryDetail from '../../components/items/entry/details/EntryDetail';
 import EntryDisplay from '../../components/items/entry/display/EntryDisplay';
+import ThemedEntryDisplay from '../../components/items/entry/display/ThemedEntryDisplay';
 import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import StepEntryDisplay from '../../components/items/entry/display/StepEntryDisplay';
+import useGetFeedDetail from '../../hooks/api/feeds/useGetFeedDetail';
 
 const Home = () => {
   const { t } = useTranslation();
@@ -19,6 +21,25 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const getEntries = useGetEntries();
+
+  // --- DBS FEED ---
+  const getFeedDetail = useGetFeedDetail();
+  const [themedEntries, setThemedEntries] = useState<IEntry[]>([]);
+  const [themedFeedTitle, setThemedFeedTitle] = useState('');
+  const [isThemedLoading, setIsThemedLoading] = useState(true);
+  useEffect(() => {
+    (async () => {
+      try {
+        const [{ items }, feed] = await Promise.all([
+          getEntries({ page: 1, limit: 30, feedId: 'afe55681-b71b-4aee-8327-422fbce314e5' }),
+          getFeedDetail('afe55681-b71b-4aee-8327-422fbce314e5'),
+        ]);
+        setThemedEntries(items);
+        setThemedFeedTitle(feed.title);
+      } finally { setIsThemedLoading(false); }
+    })();
+  }, [selectedCatalogId]);
+  // --- END ---
 
   // Reload entries when catalog changes
   useEffect(() => {
@@ -81,6 +102,19 @@ const Home = () => {
         />
 
 
+
+        {/* Themed Feed */}
+        {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+          <div className='mt-12'>
+            <ThemedEntryDisplay
+              title={themedFeedTitle}
+              color="rgba(145, 48, 169)"
+              isLoading={isThemedLoading}
+              entries={themedEntries}
+              limitRows
+            />
+          </div>
+        )}
 
         {/* <div className='flex justify-between items-center mb-5 flex-wrap mt-12'>
           <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>Learn Data science in 6 books</h2>
