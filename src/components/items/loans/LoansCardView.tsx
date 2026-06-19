@@ -19,9 +19,9 @@ import CancelReservationModal from '../../modals/CancelReservationModal';
 
 function BorrowedDateBadge({ date }: { date: string }) {
   return (
-    <span className="flex items-center gap-[5px] h-[16px] px-2 rounded-[4px] bg-[#f0f8ff] shrink-0">
-      <RxCalendar size={11} className="text-[#1e6cb4] shrink-0" />
-      <span className="text-[10px] text-[#1e6cb4] tracking-[0.1px] whitespace-nowrap">
+    <span className="flex items-center gap-[5px] h-[16px] px-2 rounded-[4px] bg-[#f0f8ff] dark:bg-blue-900/40 shrink-0">
+      <RxCalendar size={11} className="text-[#1e6cb4] dark:text-blue-300 shrink-0" />
+      <span className="text-[10px] text-[#1e6cb4] dark:text-blue-300 tracking-[0.1px] whitespace-nowrap">
         Požičané od: {date}
       </span>
     </span>
@@ -30,8 +30,8 @@ function BorrowedDateBadge({ date }: { date: string }) {
 
 function DaysLeftBadge({ daysLeft }: { daysLeft: number }) {
   const isUrgent = daysLeft <= 1;
-  const bgColor = isUrgent ? 'bg-[#ffe5dd]' : 'bg-[#fff4dd]';
-  const textColor = isUrgent ? 'text-[#c30000]' : 'text-[#333]';
+  const bgColor = isUrgent ? 'bg-[#ffe5dd] dark:bg-red-900/30' : 'bg-[#fff4dd] dark:bg-yellow-900/30';
+  const textColor = isUrgent ? 'text-[#c30000] dark:text-red-400' : 'text-[#333] dark:text-yellow-400';
   const dayWord = daysLeft === 1 ? 'deň' : daysLeft >= 2 && daysLeft <= 4 ? 'dni' : 'dní';
 
   return (
@@ -46,9 +46,9 @@ function DaysLeftBadge({ daysLeft }: { daysLeft: number }) {
 
 function ReservedDateBadge({ date }: { date: string }) {
   return (
-    <span className="flex items-center gap-[5px] h-[16px] px-2 rounded-[4px] bg-[#feeecc] shrink-0">
-      <RxCalendar size={11} className="text-[#9f6c00] shrink-0" />
-      <span className="text-[10px] text-[#9f6c00] tracking-[0.1px] whitespace-nowrap">
+    <span className="flex items-center gap-[5px] h-[16px] px-2 rounded-[4px] bg-[#feeecc] dark:bg-yellow-900/30 shrink-0">
+      <RxCalendar size={11} className="text-[#9f6c00] dark:text-yellow-400 shrink-0" />
+      <span className="text-[10px] text-[#9f6c00] dark:text-yellow-400 tracking-[0.1px] whitespace-nowrap">
         Rezervované: {date}
       </span>
     </span>
@@ -74,10 +74,10 @@ function ActionBtn({
       disabled={disabled}
       className={`flex items-center justify-center gap-[10px] h-[34px] w-[100px] px-2 py-1 rounded-[6px] text-[12px] tracking-[0.1px] transition-colors shrink-0
         ${disabled
-          ? 'border-[0.5px] border-[rgba(0,0,0,0.25)] text-[rgba(0,0,0,0.25)] cursor-default'
+          ? 'border-[0.5px] border-[rgba(0,0,0,0.25)] dark:border-[rgba(255,255,255,0.25)] text-[rgba(0,0,0,0.25)] dark:text-[rgba(255,255,255,0.25)] cursor-default'
           : filled
-            ? 'bg-lightGray border-[0.5px] border-darkGray text-darkGray hover:bg-gray-200'
-            : 'border-[0.5px] border-darkGray text-darkGray hover:bg-gray-100'
+            ? 'bg-lightGray dark:bg-zinc-700 border-[0.5px] border-darkGray dark:border-zinc-500 text-darkGray dark:text-zinc-200 hover:bg-gray-200 dark:hover:bg-zinc-600'
+            : 'border-[0.5px] border-darkGray dark:border-zinc-500 text-darkGray dark:text-zinc-200 hover:bg-gray-100 dark:hover:bg-zinc-700'
         }`}
     >
       {icon}
@@ -108,7 +108,7 @@ function BorrowedCard({
   const dueDate = format(expiresAt, 'dd.MM.yyyy');
 
   return (
-    <div className="w-full bg-white border border-[#e5e5e5] rounded-[6px] p-3 flex gap-3">
+    <div className="w-full bg-white dark:bg-zinc-800 border border-[#e5e5e5] dark:border-zinc-700 rounded-[6px] p-3 flex gap-3">
       <div
         className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden cursor-pointer"
         onClick={() => onOpenDetail(license.entry_id, license.entry?.catalog_id)}
@@ -124,12 +124,12 @@ function BorrowedCard({
         <div className="flex items-start justify-between gap-2 flex-wrap">
           <div className="min-w-0">
             <p
-              className="font-semibold text-[14px] text-[#15384e] tracking-[0.1px] truncate leading-normal cursor-pointer hover:underline"
+              className="font-semibold text-[14px] text-secondary dark:text-secondaryLight tracking-[0.1px] truncate leading-normal cursor-pointer hover:underline"
               onClick={() => onOpenDetail(license.entry_id, license.entry?.catalog_id)}
             >
               {license.entry?.title || 'Neznámy titul'}
             </p>
-            <p className="font-light text-[12px] text-[#15384e] tracking-[0.1px]">Autor</p>
+            <p className="font-light text-[12px] text-secondary dark:text-secondaryLight tracking-[0.1px]">Autor</p>
           </div>
           <div className="flex items-center gap-[11px] h-[28px] px-3 rounded-[6px] bg-[#cce6fe] shadow-[inset_-1px_-1px_2.8px_0px_rgba(0,0,0,0.1)] flex-shrink-0">
             <span className="w-[7px] h-[7px] rounded-full bg-[#1e6cb4] shrink-0" />
@@ -172,7 +172,7 @@ function ReservedCard({
   const availableFrom = format(expiresAt, 'dd.MM.yyyy');
 
   return (
-    <div className="w-full bg-white border border-[#e5e5e5] rounded-[6px] p-3 flex gap-3">
+    <div className="w-full bg-white dark:bg-zinc-800 border border-[#e5e5e5] dark:border-zinc-700 rounded-[6px] p-3 flex gap-3">
       <div
         className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden cursor-pointer"
         onClick={() => onOpenDetail(license.entry_id, license.entry?.catalog_id)}
@@ -188,12 +188,12 @@ function ReservedCard({
         <div className="flex items-start justify-between gap-2 flex-wrap">
           <div className="min-w-0">
             <p
-              className="font-semibold text-[14px] text-[#15384e] tracking-[0.1px] truncate leading-normal cursor-pointer hover:underline"
+              className="font-semibold text-[14px] text-secondary dark:text-secondaryLight tracking-[0.1px] truncate leading-normal cursor-pointer hover:underline"
               onClick={() => onOpenDetail(license.entry_id, license.entry?.catalog_id)}
             >
               {license.entry?.title || 'Neznámy titul'}
             </p>
-            <p className="font-light text-[12px] text-[#15384e] tracking-[0.1px]">Autor</p>
+            <p className="font-light text-[12px] text-secondary dark:text-secondaryLight tracking-[0.1px]">Autor</p>
           </div>
           <div className="flex items-center gap-[11px] h-[28px] px-3 rounded-[6px] bg-[#feeecc] shadow-[inset_-1px_-1px_2.8px_0px_rgba(0,0,0,0.1)] flex-shrink-0">
             <span className="w-[7px] h-[7px] rounded-full bg-[#9f6c00] shrink-0" />
@@ -230,7 +230,7 @@ function PastCard({
   const to = format(expiresAt, 'dd.MM.yyyy');
 
   return (
-    <div className="w-full bg-white border border-[#e5e5e5] rounded-[6px] p-3 flex gap-3 opacity-75">
+    <div className="w-full bg-white dark:bg-zinc-800 border border-[#e5e5e5] dark:border-zinc-700 rounded-[6px] p-3 flex gap-3 opacity-75">
       <div className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden grayscale">
         <img
           alt={license.entry?.title}
@@ -242,14 +242,14 @@ function PastCard({
       <div className="flex-1 min-w-0 flex flex-col gap-2 justify-between py-0.5">
         <div className="flex items-start justify-between gap-2 flex-wrap">
           <div className="min-w-0">
-            <p className="font-semibold text-[14px] text-[#15384e] tracking-[0.1px] truncate leading-normal">
+            <p className="font-semibold text-[14px] text-secondary dark:text-secondaryLight tracking-[0.1px] truncate leading-normal">
               {license.entry?.title || 'Neznámy titul'}
             </p>
-            <p className="font-light text-[12px] text-[#15384e] tracking-[0.1px]">Autor</p>
+            <p className="font-light text-[12px] text-secondary dark:text-secondaryLight tracking-[0.1px]">Autor</p>
           </div>
           <button
             onClick={() => onViewDetail(license.entry_id, license.entry?.catalog_id)}
-            className="flex items-center gap-[6px] h-[28px] px-3 rounded-[6px] text-[12px] tracking-[0.1px] whitespace-nowrap border-[0.5px] border-darkGray text-darkGray hover:bg-gray-100 transition-colors flex-shrink-0"
+            className="flex items-center gap-[6px] h-[28px] px-3 rounded-[6px] text-[12px] tracking-[0.1px] whitespace-nowrap border-[0.5px] border-darkGray dark:border-zinc-500 text-darkGray dark:text-zinc-300 hover:bg-gray-100 dark:hover:bg-zinc-700 transition-colors flex-shrink-0"
           >
             <RiBookmarkLine size={14} />
             {t('license.loansPage.card.viewDetail')}
@@ -257,9 +257,9 @@ function PastCard({
         </div>
 
         <div className="flex flex-wrap gap-[6px]">
-          <span className="flex items-center gap-[5px] h-[16px] px-2 rounded-[4px] bg-[#f0f0f0] shrink-0">
-            <RxCalendar size={11} className="text-[#666] shrink-0" />
-            <span className="text-[10px] text-[#666] tracking-[0.1px] whitespace-nowrap">{from} – {to}</span>
+          <span className="flex items-center gap-[5px] h-[16px] px-2 rounded-[4px] bg-[#f0f0f0] dark:bg-zinc-700 shrink-0">
+            <RxCalendar size={11} className="text-[#666] dark:text-zinc-400 shrink-0" />
+            <span className="text-[10px] text-[#666] dark:text-zinc-400 tracking-[0.1px] whitespace-nowrap">{from} – {to}</span>
           </span>
         </div>
       </div>
@@ -296,14 +296,22 @@ export default function LoansCardView() {
     setLoading(true);
     getLicenses({ page: 1, limit: 50 })
       .then(({ items }) => {
+        items.sort((a, b) => {
+          const aDate = a.expires_at ? new Date(a.expires_at) : new Date(0);
+          const bDate = b.expires_at ? new Date(b.expires_at) : new Date(0);
+          return bDate.getTime() - aDate.getTime();
+        });
         const now = new Date();
         setBorrowed(
           items.filter((l) => {
             return l.state === LICENSE_STATE.active && new Date(l.starts_at) <= now && new Date(l.expires_at) > now;
           }),
         );
+        // setReserved(
+        //   items.filter((l) => l.state === LICENSE_STATE.ready && new Date(l.starts_at) > now),
+        // );
         setReserved(
-          items.filter((l) => l.state === LICENSE_STATE.ready && new Date(l.starts_at) > now),
+          items.filter((l) => l.state === LICENSE_STATE.ready),
         );
         setPast(
           items.filter((l) => {
@@ -315,9 +323,9 @@ export default function LoansCardView() {
             ].includes(l.state);
             const isExpiredActive =
               l.state === LICENSE_STATE.active && new Date(l.expires_at) <= now;
-            const isStaleReady =
-              l.state === LICENSE_STATE.ready && new Date(l.starts_at) <= now;
-            return isTerminal || isExpiredActive || isStaleReady;
+            // const isStaleReady =
+            //   l.state === LICENSE_STATE.ready && new Date(l.starts_at) <= now;
+            return isTerminal || isExpiredActive;
           }),
         );
       })
@@ -343,7 +351,7 @@ export default function LoansCardView() {
   };
 
   if (loading) {
-    return <div className="py-8 text-center text-darkGray">Načítavam...</div>;
+    return <div className="py-8 text-center text-darkGray dark:text-zinc-400">Načítavam...</div>;
   }
 
   return (
@@ -351,12 +359,12 @@ export default function LoansCardView() {
       <div className="flex flex-col w-full">
         {/* Borrowed section */}
         <div className="flex flex-col gap-[20px] py-[20px]">
-          <p className="text-[18px] font-bold text-secondary tracking-[0.1px]">
-            {t('license.loansPage.card.borrowedSection')} <span className="text-[16px] font-light text-[#15384e]">({borrowed.length})</span>
+          <p className="text-[18px] font-bold text-secondary dark:text-secondaryLight tracking-[0.1px]">
+            {t('license.loansPage.card.borrowedSection')} <span className="text-[16px] font-light text-secondary dark:text-secondaryLight">({borrowed.length})</span>
           </p>
           <div className="flex flex-col gap-[12px] w-full">
             {borrowed.length === 0 ? (
-              <p className="text-[14px] text-darkGray">{t('license.loansPage.card.noBorrowed')}</p>
+              <p className="text-[14px] text-darkGray dark:text-zinc-400">{t('license.loansPage.card.noBorrowed')}</p>
             ) : (
               borrowed.map((license) => (
                 <BorrowedCard
@@ -376,8 +384,8 @@ export default function LoansCardView() {
         {/* Reserved section */}
         {reserved.length > 0 && (
           <div className="flex flex-col gap-[20px] py-[20px]">
-            <p className="text-[18px] font-bold text-secondary tracking-[0.1px]">
-              {t('license.loansPage.card.reservedSection')} <span className="text-[16px] font-light text-[#15384e]">({reserved.length})</span>
+            <p className="text-[18px] font-bold text-secondary dark:text-secondaryLight tracking-[0.1px]">
+              {t('license.loansPage.card.reservedSection')} <span className="text-[16px] font-light text-secondary dark:text-secondaryLight">({reserved.length})</span>
             </p>
             <div className="flex flex-col gap-[12px] w-full">
               {reserved.map((license) => (
@@ -390,8 +398,8 @@ export default function LoansCardView() {
         {/* Past / Re-reserve section */}
         {past.length > 0 && (
           <div className="flex flex-col gap-[20px] py-[20px]">
-            <p className="text-[18px] font-bold text-secondary tracking-[0.1px]">
-              {t('license.loansPage.card.pastSection')} <span className="text-[16px] font-light text-[#15384e]">({past.length})</span>
+            <p className="text-[18px] font-bold text-secondary dark:text-secondaryLight tracking-[0.1px]">
+              {t('license.loansPage.card.pastSection')} <span className="text-[16px] font-light text-secondary dark:text-secondaryLight">({past.length})</span>
             </p>
             <div className="flex flex-col gap-[12px] w-full">
               {past.map((license) => (
