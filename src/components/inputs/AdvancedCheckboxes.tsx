@@ -57,7 +57,7 @@ export default function AdvancedCheckboxes({
             {enableSearch && (
                 <div className="relative">
                     <input
-                        className="w-full bg-white dark:bg-strongDarkGray rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] px-2 py-[5px] pr-7 text-[11px] text-[#b1b1b1] placeholder:text-[#b1b1b1] focus:outline-none"
+                        className="w-full bg-white dark:bg-strongDarkGray rounded-[4px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] px-2 py-[5px] pr-7 text-[11px] text-[#b1b1b1] placeholder:text-[#b1b1b1] focus:outline-none"
                         placeholder={t('searchBar.search')}
                         value={searchQuery}
                         onChange={e => handleSearch(e.target.value)}

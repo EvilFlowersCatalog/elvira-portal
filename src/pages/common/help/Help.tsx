@@ -134,7 +134,7 @@ const Help = () => {
         </div>
 
         {/* FAQ */}
-        <h2 className="text-3xl font-bold text-secondary dark:text-secondaryLight text-center mb-6">FAQ</h2>
+        <h2 className="text-3xl font-bold text-secondary dark:text-secondaryLight text-center mb-6 pt-12">FAQ</h2>
         <div className="flex flex-col gap-3 mb-12">
           {faqItems.map((item, i) => (
             <div key={i} className="bg-white dark:bg-strongDarkGray border border-gray-200 dark:border-zinc-700 rounded-xl overflow-hidden">

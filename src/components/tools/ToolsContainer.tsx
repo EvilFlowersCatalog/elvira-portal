@@ -132,7 +132,7 @@ const ToolsContainer = ({
           />
         </div>
 
-        <div className="transition-all duration-400 w-full mt-2">
+        <div className="transition-all duration-400 w-full mt-7">
           <div className="grid lg:grid-cols-[auto_1fr_auto] grid-cols-2 gap-3 w-full text-[15px] items-start">
             {advancedSearch && (
               <button

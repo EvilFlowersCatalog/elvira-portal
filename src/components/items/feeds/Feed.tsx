@@ -81,7 +81,7 @@ const Feed = ({ feed }: IFeedParams) => {
   return (
     <div className={'relative flex p-2 w-full md:w-1/2 xl:w-1/4'}>
       <button
-        className={`relative h-[126px] w-full bg-primaryLight text-left rounded-[8px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] p-4 flex flex-col gap-2 duration-200 overflow-hidden hover:brightness-95`}
+        className={`relative h-[126px] w-full bg-primaryLight text-left rounded-[8px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] p-4 flex flex-col gap-2 duration-200 overflow-hidden hover:brightness-95`}
         onClick={() => handleFeedClick()}
         onMouseEnter={() => setIsHovering(true)}
         onMouseOut={() => setIsHovering(false)}

@@ -110,7 +110,7 @@ function BorrowedCard({
   return (
     <div className="w-full bg-white dark:bg-zinc-800 border border-[#e5e5e5] dark:border-zinc-700 rounded-[6px] p-3 flex gap-3">
       <div
-        className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden cursor-pointer"
+        className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] overflow-hidden cursor-pointer"
         onClick={() => onOpenDetail(license.entry_id, license.entry?.catalog_id)}
       >
         <img
@@ -174,7 +174,7 @@ function ReservedCard({
   return (
     <div className="w-full bg-white dark:bg-zinc-800 border border-[#e5e5e5] dark:border-zinc-700 rounded-[6px] p-3 flex gap-3">
       <div
-        className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden cursor-pointer"
+        className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] overflow-hidden cursor-pointer"
         onClick={() => onOpenDetail(license.entry_id, license.entry?.catalog_id)}
       >
         <img
@@ -231,7 +231,7 @@ function PastCard({
 
   return (
     <div className="w-full bg-white dark:bg-zinc-800 border border-[#e5e5e5] dark:border-zinc-700 rounded-[6px] p-3 flex gap-3 opacity-75">
-      <div className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_12px_0px_rgba(0,0,0,0.1)] overflow-hidden grayscale">
+      <div className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] overflow-hidden grayscale">
         <img
           alt={license.entry?.title}
           src={license.entry?.thumbnail ? `${license.entry.thumbnail}?access_token=${token}` : '/assets/thumbnail.webp'}
