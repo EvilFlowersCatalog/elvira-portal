@@ -49,7 +49,7 @@ const useGetLicenses = () => {
     }
 
     params.set("entry_id", query.entry_id || "");
-    params.set("pagination", query.pagination !== false ? "true" : "false");
+    params.set("paginate", query.pagination !== false ? "true" : "false");
     params.set("page", query.page?.toString() || "1");
     params.set("limit", query.limit?.toString() || "10");
     params.set("sort_by", query.sortBy || "");

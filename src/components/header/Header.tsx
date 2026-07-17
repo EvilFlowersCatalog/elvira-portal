@@ -1,4 +1,5 @@
 import { FiMenu } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import {
   NAVIGATION_PATHS,
@@ -13,11 +14,15 @@ const Header = () => {
     titleLogoLight,
     specialNavigation,
   } = useAppContext();
+  const { t } = useTranslation();
 
   return (
     <div className='fixed left-0 top-0 z-30 w-full h-fit py-3 flex px-5 gap-4 items-center bg-white dark:bg-zinc-800'>
-      <button className='' onClick={() => setShowNavbar(true)}>
-        <FiMenu size={30} />
+      <button
+        aria-label={t('navbar.openMenu', { defaultValue: 'Open menu' })}
+        onClick={() => setShowNavbar(true)}
+      >
+        <FiMenu size={30} aria-hidden="true" />
       </button>
 
       {/* Spacer */}

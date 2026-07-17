@@ -232,7 +232,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
                     <button
                       key={feed.id}
                       onClick={() => handleFeedClick(feed.id)}
-                      className="px-2 py-1 text-xs bg-primaryLight dark:bg-primaryDark text-primary dark:text-primaryDark font-medium transition-colors rounded-md"
+                      className="px-2 py-1 text-xs bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight font-medium transition-colors rounded-md"
                     >
                       {feed.title}
                     </button>
@@ -250,7 +250,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
                     <button
                       key={category.id}
                       onClick={() => handleCategoryClick(category.id)}
-                      className="px-2 py-1 text-xs bg-primaryLight dark:bg-primaryDark text-primary dark:text-primaryDark font-medium transition-colors rounded-md"
+                      className="px-2 py-1 text-xs bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight font-medium transition-colors rounded-md"
                     >
                       {category.term}
                     </button>

@@ -54,7 +54,7 @@ const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
             <span
               className={`absolute font-light
                   ${isFocused || hasValue
-                    ? `top-0 text-[12px] ${isInvalid ? 'text-red' : 'text-primary'}`
+                    ? `top-0 text-[12px] ${isInvalid ? 'text-redText' : 'text-primaryText dark:text-primaryLight'}`
                     : `top-1/2 -translate-y-[1px]`}
                   duration-200 pointer-events-none select-none`}
                   style={{ paddingLeft: isFocused || hasValue ? 0 : `${paddingLeft}px` }}
@@ -81,10 +81,15 @@ const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
             onFocus={handleFocus}
             onBlur={handleBlur}
             id={id}
+            aria-label={
+              (props['aria-label'] as string) ??
+              (typeof placeholder === 'string' && placeholder ? placeholder : undefined)
+            }
+            aria-invalid={isInvalid || undefined}
           />
         </div>
         {isInvalid && (
-          <span className='text-red text-sm text-left'>* {invalidMessage}</span>
+          <span role="alert" className='text-redText text-sm text-left'>* {invalidMessage}</span>
         )}
       </div>
     );

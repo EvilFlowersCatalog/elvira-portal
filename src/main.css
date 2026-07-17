@@ -50,13 +50,29 @@ body,
   animation-delay: -0.16s;
 }
 
-@layer base {
-  button {
-    @apply focus:outline-none;
-  }
-  input {
-    @apply focus:outline-none;
-  }
+/*
+ * Accessibility (WCAG 2.4.7 Focus Visible / 2.4.11 Focus Appearance):
+ * Keep a visible focus indicator for keyboard users while suppressing the
+ * outline only for pointer interactions (:focus-visible handles this split).
+ * These rules are intentionally UNLAYERED so they win over Tailwind's
+ * `outline-none` utility (which lives in @layer utilities) that several inputs use.
+ */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[role="combobox"]:focus-visible,
+[role="tab"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--color-primary) !important;
+  outline-offset: 2px !important;
+  border-radius: 3px;
+}
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible) {
+  outline: none;
 }
 
 /* CSS Variables for faculty themes */
@@ -137,4 +153,31 @@ body,
   --color-red: #ff2129;
   --color-green: #77dd77;
   --color-strong-dark-gray: #141414;
+  /* Semantic colors that meet WCAG AA when used as text / on their surfaces */
+  --color-red-text: #c30000;   /* red as text/on-light (≥4.5:1) */
+  --color-green-text: #007a16; /* green as text/on-light (≥4.5:1) */
 }
+
+/*
+ * Derived, contrast-aware theme tokens (WCAG 1.4.3).
+ * For each faculty theme:
+ *   --color-on-primary   : text/icon color to place ON a `primary` fill (buttons)
+ *   --color-primary-text : `primary` darkened enough to use as TEXT on white/primaryLight
+ *   --color-primary-dark : dark-mode surface tint for `primary` chips (pairs with light text)
+ * Defaults below cover any theme that doesn't override them.
+ */
+:root {
+  --color-on-primary: #141414;
+  --color-primary-text: #0077A3;
+  --color-primary-dark: #0A3D52;
+}
+:root[data-theme="fiit"]    { --color-on-primary:#141414; --color-primary-text:#0077A3; --color-primary-dark:#0A3D52; }
+:root[data-theme="stu"]     { --color-on-primary:#ffffff; --color-primary-text:#a80331; --color-primary-dark:#4A0716; }
+:root[data-theme="mtf"]     { --color-on-primary:#141414; --color-primary-text:#C81F14; --color-primary-dark:#5A0E09; }
+:root[data-theme="svf"]     { --color-on-primary:#141414; --color-primary-text:#B0511A; --color-primary-dark:#4A2410; }
+:root[data-theme="sjf"]     { --color-on-primary:#ffffff; --color-primary-text:#4C5B60; --color-primary-dark:#202A2D; }
+:root[data-theme="fei"]     { --color-on-primary:#ffffff; --color-primary-text:#0C4A8E; --color-primary-dark:#0D2238; }
+:root[data-theme="fchpt"]   { --color-on-primary:#141414; --color-primary-text:#756000; --color-primary-dark:#4A3F0F; }
+:root[data-theme="fad"]     { --color-on-primary:#141414; --color-primary-text:#007A3A; --color-primary-dark:#103A22; }
+:root[data-theme="ku"]      { --color-on-primary:#141414; --color-primary-text:#7A6100; --color-primary-dark:#3A2F0A; }
+:root[data-theme="default"] { --color-on-primary:#141414; --color-primary-text:#0077A3; --color-primary-dark:#0A3D52; }

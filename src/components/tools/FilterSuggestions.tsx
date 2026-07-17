@@ -194,7 +194,7 @@ const FilterSuggestions = ({ searchQuery }: FilterSuggestionsProps) => {
                       <button
                         key={feed.id}
                         onClick={() => handleFeedClick(feed.id)}
-                        className="text-left px-3 py-1.5 text-sm bg-primaryLight dark:bg-primaryDark text-primary dark:text-primaryDark hover:opacity-80 transition-opacity rounded-md"
+                        className="text-left px-3 py-1.5 text-sm bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight hover:opacity-80 transition-opacity rounded-md"
                       >
                         {feed.title}
                       </button>
@@ -228,7 +228,7 @@ const FilterSuggestions = ({ searchQuery }: FilterSuggestionsProps) => {
                       <button
                         key={category.id}
                         onClick={() => handleCategoryClick(category.id)}
-                        className="text-left px-3 py-1.5 text-sm bg-primaryLight dark:bg-primaryDark text-primary dark:text-primaryDark hover:opacity-80 transition-opacity rounded-md"
+                        className="text-left px-3 py-1.5 text-sm bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight hover:opacity-80 transition-opacity rounded-md"
                       >
                         {category.term}
                       </button>

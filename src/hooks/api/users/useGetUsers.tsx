@@ -25,7 +25,7 @@ const useGetUsers = () => {
             params.set('page', options.page?.toString() || '1');
             params.set('limit', options.limit?.toString() || '10');
         } else {
-            params.set('pagination', 'false');
+            params.set('paginate', 'false');
         }
 
         if (options.sortBy) {

@@ -22,6 +22,9 @@ export interface ILicenseEntry {
 	thumbnail?: string;
 	image?: string;
 	authors?: ILicenseAuthor[];
+	/** Queue fields from the LCP-state decorator (present on embedded entries). */
+	queue_length?: number;
+	next_available_at?: string | null;
 }
 
 /** "Surname, N. Surname" — matches how authors read elsewhere in the catalog. */

@@ -33,6 +33,7 @@ import AiChatHistory from '../pages/common/AiChatHistory';
 import History from '../pages/common/History';
 import CatalogInitializer from '../components/catalog/CatalogInitializer';
 import Profile from '../pages/common/Profile';
+import ClaimReservation from '../pages/common/ClaimReservation';
 
 const BaseRoutes = () => {
   const { auth } = useAuthContext();
@@ -77,6 +78,7 @@ const BaseRoutes = () => {
         <Route element={<RequireAuth />}>
           <Route index element={<Home />} />
           <Route path='library' element={<Library />} />
+          <Route path='library/reservations/:reservation-id/claim' element={<ClaimReservation />} />
           <Route path='shelf' element={<Shelf />} />
           <Route path='profile' element={<Profile />} />
           { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (

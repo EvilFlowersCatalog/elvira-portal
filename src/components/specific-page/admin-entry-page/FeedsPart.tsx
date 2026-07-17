@@ -29,7 +29,7 @@ const FeedsPart = ({ entry, setEntry }: IPartParams) => {
             <div key={index} className={`h-fit`}>
               <button
                 type='button'
-                className={`bg-primary p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md`}
+                className={`bg-primary p-2 text-sm hover:bg-redText w-full flex gap-2 justify-between items-center text-white rounded-md`}
                 onClick={() => {
                   umamiTrack('Entry Remove Feed Button', {
                     feedId: item.id,

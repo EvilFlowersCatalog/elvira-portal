@@ -184,7 +184,7 @@ const FeedForm = ({
             <div className='w-full md:w-1/2 lg:w-1/3 flex p-1' key={index}>
               <button
                 type='button'
-                className={`bg-primary p-2 text-sm hover:bg-red flex w-full gap-2 justify-between items-center text-white rounded-md`}
+                className={`bg-primary p-2 text-sm hover:bg-redText flex w-full gap-2 justify-between items-center text-white rounded-md`}
                 onClick={() => {
                   setParentFeeds((prev) => ({
                     feeds: prev.feeds.filter(

@@ -11,25 +11,27 @@ interface AvailabilityBadgeProps {
   days?: number | null;
 }
 
+// Text colors are chosen to meet WCAG AA (≥4.5:1) on their pastel backgrounds,
+// and each state carries a dark-mode variant for theme consistency.
 const CONFIGS = {
   available: {
-    bg: 'bg-[#cfffd8]',
-    dot: 'bg-[#005e11]',
-    text: 'text-[#005e11]',
+    bg: 'bg-[#cfffd8] dark:bg-[#0f3d1a]',
+    dot: 'bg-[#005e11] dark:bg-[#7ee49a]',
+    text: 'text-[#005e11] dark:text-[#9ff0b4]',
   },
   borrowed: {
-    bg: 'bg-[#cce6fe]',
-    dot: 'bg-[#1e6cb4]',
-    text: 'text-[#1e6cb4]',
+    bg: 'bg-[#cce6fe] dark:bg-[#0d2b47]',
+    dot: 'bg-[#175a97] dark:bg-[#8fc4f5]',
+    text: 'text-[#175a97] dark:text-[#a9d2f7]',
   },
   reserved: {
-    bg: 'bg-[#feeecc]',
-    dot: 'bg-[#9f6c00]',
-    text: 'text-[#9f6c00]',
+    bg: 'bg-[#feeecc] dark:bg-[#3d2f0a]',
+    dot: 'bg-[#8a5e00] dark:bg-[#f0cd7a]',
+    text: 'text-[#8a5e00] dark:text-[#f2d79a]',
   },
   unavailable: {
     bg: 'bg-[#ebebeb] dark:bg-neutral-700',
-    dot: 'bg-[#575757]',
+    dot: 'bg-[#575757] dark:bg-neutral-300',
     text: 'text-[#575757] dark:text-neutral-300',
   },
 } as const;

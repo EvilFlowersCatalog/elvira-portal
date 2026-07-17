@@ -36,7 +36,7 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
             const customEvent = event as CustomEvent;
             const updatedEntry = customEvent.detail.id;
             if (updatedEntry === entry.id) {
-                var isOnShelf = customEvent.detail.isOnShelf;
+                const isOnShelf = customEvent.detail.isOnShelf;
                 if (isOnShelf) entry.shelf_record_id = customEvent.detail.shelf_record_id;
                 setIsOnShelf(isOnShelf);
             }
@@ -123,7 +123,19 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
         <div className="group rounded-[8px] relative w-full bg-white dark:bg-strongDarkGray shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.25)] dark:hover:shadow-strongDarkGray transition-shadow duration-300 flex flex-col gap-[7px] pb-[10px]">
             {/* Book cover */}
             <div className="h-[163px] relative shrink-0 w-full overflow-hidden rounded-t-[8px]">
-                <div onClick={openEntryDetail} className="relative w-full h-full cursor-pointer select-none">
+                <div
+                    onClick={openEntryDetail}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`${t('entry.detail.openDetail', { defaultValue: 'Open detail' })}: ${entry.title}`}
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            openEntryDetail();
+                        }
+                    }}
+                    className="relative w-full h-full cursor-pointer select-none"
+                >
                     <img
                         className="w-full h-full object-cover select-none"
                         src={entry.thumbnail + `?access_token=${auth?.token}`}
@@ -138,8 +150,13 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
                         />
                     )}
                 </div>
-                <div
+                <button
+                    type="button"
                     onClick={handleBookmarkToggle}
+                    aria-pressed={isOnShelf}
+                    aria-label={isOnShelf
+                        ? t('myShelf.remove', { defaultValue: 'Remove from shelf' })
+                        : t('myShelf.add', { defaultValue: 'Add to shelf' })}
                     className={`cursor-pointer absolute top-[8px] right-[6px] w-9 h-7 rounded-[8px] flex items-center justify-center drop-shadow-[0px_4px_6px_rgba(0,0,0,0.1)]
                      ${isOnShelf ? 'bg-primaryLight border-2 border-primary' : 'bg-white'}`}
                 >
@@ -151,7 +168,7 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
                             strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round"
                         />
                     </svg>
-                </div>
+                </button>
             </div>
 
             {/* Detail section */}
@@ -159,18 +176,20 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
                 {/* Feeds */}
                 <div className="flex gap-[6px] items-center w-full min-w-0 overflow-hidden">
                     {entry.feeds.length > 0 && (
-                        <span
+                        <button
+                            type="button"
                             key={id ? `${id}-${entry.feeds[0].id}` : entry.feeds[0].id}
                             onClick={() => handleParamClick('feed-id', entry.feeds[0].id)}
-                            className="cursor-pointer font-medium px-[4px] py-[3px] text-[9px] tracking-[0.1px] bg-primaryLight text-primary rounded-[4px] truncate min-w-0 shrink"
+                            aria-label={`${t('search.filterByFeed', { defaultValue: 'Filter by category' })}: ${entry.feeds[0].title}`}
+                            className="cursor-pointer font-medium px-[4px] py-[3px] text-[9px] tracking-[0.1px] bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight rounded-[4px] truncate min-w-0 shrink"
                         >
                             {entry.feeds[0].title}
-                        </span>
+                        </button>
                     )}
                     {entry.feeds.length > 1 && (
                         <span
                             title={entry.feeds.slice(1).map(f => f.title).join(', ')}
-                            className="cursor-pointer font-medium px-[4px] py-[3px] text-[9px] tracking-[0.1px] bg-primaryLight text-primary rounded-[4px] flex-shrink-0 whitespace-nowrap"
+                            className="font-medium px-[4px] py-[3px] text-[9px] tracking-[0.1px] bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight rounded-[4px] flex-shrink-0 whitespace-nowrap"
                         >
                             +{entry.feeds.length - 1}
                         </span>

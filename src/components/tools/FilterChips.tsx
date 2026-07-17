@@ -24,7 +24,7 @@ const FilterChips = ({ filters, onRemove, onClear }: IFilterChips) => {
       {filters.map((filter, index) => (
         <div
           key={`${filter.key}-${filter.itemId || filter.value}-${index}`}
-          className="flex items-center gap-1 px-3 py-1 rounded-md bg-primaryLight dark:bg-primaryDark text-primary dark:text-primaryDark font-medium text-xs"
+          className="flex items-center gap-1 px-3 py-1 rounded-md bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight font-medium text-xs"
         >
           <span>{filter.label}</span>
           <button

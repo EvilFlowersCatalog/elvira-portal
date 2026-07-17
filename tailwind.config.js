@@ -45,12 +45,18 @@ export default {
         // Dynamic colors based on faculty theme (CSS variables)
         primary: 'var(--color-primary)',
         primaryLight: 'var(--color-primary-light)',
+        // Contrast-aware derived tokens (see src/main.css)
+        primaryText: 'var(--color-primary-text)',
+        primaryDark: 'var(--color-primary-dark)',
+        onPrimary: 'var(--color-on-primary)',
         secondary: 'var(--color-secondary)',
         secondaryLight: 'var(--color-secondary-light)',
         lightGray: 'var(--color-light-gray)',
         darkGray: 'var(--color-dark-gray)',
         red: 'var(--color-red)',
+        redText: 'var(--color-red-text)',
         green: 'var(--color-green)',
+        greenText: 'var(--color-green-text)',
         strongDarkGray: 'var(--color-strong-dark-gray)',
       },
       flex: {

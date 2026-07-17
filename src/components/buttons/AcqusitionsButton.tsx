@@ -12,10 +12,11 @@ import { IEntryDetail } from "../../utils/interfaces/entry";
 import { IEntryAcquisition } from "../../utils/interfaces/acquisition";
 import { ILicense, LICENSE_STATE } from "../../utils/interfaces/license";
 import useDownloadLicense from "../../hooks/api/licenses/useDownloadLicense";
+import useCreateReservation from "../../hooks/api/reservations/useCreateReservation";
+import { problemDetailMessage } from "../../utils/problemDetail";
 import { toast } from "react-toastify";
 import ExtendLoanModal from "../modals/ExtendLoanModal";
 import ReturnBookModal from "../modals/ReturnBookModal";
-import CancelReservationModal from "../modals/CancelReservationModal";
 
 export default function AcquisitionsButton({
   entry,
@@ -33,10 +34,11 @@ export default function AcquisitionsButton({
   const getUserLicenses = useGetLicenses();
   const { openInThorium, downloadDirect } = useDownloadLicense();
 
+  const createReservation = useCreateReservation();
   const [activeLicense, setActiveLicense] = useState<ILicense | null>(propActiveLicense ?? null);
   const [showExtend, setShowExtend] = useState(false);
   const [showReturn, setShowReturn] = useState(false);
-  const [showCancel, setShowCancel] = useState(false);
+  const [reserving, setReserving] = useState(false);
 
   useEffect(() => {
     if (propActiveLicense !== undefined) {
@@ -68,16 +70,22 @@ export default function AcquisitionsButton({
 
   const isReadiumEnabled = Boolean(entry.config?.readium_enabled);
   const hasAcquisitions = acquisitions.length > 0;
+  // A `ready` licence is a granted-but-not-yet-started loan (the user claimed it
+  // or it was just issued), NOT a queue reservation — this matches how
+  // LoansCardView renders it in the "Borrowed" section. The real queue is the
+  // separate Reservation model handled via `entry.user_reservation_id` below.
+  // Treating `ready` as a reservation here previously contradicted the loans list.
   const isActiveLoan =
-    activeLicense?.state === LICENSE_STATE.active &&
+    (activeLicense?.state === LICENSE_STATE.active ||
+      activeLicense?.state === LICENSE_STATE.ready) &&
     (!activeLicense?.expires_at || new Date(activeLicense.expires_at) > new Date());
-  const isReserved = activeLicense?.state === LICENSE_STATE.ready;
 
   if (isActiveLoan && activeLicense) {
     return (
       <>
         <div className="flex flex-col gap-2 w-full">
-          <div
+          <button
+            type="button"
             className={`${ActionButtonStyle} w-full cursor-pointer`}
             onClick={() => {
               const licenseRef = { id: activeLicense.lcp_license_id || activeLicense.id, download_url: activeLicense.download_url };
@@ -95,7 +103,7 @@ export default function AcquisitionsButton({
           >
             <BiDownload size={24} className="flex-shrink-0" />
             {t("entry.detail.activeLicense")}
-          </div>
+          </button>
           <div className="flex gap-2">
             <button
               className={`${ActionButtonStyle} flex-1 cursor-pointer`}
@@ -131,33 +139,54 @@ export default function AcquisitionsButton({
     );
   }
 
-  if (isReserved && activeLicense) {
-    return (
-      <>
+  if (isReadiumEnabled) {
+    // Already in the queue for this title (real Reservation, not a ready licence).
+    if (entry.user_reservation_id) {
+      return (
+        <div className={`${ActionButtonStyle} w-full`} style={{ cursor: "default" }}>
+          <HiOutlineUsers size={24} className="flex-shrink-0" />
+          {entry.user_position
+            ? t("entry.detail.queuePosition", { position: entry.user_position, defaultValue: `In queue · #${entry.user_position}` })
+            : t("entry.detail.reserved", { defaultValue: "Reserved" })}
+        </div>
+      );
+    }
+
+    // No free slots -> the only action is to join the queue. Borrowing here would
+    // just 409 ("no available slots"), so offer Reserve instead of Borrow.
+    if (entry.lcp_state === "fully_borrowed") {
+      return (
         <button
-          className={`${ActionButtonStyle} w-full cursor-pointer`}
-          onClick={() => setShowCancel(true)}
+          type="button"
+          disabled={reserving}
+          aria-label={t("entry.detail.reserve", { defaultValue: "Reserve" })}
+          className={`${ActionButtonStyle} w-full ${reserving ? "opacity-60 cursor-wait" : "cursor-pointer"}`}
+          onClick={async () => {
+            if (reserving) return;
+            setReserving(true);
+            try {
+              await createReservation(entry.id);
+              toast.success(t("entry.detail.reserveSuccess", { defaultValue: "Added to the queue. We'll email you when it's available." }));
+              onRefresh?.();
+            } catch (e) {
+              toast.error(problemDetailMessage(e, t("entry.detail.reserveFailed", { defaultValue: "Could not reserve. Try again." })));
+            } finally {
+              setReserving(false);
+            }
+          }}
         >
           <HiOutlineUsers size={24} className="flex-shrink-0" />
-          {t('entry.detail.cancelReservation')}
+          {t("entry.detail.reserve", { defaultValue: "Reserve" })}
+          {entry.queue_length ? ` (${entry.queue_length})` : ""}
         </button>
-        {showCancel && (
-          <CancelReservationModal
-            license={activeLicense}
-            onClose={() => setShowCancel(false)}
-            onSuccess={() => { setActiveLicense(null); onRefresh?.(); }}
-          />
-        )}
-      </>
-    );
-  }
+      );
+    }
 
-  if (isReadiumEnabled) {
     return (
-      <div className={`${ActionButtonStyle} w-full cursor-pointer`} onClick={openBorrowModal}>
+      <button type="button" className={`${ActionButtonStyle} w-full cursor-pointer`} onClick={openBorrowModal}>
         <BiCalendar size={24} className="flex-shrink-0" />
         {t("entry.detail.borrow")}
-      </div>
+      </button>
     );
   }
 

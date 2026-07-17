@@ -147,7 +147,7 @@ const HomeHeader = () => {
           onClick={() => {
             setShowAiAssistant(true);
           }}
-          className="absolute md:right-4 md:bottom-2 size-fit flex items-center gap-2 text-xs text-primary bg-primaryLight rounded-md px-2 py-1 max-md:relative max-md:w-full max-md:flex max-md:justify-center max-md:p-3"
+          className="absolute md:right-4 md:bottom-2 size-fit flex items-center gap-2 text-xs text-primaryText dark:text-primaryLight bg-primaryLight dark:bg-primaryDark rounded-md px-2 py-1 max-md:relative max-md:w-full max-md:flex max-md:justify-center max-md:p-3"
         >
           <svg
             className="w-4"

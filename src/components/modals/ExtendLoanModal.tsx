@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RiCloseLine } from 'react-icons/ri';
 import { FiCheckCircle } from 'react-icons/fi';
 import { format, parseISO, addDays, differenceInDays } from 'date-fns';
@@ -7,6 +8,9 @@ import { ILicense } from '../../utils/interfaces/license';
 import { problemDetailMessage } from '../../utils/problemDetail';
 import useRenewLicense from '../../hooks/api/licenses/useRenewLicense';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
+import useFocusTrap from '../../hooks/useFocusTrap';
+
+const M = 'license.loansPage.modals';
 
 interface Props {
   license: ILicense;
@@ -20,10 +24,19 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
   const [success, setSuccess] = useState(false);
   const renewLicense = useRenewLicense();
   const { auth } = useAuthContext();
+  const { t } = useTranslation();
+  const dialogRef = useFocusTrap(true);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   const expiresAt = parseISO(license.expires_at);
   const daysLeft = differenceInDays(expiresAt, new Date());
-  const daysWord = daysLeft === 1 ? 'deň' : daysLeft >= 2 && daysLeft <= 4 ? 'dni' : 'dní';
   const newExpiry1Week = addDays(expiresAt, 7);
   const newExpiry2Weeks = addDays(expiresAt, 14);
   const newExpiry = selected === 1 ? newExpiry1Week : newExpiry2Weeks;
@@ -49,7 +62,7 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
     } catch (e) {
       // Surface the API's RFC 7807 `detail` — it explains *why* (embargo, queue,
       // window, cap). A generic retry message hides a policy refusal as an error.
-      toast.error(problemDetailMessage(e, 'Predĺženie zlyhalo. Skúste to znova.'));
+      toast.error(problemDetailMessage(e, t(`${M}.extendFailed`, { defaultValue: 'Extension failed. Please try again.' })));
     } finally {
       setLoading(false);
     }
@@ -58,17 +71,26 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
   return (
     <div className="fixed inset-0 z-[60] bg-black/60 flex items-center justify-center" onClick={onClose}>
       <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="extend-loan-title"
         className="relative bg-white dark:bg-zinc-800 rounded-xl shadow-xl w-full max-w-[600px] mx-4 py-6 px-6"
         onClick={(e) => e.stopPropagation()}
       >
-        <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" onClick={onClose}>
-          <RiCloseLine size={24} />
+        <button
+          type="button"
+          aria-label={t('common.close', { defaultValue: 'Close' })}
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white"
+          onClick={onClose}
+        >
+          <RiCloseLine size={24} aria-hidden="true" />
         </button>
 
         {success ? (
           <div className="flex flex-col items-center gap-4 py-4">
-            <h2 className="text-2xl font-bold text-secondary dark:text-secondaryLight text-center">
-              Predĺženie úspešné!
+            <h2 id="extend-loan-title" className="text-2xl font-bold text-secondary dark:text-secondaryLight text-center">
+              {t(`${M}.extendSuccessTitle`, { defaultValue: 'Extension successful!' })}
             </h2>
             <FiCheckCircle size={66} className="text-[#008B19] my-2" />
             <div className="w-full bg-lightGray dark:bg-zinc-700 rounded-xl p-4 flex gap-3 items-center">
@@ -83,14 +105,15 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
               )}
               <div className="flex flex-col gap-2 min-w-0">
                 <p className="font-semibold text-sm text-secondary dark:text-secondaryLight truncate">
-                  {license.entry?.title || 'Neznámy titul'}
+                  {license.entry?.title || t(`${M}.unknownTitle`, { defaultValue: 'Unknown title' })}
                 </p>
                 <div className="flex gap-2 flex-wrap">
                   <span className="text-xs px-2 py-0.5 rounded-[7px] bg-[#cfffd8] border border-[#008b19] text-[#005e11]">
-                    Požičané do: {format(newExpiry, 'd.M.yyyy')}
+                    {t(`${M}.borrowedUntil`, { defaultValue: 'Borrowed until:' })} {format(newExpiry, 'd.M.yyyy')}
                   </span>
                   <span className="text-xs px-2 py-0.5 rounded-[7px] bg-[#cfffd8] border border-[#008b19] text-[#005e11]">
-                    Zostáva: {differenceInDays(newExpiry, new Date())} dní
+                    {t(`${M}.remaining`, { defaultValue: 'Remaining:' })} {differenceInDays(newExpiry, new Date())}{' '}
+                    {t(`${M}.dayUnit`, { count: differenceInDays(newExpiry, new Date()) })}
                   </span>
                 </div>
               </div>
@@ -98,8 +121,8 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
           </div>
         ) : (
           <>
-            <h2 className="text-base font-bold text-secondary dark:text-secondaryLight text-center mb-4">
-              Predĺženie výpožičky
+            <h2 id="extend-loan-title" className="text-base font-bold text-secondary dark:text-secondaryLight text-center mb-4">
+              {t(`${M}.extendTitle`, { defaultValue: 'Extend loan' })}
             </h2>
 
             {/* Book info card */}
@@ -115,14 +138,14 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
               )}
               <div className="flex flex-col gap-2 min-w-0 flex-1">
                 <p className="font-semibold text-sm text-secondary dark:text-secondaryLight truncate">
-                  {license.entry?.title || 'Neznámy titul'}
+                  {license.entry?.title || t(`${M}.unknownTitle`, { defaultValue: 'Unknown title' })}
                 </p>
                 <div className="flex gap-2 flex-wrap">
-                  <span className="text-xs px-2 py-0.5 rounded-[7px] bg-[#cce6fe] border border-[#4c99e0] text-[#1e6cb4]">
-                    Požičané do: {format(expiresAt, 'd. M. yyyy')}
+                  <span className="text-xs px-2 py-0.5 rounded-[7px] bg-[#cce6fe] border border-[#4c99e0] text-[#175a97]">
+                    {t(`${M}.borrowedUntil`, { defaultValue: 'Borrowed until:' })} {format(expiresAt, 'd. M. yyyy')}
                   </span>
                   <span className={`text-xs px-2 py-0.5 rounded-[7px] ${daysLeft <= 1 ? 'bg-[#ffe5dd] border border-[#c30000] text-[#c30000]' : 'bg-[#fff4dd] border border-[#e5c97e] text-[#333]'}`}>
-                    Zostáva: {daysLeft} {daysWord}
+                    {t(`${M}.remaining`, { defaultValue: 'Remaining:' })} {daysLeft} {t(`${M}.dayUnit`, { count: daysLeft })}
                   </span>
                 </div>
               </div>
@@ -131,19 +154,21 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
             {/* Duration selector */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-semibold text-secondary dark:text-secondaryLight">Doba predĺženia:</span>
+                <span className="text-sm font-semibold text-secondary dark:text-secondaryLight">
+                  {t(`${M}.durationLabel`, { defaultValue: 'Extension period:' })}
+                </span>
               </div>
               <div className="flex flex-col gap-2">
                 {[
-                  { val: 1 as const, label: '1 týždeň', target: newExpiry1Week },
-                  { val: 2 as const, label: '2 týždne', target: newExpiry2Weeks },
+                  { val: 1 as const, label: t(`${M}.oneWeek`, { defaultValue: '1 week' }), target: newExpiry1Week },
+                  { val: 2 as const, label: t(`${M}.twoWeeks`, { defaultValue: '2 weeks' }), target: newExpiry2Weeks },
                 ].map((opt) => {
                   const disabled = exceedsBound(opt.target);
                   return (
                     <button
                       key={opt.val}
                       disabled={disabled}
-                      title={disabled && policy ? `Presahuje maximálne okno ${policy.max_renew_days} dní` : undefined}
+                      title={disabled && policy ? t(`${M}.exceedsMaxWindow`, { days: policy.max_renew_days, defaultValue: 'Exceeds the maximum window of {{days}} days' }) : undefined}
                       className={`flex items-center gap-3 px-4 py-3 rounded-lg border text-left transition-colors ${
                         disabled
                           ? 'bg-gray-100 dark:bg-zinc-800 border-[#e5e5e5] dark:border-zinc-700 opacity-50 cursor-not-allowed'
@@ -160,8 +185,8 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
                         <p className="text-xs font-semibold text-secondary dark:text-secondaryLight">{opt.label}</p>
                         <p className="text-[11px] text-gray-500">
                           {disabled && policy
-                            ? `Nedostupné — presahuje ${policy.max_renew_days}-dňové okno`
-                            : `Požičané do: ${format(opt.target, 'd.M.yyyy')}`}
+                            ? t(`${M}.unavailableExceedsWindow`, { days: policy.max_renew_days, defaultValue: 'Unavailable — exceeds the {{days}}-day window' })
+                            : `${t(`${M}.borrowedUntil`, { defaultValue: 'Borrowed until:' })} ${format(opt.target, 'd.M.yyyy')}`}
                         </p>
                       </div>
                     </button>
@@ -173,20 +198,24 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
                   copy can never drift from what `evaluate_renew` enforces. */}
               {policy && (
                 <div className="mt-3 rounded-lg bg-[#f0f8ff] dark:bg-blue-900/20 px-3 py-2">
-                  <p className="text-[11px] text-[#1e6cb4] dark:text-blue-300 leading-relaxed">
-                    Výpožičku možno predĺžiť najskôr {policy.embargo_days} dní po vypožičaní a
-                    najviac o {policy.max_renew_days} dní dopredu. Predĺženie nie je možné, ak
-                    na titul čakajú ďalší používatelia.
-                    {policy.max_renewals !== null && ` Maximálny počet predĺžení: ${policy.max_renewals}.`}
+                  <p className="text-[11px] text-[#175a97] dark:text-blue-300 leading-relaxed">
+                    {t(`${M}.renewalPolicy`, {
+                      embargoDays: policy.embargo_days,
+                      maxRenewDays: policy.max_renew_days,
+                      defaultValue:
+                        'A loan can be extended no sooner than {{embargoDays}} days after borrowing and by at most {{maxRenewDays}} days ahead. Extension is not possible when other users are waiting for the title.',
+                    })}
+                    {policy.max_renewals !== null &&
+                      t(`${M}.maxRenewals`, { max: policy.max_renewals, defaultValue: ' Maximum number of renewals: {{max}}.' })}
                   </p>
                   {underEmbargo && embargoUntil && (
                     <p className="text-[11px] text-[#9f6c00] dark:text-yellow-400 mt-1 font-semibold">
-                      Túto výpožičku bude možné predĺžiť až od {format(embargoUntil, 'd.M.yyyy')}.
+                      {t(`${M}.embargoNotice`, { date: format(embargoUntil, 'd.M.yyyy'), defaultValue: 'This loan can be extended starting {{date}}.' })}
                     </p>
                   )}
                   {capReached && (
                     <p className="text-[11px] text-[#c30000] dark:text-red-400 mt-1 font-semibold">
-                      Dosiahli ste maximálny počet predĺžení.
+                      {t(`${M}.capReachedNotice`, { defaultValue: 'You have reached the maximum number of renewals.' })}
                     </p>
                   )}
                 </div>
@@ -198,14 +227,16 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
                 className="h-[35px] w-[170px] rounded-[7px] bg-lightGray border border-[rgba(0,0,0,0.1)] text-[#333] dark:text-white dark:bg-zinc-700 text-sm font-medium hover:bg-gray-200 transition-colors"
                 onClick={onClose}
               >
-                Zrušiť
+                {t(`${M}.cancel`, { defaultValue: 'Cancel' })}
               </button>
               <button
                 disabled={loading}
-                className="h-[35px] w-[170px] rounded-[7px] bg-primary text-white text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-60 shadow"
+                className="h-[35px] w-[170px] rounded-[7px] bg-primary text-onPrimary text-sm font-medium hover:bg-primaryDark transition-colors disabled:opacity-60 shadow"
                 onClick={handleExtend}
               >
-                {loading ? 'Predlžujem...' : 'Predĺžiť'}
+                {loading
+                  ? t(`${M}.extending`, { defaultValue: 'Extending...' })
+                  : t(`${M}.extend`, { defaultValue: 'Extend' })}
               </button>
             </div>
           </>

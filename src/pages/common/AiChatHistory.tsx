@@ -152,7 +152,7 @@ const AiChatHistory = () => {
           </Typography>
           <IconButton 
             onClick={handleNewChat}
-            className="bg-primary text-white hover:bg-primary-dark"
+            className="bg-primary text-onPrimary hover:bg-primaryDark"
             sx={{
               backgroundColor: 'primary.main',
               color: 'white',
@@ -177,7 +177,7 @@ const AiChatHistory = () => {
             </Typography>
             <button
               onClick={handleNewChat}
-              className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition-colors mt-5"
+              className="bg-primary text-onPrimary px-6 py-3 rounded-lg hover:bg-primaryDark transition-colors mt-5"
             >
               {t('assistant.newChat')}
             </button>

@@ -242,18 +242,20 @@ const Navbar = () => {
               />
             </button>
             <button
+              aria-label={t('navbar.collapse', { defaultValue: 'Collapse sidebar' })}
               className={`h-full flex items-center text-gray w-fit rounded-md px-1 ml-auto`}
               onClick={toggleNavbar}
             >
-              <RiArrowLeftDoubleFill size={18} />
+              <RiArrowLeftDoubleFill size={18} aria-hidden="true" />
             </button>
           </>
         ) : (
           <button
+            aria-label={t('navbar.expand', { defaultValue: 'Expand sidebar' })}
             className="flex items-center w-7 h-7 justify-center bg-zinc-100 dark:bg-zinc-700 text-black dark:text-white rounded-md mx-auto"
             onClick={toggleNavbar}
           >
-            <RiArrowLeftDoubleFill size={18} className="rotate-180" />
+            <RiArrowLeftDoubleFill size={18} className="rotate-180" aria-hidden="true" />
           </button>
         )}
       </div>
