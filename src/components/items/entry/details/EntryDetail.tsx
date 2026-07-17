@@ -329,6 +329,20 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               <InfoItem label={t('entry.detail.publishDate')}>{entry.published_at ? new Date(entry.published_at).toLocaleDateString('sk-SK', { year: 'numeric', }) : '-'}</InfoItem>
               <InfoItem label={t('entry.detail.lang')}>{getLanguage(entry.language?.alpha2 || '')?.name[i18n.language as AcceptedLanguage]}</InfoItem>
 
+              {/* Loan capacity (readium_amount). Only meaningful for LCP entries.
+                  `over_saturated` means more loans are live than the cap allows —
+                  the backend surfaces that rather than silently clamping it. */}
+              {entry.lcp_state !== 'not_lcp' && (
+                <>
+                  <InfoItem label={t('entry.detail.activeSlots')}>
+                    <span className={entry.over_saturated ? 'text-red-600 dark:text-red-400 font-bold' : undefined}>
+                      {entry.active_count} / {entry.total_slots}
+                    </span>
+                  </InfoItem>
+                  <InfoItem label={t('entry.detail.availableSlots')}>{entry.available_slots}</InfoItem>
+                </>
+              )}
+
               <InfoItemCustom label={t('entry.detail.categories')}>
                 <div className="flex flex-col gap-1">
                   {entry.categories.length === 0 ? (

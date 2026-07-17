@@ -4,6 +4,7 @@ import { FiCheckCircle } from 'react-icons/fi';
 import { format, parseISO, addDays, differenceInDays } from 'date-fns';
 import { toast } from 'react-toastify';
 import { ILicense } from '../../utils/interfaces/license';
+import { problemDetailMessage } from '../../utils/problemDetail';
 import useRenewLicense from '../../hooks/api/licenses/useRenewLicense';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 
@@ -27,14 +28,28 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
   const newExpiry2Weeks = addDays(expiresAt, 14);
   const newExpiry = selected === 1 ? newExpiry1Week : newExpiry2Weeks;
 
+  // The server caps `requested_end` at now + max_renew_days and refuses anything
+  // beyond it. Offering options past that bound just produces a 403 the user
+  // can't interpret, so grey them out and say why.
+  const policy = license.renew_policy;
+  const renewUpperBound = policy ? addDays(new Date(), policy.max_renew_days) : null;
+  const exceedsBound = (d: Date) => (renewUpperBound ? d > renewUpperBound : false);
+
+  // A loan is under embargo until embargo_days after acquisition.
+  const embargoUntil = policy ? addDays(parseISO(license.created_at), policy.embargo_days) : null;
+  const underEmbargo = embargoUntil ? embargoUntil > new Date() : false;
+  const capReached = license.renewals_remaining === 0;
+
   const handleExtend = async () => {
     setLoading(true);
     try {
       await renewLicense(license.id, newExpiry.toISOString());
       setSuccess(true);
       onSuccess();
-    } catch {
-      toast.error('Predĺženie zlyhalo. Skúste to znova.');
+    } catch (e) {
+      // Surface the API's RFC 7807 `detail` — it explains *why* (embargo, queue,
+      // window, cap). A generic retry message hides a policy refusal as an error.
+      toast.error(problemDetailMessage(e, 'Predĺženie zlyhalo. Skúste to znova.'));
     } finally {
       setLoading(false);
     }
@@ -120,28 +135,62 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
               </div>
               <div className="flex flex-col gap-2">
                 {[
-                  { val: 1 as const, label: '1 týždeň', date: format(newExpiry1Week, 'd.M.yyyy') },
-                  { val: 2 as const, label: '2 týždne', date: format(newExpiry2Weeks, 'd.M.yyyy') },
-                ].map((opt) => (
-                  <button
-                    key={opt.val}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg border text-left transition-colors ${
-                      selected === opt.val
-                        ? 'bg-[#e6f3ff] border-[#0077cc]'
-                        : 'bg-white dark:bg-zinc-700 border-[#e5e5e5] dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-600'
-                    }`}
-                    onClick={() => setSelected(opt.val)}
-                  >
-                    <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${selected === opt.val ? 'border-[#0077cc]' : 'border-gray-400'}`}>
-                      {selected === opt.val && <span className="w-2 h-2 rounded-full bg-[#0077cc]" />}
-                    </span>
-                    <div>
-                      <p className="text-xs font-semibold text-secondary dark:text-secondaryLight">{opt.label}</p>
-                      <p className="text-[11px] text-gray-500">Požičané do: {opt.date}</p>
-                    </div>
-                  </button>
-                ))}
+                  { val: 1 as const, label: '1 týždeň', target: newExpiry1Week },
+                  { val: 2 as const, label: '2 týždne', target: newExpiry2Weeks },
+                ].map((opt) => {
+                  const disabled = exceedsBound(opt.target);
+                  return (
+                    <button
+                      key={opt.val}
+                      disabled={disabled}
+                      title={disabled && policy ? `Presahuje maximálne okno ${policy.max_renew_days} dní` : undefined}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-lg border text-left transition-colors ${
+                        disabled
+                          ? 'bg-gray-100 dark:bg-zinc-800 border-[#e5e5e5] dark:border-zinc-700 opacity-50 cursor-not-allowed'
+                          : selected === opt.val
+                            ? 'bg-[#e6f3ff] border-[#0077cc]'
+                            : 'bg-white dark:bg-zinc-700 border-[#e5e5e5] dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-600'
+                      }`}
+                      onClick={() => !disabled && setSelected(opt.val)}
+                    >
+                      <span className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${selected === opt.val && !disabled ? 'border-[#0077cc]' : 'border-gray-400'}`}>
+                        {selected === opt.val && !disabled && <span className="w-2 h-2 rounded-full bg-[#0077cc]" />}
+                      </span>
+                      <div>
+                        <p className="text-xs font-semibold text-secondary dark:text-secondaryLight">{opt.label}</p>
+                        <p className="text-[11px] text-gray-500">
+                          {disabled && policy
+                            ? `Nedostupné — presahuje ${policy.max_renew_days}-dňové okno`
+                            : `Požičané do: ${format(opt.target, 'd.M.yyyy')}`}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
+
+              {/* Renewal rules, read from the server's published policy so this
+                  copy can never drift from what `evaluate_renew` enforces. */}
+              {policy && (
+                <div className="mt-3 rounded-lg bg-[#f0f8ff] dark:bg-blue-900/20 px-3 py-2">
+                  <p className="text-[11px] text-[#1e6cb4] dark:text-blue-300 leading-relaxed">
+                    Výpožičku možno predĺžiť najskôr {policy.embargo_days} dní po vypožičaní a
+                    najviac o {policy.max_renew_days} dní dopredu. Predĺženie nie je možné, ak
+                    na titul čakajú ďalší používatelia.
+                    {policy.max_renewals !== null && ` Maximálny počet predĺžení: ${policy.max_renewals}.`}
+                  </p>
+                  {underEmbargo && embargoUntil && (
+                    <p className="text-[11px] text-[#9f6c00] dark:text-yellow-400 mt-1 font-semibold">
+                      Túto výpožičku bude možné predĺžiť až od {format(embargoUntil, 'd.M.yyyy')}.
+                    </p>
+                  )}
+                  {capReached && (
+                    <p className="text-[11px] text-[#c30000] dark:text-red-400 mt-1 font-semibold">
+                      Dosiahli ste maximálny počet predĺžení.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="flex justify-center gap-12">

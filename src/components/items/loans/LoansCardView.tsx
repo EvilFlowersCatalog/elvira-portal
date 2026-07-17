@@ -9,13 +9,25 @@ import { MdMoreTime } from 'react-icons/md';
 import { IoClose } from 'react-icons/io5';
 import { RiBookmarkLine } from 'react-icons/ri';
 import { useTranslation } from 'react-i18next';
-import { ILicense, LICENSE_STATE } from '../../../utils/interfaces/license';
+import { formatAuthors, ILicense, ILicenseEntry, LICENSE_STATE } from '../../../utils/interfaces/license';
 import useGetLicenses from '../../../hooks/api/licenses/useGetLicenses';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import useDownloadLicense from '../../../hooks/api/licenses/useDownloadLicense';
 import ExtendLoanModal from '../../modals/ExtendLoanModal';
 import ReturnBookModal from '../../modals/ReturnBookModal';
 import CancelReservationModal from '../../modals/CancelReservationModal';
+
+/** All three cards render the same author line — the entry serializer already
+ *  ships `authors`, so read it rather than printing a placeholder. */
+function AuthorLine({ entry }: { entry?: ILicenseEntry }) {
+  const { t } = useTranslation();
+  const authors = formatAuthors(entry);
+  return (
+    <p className="font-light text-[12px] text-secondary dark:text-secondaryLight tracking-[0.1px] truncate">
+      {authors || t('entry.detail.noAuthor')}
+    </p>
+  );
+}
 
 function BorrowedDateBadge({ date }: { date: string }) {
   return (
@@ -129,7 +141,7 @@ function BorrowedCard({
             >
               {license.entry?.title || 'Neznámy titul'}
             </p>
-            <p className="font-light text-[12px] text-secondary dark:text-secondaryLight tracking-[0.1px]">Autor</p>
+            <AuthorLine entry={license.entry} />
           </div>
           <div className="flex items-center gap-[11px] h-[28px] px-3 rounded-[6px] bg-[#cce6fe] shadow-[inset_-1px_-1px_2.8px_0px_rgba(0,0,0,0.1)] flex-shrink-0">
             <span className="w-[7px] h-[7px] rounded-full bg-[#1e6cb4] shrink-0" />
@@ -193,7 +205,7 @@ function ReservedCard({
             >
               {license.entry?.title || 'Neznámy titul'}
             </p>
-            <p className="font-light text-[12px] text-secondary dark:text-secondaryLight tracking-[0.1px]">Autor</p>
+            <AuthorLine entry={license.entry} />
           </div>
           <div className="flex items-center gap-[11px] h-[28px] px-3 rounded-[6px] bg-[#feeecc] shadow-[inset_-1px_-1px_2.8px_0px_rgba(0,0,0,0.1)] flex-shrink-0">
             <span className="w-[7px] h-[7px] rounded-full bg-[#9f6c00] shrink-0" />
@@ -245,7 +257,7 @@ function PastCard({
             <p className="font-semibold text-[14px] text-secondary dark:text-secondaryLight tracking-[0.1px] truncate leading-normal">
               {license.entry?.title || 'Neznámy titul'}
             </p>
-            <p className="font-light text-[12px] text-secondary dark:text-secondaryLight tracking-[0.1px]">Autor</p>
+            <AuthorLine entry={license.entry} />
           </div>
           <button
             onClick={() => onViewDetail(license.entry_id, license.entry?.catalog_id)}

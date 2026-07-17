@@ -4,6 +4,7 @@ import { RxCalendar } from 'react-icons/rx';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { toast } from 'react-toastify';
 import { ILicense, LICENSE_ACTION } from '../../utils/interfaces/license';
+import { problemDetailMessage } from '../../utils/problemDetail';
 import useUpdateLicenseState from '../../hooks/api/licenses/useUpdateLicense';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 
@@ -29,8 +30,8 @@ export default function ReturnBookModal({ license, onClose, onSuccess }: Props) 
       toast.success('Kniha bola úspešne vrátená.');
       onSuccess();
       onClose();
-    } catch {
-      toast.error('Vrátenie zlyhalo. Skúste to znova.');
+    } catch (e) {
+      toast.error(problemDetailMessage(e, 'Vrátenie zlyhalo. Skúste to znova.'));
     } finally {
       setLoading(false);
     }

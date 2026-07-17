@@ -5,6 +5,7 @@ import { HiOutlineUsers } from 'react-icons/hi';
 import { format, parseISO } from 'date-fns';
 import { toast } from 'react-toastify';
 import { ILicense } from '../../utils/interfaces/license';
+import { problemDetailMessage } from '../../utils/problemDetail';
 import useCancelReservation from '../../hooks/api/reservations/useCancelReservation';
 
 interface Props {
@@ -15,7 +16,11 @@ interface Props {
   queueTotal?: number;
 }
 
-export default function CancelReservationModal({ license, onClose, onSuccess, queuePosition = 1, queueTotal = 3 }: Props) {
+// No defaults for the queue figures: callers that don't know the real position
+// must not render an invented one. `LoansCardView` cancels a future-dated loan,
+// which has no queue at all — the previous `= 1` / `= 3` defaults showed every
+// user a fabricated "1. /3".
+export default function CancelReservationModal({ license, onClose, onSuccess, queuePosition, queueTotal }: Props) {
   const [loading, setLoading] = useState(false);
   const cancelReservation = useCancelReservation();
 
@@ -28,8 +33,8 @@ export default function CancelReservationModal({ license, onClose, onSuccess, qu
       toast.success('Rezervácia bola zrušená.');
       onSuccess();
       onClose();
-    } catch {
-      toast.error('Zrušenie zlyhalo. Skúste to znova.');
+    } catch (e) {
+      toast.error(problemDetailMessage(e, 'Zrušenie zlyhalo. Skúste to znova.'));
     } finally {
       setLoading(false);
     }
@@ -57,10 +62,12 @@ export default function CancelReservationModal({ license, onClose, onSuccess, qu
               {license.entry?.title || 'Neznámy titul'}
             </p>
             <div className="flex gap-2 flex-wrap">
-              <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-[7px] bg-[#ffe5dd] border border-[#c30000] text-[#c30000]">
-                <HiOutlineUsers size={12} className="shrink-0" />
-                Vaše poradie: {queuePosition}. /{queueTotal}
-              </span>
+              {queuePosition !== undefined && queueTotal !== undefined && (
+                <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-[7px] bg-[#ffe5dd] border border-[#c30000] text-[#c30000]">
+                  <HiOutlineUsers size={12} className="shrink-0" />
+                  Vaše poradie: {queuePosition}. /{queueTotal}
+                </span>
+              )}
               {expiresAt && (
                 <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-[7px] bg-[#ffe5dd] border border-[#c30000] text-[#c30000]">
                   <RxCalendar size={12} className="shrink-0" />
