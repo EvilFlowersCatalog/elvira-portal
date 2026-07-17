@@ -147,7 +147,7 @@ function BorrowedCard({
           <div className="flex gap-[10px] flex-wrap">
             <ActionBtn icon={<MdMoreTime size={20} />} label="Predĺžiť" onClick={() => onExtend(license)} />
             <ActionBtn icon={<BsArrowReturnLeft size={20} />} label="Vrátiť" onClick={() => onReturn(license)} />
-            <ActionBtn icon={<LuDownload size={20} />} label="Stiahnuť" filled onClick={() => onDownload(license.lcp_license_id || license.id)} />
+            <ActionBtn icon={<LuDownload size={20} />} label="Stiahnuť" filled onClick={() => onDownload(license.id)} />
           </div>
         </div>
       </div>
@@ -302,32 +302,26 @@ export default function LoansCardView() {
           return bDate.getTime() - aDate.getTime();
         });
         const now = new Date();
-        setBorrowed(
-          items.filter((l) => {
-            return l.state === LICENSE_STATE.active && new Date(l.starts_at) <= now && new Date(l.expires_at) > now;
-          }),
-        );
-        // setReserved(
-        //   items.filter((l) => l.state === LICENSE_STATE.ready && new Date(l.starts_at) > now),
-        // );
-        setReserved(
-          items.filter((l) => l.state === LICENSE_STATE.ready),
-        );
-        setPast(
-          items.filter((l) => {
-            const isTerminal = [
-              LICENSE_STATE.cancelled,
-              LICENSE_STATE.returned,
-              LICENSE_STATE.expired,
-              LICENSE_STATE.revoked,
-            ].includes(l.state);
-            const isExpiredActive =
-              l.state === LICENSE_STATE.active && new Date(l.expires_at) <= now;
-            // const isStaleReady =
-            //   l.state === LICENSE_STATE.ready && new Date(l.starts_at) <= now;
-            return isTerminal || isExpiredActive;
-          }),
-        );
+        const startsAt = (l: ILicense) => new Date(l.starts_at);
+        const expiresAt = (l: ILicense) => new Date(l.expires_at);
+
+        // `ready` means the LCP license is issued and downloadable but no device
+        // has registered against it yet; `active` means one has. Both are live
+        // loans — a loan only ends when it reaches a terminal state or its
+        // window closes. Treating `ready` as a reservation hid every fresh loan.
+        const isLiveState = (l: ILicense) => l.state === LICENSE_STATE.ready || l.state === LICENSE_STATE.active;
+        const isTerminalState = (l: ILicense) =>
+          [
+            LICENSE_STATE.cancelled,
+            LICENSE_STATE.returned,
+            LICENSE_STATE.expired,
+            LICENSE_STATE.revoked,
+          ].includes(l.state);
+
+        setBorrowed(items.filter((l) => isLiveState(l) && startsAt(l) <= now && expiresAt(l) > now));
+        // Only a future-dated loan is a genuine "reservation" on this screen.
+        setReserved(items.filter((l) => l.state === LICENSE_STATE.ready && startsAt(l) > now));
+        setPast(items.filter((l) => isTerminalState(l) || (isLiveState(l) && expiresAt(l) <= now)));
       })
       .finally(() => setLoading(false));
   };
