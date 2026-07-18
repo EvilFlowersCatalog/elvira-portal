@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 import useGetEntries from '../../hooks/api/entries/useGetEntries';
 import { IEntry } from '../../utils/interfaces/entry';
 import { useSearchParams } from 'react-router-dom';
@@ -9,57 +9,37 @@ import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper'
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import FilterSuggestions from '../../components/tools/FilterSuggestions';
-import useItemContainer from '../../hooks/useItemContainer';
+import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
 
 const Library = () => {
-  const list = useItemContainer<IEntry>();
   const { t } = useTranslation();
   const { selectedCatalogId } = useAppContext();
   const [searchParams] = useSearchParams();
   const getEntries = useGetEntries();
 
-  useEffect(() => {
-    list.reset();
-  }, [selectedCatalogId, searchParams]);
+  // Only params that affect the result set go in the query key, so opening a
+  // book (which adds entry-detail-id) doesn't reset the list or scroll position.
+  const filters = useMemo(
+    () => ({
+      title: searchParams.get('title') ?? '',
+      categoryId: searchParams.get('category-id') ?? '',
+      feedId: searchParams.get('feed-id') ?? searchParams.get('feed-id-step') ?? '',
+      authors: searchParams.get('author') ?? '',
+      publishedAtGte: searchParams.get('publishedAtGte') ?? '',
+      publishedAtLte: searchParams.get('publishedAtLte') ?? '',
+      orderBy: searchParams.get('order-by') ?? '',
+      query: searchParams.get('query') ?? '',
+      languageCode: searchParams.get('languageCode') ?? '',
+      categories: searchParams.get('categories') ?? '',
+      feeds: searchParams.get('feeds') ?? '',
+    }),
+    [searchParams]
+  );
 
-  useEffect(() => {
-    if (list.page === 0) {
-      list.setPage(1);
-      return;
-    }
-
-    (async () => {
-      try {
-        const { items, metadata } = await getEntries({
-          page: list.page,
-          limit: 30,
-          title: searchParams.get('title') ?? '',
-          categoryId: searchParams.get('category-id') ?? '',
-          feedId: searchParams.get('feed-id') ?? searchParams.get('feed-id-step') ?? '',
-          authors: searchParams.get('author') ?? '',
-          publishedAtGte: searchParams.get('publishedAtGte') ?? '',
-          publishedAtLte: searchParams.get('publishedAtLte') ?? '',
-          orderBy: searchParams.get('order-by') ?? '',
-          query: searchParams.get('query') ?? '',
-          languageCode: searchParams.get('languageCode') ?? '',
-          categories: searchParams.get('categories') ?? '',
-          feeds: searchParams.get('feeds') ?? '',
-        });
-
-        const allEntries = [...(list.items ?? []), ...items];
-        const uniqueEntries = Array.from(
-          new Map(allEntries.map((entry) => [entry.id, entry])).values()
-        );
-        list.setItems(uniqueEntries);
-        list.setMaxPage(metadata.pages);
-      } catch {
-        list.setIsError(true);
-      } finally {
-        list.setIsLoading(false);
-        list.setLoadingNext(false);
-      }
-    })();
-  }, [list.page]);
+  const list = useInfiniteItemContainer<IEntry>(
+    ['entries-infinite', selectedCatalogId, filters],
+    (page) => getEntries({ page, limit: 30, ...filters })
+  );
 
   return (
     <ItemContainer

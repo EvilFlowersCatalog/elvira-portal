@@ -1,10 +1,10 @@
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { AcceptedLanguage, getLanguage } from '../../hooks/api/languages/languages';
 import useGetCategories from '../../hooks/api/categories/useGetCategories';
-import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
+import useFeedsQuery from '../../hooks/api/feeds/useFeedsQuery';
 import { ICategory } from '../../utils/interfaces/category';
 import { IFeed } from '../../utils/interfaces/feed';
 import i18next from '../../utils/i18n/i18next';
@@ -37,10 +37,12 @@ const ToolsContainer = ({
   const orderBy = searchParams.get('order-by') || '-created_at';
 
   const [categories, setCategories] = useState<ICategory[]>([]);
-  const [feeds, setFeeds] = useState<IFeed[]>([]);
 
   const getCategories = useGetCategories();
-  const getFeeds = useGetFeeds();
+
+  // Collections list (cached/deduped by React Query).
+  const { data: feedsData } = useFeedsQuery({ paginate: false });
+  const feeds: IFeed[] = useMemo(() => feedsData?.items ?? [], [feedsData]);
 
   useEffect(() => {
     if (!advancedSearch) setShowAdvancedSearch(false);
@@ -49,9 +51,7 @@ const ToolsContainer = ({
   useEffect(() => {
     (async () => {
       const { items: itemsCategories } = await getCategories({ paginate: false });
-      const { items: itemsFeeds } = await getFeeds({ paginate: false });
       setCategories(itemsCategories);
-      setFeeds(itemsFeeds);
     })();
   }, []);
 

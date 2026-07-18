@@ -8,6 +8,7 @@ import { Suspense, useEffect } from 'react';
 import Header from './components/header/Header';
 import useAppContext from './hooks/contexts/useAppContext';
 import PageLoading from './components/page/PageLoading';
+import RouteErrorBoundary from './components/page/RouteErrorBoundary';
 
 const App = () => {
   const { informed } = useCookiesContext();
@@ -58,9 +59,11 @@ const App = () => {
           id="outlet-wrapper"
           className={`flex flex-1 h-screen flex-col overflow-hidden bg-lightGray dark:bg-darkGray ${show() ? 'max-lg:pt-14' : ''}`}
         >
-          <Suspense fallback={<PageLoading />}>
-            <Outlet />
-          </Suspense>
+          <RouteErrorBoundary>
+            <Suspense fallback={<PageLoading />}>
+              <Outlet />
+            </Suspense>
+          </RouteErrorBoundary>
         </div>
 
       </div>

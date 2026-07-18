@@ -2,6 +2,7 @@ import { CircleLoader } from "react-spinners";
 import { FaPaperPlane } from "react-icons/fa6";
 import { FiClock, FiPlus } from "react-icons/fi";
 import { useEffect, useState, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTranslation } from "react-i18next";
@@ -9,7 +10,7 @@ import useAppContext from "../../hooks/contexts/useAppContext";
 import EntryItem from "../../components/items/entry/display/EntryItem";
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
 import { IEntry } from "../../utils/interfaces/entry";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../../hooks/contexts/useAuthContext";
 import { AiMessage } from "../../providers/AppProvider";
@@ -37,28 +38,28 @@ function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, ha
 }
 
 function MessageElement({ msg, bookCatalogs }: { msg: AiMessage, bookCatalogs: Record<string, string> }) {
-    const [books, setBooks] = useState<any[]>([]);
     const { getEntryDetail } = useGetEntryDetail();
 
-    useEffect(() => {
-        if (msg.content.type === "entries" && Array.isArray(msg.content.data)) {
-            const entryIds = msg.content.data;
-            setBooks([]);
-            (async () => {
-                const details = await Promise.all(
-                    entryIds.map((id: string) => {
-                        const catalogId = bookCatalogs[id];
-                        return getEntryDetail(id, catalogId || undefined);
-                    })
-                );
-                const entries: IEntry[] = details.map(entryDetail => ({
-                    ...entryDetail,
-                    popularity: Number(entryDetail.popularity),
-                }));
-                setBooks(entries);
-            })();
-        }
-    }, [msg.content.type, JSON.stringify(msg.content.data), JSON.stringify(bookCatalogs)])
+    const entryIds =
+        msg.content.type === "entries" && Array.isArray(msg.content.data)
+            ? (msg.content.data as string[])
+            : [];
+
+    // Recommended-book details for an "entries" message (cached/deduped by
+    // React Query; keyed by the ids + their catalog map).
+    const { data: books = [] } = useQuery({
+        queryKey: ["ai-message-books", entryIds, bookCatalogs],
+        queryFn: async () => {
+            const details = await Promise.all(
+                entryIds.map((id) => getEntryDetail(id, bookCatalogs[id] || undefined))
+            );
+            return details.map((entryDetail) => ({
+                ...entryDetail,
+                popularity: Number(entryDetail.popularity),
+            })) as IEntry[];
+        },
+        enabled: entryIds.length > 0,
+    });
 
     switch (msg.content.type) {
         case "message":
@@ -108,11 +109,9 @@ export default function AiAssistantPage() {
         setAiShowSuggestions,
         selectedCatalogId,
     } = useAppContext();
-    const { getEntryDetail } = useGetEntryDetail();
 
     const [input, setInput] = useState("");
     const [isGeneratingResponse, setGeneratingResponse] = useState(false);
-    const [assistantEntry, setAssistantEntry] = useState<any>(null);
     const [currentCatalogId] = useState<string | undefined>(selectedCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -122,14 +121,7 @@ export default function AiAssistantPage() {
 
     useEffect(() => {
         umamiTrack("AI Assistant Page Visit");
-        
-        // Check if there's an entry-id in the URL params
-        const entryId = searchParams.get('entry-id');
-        if (entryId) {
-            getEntryDetail(entryId, undefined).then((entry) => {
-                setAssistantEntry(entry);
-            });
-        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -336,13 +328,13 @@ export default function AiAssistantPage() {
                     Elvira AI
                 </h1>
                 <div className="flex gap-2">
-                    <a
-                        href={NAVIGATION_PATHS.aiChatHistory}
+                    <Link
+                        to={NAVIGATION_PATHS.aiChatHistory}
                         aria-label="Chat history"
                         className="inline-flex items-center justify-center rounded-full p-2 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                     >
                         <FiClock size={20} className="text-black dark:text-white" />
-                    </a>
+                    </Link>
                     <button
                         type="button"
                         aria-label="New chat"
@@ -360,13 +352,13 @@ export default function AiAssistantPage() {
                     Elvira AI
                 </p>
                 <div className="flex gap-1">
-                    <a
-                        href={NAVIGATION_PATHS.aiChatHistory}
+                    <Link
+                        to={NAVIGATION_PATHS.aiChatHistory}
                         aria-label="Chat history"
                         className="inline-flex items-center justify-center rounded-full p-1.5 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                     >
                         <FiClock size={18} className="text-black dark:text-white" />
-                    </a>
+                    </Link>
                     <button
                         type="button"
                         aria-label="New chat"

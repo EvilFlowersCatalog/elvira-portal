@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { FiPlus, FiFolder, FiEdit2, FiChevronRight } from 'react-icons/fi';
 import { MdOutlineCollectionsBookmark } from 'react-icons/md';
 import { IFeed } from '../../utils/interfaces/feed';
 import { Metadata } from '../../utils/interfaces/general/general';
-import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
+import useFeedsQuery from '../../hooks/api/feeds/useFeedsQuery';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { PageHeader, DataTable, DataTableColumn, SortState, StatusChip, SearchField, IconButton } from '../../components/admin';
 import Button from '../../components/buttons/Button';
@@ -18,13 +18,7 @@ const isFolder = (f: IFeed) => f.kind === 'navigation';
 const AdminFeeds = () => {
   const { t } = useTranslation();
   const { selectedCatalogId } = useAppContext();
-  const getFeeds = useGetFeeds();
   const [searchParams, setSearchParams] = useSearchParams();
-
-  const [items, setItems] = useState<IFeed[]>([]);
-  const [metadata, setMetadata] = useState<Metadata>({ page: 1, limit: DEFAULT_LIMIT, pages: 1, total: 0 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('edit');
@@ -59,38 +53,31 @@ const AdminFeeds = () => {
     setSearchParams(next);
   };
 
-  const fetchFeeds = useCallback(async () => {
-    if (!selectedCatalogId) {
-      setItems([]);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError(false);
-    try {
-      const { items, metadata } = await getFeeds({
-        page,
-        limit,
-        paginate: true,
-        // 'null' returns top-level feeds; a folder id returns that folder's children.
-        parentId: currentParent ?? 'null',
-        title: q || undefined,
-        orderBy: orderBy || undefined,
-      });
-      setItems(items);
-      setMetadata(metadata);
-    } catch {
-      setError(true);
-      setItems([]);
-    } finally {
-      setLoading(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, limit, q, orderBy, selectedCatalogId, currentParent]);
-
-  useEffect(() => {
-    fetchFeeds();
-  }, [fetchFeeds]);
+  const {
+    data,
+    isLoading: loading,
+    isError: error,
+    refetch,
+  } = useFeedsQuery(
+    {
+      page,
+      limit,
+      paginate: true,
+      // 'null' returns top-level feeds; a folder id returns that folder's children.
+      parentId: currentParent ?? 'null',
+      title: q || undefined,
+      orderBy: orderBy || undefined,
+    },
+    { enabled: !!selectedCatalogId }
+  );
+  const items = data?.items ?? [];
+  const metadata: Metadata = data?.metadata ?? {
+    page: 1,
+    limit: DEFAULT_LIMIT,
+    pages: 1,
+    total: 0,
+  };
+  const fetchFeeds = () => refetch();
 
   const openEdit = (f: IFeed) => {
     setActive(f);

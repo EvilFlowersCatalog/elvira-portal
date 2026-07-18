@@ -6,12 +6,12 @@ import {
   NAVIGATION_PATHS,
 } from '../../utils/interfaces/general/general';
 import { useEffect, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import useGetFeedDetail from '../../hooks/api/feeds/useGetFeedDetail';
 import useGetCategoryDetail from '../../hooks/api/categories/useGetCategoryDetail';
 
 const Breadcrumb = () => {
-  const { specialNavigation, lang, editingEntryTitle } = useAppContext();
+  const { lang, editingEntryTitle } = useAppContext();
   const [breadcrumbs, setBreadcrumbs] = useState<
     { path: string; label: string }[]
   >([]);
@@ -35,13 +35,11 @@ const Breadcrumb = () => {
     return lang === LANG_TYPE.en;
   };
 
-  // Inside the admin section the same backend resources carry librarian-facing
-  // names (Publications/Collections), distinct from the user-facing app.
-  const inAdmin = location.pathname.startsWith('/administration');
-
   const breadcrumbsTranslator: { [key: string]: string } = {
     ['library']: isEn() ? 'Library' : 'Knižnica',
-    ['feeds']: inAdmin ? (isEn() ? 'Collections' : 'Zbierky') : isEn() ? 'Feeds' : 'Skupiny',
+    // "Collections" (Zbierky) is the product-wide name for feed resources,
+    // in both the public app and admin.
+    ['feeds']: isEn() ? 'Collections' : 'Zbierky',
     ['about']: isEn() ? 'About' : 'O Projekte',
     ['administration']: isEn() ? 'Administration' : 'Administrácia',
     ['shelf']: isEn() ? 'Shelf' : 'Polička',
@@ -254,31 +252,32 @@ const Breadcrumb = () => {
 
   return (
     <div className='flex flex-wrap items-center gap-[7px] px-5 h-10'>
-      <button
+      <Link
+        to={NAVIGATION_PATHS.home}
         className='text-darkGray hover:text-secondary dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors shrink-0'
-        onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.home)}
       >
         <FaHome size={18} />
-      </button>
-      {breadcrumbs.map((breadcrumb, index) => (
-        <span key={index} className='flex items-center gap-[7px]'>
-          <MdChevronRight size={13} className='text-darkGray dark:text-zinc-500 shrink-0' />
-          <button
-            className={`text-[13px] tracking-[0.1px] text-darkGray dark:text-zinc-400 whitespace-nowrap ${
-              index === breadcrumbs.length - 1
-                ? 'cursor-default'
-                : 'cursor-pointer hover:text-secondary dark:hover:text-zinc-200 transition-colors'
-            }`}
-            onClick={
-              index !== breadcrumbs.length - 1
-                ? (e) => specialNavigation(e, breadcrumb.path)
-                : undefined
-            }
-          >
-            {breadcrumb.label}
-          </button>
-        </span>
-      ))}
+      </Link>
+      {breadcrumbs.map((breadcrumb, index) => {
+        const isLast = index === breadcrumbs.length - 1;
+        return (
+          <span key={index} className='flex items-center gap-[7px]'>
+            <MdChevronRight size={13} className='text-darkGray dark:text-zinc-500 shrink-0' />
+            {isLast ? (
+              <span className='text-[13px] tracking-[0.1px] text-darkGray dark:text-zinc-400 whitespace-nowrap cursor-default'>
+                {breadcrumb.label}
+              </span>
+            ) : (
+              <Link
+                to={breadcrumb.path}
+                className='text-[13px] tracking-[0.1px] text-darkGray dark:text-zinc-400 whitespace-nowrap cursor-pointer hover:text-secondary dark:hover:text-zinc-200 transition-colors'
+              >
+                {breadcrumb.label}
+              </Link>
+            )}
+          </span>
+        );
+      })}
     </div>
   );
 };

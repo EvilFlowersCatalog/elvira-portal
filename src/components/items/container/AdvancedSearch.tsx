@@ -10,7 +10,7 @@ import ElviraNumberInput from "../../inputs/ElviraNumberInput";
 import { IoClose } from "react-icons/io5";
 import AdvancedCheckboxes from "../../inputs/AdvancedCheckboxes";
 import useGetCategories from "../../../hooks/api/categories/useGetCategories";
-import useGetFeeds from "../../../hooks/api/feeds/useGetFeeds";
+import useFeedsQuery from "../../../hooks/api/feeds/useFeedsQuery";
 import { IFeed } from "../../../utils/interfaces/feed";
 import { AvailabilityState } from "../entry/details/AvailabilityBadge";
 
@@ -80,15 +80,15 @@ export function AdvancedSearch() {
     const [allCategories, setAllCategories] = useState<ICategory[]>([]);
     const [activeCategories, setActiveCategories] = useState<ICategory[]>([]);
 
-    const getFeeds = useGetFeeds();
-    const [allFeeds, setAllFeeds] = useState<IFeed[]>([]);
     const [activeFeeds, setActiveFeeds] = useState<IFeed[]>([]);
+
+    // Collections list (cached/deduped by React Query).
+    const { data: feedsData } = useFeedsQuery({ paginate: false });
+    const allFeeds = useMemo<IFeed[]>(() => feedsData?.items ?? [], [feedsData]);
 
     useEffect(() => {
         (async () => {
             const { items: itemsCategories } = await getCategories({ paginate: false });
-            const { items: itemsFeeds } = await getFeeds({ paginate: false });
-            setAllFeeds(itemsFeeds);
             setAllCategories(itemsCategories);
         })();
     }, []);

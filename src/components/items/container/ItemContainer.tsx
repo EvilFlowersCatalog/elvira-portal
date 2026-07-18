@@ -11,7 +11,7 @@ import { H1 } from '../../primitives/Heading';
 import { AdvancedSearchWrapper } from './AdvancedSearch';
 import OpenFiltersButton from '../../buttons/OpenFiltersButton';
 import LicenseCalendar from '../entry/details/LicenseCalendar';
-import { IItemContainerList } from '../../../hooks/useItemContainer';
+import { IItemContainerList } from '../../../hooks/api/useInfiniteItemContainer';
 
 interface IItemContainer {
   children: ReactNode;

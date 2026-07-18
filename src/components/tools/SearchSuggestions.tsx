@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import useAuthContext from "../../hooks/contexts/useAuthContext";
-import useGetEntries from "../../hooks/api/entries/useGetEntries";
+import useEntriesQuery from "../../hooks/api/entries/useEntriesQuery";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 import { IEntry } from "../../utils/interfaces/entry";
 import { ICategory } from "../../utils/interfaces/category";
 import { IFeed } from "../../utils/interfaces/feed";
@@ -20,78 +21,35 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   
-  const [entries, setEntries] = useState<IEntry[]>([]);
-  const [authors, setAuthors] = useState<string[]>([]);
-  const [categories, setCategories] = useState<ICategory[]>([]);
-  const [feeds, setFeeds] = useState<IFeed[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const debouncedQuery = useDebouncedValue(searchQuery, 300);
+  const enabled = !!debouncedQuery && debouncedQuery.trim().length >= 2;
+  const { data, isLoading } = useEntriesQuery(
+    { page: 1, limit: 6, title: debouncedQuery },
+    { enabled }
+  );
 
-  const getEntries = useGetEntries();
-
-  useEffect(() => {
-    if (!searchQuery || searchQuery.trim().length < 2) {
-      setEntries([]);
-      setAuthors([]);
-      setCategories([]);
-      setFeeds([]);
-      return;
-    }
-
-    const fetchSuggestions = async () => {
-      setIsLoading(true);
-      try {
-        const { items } = await getEntries({
-          page: 1,
-          limit: 6,
-          title: searchQuery,
-        });
-
-        setEntries(items.slice(0, 6));
-
-        // Extract unique authors from returned entries
-        const uniqueAuthors = new Set<string>();
-        items.forEach(entry => {
-          entry.authors?.forEach(author => {
-            uniqueAuthors.add(author.name);
-          });
-        });
-        setAuthors(Array.from(uniqueAuthors).slice(0, 10));
-
-        // Extract unique categories
-        const categoriesMap = new Map<string, ICategory>();
-        items.forEach(entry => {
-          entry.categories?.forEach(cat => {
-            if (!categoriesMap.has(cat.id)) {
-              categoriesMap.set(cat.id, cat);
-            }
-          });
-        });
-        setCategories(Array.from(categoriesMap.values()).slice(0, 10));
-
-        // Extract unique feeds
-        const feedsMap = new Map<string, IFeed>();
-        items.forEach(entry => {
-          entry.feeds?.forEach(feed => {
-            if (!feedsMap.has(feed.id)) {
-              feedsMap.set(feed.id, feed);
-            }
-          });
-        });
-        setFeeds(Array.from(feedsMap.values()).slice(0, 10));
-      } catch (error) {
-        console.error("Failed to fetch suggestions", error);
-        setEntries([]);
-        setAuthors([]);
-        setCategories([]);
-        setFeeds([]);
-      } finally {
-        setIsLoading(false);
-      }
+  // Derive the books preview plus author / category / collection facets.
+  const { entries, authors, categories, feeds } = useMemo(() => {
+    const items = data?.items ?? [];
+    const uniqueAuthors = new Set<string>();
+    const categoriesMap = new Map<string, ICategory>();
+    const feedsMap = new Map<string, IFeed>();
+    items.forEach((entry) => {
+      entry.authors?.forEach((author) => uniqueAuthors.add(author.name));
+      entry.categories?.forEach((cat) => {
+        if (!categoriesMap.has(cat.id)) categoriesMap.set(cat.id, cat);
+      });
+      entry.feeds?.forEach((feed) => {
+        if (!feedsMap.has(feed.id)) feedsMap.set(feed.id, feed);
+      });
+    });
+    return {
+      entries: items.slice(0, 6),
+      authors: Array.from(uniqueAuthors).slice(0, 10),
+      categories: Array.from(categoriesMap.values()).slice(0, 10),
+      feeds: Array.from(feedsMap.values()).slice(0, 10),
     };
-
-    const debounce = setTimeout(fetchSuggestions, 300);
-    return () => clearTimeout(debounce);
-  }, [searchQuery]);
+  }, [data]);
 
   const handleBookClick = (entryId: string) => {
     searchParams.set('entry-detail-id', entryId);

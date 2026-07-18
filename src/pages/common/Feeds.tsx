@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { IFeed } from '../../utils/interfaces/feed';
 import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
@@ -8,11 +8,10 @@ import Feed from '../../components/items/feeds/Feed';
 import LoadNext from '../../components/items/loadings/LoadNext';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../hooks/contexts/useAppContext';
-import useItemContainer from '../../hooks/useItemContainer';
+import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
 
 const Feeds = () => {
   const { selectedCatalogId } = useAppContext();
-  const list = useItemContainer<IFeed>();
   const [searchParams] = useSearchParams();
   const [currentFeedDescription, setCurrentFeedDescription] = useState<string>('');
   const [currentFeedTitle, setCurrentFeedTitle] = useState<string>('');
@@ -21,54 +20,48 @@ const Feeds = () => {
   const getFeeds = useGetFeeds();
   const getFeedDetail = useGetFeedDetail();
 
-  useEffect(() => {
-    list.reset();
-  }, [selectedCatalogId]);
+  // Current level in the drill-down chain (parent-id = folderA&folderB&…).
+  const currentFeedId = useMemo(() => {
+    const fp = searchParams.get('parent-id')?.split('&').filter(Boolean) ?? [];
+    return fp.length > 0 ? fp[fp.length - 1] : null;
+  }, [searchParams]);
 
+  const filters = useMemo(() => {
+    const title = searchParams.get('query') ?? '';
+    // A text query searches everywhere; otherwise scope to the current folder.
+    const parentId = title.length > 0 ? '' : currentFeedId ?? 'null';
+    return { title, parentId, orderBy: searchParams.get('order-by') ?? '' };
+  }, [searchParams, currentFeedId]);
+
+  const list = useInfiniteItemContainer<IFeed>(
+    ['feeds-infinite', selectedCatalogId, filters],
+    () => getFeeds({ paginate: false, ...filters })
+  );
+
+  // Resolve the current folder's title/description for the header.
   useEffect(() => {
-    if (list.page === 0) {
-      list.setPage(1);
+    if (!currentFeedId || currentFeedId === 'null') {
+      setCurrentFeedDescription('');
+      setCurrentFeedTitle('');
       return;
     }
-
-    (async () => {
-      const fp = searchParams.get('parent-id')?.split('&') ?? [];
-      const currentFeedId = fp.length > 0 ? fp[fp.length - 1] : null;
-      const title = searchParams.get('query') ?? '';
-      const parentId = title.length > 0 ? '' : fp.length > 0 ? fp[fp.length - 1] : 'null';
-
-      try {
-        const { items, metadata } = await getFeeds({
-          paginate: false,
-          orderBy: searchParams.get('order-by') ?? '',
-          title,
-          parentId,
-        });
-
-        list.setMaxPage(metadata.pages);
-        list.setItems([...(list.items ?? []), ...items]);
-
-        if (currentFeedId && currentFeedId !== 'null') {
-          try {
-            const feedDetail = await getFeedDetail(currentFeedId);
-            setCurrentFeedDescription(feedDetail.content || '');
-            setCurrentFeedTitle(feedDetail.title || '');
-          } catch {
-            setCurrentFeedDescription('');
-            setCurrentFeedTitle('');
-          }
-        } else {
-          setCurrentFeedDescription('');
-          setCurrentFeedTitle('');
-        }
-      } catch {
-        list.setIsError(true);
-      } finally {
-        list.setIsLoading(false);
-        list.setLoadingNext(false);
-      }
-    })();
-  }, [list.page]);
+    let alive = true;
+    getFeedDetail(currentFeedId)
+      .then((feed) => {
+        if (!alive) return;
+        setCurrentFeedDescription(feed.content || '');
+        setCurrentFeedTitle(feed.title || '');
+      })
+      .catch(() => {
+        if (!alive) return;
+        setCurrentFeedDescription('');
+        setCurrentFeedTitle('');
+      });
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentFeedId]);
 
   return (
     <ItemContainer

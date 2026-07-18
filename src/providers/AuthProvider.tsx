@@ -18,7 +18,6 @@ import {
   COOKIES_TYPE,
   NAVIGATION_PATHS,
 } from '../utils/interfaces/general/general';
-import useAppContext from '../hooks/contexts/useAppContext';
 import useVerifyCredentials from '../hooks/api/verify/useVerifyCredentials';
 import axios, { CancelTokenSource } from 'axios';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
@@ -41,7 +40,6 @@ const BROADCAST_MESSAGE = 'logout';
 const AuthProvider = ({ children }: IContextProviderParams) => {
   const { t } = useTranslation();
   const { cookies, setCookie, removeCookie } = useCookiesContext();
-  const { selectedCatalogId} = useAppContext(); 
 
   const [staySigned, setStaySigned] = useState<boolean>(false);
   const [auth, setAuth] = useState<IAuth | null>(
@@ -86,11 +84,14 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
       // Verify given credentials and retrieve user data
       const { response: user } = await verifyCredentials(loginForm);
 
-      // If needed and determine isSuperUser status
-      const catalogId = selectedCatalogId || import.meta.env.ELVIRA_CATALOG_ID;
+      // Show the admin entry point if the user is a superuser or manages ANY
+      // catalog. Don't key this off selectedCatalogId — catalogs load after
+      // auth, so it's usually null here; AdminGuard re-verifies server-side for
+      // the active catalog anyway.
+      const catalogPermissions = user.user.catalog_permissions ?? {};
       const isSuperUser =
         user.user.is_superuser ||
-        (catalogId && user.user.catalog_permissions[catalogId] === 'manage');
+        Object.values(catalogPermissions).includes('manage');
 
       // Set authentication context
       setAuth({

@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
 import { CircleLoader } from 'react-spinners';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import useGetUserChats, { IChat } from '../../hooks/api/assistant/useGetUserChats';
+import { IChat } from '../../hooks/api/assistant/useGetUserChats';
+import useUserChatsQuery from '../../hooks/api/assistant/useUserChatsQuery';
 import useGetChatHistory from '../../hooks/api/assistant/useGetChatHistory';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
@@ -24,29 +24,13 @@ const AiChatHistory = () => {
     umamiTrack ,
     selectedCatalogId
   } = useAppContext();
-  const getUserChats = useGetUserChats();
   const getChatHistory = useGetChatHistory();
 
-
-  const [chats, setChats] = useState<IChat[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    loadChats();
-  }, []);
-
-  const loadChats = async () => {
-    try {
-      setIsLoading(true);
-      const userChats = await getUserChats();
-      setChats(userChats.chats);
-    } catch (err) {
-      setError(t('assistant.chatHistoryError'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Page load via React Query (cached / deduped). The per-chat resume fetch
+  // below stays imperative — it's a click-driven action, not a page query.
+  const { data, isLoading, isError } = useUserChatsQuery();
+  const chats: IChat[] = data?.chats ?? [];
+  const error = isError ? t('assistant.chatHistoryError') : null;
 
   const handleChatClick = async (chat: IChat) => {
     try {      
