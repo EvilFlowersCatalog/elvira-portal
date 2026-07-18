@@ -29,8 +29,11 @@ const useGetShelf = () => {
     // Check if there is param, if yes set it
     if (title) params.set('title', title);
     if (feedId) params.set('feed_id', feedId);
-    if (publishedAtGte) params.set('published_at_gte', publishedAtGte);
-    if (publishedAtLte) params.set('published_at_lte', publishedAtLte);
+    // Django-filter uses the double-underscore lookup convention (matches the
+    // entries endpoint's `published_at__gte`/`__lte`). The single-underscore
+    // spelling used before was silently dropped by the backend.
+    if (publishedAtGte) params.set('published_at__gte', publishedAtGte);
+    if (publishedAtLte) params.set('published_at__lte', publishedAtLte);
     if (authors) params.set('author', authors);
     if (query) params.set('query', query);
 

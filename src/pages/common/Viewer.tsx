@@ -268,7 +268,7 @@ const Viewer = () => {
             },
           },
           config: {
-            download: entryDetail.config.evilflowres_metadata_fetch,
+            download: entryDetail.config.evilflowers_metadata_fetch,
             share: entryDetail.config.evilflowers_share_enabled,
             print: entryDetail.config.evilflowers_viewer_print,
             edit: entryDetail.config.evilflowers_annotations_create,

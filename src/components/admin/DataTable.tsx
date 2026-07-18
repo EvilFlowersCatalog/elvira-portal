@@ -214,6 +214,13 @@ export default function DataTable<T>({
   const rowPad = density === 'compact' ? 'px-4 py-2' : 'px-4 py-3';
   const hasPagination = page != null && onPageChange != null;
 
+  // Only wipe to a skeleton on the very first load. Once we have rows, a
+  // pagination / search / sort refetch keeps the previous rows on screen (dimmed
+  // slightly, with a top progress bar) instead of flashing the whole table to
+  // skeletons — the same "no wipe" behaviour used by the public grid.
+  const showSkeleton = !!loading && rows.length === 0;
+  const isRefreshing = !!loading && rows.length > 0;
+
   const handleSort = (col: DataTableColumn<T>) => {
     if (!col.sortKey || !onSortChange) return;
     const nextDir: SortDir =
@@ -241,9 +248,16 @@ export default function DataTable<T>({
         </div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
+      <div className="relative overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
+        {/* Indeterminate progress bar for background refetches (page / search /
+            sort) — the rows below stay visible instead of wiping to a skeleton. */}
+        {isRefreshing && (
+          <div className="absolute inset-x-0 top-0 z-10 h-0.5 overflow-hidden">
+            <div className="h-full w-1/3 animate-[loadingbar_1s_ease-in-out_infinite] bg-primary" />
+          </div>
+        )}
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
+          <table className="w-full border-collapse text-sm" aria-busy={isRefreshing}>
             <caption className="sr-only">{caption}</caption>
             <thead>
               <tr className="border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/40">
@@ -298,8 +312,13 @@ export default function DataTable<T>({
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-700/60">
-              {loading ? (
+            <tbody
+              className={twMerge(
+                'divide-y divide-zinc-100 dark:divide-zinc-700/60 transition-opacity duration-200',
+                isRefreshing && 'opacity-60'
+              )}
+            >
+              {showSkeleton ? (
                 Array.from({ length: 6 }).map((_, i) => (
                   <tr key={`sk-${i}`}>
                     {visible.map((col) => (

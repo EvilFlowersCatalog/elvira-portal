@@ -9,7 +9,7 @@ interface GetLicensesParams {
   pagination?: boolean;
   page?: number;
   limit?: number;
-  sortBy?: string;
+  orderBy?: string;
 }
 
 const useGetLicenses = () => {
@@ -25,7 +25,7 @@ const useGetLicenses = () => {
    * @param query.pagination Whether to enable pagination (default is true).
    * @param query.page The page number for pagination.
    * @param query.limit The number of items per page for pagination.
-   * @param query.sortBy The field to sort the results by.
+   * @param query.orderBy The field to order the results by (backend reads `order_by`).
    * @returns A promise that resolves to an object containing the fetched licenses and metadata.
    */
   const getLicenses = async (
@@ -52,7 +52,9 @@ const useGetLicenses = () => {
     params.set("paginate", query.pagination !== false ? "true" : "false");
     params.set("page", query.page?.toString() || "1");
     params.set("limit", query.limit?.toString() || "10");
-    params.set("sort_by", query.sortBy || "");
+    // Backend orders via `order_by` (Ordering.create_from_request); the old
+    // `sort_by` param was silently ignored. Only send when a field is requested.
+    if (query.orderBy) params.set("order_by", query.orderBy);
 
     const GET_LICENCES_URL = "/readium/v1/licenses";
     const { data } = await axios.get<{

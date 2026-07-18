@@ -9,10 +9,10 @@ type BoolKey = keyof Pick<
   | 'evilflowers_share_enabled'
   | 'evilflowers_viewer_print'
   | 'evilflowers_annotations_create'
-  | 'evilflowers_ocr_enable'
+  | 'evilflowers_ocr_enabled'
   | 'evilflowers_ocr_rewrite'
   | 'evilflowers_ip_block'
-  | 'evilflowres_metadata_fetch'
+  | 'evilflowers_metadata_fetch'
   | 'readium_enabled'
 >;
 
@@ -20,8 +20,8 @@ const BOOL_FIELDS: { key: BoolKey; labelKey: string; helpKey: string; event: str
   { key: 'evilflowers_annotations_create', labelKey: 'annotations', helpKey: 'annotations', event: 'Annotation Config Button' },
   { key: 'evilflowers_share_enabled', labelKey: 'share', helpKey: 'share', event: 'Share Config Button' },
   { key: 'evilflowers_viewer_print', labelKey: 'print', helpKey: 'print', event: 'Print Config Button' },
-  { key: 'evilflowres_metadata_fetch', labelKey: 'download', helpKey: 'download', event: 'Download Config Button' },
-  { key: 'evilflowers_ocr_enable', labelKey: 'ocrEnable', helpKey: 'ocrEnable', event: 'OCR Enable Config Button' },
+  { key: 'evilflowers_metadata_fetch', labelKey: 'download', helpKey: 'download', event: 'Download Config Button' },
+  { key: 'evilflowers_ocr_enabled', labelKey: 'ocrEnable', helpKey: 'ocrEnable', event: 'OCR Enable Config Button' },
   { key: 'evilflowers_ocr_rewrite', labelKey: 'ocrRewrite', helpKey: 'ocrRewrite', event: 'OCR Rewrite Config Button' },
   { key: 'evilflowers_ip_block', labelKey: 'intranetIpRestriction', helpKey: 'intranetIpRestriction', event: 'Intranet IP Block Config Button' },
   { key: 'readium_enabled', labelKey: 'readiumEnabled', helpKey: 'readiumEnabled', event: 'Readium Config Button' },

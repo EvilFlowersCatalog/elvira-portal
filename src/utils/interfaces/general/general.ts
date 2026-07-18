@@ -76,7 +76,7 @@ export interface IMetadata {
 }
 
 export interface IConfig {
-  evilflowers_ocr_enable: boolean;
+  evilflowers_ocr_enabled: boolean;
   evilflowers_ocr_rewrite: boolean;
   
   evilflowers_annotations_create: boolean;
@@ -85,7 +85,7 @@ export interface IConfig {
   evilflowers_render_type: "page" | "document";
 
   evilflowers_share_enabled: boolean;
-  evilflowres_metadata_fetch: boolean;
+  evilflowers_metadata_fetch: boolean;
 
   evilflowers_ip_block: boolean;
 

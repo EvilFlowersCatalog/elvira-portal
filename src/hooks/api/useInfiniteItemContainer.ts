@@ -1,4 +1,4 @@
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useMemo } from 'react';
 
 interface PagedResponse<T> {
@@ -17,6 +17,9 @@ export interface IItemContainerList<T = any> {
   setItems: (items: T[]) => void;
   isLoading: boolean;
   setIsLoading: (v: boolean) => void;
+  /** Background activity (refetch / next page / query-key change) — true while
+   * fresh data loads even though stale items are still shown. */
+  isFetching: boolean;
   isError: boolean;
   setIsError: (v: boolean) => void;
   page: number;
@@ -53,6 +56,13 @@ export function useInfiniteItemContainer<T extends { id: string }>(
         ? allPages.length + 1
         : undefined,
     enabled: options?.enabled ?? true,
+    // When the queryKey changes (new search / filter / sort / catalog), keep the
+    // previous result set on screen while the next one loads instead of wiping
+    // the grid to a full-page skeleton. This is what removes the visible
+    // "flash / blink" on every filter change: `isLoading` (isPending) only stays
+    // true for the very first load, so ItemContainer renders the old items until
+    // the fresh data arrives. `isFetching` still exposes the background activity.
+    placeholderData: keepPreviousData,
   });
 
   // Flatten loaded pages and de-duplicate by id (the same guard the old manual
@@ -71,6 +81,7 @@ export function useInfiniteItemContainer<T extends { id: string }>(
     setItems: noop,
     isLoading: query.isLoading,
     setIsLoading: noop,
+    isFetching: query.isFetching,
     isError: query.isError,
     setIsError: noop,
     page,

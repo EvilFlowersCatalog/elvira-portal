@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
-import useAuthContext from '../../../../hooks/contexts/useAuthContext';
 import { IEntryDetail } from '../../../../utils/interfaces/entry';
 import { ILicense, LICENSE_STATE } from '../../../../utils/interfaces/license';
 import useGetEntryDetail from '../../../../hooks/api/entries/useGetEntryDetail';
@@ -13,6 +12,7 @@ import useAddToShelf from '../../../../hooks/api/my-shelf/useAddToShelf';
 import useRemoveFromShelf from '../../../../hooks/api/my-shelf/useRemoveFromShelf';
 import { NAVIGATION_PATHS } from '../../../../utils/interfaces/general/general';
 import ShelfButton from '../../../buttons/ShelfButton';
+import Thumbnail from '../Thumbnail';
 import { TabContent, Tabs, TabsComponent, TabsHeader, TabTitle } from './EntryDetailTabs';
 import { InfoGrid, InfoItem, InfoItemCustom } from './EntryGrid';
 import { SummaryText } from './SummaryText';
@@ -32,7 +32,6 @@ interface IEntryDetailParams {
 
 const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const { setShowAiAssistant, umamiTrack } = useAppContext();
-  const { auth } = useAuthContext();
   const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -253,12 +252,11 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       ) : (
         <div className={'flex h-full flex-col mdlg:flex-row'}>
           <div className='p-8 bg-lightGray dark:bg-darkGray h-full min-w-[400px] flex flex-col'>
-            <div className={`w-full flex justify-center border rounded-md flex-shrink overflow-hidden h-full`}>
-              <img className={'w-full h-full object-cover'}
-                src={entry.thumbnail + `?access_token=${auth?.token}`}
-                alt='Entry Thumbnail'
-              />
-            </div>
+            <Thumbnail
+              thumbnail={entry.thumbnail}
+              alt='Entry Thumbnail'
+              wrapperClassName='w-full flex justify-center border rounded-md flex-shrink h-full'
+            />
 
             {entry?.config?.readium_enabled && (
               <div className="flex justify-center mt-2">

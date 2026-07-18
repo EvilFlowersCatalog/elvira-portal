@@ -23,7 +23,7 @@ const AdminAddEntry = () => {
       isbn: '',
     },
     config: {
-      evilflowers_ocr_enable: false,
+      evilflowers_ocr_enabled: false,
       evilflowers_ocr_rewrite: false,
 
       evilflowers_annotations_create: true,
@@ -32,7 +32,7 @@ const AdminAddEntry = () => {
       evilflowers_render_type: "page",
       
       evilflowers_share_enabled: false,
-      evilflowres_metadata_fetch: false,
+      evilflowers_metadata_fetch: false,
       
       evilflowers_ip_block: false,
       

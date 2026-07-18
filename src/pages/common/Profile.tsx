@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
@@ -8,12 +9,11 @@ import ElviraInput from '../../components/inputs/ElviraInput';
 import PageLoading from '../../components/page/PageLoading';
 import PageMessage from '../../components/page/PageMessage';
 import { H1 } from '../../components/primitives/Heading';
-import useGetUserDetails from '../../hooks/api/users/useGetUserDetails';
 import useSetUserPassphrase from '../../hooks/api/users/useSetUserPassphrase';
+import useUserDetailsQuery from '../../hooks/api/users/useUserDetailsQuery';
 import useGetShelf from '../../hooks/api/my-shelf/useGetShelf';
-import useGetLicenses from '../../hooks/api/licenses/useGetLicenses';
+import useLicensesQuery from '../../hooks/api/licenses/useLicensesQuery';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
-import { IUser } from '../../utils/interfaces/user';
 import { LICENSE_STATE } from '../../utils/interfaces/license';
 import { BookmarkIcon, ClockIcon, LibraryIcon, LoansIcon } from '../../components/header/navbar/NavbarIcons';
 
@@ -23,69 +23,51 @@ const Profile = () => {
   const { t } = useTranslation();
   const { auth } = useAuthContext();
 
-  const getUserDetails = useGetUserDetails();
   const setUserPassphrase = useSetUserPassphrase();
   const getShelf = useGetShelf();
-  const getLicenses = useGetLicenses();
 
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isError, setIsError] = useState<boolean>(false);
+  // User profile, bookmark count and active-loan count are now React Query reads:
+  // cached and de-duplicated, so returning to this page renders instantly from
+  // cache (with a background refetch) instead of full-page-spinnering every time.
+  const {
+    data: userDetails = null,
+    isLoading,
+    isError,
+  } = useUserDetailsQuery(auth?.userId);
+
+  const { data: shelfData } = useQuery({
+    queryKey: ['shelf-count', auth?.userId ?? null],
+    queryFn: () => getShelf({ page: 1, limit: 1 }),
+    enabled: !!auth,
+  });
+
+  const { data: licenseData } = useLicensesQuery({
+    user_mode: 'current',
+    page: 1,
+    limit: 50,
+  });
+
+  const bookmarksCount = shelfData?.metadata.total ?? 0;
+
+  const loansCount = useMemo(() => {
+    if (!licenseData) return 0;
+    const now = new Date();
+    return licenseData.items.filter(
+      (l) =>
+        l.state === LICENSE_STATE.active &&
+        new Date(l.starts_at) <= now &&
+        new Date(l.expires_at) > now
+    ).length;
+  }, [licenseData]);
+
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  const [userDetails, setUserDetails] = useState<IUser | null>(null);
   const [passphrase, setPassphrase] = useState<string>('');
   const [passphraseHint, setPassphraseHint] = useState<string>('');
-  const [bookmarksCount, setBookmarksCount] = useState<number>(0);
-  const [loansCount, setLoansCount] = useState<number>(0);
   const [notifications, setNotifications] = useState<Record<NotificationKey, boolean>>({
     loanEnd: false,
     newBooks: false,
     reservationChange: false,
   });
-
-  useEffect(() => {
-    if (!auth) return;
-    let mounted = true;
-
-    (async () => {
-      try {
-        const details = await getUserDetails(auth.userId);
-        if (mounted) setUserDetails(details);
-      } catch {
-        if (mounted) setIsError(true);
-      } finally {
-        if (mounted) setIsLoading(false);
-      }
-    })();
-
-    return () => { mounted = false; };
-  }, [auth?.userId]);
-
-  useEffect(() => {
-    if (!auth) return;
-    let mounted = true;
-
-    (async () => {
-      try {
-        const [shelfData, licenseData] = await Promise.all([
-          getShelf({ page: 1, limit: 1 }),
-          getLicenses({ user_mode: 'current', page: 1, limit: 50 }),
-        ]);
-        if (!mounted) return;
-
-        setBookmarksCount(shelfData.metadata.total);
-
-        const now = new Date();
-        const active = licenseData.items.filter((l) => {
-          return l.state === LICENSE_STATE.active && new Date(l.starts_at) <= now && new Date(l.expires_at) > now;
-        });
-        setLoansCount(active.length);
-      } catch {
-        // counts stay 0 on error
-      }
-    })();
-
-    return () => { mounted = false; };
-  }, [auth?.userId]);
 
   useEffect(() => {
     setPassphraseHint(userDetails?.lcp_passphrase_hint || '');

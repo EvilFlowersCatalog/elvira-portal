@@ -1,10 +1,9 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import useAuthContext from "../../hooks/contexts/useAuthContext";
 import useEntriesQuery from "../../hooks/api/entries/useEntriesQuery";
+import Thumbnail from "../items/entry/Thumbnail";
 import useDebouncedValue from "../../hooks/useDebouncedValue";
-import { IEntry } from "../../utils/interfaces/entry";
 import { ICategory } from "../../utils/interfaces/category";
 import { IFeed } from "../../utils/interfaces/feed";
 import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
@@ -17,7 +16,6 @@ interface SearchSuggestionsProps {
 
 const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: SearchSuggestionsProps) => {
   const { t } = useTranslation();
-  const { auth } = useAuthContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   
@@ -141,13 +139,11 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
                   onClick={() => handleBookClick(entry.id)}
                   className="flex gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded transition-colors"
                 >
-                  <div className="flex-shrink-0 h-16 w-10 rounded overflow-hidden">
-                    <img
-                      src={entry.thumbnail + `?access_token=${auth?.token}`}
-                      alt={entry.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                  <Thumbnail
+                    thumbnail={entry.thumbnail}
+                    alt={entry.title}
+                    wrapperClassName="flex-shrink-0 h-16 w-10 rounded"
+                  />
                   <div className="flex-1 min-w-0">
                     <h4 className="text-xs font-semibold line-clamp-2 h-8 mb-1 text-secondary dark:text-white">
                       {entry.title}
