@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import useAppContext from '../../hooks/contexts/useAppContext';
@@ -55,9 +55,9 @@ const ToolsContainer = ({
     })();
   }, []);
 
-  const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
-    if (e.target.value === 'none') searchParams.delete('order-by');
-    else searchParams.set('order-by', e.target.value);
+  const handleSelectChange = (value: string) => {
+    if (value === 'none') searchParams.delete('order-by');
+    else searchParams.set('order-by', value);
     setSearchParams(searchParams);
   };
 

@@ -14,6 +14,7 @@ import ElviraInput from '../../components/inputs/ElviraInput';
 import useCookiesContext from '../../hooks/contexts/useCookiesContext';
 import FormModal from '../../components/modals/FormModal';
 import LicenseTerms from '../../components/dialogs/LicenseTerms';
+import Checkbox from '../../components/primitives/Checkbox';
 
 const Auth = () => {
   const { login , staySigned, setStaySigned} = useAuthContext();
@@ -134,39 +135,35 @@ const Auth = () => {
                 </div>
                 <div className='w-full'>
 
-                  <div className='flex w-full gap-2 items-center'>
-                    <input
-                      type='checkbox'
-                      className={`m-[9px] h-[18px] w-[18px] cursor-pointer ${
-                        checLicensekInvalid ? 'accent-red' : 'accent-primary'
-                      }`}
+                  <div className='flex w-full gap-2 items-center mb-4'>
+                    <Checkbox
                       required
+                      invalid={checLicensekInvalid}
                       checked={licenseChecked}
                       onChange={handleLicenseCheckChange}
                       onInvalid={handleLicenseCheckInvalid}
+                      label={
+                        <button
+                          type='button'
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenLicenseModal(true);
+                          }}
+                          className={`hover:underline text-sm cursor-pointer text-left ${
+                            checLicensekInvalid ? 'text-red' : 'text-black dark:text-white'
+                          }`}
+                        >
+                          {t('login.license')}
+                        </button>
+                      }
                     />
-                    <button
-                      type='button'
-                      onClick={() => setOpenLicenseModal(true)}
-                      className={`hover:underline text-sm cursor-pointer text-left ${
-                        checLicensekInvalid ? 'text-red' : 'text-black dark:text-white'
-                      }`}
-                    >
-                      {t('login.license')}
-                    </button>
                   </div>
                   <div className='flex w-full gap-2 items-center'>
-                    <input
-                      type='checkbox'
-                      className='m-[9px] h-[18px] w-[18px] cursor-pointer accent-primary'
+                    <Checkbox
                       checked={staySigned}
-                      onChange={(e)=>setStaySigned(e.target.checked)}
+                      onChange={(e) => setStaySigned(e.target.checked)}
+                      label={t('login.stayLogged')}
                     />
-                    <p onClick={()=>{setStaySigned(!staySigned)}}
-                      className={`text-sm cursor-pointer text-left text-black dark:text-white`}
-                    >
-                      {t('login.stayLogged')}
-                    </p>
                   </div>
 
                 </div>

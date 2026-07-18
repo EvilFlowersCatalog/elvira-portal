@@ -10,6 +10,8 @@ import {
 } from 'react-icons/fi';
 import { twMerge } from 'tailwind-merge';
 import IconButton from './IconButton';
+import Select from '../primitives/Select';
+import Checkbox from '../primitives/Checkbox';
 
 export type SortDir = 'asc' | 'desc';
 export interface SortState {
@@ -153,18 +155,13 @@ function ColumnsMenu<T>({
           {hideable.map((col) => {
             const checked = !hidden.has(col.id);
             return (
-              <label
+              <Checkbox
                 key={col.id}
-                className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700/60"
-              >
-                <input
-                  type="checkbox"
-                  className="accent-primary"
-                  checked={checked}
-                  onChange={() => onToggle(col.id)}
-                />
-                <span className="truncate">{typeof col.header === 'string' ? col.header : col.id}</span>
-              </label>
+                checked={checked}
+                onChange={() => onToggle(col.id)}
+                className="w-full rounded-md px-2 py-1.5 text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-700/60"
+                label={<span className="truncate">{typeof col.header === 'string' ? col.header : col.id}</span>}
+              />
             );
           })}
         </div>
@@ -420,18 +417,14 @@ function DataTableFooter({
             <label htmlFor="dt-page-size" className="text-zinc-500 dark:text-zinc-400">
               Rows
             </label>
-            <select
+            <Select
               id="dt-page-size"
-              value={pageSize}
-              onChange={(e) => onPageSizeChange(parseInt(e.target.value, 10))}
-              className="rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-2 py-1 text-sm outline-none focus:border-primary"
-            >
-              {pageSizeOptions.map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
+              value={String(pageSize)}
+              onChange={(value) => onPageSizeChange(parseInt(value, 10))}
+              options={pageSizeOptions.map((n) => ({ value: String(n), label: String(n) }))}
+              className="w-20"
+              triggerClassName="py-1"
+            />
           </>
         )}
         {total != null && (

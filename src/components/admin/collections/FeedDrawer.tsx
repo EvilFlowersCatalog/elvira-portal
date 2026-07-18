@@ -5,6 +5,7 @@ import { FiTrash2, FiX, FiSearch, FiFolder } from 'react-icons/fi';
 import Drawer from '../Drawer';
 import ConfirmDialog from '../ConfirmDialog';
 import { Field, TextInput } from '../Field';
+import Select from '../../primitives/Select';
 import Button from '../../buttons/Button';
 import { IFeed } from '../../../utils/interfaces/feed';
 import { uuid } from '../../../utils/func/functions';
@@ -266,15 +267,16 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
           </Field>
 
           <Field label={t('administration.collectionsPage.kind')} htmlFor="feed-kind">
-            <select
+            <Select
               id="feed-kind"
               value={kind}
-              onChange={(e) => setKind(e.target.value)}
-              className="h-10 w-full rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40 px-3 text-sm outline-none focus:border-primary"
-            >
-              <option value="acquisition">{t('administration.collectionsPage.kindAcquisition')}</option>
-              <option value="navigation">{t('administration.collectionsPage.kindNavigation')}</option>
-            </select>
+              onChange={setKind}
+              options={[
+                { value: 'acquisition', label: t('administration.collectionsPage.kindAcquisition') },
+                { value: 'navigation', label: t('administration.collectionsPage.kindNavigation') },
+              ]}
+              triggerClassName="h-10 rounded-lg border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40"
+            />
           </Field>
 
           {/* Graph structure: parent folders (a feed can have multiple parents) */}

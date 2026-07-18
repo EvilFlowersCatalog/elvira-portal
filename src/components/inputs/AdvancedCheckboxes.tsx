@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { IoSearch } from "react-icons/io5";
+import Checkbox from "../primitives/Checkbox";
 
 export default function AdvancedCheckboxes({
     options,
@@ -68,20 +69,16 @@ export default function AdvancedCheckboxes({
 
             <div className="flex flex-col gap-[7px]">
                 {displayedOptions.map(option => (
-                    <label
+                    <Checkbox
                         key={option.value}
-                        className="flex items-center gap-[5px] cursor-pointer select-none"
-                    >
-                        <input
-                            type="checkbox"
-                            checked={selected.includes(option.value)}
-                            onChange={e => toggle(option.value, e.target.checked)}
-                            className="w-[18px] h-[18px] accent-primary cursor-pointer flex-shrink-0"
-                        />
-                        <span className={`text-[14px] tracking-[0.1px] leading-[20px] ${selected.includes(option.value) ? 'font-medium' : 'font-normal'} text-darkGray dark:text-white`}>
-                            {option.label}
-                        </span>
-                    </label>
+                        checked={selected.includes(option.value)}
+                        onChange={e => toggle(option.value, e.target.checked)}
+                        label={
+                            <span className={`text-[14px] tracking-[0.1px] leading-[20px] ${selected.includes(option.value) ? 'font-medium' : 'font-normal'} text-darkGray dark:text-white`}>
+                                {option.label}
+                            </span>
+                        }
+                    />
                 ))}
             </div>
 

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { FiSearch, FiX } from 'react-icons/fi';
 import { twMerge } from 'tailwind-merge';
 import useDebouncedValue from '../../hooks/useDebouncedValue';
+import Tooltip from '../primitives/Tooltip';
 
 interface SearchFieldProps {
   /** Current committed value (controlled). */
@@ -69,15 +70,16 @@ export default function SearchField({
         className="flex-1 min-w-0 bg-transparent outline-none text-sm text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-400"
       />
       {text && (
-        <button
-          type="button"
-          aria-label="Clear search"
-          title="Clear search"
-          onClick={() => setText('')}
-          className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 shrink-0"
-        >
-          <FiX size={16} />
-        </button>
+        <Tooltip content="Clear search">
+          <button
+            type="button"
+            aria-label="Clear search"
+            onClick={() => setText('')}
+            className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 shrink-0"
+          >
+            <FiX size={16} />
+          </button>
+        </Tooltip>
       )}
     </div>
   );

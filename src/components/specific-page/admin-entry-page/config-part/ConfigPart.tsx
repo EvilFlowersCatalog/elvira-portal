@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { IPartParams, IConfig } from '../../../../utils/interfaces/general/general';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
 import { Switch } from '../../../admin/Field';
+import Select from '../../../primitives/Select';
 
 /** Boolean reader/access flags, rendered data-driven with helper text. */
 type BoolKey = keyof Pick<
@@ -46,18 +47,20 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
         <label htmlFor="render-type" className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
           {t('entry.wizard.renderType')}
         </label>
-        <select
+        <Select
           id="render-type"
           value={config?.evilflowers_render_type ?? 'page'}
-          onChange={(e) => {
-            umamiTrack('Render Type Config', { value: e.target.value });
-            setConfig({ evilflowers_render_type: e.target.value as IConfig['evilflowers_render_type'] });
+          onChange={(value) => {
+            umamiTrack('Render Type Config', { value });
+            setConfig({ evilflowers_render_type: value as IConfig['evilflowers_render_type'] });
           }}
-          className="h-10 w-full max-w-xs rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40 px-3 text-sm outline-none focus:border-primary"
-        >
-          <option value="page">{t('entry.wizard.renderTypePage')}</option>
-          <option value="document">{t('entry.wizard.renderTypeDocument')}</option>
-        </select>
+          options={[
+            { value: 'page', label: t('entry.wizard.renderTypePage') },
+            { value: 'document', label: t('entry.wizard.renderTypeDocument') },
+          ]}
+          className="max-w-xs"
+          triggerClassName="h-10 rounded-lg border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40"
+        />
         <p className="text-xs text-zinc-500 dark:text-zinc-400">{t('entry.wizard.configHelp.renderType')}</p>
       </div>
 

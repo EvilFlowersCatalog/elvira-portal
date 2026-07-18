@@ -13,7 +13,7 @@ export default function AdminLayout() {
       <Breadcrumb />
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <AdminNav />
-        <div id="admin-content" className="min-w-0 flex-1 overflow-y-auto">
+        <div id="admin-content" className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
           <Outlet />
         </div>
       </div>

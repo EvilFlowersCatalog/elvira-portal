@@ -1,5 +1,6 @@
 import { ButtonHTMLAttributes, forwardRef } from 'react';
 import { twMerge } from 'tailwind-merge';
+import Tooltip from '../primitives/Tooltip';
 
 type Variant = 'ghost' | 'outline' | 'solid' | 'danger';
 type Size = 'sm' | 'md';
@@ -28,27 +29,29 @@ const SIZES: Record<Size, string> = {
 };
 
 /**
- * Accessible icon-only button. Enforces an aria-label + title and a real
- * <button> element so the control is keyboard-operable and screen-reader named.
+ * Accessible icon-only button. Enforces an aria-label + a styled Tooltip (instead of
+ * the native title="" bubble) and a real <button> element so the control is
+ * keyboard-operable and screen-reader named.
  */
 const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   ({ label, variant = 'ghost', size = 'md', className, children, ...props }, ref) => {
     return (
-      <button
-        ref={ref}
-        type="button"
-        aria-label={label}
-        title={label}
-        className={twMerge(
-          'inline-flex items-center justify-center rounded-md transition-colors shrink-0 disabled:opacity-40 disabled:pointer-events-none',
-          SIZES[size],
-          VARIANTS[variant],
-          className
-        )}
-        {...props}
-      >
-        {children}
-      </button>
+      <Tooltip content={label}>
+        <button
+          ref={ref}
+          type="button"
+          aria-label={label}
+          className={twMerge(
+            'inline-flex items-center justify-center rounded-md transition-colors shrink-0 disabled:opacity-40 disabled:pointer-events-none',
+            SIZES[size],
+            VARIANTS[variant],
+            className
+          )}
+          {...props}
+        >
+          {children}
+        </button>
+      </Tooltip>
     );
   }
 );

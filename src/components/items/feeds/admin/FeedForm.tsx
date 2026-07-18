@@ -13,6 +13,7 @@ import ElviraInput from '../../../../components/inputs/ElviraInput';
 import ElviraTextarea from '../../../../components/inputs/ElviraTextarea';
 import FeedAutofill from '../../../autofills/FeedAutofill';
 import { MdRemoveCircle } from 'react-icons/md';
+import Select from '../../../primitives/Select';
 
 interface IFeedForm {
   setOpen: (open: boolean) => void;
@@ -63,10 +64,10 @@ const FeedForm = ({
     }));
   };
   // set kind
-  const handleKindChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  const handleKindChange = (value: string) => {
     setForm((prevForm) => ({
       ...prevForm,
-      kind: e.target.value,
+      kind: value,
     }));
   };
 
@@ -199,21 +200,20 @@ const FeedForm = ({
         </div>
 
         {/* Kind */}
-        <div className='flex w-full flex-col text-left'>
+        <div className='flex w-full flex-col gap-1 text-left'>
           <label htmlFor='selectionKind' className={`text-sm pl-1 text-primary`}>
             {t('modal.feedForm.kind')}
           </label>
-            <select
-              className="bg-transparent outline-none p-2 pl-0 dark:text-white"
-              value={form.kind}
-              id="selectionKind"
-              aria-label="Selection Kind"
-              onChange={handleKindChange}
-            >
-                <option value="acquisition">{t('modal.feedForm.acquistion')}</option>
-                <option value="navigation">{t('modal.feedForm.navigation')}</option>
-            </select>
-
+          <Select
+            id="selectionKind"
+            aria-label="Selection Kind"
+            value={form.kind}
+            onChange={handleKindChange}
+            options={[
+              { value: 'acquisition', label: t('modal.feedForm.acquistion') },
+              { value: 'navigation', label: t('modal.feedForm.navigation') },
+            ]}
+          />
         </div>
         <button ref={buttonRef} type='submit' className='hidden'></button>
       </form>

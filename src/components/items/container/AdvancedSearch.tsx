@@ -9,6 +9,7 @@ import FeedAutofill from "../../autofills/FeedAutofill";
 import ElviraNumberInput from "../../inputs/ElviraNumberInput";
 import { IoClose } from "react-icons/io5";
 import AdvancedCheckboxes from "../../inputs/AdvancedCheckboxes";
+import Checkbox from "../../primitives/Checkbox";
 import useGetCategories from "../../../hooks/api/categories/useGetCategories";
 import useFeedsQuery from "../../../hooks/api/feeds/useFeedsQuery";
 import { IFeed } from "../../../utils/interfaces/feed";
@@ -229,23 +230,22 @@ export function AdvancedSearch() {
                 </p>
                 <div className="flex flex-col gap-[7px]">
                     {availabilityOptions.map(opt => (
-                        <label key={opt.value} className="flex items-center gap-[5px] cursor-pointer select-none">
-                            <input
-                                type="checkbox"
-                                checked={availability.includes(opt.value as AvailabilityState)}
-                                onChange={e => {
-                                    const val = opt.value as AvailabilityState;
-                                    setAvailability(e.target.checked
-                                        ? [...availability, val]
-                                        : availability.filter(v => v !== val)
-                                    );
-                                }}
-                                className="w-[18px] h-[18px] accent-primary cursor-pointer flex-shrink-0"
-                            />
-                            <span className={`text-[14px] tracking-[0.1px] leading-[20px] ${availability.includes(opt.value as AvailabilityState) ? 'font-medium' : 'font-normal'} text-darkGray dark:text-white`}>
-                                {opt.label}
-                            </span>
-                        </label>
+                        <Checkbox
+                            key={opt.value}
+                            checked={availability.includes(opt.value as AvailabilityState)}
+                            onChange={e => {
+                                const val = opt.value as AvailabilityState;
+                                setAvailability(e.target.checked
+                                    ? [...availability, val]
+                                    : availability.filter(v => v !== val)
+                                );
+                            }}
+                            label={
+                                <span className={`text-[14px] tracking-[0.1px] leading-[20px] ${availability.includes(opt.value as AvailabilityState) ? 'font-medium' : 'font-normal'} text-darkGray dark:text-white`}>
+                                    {opt.label}
+                                </span>
+                            }
+                        />
                     ))}
                 </div>
             </div>

@@ -167,17 +167,17 @@ input:focus:not(:focus-visible) {
  * Defaults below cover any theme that doesn't override them.
  */
 :root {
-  --color-on-primary: #141414;
+  --color-on-primary: #ffffff;
   --color-primary-text: #0077A3;
   --color-primary-dark: #0A3D52;
 }
-:root[data-theme="fiit"]    { --color-on-primary:#141414; --color-primary-text:#0077A3; --color-primary-dark:#0A3D52; }
+:root[data-theme="fiit"]    { --color-on-primary:#ffffff; --color-primary-text:#0077A3; --color-primary-dark:#0A3D52; }
 :root[data-theme="stu"]     { --color-on-primary:#ffffff; --color-primary-text:#a80331; --color-primary-dark:#4A0716; }
-:root[data-theme="mtf"]     { --color-on-primary:#141414; --color-primary-text:#C81F14; --color-primary-dark:#5A0E09; }
-:root[data-theme="svf"]     { --color-on-primary:#141414; --color-primary-text:#B0511A; --color-primary-dark:#4A2410; }
+:root[data-theme="mtf"]     { --color-on-primary:#ffffff; --color-primary-text:#C81F14; --color-primary-dark:#5A0E09; }
+:root[data-theme="svf"]     { --color-on-primary:#ffffff; --color-primary-text:#B0511A; --color-primary-dark:#4A2410; }
 :root[data-theme="sjf"]     { --color-on-primary:#ffffff; --color-primary-text:#4C5B60; --color-primary-dark:#202A2D; }
 :root[data-theme="fei"]     { --color-on-primary:#ffffff; --color-primary-text:#0C4A8E; --color-primary-dark:#0D2238; }
-:root[data-theme="fchpt"]   { --color-on-primary:#141414; --color-primary-text:#756000; --color-primary-dark:#4A3F0F; }
-:root[data-theme="fad"]     { --color-on-primary:#141414; --color-primary-text:#007A3A; --color-primary-dark:#103A22; }
-:root[data-theme="ku"]      { --color-on-primary:#141414; --color-primary-text:#7A6100; --color-primary-dark:#3A2F0A; }
-:root[data-theme="default"] { --color-on-primary:#141414; --color-primary-text:#0077A3; --color-primary-dark:#0A3D52; }
+:root[data-theme="fchpt"]   { --color-on-primary:#ffffff; --color-primary-text:#756000; --color-primary-dark:#4A3F0F; }
+:root[data-theme="fad"]     { --color-on-primary:#ffffff; --color-primary-text:#007A3A; --color-primary-dark:#103A22; }
+:root[data-theme="ku"]      { --color-on-primary:#ffffff; --color-primary-text:#7A6100; --color-primary-dark:#3A2F0A; }
+:root[data-theme="default"] { --color-on-primary:#ffffff; --color-primary-text:#0077A3; --color-primary-dark:#0A3D52; }
