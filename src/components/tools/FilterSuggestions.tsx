@@ -20,8 +20,11 @@ const FilterSuggestions = ({ searchQuery }: FilterSuggestionsProps) => {
   const MAX_ITEMS_PER_COLUMN = 3;
 
   const enabled = !!searchQuery && searchQuery.trim().length >= 2;
+  // Derive facets from the same relevance full-text `query` the grid uses (not a
+  // title-only match), so the suggested authors/collections/categories actually
+  // correspond to the results the user is seeing.
   const { data, isLoading } = useEntriesQuery(
-    { page: 1, limit: 50, title: searchQuery },
+    { page: 1, limit: 50, query: searchQuery },
     { enabled }
   );
 

@@ -19,12 +19,22 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   
-  const debouncedQuery = useDebouncedValue(searchQuery, 300);
+  const debouncedQuery = useDebouncedValue(searchQuery, 250);
   const enabled = !!debouncedQuery && debouncedQuery.trim().length >= 2;
-  const { data, isLoading } = useEntriesQuery(
-    { page: 1, limit: 6, title: debouncedQuery },
+  // Use the backend's relevance-ranked full-text `query` (matches title, summary,
+  // author, publisher and category) instead of the old title-only `title` filter,
+  // which missed most matches. `keepPreviousData` (in useEntriesQuery) keeps the
+  // last suggestions visible while the next set loads, so the panel updates in
+  // place with no flash — the user never sees a loading wipe.
+  const { data, isFetching, isPlaceholderData } = useEntriesQuery(
+    { query: debouncedQuery, limit: 6 },
     { enabled }
   );
+
+  // Only show the skeleton on the very first fetch (nothing cached to show yet).
+  const showInitialLoading = isFetching && !data;
+  // Background refresh while previous suggestions stay on screen.
+  const isRefreshing = isFetching && isPlaceholderData;
 
   // Derive the books preview plus author / category / collection facets.
   const { entries, authors, categories, feeds } = useMemo(() => {
@@ -53,6 +63,20 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
     searchParams.set('entry-detail-id', entryId);
     searchParams.set('entry-catalog-id', entries.find(e => e.id === entryId)?.catalog_id || '');
     setSearchParams(searchParams);
+    onClose();
+  };
+
+  // Commit the free-text search to the full library grid (relevance-ranked
+  // `query`). This is the "see all results" affordance — same as pressing Enter.
+  const handleSeeAll = () => {
+    const params = new URLSearchParams(searchParams);
+    params.set('query', searchQuery.trim());
+    params.delete('entry-detail-id');
+    if (shouldRedirect) {
+      navigate({ pathname: NAVIGATION_PATHS.library, search: params.toString() });
+    } else {
+      setSearchParams(params);
+    }
     onClose();
   };
 
@@ -119,19 +143,48 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
 
   return (
     <div className="absolute top-[70px] left-0 right-0 bg-white dark:bg-darkGray border border-gray-300 dark:border-gray-700 rounded-md shadow-lg z-50 max-h-[500px] overflow-auto">
-      {isLoading ? (
-        <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-          {t('common.loading')}...
+      {/* Thin top progress bar for background refreshes — the previous
+          suggestions stay visible underneath instead of a loading wipe. */}
+      {isRefreshing && (
+        <div className="sticky top-0 left-0 right-0 z-10 h-0.5 overflow-hidden">
+          <div className="h-full w-1/3 animate-[loadingbar_1s_ease-in-out_infinite] bg-primary" />
+        </div>
+      )}
+
+      {showInitialLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex gap-3 p-2">
+              <div className="flex-shrink-0 h-16 w-10 rounded bg-gray-200 dark:bg-zinc-700 animate-pulse" />
+              <div className="flex-1 flex flex-col gap-2 pt-1">
+                <div className="h-3 w-3/4 rounded bg-gray-200 dark:bg-zinc-700 animate-pulse" />
+                <div className="h-3 w-1/2 rounded bg-gray-200 dark:bg-zinc-700 animate-pulse" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : !hasResults ? (
-        <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-          Žiadne výsledky pre vaše vyhľadávanie
-        </div>
+        <button
+          type="button"
+          onClick={handleSeeAll}
+          className="w-full p-8 text-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primaryLight transition-colors"
+        >
+          {t('search.noResults', { query: searchQuery.trim() })}
+        </button>
       ) : (
-        <div className="grid grid-cols-12 gap-4">
+        <div className={`grid grid-cols-12 gap-4 transition-opacity duration-150 ${isRefreshing ? 'opacity-70' : 'opacity-100'}`}>
           {/* Books Section - 8 columns */}
           <div className="col-span-12 lg:col-span-8 p-4">
-            <h3 className="text-sm font-bold mb-3 text-gray-700 dark:text-gray-300">Knihy</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">{t('search.books')}</h3>
+              <button
+                type="button"
+                onClick={handleSeeAll}
+                className="text-xs font-medium text-primaryText dark:text-primaryLight hover:underline"
+              >
+                {t('search.seeAll', { query: searchQuery.trim() })}
+              </button>
+            </div>
             <div className="grid md:grid-cols-2 gap-3">
               {entries.map((entry) => (
                 <div
@@ -162,7 +215,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
             {/* Authors */}
             {authors.length > 0 && (
               <div className="rounded-md p-3">
-                <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">Autori</h3>
+                <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">{t('search.authors')}</h3>
                 <div className="flex flex-col gap-1">
                   {authors.slice(0,5).map((author, index) => (
                     <button
@@ -180,7 +233,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
             {/* Feeds */}
             {feeds.length > 0 && (
               <div className="rounded-md p-3">
-                <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">Skupiny</h3>
+                <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">{t('search.feeds')}</h3>
                 <div className="flex flex-row flex-wrap gap-2">
                   {feeds.map((feed) => (
                     <button
@@ -198,7 +251,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
             {/* Categories */}
             {categories.length > 0 && (
               <div className="rounded-md p-3">
-                <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">Kategórie</h3>
+                <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">{t('search.categories')}</h3>
                 <div className="flex flex-row flex-wrap gap-2">
                   {categories.map((category) => (
                     <button

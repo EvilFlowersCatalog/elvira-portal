@@ -660,6 +660,13 @@ export const en = {
     search: {
       smartOn: 'Enable smart search',
       smartOff: 'Disable smart search',
+      // Suggestions dropdown
+      books: 'Books',
+      authors: 'Authors',
+      feeds: 'Collections',
+      categories: 'Categories',
+      noResults: 'No results for “{{query}}”',
+      seeAll: 'Search all results for “{{query}}”',
     },
 
     profile: {
