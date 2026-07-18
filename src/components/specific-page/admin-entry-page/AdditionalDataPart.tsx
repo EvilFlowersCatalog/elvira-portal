@@ -7,8 +7,6 @@ import LanguageAutofill from '../../autofills/LanguageAutofill';
 import { ChangeEvent, useEffect, useState } from 'react';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import useAppContext from '../../../hooks/contexts/useAppContext';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 interface IAdditionalDataPartParams extends IPartParams {
   stringImage: string;
@@ -71,13 +69,6 @@ const AdditionalDataPart = ({
     });
   };
 
-  const formatDate = (date: Date): string => {
-    const y = date.getFullYear();
-    const m = (date.getMonth() + 1).toString().padStart(2, '0');
-    const d = date.getDate().toString().padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  };
-
   return (
     <div className='flex flex-col gap-4'>
       {/* Cover */}
@@ -112,56 +103,39 @@ const AdditionalDataPart = ({
           value={entry.publisher ?? ''}
         />
         <div className='flex flex-col'>
-          <div className='w-full'>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DatePicker 
-                  label={t('entry.wizard.year')}
-                  sx= {{
-                    ".MuiInputLabel-formControl": {
-                      color: 'black',
-                    },
-                    ".dark & .MuiInputLabel-formControl": {
-                      color: 'white',
-                    },
-                    ".dark & .MuiButtonBase-root": {
-                      color: 'white'
-                    },
-                     ".dark & :hover .MuiPickersOutlinedInput-notchedOutline" : {
-                      borderColor: 'gray'
-                    },
-                    ".dark & .MuiPickersOutlinedInput-notchedOutline" : {
-                      borderColor: 'white'
-                    },
-                    ".dark & .MuiPickersSectionList-root" : {
-                      color: 'white'
-                    }
-                  }}
-                  value={entry.published_at ? new Date(entry.published_at) : null}
-                  onChange={(date: Date | null) => {
-                    if (date) {
-                      const formatted = formatDate(date);
-                      setEntry({
-                        ...entry,
-                        published_at: formatted,
-                      });
-                      umamiTrack('Date Selection', {
-                        year: date.getFullYear().toString(),
-                        month: (date.getMonth() + 1).toString(),
-                        day: date.getDate().toString(),
-                      });
-                    } else {
-                      setEntry({
-                        ...entry,
-                        published_at: '',
-                      });
-                    }
-                  }}
-                  views={['year', 'month', 'day']}
-                />
-              </LocalizationProvider>
-            </div>
+          <div className='w-full flex flex-col gap-1'>
+            <label htmlFor='published-at' className='text-sm pl-1 text-black dark:text-white'>
+              {t('entry.wizard.year')}
+            </label>
+            <input
+              id='published-at'
+              type='date'
+              className='w-full p-2 bg-white shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A] dark:bg-strongDarkGray dark:text-white outline-none rounded-md border border-black dark:border-white focus:border-primary [color-scheme:light] dark:[color-scheme:dark]'
+              value={entry.published_at ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value) {
+                  const [year, month, day] = value.split('-');
+                  setEntry({
+                    ...entry,
+                    published_at: value,
+                  });
+                  umamiTrack('Date Selection', {
+                    year: parseInt(year, 10).toString(),
+                    month: parseInt(month, 10).toString(),
+                    day: parseInt(day, 10).toString(),
+                  });
+                } else {
+                  setEntry({
+                    ...entry,
+                    published_at: '',
+                  });
+                }
+              }}
+            />
           </div>
         </div>
+      </div>
     </div>
   );
 };

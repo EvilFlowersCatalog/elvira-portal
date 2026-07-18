@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FiPlus, FiEdit2, FiTrash2, FiBookOpen } from 'react-icons/fi';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
-import useGetEntries from '../../../hooks/api/entries/useGetEntries';
+import useEntriesQuery from '../../../hooks/api/entries/useEntriesQuery';
 import useDeleteEntry from '../../../hooks/api/entries/useDeleteEntry';
 import { IEntry } from '../../../utils/interfaces/entry';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
@@ -28,14 +28,9 @@ const AdminEntries = () => {
   const navigate = useNavigate();
   const { selectedCatalogId, umamiTrack } = useAppContext();
   const { auth } = useAuthContext();
-  const getEntries = useGetEntries();
   const deleteEntry = useDeleteEntry();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [items, setItems] = useState<IEntry[]>([]);
-  const [metadata, setMetadata] = useState({ page: 1, limit: DEFAULT_LIMIT, pages: 1, total: 0 });
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
   const [pendingDelete, setPendingDelete] = useState<IEntry | null>(null);
 
   const page = parseInt(searchParams.get('page') || '1', 10);
@@ -55,30 +50,22 @@ const AdminEntries = () => {
     [searchParams, setSearchParams]
   );
 
-  const fetchEntries = useCallback(async () => {
-    if (!selectedCatalogId) {
-      setItems([]);
-      setLoading(false);
-      return;
-    }
-    setLoading(true);
-    setError(false);
-    try {
-      const { items, metadata } = await getEntries({ page, limit, title: q, orderBy });
-      setItems(items);
-      setMetadata(metadata);
-    } catch {
-      setError(true);
-      setItems([]);
-    } finally {
-      setLoading(false);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, limit, q, orderBy, selectedCatalogId]);
-
-  useEffect(() => {
-    fetchEntries();
-  }, [fetchEntries]);
+  const {
+    data,
+    isLoading: loading,
+    isError: error,
+    refetch,
+  } = useEntriesQuery(
+    { page, limit, title: q, orderBy },
+    { enabled: !!selectedCatalogId }
+  );
+  const items = data?.items ?? [];
+  const metadata = data?.metadata ?? {
+    page: 1,
+    limit: DEFAULT_LIMIT,
+    pages: 1,
+    total: 0,
+  };
 
   const openEdit = (e: IEntry) => {
     umamiTrack('Edit Entry Button', { entryId: e.id });
@@ -90,7 +77,7 @@ const AdminEntries = () => {
     try {
       await deleteEntry(pendingDelete.id, pendingDelete.catalog_id || selectedCatalogId || undefined);
       toast.success(t('administration.entriesPage.deleted'));
-      fetchEntries();
+      refetch();
     } catch {
       toast.error(t('administration.entriesPage.deleteError'));
     } finally {
@@ -217,7 +204,7 @@ const AdminEntries = () => {
         onRowClick={openEdit}
         loading={loading}
         error={error ? t('administration.entriesPage.loadError') : undefined}
-        onRetry={fetchEntries}
+        onRetry={() => refetch()}
         emptyTitle={selectedCatalogId ? t('administration.entriesPage.empty') : t('administration.entriesPage.noCatalog')}
         emptyDescription={selectedCatalogId ? t('administration.entriesPage.emptyHint') : undefined}
         sort={sort}

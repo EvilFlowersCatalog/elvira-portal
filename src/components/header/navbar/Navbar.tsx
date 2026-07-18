@@ -28,14 +28,13 @@ import { useLocation } from "react-router-dom";
 import { FiLogOut, FiUser } from "react-icons/fi";
 import Gravatar from "react-gravatar";
 import Button from "../../buttons/Button";
-import { MenuItem, Select } from "@mui/material";
-import { CatalogSelectStyle } from "../../inputs/ElviraSelect";
 import {
   CATALOG_ICON_MAP,
   DEFAULT_CATALOG_ICON,
 } from "../../../utils/catalogIcons";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
+import { RiArrowDownSLine } from "react-icons/ri";
 
 function StuDots({ color }: { color: string }) {
   return (
@@ -98,6 +97,97 @@ function StuDots({ color }: { color: string }) {
     </svg>
   );
 }
+
+function CatalogIcon({ value }: { value: string }) {
+  const iconConfig = CATALOG_ICON_MAP[value] || DEFAULT_CATALOG_ICON;
+  if (iconConfig.type === "stuDots" && iconConfig.color) {
+    return <StuDots color={iconConfig.color} />;
+  }
+  if (iconConfig.type === "customSvg" && iconConfig.svgUrl) {
+    return <img src={iconConfig.svgUrl} alt="" width="19" height="13" />;
+  }
+  return null;
+}
+
+interface ICatalogSelectParams {
+  isCollapsed: boolean;
+  selectedValue: string;
+  selectedLabel: string;
+  catalogs: { catalogId: string; value: string; label: string }[];
+  onSelect: (value: string) => void;
+}
+const CatalogSelect = ({
+  isCollapsed,
+  selectedValue,
+  selectedLabel,
+  catalogs,
+  onSelect,
+}: ICatalogSelectParams) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div className="relative w-full" ref={ref}>
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label="Catalog"
+        className={`w-full flex items-center gap-3 py-2 dark:text-white overflow-hidden ${
+          isCollapsed ? "justify-center" : ""
+        }`}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <CatalogIcon value={selectedValue} />
+        {!isCollapsed && (
+          <>
+            <span className="truncate">{selectedLabel}</span>
+            <RiArrowDownSLine size={18} className="ml-auto shrink-0" aria-hidden="true" />
+          </>
+        )}
+      </button>
+      {open && (
+        <div
+          role="listbox"
+          className="absolute left-0 top-full z-50 mt-1 w-full min-w-[180px] rounded-md border border-[#e5e5e5] dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-[0px_2px_2.5px_rgba(0,0,0,0.25)] overflow-hidden"
+        >
+          {catalogs.map((catalog) => (
+            <button
+              key={catalog.catalogId}
+              type="button"
+              role="option"
+              aria-selected={catalog.value === selectedValue}
+              className={`w-full flex gap-3 items-center overflow-hidden px-3 py-2 text-left hover:bg-zinc-100 dark:hover:bg-zinc-700 ${
+                catalog.value === selectedValue ? "bg-zinc-100 dark:bg-zinc-700" : ""
+              }`}
+              onClick={() => {
+                onSelect(catalog.value);
+                setOpen(false);
+              }}
+            >
+              <CatalogIcon value={catalog.value} />
+              <span className="truncate">{catalog.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface INavbarButtonParams {
   name: string;
@@ -261,42 +351,13 @@ const Navbar = () => {
       </div>
       {auth ? (
         <div className="mb-3">
-        <Select
-          className="ml-auto dark:text-white w-full"
-          sx={CatalogSelectStyle}
-          label={"Catalog"}
-          labelId="catalog-label"
-          value={selectedCatalog?.value || ""}
-          id="catalog-select"
-          variant="standard"
-          onChange={(e) => {
-            switchCatalog(e.target.value);
-          }}
-        >
-          {availableCatalogs.map((catalog) => {
-            const iconConfig =
-              CATALOG_ICON_MAP[catalog.value] || DEFAULT_CATALOG_ICON;
-
-            return (
-              <MenuItem key={catalog.catalogId} value={catalog.value}>
-                <div className="flex gap-3 items-center overflow-hidden">
-                  {iconConfig.type === "stuDots" && iconConfig.color && (
-                    <StuDots color={iconConfig.color} />
-                  )}
-                  {iconConfig.type === "customSvg" && iconConfig.svgUrl && (
-                    <img
-                      src={iconConfig.svgUrl}
-                      alt=""
-                      width="19"
-                      height="13"
-                    />
-                  )}
-                  <span className="truncate">{catalog.label}</span>
-                </div>
-              </MenuItem>
-            );
-          })}
-        </Select>
+          <CatalogSelect
+            isCollapsed={isCollapsed}
+            selectedValue={selectedCatalog?.value || ""}
+            selectedLabel={selectedCatalog?.label || ""}
+            catalogs={availableCatalogs}
+            onSelect={(value) => switchCatalog(value)}
+          />
         </div>
       ) : null}
 

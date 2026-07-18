@@ -2,9 +2,7 @@ import { ButtonHTMLAttributes, forwardRef } from 'react';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { twMerge } from 'tailwind-merge';
 
-interface CustomInputProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  
-}
+type CustomInputProps = ButtonHTMLAttributes<HTMLButtonElement>;
 
 /**
  * Returns button

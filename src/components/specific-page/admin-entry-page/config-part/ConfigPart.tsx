@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { IPartParams, IConfig } from '../../../../utils/interfaces/general/general';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
 import { Switch } from '../../../admin/Field';
+import Select from '../../../primitives/Select';
 
 /** Boolean reader/access flags, rendered data-driven with helper text. */
 type BoolKey = keyof Pick<
@@ -9,10 +10,10 @@ type BoolKey = keyof Pick<
   | 'evilflowers_share_enabled'
   | 'evilflowers_viewer_print'
   | 'evilflowers_annotations_create'
-  | 'evilflowers_ocr_enable'
+  | 'evilflowers_ocr_enabled'
   | 'evilflowers_ocr_rewrite'
   | 'evilflowers_ip_block'
-  | 'evilflowres_metadata_fetch'
+  | 'evilflowers_metadata_fetch'
   | 'readium_enabled'
 >;
 
@@ -20,8 +21,8 @@ const BOOL_FIELDS: { key: BoolKey; labelKey: string; helpKey: string; event: str
   { key: 'evilflowers_annotations_create', labelKey: 'annotations', helpKey: 'annotations', event: 'Annotation Config Button' },
   { key: 'evilflowers_share_enabled', labelKey: 'share', helpKey: 'share', event: 'Share Config Button' },
   { key: 'evilflowers_viewer_print', labelKey: 'print', helpKey: 'print', event: 'Print Config Button' },
-  { key: 'evilflowres_metadata_fetch', labelKey: 'download', helpKey: 'download', event: 'Download Config Button' },
-  { key: 'evilflowers_ocr_enable', labelKey: 'ocrEnable', helpKey: 'ocrEnable', event: 'OCR Enable Config Button' },
+  { key: 'evilflowers_metadata_fetch', labelKey: 'download', helpKey: 'download', event: 'Download Config Button' },
+  { key: 'evilflowers_ocr_enabled', labelKey: 'ocrEnable', helpKey: 'ocrEnable', event: 'OCR Enable Config Button' },
   { key: 'evilflowers_ocr_rewrite', labelKey: 'ocrRewrite', helpKey: 'ocrRewrite', event: 'OCR Rewrite Config Button' },
   { key: 'evilflowers_ip_block', labelKey: 'intranetIpRestriction', helpKey: 'intranetIpRestriction', event: 'Intranet IP Block Config Button' },
   { key: 'readium_enabled', labelKey: 'readiumEnabled', helpKey: 'readiumEnabled', event: 'Readium Config Button' },
@@ -46,18 +47,20 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
         <label htmlFor="render-type" className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
           {t('entry.wizard.renderType')}
         </label>
-        <select
+        <Select
           id="render-type"
           value={config?.evilflowers_render_type ?? 'page'}
-          onChange={(e) => {
-            umamiTrack('Render Type Config', { value: e.target.value });
-            setConfig({ evilflowers_render_type: e.target.value as IConfig['evilflowers_render_type'] });
+          onChange={(value) => {
+            umamiTrack('Render Type Config', { value });
+            setConfig({ evilflowers_render_type: value as IConfig['evilflowers_render_type'] });
           }}
-          className="h-10 w-full max-w-xs rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40 px-3 text-sm outline-none focus:border-primary"
-        >
-          <option value="page">{t('entry.wizard.renderTypePage')}</option>
-          <option value="document">{t('entry.wizard.renderTypeDocument')}</option>
-        </select>
+          options={[
+            { value: 'page', label: t('entry.wizard.renderTypePage') },
+            { value: 'document', label: t('entry.wizard.renderTypeDocument') },
+          ]}
+          className="max-w-xs"
+          triggerClassName="h-10 rounded-lg border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40"
+        />
         <p className="text-xs text-zinc-500 dark:text-zinc-400">{t('entry.wizard.configHelp.renderType')}</p>
       </div>
 

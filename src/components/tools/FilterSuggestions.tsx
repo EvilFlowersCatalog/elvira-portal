@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
-import useGetEntries from "../../hooks/api/entries/useGetEntries";
+import useEntriesQuery from "../../hooks/api/entries/useEntriesQuery";
 import { ICategory } from "../../utils/interfaces/category";
 import { IFeed } from "../../utils/interfaces/feed";
 import { MdClose } from "react-icons/md";
@@ -14,79 +14,46 @@ const FilterSuggestions = ({ searchQuery }: FilterSuggestionsProps) => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   
-  const [authors, setAuthors] = useState<string[]>([]);
-  const [categories, setCategories] = useState<ICategory[]>([]);
-  const [feeds, setFeeds] = useState<IFeed[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [showAll, setShowAll] = useState(false);
 
-  const getEntries = useGetEntries();
-
   const MAX_ITEMS_PER_COLUMN = 3;
 
+  const enabled = !!searchQuery && searchQuery.trim().length >= 2;
+  // Derive facets from the same relevance full-text `query` the grid uses (not a
+  // title-only match), so the suggested authors/collections/categories actually
+  // correspond to the results the user is seeing.
+  const { data, isLoading } = useEntriesQuery(
+    { page: 1, limit: 50, query: searchQuery },
+    { enabled }
+  );
+
+  // Derive the author / category / collection facets from the returned entries.
+  const { authors, categories, feeds } = useMemo(() => {
+    const items = data?.items ?? [];
+    const uniqueAuthors = new Set<string>();
+    const categoriesMap = new Map<string, ICategory>();
+    const feedsMap = new Map<string, IFeed>();
+    items.forEach((entry) => {
+      entry.authors?.forEach((author) => uniqueAuthors.add(author.name));
+      entry.categories?.forEach((cat) => {
+        if (!categoriesMap.has(cat.id)) categoriesMap.set(cat.id, cat);
+      });
+      entry.feeds?.forEach((feed) => {
+        if (!feedsMap.has(feed.id)) feedsMap.set(feed.id, feed);
+      });
+    });
+    return {
+      authors: Array.from(uniqueAuthors),
+      categories: Array.from(categoriesMap.values()),
+      feeds: Array.from(feedsMap.values()),
+    };
+  }, [data]);
+
+  // Reset visibility / show-all whenever the search term changes.
   useEffect(() => {
-    // Reset visibility and showAll when searchQuery changes
     setIsVisible(true);
     setShowAll(false);
-    
-    if (!searchQuery || searchQuery.trim().length < 2) {
-      setAuthors([]);
-      setCategories([]);
-      setFeeds([]);
-      return;
-    }
-
-    const fetchSuggestions = async () => {
-      setIsLoading(true);
-      try {
-        const { items } = await getEntries({
-          page: 1,
-          limit: 50,
-          title: searchQuery,
-        });
-
-        // Extract unique authors from returned entries
-        const uniqueAuthors = new Set<string>();
-        items.forEach(entry => {
-          entry.authors?.forEach(author => {
-            uniqueAuthors.add(author.name);
-          });
-        });
-        setAuthors(Array.from(uniqueAuthors));
-
-        // Extract unique categories
-        const categoriesMap = new Map<string, ICategory>();
-        items.forEach(entry => {
-          entry.categories?.forEach(cat => {
-            if (!categoriesMap.has(cat.id)) {
-              categoriesMap.set(cat.id, cat);
-            }
-          });
-        });
-        setCategories(Array.from(categoriesMap.values()));
-
-        // Extract unique feeds
-        const feedsMap = new Map<string, IFeed>();
-        items.forEach(entry => {
-          entry.feeds?.forEach(feed => {
-            if (!feedsMap.has(feed.id)) {
-              feedsMap.set(feed.id, feed);
-            }
-          });
-        });
-        setFeeds(Array.from(feedsMap.values()));
-      } catch (error) {
-        console.error("Failed to fetch suggestions", error);
-        setAuthors([]);
-        setCategories([]);
-        setFeeds([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchSuggestions();
   }, [searchQuery]);
 
   const handleAuthorClick = (authorName: string) => {

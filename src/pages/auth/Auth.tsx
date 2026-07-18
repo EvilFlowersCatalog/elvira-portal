@@ -11,10 +11,10 @@ import {
 } from '../../utils/interfaces/general/general';
 import { CircleLoader } from 'react-spinners';
 import ElviraInput from '../../components/inputs/ElviraInput';
-import { Checkbox } from '@mui/material';
 import useCookiesContext from '../../hooks/contexts/useCookiesContext';
 import FormModal from '../../components/modals/FormModal';
 import LicenseTerms from '../../components/dialogs/LicenseTerms';
+import Checkbox from '../../components/primitives/Checkbox';
 
 const Auth = () => {
   const { login , staySigned, setStaySigned} = useAuthContext();
@@ -74,7 +74,7 @@ const Auth = () => {
     setLicenseChecked(e.target.checked);
   };
 
-  const handleLicenseCheckInvalid = (e: FormEvent<HTMLButtonElement>) => {
+  const handleLicenseCheckInvalid = (e: FormEvent<HTMLInputElement>) => {
     e.preventDefault();
     setCheckLicenseInvalid(true);
   };
@@ -135,47 +135,35 @@ const Auth = () => {
                 </div>
                 <div className='w-full'>
 
-                  <div className='flex w-full gap-2 items-center'>
+                  <div className='flex w-full gap-2 items-center mb-4'>
                     <Checkbox
-                      size='small'
                       required
+                      invalid={checLicensekInvalid}
                       checked={licenseChecked}
                       onChange={handleLicenseCheckChange}
                       onInvalid={handleLicenseCheckInvalid}
-                      sx={{
-                        color: checLicensekInvalid ? 'red' : 'var(--color-primary)',
-                        '&.Mui-checked': {
-                          color: checLicensekInvalid ? 'red' : 'var(--color-primary)',
-                        },
-                      }}
+                      label={
+                        <button
+                          type='button'
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setOpenLicenseModal(true);
+                          }}
+                          className={`hover:underline text-sm cursor-pointer text-left ${
+                            checLicensekInvalid ? 'text-red' : 'text-black dark:text-white'
+                          }`}
+                        >
+                          {t('login.license')}
+                        </button>
+                      }
                     />
-                    <button
-                      type='button'
-                      onClick={() => setOpenLicenseModal(true)}
-                      className={`hover:underline text-sm cursor-pointer text-left ${
-                        checLicensekInvalid ? 'text-red' : 'text-black dark:text-white'
-                      }`}
-                    >
-                      {t('login.license')}
-                    </button>
                   </div>
                   <div className='flex w-full gap-2 items-center'>
                     <Checkbox
-                      size='small'
                       checked={staySigned}
-                      onChange={(e, checked)=>setStaySigned(checked)}
-                      sx={{
-                        color: 'var(--color-primary)',
-                        '&.Mui-checked': {
-                          color: 'var(--color-primary)',
-                        },
-                      }}
+                      onChange={(e) => setStaySigned(e.target.checked)}
+                      label={t('login.stayLogged')}
                     />
-                    <p onClick={()=>{setStaySigned(!staySigned)}}
-                      className={`text-sm cursor-pointer text-left text-black dark:text-white`}
-                    >
-                      {t('login.stayLogged')}
-                    </p>
                   </div>
 
                 </div>

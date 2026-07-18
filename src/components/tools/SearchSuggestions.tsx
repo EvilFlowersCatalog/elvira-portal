@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import useAuthContext from "../../hooks/contexts/useAuthContext";
-import useGetEntries from "../../hooks/api/entries/useGetEntries";
-import { IEntry } from "../../utils/interfaces/entry";
+import useEntriesQuery from "../../hooks/api/entries/useEntriesQuery";
+import Thumbnail from "../items/entry/Thumbnail";
+import useDebouncedValue from "../../hooks/useDebouncedValue";
 import { ICategory } from "../../utils/interfaces/category";
 import { IFeed } from "../../utils/interfaces/feed";
 import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
@@ -16,87 +16,67 @@ interface SearchSuggestionsProps {
 
 const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: SearchSuggestionsProps) => {
   const { t } = useTranslation();
-  const { auth } = useAuthContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   
-  const [entries, setEntries] = useState<IEntry[]>([]);
-  const [authors, setAuthors] = useState<string[]>([]);
-  const [categories, setCategories] = useState<ICategory[]>([]);
-  const [feeds, setFeeds] = useState<IFeed[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const debouncedQuery = useDebouncedValue(searchQuery, 250);
+  const enabled = !!debouncedQuery && debouncedQuery.trim().length >= 2;
+  // Use the backend's relevance-ranked full-text `query` (matches title, summary,
+  // author, publisher and category) instead of the old title-only `title` filter,
+  // which missed most matches. `keepPreviousData` (in useEntriesQuery) keeps the
+  // last suggestions visible while the next set loads, so the panel updates in
+  // place with no flash — the user never sees a loading wipe.
+  const { data, isFetching, isPlaceholderData } = useEntriesQuery(
+    { query: debouncedQuery, limit: 6 },
+    { enabled }
+  );
 
-  const getEntries = useGetEntries();
+  // Only show the skeleton on the very first fetch (nothing cached to show yet).
+  const showInitialLoading = isFetching && !data;
+  // Background refresh while previous suggestions stay on screen.
+  const isRefreshing = isFetching && isPlaceholderData;
 
-  useEffect(() => {
-    if (!searchQuery || searchQuery.trim().length < 2) {
-      setEntries([]);
-      setAuthors([]);
-      setCategories([]);
-      setFeeds([]);
-      return;
-    }
-
-    const fetchSuggestions = async () => {
-      setIsLoading(true);
-      try {
-        const { items } = await getEntries({
-          page: 1,
-          limit: 6,
-          title: searchQuery,
-        });
-
-        setEntries(items.slice(0, 6));
-
-        // Extract unique authors from returned entries
-        const uniqueAuthors = new Set<string>();
-        items.forEach(entry => {
-          entry.authors?.forEach(author => {
-            uniqueAuthors.add(author.name);
-          });
-        });
-        setAuthors(Array.from(uniqueAuthors).slice(0, 10));
-
-        // Extract unique categories
-        const categoriesMap = new Map<string, ICategory>();
-        items.forEach(entry => {
-          entry.categories?.forEach(cat => {
-            if (!categoriesMap.has(cat.id)) {
-              categoriesMap.set(cat.id, cat);
-            }
-          });
-        });
-        setCategories(Array.from(categoriesMap.values()).slice(0, 10));
-
-        // Extract unique feeds
-        const feedsMap = new Map<string, IFeed>();
-        items.forEach(entry => {
-          entry.feeds?.forEach(feed => {
-            if (!feedsMap.has(feed.id)) {
-              feedsMap.set(feed.id, feed);
-            }
-          });
-        });
-        setFeeds(Array.from(feedsMap.values()).slice(0, 10));
-      } catch (error) {
-        console.error("Failed to fetch suggestions", error);
-        setEntries([]);
-        setAuthors([]);
-        setCategories([]);
-        setFeeds([]);
-      } finally {
-        setIsLoading(false);
-      }
+  // Derive the books preview plus author / category / collection facets.
+  const { entries, authors, categories, feeds } = useMemo(() => {
+    const items = data?.items ?? [];
+    const uniqueAuthors = new Set<string>();
+    const categoriesMap = new Map<string, ICategory>();
+    const feedsMap = new Map<string, IFeed>();
+    items.forEach((entry) => {
+      entry.authors?.forEach((author) => uniqueAuthors.add(author.name));
+      entry.categories?.forEach((cat) => {
+        if (!categoriesMap.has(cat.id)) categoriesMap.set(cat.id, cat);
+      });
+      entry.feeds?.forEach((feed) => {
+        if (!feedsMap.has(feed.id)) feedsMap.set(feed.id, feed);
+      });
+    });
+    return {
+      entries: items.slice(0, 6),
+      authors: Array.from(uniqueAuthors).slice(0, 10),
+      categories: Array.from(categoriesMap.values()).slice(0, 10),
+      feeds: Array.from(feedsMap.values()).slice(0, 10),
     };
-
-    const debounce = setTimeout(fetchSuggestions, 300);
-    return () => clearTimeout(debounce);
-  }, [searchQuery]);
+  }, [data]);
 
   const handleBookClick = (entryId: string) => {
     searchParams.set('entry-detail-id', entryId);
     searchParams.set('entry-catalog-id', entries.find(e => e.id === entryId)?.catalog_id || '');
     setSearchParams(searchParams);
+    onClose();
+  };
+
+  // Commit the free-text search to the full library grid (relevance-ranked
+  // `query`). This is the "see all results" affordance — same as pressing Enter.
+  const handleSeeAll = () => {
+    const params = new URLSearchParams(searchParams);
+    params.set('query', searchQuery.trim());
+    params.delete('entry-detail-id');
+    if (shouldRedirect) {
+      navigate({ pathname: NAVIGATION_PATHS.library, search: params.toString() });
+    } else {
+      setSearchParams(params);
+    }
     onClose();
   };
 
@@ -163,19 +143,48 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
 
   return (
     <div className="absolute top-[70px] left-0 right-0 bg-white dark:bg-darkGray border border-gray-300 dark:border-gray-700 rounded-md shadow-lg z-50 max-h-[500px] overflow-auto">
-      {isLoading ? (
-        <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-          {t('common.loading')}...
+      {/* Thin top progress bar for background refreshes — the previous
+          suggestions stay visible underneath instead of a loading wipe. */}
+      {isRefreshing && (
+        <div className="sticky top-0 left-0 right-0 z-10 h-0.5 overflow-hidden">
+          <div className="h-full w-1/3 animate-[loadingbar_1s_ease-in-out_infinite] bg-primary" />
+        </div>
+      )}
+
+      {showInitialLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="flex gap-3 p-2">
+              <div className="flex-shrink-0 h-16 w-10 rounded bg-gray-200 dark:bg-zinc-700 animate-pulse" />
+              <div className="flex-1 flex flex-col gap-2 pt-1">
+                <div className="h-3 w-3/4 rounded bg-gray-200 dark:bg-zinc-700 animate-pulse" />
+                <div className="h-3 w-1/2 rounded bg-gray-200 dark:bg-zinc-700 animate-pulse" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : !hasResults ? (
-        <div className="p-8 text-center text-gray-500 dark:text-gray-400">
-          Žiadne výsledky pre vaše vyhľadávanie
-        </div>
+        <button
+          type="button"
+          onClick={handleSeeAll}
+          className="w-full p-8 text-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primaryLight transition-colors"
+        >
+          {t('search.noResults', { query: searchQuery.trim() })}
+        </button>
       ) : (
-        <div className="grid grid-cols-12 gap-4">
+        <div className={`grid grid-cols-12 gap-4 transition-opacity duration-150 ${isRefreshing ? 'opacity-70' : 'opacity-100'}`}>
           {/* Books Section - 8 columns */}
           <div className="col-span-12 lg:col-span-8 p-4">
-            <h3 className="text-sm font-bold mb-3 text-gray-700 dark:text-gray-300">Knihy</h3>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">{t('search.books')}</h3>
+              <button
+                type="button"
+                onClick={handleSeeAll}
+                className="text-xs font-medium text-primaryText dark:text-primaryLight hover:underline"
+              >
+                {t('search.seeAll', { query: searchQuery.trim() })}
+              </button>
+            </div>
             <div className="grid md:grid-cols-2 gap-3">
               {entries.map((entry) => (
                 <div
@@ -183,13 +192,11 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
                   onClick={() => handleBookClick(entry.id)}
                   className="flex gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded transition-colors"
                 >
-                  <div className="flex-shrink-0 h-16 w-10 rounded overflow-hidden">
-                    <img
-                      src={entry.thumbnail + `?access_token=${auth?.token}`}
-                      alt={entry.title}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
+                  <Thumbnail
+                    thumbnail={entry.thumbnail}
+                    alt={entry.title}
+                    wrapperClassName="flex-shrink-0 h-16 w-10 rounded"
+                  />
                   <div className="flex-1 min-w-0">
                     <h4 className="text-xs font-semibold line-clamp-2 h-8 mb-1 text-secondary dark:text-white">
                       {entry.title}
@@ -208,7 +215,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
             {/* Authors */}
             {authors.length > 0 && (
               <div className="rounded-md p-3">
-                <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">Autori</h3>
+                <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">{t('search.authors')}</h3>
                 <div className="flex flex-col gap-1">
                   {authors.slice(0,5).map((author, index) => (
                     <button
@@ -226,7 +233,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
             {/* Feeds */}
             {feeds.length > 0 && (
               <div className="rounded-md p-3">
-                <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">Skupiny</h3>
+                <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">{t('search.feeds')}</h3>
                 <div className="flex flex-row flex-wrap gap-2">
                   {feeds.map((feed) => (
                     <button
@@ -244,7 +251,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
             {/* Categories */}
             {categories.length > 0 && (
               <div className="rounded-md p-3">
-                <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">Kategórie</h3>
+                <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">{t('search.categories')}</h3>
                 <div className="flex flex-row flex-wrap gap-2">
                   {categories.map((category) => (
                     <button

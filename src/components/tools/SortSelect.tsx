@@ -1,38 +1,32 @@
-import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import { MUISelectStyle } from '../inputs/ElviraSelect';
+import Select from '../primitives/Select';
 
 interface ISortSelect {
   value: string;
-  onChange: (e: SelectChangeEvent) => void;
+  onChange: (value: string) => void;
 }
 
 const SortSelect = ({ value, onChange }: ISortSelect) => {
   const { t } = useTranslation();
 
+  const options = [
+    { value: 'created_at', label: t('tools.orderBy.createdAtAsc') },
+    { value: '-created_at', label: t('tools.orderBy.createdAtDesc') },
+    { value: 'title', label: t('tools.orderBy.titleAsc') },
+    { value: '-title', label: t('tools.orderBy.titleDesc') },
+    { value: '-popularity', label: t('tools.orderBy.popularityDesc') },
+    { value: 'popularity', label: t('tools.orderBy.popularityAsc') },
+  ];
+
   return (
     <Select
-      className="ml-auto dark:text-white"
-      sx={MUISelectStyle}
-      MenuProps={{
-        PaperProps: {
-          sx: { '& .MuiList-root': { paddingBottom: 0, paddingTop: 0 } },
-        },
-      }}
-      label={'Sort By'}
       value={value}
-      labelId="sort-label"
-      id="orderBy"
       onChange={onChange}
-      variant="standard"
-    >
-      <MenuItem value="created_at">{t('tools.orderBy.createdAtAsc')}</MenuItem>
-      <MenuItem value="-created_at">{t('tools.orderBy.createdAtDesc')}</MenuItem>
-      <MenuItem value="title">{t('tools.orderBy.titleAsc')}</MenuItem>
-      <MenuItem value="-title">{t('tools.orderBy.titleDesc')}</MenuItem>
-      <MenuItem value="-popularity">{t('tools.orderBy.popularityDesc')}</MenuItem>
-      <MenuItem value="popularity">{t('tools.orderBy.popularityAsc')}</MenuItem>
-    </Select>
+      options={options}
+      aria-label="Sort By"
+      className="ml-auto w-fit min-w-[180px]"
+      triggerClassName="border-none dark:text-white"
+    />
   );
 };
 

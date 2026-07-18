@@ -1,38 +1,43 @@
 import { useEffect } from 'react';
-import useGetCatalogs from '../../hooks/api/catalogs/useGetCatalogs';
+import useCatalogsQuery from '../../hooks/api/catalogs/useCatalogsQuery';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { ICatalog } from '../../utils/interfaces/catalog';
 import { ICatalogOption } from '../../providers/AppProvider';
 
 /**
- * Component that fetches and initializes available catalogs from the API
- * Must be rendered within AuthProvider to have authentication available
+ * Fetches available catalogs from the API and seeds them into AppContext.
+ * Must be rendered within AuthProvider so authentication is available.
+ *
+ * Uses `useCatalogsQuery` (React Query) for the fetch — caching, de-duplication
+ * and retries are handled by the query; this component only maps the result
+ * into the shape AppContext expects once it arrives.
  */
 const CatalogInitializer = () => {
-  const getCatalogs = useGetCatalogs();
+  const { data, isError, error } = useCatalogsQuery();
   const { initializeCatalogs } = useAppContext();
 
   useEffect(() => {
-    const fetchCatalogs = async () => {
-      try {
-        const response = await getCatalogs();
-        const catalogOptions: ICatalogOption[] = response.items.map((catalog: ICatalog) => ({
-          label: catalog.title,
-          value: catalog.url_name,
-          catalogId: catalog.id,
-        }));
-        
-        initializeCatalogs(catalogOptions);
-      } catch (error) {
-        console.error('Failed to fetch catalogs:', error);
-        // Fail gracefully - AppProvider will use env fallback
-      }
-    };
+    if (!data) return;
 
-    fetchCatalogs();
-  }, []);
+    const catalogOptions: ICatalogOption[] = data.items.map(
+      (catalog: ICatalog) => ({
+        label: catalog.title,
+        value: catalog.url_name,
+        catalogId: catalog.id,
+      })
+    );
 
-  // This component doesn't render anything
+    initializeCatalogs(catalogOptions);
+    // initializeCatalogs is stable enough; re-run only when the data changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data]);
+
+  useEffect(() => {
+    // Fail gracefully — AppProvider falls back to the env-configured catalog.
+    if (isError) console.error('Failed to fetch catalogs:', error);
+  }, [isError, error]);
+
+  // This component doesn't render anything.
   return null;
 };
 

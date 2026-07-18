@@ -5,10 +5,11 @@ import { FiTrash2, FiX, FiSearch, FiFolder } from 'react-icons/fi';
 import Drawer from '../Drawer';
 import ConfirmDialog from '../ConfirmDialog';
 import { Field, TextInput } from '../Field';
+import Select from '../../primitives/Select';
 import Button from '../../buttons/Button';
 import { IFeed } from '../../../utils/interfaces/feed';
 import { uuid } from '../../../utils/func/functions';
-import useGetFeeds from '../../../hooks/api/feeds/useGetFeeds';
+import useFeedsQuery from '../../../hooks/api/feeds/useFeedsQuery';
 import useGetFeedDetail from '../../../hooks/api/feeds/useGetFeedDetail';
 import useUploadFeed from '../../../hooks/api/feeds/useUploadFeed';
 import useEditFeed from '../../../hooks/api/feeds/useEditFeed';
@@ -109,7 +110,6 @@ function ParentPicker({
 
 export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentId, onClose, onSaved }: FeedDrawerProps) {
   const { t } = useTranslation();
-  const getFeeds = useGetFeeds();
   const getFeedDetail = useGetFeedDetail();
   const uploadFeed = useUploadFeed();
   const editFeed = useEditFeed();
@@ -120,25 +120,21 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
   const [content, setContent] = useState('');
   const [kind, setKind] = useState('acquisition');
   const [parents, setParents] = useState<FeedRef[]>([]);
-  const [folders, setFolders] = useState<FeedRef[]>([]);
   const [errors, setErrors] = useState<{ title?: string }>({});
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
-  // Load all navigation folders once per open — used for the parent picker and
-  // to resolve parent ids to titles.
-  useEffect(() => {
-    if (!open) return;
-    let alive = true;
-    getFeeds({ paginate: false, kind: 'navigation' })
-      .then(({ items }) => alive && setFolders(items.map((f) => ({ id: f.id, title: f.title }))))
-      .catch(() => alive && setFolders([]));
-    return () => {
-      alive = false;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  // All navigation folders (fetched once the drawer opens) — used for the parent
+  // picker and to resolve parent ids to titles. Cached/deduped by React Query.
+  const { data: foldersData } = useFeedsQuery(
+    { paginate: false, kind: 'navigation' },
+    { enabled: open }
+  );
+  const folders: FeedRef[] = useMemo(
+    () => (foldersData?.items ?? []).map((f) => ({ id: f.id, title: f.title })),
+    [foldersData]
+  );
 
   useEffect(() => {
     if (!open) return;
@@ -271,15 +267,16 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
           </Field>
 
           <Field label={t('administration.collectionsPage.kind')} htmlFor="feed-kind">
-            <select
+            <Select
               id="feed-kind"
               value={kind}
-              onChange={(e) => setKind(e.target.value)}
-              className="h-10 w-full rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40 px-3 text-sm outline-none focus:border-primary"
-            >
-              <option value="acquisition">{t('administration.collectionsPage.kindAcquisition')}</option>
-              <option value="navigation">{t('administration.collectionsPage.kindNavigation')}</option>
-            </select>
+              onChange={setKind}
+              options={[
+                { value: 'acquisition', label: t('administration.collectionsPage.kindAcquisition') },
+                { value: 'navigation', label: t('administration.collectionsPage.kindNavigation') },
+              ]}
+              triggerClassName="h-10 rounded-lg border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40"
+            />
           </Field>
 
           {/* Graph structure: parent folders (a feed can have multiple parents) */}

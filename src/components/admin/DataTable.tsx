@@ -10,6 +10,8 @@ import {
 } from 'react-icons/fi';
 import { twMerge } from 'tailwind-merge';
 import IconButton from './IconButton';
+import Select from '../primitives/Select';
+import Checkbox from '../primitives/Checkbox';
 
 export type SortDir = 'asc' | 'desc';
 export interface SortState {
@@ -153,18 +155,13 @@ function ColumnsMenu<T>({
           {hideable.map((col) => {
             const checked = !hidden.has(col.id);
             return (
-              <label
+              <Checkbox
                 key={col.id}
-                className="flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700/60"
-              >
-                <input
-                  type="checkbox"
-                  className="accent-primary"
-                  checked={checked}
-                  onChange={() => onToggle(col.id)}
-                />
-                <span className="truncate">{typeof col.header === 'string' ? col.header : col.id}</span>
-              </label>
+                checked={checked}
+                onChange={() => onToggle(col.id)}
+                className="w-full rounded-md px-2 py-1.5 text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-700/60"
+                label={<span className="truncate">{typeof col.header === 'string' ? col.header : col.id}</span>}
+              />
             );
           })}
         </div>
@@ -214,6 +211,13 @@ export default function DataTable<T>({
   const rowPad = density === 'compact' ? 'px-4 py-2' : 'px-4 py-3';
   const hasPagination = page != null && onPageChange != null;
 
+  // Only wipe to a skeleton on the very first load. Once we have rows, a
+  // pagination / search / sort refetch keeps the previous rows on screen (dimmed
+  // slightly, with a top progress bar) instead of flashing the whole table to
+  // skeletons — the same "no wipe" behaviour used by the public grid.
+  const showSkeleton = !!loading && rows.length === 0;
+  const isRefreshing = !!loading && rows.length > 0;
+
   const handleSort = (col: DataTableColumn<T>) => {
     if (!col.sortKey || !onSortChange) return;
     const nextDir: SortDir =
@@ -241,9 +245,16 @@ export default function DataTable<T>({
         </div>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
+      <div className="relative overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
+        {/* Indeterminate progress bar for background refetches (page / search /
+            sort) — the rows below stay visible instead of wiping to a skeleton. */}
+        {isRefreshing && (
+          <div className="absolute inset-x-0 top-0 z-10 h-0.5 overflow-hidden">
+            <div className="h-full w-1/3 animate-[loadingbar_1s_ease-in-out_infinite] bg-primary" />
+          </div>
+        )}
         <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-sm">
+          <table className="w-full border-collapse text-sm" aria-busy={isRefreshing}>
             <caption className="sr-only">{caption}</caption>
             <thead>
               <tr className="border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/40">
@@ -298,8 +309,13 @@ export default function DataTable<T>({
               </tr>
             </thead>
 
-            <tbody className="divide-y divide-zinc-100 dark:divide-zinc-700/60">
-              {loading ? (
+            <tbody
+              className={twMerge(
+                'divide-y divide-zinc-100 dark:divide-zinc-700/60 transition-opacity duration-200',
+                isRefreshing && 'opacity-60'
+              )}
+            >
+              {showSkeleton ? (
                 Array.from({ length: 6 }).map((_, i) => (
                   <tr key={`sk-${i}`}>
                     {visible.map((col) => (
@@ -401,18 +417,14 @@ function DataTableFooter({
             <label htmlFor="dt-page-size" className="text-zinc-500 dark:text-zinc-400">
               Rows
             </label>
-            <select
+            <Select
               id="dt-page-size"
-              value={pageSize}
-              onChange={(e) => onPageSizeChange(parseInt(e.target.value, 10))}
-              className="rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-2 py-1 text-sm outline-none focus:border-primary"
-            >
-              {pageSizeOptions.map((n) => (
-                <option key={n} value={n}>
-                  {n}
-                </option>
-              ))}
-            </select>
+              value={String(pageSize)}
+              onChange={(value) => onPageSizeChange(parseInt(value, 10))}
+              options={pageSizeOptions.map((n) => ({ value: String(n), label: String(n) }))}
+              className="w-20"
+              triggerClassName="py-1"
+            />
           </>
         )}
         {total != null && (

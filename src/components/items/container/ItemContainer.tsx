@@ -1,5 +1,5 @@
-import { useLocation, useSearchParams } from 'react-router-dom';
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { ReactNode, useRef, useState } from 'react';
 import Breadcrumb from '../../buttons/Breadcrumb';
 import PageLoading from '../../page/PageLoading';
 import PageMessage from '../../page/PageMessage';
@@ -11,7 +11,7 @@ import { H1 } from '../../primitives/Heading';
 import { AdvancedSearchWrapper } from './AdvancedSearch';
 import OpenFiltersButton from '../../buttons/OpenFiltersButton';
 import LicenseCalendar from '../entry/details/LicenseCalendar';
-import { IItemContainerList } from '../../../hooks/useItemContainer';
+import { IItemContainerList } from '../../../hooks/api/useInfiniteItemContainer';
 
 interface IItemContainer {
   children: ReactNode;
@@ -40,28 +40,33 @@ const ItemContainer = ({
   shouldRedirectSuggestions = false,
   showResultsHeading = true,
 }: IItemContainer) => {
-  const { handleScroll, searchParamsEqual } = useAppContext();
+  const { handleScroll } = useAppContext();
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const [showScrollUp, setShowScrollUp] = useState<boolean>(false);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const previousSearchParamsRef = useRef<URLSearchParams | null>(null);
 
-  useEffect(() => {
-    if (!searchParamsEqual(previousSearchParamsRef.current, searchParams)) {
-      list.setPage(0);
-      list.setItems([]);
-      list.setIsLoading(true);
-    }
-    previousSearchParamsRef.current = searchParams;
-  }, [searchParams]);
+  // Filter/search resets are driven by the query key inside
+  // `useInfiniteItemContainer` (React Query), so the old imperative reset effect
+  // that wiped `items`/`page` here is gone — it only caused the grid to flash to
+  // a skeleton on every param change.
+
+  // Background refetch (new filter/search while previous results stay visible).
+  const isRefreshing = list.isFetching && !list.isLoading;
 
   return (
     <>
+      {/* Thin top progress bar during background refreshes — replaces the
+          full-grid skeleton wipe so filtering/searching feels continuous. */}
+      {isRefreshing && (
+        <div className='absolute inset-x-0 top-0 z-30 h-0.5 overflow-hidden'>
+          <div className='h-full w-1/3 animate-[loadingbar_1s_ease-in-out_infinite] bg-primary' />
+        </div>
+      )}
       <div
         ref={scrollRef}
-        className='flex h-screen flex-col w-full overflow-auto pt-4'
+        className='relative flex h-screen flex-col w-full overflow-auto pt-4'
         onScroll={() =>
           handleScroll(
             scrollRef,

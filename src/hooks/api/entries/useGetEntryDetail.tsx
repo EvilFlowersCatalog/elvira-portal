@@ -27,7 +27,9 @@ const useGetEntryDetail = () => {
     const licenseParams = new URLSearchParams({
       user_id: authContext.auth?.userId || '',
       entry_id: entryId,
-      pagination: 'false',
+      // Backend disables pagination via `paginate=false` (not `pagination`); the
+      // old key was ignored so only the first default-size page came back.
+      paginate: 'false',
     });
 
     const [entryRes, licenseRes] = await Promise.allSettled([

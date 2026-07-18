@@ -32,15 +32,20 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
     useEffect(() => {
         setIsOnShelf(entry.shelf_record_id != null);
 
-        document.addEventListener('shelf-updated', (event: Event) => {
+        // Keep this card in sync when the same entry is bookmarked/unbookmarked
+        // elsewhere. The listener MUST be cleaned up — previously it was added on
+        // every entry change and never removed, so infinite-scroll leaked one
+        // listener per card and every shelf toggle fanned out across all of them.
+        const handleShelfUpdated = (event: Event) => {
             const customEvent = event as CustomEvent;
-            const updatedEntry = customEvent.detail.id;
-            if (updatedEntry === entry.id) {
-                const isOnShelf = customEvent.detail.isOnShelf;
-                if (isOnShelf) entry.shelf_record_id = customEvent.detail.shelf_record_id;
-                setIsOnShelf(isOnShelf);
+            if (customEvent.detail.id === entry.id) {
+                const updated = customEvent.detail.isOnShelf;
+                if (updated) entry.shelf_record_id = customEvent.detail.shelf_record_id;
+                setIsOnShelf(updated);
             }
-        });
+        };
+        document.addEventListener('shelf-updated', handleShelfUpdated);
+        return () => document.removeEventListener('shelf-updated', handleShelfUpdated);
     }, [entry]);
 
     const handleBookmarkToggle = async () => {
@@ -97,9 +102,11 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
     };
 
     const [isFallbackImage, setIsFallbackImage] = useState(false);
+    const [imgLoaded, setImgLoaded] = useState(false);
     function invalidImageFallback(e: React.SyntheticEvent<HTMLImageElement, Event>) {
         e.currentTarget.src = '/assets/thumbnail.webp';
         setIsFallbackImage(true);
+        setImgLoaded(true);
     }
 
     const hasAcquisitions = entry.acquisitions?.length > 0;
@@ -122,7 +129,7 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
     return (
         <div className="group rounded-[8px] relative w-full bg-white dark:bg-strongDarkGray shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.25)] dark:hover:shadow-strongDarkGray transition-shadow duration-300 flex flex-col gap-[7px] pb-[10px]">
             {/* Book cover */}
-            <div className="h-[163px] relative shrink-0 w-full overflow-hidden rounded-t-[8px]">
+            <div className="h-[163px] relative shrink-0 w-full overflow-hidden rounded-t-[8px] bg-lightGray dark:bg-darkGray">
                 <div
                     onClick={openEntryDetail}
                     role="button"
@@ -137,9 +144,12 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
                     className="relative w-full h-full cursor-pointer select-none"
                 >
                     <img
-                        className="w-full h-full object-cover select-none"
+                        className={`w-full h-full object-cover select-none transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                         src={entry.thumbnail + `?access_token=${auth?.token}`}
                         alt={`Thumbnail ${entry.title}`}
+                        loading="lazy"
+                        decoding="async"
+                        onLoad={() => setImgLoaded(true)}
                         onError={invalidImageFallback}
                     />
                     {isFallbackImage && (

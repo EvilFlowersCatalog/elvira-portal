@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { differenceInDays, format, parseISO } from 'date-fns';
 import { toast } from 'react-toastify';
@@ -11,8 +11,8 @@ import { HiOutlineUsers } from 'react-icons/hi';
 import { useTranslation } from 'react-i18next';
 import { formatAuthors, ILicense, ILicenseEntry, LICENSE_STATE } from '../../../utils/interfaces/license';
 import { IReservation, RESERVATION_STATUS } from '../../../utils/interfaces/reservation';
-import useGetLicenses from '../../../hooks/api/licenses/useGetLicenses';
-import useGetReservations from '../../../hooks/api/reservations/useGetReservations';
+import useLicensesQuery from '../../../hooks/api/licenses/useLicensesQuery';
+import useReservationsQuery from '../../../hooks/api/reservations/useReservationsQuery';
 import useUpdateReservation from '../../../hooks/api/reservations/useUpdateReservation';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import useDownloadLicense from '../../../hooks/api/licenses/useDownloadLicense';
@@ -365,25 +365,65 @@ function PastCard({
 export default function LoansCardView() {
   const { t } = useTranslation();
   const { auth } = useAuthContext();
-  const getLicenses = useGetLicenses();
-  const getReservations = useGetReservations();
   const { cancelReservation, claimReservation } = useUpdateReservation();
   const { openInThorium, downloadDirect } = useDownloadLicense();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const [borrowed, setBorrowed] = useState<ILicense[]>([]);
-  // Real queue rows (Reservation model), not ready-state licences.
-  const [reservations, setReservations] = useState<IReservation[]>([]);
-  const [past, setPast] = useState<ILicense[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [claimingId, setClaimingId] = useState<string | null>(null);
+  // Licences and reservations are React Query reads keyed on the user (NOT on the
+  // URL), so opening an entry-detail modal no longer refetches the whole page,
+  // and a background refetch after claim/return keeps the current cards visible
+  // instead of flashing the "loading" state.
+  const licensesQuery = useLicensesQuery({ page: 1, limit: 50 });
+  const reservationsQuery = useReservationsQuery({
+    status: [RESERVATION_STATUS.queued, RESERVATION_STATUS.available],
+  });
 
+  const [claimingId, setClaimingId] = useState<string | null>(null);
   const [extendLicense, setExtendLicense] = useState<ILicense | null>(null);
   const [returnLicense, setReturnLicense] = useState<ILicense | null>(null);
   const [showAllPast, setShowAllPast] = useState(false);
   // Collapse the history to ~two grid rows by default so it never dominates the page.
   const PAST_COLLAPSE = 12;
+
+  // Only the first load (no cached data yet) shows the loading text; subsequent
+  // refetches keep the previous cards on screen.
+  const loading = licensesQuery.isLoading;
+
+  const { borrowed, past } = useMemo(() => {
+    const items = licensesQuery.data?.items ?? [];
+    const now = new Date();
+    const startsAt = (l: ILicense) => new Date(l.starts_at);
+    const expiresAt = (l: ILicense) => new Date(l.expires_at);
+
+    // `ready` = licence issued, downloadable, no device registered yet;
+    // `active` = a device registered. Both are live loans. (The queue lives in
+    // the separate Reservation model — not in licence state.)
+    const isLiveState = (l: ILicense) => l.state === LICENSE_STATE.ready || l.state === LICENSE_STATE.active;
+    const isTerminalState = (l: ILicense) =>
+      [LICENSE_STATE.cancelled, LICENSE_STATE.returned, LICENSE_STATE.expired, LICENSE_STATE.revoked].includes(l.state);
+
+    const borrowed = items.filter((l) => isLiveState(l) && startsAt(l) <= now && expiresAt(l) > now);
+
+    // "Previously borrowed" is a per-book re-borrow shortcut, but licences are
+    // per-loan — the same title borrowed twice yields two terminal licences.
+    // Collapse to one card per entry, keeping the most recent loan, newest first.
+    const pastLicenses = items.filter((l) => isTerminalState(l) || (isLiveState(l) && expiresAt(l) <= now));
+    const latestByEntry = new Map<string, ILicense>();
+    for (const l of pastLicenses) {
+      const prev = latestByEntry.get(l.entry_id);
+      if (!prev || expiresAt(l) > expiresAt(prev)) latestByEntry.set(l.entry_id, l);
+    }
+    const past = [...latestByEntry.values()].sort((a, b) => expiresAt(b).getTime() - expiresAt(a).getTime());
+
+    return { borrowed, past };
+  }, [licensesQuery.data]);
+
+  // Non-terminal reservations = the user's live queue entries (queued/available).
+  const reservations = useMemo(
+    () => [...(reservationsQuery.data ?? [])].sort((a, b) => a.position - b.position),
+    [reservationsQuery.data]
+  );
 
   const openEntryDetail = (entryId: string, catalogId?: string) => {
     setSearchParams((prev) => {
@@ -394,42 +434,10 @@ export default function LoansCardView() {
     });
   };
 
+  // Refresh both lists after a mutation (background refetch — cards stay visible).
   const loadAll = () => {
-    setLoading(true);
-    const licensesPromise = getLicenses({ page: 1, limit: 50 }).then(({ items }) => {
-      const now = new Date();
-      const startsAt = (l: ILicense) => new Date(l.starts_at);
-      const expiresAt = (l: ILicense) => new Date(l.expires_at);
-
-      // `ready` = licence issued, downloadable, no device registered yet;
-      // `active` = a device registered. Both are live loans. (The queue lives
-      // in the separate Reservation model, loaded below — not in licence state.)
-      const isLiveState = (l: ILicense) => l.state === LICENSE_STATE.ready || l.state === LICENSE_STATE.active;
-      const isTerminalState = (l: ILicense) =>
-        [LICENSE_STATE.cancelled, LICENSE_STATE.returned, LICENSE_STATE.expired, LICENSE_STATE.revoked].includes(l.state);
-
-      setBorrowed(items.filter((l) => isLiveState(l) && startsAt(l) <= now && expiresAt(l) > now));
-
-      // "Previously borrowed" is a per-book re-borrow shortcut, but licences are
-      // per-loan — the same title borrowed twice yields two terminal licences.
-      // Collapse to one card per entry, keeping the most recent loan, newest first.
-      const pastLicenses = items.filter((l) => isTerminalState(l) || (isLiveState(l) && expiresAt(l) <= now));
-      const latestByEntry = new Map<string, ILicense>();
-      for (const l of pastLicenses) {
-        const prev = latestByEntry.get(l.entry_id);
-        if (!prev || expiresAt(l) > expiresAt(prev)) latestByEntry.set(l.entry_id, l);
-      }
-      setPast([...latestByEntry.values()].sort((a, b) => expiresAt(b).getTime() - expiresAt(a).getTime()));
-    });
-
-    // Non-terminal reservations = the user's live queue entries (queued/available).
-    const reservationsPromise = getReservations({
-      status: [RESERVATION_STATUS.queued, RESERVATION_STATUS.available],
-    })
-      .then((items) => setReservations(items.sort((a, b) => a.position - b.position)))
-      .catch(() => setReservations([]));
-
-    Promise.allSettled([licensesPromise, reservationsPromise]).finally(() => setLoading(false));
+    licensesQuery.refetch();
+    reservationsQuery.refetch();
   };
 
   const handleCancelReservation = async (reservation: IReservation) => {
@@ -467,10 +475,6 @@ export default function LoansCardView() {
       setClaimingId(null);
     }
   };
-
-  useEffect(() => {
-    loadAll();
-  }, [searchParams]);
 
   const handleDownload = (licenseId: string) => {
     const ref = { id: licenseId };

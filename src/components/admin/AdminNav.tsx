@@ -1,5 +1,5 @@
 import { ReactElement } from 'react';
-import { useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { twMerge } from 'tailwind-merge';
 import {
@@ -69,11 +69,7 @@ const experimentalOn = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
 
 export default function AdminNav() {
   const { t } = useTranslation();
-  const { specialNavigation, umamiTrack } = useAppContext();
-  const location = useLocation();
-
-  const isActive = (item: NavItem) =>
-    item.exact ? location.pathname === item.path : location.pathname.startsWith(item.path);
+  const { umamiTrack } = useAppContext();
 
   return (
     <nav
@@ -92,7 +88,6 @@ export default function AdminNav() {
                 </span>
               )}
               {items.map((item) => {
-                const active = isActive(item);
                 const label = t(`administration.nav.${item.key}`);
                 if (item.soon) {
                   return (
@@ -111,23 +106,23 @@ export default function AdminNav() {
                   );
                 }
                 return (
-                  <button
+                  <NavLink
                     key={item.key}
-                    onClick={(e) => {
-                      umamiTrack('Admin Nav', { path: item.path });
-                      specialNavigation(e, item.path);
-                    }}
-                    aria-current={active ? 'page' : undefined}
-                    className={twMerge(
-                      'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors',
-                      active
-                        ? 'bg-primaryLight text-primaryText dark:bg-primaryDark dark:text-primaryLight'
-                        : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700/50'
-                    )}
+                    to={item.path}
+                    end={item.exact}
+                    onClick={() => umamiTrack('Admin Nav', { path: item.path })}
+                    className={({ isActive }) =>
+                      twMerge(
+                        'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors',
+                        isActive
+                          ? 'bg-primaryLight text-primaryText dark:bg-primaryDark dark:text-primaryLight'
+                          : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700/50'
+                      )
+                    }
                   >
                     <span className="shrink-0">{item.icon}</span>
                     <span className="hidden lg:inline">{label}</span>
-                  </button>
+                  </NavLink>
                 );
               })}
             </div>

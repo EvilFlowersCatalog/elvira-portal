@@ -6,6 +6,8 @@ import Drawer from '../Drawer';
 import ConfirmDialog from '../ConfirmDialog';
 import { Field, TextInput, Switch } from '../Field';
 import UserPicker from '../UserPicker';
+import Select from '../../primitives/Select';
+import Tooltip from '../../primitives/Tooltip';
 import Button from '../../buttons/Button';
 import { ICatalog, CatalogAccessMode, ICatalogPayload } from '../../../utils/interfaces/catalog';
 import { IUser } from '../../../utils/interfaces/user';
@@ -262,24 +264,27 @@ export default function CatalogDrawer({ open, catalog, mode, onClose, onSaved }:
                           <p className="truncate text-sm font-medium text-zinc-800 dark:text-zinc-100">{m.username}</p>
                           {m.label && <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">{m.label}</p>}
                         </div>
-                        <select
+                        <Select
                           aria-label={`${m.username} access mode`}
                           value={m.mode}
-                          onChange={(e) => setMemberMode(m.id, e.target.value as CatalogAccessMode)}
-                          className="rounded-md border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-2 py-1 text-sm outline-none focus:border-primary"
-                        >
-                          <option value="read">{t('administration.catalogsPage.modeRead')}</option>
-                          <option value="manage">{t('administration.catalogsPage.modeManage')}</option>
-                        </select>
-                        <button
-                          type="button"
-                          aria-label={`${t('administration.catalogsPage.remove')} ${m.username}`}
-                          title={t('administration.catalogsPage.remove')}
-                          onClick={() => removeMember(m.id)}
-                          className="text-zinc-400 hover:text-redText dark:hover:text-red"
-                        >
-                          <FiX size={16} />
-                        </button>
+                          onChange={(value) => setMemberMode(m.id, value as CatalogAccessMode)}
+                          options={[
+                            { value: 'read', label: t('administration.catalogsPage.modeRead') },
+                            { value: 'manage', label: t('administration.catalogsPage.modeManage') },
+                          ]}
+                          className="w-36 shrink-0"
+                          triggerClassName="rounded-md border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-800 px-2 py-1"
+                        />
+                        <Tooltip content={`${t('administration.catalogsPage.remove')} ${m.username}`}>
+                          <button
+                            type="button"
+                            aria-label={`${t('administration.catalogsPage.remove')} ${m.username}`}
+                            onClick={() => removeMember(m.id)}
+                            className="text-zinc-400 hover:text-redText dark:hover:text-red"
+                          >
+                            <FiX size={16} />
+                          </button>
+                        </Tooltip>
                       </div>
                     ))
                   )}
