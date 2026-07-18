@@ -2,30 +2,30 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { FiPlus } from 'react-icons/fi';
-import useGetCategories from '../../hooks/api/categories/useGetCategories';
 import useAppContext from '../../hooks/contexts/useAppContext';
-import { ICategory } from '../../utils/interfaces/category';
+import { IAuthor } from '../../utils/interfaces/author';
 import { Metadata } from '../../utils/interfaces/general/general';
+import { useListAuthors } from '../../hooks/api/authors/useAdminAuthors';
 import { PageHeader, DataTable, DataTableColumn, SortState, SearchField } from '../../components/admin';
 import Button from '../../components/buttons/Button';
-import CategoryDrawer from '../../components/admin/categories/CategoryDrawer';
+import AuthorDrawer from '../../components/admin/authors/AuthorDrawer';
 
-const DEFAULT_LIMIT = 25;
+const DEFAULT_LIMIT = 10;
 
-const AdminCategories = () => {
+const AdminAuthors = () => {
   const { t } = useTranslation();
   const { selectedCatalogId } = useAppContext();
-  const getCategories = useGetCategories();
+  const listAuthors = useListAuthors();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [items, setItems] = useState<ICategory[]>([]);
+  const [items, setItems] = useState<IAuthor[]>([]);
   const [metadata, setMetadata] = useState<Metadata>({ page: 1, limit: DEFAULT_LIMIT, pages: 1, total: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('edit');
-  const [active, setActive] = useState<ICategory | null>(null);
+  const [active, setActive] = useState<IAuthor | null>(null);
 
   const page = parseInt(searchParams.get('page') || '1', 10);
   const limit = parseInt(searchParams.get('limit') || String(DEFAULT_LIMIT), 10);
@@ -44,7 +44,7 @@ const AdminCategories = () => {
     [searchParams, setSearchParams]
   );
 
-  const fetchCategories = useCallback(async () => {
+  const fetchAuthors = useCallback(async () => {
     if (!selectedCatalogId) {
       setItems([]);
       setLoading(false);
@@ -53,12 +53,12 @@ const AdminCategories = () => {
     setLoading(true);
     setError(false);
     try {
-      const { items, metadata } = await getCategories({
+      const { items, metadata } = await listAuthors({
+        catalog_id: selectedCatalogId,
         page,
         limit,
         query: q || undefined,
         orderBy: orderBy || undefined,
-        paginate: true,
       });
       setItems(items);
       setMetadata(metadata);
@@ -72,11 +72,11 @@ const AdminCategories = () => {
   }, [page, limit, q, orderBy, selectedCatalogId]);
 
   useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+    fetchAuthors();
+  }, [fetchAuthors]);
 
-  const openEdit = (c: ICategory) => {
-    setActive(c);
+  const openEdit = (a: IAuthor) => {
+    setActive(a);
     setDrawerMode('edit');
     setDrawerOpen(true);
   };
@@ -86,51 +86,53 @@ const AdminCategories = () => {
     setDrawerOpen(true);
   };
 
-  const columns: DataTableColumn<ICategory>[] = [
+  const columns: DataTableColumn<IAuthor>[] = [
     {
-      id: 'label',
-      header: t('administration.categoriesPage.label'),
-      sortKey: 'label',
+      id: 'name',
+      header: t('administration.authorsPage.name'),
+      sortKey: 'name',
+      cell: (a) => a.name || '—',
+    },
+    {
+      id: 'surname',
+      header: t('administration.authorsPage.surname'),
+      sortKey: 'surname',
       hideable: false,
-      cell: (c) => <span className="font-medium text-secondary dark:text-secondaryLight">{c.label}</span>,
+      cell: (a) => <span className="font-medium text-secondary dark:text-secondaryLight">{a.surname || '—'}</span>,
     },
     {
-      id: 'term',
-      header: t('administration.categoriesPage.term'),
-      sortKey: 'term',
-      cell: (c) => <code className="text-xs text-zinc-500 dark:text-zinc-400">{c.term}</code>,
-    },
-    {
-      id: 'scheme',
-      header: t('administration.categoriesPage.scheme'),
-      cell: (c) => c.scheme || <span className="text-zinc-400">{t('administration.categoriesPage.none')}</span>,
+      id: 'created_at',
+      header: t('administration.authorsPage.createdAt'),
+      sortKey: 'created_at',
+      defaultHidden: true,
+      cell: (a) => (a.created_at ? new Date(a.created_at).toLocaleDateString() : '—'),
     },
   ];
 
   return (
     <div className="pb-10">
       <PageHeader
-        title={t('administration.categoriesPage.title')}
-        description={t('administration.categoriesPage.description')}
+        title={t('administration.authorsPage.title')}
+        description={t('administration.authorsPage.description')}
         actions={
           <Button onClick={openCreate} disabled={!selectedCatalogId} className="flex items-center gap-2">
             <FiPlus size={16} />
-            {t('administration.categoriesPage.add')}
+            {t('administration.authorsPage.add')}
           </Button>
         }
       />
 
-      <DataTable<ICategory>
-        caption={t('administration.categoriesPage.title')}
+      <DataTable<IAuthor>
+        caption={t('administration.authorsPage.title')}
         columns={columns}
         rows={items}
-        getRowId={(c) => c.id}
+        getRowId={(a) => a.id}
         onRowClick={openEdit}
         loading={loading}
-        error={error ? t('administration.categoriesPage.loadError') : undefined}
-        onRetry={fetchCategories}
-        emptyTitle={selectedCatalogId ? t('administration.categoriesPage.empty') : t('administration.categoriesPage.noCatalog')}
-        emptyDescription={selectedCatalogId ? t('administration.categoriesPage.emptyHint') : undefined}
+        error={error ? t('administration.authorsPage.loadError') : undefined}
+        onRetry={fetchAuthors}
+        emptyTitle={selectedCatalogId ? t('administration.authorsPage.empty') : t('administration.authorsPage.noCatalog')}
+        emptyDescription={selectedCatalogId ? t('administration.authorsPage.emptyHint') : undefined}
         sort={sort}
         onSortChange={(s) => patchParams({ order_by: s.dir === 'desc' ? `-${s.key}` : s.key, page: '1' })}
         page={metadata.page}
@@ -139,28 +141,28 @@ const AdminCategories = () => {
         pageSize={metadata.limit}
         onPageChange={(p) => patchParams({ page: String(p) })}
         onPageSizeChange={(n) => patchParams({ limit: String(n), page: '1' })}
-        storageKey="admin-categories"
+        storageKey="admin-authors"
         toolbar={
           <SearchField
             value={q}
             onChange={(v) => patchParams({ q: v || null, page: '1' })}
-            label={t('administration.categoriesPage.searchPlaceholder')}
-            placeholder={t('administration.categoriesPage.searchPlaceholder')}
+            label={t('administration.authorsPage.searchPlaceholder')}
+            placeholder={t('administration.authorsPage.searchPlaceholder')}
             className="max-w-sm"
           />
         }
       />
 
-      <CategoryDrawer
+      <AuthorDrawer
         open={drawerOpen}
-        category={active}
+        author={active}
         mode={drawerMode}
         catalogId={selectedCatalogId}
         onClose={() => setDrawerOpen(false)}
-        onSaved={fetchCategories}
+        onSaved={fetchAuthors}
       />
     </div>
   );
 };
 
-export default AdminCategories;
+export default AdminAuthors;

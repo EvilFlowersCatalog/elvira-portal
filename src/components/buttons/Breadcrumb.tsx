@@ -29,20 +29,30 @@ const Breadcrumb = () => {
     title: '',
   });
 
+  const location = useLocation();
+
   const isEn = (): boolean => {
     return lang === LANG_TYPE.en;
   };
 
+  // Inside the admin section the same backend resources carry librarian-facing
+  // names (Publications/Collections), distinct from the user-facing app.
+  const inAdmin = location.pathname.startsWith('/administration');
+
   const breadcrumbsTranslator: { [key: string]: string } = {
     ['library']: isEn() ? 'Library' : 'Knižnica',
-    ['feeds']: isEn() ? 'Feeds' : 'Skupiny',
+    ['feeds']: inAdmin ? (isEn() ? 'Collections' : 'Zbierky') : isEn() ? 'Feeds' : 'Skupiny',
     ['about']: isEn() ? 'About' : 'O Projekte',
     ['administration']: isEn() ? 'Administration' : 'Administrácia',
     ['shelf']: isEn() ? 'Shelf' : 'Polička',
     ['help']: isEn() ? 'Help' : 'Pomoc',
-    ['loans']: isEn() ? 'Loans' : 'Výpožičky',
-    ['entries']: isEn() ? 'Entries' : 'Publikácie',
+    ['loans']: isEn() ? 'Loans & Reservations' : 'Výpožičky a rezervácie',
+    ['entries']: isEn() ? 'Publications' : 'Publikácie',
     ['users']: isEn() ? 'Users' : 'Používatelia',
+    ['authors']: isEn() ? 'Authors' : 'Autori',
+    ['catalogs']: isEn() ? 'Catalogs' : 'Katalógy',
+    ['ai-users']: isEn() ? 'AI Users' : 'AI používatelia',
+    ['access']: isEn() ? 'Access & Keys' : 'Prístup a kľúče',
     ['add']: isEn() ? 'Add' : 'Pridanie',
     ['categories']: isEn() ? 'Categories' : 'Kategórie',
     ['edit']: editingEntryTitle,
@@ -54,8 +64,6 @@ const Breadcrumb = () => {
     ['viewer']: isEn() ? 'PDF Viewer' : 'PDF Viewer',
     ['ai']: isEn() ? 'AI Assistant' : 'AI Asistent',
   };
-
-  const location = useLocation();
   const getFeedDetail = useGetFeedDetail();
   const getCategoryDetail = useGetCategoryDetail();
 

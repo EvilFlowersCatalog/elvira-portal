@@ -23,11 +23,13 @@ const AdminEditEntry = () => {
   const editEntry = useEditEntry();
 
   useEffect(() => {
-    try {
-      (async () => {
-        setIsLoading(true);
+    // try/catch must live INSIDE the async fn — awaited rejections never reach a
+    // try wrapped around a fire-and-forget IIFE.
+    (async () => {
+      setIsLoading(true);
+      try {
         if (id) {
-          const entryDetail  = await getEntryDetail(id, selectedCatalogId || undefined);
+          const entryDetail = await getEntryDetail(id, selectedCatalogId || undefined);
           setEditingEntryTitle(entryDetail.title);
           setStringImage(entryDetail.thumbnail || '');
           setEntryCatalogId(entryDetail.catalog_id);
@@ -51,13 +53,13 @@ const AdminEditEntry = () => {
             categories: entryDetail.categories,
           });
         }
-      })();
-    } catch {
-      setEntry(null);
-      navigate(NAVIGATION_PATHS.adminHome, { replace: true });
-    } finally {
-      setIsLoading(false);
-    }
+      } catch {
+        setEntry(null);
+        navigate(NAVIGATION_PATHS.adminHome, { replace: true });
+      } finally {
+        setIsLoading(false);
+      }
+    })();
   }, [id]);
 
 
@@ -106,16 +108,18 @@ const AdminEditEntry = () => {
     }
   };
 
-  return AdminEntryForm({
-    FormType: 'edit',
-    handleSubmit,
-    entry,
-    setEntry,
-    isLoading,
-    stringImage,
-    setStringImage,
-    catalogId: entryCatalogId || undefined,
-  });
+  return (
+    <AdminEntryForm
+      FormType='edit'
+      handleSubmit={handleSubmit}
+      entry={entry}
+      setEntry={setEntry}
+      isLoading={isLoading}
+      stringImage={stringImage}
+      setStringImage={setStringImage}
+      catalogId={entryCatalogId || undefined}
+    />
+  );
 };
 
 export default AdminEditEntry;

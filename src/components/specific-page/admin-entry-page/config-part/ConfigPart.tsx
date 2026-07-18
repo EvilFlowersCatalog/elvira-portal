@@ -1,143 +1,100 @@
 import { useTranslation } from 'react-i18next';
-import ConfigItem from './ConfigItem';
-import { IPartParams } from '../../../../utils/interfaces/general/general';
+import { IPartParams, IConfig } from '../../../../utils/interfaces/general/general';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
-import ElviraNumberInput from '../../../inputs/ElviraNumberInput';
+import { Switch } from '../../../admin/Field';
+
+/** Boolean reader/access flags, rendered data-driven with helper text. */
+type BoolKey = keyof Pick<
+  IConfig,
+  | 'evilflowers_share_enabled'
+  | 'evilflowers_viewer_print'
+  | 'evilflowers_annotations_create'
+  | 'evilflowers_ocr_enable'
+  | 'evilflowers_ocr_rewrite'
+  | 'evilflowers_ip_block'
+  | 'evilflowres_metadata_fetch'
+  | 'readium_enabled'
+>;
+
+const BOOL_FIELDS: { key: BoolKey; labelKey: string; helpKey: string; event: string }[] = [
+  { key: 'evilflowers_annotations_create', labelKey: 'annotations', helpKey: 'annotations', event: 'Annotation Config Button' },
+  { key: 'evilflowers_share_enabled', labelKey: 'share', helpKey: 'share', event: 'Share Config Button' },
+  { key: 'evilflowers_viewer_print', labelKey: 'print', helpKey: 'print', event: 'Print Config Button' },
+  { key: 'evilflowres_metadata_fetch', labelKey: 'download', helpKey: 'download', event: 'Download Config Button' },
+  { key: 'evilflowers_ocr_enable', labelKey: 'ocrEnable', helpKey: 'ocrEnable', event: 'OCR Enable Config Button' },
+  { key: 'evilflowers_ocr_rewrite', labelKey: 'ocrRewrite', helpKey: 'ocrRewrite', event: 'OCR Rewrite Config Button' },
+  { key: 'evilflowers_ip_block', labelKey: 'intranetIpRestriction', helpKey: 'intranetIpRestriction', event: 'Intranet IP Block Config Button' },
+  { key: 'readium_enabled', labelKey: 'readiumEnabled', helpKey: 'readiumEnabled', event: 'Readium Config Button' },
+];
 
 const ConfigPart = ({ entry, setEntry }: IPartParams) => {
   const { umamiTrack } = useAppContext();
   const { t } = useTranslation();
+  const config = entry.config;
+
+  const setConfig = (patch: Partial<IConfig>) =>
+    setEntry({ ...entry, config: { ...config!, ...patch } });
 
   return (
-    <div className='flex flex-col flex-2 gap-2'>
-      <span>{t('entry.wizard.configuration')}</span>
-      <div className='flex-1 rounded-md flex flex-wrap gap-4'>
-        <ConfigItem
-          name={t('entry.wizard.download')}
-          checked={entry.config?.evilflowres_metadata_fetch ?? false}
+    <div className="flex flex-col gap-3">
+      <span className="text-sm font-semibold text-zinc-700 dark:text-zinc-200">
+        {t('entry.wizard.readerSection')}
+      </span>
+
+      {/* Reader mode (render_type) — previously hidden / set-once */}
+      <div className="flex flex-col gap-1">
+        <label htmlFor="render-type" className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+          {t('entry.wizard.renderType')}
+        </label>
+        <select
+          id="render-type"
+          value={config?.evilflowers_render_type ?? 'page'}
           onChange={(e) => {
-            umamiTrack('Download Config Button', {
-              checked: e.target.checked,
-            });
-            setEntry({
-              ...entry,
-              config: {
-                ...entry?.config!,
-                evilflowres_metadata_fetch: e.target.checked,
-              },
-            });
+            umamiTrack('Render Type Config', { value: e.target.value });
+            setConfig({ evilflowers_render_type: e.target.value as IConfig['evilflowers_render_type'] });
           }}
-        />
-        <ConfigItem
-          name={t('entry.wizard.share')}
-          checked={entry.config?.evilflowers_share_enabled ?? false}
-          onChange={(e) => {
-            umamiTrack('Share Config Button', {
-              checked: e.target.checked,
-            });
-            setEntry({
-              ...entry,
-              config: {
-                ...entry?.config!,
-                evilflowers_share_enabled: e.target.checked,
-              },
-            });
-          }}
-        />
-        <ConfigItem
-          name={t('entry.wizard.print')}
-          checked={entry.config?.evilflowers_viewer_print ?? false}
-          onChange={(e) => {
-            umamiTrack('Print Config Button', {
-              checked: e.target.checked,
-            });
-            setEntry({
-              ...entry,
-              config: {
-                ...entry?.config!,
-                evilflowers_viewer_print: e.target.checked,
-              },
-            });
-          }}
-        />
-        <ConfigItem
-          name={t('entry.wizard.annotations')}
-          checked={entry.config?.evilflowers_annotations_create ?? false}
-          onChange={(e) => {
-            umamiTrack('Annotation Config Button', {
-              checked: e.target.checked,
-            });
-            setEntry({
-              ...entry,
-              config: {
-                ...entry?.config!,
-                evilflowers_annotations_create: e.target.checked,
-              },
-            });
-          }}
-        />
-        <ConfigItem
-          name={t('entry.wizard.ocrRewrite')}
-          checked={entry.config?.evilflowers_ocr_rewrite ?? false}
-          onChange={(e) => {
-            umamiTrack('OCR Rewrite Config Button', {
-              checked: e.target.checked,
-            });
-            setEntry({
-              ...entry,
-              config: {
-                ...entry?.config!,
-                evilflowers_ocr_rewrite: e.target.checked,
-              },
-            });
-          }}
-        />
-        <ConfigItem
-          name={t('entry.wizard.readiumEnabled')}
-          checked={entry.config?.readium_enabled ?? false}
-          onChange={(e) => {
-            umamiTrack('Readium Config Button', {
-              checked: e.target.checked,
-            });
-            setEntry({
-              ...entry,
-              config: {
-                ...entry?.config!,
-                readium_enabled: e.target.checked,
-              },
-            });
-          }}
-        />
-        <ConfigItem name={t('entry.wizard.intranetIpRestriction')}
-          checked={entry.config?.evilflowers_ip_block ?? false}
-          onChange={(e) => {
-            umamiTrack('Intranet IP Block Config Button', {
-              checked: e.target.checked,
-            });
-            setEntry({
-              ...entry,
-              config: {
-                ...entry?.config!,
-                evilflowers_ip_block: e.target.checked,
-              },
-            });
-          }}
-        />
+          className="h-10 w-full max-w-xs rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40 px-3 text-sm outline-none focus:border-primary"
+        >
+          <option value="page">{t('entry.wizard.renderTypePage')}</option>
+          <option value="document">{t('entry.wizard.renderTypeDocument')}</option>
+        </select>
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">{t('entry.wizard.configHelp.renderType')}</p>
       </div>
-      {entry.config?.readium_enabled && (
-        <ElviraNumberInput
-          placeholder={t('entry.wizard.readiumAmount')}
-          value={entry.config?.readium_amount ?? 0}
-          onChange={(e) => {
-            setEntry({
-              ...entry,
-              config: {
-                ...entry?.config!,
-                readium_amount: parseInt(e.target.value) || 0,
-              },
-            });
-          }}
-        />
+
+      <div className="flex flex-col gap-3">
+        {BOOL_FIELDS.map((f) => (
+          <div key={f.key} className="flex flex-col gap-0.5">
+            <Switch
+              checked={config?.[f.key] ?? false}
+              onChange={(checked) => {
+                umamiTrack(f.event, { checked });
+                setConfig({ [f.key]: checked } as Partial<IConfig>);
+              }}
+              label={t(`entry.wizard.${f.labelKey}`)}
+            />
+            <p className="ml-14 text-xs text-zinc-500 dark:text-zinc-400">
+              {t(`entry.wizard.configHelp.${f.helpKey}`)}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {/* Readium concurrent-reads amount (only when Readium is on) */}
+      {config?.readium_enabled && (
+        <div className="flex flex-col gap-1">
+          <label htmlFor="readium-amount" className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+            {t('entry.wizard.readiumAmount')}
+          </label>
+          <input
+            id="readium-amount"
+            type="number"
+            min={0}
+            value={config?.readium_amount ?? 0}
+            onChange={(e) => setConfig({ readium_amount: parseInt(e.target.value) || 0 })}
+            className="h-10 w-full max-w-[160px] rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40 px-3 text-sm outline-none focus:border-primary"
+          />
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">{t('entry.wizard.configHelp.readiumAmount')}</p>
+        </div>
       )}
     </div>
   );

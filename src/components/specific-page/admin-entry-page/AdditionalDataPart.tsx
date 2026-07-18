@@ -79,13 +79,13 @@ const AdditionalDataPart = ({
   };
 
   return (
-    <div className='grid grid-cols-1 md:grid-cols-[auto,1fr] bg-slate-200 dark:bg-darkGray gap-4 rounded-md p-4'>
-      <div className={`relative w-48 m-auto h-full p-2`}>
+    <div className='flex flex-col gap-4'>
+      {/* Cover */}
+      <div className='relative mx-auto aspect-[3/4] w-40 overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700'>
         {stringImage && (
-          <img className='w-full h-full object-cover' src={stringImage} alt='image' />
+          <img className='h-full w-full object-cover' src={stringImage} alt='' />
         )}
-        {/* Image */}
-        <div className='absolute top-0 left-0 w-full h-full bg-white dark:bg-black bg-opacity-30 dark:bg-opacity-30'>
+        <div className='absolute inset-0 bg-white/30 dark:bg-black/30'>
           <ImageDropzone
             title={t('entry.wizard.image')}
             maxSizeDescription='(MAX 5 MB)'
@@ -103,24 +103,16 @@ const AdditionalDataPart = ({
         </div>
       </div>
 
-      {/* Information */}
-      <div className='flex flex-col flex-2'>
-        <div className='flex flex-col gap-4'>
-          <ElviraInput
-            onChange={handleTitleChange}
-            placeholder={t('entry.wizard.title')}
-            invalidMessage={t('entry.wizard.requiredMessages.title')}
-            value={entry.title ?? ''}
-            required
-          />
-          <LanguageAutofill languageCode={languageCode} setLanguageCode={setLanguageCode} setIsSelectionOpen={() => { }} isRequired={true} />
-          <ElviraInput
-            onChange={handlePublisherChange}
-            placeholder={t('entry.wizard.publisher')}
-            value={entry.publisher ?? ''}
-          />
-          <div className='flex flex-col'>
-            <div className='w-fit flex gap-4 mt-4'>
+      {/* Publish details */}
+      <div className='flex flex-col gap-4'>
+        <LanguageAutofill languageCode={languageCode} setLanguageCode={setLanguageCode} setIsSelectionOpen={() => { }} isRequired={true} />
+        <ElviraInput
+          onChange={handlePublisherChange}
+          placeholder={t('entry.wizard.publisher')}
+          value={entry.publisher ?? ''}
+        />
+        <div className='flex flex-col'>
+          <div className='w-full'>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <DatePicker 
                   label={t('entry.wizard.year')}
@@ -144,7 +136,7 @@ const AdditionalDataPart = ({
                       color: 'white'
                     }
                   }}
-                  value={entry.published_at ? new Date(entry.published_at) : new Date()}
+                  value={entry.published_at ? new Date(entry.published_at) : null}
                   onChange={(date: Date | null) => {
                     if (date) {
                       const formatted = formatDate(date);
@@ -170,7 +162,6 @@ const AdditionalDataPart = ({
             </div>
           </div>
         </div>
-      </div>
     </div>
   );
 };

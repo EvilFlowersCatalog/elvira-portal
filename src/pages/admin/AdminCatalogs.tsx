@@ -2,30 +2,35 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { FiPlus } from 'react-icons/fi';
-import useGetCategories from '../../hooks/api/categories/useGetCategories';
-import useAppContext from '../../hooks/contexts/useAppContext';
-import { ICategory } from '../../utils/interfaces/category';
+import { ICatalog } from '../../utils/interfaces/catalog';
 import { Metadata } from '../../utils/interfaces/general/general';
-import { PageHeader, DataTable, DataTableColumn, SortState, SearchField } from '../../components/admin';
+import { useListCatalogs } from '../../hooks/api/catalogs/useAdminCatalogs';
+import {
+  PageHeader,
+  DataTable,
+  DataTableColumn,
+  SortState,
+  StatusChip,
+  SearchField,
+} from '../../components/admin';
 import Button from '../../components/buttons/Button';
-import CategoryDrawer from '../../components/admin/categories/CategoryDrawer';
+import CatalogDrawer from '../../components/admin/catalogs/CatalogDrawer';
 
-const DEFAULT_LIMIT = 25;
+const DEFAULT_LIMIT = 10;
 
-const AdminCategories = () => {
+const AdminCatalogs = () => {
   const { t } = useTranslation();
-  const { selectedCatalogId } = useAppContext();
-  const getCategories = useGetCategories();
+  const listCatalogs = useListCatalogs();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [items, setItems] = useState<ICategory[]>([]);
+  const [items, setItems] = useState<ICatalog[]>([]);
   const [metadata, setMetadata] = useState<Metadata>({ page: 1, limit: DEFAULT_LIMIT, pages: 1, total: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('edit');
-  const [active, setActive] = useState<ICategory | null>(null);
+  const [active, setActive] = useState<ICatalog | null>(null);
 
   const page = parseInt(searchParams.get('page') || '1', 10);
   const limit = parseInt(searchParams.get('limit') || String(DEFAULT_LIMIT), 10);
@@ -44,22 +49,11 @@ const AdminCategories = () => {
     [searchParams, setSearchParams]
   );
 
-  const fetchCategories = useCallback(async () => {
-    if (!selectedCatalogId) {
-      setItems([]);
-      setLoading(false);
-      return;
-    }
+  const fetchCatalogs = useCallback(async () => {
     setLoading(true);
     setError(false);
     try {
-      const { items, metadata } = await getCategories({
-        page,
-        limit,
-        query: q || undefined,
-        orderBy: orderBy || undefined,
-        paginate: true,
-      });
+      const { items, metadata } = await listCatalogs({ page, limit, title: q || undefined, orderBy: orderBy || undefined });
       setItems(items);
       setMetadata(metadata);
     } catch {
@@ -69,13 +63,13 @@ const AdminCategories = () => {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, limit, q, orderBy, selectedCatalogId]);
+  }, [page, limit, q, orderBy]);
 
   useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
+    fetchCatalogs();
+  }, [fetchCatalogs]);
 
-  const openEdit = (c: ICategory) => {
+  const openEdit = (c: ICatalog) => {
     setActive(c);
     setDrawerMode('edit');
     setDrawerOpen(true);
@@ -86,51 +80,63 @@ const AdminCategories = () => {
     setDrawerOpen(true);
   };
 
-  const columns: DataTableColumn<ICategory>[] = [
+  const columns: DataTableColumn<ICatalog>[] = [
     {
-      id: 'label',
-      header: t('administration.categoriesPage.label'),
-      sortKey: 'label',
+      id: 'title',
+      header: t('administration.catalogsPage.titleCol'),
+      sortKey: 'title',
       hideable: false,
-      cell: (c) => <span className="font-medium text-secondary dark:text-secondaryLight">{c.label}</span>,
+      cell: (c) => <span className="font-medium text-secondary dark:text-secondaryLight">{c.title}</span>,
     },
     {
-      id: 'term',
-      header: t('administration.categoriesPage.term'),
-      sortKey: 'term',
-      cell: (c) => <code className="text-xs text-zinc-500 dark:text-zinc-400">{c.term}</code>,
+      id: 'url_name',
+      header: t('administration.catalogsPage.urlName'),
+      sortKey: 'url_name',
+      cell: (c) => <code className="text-xs text-zinc-500 dark:text-zinc-400">{c.url_name}</code>,
     },
     {
-      id: 'scheme',
-      header: t('administration.categoriesPage.scheme'),
-      cell: (c) => c.scheme || <span className="text-zinc-400">{t('administration.categoriesPage.none')}</span>,
+      id: 'is_public',
+      header: t('administration.catalogsPage.visibility'),
+      cell: (c) =>
+        c.is_public ? (
+          <StatusChip variant="success">{t('administration.catalogsPage.public')}</StatusChip>
+        ) : (
+          <StatusChip variant="neutral">{t('administration.catalogsPage.private')}</StatusChip>
+        ),
+    },
+    {
+      id: 'created_at',
+      header: t('administration.catalogsPage.createdAt'),
+      sortKey: 'created_at',
+      defaultHidden: true,
+      cell: (c) => (c.created_at ? new Date(c.created_at).toLocaleDateString() : '—'),
     },
   ];
 
   return (
     <div className="pb-10">
       <PageHeader
-        title={t('administration.categoriesPage.title')}
-        description={t('administration.categoriesPage.description')}
+        title={t('administration.catalogsPage.title')}
+        description={t('administration.catalogsPage.description')}
         actions={
-          <Button onClick={openCreate} disabled={!selectedCatalogId} className="flex items-center gap-2">
+          <Button onClick={openCreate} className="flex items-center gap-2">
             <FiPlus size={16} />
-            {t('administration.categoriesPage.add')}
+            {t('administration.catalogsPage.add')}
           </Button>
         }
       />
 
-      <DataTable<ICategory>
-        caption={t('administration.categoriesPage.title')}
+      <DataTable<ICatalog>
+        caption={t('administration.catalogsPage.title')}
         columns={columns}
         rows={items}
         getRowId={(c) => c.id}
         onRowClick={openEdit}
         loading={loading}
-        error={error ? t('administration.categoriesPage.loadError') : undefined}
-        onRetry={fetchCategories}
-        emptyTitle={selectedCatalogId ? t('administration.categoriesPage.empty') : t('administration.categoriesPage.noCatalog')}
-        emptyDescription={selectedCatalogId ? t('administration.categoriesPage.emptyHint') : undefined}
+        error={error ? t('administration.catalogsPage.loadError') : undefined}
+        onRetry={fetchCatalogs}
+        emptyTitle={t('administration.catalogsPage.empty')}
+        emptyDescription={t('administration.catalogsPage.emptyHint')}
         sort={sort}
         onSortChange={(s) => patchParams({ order_by: s.dir === 'desc' ? `-${s.key}` : s.key, page: '1' })}
         page={metadata.page}
@@ -139,28 +145,27 @@ const AdminCategories = () => {
         pageSize={metadata.limit}
         onPageChange={(p) => patchParams({ page: String(p) })}
         onPageSizeChange={(n) => patchParams({ limit: String(n), page: '1' })}
-        storageKey="admin-categories"
+        storageKey="admin-catalogs"
         toolbar={
           <SearchField
             value={q}
             onChange={(v) => patchParams({ q: v || null, page: '1' })}
-            label={t('administration.categoriesPage.searchPlaceholder')}
-            placeholder={t('administration.categoriesPage.searchPlaceholder')}
+            label={t('administration.catalogsPage.searchPlaceholder')}
+            placeholder={t('administration.catalogsPage.searchPlaceholder')}
             className="max-w-sm"
           />
         }
       />
 
-      <CategoryDrawer
+      <CatalogDrawer
         open={drawerOpen}
-        category={active}
+        catalog={active}
         mode={drawerMode}
-        catalogId={selectedCatalogId}
         onClose={() => setDrawerOpen(false)}
-        onSaved={fetchCategories}
+        onSaved={fetchCatalogs}
       />
     </div>
   );
 };
 
-export default AdminCategories;
+export default AdminCatalogs;

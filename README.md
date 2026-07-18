@@ -1,67 +1,105 @@
 # Welcome to Elvira Portal! 📘 🏖
 
-This delightful project is crafted with [React + Vite] version 18.2.0.
-Sit back and relax, as the app automatically refreshes whenever you tweak any of the source files.
+The web frontend for the **[EvilFlowers Catalog](https://github.com/EvilFlowersCatalog/EvilFlowersCatalog)** —
+a digital academic library. Browse and search the catalog, borrow and read
+DRM-protected (Readium LCP) titles, manage loans and reservation queues, and
+chat with the built-in AI assistant.
 
-## Local Server
+Crafted with **React 18 + Vite** and **TypeScript**. Sit back and relax — the app
+hot-reloads whenever you tweak any source file.
 
-To fire up a local server, simply execute `npm run start`. Then, glide over to `http://localhost:3000/` in your browser to explore.
+## Highlights
 
-## Build Process
+- **Discovery** — keyword search, filters (feeds, categories, authors, language,
+  year), suggestions, and infinite-scroll catalog browsing.
+- **Lending** — borrow / renew / return flows and reservation queues with proper
+  availability indicators (available · borrowed · reserved · unavailable).
+- **Reading** — in-app reader (`@evilflowers/evilflowersviewer`) with annotations.
+- **AI assistant** — conversational search & recommendations.
+- **Multi-faculty theming** — per-catalog brand colors and logos (see below), plus
+  a **light / dark mode** toggle.
+- **Bilingual** — Slovak 🇸🇰 / English 🇬🇧 (`react-i18next`).
+- **Accessible** — keyboard-operable controls with visible focus rings, dialog
+  focus-traps, labeled inputs & icon buttons, `<html lang>` synced to the UI
+  language, and WCAG-AA color contrast across every theme (light and dark).
 
-Let's build some magic! ✨ Run `npm run build:key` to kickstart the build process. The key here represents the type of build.
+## Tech stack
 
-### Build for Development
+React 18 · TypeScript · Vite · Tailwind CSS (`darkMode: 'class'`) · MUI · react-router-dom · react-i18next · axios
 
-For a development version, invoke `npm run build:dev`. Curious minds can dive into the `.env.development` file to see how it shapes the environment.
-
-### Build for Production
-
-When it's time to go live, trigger `npm run build:prod` to prepare a polished production version. Peek into the `.env.production` file to see how we've tailored things for production.
-
-### Environment Variables
-
-Ah, the secret sauce behind the scenes! 🌟 Here's a quick rundown of our Elvira-specific environment variables:
-
-- **_ELVIRA_BASE_URL_** - Where the FE (Frontend) fetches all its data from the server.
-- **_ELVIRA_CATALOG_ID_** - The magical ID where all the data resides. Each catalog ID corresponds to a different department at the STU Faculty, housing its unique data.
-- **ELVIRA_THEME** - The naming convention corresponds to each STU Faculty, leading you to their respective logo collections and uniqe colors. Additionally, 'ku' - Katolická univerzita Ružomberok.
-- **ELVIRA_UMAMI_SERVER** - The url for server where you're handling analytics
-- **ELVIRA_UMAMI_WEBSITE** - ID of website where those analytics should remain
-- **ELVIRA_EXPERIMENTAL_FEATURES** - When pushing dev version to production, undeveloped features can be switched off
-
-Feel the urge to customize? You can effortlessly overwrite these variables using bash commands:
+## Local development
 
 ```bash
-export  ELVIRA_BASE_URL=base_url
-export  ELVIRA_CATALOG_ID=catalog_id
-export  ELVIRA_THEME=theme
-export  ELVIRA_UMAMI_SERVER=server_url
-export  ELVIRA_UMAMI_WEBSITE=website_id
-export  ELVIRA_EXPERIMENTAL_FEATURES=boolean
-
-npm  run  build:key
+npm install
+npm run dev
 ```
 
-🔔 **_Oh, and a gentle reminder_** 🔔 _It's best to tweak these variables via bash commands rather than directly modifying the env files._
+Then glide over to `http://localhost:3000/` to explore. The dev server reads
+`env/.env.development`.
 
-And remember, it's the golden rule to clean up afterward:
+### Available scripts
+
+| Script | What it does |
+| --- | --- |
+| `npm run dev` | Start the Vite dev server (`http://localhost:3000/`) |
+| `npm run build:dev` | Type-check + build in **development** mode (`env/.env.development`) |
+| `npm run build:prod` | Type-check + build in **production** mode (`env/.env.production`) |
+| `npm run build:stu` | Type-check + build in **stu** mode (`env/.env.stu`) |
+| `npm run preview` | Serve the last build locally |
+| `npm run lint` | ESLint (`--max-warnings 0`) over `.ts`/`.tsx` |
+
+> There is intentionally **no** `npm run start`. Use `npm run dev`.
+
+## Build process
+
+Run `npm run build:<mode>` — the mode selects which `env/.env.<mode>` file shapes
+the build. Then `npm run preview` to serve it.
+
+## Faculty themes
+
+The active theme is chosen per catalog / via `ELVIRA_THEME` and drives the brand
+palette and logos (light & dark). Supported `data-theme` values:
+
+`fiit` · `stu` · `mtf` · `svf` · `sjf` · `fei` · `fchpt` · `fad` · `ku` (Katolícka
+univerzita Ružomberok) · `default`
+
+Each theme exposes contrast-aware CSS variables in `src/main.css`
+(`--color-primary`, `--color-primary-text`, `--color-on-primary`,
+`--color-primary-dark`, …) so text and buttons meet WCAG AA on every palette.
+
+## Environment variables
+
+Elvira-specific variables:
+
+- **`ELVIRA_BASE_URL`** — API base URL the frontend fetches all data from.
+- **`ELVIRA_CATALOG_ID`** — the catalog whose data is shown. Each catalog maps to a
+  faculty/department with its own theme and content.
+- **`ELVIRA_THEME`** — faculty theme name (see the list above); selects logos and colors.
+- **`ELVIRA_ASSISTANT_URL`** — base URL of the AI assistant service (chat & recommendations).
+- **`ELVIRA_UMAMI_SERVER`** — analytics (Umami) server URL.
+- **`ELVIRA_UMAMI_WEBSITE`** — Umami website ID for analytics.
+- **`ELVIRA_EXPERIMENTAL_FEATURES`** — `true`/`false`; gates undeveloped features when
+  shipping a dev build to production.
+
+Prefer overriding these via bash rather than editing the `env/.env.*` files directly:
 
 ```bash
-unset  ELVIRA_BASE_URL
-unset  ELVIRA_CATALOG_ID
-unset  ELVIRA_THEME
-unset  ELVIRA_UMAMI_SERVER
-unset  ELVIRA_UMAMI_WEBSITE
-unset  ELVIRA_EXPERIMENTAL_FEATURES
+export ELVIRA_BASE_URL=base_url
+export ELVIRA_CATALOG_ID=catalog_id
+export ELVIRA_THEME=theme
+export ELVIRA_ASSISTANT_URL=assistant_url
+export ELVIRA_UMAMI_SERVER=server_url
+export ELVIRA_UMAMI_WEBSITE=website_id
+export ELVIRA_EXPERIMENTAL_FEATURES=false
+
+npm run build:prod
 ```
 
-## Preview your build
+🔔 **Gentle reminder** 🔔 — clean up afterward:
 
-Excited to see your creation come to life?
-Follow these steps:
-
-1. Run `npm run build:key` (Check build process), to build your app.
-2. Run `npm run preview` to run your build.
+```bash
+unset ELVIRA_BASE_URL ELVIRA_CATALOG_ID ELVIRA_THEME ELVIRA_ASSISTANT_URL \
+      ELVIRA_UMAMI_SERVER ELVIRA_UMAMI_WEBSITE ELVIRA_EXPERIMENTAL_FEATURES
+```
 
 Let the adventure begin! 🚀

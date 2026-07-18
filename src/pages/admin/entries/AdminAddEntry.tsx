@@ -123,17 +123,19 @@ const AdminAddEntry = () => {
     }
   };
 
-  return AdminEntryForm({
-    FormType: 'add',
-    handleSubmit,
-    entry,
-    setEntry,
-    isLoading,
-    stringImage,
-    setStringImage,
-    files,
-    setFiles,
-  });
+  return (
+    <AdminEntryForm
+      FormType='add'
+      handleSubmit={handleSubmit}
+      entry={entry}
+      setEntry={setEntry}
+      isLoading={isLoading}
+      stringImage={stringImage}
+      setStringImage={setStringImage}
+      files={files}
+      setFiles={setFiles}
+    />
+  );
 };
 
 export default AdminAddEntry;

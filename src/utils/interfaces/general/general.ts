@@ -28,7 +28,11 @@ export enum NAVIGATION_PATHS {
   adminFeeds = '/administration/feeds',
   adminLicenses = '/administration/licenses',
   adminCategories = '/administration/categories',
+  adminAuthors = '/administration/authors',
+  adminCatalogs = '/administration/catalogs',
   adminUsers = '/administration/users',
+  adminAccess = '/administration/access',
+  adminApiKeys = '/administration/api-keys',
   adminLoans = '/administration/loans',
   adminAIUsers = '/administration/ai-users',
 }

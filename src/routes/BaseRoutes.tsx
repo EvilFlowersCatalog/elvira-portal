@@ -13,6 +13,9 @@ import Home from '../pages/common/Home';
 import AdminEditEntry from '../pages/admin/entries/AdminEditEntry';
 import AdminEntries from '../pages/admin/entries/AdminEntries';
 import AdminCategories from '../pages/admin/AdminCategories';
+import AdminCatalogs from '../pages/admin/AdminCatalogs';
+import AdminAuthors from '../pages/admin/AdminAuthors';
+import AdminAccess from '../pages/admin/AdminAccess';
 import Feeds from '../pages/common/Feeds';
 import AdminHome from '../pages/admin/AdminHome';
 import AdminAddEntry from '../pages/admin/entries/AdminAddEntry';
@@ -34,6 +37,7 @@ import History from '../pages/common/History';
 import CatalogInitializer from '../components/catalog/CatalogInitializer';
 import Profile from '../pages/common/Profile';
 import ClaimReservation from '../pages/common/ClaimReservation';
+import { AdminLayout } from '../components/admin';
 
 const BaseRoutes = () => {
   const { auth } = useAuthContext();
@@ -94,19 +98,22 @@ const BaseRoutes = () => {
 
           {/* Only with admin role */}
           <Route path='administration' element={<RequireAdmin />}>
-            <Route index element={<AdminHome />} />
-            <Route path='entries'>
-              <Route index element={<AdminEntries />} />
-              <Route path='add' element={<AdminAddEntry />} />
-              <Route path='edit/:entry-id' element={<AdminEditEntry />} />
-            </Route>
-            <Route path='feeds' element={<AdminFeeds />} />
-            <Route path='categories' element={<AdminCategories />} />
-            <Route path="users" element={<AdminUsers />} />
-            <Route path="ai-users" element={<AdminAIUsers />} />
-            { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+            <Route element={<AdminLayout />}>
+              <Route index element={<AdminHome />} />
+              <Route path='entries'>
+                <Route index element={<AdminEntries />} />
+                <Route path='add' element={<AdminAddEntry />} />
+                <Route path='edit/:entry-id' element={<AdminEditEntry />} />
+              </Route>
+              <Route path='feeds' element={<AdminFeeds />} />
+              <Route path='categories' element={<AdminCategories />} />
+              <Route path='catalogs' element={<AdminCatalogs />} />
+              <Route path='authors' element={<AdminAuthors />} />
+              <Route path='access' element={<AdminAccess />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="ai-users" element={<AdminAIUsers />} />
               <Route path='loans' element={<AdminLoans />} />
-            ) }
+            </Route>
           </Route>
         </Route>
       </Route>
