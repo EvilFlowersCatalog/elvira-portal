@@ -321,7 +321,7 @@ export default function AiAssistantPage() {
     }
 
     return (
-        <div className="flex flex-col h-full w-full bg-white dark:bg-zinc-900">
+        <div className="flex flex-col h-full w-full ">
             {/* Desktop Header */}
             <div className="hidden lg:flex justify-between items-center p-6">
                 <h1 className="text-[2.125rem] leading-tight font-bold text-black dark:text-white">
@@ -402,7 +402,7 @@ export default function AiAssistantPage() {
                                 <AiSuggestion suggestion={t("assistant.suggestion2")} handleSuggestion={handleSuggestion} />
                             </div>
                         ) : null}
-                        <div className="flex items-center gap-2 rounded-xl px-4 py-2.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-[#3f3f46] dark:hover:bg-[#4b5563]">
+                        <div className="flex items-center gap-2 rounded-xl px-4 py-2.5 bg-white hover:bg-zinc-100 drop-shadow-lg dark:bg-[#3f3f46] dark:hover:bg-[#4b5563]">
                             <input
                                 type="text"
                                 disabled={isGeneratingResponse}
