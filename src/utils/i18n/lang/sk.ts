@@ -654,6 +654,13 @@ export const sk = {
     search: {
       smartOn: 'Zapnúť inteligentné vyhľadávanie',
       smartOff: 'Vypnúť inteligentné vyhľadávanie',
+      // Suggestions dropdown
+      books: 'Knihy',
+      authors: 'Autori',
+      feeds: 'Skupiny',
+      categories: 'Kategórie',
+      noResults: 'Žiadne výsledky pre „{{query}}“',
+      seeAll: 'Zobraziť všetky výsledky pre „{{query}}“',
     },
 
     profile: {

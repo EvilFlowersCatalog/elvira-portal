@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { IEntryQuery } from '../../../utils/interfaces/entry';
 import useGetEntries from './useGetEntries';
 import useAppContext from '../../contexts/useAppContext';
@@ -24,6 +24,11 @@ const useEntriesQuery = (
     queryFn: () =>
       getEntries({ page: 1, limit: 30, ...query } as IEntryQuery),
     enabled: options?.enabled ?? true,
+    // Keep the previous result on screen while a new query loads (e.g. as the
+    // user types in the search suggestions) so the UI never flashes to a
+    // loading/empty state — it just updates in place. `isFetching` /
+    // `isPlaceholderData` expose the background activity for a subtle indicator.
+    placeholderData: keepPreviousData,
   });
 };
 
