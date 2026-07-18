@@ -10,9 +10,9 @@
   box-sizing: border-box !important;
   padding: 0;
   margin: 0;
-  scrollbar-width: thin !important; /* For Firefox */
-  scrollbar-color: #555 transparent !important; /* For Firefox */
-  font-family: "Inter", sans-serif !important; /* !important since evilflowersviewer is overriding * selector */
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: #555 transparent; /* For Firefox */
+  font-family: "Inter", sans-serif; /* evilflowersviewer no longer overrides the global * selector */
 }
 
 /* Custom Scrollbar for WebKit Browsers */

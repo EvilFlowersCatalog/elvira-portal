@@ -189,14 +189,13 @@ const Viewer = () => {
   useEffect(() => {
     if (!id) return;
 
-    // Load and scope the viewer CSS by wrapping everything in #pdf-viewer-page
+    // The viewer library now ships fully self-scoped styles — every rule lives
+    // under its own `.efv-viewer` root class and its global preflight is
+    // disabled — so we inject the stylesheet as-is. No manual `#rootId { … }`
+    // wrapping (which broke @font-face/@tailwind at-rules) is needed anymore.
     const styleElement = document.createElement("style");
     styleElement.id = "pdf-viewer-styles";
-    
-    // Simply wrap all CSS rules within the #pdf-viewer-page selector
-    const scopedCss = `#${rootId} { ${viewerStyles} }`;
-    
-    styleElement.textContent = scopedCss;
+    styleElement.textContent = viewerStyles;
     document.head.appendChild(styleElement);
 
     (async () => {
