@@ -127,7 +127,7 @@ const AiChatHistory = () => {
   }
 
   return (
-    <div className="flex flex-col h-full w-full bg-white dark:bg-zinc-900 p-6 overflow-auto">
+    <div className="flex flex-col h-full w-full p-6 overflow-auto">
       <div className="max-w-4xl w-full mx-auto">
         {/* Header */}
         <div className="flex justify-between items-center mb-6">
