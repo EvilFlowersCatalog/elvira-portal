@@ -62,7 +62,6 @@ export default function SearchField({
       <input
         type="search"
         aria-label={label}
-        // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus={autoFocus}
         value={text}
         onChange={(e) => setText(e.target.value)}

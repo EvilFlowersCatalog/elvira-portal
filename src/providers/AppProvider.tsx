@@ -71,7 +71,7 @@ export interface IAppContext {
     currentSearchParams: URLSearchParams,
   ) => boolean;
   handleScroll: (
-    scrollRef: RefObject<HTMLDivElement>,
+    scrollRef: RefObject<HTMLDivElement | null>,
     page: number,
     setPage: (page: number) => void,
     maxPage: number,
@@ -93,7 +93,7 @@ export interface IAppContext {
   availableCatalogs: ICatalogOption[];
   initializeCatalogs: (catalogs: ICatalogOption[]) => void;
   switchCatalog: (catalogValue: string) => void;
-  umamiTrack: (title: string, data?: Object) => void;
+  umamiTrack: (title: string, data?: object) => void;
 }
 
 export const AppContext = createContext<IAppContext | null>(null);
@@ -112,16 +112,11 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const [showAiAssistant, setShowAiAssistant] = useState<boolean>(false);
   const [editingEntryTitle, setEditingEntryTitle] = useState<string>("");
   
-  // Get initial catalog from cookies or env
-  const getInitialCatalog = (): ICatalogOption | null => {
-    const savedCatalogValue = cookies[COOKIES_TYPE.CATALOG_KEY];
-    const envCatalogId = import.meta.env.ELVIRA_CATALOG_ID;
-    
-    // Return null initially, will be set when catalogs are fetched
-    return null;
-  };
-  
-  const [selectedCatalog, setSelectedCatalog] = useState<ICatalogOption | null>(getInitialCatalog());
+  // Selected catalog starts null and is resolved from cookies/env once the
+  // catalog list arrives from the API (see initializeCatalogs).
+  const [selectedCatalog, setSelectedCatalog] = useState<ICatalogOption | null>(
+    null
+  );
   const [availableCatalogs, setAvailableCatalogs] = useState<ICatalogOption[]>([]);
   const [elviraTheme, setElviraTheme] = useState<string>(
     import.meta.env.ELVIRA_THEME || cookies[COOKIES_TYPE.CATALOG_KEY] || 'default'
@@ -270,7 +265,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     }
   };
 
-  const umamiTrack = (title: string, data?: Object) => {
+  const umamiTrack = (title: string, data?: object) => {
     if (typeof umami !== "undefined") umami.track(title, data);
   };
 
@@ -285,7 +280,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
 
   const isParamsEmpty = () => {
     // do not count entry-detail-id
-    for (let [key] of searchParams.entries()) {
+    for (const [key] of searchParams.entries()) {
       if (key !== "entry-detail-id" && key !== "parent-id") {
         return false;
       }
@@ -312,13 +307,13 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     );
 
     // Chcek prev
-    for (let key in prevRest) {
+    for (const key in prevRest) {
       if (prevRest[key] !== currRest[key]) {
         return false;
       }
     }
     // Chcek curr
-    for (let key in currRest) {
+    for (const key in currRest) {
       if (prevRest[key] !== currRest[key]) {
         return false;
       }
@@ -328,7 +323,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
 
   // handle scrolling and loading next datas
   const handleScroll = (
-    scrollRef: RefObject<HTMLDivElement>,
+    scrollRef: RefObject<HTMLDivElement | null>,
     page: number,
     setPage: (page: number) => void,
     maxPage: number,

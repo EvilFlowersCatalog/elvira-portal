@@ -83,10 +83,10 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
   };
 
   const handleDOIChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setEntry({ ...entry, identifiers: { ...entry?.identifiers!, doi: event.target.value } });
+    setEntry({ ...entry, identifiers: { ...(entry?.identifiers ?? {}), doi: event.target.value } });
   };
   const handleISBNChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setEntry({ ...entry, identifiers: { ...entry?.identifiers!, isbn: event.target.value } });
+    setEntry({ ...entry, identifiers: { ...(entry?.identifiers ?? {}), isbn: event.target.value } });
   };
 
   const fetchButton = (label: string, onClick: () => void) => (

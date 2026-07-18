@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import { SelectChangeEvent } from '@mui/material';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { AcceptedLanguage, getLanguage } from '../../hooks/api/languages/languages';
 import useGetCategories from '../../hooks/api/categories/useGetCategories';
@@ -56,7 +55,7 @@ const ToolsContainer = ({
     })();
   }, []);
 
-  const handleSelectChange = (e: SelectChangeEvent) => {
+  const handleSelectChange = (e: ChangeEvent<HTMLSelectElement>) => {
     if (e.target.value === 'none') searchParams.delete('order-by');
     else searchParams.set('order-by', e.target.value);
     setSearchParams(searchParams);

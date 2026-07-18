@@ -11,7 +11,6 @@ import {
 } from '../../utils/interfaces/general/general';
 import { CircleLoader } from 'react-spinners';
 import ElviraInput from '../../components/inputs/ElviraInput';
-import { Checkbox } from '@mui/material';
 import useCookiesContext from '../../hooks/contexts/useCookiesContext';
 import FormModal from '../../components/modals/FormModal';
 import LicenseTerms from '../../components/dialogs/LicenseTerms';
@@ -74,7 +73,7 @@ const Auth = () => {
     setLicenseChecked(e.target.checked);
   };
 
-  const handleLicenseCheckInvalid = (e: FormEvent<HTMLButtonElement>) => {
+  const handleLicenseCheckInvalid = (e: FormEvent<HTMLInputElement>) => {
     e.preventDefault();
     setCheckLicenseInvalid(true);
   };
@@ -136,18 +135,15 @@ const Auth = () => {
                 <div className='w-full'>
 
                   <div className='flex w-full gap-2 items-center'>
-                    <Checkbox
-                      size='small'
+                    <input
+                      type='checkbox'
+                      className={`m-[9px] h-[18px] w-[18px] cursor-pointer ${
+                        checLicensekInvalid ? 'accent-red' : 'accent-primary'
+                      }`}
                       required
                       checked={licenseChecked}
                       onChange={handleLicenseCheckChange}
                       onInvalid={handleLicenseCheckInvalid}
-                      sx={{
-                        color: checLicensekInvalid ? 'red' : 'var(--color-primary)',
-                        '&.Mui-checked': {
-                          color: checLicensekInvalid ? 'red' : 'var(--color-primary)',
-                        },
-                      }}
                     />
                     <button
                       type='button'
@@ -160,16 +156,11 @@ const Auth = () => {
                     </button>
                   </div>
                   <div className='flex w-full gap-2 items-center'>
-                    <Checkbox
-                      size='small'
+                    <input
+                      type='checkbox'
+                      className='m-[9px] h-[18px] w-[18px] cursor-pointer accent-primary'
                       checked={staySigned}
-                      onChange={(e, checked)=>setStaySigned(checked)}
-                      sx={{
-                        color: 'var(--color-primary)',
-                        '&.Mui-checked': {
-                          color: 'var(--color-primary)',
-                        },
-                      }}
+                      onChange={(e)=>setStaySigned(e.target.checked)}
                     />
                     <p onClick={()=>{setStaySigned(!staySigned)}}
                       className={`text-sm cursor-pointer text-left text-black dark:text-white`}

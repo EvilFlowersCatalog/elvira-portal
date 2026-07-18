@@ -4,9 +4,10 @@ import { ToastContainer } from 'react-toastify';
 import NavbarContainer from './components/header/navbar/NavbarContainer';
 import useCookiesContext from './hooks/contexts/useCookiesContext';
 import CookiesInformation from './components/dialogs/CookiesInformation';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 import Header from './components/header/Header';
 import useAppContext from './hooks/contexts/useAppContext';
+import PageLoading from './components/page/PageLoading';
 
 const App = () => {
   const { informed } = useCookiesContext();
@@ -57,7 +58,9 @@ const App = () => {
           id="outlet-wrapper"
           className={`flex flex-1 h-screen flex-col overflow-hidden bg-lightGray dark:bg-darkGray ${show() ? 'max-lg:pt-14' : ''}`}
         >
-          <Outlet />
+          <Suspense fallback={<PageLoading />}>
+            <Outlet />
+          </Suspense>
         </div>
 
       </div>

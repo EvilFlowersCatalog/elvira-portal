@@ -100,7 +100,7 @@ const Breadcrumb = () => {
 
     if (feeds.length > 0) {
       feeds.map((feed, index) => {
-        var previousFeeds = feeds.slice(0, index);
+        const previousFeeds = feeds.slice(0, index);
         // %26 is the URL encoded version of &
         const part =
           index !== 0

@@ -1,38 +1,29 @@
-import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MUISelectStyle } from '../inputs/ElviraSelect';
 
 interface ISortSelect {
   value: string;
-  onChange: (e: SelectChangeEvent) => void;
+  onChange: (e: ChangeEvent<HTMLSelectElement>) => void;
 }
 
 const SortSelect = ({ value, onChange }: ISortSelect) => {
   const { t } = useTranslation();
 
   return (
-    <Select
-      className="ml-auto dark:text-white"
-      sx={MUISelectStyle}
-      MenuProps={{
-        PaperProps: {
-          sx: { '& .MuiList-root': { paddingBottom: 0, paddingTop: 0 } },
-        },
-      }}
-      label={'Sort By'}
+    <select
+      className="ml-auto bg-transparent outline-none p-2 dark:text-white"
       value={value}
-      labelId="sort-label"
       id="orderBy"
+      aria-label="Sort By"
       onChange={onChange}
-      variant="standard"
     >
-      <MenuItem value="created_at">{t('tools.orderBy.createdAtAsc')}</MenuItem>
-      <MenuItem value="-created_at">{t('tools.orderBy.createdAtDesc')}</MenuItem>
-      <MenuItem value="title">{t('tools.orderBy.titleAsc')}</MenuItem>
-      <MenuItem value="-title">{t('tools.orderBy.titleDesc')}</MenuItem>
-      <MenuItem value="-popularity">{t('tools.orderBy.popularityDesc')}</MenuItem>
-      <MenuItem value="popularity">{t('tools.orderBy.popularityAsc')}</MenuItem>
-    </Select>
+      <option value="created_at">{t('tools.orderBy.createdAtAsc')}</option>
+      <option value="-created_at">{t('tools.orderBy.createdAtDesc')}</option>
+      <option value="title">{t('tools.orderBy.titleAsc')}</option>
+      <option value="-title">{t('tools.orderBy.titleDesc')}</option>
+      <option value="-popularity">{t('tools.orderBy.popularityDesc')}</option>
+      <option value="popularity">{t('tools.orderBy.popularityAsc')}</option>
+    </select>
   );
 };
 

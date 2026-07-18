@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Box, Typography, Card, CardContent, CircularProgress, IconButton } from '@mui/material';
+import { CircleLoader } from 'react-spinners';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import useGetUserChats, { IChat } from '../../hooks/api/assistant/useGetUserChats';
@@ -128,106 +128,89 @@ const AiChatHistory = () => {
 
   if (isLoading) {
     return (
-      <Box className="flex items-center justify-center h-full">
-        <CircularProgress />
-      </Box>
+      <div className="flex items-center justify-center h-full">
+        <CircleLoader color={'var(--color-primary)'} size={50} />
+      </div>
     );
   }
 
   if (error) {
     return (
-      <Box className="flex items-center justify-center h-full">
-        <Typography className="text-red-500">{error}</Typography>
-      </Box>
+      <div className="flex items-center justify-center h-full">
+        <p className="text-red-500">{error}</p>
+      </div>
     );
   }
 
   return (
-    <Box className="flex flex-col h-full w-full bg-white dark:bg-zinc-900 p-6 overflow-auto">
-      <Box className="max-w-4xl w-full mx-auto">
+    <div className="flex flex-col h-full w-full bg-white dark:bg-zinc-900 p-6 overflow-auto">
+      <div className="max-w-4xl w-full mx-auto">
         {/* Header */}
-        <Box className="flex justify-between items-center mb-6">
-          <Typography variant="h4" className="font-bold text-black dark:text-white">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-[2.125rem] leading-tight font-bold text-black dark:text-white">
             {t('assistant.chatHistory')}
-          </Typography>
-          <IconButton 
+          </h1>
+          <button
+            type="button"
+            aria-label={t('assistant.newChat')}
             onClick={handleNewChat}
-            className="bg-primary text-onPrimary hover:bg-primaryDark"
-            sx={{
-              backgroundColor: 'primary.main',
-              color: 'white',
-              '&:hover': {
-                backgroundColor: 'primary.dark',
-              }
-            }}
+            className="inline-flex items-center justify-center rounded-full p-2 bg-primary text-onPrimary hover:bg-primaryDark transition-colors"
           >
             <FiPlus size={24} />
-          </IconButton>
-        </Box>
+          </button>
+        </div>
 
         {/* Chat List */}
         {chats.length === 0 ? (
-          <Box className="flex flex-col items-center justify-center py-20">
+          <div className="flex flex-col items-center justify-center py-20">
             <FiMessageSquare size={64} className="text-gray-400 dark:text-gray-600 mb-4" />
-            <Typography variant="h6" className="text-gray-600 dark:text-gray-400 mb-2">
+            <p className="text-xl text-gray-600 dark:text-gray-400 mb-2">
               {t('assistant.noChats')}
-            </Typography>
-            <Typography variant="body2" className="text-gray-500 dark:text-gray-500 mb-6">
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
               {t('assistant.startFirstChat')}
-            </Typography>
+            </p>
             <button
               onClick={handleNewChat}
               className="bg-primary text-onPrimary px-6 py-3 rounded-lg hover:bg-primaryDark transition-colors mt-5"
             >
               {t('assistant.newChat')}
             </button>
-          </Box>
+          </div>
         ) : (
-          <Box className="flex flex-col gap-3">
+          <div className="flex flex-col gap-3">
             {chats.map((chat) => (
-              <Card
+              <div
                 key={chat.chatId}
                 onClick={() => handleChatClick(chat)}
-                className="cursor-pointer transition-all hover:shadow-lg"
-                sx={{
-                  backgroundColor: 'white',
-                  '.dark &': {
-                    backgroundColor: '#27272a',
-                  },
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                  }
-                }}
+                className="cursor-pointer rounded-lg bg-white dark:bg-[#27272a] shadow-[0px_2px_1px_-1px_rgba(0,0,0,0.2),0px_1px_1px_0px_rgba(0,0,0,0.14),0px_1px_3px_0px_rgba(0,0,0,0.12)] transition-all hover:shadow-lg hover:-translate-y-0.5"
               >
-                <CardContent className="p-4">
-                  <Box className="flex items-start justify-between">
-                    <Box className="flex-1">
-                      <Typography variant="h6" className="font-semibold text-black dark:text-white mb-1">
+                <div className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <p className="text-xl font-semibold text-black dark:text-white mb-1">
                         {chat.title || t('assistant.untitledChat')}
-                      </Typography>
+                      </p>
                       {chat.lastMessage && (
-                        <Typography 
-                          variant="body2" 
-                          className="text-gray-600 dark:text-gray-400 line-clamp-2 mb-2"
-                        >
+                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
                           {chat.lastMessage.text}
-                        </Typography>
+                        </p>
                       )}
-                      <Box className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
+                      <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
                         <span>{t('assistant.messages', { count: chat.messageCount })}</span>
                         <span>•</span>
                         <span>{formatDate(chat.lastMessage.timestamp)}</span>
-                      </Box>
-                    </Box>
+                      </div>
+                    </div>
                     <FiMessageSquare size={24} className="text-gray-400 dark:text-gray-600 ml-4" />
-                  </Box>
-                </CardContent>
-              </Card>
+                  </div>
+                </div>
+              </div>
             ))}
-          </Box>
+          </div>
         )}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 };
 

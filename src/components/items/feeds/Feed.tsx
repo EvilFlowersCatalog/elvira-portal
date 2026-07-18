@@ -13,7 +13,7 @@ interface IFeedParams {
 
 const Feed = ({ feed }: IFeedParams) => {
   const { umamiTrack } = useAppContext();
-  var getFeedDetails = useGetFeedDetail();
+  const getFeedDetails = useGetFeedDetail();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [isHovering, setIsHovering] = useState<boolean>(false);
@@ -33,9 +33,9 @@ const Feed = ({ feed }: IFeedParams) => {
       const params = new URLSearchParams(searchParams);
       params.delete('query');
 
-      var searchAll = searchParams.get('search-all') === 'true';
+      const searchAll = searchParams.get('search-all') === 'true';
 
-      var previous;
+      let previous;
       if (searchAll) {
         params.delete('search-all');
         if (feed.parents && feed.parents.length > 0) {
@@ -58,11 +58,11 @@ const Feed = ({ feed }: IFeedParams) => {
       });
       const params = new URLSearchParams();
 
-      var searchAll = searchParams.get('search-all') === 'true';
+      const searchAll = searchParams.get('search-all') === 'true';
 
         if (searchAll) {
           if (feed.parents && feed.parents.length > 0) {
-            var parentPath = await getParentFeed(feed.parents[0]);
+            const parentPath = await getParentFeed(feed.parents[0]);
             params.set('parent-id', parentPath.join("&"));
           }
         } else {

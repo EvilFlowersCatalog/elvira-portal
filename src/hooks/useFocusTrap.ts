@@ -19,7 +19,9 @@ const FOCUSABLE_SELECTOR = [
  * @param active whether the trap should be engaged
  * @returns a ref to attach to the dialog container div
  */
-export default function useFocusTrap(active: boolean): React.RefObject<HTMLDivElement> {
+export default function useFocusTrap(
+  active: boolean
+): React.RefObject<HTMLDivElement | null> {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

@@ -22,6 +22,7 @@ import useAppContext from '../hooks/contexts/useAppContext';
 import useVerifyCredentials from '../hooks/api/verify/useVerifyCredentials';
 import axios, { CancelTokenSource } from 'axios';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
+import { setAxiosAuth } from '../hooks/api/useAxios';
 
 export interface IAuthContext {
   auth: IAuth | null;
@@ -118,7 +119,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
 
   useEffect(() => {
     if (auth) {
-      var maxAge = staySigned 
+      const maxAge = staySigned 
       ? 365 * 60 * 60 * 24 // 1 Year (Forever)
       : 30 * 60; // 30 minutes of inactivity
       setCookie(COOKIES_TYPE.AUTH_KEY, auth, { maxAge });
@@ -145,6 +146,11 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
     setAuth(null); // set to null
     setCheck((prev) => !prev); // if auth was already null
   };
+
+  // Feed the shared axios interceptors (registered once in useAxios) the current
+  // auth. Done during render — which runs parent-before-child — so the token is
+  // in place before any child effect or query fires a request.
+  setAxiosAuth({ token: auth?.token, logout, cancelTokenSource });
 
   return (
     <AuthContext.Provider

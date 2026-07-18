@@ -11,10 +11,8 @@ import { toast } from 'react-toastify';
 import FormModal from '../../../../components/modals/FormModal';
 import ElviraInput from '../../../../components/inputs/ElviraInput';
 import ElviraTextarea from '../../../../components/inputs/ElviraTextarea';
-import { MUISelectStyle } from '../../../inputs/ElviraSelect';
 import FeedAutofill from '../../../autofills/FeedAutofill';
 import { MdRemoveCircle } from 'react-icons/md';
-import { MenuItem, Select } from '@mui/material';
 
 interface IFeedForm {
   setOpen: (open: boolean) => void;
@@ -65,7 +63,7 @@ const FeedForm = ({
     }));
   };
   // set kind
-  const handleKindChange = (e: any) => {
+  const handleKindChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setForm((prevForm) => ({
       ...prevForm,
       kind: e.target.value,
@@ -202,24 +200,20 @@ const FeedForm = ({
 
         {/* Kind */}
         <div className='flex w-full flex-col text-left'>
-          <label htmlFor='selection-kind' className={`text-sm pl-1 text-primary`}>
+          <label htmlFor='selectionKind' className={`text-sm pl-1 text-primary`}>
             {t('modal.feedForm.kind')}
           </label>
-            <Select
-              className="dark:text-white"
-              sx={MUISelectStyle}
-              MenuProps={{ PaperProps: { sx: { "& .MuiList-root": { paddingBottom: 0, paddingTop: 0}}}}}
-              label={"Selection Kind"}
+            <select
+              className="bg-transparent outline-none p-2 pl-0 dark:text-white"
               value={form.kind}
-              labelId='selection-kind'
               id="selectionKind"
+              aria-label="Selection Kind"
               onChange={handleKindChange}
-              variant="standard"
             >
-                <MenuItem value="acquisition">{t('modal.feedForm.acquistion')}</MenuItem>
-                <MenuItem value="navigation">{t('modal.feedForm.navigation')}</MenuItem>
-            </Select>
-            
+                <option value="acquisition">{t('modal.feedForm.acquistion')}</option>
+                <option value="navigation">{t('modal.feedForm.navigation')}</option>
+            </select>
+
         </div>
         <button ref={buttonRef} type='submit' className='hidden'></button>
       </form>

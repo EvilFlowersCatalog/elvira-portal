@@ -22,7 +22,6 @@ import { ActionButtonStyle, ActionsButton, ActionsWrapper } from './DetailAction
 import { AcceptedLanguage, getLanguage } from '../../../../hooks/api/languages/languages';
 import AcquisitionsButton from '../../../buttons/AcqusitionsButton';
 import DetailModal from '../../../modals/DetailModal';
-import { Tooltip } from '@mui/material';
 import { twMerge } from 'tailwind-merge';
 import EntryItem from '../display/EntryItem';
 import { AvailabilityBadge, AvailabilityState } from './AvailabilityBadge';
@@ -366,8 +365,8 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               </InfoItemCustom>
             </InfoGrid>
 
-            <Tooltip title={t('entry.detail.askAi')} placement='left'>
               <button
+                title={t('entry.detail.askAi')}
                 className="absolute right-6 bottom-4 p-3 rounded-full bg-primary text-white font-semibold hover:bg-primaryDark transition-colors duration-150 hidden mdlg:block"
                 onClick={askAi}
               >
@@ -378,7 +377,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                   </svg>
                 </div>
               </button>
-            </Tooltip>
 
             {/* TABS */}
             {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
