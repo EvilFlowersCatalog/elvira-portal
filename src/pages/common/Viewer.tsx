@@ -108,15 +108,17 @@ const Viewer = () => {
       return null;
     }
   };
-  const saveGroupFunc = async (name: string) => {
+  const saveGroupFunc = async (name: string): Promise<{ response: { id: string } }> => {
     try {
-      await createAnotation({
+      const response = await createAnotation({
         user_acquisition_id,
         title: name,
       });
       // toast within editor only notifications.editPage.group.add.success
+      return { response: { id: response.id } };
     } catch {
       toast.error(t("notifications.editPage.group.add.error"));
+      return { response: { id: "" } };
     }
   };
   const updateLayerFunc = async (
@@ -259,9 +261,6 @@ const Viewer = () => {
               saveLayerFunc,
               saveGroupFunc,
               updateLayerFunc,
-              updateGroupFunc,
-              deleteLayerFunc,
-              deleteGroupFunc,
               getLayerFunc,
               getGroupsFunc,
             },
