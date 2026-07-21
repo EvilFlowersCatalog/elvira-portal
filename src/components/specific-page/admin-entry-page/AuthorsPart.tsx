@@ -62,20 +62,22 @@ const AuthorsPart = ({ entry, setEntry }: IPartParams) => {
         <div className='flex flex-col flex-1 gap-4'>
           {entry.authors?.map((_, index) => (
             <div className='flex w-full gap-4 items-center' key={index}>
-              <AuthorsAutofill
-                entryForm={entry}
-                setEntryForm={setEntry}
-                index={index}
-                authors={authors}
-                type='name'
-              />
-              <AuthorsAutofill
-                entryForm={entry}
-                setEntryForm={setEntry}
-                index={index}
-                authors={authors}
-                type='surname'
-              />
+              <div className='flex flex-col md:flex-row gap-2 w-full'>
+                <AuthorsAutofill
+                  entryForm={entry}
+                  setEntryForm={setEntry}
+                  index={index}
+                  authors={authors}
+                  type='name'
+                />
+                <AuthorsAutofill
+                  entryForm={entry}
+                  setEntryForm={setEntry}
+                  index={index}
+                  authors={authors}
+                  type='surname'
+                />
+              </div>
               <BiTrash
                 color='red'
                 size={40}

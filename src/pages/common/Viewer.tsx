@@ -101,7 +101,7 @@ const Viewer = () => {
         page,
         content: svg,
       });
-      toast.success(t("notifications.editPage.layer.save.success"));
+      // toast within editor only  notifications.editPage.layer.save.success
       return { id: response.id, svg: response.content };
     } catch {
       toast.error(t("notifications.editPage.layer.save.error"));
@@ -114,7 +114,7 @@ const Viewer = () => {
         user_acquisition_id,
         title: name,
       });
-      toast.success(t("notifications.editPage.group.add.success"));
+      // toast within editor only notifications.editPage.group.add.success
     } catch {
       toast.error(t("notifications.editPage.group.add.error"));
     }
@@ -131,7 +131,7 @@ const Viewer = () => {
         page,
         content: svg,
       });
-      toast.success(t("notifications.editPage.layer.edit.success"));
+      // toast within editor only notifications.editPage.layer.edit.error.success
     } catch {
       toast.error(t("notifications.editPage.layer.edit.error"));
     }
@@ -139,7 +139,7 @@ const Viewer = () => {
   const updateGroupFunc = async (id: string, name: string) => {
     try {
       await updateAnotation(id, { title: name });
-      toast.success(t("notifications.editPage.group.edit.success"));
+      // toast within editor only notifications.editPage.group.edit.success
     } catch {
       toast.error(t("notifications.editPage.group.edit.error"));
     }
@@ -147,7 +147,7 @@ const Viewer = () => {
   const deleteLayerFunc = async (id: string) => {
     try {
       await deleteAnotationItem(id);
-      toast.success(t("notifications.editPage.layer.delete.success"));
+      // toast within editor only notifications.editPage.layer.delete.success
     } catch {
       toast.error(t("notifications.editPage.layer.delete.error"));
     }
@@ -155,7 +155,7 @@ const Viewer = () => {
   const deleteGroupFunc = async (id: string) => {
     try {
       await deleteAnotation(id);
-      toast.success(t("notifications.editPage.group.remove.success"));
+      // toast within editor only notifications.editPage.group.remove.success
     } catch {
       toast.error(t("notifications.editPage.group.remove.error"));
     }
