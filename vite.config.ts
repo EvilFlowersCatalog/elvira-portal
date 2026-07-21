@@ -17,6 +17,8 @@ export default defineConfig({
     port: 3000,
   },
   build: {
+    // esbuild's minifier hangs re-minifying the pre-minified evilflowersviewer bundle.
+    minify: false,
     // Route-level code-splitting (React.lazy) keeps the main entry small; the
     // reader/viewer vendor chunk is legitimately large so raise the warning bar.
     chunkSizeWarningLimit: 900,
