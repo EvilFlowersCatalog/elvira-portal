@@ -77,9 +77,10 @@ const Viewer = () => {
       return "";
     }
   };
-  // Home function for viewer to navigate home
+  // Home function for viewer to navigate back to where the reader was opened from, or home if unknown
   const homeFunction = () => {
-    navigate(NAVIGATION_PATHS.home);
+    const fromPath = (location.state as { fromPath?: string })?.fromPath;
+    navigate(fromPath || NAVIGATION_PATHS.home);
   };
   const closeFunction = () => {
     const catalogParam = entryCatalogId ? `&entry-catalog-id=${entryCatalogId}` : '';

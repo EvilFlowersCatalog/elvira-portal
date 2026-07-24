@@ -16,7 +16,6 @@ interface IPDFButtonsParams {
 
 const PDFButton = ({ acquisition, index, entryId, catalogId, children }: IPDFButtonsParams) => {
   const { umamiTrack } = useAppContext();
-  const { t } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -27,16 +26,18 @@ const PDFButton = ({ acquisition, index, entryId, catalogId, children }: IPDFBut
     });
     const path = NAVIGATION_PATHS.viewer + entryId + `/${index}`;
     const from = location.pathname.includes(NAVIGATION_PATHS.shelf) ? 'shelf' : '';
-    
+    const fromPath = `${location.pathname}${location.search}`;
+
     // Navigate with catalog_id in state
     const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
     e.preventDefault();
     if (e.ctrlKey || (e.metaKey && isMac) || e.button === 1) {
       window.open(path, '_blank');
     } else {
-      const state: { from?: string; catalogId?: string } = {};
+      const state: { from?: string; catalogId?: string; fromPath?: string } = {};
       if (from) state.from = from;
       if (catalogId) state.catalogId = catalogId;
+      if (fromPath) state.fromPath = fromPath;
       navigate(path, { state });
     }
   };
