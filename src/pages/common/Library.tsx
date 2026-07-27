@@ -56,7 +56,7 @@ const Library = () => {
           <EntryItem key={entry.id} entry={entry} />
         ))}
         {list.loadingNext &&
-          Array.from({ length: 30 }).map((_, index) => <EntryBoxLoading key={index} />)}
+          Array.from({ length: 30 }).map((_, index) => <EntryBoxLoading key={index} fixedSize />)}
       </EntriesWrapper>
     </ItemContainer>
   );

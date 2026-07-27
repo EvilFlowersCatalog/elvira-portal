@@ -66,7 +66,7 @@ const Shelf = () => {
           <EntryItem key={entry.id} entry={entry} triggerReload={triggerReload} />
         ))}
         {list.loadingNext &&
-          Array.from({ length: 30 }).map((_, index) => <EntryBoxLoading key={index} />)}
+          Array.from({ length: 30 }).map((_, index) => <EntryBoxLoading key={index} fixedSize />)}
       </EntriesWrapper>
     </ItemContainer>
   );
