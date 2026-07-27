@@ -1,6 +1,7 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import PopupInfo from '../../components/common/PopupInfo';
@@ -14,7 +15,7 @@ import useUserDetailsQuery from '../../hooks/api/users/useUserDetailsQuery';
 import useGetShelf from '../../hooks/api/my-shelf/useGetShelf';
 import useLicensesQuery from '../../hooks/api/licenses/useLicensesQuery';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
-import { LICENSE_STATE } from '../../utils/interfaces/license';
+import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 import { BookmarkIcon, ClockIcon, LibraryIcon, LoansIcon } from '../../components/header/navbar/NavbarIcons';
 
 type NotificationKey = 'loanEnd' | 'newBooks' | 'reservationChange';
@@ -22,6 +23,7 @@ type NotificationKey = 'loanEnd' | 'newBooks' | 'reservationChange';
 const Profile = () => {
   const { t } = useTranslation();
   const { auth } = useAuthContext();
+  const navigate = useNavigate();
 
   const setUserPassphrase = useSetUserPassphrase();
   const getShelf = useGetShelf();
@@ -44,21 +46,11 @@ const Profile = () => {
   const { data: licenseData } = useLicensesQuery({
     user_mode: 'current',
     page: 1,
-    limit: 50,
+    limit: 1,
   });
 
   const bookmarksCount = shelfData?.metadata.total ?? 0;
-
-  const loansCount = useMemo(() => {
-    if (!licenseData) return 0;
-    const now = new Date();
-    return licenseData.items.filter(
-      (l) =>
-        l.state === LICENSE_STATE.active &&
-        new Date(l.starts_at) <= now &&
-        new Date(l.expires_at) > now
-    ).length;
-  }, [licenseData]);
+  const loansCount = licenseData?.metadata.total ?? 0;
 
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [passphrase, setPassphrase] = useState<string>('');
@@ -122,12 +114,12 @@ const Profile = () => {
     { key: 'reservationChange', label: t('profile.notifications.reservationChange'), desc: t('profile.notifications.reservationChangeDesc') },
   ];
 
-  const stats = [
+  const stats: { labelKey: string; value: number; icon: ReactNode; path?: NAVIGATION_PATHS }[] = [
     { labelKey: 'profile.stats.readBooks', value: 0, icon: <LibraryIcon size={22} className='text-secondary dark:text-secondaryLight' /> },
-    { labelKey: 'profile.stats.savedBooks', value: bookmarksCount, icon: <BookmarkIcon size={22} className='text-secondary dark:text-secondaryLight' /> },
-    { labelKey: 'profile.stats.borrowedBooks', value: loansCount, icon: <LoansIcon size={22} className='text-secondary dark:text-secondaryLight' /> },
+    { labelKey: 'profile.stats.savedBooks', value: bookmarksCount, icon: <BookmarkIcon size={22} className='text-secondary dark:text-secondaryLight' />, path: NAVIGATION_PATHS.shelf },
+    { labelKey: 'profile.stats.borrowedBooks', value: loansCount, icon: <LoansIcon size={22} className='text-secondary dark:text-secondaryLight' />, path: NAVIGATION_PATHS.loans },
     { labelKey: 'profile.stats.readingHours', value: 0, icon: <ClockIcon size={22} className='text-secondary dark:text-secondaryLight' /> },
-  ] as const;
+  ];
 
   return (
     <div className='w-full h-full overflow-auto pb-10'>
@@ -176,20 +168,27 @@ const Profile = () => {
 
           {/* Stats row */}
           <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
-            {stats.map(({ labelKey, value, icon }) => (
-              <div
-                key={labelKey}
-                className='bg-white dark:bg-zinc-800 rounded-[8px] shadow-[0px_4px_6px_rgba(0,0,0,0.1)] dark:shadow-[0px_4px_6px_rgba(0,0,0,0.3)] h-[69px] flex items-center px-3 gap-3'
-              >
-                <div className='w-10 h-10 rounded-[6px] bg-primaryLight dark:bg-zinc-700 flex items-center justify-center flex-shrink-0'>
-                  {icon}
+            {stats.map(({ labelKey, value, icon, path }) => {
+              const clickable = !!path;
+              return (
+                <div
+                  key={labelKey}
+                  role={clickable ? 'button' : undefined}
+                  tabIndex={clickable ? 0 : undefined}
+                  onClick={clickable ? () => navigate(path) : undefined}
+                  onKeyDown={clickable ? (e) => { if (e.key === 'Enter' || e.key === ' ') navigate(path); } : undefined}
+                  className={`bg-white dark:bg-zinc-800 rounded-[8px] shadow-[0px_4px_6px_rgba(0,0,0,0.1)] dark:shadow-[0px_4px_6px_rgba(0,0,0,0.3)] h-[69px] flex items-center px-3 gap-3 ${clickable ? 'cursor-pointer' : ''}`}
+                >
+                  <div className='w-10 h-10 rounded-[6px] bg-primaryLight dark:bg-zinc-700 flex items-center justify-center flex-shrink-0'>
+                    {icon}
+                  </div>
+                  <div>
+                    <p className='text-[12px] font-light text-secondary dark:text-secondaryLight'>{t(labelKey)}</p>
+                    <p className='text-[20px] font-extrabold text-secondary dark:text-secondaryLight leading-tight'>{value}</p>
+                  </div>
                 </div>
-                <div>
-                  <p className='text-[12px] font-light text-secondary dark:text-secondaryLight'>{t(labelKey)}</p>
-                  <p className='text-[20px] font-extrabold text-secondary dark:text-secondaryLight leading-tight'>{value}</p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Bottom two-column section */}
