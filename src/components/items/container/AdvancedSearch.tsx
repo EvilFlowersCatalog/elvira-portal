@@ -6,14 +6,17 @@ import { ICategory } from "../../../utils/interfaces/category";
 import LanguageAutofill from "../../autofills/LanguageAutofill";
 import CategoryAutofill from "../../autofills/CategoryAutofill";
 import FeedAutofill from "../../autofills/FeedAutofill";
-import ElviraNumberInput from "../../inputs/ElviraNumberInput";
 import { IoClose } from "react-icons/io5";
 import AdvancedCheckboxes from "../../inputs/AdvancedCheckboxes";
 import Checkbox from "../../primitives/Checkbox";
+import DualRangeSlider from "../../primitives/DualRangeSlider";
 import useGetCategories from "../../../hooks/api/categories/useGetCategories";
 import useFeedsQuery from "../../../hooks/api/feeds/useFeedsQuery";
+import useGetEntries from "../../../hooks/api/entries/useGetEntries";
 import { IFeed } from "../../../utils/interfaces/feed";
 import { AvailabilityState } from "../entry/details/AvailabilityBadge";
+
+const DEFAULT_MIN_YEAR = 1900;
 
 type AvailabilityOption = { value: AvailabilityState; labelKey: string };
 
@@ -77,6 +80,10 @@ export function AdvancedSearch() {
     const [availability, setAvailability] = useState<AvailabilityState[]>([]);
     const yearDebounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+    const currentYear = new Date().getFullYear();
+    const [minYear, setMinYear] = useState<number>(DEFAULT_MIN_YEAR);
+
+    const getEntries = useGetEntries();
     const getCategories = useGetCategories();
     const [allCategories, setAllCategories] = useState<ICategory[]>([]);
     const [activeCategories, setActiveCategories] = useState<ICategory[]>([]);
@@ -91,6 +98,18 @@ export function AdvancedSearch() {
         (async () => {
             const { items: itemsCategories } = await getCategories({ paginate: false });
             setAllCategories(itemsCategories);
+        })();
+    }, []);
+
+    useEffect(() => {
+        (async () => {
+            try {
+                const { items } = await getEntries({ page: 1, limit: 1, orderBy: 'published_at' });
+                const earliest = items[0]?.published_at ? new Date(items[0].published_at).getFullYear() : NaN;
+                if (!Number.isNaN(earliest) && earliest > 0) setMinYear(earliest);
+            } catch {
+                // Falls back to DEFAULT_MIN_YEAR when the earliest year can't be determined.
+            }
         })();
     }, []);
 
@@ -257,19 +276,41 @@ export function AdvancedSearch() {
                 <p className="text-[14px] font-medium text-darkGray dark:text-white tracking-[0.1px]">
                     {t('searchBar.yearFromTo')}
                 </p>
+                <div className="px-1.5 pt-1">
+                    <DualRangeSlider
+                        min={minYear}
+                        max={currentYear}
+                        value={[
+                            year[0] ? Number(year[0]) : minYear,
+                            year[1] ? Number(year[1]) : currentYear,
+                        ]}
+                        onChange={([from, to]) => setYear([from.toString(), to.toString()])}
+                        onFinish={onYearFinish}
+                    />
+                </div>
                 <div className="flex items-center gap-2">
-                    <ElviraNumberInput
+                    <input
+                        type="text"
+                        inputMode="numeric"
                         placeholder={t('searchBar.yearFrom')}
-                        value={year[0].toString()}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => handleYearChange(0, e.target.value)}
+                        value={year[0]}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            if (e.target.value === "" || /^\d*$/.test(e.target.value)) handleYearChange(0, e.target.value);
+                        }}
                         onBlur={onYearFinish}
+                        className="w-full min-w-0 px-3 py-1.5 text-[14px] text-darkGray dark:text-white bg-white dark:bg-strongDarkGray border border-[rgba(0,0,0,0.15)] dark:border-[rgba(255,255,255,0.2)] rounded-md outline-none focus:border-primary"
                     />
                     <span className="text-[14px] font-medium text-darkGray dark:text-white flex-shrink-0">-</span>
-                    <ElviraNumberInput
+                    <input
+                        type="text"
+                        inputMode="numeric"
                         placeholder={t('searchBar.yearTo')}
-                        value={year[1].toString()}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => handleYearChange(1, e.target.value)}
+                        value={year[1]}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            if (e.target.value === "" || /^\d*$/.test(e.target.value)) handleYearChange(1, e.target.value);
+                        }}
                         onBlur={onYearFinish}
+                        className="w-full min-w-0 px-3 py-1.5 text-[14px] text-darkGray dark:text-white bg-white dark:bg-strongDarkGray border border-[rgba(0,0,0,0.15)] dark:border-[rgba(255,255,255,0.2)] rounded-md outline-none focus:border-primary"
                     />
                 </div>
             </div>

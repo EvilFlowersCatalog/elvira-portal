@@ -46,6 +46,7 @@ export interface IEntry extends Partial<IEntryLcpFields> {
   updated_at: string;
   shelf_record_id: string;
   thumbnail: string;
+  published_at?: string;
 }
 
 export interface IEntryDetail extends Partial<IEntryLcpFields> {
