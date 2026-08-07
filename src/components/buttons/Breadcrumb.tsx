@@ -57,6 +57,7 @@ const Breadcrumb = () => {
     ['profile']: isEn() ? 'Profile' : 'Profil',
     ['history']: isEn() ? 'History' : 'História',
     ['ai-chat']: isEn() ? 'AI Assistant' : 'AI Asistent',
+    ['ai-chat-history']: isEn() ? 'AI Assistant' : 'AI Asistent',
     ['books']: isEn() ? 'Books' : 'Knihy',
     ['search']: isEn() ? 'Search' : 'Vyhľadávanie',
     ['viewer']: isEn() ? 'PDF Viewer' : 'PDF Viewer',

@@ -1,4 +1,3 @@
-import { CircleLoader } from 'react-spinners';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { IChat } from '../../hooks/api/assistant/useGetUserChats';
@@ -10,6 +9,28 @@ import { FiMessageSquare, FiPlus } from 'react-icons/fi';
 import { AiMessage } from '../../providers/AppProvider';
 import axios from 'axios';
 import useAuth from '../../hooks/contexts/useAuthContext';
+import Breadcrumb from '../../components/buttons/Breadcrumb';
+import { H1 } from '../../components/primitives/Heading';
+
+function ChatRowSkeleton() {
+  return (
+    <div className="rounded-lg bg-zinc-300 dark:bg-darkGray animate-pulse">
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 flex flex-col gap-2">
+            <div className="h-5 w-1/2 rounded-md bg-zinc-400 dark:bg-strongDarkGray" />
+            <div className="h-4 w-3/4 rounded-md bg-zinc-400 dark:bg-strongDarkGray" />
+            <div className="flex items-center gap-4 mt-1">
+              <div className="h-3 w-16 rounded-md bg-zinc-400 dark:bg-strongDarkGray" />
+              <div className="h-3 w-20 rounded-md bg-zinc-400 dark:bg-strongDarkGray" />
+            </div>
+          </div>
+          <div className="w-6 h-6 rounded-md bg-zinc-400 dark:bg-strongDarkGray shrink-0" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const AiChatHistory = () => {
   const { t } = useTranslation();
@@ -110,90 +131,84 @@ const AiChatHistory = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <CircleLoader color={'var(--color-primary)'} size={50} />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <p className="text-red-500">{error}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex flex-col h-full w-full p-6 overflow-auto">
-      <div className="max-w-4xl w-full mx-auto">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-[2.125rem] leading-tight font-bold text-black dark:text-white">
-            {t('assistant.chatHistory')}
-          </h1>
-          <button
-            type="button"
-            aria-label={t('assistant.newChat')}
-            onClick={handleNewChat}
-            className="inline-flex items-center justify-center rounded-full p-2 bg-primary text-onPrimary hover:bg-primaryDark transition-colors"
-          >
-            <FiPlus size={24} />
-          </button>
-        </div>
+    <div className="flex flex-col h-full w-full overflow-auto">
+      <Breadcrumb />
+      <div className="flex justify-between items-center pr-4">
+        <H1>{t('assistant.chatHistory')}</H1>
+        <button
+          type="button"
+          aria-label={t('assistant.newChat')}
+          onClick={handleNewChat}
+          className="inline-flex items-center justify-center rounded-full p-2 bg-primary text-onPrimary hover:bg-primaryDark transition-colors shrink-0"
+        >
+          <FiPlus size={24} />
+        </button>
+      </div>
 
-        {/* Chat List */}
-        {chats.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <FiMessageSquare size={64} className="text-gray-400 dark:text-gray-600 mb-4" />
-            <p className="text-xl text-gray-600 dark:text-gray-400 mb-2">
-              {t('assistant.noChats')}
-            </p>
-            <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
-              {t('assistant.startFirstChat')}
-            </p>
-            <button
-              onClick={handleNewChat}
-              className="bg-primary text-onPrimary px-6 py-3 rounded-lg hover:bg-primaryDark transition-colors mt-5"
-            >
-              {t('assistant.newChat')}
-            </button>
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {chats.map((chat) => (
-              <div
-                key={chat.chatId}
-                onClick={() => handleChatClick(chat)}
-                className="cursor-pointer rounded-lg bg-white dark:bg-[#27272a] shadow-[0px_2px_1px_-1px_rgba(0,0,0,0.2),0px_1px_1px_0px_rgba(0,0,0,0.14),0px_1px_3px_0px_rgba(0,0,0,0.12)] transition-all hover:shadow-lg hover:-translate-y-0.5"
+      {isLoading ? (
+        <div className="max-w-4xl w-full mx-auto px-6 pb-6 flex flex-col gap-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <ChatRowSkeleton key={i} />
+          ))}
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center flex-1">
+          <p className="text-red-500">{error}</p>
+        </div>
+      ) : (
+        <div className="max-w-4xl w-full mx-auto px-6 pb-6">
+          {/* Chat List */}
+          {chats.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <FiMessageSquare size={64} className="text-gray-400 dark:text-gray-600 mb-4" />
+              <p className="text-xl text-gray-600 dark:text-gray-400 mb-2">
+                {t('assistant.noChats')}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
+                {t('assistant.startFirstChat')}
+              </p>
+              <button
+                onClick={handleNewChat}
+                className="bg-primary text-onPrimary px-6 py-3 rounded-lg hover:bg-primaryDark transition-colors mt-5"
               >
-                <div className="p-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="text-xl font-semibold text-black dark:text-white mb-1">
-                        {chat.title || t('assistant.untitledChat')}
-                      </p>
-                      {chat.lastMessage && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
-                          {chat.lastMessage.text}
+                {t('assistant.newChat')}
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {chats.map((chat) => (
+                <div
+                  key={chat.chatId}
+                  onClick={() => handleChatClick(chat)}
+                  className="cursor-pointer rounded-lg bg-white dark:bg-[#27272a] shadow-[0px_2px_1px_-1px_rgba(0,0,0,0.2),0px_1px_1px_0px_rgba(0,0,0,0.14),0px_1px_3px_0px_rgba(0,0,0,0.12)] transition-all hover:shadow-lg hover:-translate-y-0.5"
+                >
+                  <div className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="text-xl font-semibold text-black dark:text-white mb-1">
+                          {chat.title || t('assistant.untitledChat')}
                         </p>
-                      )}
-                      <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
-                        <span>{t('assistant.messages', { count: chat.messageCount })}</span>
-                        <span>•</span>
-                        <span>{formatDate(chat.lastMessage.timestamp)}</span>
+                        {chat.lastMessage && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
+                            {chat.lastMessage.text}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
+                          <span>{t('assistant.messages', { count: chat.messageCount })}</span>
+                          <span>•</span>
+                          <span>{formatDate(chat.lastMessage.timestamp)}</span>
+                        </div>
                       </div>
+                      <FiMessageSquare size={24} className="text-gray-400 dark:text-gray-600 ml-4" />
                     </div>
-                    <FiMessageSquare size={24} className="text-gray-400 dark:text-gray-600 ml-4" />
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
