@@ -362,6 +362,48 @@ function PastCard({
   );
 }
 
+function LoanRowSkeleton() {
+  return (
+    <div className="w-full bg-zinc-300 dark:bg-darkGray rounded-[6px] p-3 flex gap-3 animate-pulse">
+      <div className="w-[55px] h-[78px] flex-shrink-0 rounded-[4px] bg-zinc-300 dark:bg-strongDarkGray" />
+      <div className="flex-1 min-w-0 flex flex-col gap-2 justify-between py-0.5">
+        <div className="flex items-start justify-between gap-2 flex-wrap">
+          <div className="min-w-0 flex flex-col gap-2">
+            <div className="h-4 w-40 rounded-md bg-zinc-300 dark:bg-strongDarkGray" />
+            <div className="h-3 w-24 rounded-md bg-zinc-300 dark:bg-strongDarkGray" />
+          </div>
+          <div className="h-[28px] w-[150px] rounded-[6px] bg-zinc-300 dark:bg-strongDarkGray" />
+        </div>
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex gap-[6px]">
+            <div className="h-[16px] w-[110px] rounded-[4px] bg-zinc-300 dark:bg-strongDarkGray" />
+            <div className="h-[16px] w-[90px] rounded-[4px] bg-zinc-300 dark:bg-strongDarkGray" />
+          </div>
+          <div className="flex gap-[10px]">
+            <div className="h-[34px] w-[100px] rounded-[6px] bg-zinc-300 dark:bg-strongDarkGray" />
+            <div className="h-[34px] w-[100px] rounded-[6px] bg-zinc-300 dark:bg-strongDarkGray" />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Grid-card skeleton, matching PastCard's cover-first shape.
+function LoanCardSkeleton() {
+  return (
+    <div className="flex flex-col bg-zinc-300 dark:bg-darkGray rounded-[8px] overflow-hidden animate-pulse">
+      <div className="w-full aspect-[3/4] bg-zinc-300 dark:bg-strongDarkGray" />
+      <div className="flex flex-col gap-2 p-2">
+        <div className="h-3.5 w-full rounded-md bg-zinc-300 dark:bg-strongDarkGray" />
+        <div className="h-3.5 w-2/3 rounded-md bg-zinc-300 dark:bg-strongDarkGray" />
+        <div className="h-3 w-1/2 rounded-md bg-zinc-300 dark:bg-strongDarkGray" />
+        <div className="h-[30px] w-full rounded-[6px] bg-zinc-300 dark:bg-strongDarkGray mt-1" />
+      </div>
+    </div>
+  );
+}
+
 export default function LoansCardView() {
   const { t } = useTranslation();
   const { auth } = useAuthContext();
@@ -491,7 +533,30 @@ export default function LoansCardView() {
   };
 
   if (loading) {
-    return <div className="py-8 text-center text-darkGray dark:text-zinc-400">{t(`${CARD}.loading`)}</div>;
+    return (
+      <div className="flex flex-col w-full">
+        <div className="flex flex-col gap-[20px] py-[20px]">
+          <p className="text-[18px] font-bold text-secondary dark:text-secondaryLight tracking-[0.1px]">
+            {t('license.loansPage.card.borrowedSection')}
+          </p>
+          <div className="flex flex-col gap-[12px] w-full">
+            {Array.from({ length: 1 }).map((_, i) => (
+              <LoanRowSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+        <div className="flex flex-col gap-[20px] py-[20px]">
+          <p className="text-[18px] font-bold text-secondary dark:text-secondaryLight tracking-[0.1px]">
+            {t(`${CARD}.pastSection`)}
+          </p>
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4 w-full">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <LoanCardSkeleton key={i} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
