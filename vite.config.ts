@@ -24,12 +24,15 @@ export default defineConfig({
     chunkSizeWarningLimit: 900,
     rollupOptions: {
       output: {
-        manualChunks: {
-          // Split heavy, independently-cacheable vendor groups out of the main bundle.
-          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          'vendor-viewer': ['@evilflowers/evilflowersviewer'],
-          'vendor-i18n': ['react-i18next', 'i18next'],
-          'vendor-markdown': ['react-markdown', 'remark-gfm'],
+        // rolldown (Vite's default bundler) only supports the function form of
+        // manualChunks, not Rollup's legacy object/record form.
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (/[\\/](react|react-dom|react-router-dom)[\\/]/.test(id)) return 'vendor-react';
+            if (id.includes('@evilflowers/evilflowersviewer')) return 'vendor-viewer';
+            if (/[\\/](react-i18next|i18next)[\\/]/.test(id)) return 'vendor-i18n';
+            if (/[\\/](react-markdown|remark-gfm)[\\/]/.test(id)) return 'vendor-markdown';
+          }
         },
       },
     },
