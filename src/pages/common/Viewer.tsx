@@ -1,4 +1,9 @@
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { IUserAcquisitionShare } from "../../utils/interfaces/acquisition";
@@ -8,6 +13,8 @@ import {
   THEME_TYPE,
 } from "../../utils/interfaces/general/general";
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
+import useGetEntries from "../../hooks/api/entries/useGetEntries";
+import EntryDetail from "../../components/items/entry/details/EntryDetail";
 import useGetUserAcquisition from "../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisition";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -27,6 +34,22 @@ import useUpdateAnotation from "../../hooks/api/anotations/useUpdateAnotation";
 import useUpdateAnotationItem from "../../hooks/api/anotations/anotation-items/useUpdateAnotationItem";
 import useCreateAnotationItem from "../../hooks/api/anotations/anotation-items/useCreateAnotationItem";
 import useDeleteAnotationItem from "../../hooks/api/anotations/anotation-items/useDeleteAnotationItem";
+import useAddToShelf from "../../hooks/api/my-shelf/useAddToShelf";
+import useRemoveFromShelf from "../../hooks/api/my-shelf/useRemoveFromShelf";
+
+
+interface ISuggestedEntry {
+  id: string;
+  catalog_id: string;
+  title: string;
+  authors: { name: string; surname: string }[];
+  thumbnail: string;
+  shelf_record_id?: string | null;
+}
+interface IExplainResult {
+  simple: string;
+  examples: { label: string; description: string }[];
+}
 
 const rootId = "elvira-viewer-app";
 
@@ -43,8 +66,12 @@ const Viewer = () => {
   );
 
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const addToShelf = useAddToShelf();
+  const removeFromShelf = useRemoveFromShelf();
   const createUserAcquisition = useCreateUserAcquisition();
   const { getEntryDetail } = useGetEntryDetail();
+  const getEntries = useGetEntries();
   const getUserAcquisition = useGetUserAcquisition();
   const getAnotations = useGetAnotations();
   const updateAnotation = useUpdateAnotation();
@@ -91,6 +118,88 @@ const Viewer = () => {
 
     navigate(path);
   };
+
+  // Mirrors EntryItem.tsx's openEntryDetail — same modal, same query params.
+  const openEntryDetailFunction = (entry: ISuggestedEntry) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("entry-detail-id", entry.id);
+    params.set("entry-catalog-id", entry.catalog_id);
+    setSearchParams(params);
+  };
+
+  const bookmarkToggleFunction = async (entry: ISuggestedEntry) => {
+    try {
+      if (entry.shelf_record_id != null) {
+        await removeFromShelf(entry.shelf_record_id);
+        toast.success(t("notifications.myShelf.remove.success"));
+        entry.shelf_record_id = null;
+        document.dispatchEvent(
+          new CustomEvent("shelf-updated", {
+            detail: { id: entry.id, isOnShelf: false },
+          })
+        );
+        return { isOnShelf: false, shelfRecordId: null };
+      }
+
+      const created = await addToShelf(entry.id);
+      toast.success(t("notifications.myShelf.add.success"));
+      entry.shelf_record_id = created.response.id;
+      document.dispatchEvent(
+        new CustomEvent("shelf-updated", {
+          detail: {
+            id: entry.id,
+            isOnShelf: true,
+            shelf_record_id: created.response.id,
+          },
+        })
+      );
+      return { isOnShelf: true, shelfRecordId: created.response.id };
+    } catch {
+      toast.error(
+        t(
+          entry.shelf_record_id != null
+            ? "notifications.myShelf.remove.error"
+            : "notifications.myShelf.add.error"
+        )
+      );
+      throw new Error("bookmark-toggle-failed");
+    }
+  };
+
+  const suggestionsFunction =
+    import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true"
+      ? async (kind: string): Promise<ISuggestedEntry[]> => {
+          const pageByKind: Record<string, number> = {
+            similar: 1,
+            prerequisite: 2,
+            advanced: 3,
+          };
+          const { items } = await getEntries({
+            page: pageByKind[kind] ?? 1,
+            limit: 4,
+          });
+          return items.map((entry) => ({
+            id: entry.id,
+            catalog_id: entry.catalog_id,
+            title: entry.title,
+            authors: entry.authors,
+            thumbnail: `${entry.thumbnail}?access_token=${auth?.token}`,
+            shelf_record_id: entry.shelf_record_id,
+          }));
+        }
+      : undefined;
+
+
+  const explainFunction =
+    import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true"
+      ? async (selectedText: string): Promise<IExplainResult> => ({
+          simple: `Jednoducho: ${selectedText}`,
+          examples: [
+            { label: "Príklad", description: `Kontext pre: ${selectedText}` },
+          ],
+        })
+      : undefined;
+
   const saveLayerFunc = async (
     svg: string,
     groupId: string,
@@ -199,7 +308,10 @@ const Viewer = () => {
     const styleElement = document.createElement("style");
     styleElement.id = "pdf-viewer-styles";
     styleElement.textContent = viewerStyles;
-    document.head.appendChild(styleElement);
+    document.head.insertBefore(styleElement, document.head.firstChild);
+
+    let viewerApp: { unmount: () => void } | undefined;
+    let cancelled = false;
 
     (async () => {
       try {
@@ -247,8 +359,10 @@ const Viewer = () => {
 
         setProgressBar(90);
 
+        if (cancelled) return;
+
         // Render viewer with the provided options and configurations
-        renderViewer({
+        viewerApp = renderViewer({
           rootId: `#${rootId}`,
           data: pdf,
           options: {
@@ -258,6 +372,10 @@ const Viewer = () => {
             closeFunction,
             homeFunction,
             shareFunction,
+            openEntryDetailFunction,
+            bookmarkToggleFunction,
+            suggestionsFunction,
+            explainFunction,
             editPackage: {
               saveLayerFunc,
               saveGroupFunc,
@@ -282,6 +400,9 @@ const Viewer = () => {
     })();
 
     return () => {
+      cancelled = true;
+      viewerApp?.unmount();
+
       // Remove the scoped styles
       const styleElement = document.getElementById("pdf-viewer-styles");
       if (styleElement) {
@@ -337,6 +458,10 @@ const Viewer = () => {
         </div>
       )}
       <div id={rootId}></div>
+      {/* ItemContainer (which normally hosts this) isn't rendered on this
+          route, so entry-detail-id/entry-catalog-id search params set from
+          the viewer's suggestion cards had nowhere to be picked up. */}
+      <EntryDetail triggerReload={null} />
     </>
   );
 };
