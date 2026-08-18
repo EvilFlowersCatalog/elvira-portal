@@ -5,28 +5,27 @@ import { RxCalendar } from 'react-icons/rx';
 import { HiOutlineUsers } from 'react-icons/hi';
 import { format, parseISO } from 'date-fns';
 import { toast } from 'react-toastify';
-import { ILicense } from '../../utils/interfaces/license';
+import { IReservation, RESERVATION_STATUS } from '../../utils/interfaces/reservation';
 import { problemDetailMessage } from '../../utils/problemDetail';
-import useCancelReservation from '../../hooks/api/reservations/useCancelReservation';
+import useUpdateReservation from '../../hooks/api/reservations/useUpdateReservation';
 import useFocusTrap from '../../hooks/useFocusTrap';
 
 const M = 'license.loansPage.modals';
 
 interface Props {
-  license: ILicense;
+  reservation: IReservation;
   onClose: () => void;
   onSuccess: () => void;
-  queuePosition?: number;
-  queueTotal?: number;
 }
 
-// No defaults for the queue figures: callers that don't know the real position
-// must not render an invented one. `LoansCardView` cancels a future-dated loan,
-// which has no queue at all — the previous `= 1` / `= 3` defaults showed every
-// user a fabricated "1. /3".
-export default function CancelReservationModal({ license, onClose, onSuccess, queuePosition, queueTotal }: Props) {
+/**
+ * Confirmation before a queue reservation is cancelled (PATCH `cancelled`).
+ * Cancelling reflows the positions of everyone behind, so it must not happen
+ * on a stray click.
+ */
+export default function CancelReservationModal({ reservation, onClose, onSuccess }: Props) {
   const [loading, setLoading] = useState(false);
-  const cancelReservation = useCancelReservation();
+  const { cancelReservation } = useUpdateReservation();
   const { t } = useTranslation();
   const dialogRef = useFocusTrap(true);
 
@@ -38,12 +37,16 @@ export default function CancelReservationModal({ license, onClose, onSuccess, qu
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  const expiresAt = license.expires_at ? parseISO(license.expires_at) : null;
+  const isAvailable = reservation.status === RESERVATION_STATUS.available;
+  const estimatedFrom = reservation.entry?.next_available_at
+    ? parseISO(reservation.entry.next_available_at)
+    : null;
+  const queueTotal = reservation.entry?.queue_length ?? reservation.position;
 
   const handleCancel = async () => {
     setLoading(true);
     try {
-      await cancelReservation(license.id);
+      await cancelReservation(reservation.id);
       toast.success(t(`${M}.cancelSuccess`, { defaultValue: 'The reservation was cancelled.' }));
       onSuccess();
       onClose();
@@ -82,19 +85,25 @@ export default function CancelReservationModal({ license, onClose, onSuccess, qu
           <div className="w-[55px] h-[78px] rounded-[5px] bg-gray-300 shrink-0" />
           <div className="flex flex-col gap-2 min-w-0 flex-1">
             <p className="font-semibold text-sm text-secondary dark:text-secondaryLight truncate">
-              {license.entry?.title || t(`${M}.unknownTitle`, { defaultValue: 'Unknown title' })}
+              {reservation.entry?.title || t(`${M}.unknownTitle`, { defaultValue: 'Unknown title' })}
             </p>
             <div className="flex gap-2 flex-wrap">
-              {queuePosition !== undefined && queueTotal !== undefined && (
+              {!isAvailable && (
                 <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-[7px] bg-[#ffe5dd] border border-[#c30000] text-[#c30000]">
                   <HiOutlineUsers size={12} className="shrink-0" />
-                  {t(`${M}.queuePosition`, { defaultValue: 'Your position:' })} {queuePosition}. /{queueTotal}
+                  {t(`${M}.queuePosition`, { defaultValue: 'Your position:' })} {reservation.position}. /{queueTotal}
                 </span>
               )}
-              {expiresAt && (
+              {!isAvailable && estimatedFrom && (
                 <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-[7px] bg-[#ffe5dd] border border-[#c30000] text-[#c30000]">
                   <RxCalendar size={12} className="shrink-0" />
-                  {t(`${M}.estimatedAvailability`, { defaultValue: 'Estimated availability:' })} {format(expiresAt, 'd. M. yyyy')}
+                  {t(`${M}.estimatedAvailability`, { defaultValue: 'Estimated availability:' })} {format(estimatedFrom, 'd. M. yyyy')}
+                </span>
+              )}
+              {isAvailable && (
+                <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-[7px] bg-[#ffe5dd] border border-[#c30000] text-[#c30000]">
+                  <RxCalendar size={12} className="shrink-0" />
+                  {t(`${M}.availableNowWarning`, { defaultValue: 'This copy is ready for you — cancelling passes it to the next person in line.' })}
                 </span>
               )}
             </div>

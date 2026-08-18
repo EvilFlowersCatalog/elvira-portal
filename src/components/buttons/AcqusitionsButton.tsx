@@ -4,7 +4,7 @@ import { LuRepeat2 } from "react-icons/lu";
 import { MdOutlineKeyboardReturn } from "react-icons/md";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import useGetLicenses from "../../hooks/api/licenses/useGetLicenses";
 import PDFButton from "./PDFButtons";
 import { ActionButtonStyle } from "../items/entry/details/DetailActions";
@@ -12,11 +12,10 @@ import { IEntryDetail } from "../../utils/interfaces/entry";
 import { IEntryAcquisition } from "../../utils/interfaces/acquisition";
 import { ILicense, LICENSE_STATE } from "../../utils/interfaces/license";
 import useDownloadLicense from "../../hooks/api/licenses/useDownloadLicense";
-import useCreateReservation from "../../hooks/api/reservations/useCreateReservation";
-import { problemDetailMessage } from "../../utils/problemDetail";
 import { toast } from "react-toastify";
 import ExtendLoanModal from "../modals/ExtendLoanModal";
 import ReturnBookModal from "../modals/ReturnBookModal";
+import ReserveQueueModal from "../modals/ReserveQueueModal";
 
 export default function AcquisitionsButton({
   entry,
@@ -31,14 +30,14 @@ export default function AcquisitionsButton({
 }) {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const getUserLicenses = useGetLicenses();
   const { openInThorium, downloadDirect } = useDownloadLicense();
 
-  const createReservation = useCreateReservation();
   const [activeLicense, setActiveLicense] = useState<ILicense | null>(propActiveLicense ?? null);
   const [showExtend, setShowExtend] = useState(false);
   const [showReturn, setShowReturn] = useState(false);
-  const [reserving, setReserving] = useState(false);
+  const [showReserve, setShowReserve] = useState(false);
 
   useEffect(() => {
     if (propActiveLicense !== undefined) {
@@ -141,44 +140,46 @@ export default function AcquisitionsButton({
 
   if (isReadiumEnabled) {
     // Already in the queue for this title (real Reservation, not a ready licence).
+    // Links to the loans page where the reservation can be tracked or cancelled.
     if (entry.user_reservation_id) {
       return (
-        <div className={`${ActionButtonStyle} w-full`} style={{ cursor: "default" }}>
+        <button
+          type="button"
+          className={`${ActionButtonStyle} w-full cursor-pointer`}
+          onClick={() => navigate("/loans")}
+        >
           <HiOutlineUsers size={24} className="flex-shrink-0" />
           {entry.user_position
             ? t("entry.detail.queuePosition", { position: entry.user_position, defaultValue: `In queue · #${entry.user_position}` })
             : t("entry.detail.reserved", { defaultValue: "Reserved" })}
-        </div>
+        </button>
       );
     }
 
-    // No free slots -> the only action is to join the queue. Borrowing here would
-    // just 409 ("no available slots"), so offer Reserve instead of Borrow.
-    if (entry.lcp_state === "fully_borrowed") {
+    // No slot free right now (`fully_borrowed`, or `available_in_days` while an
+    // available reservation holds a virtual slot) -> the only action is to join
+    // the queue; borrowing would just 409 ("no available slots").
+    if (entry.lcp_state === "fully_borrowed" || entry.lcp_state === "available_in_days") {
       return (
-        <button
-          type="button"
-          disabled={reserving}
-          aria-label={t("entry.detail.reserve", { defaultValue: "Reserve" })}
-          className={`${ActionButtonStyle} w-full ${reserving ? "opacity-60 cursor-wait" : "cursor-pointer"}`}
-          onClick={async () => {
-            if (reserving) return;
-            setReserving(true);
-            try {
-              await createReservation(entry.id);
-              toast.success(t("entry.detail.reserveSuccess", { defaultValue: "Added to the queue. We'll email you when it's available." }));
-              onRefresh?.();
-            } catch (e) {
-              toast.error(problemDetailMessage(e, t("entry.detail.reserveFailed", { defaultValue: "Could not reserve. Try again." })));
-            } finally {
-              setReserving(false);
-            }
-          }}
-        >
-          <HiOutlineUsers size={24} className="flex-shrink-0" />
-          {t("entry.detail.reserve", { defaultValue: "Reserve" })}
-          {entry.queue_length ? ` (${entry.queue_length})` : ""}
-        </button>
+        <>
+          <button
+            type="button"
+            aria-label={t("entry.detail.reserve", { defaultValue: "Reserve" })}
+            className={`${ActionButtonStyle} w-full cursor-pointer`}
+            onClick={() => setShowReserve(true)}
+          >
+            <HiOutlineUsers size={24} className="flex-shrink-0" />
+            {t("entry.detail.reserve", { defaultValue: "Reserve" })}
+            {entry.queue_length ? ` (${entry.queue_length})` : ""}
+          </button>
+          {showReserve && (
+            <ReserveQueueModal
+              entry={entry}
+              onClose={() => setShowReserve(false)}
+              onSuccess={() => onRefresh?.()}
+            />
+          )}
+        </>
       );
     }
 

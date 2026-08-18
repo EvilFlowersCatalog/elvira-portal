@@ -706,14 +706,29 @@ export const sk = {
         success: 'Prístupová fráza bola úspešne uložená.',
         error: 'Nepodarilo sa uložiť prístupovú frázu.',
       },
-      notifications: {
+      contacts: {
         title: 'Notifikácie',
-        loanEnd: 'Koniec výpožičky',
-        loanEndDesc: 'Upozorniť 1 deň pred koncom výpožičky',
-        newBooks: 'Novinky v knižnici',
-        newBooksDesc: 'Dostávať upozornenia o nových knihách',
-        reservationChange: 'Zmena rezervácie',
-        reservationChangeDesc: 'Upozorniť na zmenu dostupnosti rezervovanej knihy',
+        infoLabel: 'O notifikačných adresách',
+        description: 'Upozornenia o rezerváciách a výpožičkách posielame na tieto e-mailové adresy.',
+        ldapNote:
+          'Ak sa prihlasujete univerzitným (AIS) kontom, e-mail z adresára sa doplní automaticky pri každom prihlásení — adresa odstránená tu sa znova objaví. Ručne pridané adresy slúžia ako náhrada alebo pre neuniverzitné kontá.',
+        empty: 'Žiadna e-mailová adresa — nebudete dostávať upozornenia o rezerváciách ani výpožičkách.',
+        primary: 'Hlavná',
+        setPrimary: 'Nastaviť ako hlavnú',
+        setPrimaryFailed: 'Nepodarilo sa nastaviť ako hlavnú.',
+        delete: 'Odstrániť',
+        confirmDelete: 'Naozaj odstrániť?',
+        keep: 'Ponechať',
+        deleted: 'E-mailová adresa bola odstránená.',
+        deleteFailed: 'Nepodarilo sa odstrániť e-mailovú adresu.',
+        placeholder: 'E-mailová adresa',
+        invalidEmail: 'Zadajte platnú e-mailovú adresu.',
+        add: 'Pridať',
+        adding: 'Ukladám...',
+        added: 'E-mailová adresa bola uložená.',
+        addFailed: 'Nepodarilo sa uložiť e-mailovú adresu.',
+        nudge: 'Pridajte si e-mailovú adresu, aby sme vás mohli upozorniť, keď bude kniha dostupná.',
+        nudgeAction: 'Pridať e-mailovú adresu',
       },
     },
 
@@ -867,16 +882,17 @@ export const sk = {
 
     license: {
       queue: {
-        title: 'Front výpožičiek',
-        status: 'Stav rady',
-        alreadyBorrowed: 'Už vypožičané. Pripravené na stiahnutie.',
-        download: 'Stiahnuť výpožičku',
-        loading: 'Kontrolujem dostupnosť...',
-        availableIn: 'Dostupné na výpožičku o {{days}} dní',
-        availableNow: 'Dostupné na výpožičku teraz',
-        borrow: 'Vypožičať na 7 dní',
-        noWindow: 'V najbližších {{days}} dňoch nie je dostupné 7-dňové okno',
-        note: 'Výpožičky sú na 7-dňové okná. Ak je najbližší termín v budúcnosti, počkajte, kým sa otvorí.',
+        title: 'Zaradiť sa do poradovníka?',
+        allBorrowed: 'Všetky výtlačky ({{total}}) sú momentálne požičané. Hneď ako bude niektorý dostupný, pošleme vám e-mail.',
+        waiting: 'Čakajúci: {{waitingCount}}',
+        nextReturn: 'Najbližšie vrátenie ~{{date}}',
+        join: 'Zaradiť sa',
+        joining: 'Zaraďujem…',
+        joined: 'Ste {{position}}. v poradí. Keď na vás príde rad, pošleme vám e-mail.',
+        joinFailed: 'Nepodarilo sa zaradiť do poradovníka. Skúste to znova.',
+        dismiss: 'Teraz nie',
+        alreadyQueued: 'V poradovníku na túto knihu už ste.',
+        alreadyBorrowed: 'Túto knihu už máte požičanú.',
       },
       calendar: {
         title: 'Kalendár výpožičiek',
@@ -966,6 +982,7 @@ export const sk = {
           maxRenewals: ' Maximálny počet predĺžení: {{max}}.',
           embargoNotice: 'Túto výpožičku bude možné predĺžiť až od {{date}}.',
           capReachedNotice: 'Dosiahli ste maximálny počet predĺžení.',
+          availableNowWarning: 'Tento výtlačok je pripravený pre vás — zrušením ho posuniete ďalšiemu v poradí.',
         },
         table: {
           title: 'Počet výpožičiek: {{x}}',
@@ -984,6 +1001,23 @@ export const sk = {
           actions: 'Akcie',
         },
       }
+    },
+
+    // Stránka vyzdvihnutia rezervácie z e-mailu (/library/reservations/:id/claim)
+    claim: {
+      title: 'Vyzdvihnutie rezervácie',
+      loading: 'Načítavam…',
+      prompt: 'Výtlačok je pripravený pre vás.',
+      deadline: 'Vyzdvihnite do {{date}}',
+      confirm: 'Vyzdvihnúť',
+      claiming: 'Vyzdvihujem…',
+      success: 'Vyzdvihnuté! Kniha je vo vašich výpožičkách.',
+      failed: 'Nepodarilo sa vyzdvihnúť. Lehota už mohla uplynúť.',
+      notFound: 'Rezervácia sa nenašla, už bola vyzdvihnutá alebo lehota na vyzdvihnutie uplynula.',
+      loadFailed: 'Rezerváciu sa nepodarilo načítať.',
+      passphraseRequired: 'Pred otvorením vypožičaných kníh si musíte nastaviť prístupovú frázu.',
+      setPassphrase: 'Nastaviť prístupovú frázu',
+      goToLoans: 'Prejsť na výpožičky',
     },
 
     dropzone: {

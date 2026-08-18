@@ -712,14 +712,29 @@ export const en = {
         success: 'Passphrase was successfully saved.',
         error: 'Failed to save passphrase.',
       },
-      notifications: {
+      contacts: {
         title: 'Notifications',
-        loanEnd: 'Loan End',
-        loanEndDesc: 'Notify 1 day before the loan ends',
-        newBooks: 'Library News',
-        newBooksDesc: 'Receive notifications about new books',
-        reservationChange: 'Reservation Change',
-        reservationChangeDesc: 'Notify on availability change of a reserved book',
+        infoLabel: 'About notification addresses',
+        description: 'Reservation and loan notifications are sent to these email addresses.',
+        ldapNote:
+          'If you sign in with a university (AIS) account, your directory email is filled in automatically on each login — an address deleted here will reappear. Manual entries are for overrides and non-university accounts.',
+        empty: "No email address — you won't receive reservation or loan notifications.",
+        primary: 'Primary',
+        setPrimary: 'Set as primary',
+        setPrimaryFailed: 'Could not set as primary.',
+        delete: 'Remove',
+        confirmDelete: 'Really remove?',
+        keep: 'Keep',
+        deleted: 'Email address removed.',
+        deleteFailed: 'Could not remove the email address.',
+        placeholder: 'Email address',
+        invalidEmail: 'Enter a valid email address.',
+        add: 'Add',
+        adding: 'Saving...',
+        added: 'Email address saved.',
+        addFailed: 'Could not save the email address.',
+        nudge: 'Add an email address so we can notify you when the book is available.',
+        nudgeAction: 'Add email address',
       },
     },
 
@@ -879,16 +894,17 @@ export const en = {
 
     license: {
       queue: {
-        title: 'Borrow queue',
-        status: 'Queue status',
-        alreadyBorrowed: 'Already borrowed. Ready to download.',
-        download: 'Download loan',
-        loading: 'Checking availability...',
-        availableIn: 'Available to lend in {{days}} days',
-        availableNow: 'Available to lend now',
-        borrow: 'Borrow for 7 days',
-        noWindow: 'No 7-day window in the next {{days}} days',
-        note: 'Loans are issued in 7-day windows. If the closest slot is in the future, wait until it opens to borrow.',
+        title: 'Join the waiting list?',
+        allBorrowed: "All {{total}} copies are currently on loan. We'll email you as soon as one is available for you.",
+        waiting: 'Waiting: {{waitingCount}}',
+        nextReturn: 'Next return expected ~{{date}}',
+        join: 'Join the queue',
+        joining: 'Joining…',
+        joined: "You are #{{position}} in line. We'll email you when it's your turn.",
+        joinFailed: 'Could not join the queue. Try again.',
+        dismiss: 'Not now',
+        alreadyQueued: 'You are already in the queue for this book.',
+        alreadyBorrowed: 'You already have this book on loan.',
       },
       calendar: {
         title: 'License Calendar',
@@ -975,6 +991,7 @@ export const en = {
           maxRenewals: ' Maximum number of renewals: {{max}}.',
           embargoNotice: 'This loan can be extended starting {{date}}.',
           capReachedNotice: 'You have reached the maximum number of renewals.',
+          availableNowWarning: 'This copy is ready for you — cancelling passes it to the next person in line.',
         },
         table: {
           title: 'Amount of loans: {{x}}',
@@ -993,6 +1010,23 @@ export const en = {
           actions: 'Actions',
         }
       }
+    },
+
+    // Email claim deep link page (/library/reservations/:id/claim)
+    claim: {
+      title: 'Claim your reservation',
+      loading: 'Loading…',
+      prompt: 'A copy is available for you.',
+      deadline: 'Claim before {{date}}',
+      confirm: 'Claim now',
+      claiming: 'Claiming…',
+      success: 'Claimed! The book is now in your loans.',
+      failed: 'Could not claim. The window may have passed.',
+      notFound: 'Reservation not found, already claimed, or the pickup window has expired.',
+      loadFailed: 'Could not load the reservation.',
+      passphraseRequired: 'You need to set a reading passphrase before you can open borrowed books.',
+      setPassphrase: 'Set reading passphrase',
+      goToLoans: 'Go to my loans',
     },
 
     dropzone: {

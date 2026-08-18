@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { addDays, format } from "date-fns";
 import { CircleLoader } from "react-spinners";
 import { toast } from "react-toastify";
@@ -18,6 +18,15 @@ import useAuthContext from "../../../../hooks/contexts/useAuthContext";
 import { ILicense } from "../../../../utils/interfaces/license";
 import useCreateLicense from "../../../../hooks/api/licenses/useCreateLicense";
 import useDownloadLicense from "../../../../hooks/api/licenses/useDownloadLicense";
+import ReserveQueueModal from "../../../modals/ReserveQueueModal";
+import {
+  CONFLICT_REASON,
+  getConflictReasonCode,
+  getNoSlotsConflict,
+  isPassphraseRequired,
+  problemDetailMessage,
+  INoSlotsConflictData,
+} from "../../../../utils/problemDetail";
 
 type View = 'main' | 'passphrase' | 'success';
 type Duration = '1week' | '2weeks';
@@ -46,6 +55,9 @@ export default function LicenseCalendar() {
   const [isCreatingLicense, setIsCreatingLicense] = useState(false);
   const [view, setView] = useState<View>('main');
   const [createdLicense, setCreatedLicense] = useState<ILicense | null>(null);
+  // Set when a borrow raced into a 409 `no_available_slots` — offers the queue.
+  const [slotsConflict, setSlotsConflict] = useState<INoSlotsConflictData | null>(null);
+  const navigate = useNavigate();
   const [selectedDuration, setSelectedDuration] = useState<Duration>('1week');
   const [showHowItWorks, setShowHowItWorks] = useState(false);
 
@@ -124,8 +136,28 @@ export default function LicenseCalendar() {
       });
       setCreatedLicense(license);
       setView('success');
-    } catch {
-      toast.error(t("notifications.license.create.error"));
+    } catch (e) {
+      // 409 conflicts carry a machine-readable reason_code (see integration spec).
+      const noSlots = getNoSlotsConflict(e);
+      if (noSlots) {
+        if (noSlots.user_reservation_id) {
+          // Race with another tab — the user already queued; don't re-post.
+          toast.info(t('license.queue.alreadyQueued', { defaultValue: 'You are already in the queue for this book.' }));
+          closeModal();
+          navigate('/loans');
+        } else {
+          setSlotsConflict(noSlots);
+        }
+      } else if (getConflictReasonCode(e) === CONFLICT_REASON.alreadyBorrowed) {
+        toast.info(t('license.queue.alreadyBorrowed', { defaultValue: 'You already have this book on loan.' }));
+        closeModal();
+        navigate('/loans');
+      } else if (isPassphraseRequired(e)) {
+        // `has_lcp_passphrase` was stale — the backend is the authority.
+        setView('passphrase');
+      } else {
+        toast.error(problemDetailMessage(e, t("notifications.license.create.error")));
+      }
     } finally {
       setIsCreatingLicense(false);
     }
@@ -172,6 +204,20 @@ export default function LicenseCalendar() {
   if (!entryId) return null;
 
   const isSubmitting = isCreatingLicense || isSavingPassphrase;
+
+  // Borrow raced into "no available slots" -> swap to the queue confirmation
+  // (fresher queue figures come from the 409 payload, not the stale entry).
+  if (slotsConflict && entry) {
+    return (
+      <ReserveQueueModal
+        entry={entry}
+        queueLength={slotsConflict.queue_length}
+        nextAvailableAt={slotsConflict.next_available_at}
+        onClose={() => { setSlotsConflict(null); closeModal(); }}
+        onSuccess={() => setSlotsConflict(null)}
+      />
+    );
+  }
 
   return (
     <div
