@@ -19,6 +19,7 @@ import useDownloadLicense from '../../../hooks/api/licenses/useDownloadLicense';
 import { isPassphraseRequired, problemDetailMessage } from '../../../utils/problemDetail';
 import ExtendLoanModal from '../../modals/ExtendLoanModal';
 import ReturnBookModal from '../../modals/ReturnBookModal';
+import CancelReservationModal from '../../modals/CancelReservationModal';
 
 /** All three cards render the same author line — the entry serializer already
  *  ships `authors`, so read it rather than printing a placeholder. */
@@ -407,7 +408,7 @@ function LoanCardSkeleton() {
 export default function LoansCardView() {
   const { t } = useTranslation();
   const { auth } = useAuthContext();
-  const { cancelReservation, claimReservation } = useUpdateReservation();
+  const { claimReservation } = useUpdateReservation();
   const { openInThorium, downloadDirect } = useDownloadLicense();
   const [, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -424,6 +425,7 @@ export default function LoansCardView() {
   const [claimingId, setClaimingId] = useState<string | null>(null);
   const [extendLicense, setExtendLicense] = useState<ILicense | null>(null);
   const [returnLicense, setReturnLicense] = useState<ILicense | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<IReservation | null>(null);
   const [showAllPast, setShowAllPast] = useState(false);
   // Collapse the history to ~two grid rows by default so it never dominates the page.
   const PAST_COLLAPSE = 12;
@@ -480,16 +482,6 @@ export default function LoansCardView() {
   const loadAll = () => {
     licensesQuery.refetch();
     reservationsQuery.refetch();
-  };
-
-  const handleCancelReservation = async (reservation: IReservation) => {
-    try {
-      await cancelReservation(reservation.id);
-      toast.success(t('license.loansPage.card.reservationCancelled', { defaultValue: 'Reservation cancelled.' }));
-      loadAll();
-    } catch (e) {
-      toast.error(problemDetailMessage(e, t('license.loansPage.card.reservationCancelFailed', { defaultValue: 'Could not cancel. Try again.' })));
-    }
   };
 
   const handleClaimReservation = async (reservation: IReservation) => {
@@ -600,7 +592,7 @@ export default function LoansCardView() {
                   token={auth?.token}
                   claiming={claimingId === reservation.id}
                   onClaim={handleClaimReservation}
-                  onCancel={handleCancelReservation}
+                  onCancel={setCancelTarget}
                   onOpenDetail={openEntryDetail}
                 />
               ))}
@@ -646,6 +638,14 @@ export default function LoansCardView() {
         <ReturnBookModal
           license={returnLicense}
           onClose={() => setReturnLicense(null)}
+          onSuccess={loadAll}
+        />
+      )}
+
+      {cancelTarget && (
+        <CancelReservationModal
+          reservation={cancelTarget}
+          onClose={() => setCancelTarget(null)}
           onSuccess={loadAll}
         />
       )}

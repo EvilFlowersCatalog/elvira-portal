@@ -16,6 +16,23 @@ export const PROBLEM_DETAIL_TYPE = {
 	passphraseRequired: 'PASSPHRASE_REQUIRED',
 } as const;
 
+/** Machine-readable borrow-conflict reasons carried in a 409's `additional_data`. */
+export const CONFLICT_REASON = {
+	noAvailableSlots: 'no_available_slots',
+	alreadyBorrowed: 'already_borrowed',
+} as const;
+
+/** `additional_data` of a 409 `no_available_slots` borrow conflict. */
+export interface INoSlotsConflictData {
+	reason_code: typeof CONFLICT_REASON.noAvailableSlots;
+	entry_id: string;
+	queue_length: number;
+	next_available_at: string | null;
+	/** Non-null when the caller already queued (e.g. a race with another tab). */
+	user_reservation_id: string | null;
+	reservations_url: string;
+}
+
 /** Unwrap the RFC 7807 body from an axios error, if present. */
 export const getProblemDetail = (e: unknown): IProblemDetail | undefined =>
 	(e as AxiosError<IProblemDetail>)?.response?.data;
@@ -26,7 +43,22 @@ export const getProblemDetail = (e: unknown): IProblemDetail | undefined =>
  * `detail_type = PASSPHRASE_REQUIRED` plus `additional_data.set_passphrase_url`.
  */
 export const isPassphraseRequired = (e: unknown): boolean =>
-	getProblemDetail(e)?.detail_type === PROBLEM_DETAIL_TYPE.passphraseRequired;
+	getProblemDetail(e)?.detail_type === PROBLEM_DETAIL_TYPE.passphraseRequired ||
+	getProblemDetail(e)?.type === '/passphrase-required';
+
+/** Borrow-conflict discriminator from a 409's `additional_data.reason_code`. */
+export const getConflictReasonCode = (e: unknown): string | undefined => {
+	const code = getProblemDetail(e)?.additional_data?.reason_code;
+	return typeof code === 'string' ? code : undefined;
+};
+
+/** Typed view of a 409 `no_available_slots` conflict, or undefined. */
+export const getNoSlotsConflict = (e: unknown): INoSlotsConflictData | undefined => {
+	const data = getProblemDetail(e)?.additional_data;
+	return data?.reason_code === CONFLICT_REASON.noAvailableSlots
+		? (data as unknown as INoSlotsConflictData)
+		: undefined;
+};
 
 /**
  * Pull the human-readable reason out of an API error.

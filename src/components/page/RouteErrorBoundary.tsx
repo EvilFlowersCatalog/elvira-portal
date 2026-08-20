@@ -30,7 +30,6 @@ class RouteErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: unknown, info: ErrorInfo) {
-    // eslint-disable-next-line no-console
     console.error('Route error boundary caught:', error, info.componentStack);
   }
 

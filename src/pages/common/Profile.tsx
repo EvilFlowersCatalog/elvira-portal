@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import PopupInfo from '../../components/common/PopupInfo';
+import NotificationContactsSection from '../../components/common/NotificationContactsSection';
 import Button from '../../components/buttons/Button';
 import ElviraInput from '../../components/inputs/ElviraInput';
 import PageLoading from '../../components/page/PageLoading';
@@ -17,8 +18,6 @@ import useLicensesQuery from '../../hooks/api/licenses/useLicensesQuery';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 import { BookmarkIcon, ClockIcon, LibraryIcon, LoansIcon } from '../../components/header/navbar/NavbarIcons';
-
-type NotificationKey = 'loanEnd' | 'newBooks' | 'reservationChange';
 
 const Profile = () => {
   const { t } = useTranslation();
@@ -55,11 +54,6 @@ const Profile = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [passphrase, setPassphrase] = useState<string>('');
   const [passphraseHint, setPassphraseHint] = useState<string>('');
-  const [notifications, setNotifications] = useState<Record<NotificationKey, boolean>>({
-    loanEnd: false,
-    newBooks: false,
-    reservationChange: false,
-  });
 
   useEffect(() => {
     setPassphraseHint(userDetails?.lcp_passphrase_hint || '');
@@ -103,16 +97,6 @@ const Profile = () => {
       setIsSubmitting(false);
     }
   };
-
-  const toggleNotification = (key: NotificationKey) => {
-    setNotifications(prev => ({ ...prev, [key]: !prev[key] }));
-  };
-
-  const notificationItems: { key: NotificationKey; label: string; desc: string }[] = [
-    { key: 'loanEnd', label: t('profile.notifications.loanEnd'), desc: t('profile.notifications.loanEndDesc') },
-    { key: 'newBooks', label: t('profile.notifications.newBooks'), desc: t('profile.notifications.newBooksDesc') },
-    { key: 'reservationChange', label: t('profile.notifications.reservationChange'), desc: t('profile.notifications.reservationChangeDesc') },
-  ];
 
   const stats: { labelKey: string; value: number; icon: ReactNode; path?: NAVIGATION_PATHS }[] = [
     { labelKey: 'profile.stats.readBooks', value: 0, icon: <LibraryIcon size={22} className='text-secondary dark:text-secondaryLight' /> },
@@ -233,37 +217,9 @@ const Profile = () => {
               </form>
             </section>
 
-            {/* Notifications section */}
-            <section className='rounded-[7px] p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] dark:shadow-[0px_4px_6px_0px_rgba(0,0,0,0.3)] border border-[#e5e5e5] dark:border-zinc-700'>
-              <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight mb-4'>
-                {t('profile.notifications.title')}
-              </h2>
-              <div className='flex flex-col divide-y divide-zinc-100 dark:divide-zinc-700'>
-                {notificationItems.map(({ key, label, desc }) => (
-                  <div key={key} className='flex items-center justify-between py-4 first:pt-0 last:pb-0'>
-                    <div className='mr-4'>
-                      <p className='text-sm font-semibold text-secondary dark:text-secondaryLight'>{label}</p>
-                      <p className='text-xs font-light text-secondary dark:text-zinc-400 mt-0.5'>{desc}</p>
-                    </div>
-                    <button
-                      type='button'
-                      role='switch'
-                      aria-checked={notifications[key]}
-                      onClick={() => toggleNotification(key)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors flex-shrink-0 ${
-                        notifications[key] ? 'bg-primary' : 'bg-zinc-300 dark:bg-zinc-600'
-                      }`}
-                    >
-                      <span
-                        className={`inline-block h-[18px] w-[18px] transform rounded-full bg-white shadow transition-transform ${
-                          notifications[key] ? 'translate-x-6' : 'translate-x-1'
-                        }`}
-                      />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </section>
+            {/* Notifications section — real notification contacts (email delivery
+                addresses); replaces the former local-state-only toggles. */}
+            <NotificationContactsSection />
           </div>
         </div>
       )}
