@@ -186,13 +186,14 @@ export default function NotificationContactsSection() {
             type='email'
             placeholder={t(`${P}.placeholder`, { defaultValue: 'Email address' })}
             invalidMessage={t(`${P}.invalidEmail`, { defaultValue: 'Enter a valid email address.' })}
+            label='false'
             required
             maxLength={256}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
         </div>
-        <Button type='submit' disabled={submitting} className='sm:mt-1'>
+        <Button type='submit' disabled={submitting}>
           {submitting
             ? t(`${P}.adding`, { defaultValue: 'Saving...' })
             : t(`${P}.add`, { defaultValue: 'Add' })}

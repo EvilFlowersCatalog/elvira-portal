@@ -700,6 +700,8 @@ export const sk = {
         description: 'Nastavte prístupovú frázu pre svoj účet.',
         placeholder: 'Prístupová fráza',
         hintPlaceholder: 'Nápoveda k prístupovej fráze',
+        hintInfo: 'Voliteľná pripomienka, ktorá vám pomôže zapamätať si prístupovú frázu. Je viditeľná iba vám tu, preto sem nepíšte samotnú frázu.',
+        hintInfoLabel: 'O nápovede k prístupovej fráze',
         required: 'Prístupová fráza je povinná.',
         saveButton: 'Uložiť',
         saving: 'Ukladám...',

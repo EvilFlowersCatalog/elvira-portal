@@ -706,6 +706,8 @@ export const en = {
         description: 'Set a passphrase for your account.',
         placeholder: 'Passphrase',
         hintPlaceholder: 'Passphrase hint',
+        hintInfo: 'An optional reminder to help you recall your passphrase. It is visible to you here, so avoid writing the passphrase itself.',
+        hintInfoLabel: 'About the passphrase hint',
         required: 'Passphrase is required.',
         saveButton: 'Save',
         saving: 'Saving...',

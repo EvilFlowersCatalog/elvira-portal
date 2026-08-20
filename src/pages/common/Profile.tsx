@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { FiHelpCircle } from 'react-icons/fi';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import PopupInfo from '../../components/common/PopupInfo';
 import NotificationContactsSection from '../../components/common/NotificationContactsSection';
@@ -197,6 +198,7 @@ const Profile = () => {
                   placeholder={t('profile.passphrase.placeholder')}
                   invalidMessage={t('profile.passphrase.required')}
                   required
+                  label='false'
                   minLength={4}
                   maxLength={256}
                   value={passphrase}
@@ -204,6 +206,10 @@ const Profile = () => {
                 />
                 <ElviraInput
                   type='text'
+                  label='icon'
+                  icon={<FiHelpCircle size={16} />}
+                  tooltip={t('profile.passphrase.hintInfo')}
+                  tooltipLabel={t('profile.passphrase.hintInfoLabel')}
                   placeholder={t('profile.passphrase.hintPlaceholder')}
                   maxLength={256}
                   value={passphraseHint}
