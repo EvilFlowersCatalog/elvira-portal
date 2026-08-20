@@ -1,17 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { CircleLoader } from 'react-spinners';
 import { RiAddLine, RiBookmarkFill, RiBookmarkLine, RiChatQuoteLine, RiCloseLine, RiShareLine } from 'react-icons/ri';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
-import useAuthContext from '../../../../hooks/contexts/useAuthContext';
 import { IEntryDetail } from '../../../../utils/interfaces/entry';
+import { ILicense, LICENSE_STATE } from '../../../../utils/interfaces/license';
 import useGetEntryDetail from '../../../../hooks/api/entries/useGetEntryDetail';
 import useAddToShelf from '../../../../hooks/api/my-shelf/useAddToShelf';
 import useRemoveFromShelf from '../../../../hooks/api/my-shelf/useRemoveFromShelf';
 import { NAVIGATION_PATHS } from '../../../../utils/interfaces/general/general';
 import ShelfButton from '../../../buttons/ShelfButton';
+import Thumbnail from '../Thumbnail';
 import { TabContent, Tabs, TabsComponent, TabsHeader, TabTitle } from './EntryDetailTabs';
 import { InfoGrid, InfoItem, InfoItemCustom } from './EntryGrid';
 import { SummaryText } from './SummaryText';
@@ -21,11 +22,10 @@ import { ActionButtonStyle, ActionsButton, ActionsWrapper } from './DetailAction
 import { AcceptedLanguage, getLanguage } from '../../../../hooks/api/languages/languages';
 import AcquisitionsButton from '../../../buttons/AcqusitionsButton';
 import DetailModal from '../../../modals/DetailModal';
-import useGetAvailability from '../../../../hooks/api/licenses/useGetAvailability';
-import { IAvailabilityResponse } from '../../../../utils/interfaces/license';
-import { Tooltip } from '@mui/material';
 import { twMerge } from 'tailwind-merge';
 import EntryItem from '../display/EntryItem';
+import { AvailabilityBadge, AvailabilityState } from './AvailabilityBadge';
+import Tooltip from '../../../primitives/Tooltip';
 
 interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
@@ -33,7 +33,6 @@ interface IEntryDetailParams {
 
 const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const { setShowAiAssistant, umamiTrack } = useAppContext();
-  const { auth } = useAuthContext();
   const { t, i18n } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -42,7 +41,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const [catalogId, setCatalogId] = useState<string | null>(null);
 
   const [entry, setEntry] = useState<IEntryDetail | null>(null);
-  const [availability, setAvailability] = useState<IAvailabilityResponse | null>(null);
   const chapters = ["Introduction", "Chapter 1", "Chapter 2"];
   const reviews = [
     {
@@ -62,13 +60,14 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     },
   ]
 
+  const [activeLicense, setActiveLicense] = useState<ILicense | null>(null);
   const [update, setUpdate] = useState<boolean>(false);
+  const prevLicensingEntryId = useRef<string | null>(null);
 
   const location = useLocation();
   const navigate = useNavigate();
 
-  const getEntryDetail = useGetEntryDetail();
-  const getAvailability = useGetAvailability();
+  const { getEntryDetailWithLicense } = useGetEntryDetail();
   const addToShelf = useAddToShelf();
   const removeFromShelf = useRemoveFromShelf();
 
@@ -164,28 +163,31 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   useEffect(() => {
     const paramEntryId = searchParams.get('entry-detail-id');
     const paramCatalogId = searchParams.get('entry-catalog-id');
+    const paramLicensingId = searchParams.get('licensing-entry-id');
     setEntryId(paramEntryId);
     setCatalogId(paramCatalogId);
+    // When the borrow modal closes for this entry, trigger a license refetch
+    if (prevLicensingEntryId.current === paramEntryId && !paramLicensingId && paramEntryId) {
+      setUpdate((u) => !u);
+    }
+    prevLicensingEntryId.current = paramLicensingId;
   }, [searchParams]);
 
   // If entryId is changed
   useEffect(() => {
-    // Reset
     setEntry(null);
     if (!entryId) return;
 
     (async () => {
       try {
-        const entryDetail = await getEntryDetail(entryId, catalogId || undefined);
+        const { entry: entryDetail, activeLicense: license } = await getEntryDetailWithLicense(entryId, catalogId || undefined);
         setEntry(entryDetail);
-        if(import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
-          const entryAvailability = await getAvailability(new Date(), new Date(), entryId);
-          setAvailability(entryAvailability);
-        }
-        } catch (error) {
-          setEntry(null);
-        }
-      })();
+        setActiveLicense(license);
+      } catch {
+        setEntry(null);
+        setActiveLicense(null);
+      }
+    })();
   }, [entryId, update]);
 
   const askAi = () => {
@@ -196,6 +198,40 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     setSearchParams(params);
   };
 
+
+  const getAvailabilityBadge = (): { state: AvailabilityState; date: string | null; position?: number | null; days?: number | null } | null => {
+    if (!entry?.config?.readium_enabled) return null;
+
+    const isActiveLoan =
+      activeLicense?.state === LICENSE_STATE.active &&
+      (!activeLicense?.expires_at || new Date(activeLicense.expires_at) > new Date());
+
+    if (isActiveLoan && activeLicense) {
+      return { state: 'borrowed', date: activeLicense.expires_at };
+    }
+
+    if (activeLicense?.state === LICENSE_STATE.ready) {
+      return { state: 'reserved', date: activeLicense.starts_at, position: entry.user_position ?? null };
+    }
+
+    const lcpState = entry.lcp_state;
+    if (lcpState === 'available_now') return { state: 'available', date: null };
+
+    if (lcpState === 'available_in_days') {
+      const days = entry.next_available_at
+        ? Math.max(0, Math.ceil((new Date(entry.next_available_at).getTime() - Date.now()) / 86_400_000))
+        : null;
+      return { state: 'unavailable', date: entry.next_available_at ?? null, days };
+    }
+
+    if (lcpState === 'fully_borrowed') {
+      return { state: 'unavailable', date: null, position: entry.user_position ?? null };
+    }
+
+    return null;
+  };
+
+  const availabilityBadge = getAvailabilityBadge();
 
   if (!entryId) return <></>;
 
@@ -217,15 +253,26 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       ) : (
         <div className={'flex h-full flex-col mdlg:flex-row'}>
           <div className='p-8 bg-lightGray dark:bg-darkGray h-full min-w-[400px] flex flex-col'>
-            <div className={`w-full flex justify-center border rounded-md flex-shrink overflow-hidden h-full`}>
-              <img className={'w-full h-full object-cover'}
-                src={entry.thumbnail + `?access_token=${auth?.token}`}
-                alt='Entry Thumbnail'
-              />
-            </div>
+            <Thumbnail
+              thumbnail={entry.thumbnail}
+              alt='Entry Thumbnail'
+              wrapperClassName='w-full flex justify-center border rounded-md flex-shrink h-full'
+            />
+
+            {entry?.config?.readium_enabled && (
+              <div className="flex justify-center mt-2">
+                {availabilityBadge ? (
+                  <AvailabilityBadge state={availabilityBadge.state} date={availabilityBadge.date} position={availabilityBadge.position} days={availabilityBadge.days} />
+                ) : (
+                  <div className="w-full h-[24px] rounded-md bg-zinc-200 dark:bg-zinc-700 animate-pulse" />
+                )}
+              </div>
+            )}
 
             <ActionsWrapper>
-              <AcquisitionsButton acquisitions={entry.acquisitions} availability={availability} entry={entry} />
+              <div className="col-span-2">
+                <AcquisitionsButton acquisitions={entry.acquisitions} entry={entry} activeLicense={activeLicense} onRefresh={() => setUpdate(u => !u)} />
+              </div>
               <ShelfButton
                 isLoading={isLoading}
                 entryId={entryId!}
@@ -280,6 +327,20 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               <InfoItem label={t('entry.detail.publishDate')}>{entry.published_at ? new Date(entry.published_at).toLocaleDateString('sk-SK', { year: 'numeric', }) : '-'}</InfoItem>
               <InfoItem label={t('entry.detail.lang')}>{getLanguage(entry.language?.alpha2 || '')?.name[i18n.language as AcceptedLanguage]}</InfoItem>
 
+              {/* Loan capacity (readium_amount). Only meaningful for LCP entries.
+                  `over_saturated` means more loans are live than the cap allows —
+                  the backend surfaces that rather than silently clamping it. */}
+              {entry.lcp_state !== 'not_lcp' && (
+                <>
+                  <InfoItem label={t('entry.detail.activeSlots')}>
+                    <span className={entry.over_saturated ? 'text-red-600 dark:text-red-400 font-bold' : undefined}>
+                      {entry.active_count} / {entry.total_slots}
+                    </span>
+                  </InfoItem>
+                  <InfoItem label={t('entry.detail.availableSlots')}>{entry.available_slots}</InfoItem>
+                </>
+              )}
+
               <InfoItemCustom label={t('entry.detail.categories')}>
                 <div className="flex flex-col gap-1">
                   {entry.categories.length === 0 ? (
@@ -303,8 +364,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               </InfoItemCustom>
             </InfoGrid>
 
-            { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
-              <Tooltip title={t('entry.detail.askAi')} placement='left'>
+              <Tooltip content={t('entry.detail.askAi')} placement='left'>
                 <button
                   className="absolute right-6 bottom-4 p-3 rounded-full bg-primary text-white font-semibold hover:bg-primaryDark transition-colors duration-150 hidden mdlg:block"
                   onClick={askAi}
@@ -317,7 +377,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                   </div>
                 </button>
               </Tooltip>
-            )}
 
             {/* TABS */}
             {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (

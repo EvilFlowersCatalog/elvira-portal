@@ -11,10 +11,9 @@ import { toast } from 'react-toastify';
 import FormModal from '../../../../components/modals/FormModal';
 import ElviraInput from '../../../../components/inputs/ElviraInput';
 import ElviraTextarea from '../../../../components/inputs/ElviraTextarea';
-import { MUISelectStyle } from '../../../inputs/ElviraSelect';
 import FeedAutofill from '../../../autofills/FeedAutofill';
 import { MdRemoveCircle } from 'react-icons/md';
-import { MenuItem, Select } from '@mui/material';
+import Select from '../../../primitives/Select';
 
 interface IFeedForm {
   setOpen: (open: boolean) => void;
@@ -65,10 +64,10 @@ const FeedForm = ({
     }));
   };
   // set kind
-  const handleKindChange = (e: any) => {
+  const handleKindChange = (value: string) => {
     setForm((prevForm) => ({
       ...prevForm,
-      kind: e.target.value,
+      kind: value,
     }));
   };
 
@@ -184,7 +183,7 @@ const FeedForm = ({
             <div className='w-full md:w-1/2 lg:w-1/3 flex p-1' key={index}>
               <button
                 type='button'
-                className={`bg-primary p-2 text-sm hover:bg-red flex w-full gap-2 justify-between items-center text-white rounded-md`}
+                className={`bg-primary p-2 text-sm hover:bg-redText flex w-full gap-2 justify-between items-center text-white rounded-md`}
                 onClick={() => {
                   setParentFeeds((prev) => ({
                     feeds: prev.feeds.filter(
@@ -201,25 +200,20 @@ const FeedForm = ({
         </div>
 
         {/* Kind */}
-        <div className='flex w-full flex-col text-left'>
-          <label htmlFor='selection-kind' className={`text-sm pl-1 text-primary`}>
+        <div className='flex w-full flex-col gap-1 text-left'>
+          <label htmlFor='selectionKind' className={`text-sm pl-1 text-primary`}>
             {t('modal.feedForm.kind')}
           </label>
-            <Select
-              className="dark:text-white"
-              sx={MUISelectStyle}
-              MenuProps={{ PaperProps: { sx: { "& .MuiList-root": { paddingBottom: 0, paddingTop: 0}}}}}
-              label={"Selection Kind"}
-              value={form.kind}
-              labelId='selection-kind'
-              id="selectionKind"
-              onChange={handleKindChange}
-              variant="standard"
-            >
-                <MenuItem value="acquisition">{t('modal.feedForm.acquistion')}</MenuItem>
-                <MenuItem value="navigation">{t('modal.feedForm.navigation')}</MenuItem>
-            </Select>
-            
+          <Select
+            id="selectionKind"
+            aria-label="Selection Kind"
+            value={form.kind}
+            onChange={handleKindChange}
+            options={[
+              { value: 'acquisition', label: t('modal.feedForm.acquistion') },
+              { value: 'navigation', label: t('modal.feedForm.navigation') },
+            ]}
+          />
         </div>
         <button ref={buttonRef} type='submit' className='hidden'></button>
       </form>

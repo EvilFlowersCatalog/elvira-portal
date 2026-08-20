@@ -1,20 +1,61 @@
 import { IEntryDetail } from '../../../utils/interfaces/entry';
+import { ILicense, LICENSE_STATE } from '../../../utils/interfaces/license';
 import useAxios from '../useAxios';
+import useAuthContext from '../../contexts/useAuthContext';
+
+export interface IEntryWithLicense {
+  entry: IEntryDetail;
+  activeLicense: ILicense | null;
+}
 
 const useGetEntryDetail = () => {
   const axios = useAxios();
+  const authContext = useAuthContext();
 
   const getEntryDetail = async (entryId: string, catalogId?: string): Promise<IEntryDetail> => {
-    // Use provided catalogId or fall back to env variable
     const effectiveCatalogId = catalogId || import.meta.env.ELVIRA_CATALOG_ID;
     const ENTRY_DETAIL_URL = `/api/v1/catalogs/${effectiveCatalogId}/entries/${entryId}`;
-    // Get entry detail
     const { data: entryDetail } = await axios.get<{ response: IEntryDetail }>(ENTRY_DETAIL_URL);
-    // return
     return entryDetail.response;
   };
 
-  return getEntryDetail;
+  // Fetches entry detail and the current user's active/reserved license for it in parallel.
+  const getEntryDetailWithLicense = async (entryId: string, catalogId?: string): Promise<IEntryWithLicense> => {
+    const effectiveCatalogId = catalogId || import.meta.env.ELVIRA_CATALOG_ID;
+    const ENTRY_DETAIL_URL = `/api/v1/catalogs/${effectiveCatalogId}/entries/${entryId}`;
+
+    const licenseParams = new URLSearchParams({
+      user_id: authContext.auth?.userId || '',
+      entry_id: entryId,
+      // Backend disables pagination via `paginate=false` (not `pagination`); the
+      // old key was ignored so only the first default-size page came back.
+      paginate: 'false',
+    });
+
+    const [entryRes, licenseRes] = await Promise.allSettled([
+      axios.get<{ response: IEntryDetail }>(ENTRY_DETAIL_URL),
+      axios.get<{ items: ILicense[] }>('/readium/v1/licenses', { params: licenseParams }),
+    ]);
+
+    if (entryRes.status === 'rejected') throw entryRes.reason;
+    const entry = entryRes.value.data.response;
+
+    let activeLicense: ILicense | null = null;
+    if (licenseRes.status === 'fulfilled') {
+      const now = new Date();
+      activeLicense = licenseRes.value.data.items.find((l) => {
+        const notExpired = !l.expires_at || new Date(l.expires_at) > now;
+        if (l.state === LICENSE_STATE.active) {
+          return notExpired;
+        }
+        return l.state === LICENSE_STATE.ready;
+      }) ?? null;
+    }
+
+    return { entry, activeLicense };
+  };
+
+  return { getEntryDetail, getEntryDetailWithLicense };
 };
 
 export default useGetEntryDetail;

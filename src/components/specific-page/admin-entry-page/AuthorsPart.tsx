@@ -53,29 +53,31 @@ const AuthorsPart = ({ entry, setEntry }: IPartParams) => {
   };
 
   return (
-    <div className='flex flex-col bg-slate-200 dark:bg-darkGray rounded-md p-4 gap-2'>
+    <div className='flex flex-col gap-2'>
       <div className='w-full flex items-center gap-2'>
-        <h2 className='text-lg'>{t('entry.wizard.authors')}</h2>
+        <h2 className='text-sm font-semibold text-zinc-700 dark:text-zinc-200'>{t('entry.wizard.authors')}</h2>
         <IoMdAdd onClick={addAuthor} className='ml-auto cursor-pointer' size={20} />
       </div>
       <div className='flex-1 rounded-md'>
         <div className='flex flex-col flex-1 gap-4'>
           {entry.authors?.map((_, index) => (
             <div className='flex w-full gap-4 items-center' key={index}>
-              <AuthorsAutofill
-                entryForm={entry}
-                setEntryForm={setEntry}
-                index={index}
-                authors={authors}
-                type='name'
-              />
-              <AuthorsAutofill
-                entryForm={entry}
-                setEntryForm={setEntry}
-                index={index}
-                authors={authors}
-                type='surname'
-              />
+              <div className='flex flex-col md:flex-row gap-2 w-full'>
+                <AuthorsAutofill
+                  entryForm={entry}
+                  setEntryForm={setEntry}
+                  index={index}
+                  authors={authors}
+                  type='name'
+                />
+                <AuthorsAutofill
+                  entryForm={entry}
+                  setEntryForm={setEntry}
+                  index={index}
+                  authors={authors}
+                  type='surname'
+                />
+              </div>
               <BiTrash
                 color='red'
                 size={40}

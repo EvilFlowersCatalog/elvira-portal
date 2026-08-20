@@ -1,5 +1,3 @@
-import { light } from '@mui/material/styles/createPalette';
-
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{ts,js,jsx,tsx}'],
@@ -26,10 +24,22 @@ export default {
             opacity: '1',
           },
         },
+        // Indeterminate top progress bar for background refetches.
+        loadingbar: {
+          '0%': { transform: 'translateX(-100%)' },
+          '50%': { transform: 'translateX(150%)' },
+          '100%': { transform: 'translateX(400%)' },
+        },
+        // Gentle fade-in for images/cards so content doesn't pop in.
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
       },
       animation: {
         'fly-right': 'flyRight 0.5s ease-out forwards',
         'fly-left': 'flyLeft 0.5s ease-out forwards',
+        'fade-in': 'fadeIn 0.35s ease-out forwards',
       },
       screens: {
         sm: '321px',
@@ -45,12 +55,18 @@ export default {
         // Dynamic colors based on faculty theme (CSS variables)
         primary: 'var(--color-primary)',
         primaryLight: 'var(--color-primary-light)',
+        // Contrast-aware derived tokens (see src/main.css)
+        primaryText: 'var(--color-primary-text)',
+        primaryDark: 'var(--color-primary-dark)',
+        onPrimary: 'var(--color-on-primary)',
         secondary: 'var(--color-secondary)',
         secondaryLight: 'var(--color-secondary-light)',
         lightGray: 'var(--color-light-gray)',
         darkGray: 'var(--color-dark-gray)',
         red: 'var(--color-red)',
+        redText: 'var(--color-red-text)',
         green: 'var(--color-green)',
+        greenText: 'var(--color-green-text)',
         strongDarkGray: 'var(--color-strong-dark-gray)',
       },
       flex: {

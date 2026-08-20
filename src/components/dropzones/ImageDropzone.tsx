@@ -69,7 +69,8 @@ const ImageDropzone = ({
         onClick: (e) => {
           if (fileName) e.stopPropagation();
         },
-        className: `w-full h-full flex flex-1 border-4 border-dashed border-spacing-8 border-primary rounded-md bg-primary hover:bg-opacity-30 bg-opacity-10 text-white duration-200 ${
+        // bg-primary/10 doesn't work for some reason, so using color mix as a workaround
+        className: `w-full h-full flex flex-1 border-4 border-dash/ed border-spacing-8 border-primary rounded-md bg-[color:color-mix(in_srgb,var(--color-primary)_10%,transparent)] hover:bg-[color:color-mix(in_srgb,var(--color-primary)_30%,transparent)] text-white duration-200 ${
           fileName ? '' : 'cursor-pointer'
         }`,
       })}>

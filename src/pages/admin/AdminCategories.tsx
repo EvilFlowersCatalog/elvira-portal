@@ -1,123 +1,165 @@
-import { useEffect, useState } from 'react';
-import { MdAdd } from 'react-icons/md';
-import { useSearchParams } from 'react-router-dom';
-import useGetCategories from '../../hooks/api/categories/useGetCategories';
-import ItemContainer from '../../components/items/container/ItemContainer';
-import Category from '../../components/items/categories/Category';
-import CategoryForm from '../../components/items/categories/CategoryForm';
-import useAppContext from '../../hooks/contexts/useAppContext';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
+import { FiPlus } from 'react-icons/fi';
+import useGetCategories from '../../hooks/api/categories/useGetCategories';
+import useAppContext from '../../hooks/contexts/useAppContext';
+import { ICategory } from '../../utils/interfaces/category';
+import { Metadata } from '../../utils/interfaces/general/general';
+import { PageHeader, DataTable, DataTableColumn, SortState, SearchField } from '../../components/admin';
+import Button from '../../components/buttons/Button';
+import CategoryDrawer from '../../components/admin/categories/CategoryDrawer';
+
+const DEFAULT_LIMIT = 25;
 
 const AdminCategories = () => {
-  const { umamiTrack, selectedCatalogId } = useAppContext();
-
-  const [categories, setCategories] = useState<any[]>([]);
-  const [searchParams] = useSearchParams();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [loadingNext, setLoadingNext] = useState<boolean>(false);
-  const [isError, setIsError] = useState<boolean>(false);
-  const [page, setPage] = useState<number>(0);
-  const [maxPage, setMaxPage] = useState<number>(0);
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [reloadPage, setReloadPage] = useState<boolean>(false);
-
   const { t } = useTranslation();
+  const { selectedCatalogId } = useAppContext();
   const getCategories = useGetCategories();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Reload categories when catalog changes
-  useEffect(() => {
-    setPage(0);
-    setCategories([]);
-    setIsLoading(true);
-  }, [selectedCatalogId]);
+  const [items, setItems] = useState<ICategory[]>([]);
+  const [metadata, setMetadata] = useState<Metadata>({ page: 1, limit: DEFAULT_LIMIT, pages: 1, total: 0 });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
-  // When searchParams change or is triggered reload -> Reset page
-  useEffect(() => {
-    setPage(0);
-    setCategories([]);
-    setIsLoading(true);
-  }, [reloadPage]);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('edit');
+  const [active, setActive] = useState<ICategory | null>(null);
 
-  useEffect(() => {
-    if (page === 0) {
-      setPage(1);
+  const page = parseInt(searchParams.get('page') || '1', 10);
+  const limit = parseInt(searchParams.get('limit') || String(DEFAULT_LIMIT), 10);
+  const q = searchParams.get('q') || '';
+  const orderBy = searchParams.get('order_by') || '';
+  const sort: SortState | null = orderBy
+    ? { key: orderBy.replace(/^-/, ''), dir: orderBy.startsWith('-') ? 'desc' : 'asc' }
+    : null;
+
+  const patchParams = useCallback(
+    (patch: Record<string, string | null>) => {
+      const next = new URLSearchParams(searchParams);
+      Object.entries(patch).forEach(([k, v]) => (v ? next.set(k, v) : next.delete(k)));
+      setSearchParams(next);
+    },
+    [searchParams, setSearchParams]
+  );
+
+  const fetchCategories = useCallback(async () => {
+    if (!selectedCatalogId) {
+      setItems([]);
+      setLoading(false);
       return;
     }
+    setLoading(true);
+    setError(false);
+    try {
+      const { items, metadata } = await getCategories({
+        page,
+        limit,
+        query: q || undefined,
+        orderBy: orderBy || undefined,
+        paginate: true,
+      });
+      setItems(items);
+      setMetadata(metadata);
+    } catch {
+      setError(true);
+      setItems([]);
+    } finally {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [page, limit, q, orderBy, selectedCatalogId]);
 
-    (async () => {
-      try {
-        const { items, metadata } = await getCategories({
-          page,
-          limit: 50,
-          query: searchParams.get('query') ?? '',
-          orderBy: searchParams.get('order-by') ?? '-created_at',
-        });
-        // Set items and metadata
-        setMaxPage(metadata.pages);
-        setCategories([...(categories ?? []), ...items]);
-      } catch {
-        // if there was error set to true
-        setIsError(true);
-      } finally {
-        // after everything set false
-        setIsLoading(false);
-        setLoadingNext(false);
-      }
-    })();
-  }, [page]);
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
+
+  const openEdit = (c: ICategory) => {
+    setActive(c);
+    setDrawerMode('edit');
+    setDrawerOpen(true);
+  };
+  const openCreate = () => {
+    setActive(null);
+    setDrawerMode('create');
+    setDrawerOpen(true);
+  };
+
+  const columns: DataTableColumn<ICategory>[] = [
+    {
+      id: 'label',
+      header: t('administration.categoriesPage.label'),
+      sortKey: 'label',
+      hideable: false,
+      cell: (c) => <span className="font-medium text-secondary dark:text-secondaryLight">{c.label}</span>,
+    },
+    {
+      id: 'term',
+      header: t('administration.categoriesPage.term'),
+      sortKey: 'term',
+      cell: (c) => <code className="text-xs text-zinc-500 dark:text-zinc-400">{c.term}</code>,
+    },
+    {
+      id: 'scheme',
+      header: t('administration.categoriesPage.scheme'),
+      cell: (c) => c.scheme || <span className="text-zinc-400">{t('administration.categoriesPage.none')}</span>,
+    },
+  ];
 
   return (
-    <>
-      <ItemContainer
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
-        isError={isError}
-        items={categories}
-        setItems={setCategories}
-        page={page}
-        setPage={setPage}
-        maxPage={maxPage}
-        loadingNext={loadingNext}
-        setLoadingNext={setLoadingNext}
-        isEntries={false}
-        showEmpty={false}
-        searchSpecifier={'query'}
-        title={t('administration.homePage.categories.title')}
-      >
-        <div className='grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4 p-4'>
-          {/* Add button */}
-          <div className={'w-full'}>
-            <button
-              onClick={() => {
-                umamiTrack('Add Category Button');
-                setIsOpen(true);
-              }}
-              className={`flex flex-col justify-center items-center gap-3 w-full h-full p-8 
-        rounded-xl border-4 border-dashed border-zinc-300 dark:border-zinc-600 
-        text-zinc-500 dark:text-zinc-400 hover:text-primary hover:border-primary 
-        hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all duration-200`}>
-              <MdAdd size={50} />
-            </button>
-          </div>
+    <div className="pb-10">
+      <PageHeader
+        title={t('administration.categoriesPage.title')}
+        description={t('administration.categoriesPage.description')}
+        actions={
+          <Button onClick={openCreate} disabled={!selectedCatalogId} className="flex items-center gap-2">
+            <FiPlus size={16} />
+            {t('administration.categoriesPage.add')}
+          </Button>
+        }
+      />
 
-          {categories.map((category, index) => (
-            <Category
-              key={index}
-              category={category}
-              reloadPage={reloadPage}
-              setReloadPage={setReloadPage}
-            />
-          ))}
-        </div>
-      </ItemContainer>
-      {isOpen && (
-        <CategoryForm
-          setOpen={setIsOpen}
-          reloadPage={reloadPage}
-          setReloadPage={setReloadPage}
-        />
-      )}
-    </>
+      <DataTable<ICategory>
+        caption={t('administration.categoriesPage.title')}
+        columns={columns}
+        rows={items}
+        getRowId={(c) => c.id}
+        onRowClick={openEdit}
+        loading={loading}
+        error={error ? t('administration.categoriesPage.loadError') : undefined}
+        onRetry={fetchCategories}
+        emptyTitle={selectedCatalogId ? t('administration.categoriesPage.empty') : t('administration.categoriesPage.noCatalog')}
+        emptyDescription={selectedCatalogId ? t('administration.categoriesPage.emptyHint') : undefined}
+        sort={sort}
+        onSortChange={(s) => patchParams({ order_by: s.dir === 'desc' ? `-${s.key}` : s.key, page: '1' })}
+        page={metadata.page}
+        pageCount={metadata.pages}
+        total={metadata.total}
+        pageSize={metadata.limit}
+        onPageChange={(p) => patchParams({ page: String(p) })}
+        onPageSizeChange={(n) => patchParams({ limit: String(n), page: '1' })}
+        storageKey="admin-categories"
+        toolbar={
+          <SearchField
+            value={q}
+            onChange={(v) => patchParams({ q: v || null, page: '1' })}
+            label={t('administration.categoriesPage.searchPlaceholder')}
+            placeholder={t('administration.categoriesPage.searchPlaceholder')}
+            className="max-w-sm"
+          />
+        }
+      />
+
+      <CategoryDrawer
+        open={drawerOpen}
+        category={active}
+        mode={drawerMode}
+        catalogId={selectedCatalogId}
+        onClose={() => setDrawerOpen(false)}
+        onSaved={fetchCategories}
+      />
+    </div>
   );
 };
 

@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Box, Typography, Card, CardContent, CircularProgress, IconButton } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import useGetUserChats, { IChat } from '../../hooks/api/assistant/useGetUserChats';
+import { IChat } from '../../hooks/api/assistant/useGetUserChats';
+import useUserChatsQuery from '../../hooks/api/assistant/useUserChatsQuery';
 import useGetChatHistory from '../../hooks/api/assistant/useGetChatHistory';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
@@ -10,6 +9,28 @@ import { FiMessageSquare, FiPlus } from 'react-icons/fi';
 import { AiMessage } from '../../providers/AppProvider';
 import axios from 'axios';
 import useAuth from '../../hooks/contexts/useAuthContext';
+import Breadcrumb from '../../components/buttons/Breadcrumb';
+import { H1 } from '../../components/primitives/Heading';
+
+function ChatRowSkeleton() {
+  return (
+    <div className="rounded-lg bg-zinc-300 dark:bg-darkGray animate-pulse">
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex-1 flex flex-col gap-2">
+            <div className="h-5 w-1/2 rounded-md bg-zinc-400 dark:bg-strongDarkGray" />
+            <div className="h-4 w-3/4 rounded-md bg-zinc-400 dark:bg-strongDarkGray" />
+            <div className="flex items-center gap-4 mt-1">
+              <div className="h-3 w-16 rounded-md bg-zinc-400 dark:bg-strongDarkGray" />
+              <div className="h-3 w-20 rounded-md bg-zinc-400 dark:bg-strongDarkGray" />
+            </div>
+          </div>
+          <div className="w-6 h-6 rounded-md bg-zinc-400 dark:bg-strongDarkGray shrink-0" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 const AiChatHistory = () => {
   const { t } = useTranslation();
@@ -24,29 +45,13 @@ const AiChatHistory = () => {
     umamiTrack ,
     selectedCatalogId
   } = useAppContext();
-  const getUserChats = useGetUserChats();
   const getChatHistory = useGetChatHistory();
 
-
-  const [chats, setChats] = useState<IChat[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    loadChats();
-  }, []);
-
-  const loadChats = async () => {
-    try {
-      setIsLoading(true);
-      const userChats = await getUserChats();
-      setChats(userChats.chats);
-    } catch (err) {
-      setError(t('assistant.chatHistoryError'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  // Page load via React Query (cached / deduped). The per-chat resume fetch
+  // below stays imperative — it's a click-driven action, not a page query.
+  const { data, isLoading, isError } = useUserChatsQuery();
+  const chats: IChat[] = data?.chats ?? [];
+  const error = isError ? t('assistant.chatHistoryError') : null;
 
   const handleChatClick = async (chat: IChat) => {
     try {      
@@ -126,108 +131,85 @@ const AiChatHistory = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <Box className="flex items-center justify-center h-full">
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box className="flex items-center justify-center h-full">
-        <Typography className="text-red-500">{error}</Typography>
-      </Box>
-    );
-  }
-
   return (
-    <Box className="flex flex-col h-full w-full bg-white dark:bg-zinc-900 p-6">
-      <Box className="max-w-4xl w-full mx-auto">
-        {/* Header */}
-        <Box className="flex justify-between items-center mb-6">
-          <Typography variant="h4" className="font-bold text-black dark:text-white">
-            {t('assistant.chatHistory')}
-          </Typography>
-          <IconButton 
-            onClick={handleNewChat}
-            className="bg-primary text-white hover:bg-primary-dark"
-            sx={{
-              backgroundColor: 'primary.main',
-              color: 'white',
-              '&:hover': {
-                backgroundColor: 'primary.dark',
-              }
-            }}
-          >
-            <FiPlus size={24} />
-          </IconButton>
-        </Box>
+    <div className="flex flex-col h-full w-full overflow-auto">
+      <Breadcrumb />
+      <div className="flex justify-between items-center pr-4">
+        <H1>{t('assistant.chatHistory')}</H1>
+        <button
+          type="button"
+          aria-label={t('assistant.newChat')}
+          onClick={handleNewChat}
+          className="inline-flex items-center justify-center rounded-full p-2 bg-primary text-onPrimary hover:bg-primaryDark transition-colors shrink-0"
+        >
+          <FiPlus size={24} />
+        </button>
+      </div>
 
-        {/* Chat List */}
-        {chats.length === 0 ? (
-          <Box className="flex flex-col items-center justify-center py-20">
-            <FiMessageSquare size={64} className="text-gray-400 dark:text-gray-600 mb-4" />
-            <Typography variant="h6" className="text-gray-600 dark:text-gray-400 mb-2">
-              {t('assistant.noChats')}
-            </Typography>
-            <Typography variant="body2" className="text-gray-500 dark:text-gray-500 mb-6">
-              {t('assistant.startFirstChat')}
-            </Typography>
-            <button
-              onClick={handleNewChat}
-              className="bg-primary text-white px-6 py-3 rounded-lg hover:bg-primary-dark transition-colors mt-5"
-            >
-              {t('assistant.newChat')}
-            </button>
-          </Box>
-        ) : (
-          <Box className="flex flex-col gap-3">
-            {chats.map((chat) => (
-              <Card
-                key={chat.chatId}
-                onClick={() => handleChatClick(chat)}
-                className="cursor-pointer transition-all hover:shadow-lg"
-                sx={{
-                  backgroundColor: 'white',
-                  '.dark &': {
-                    backgroundColor: '#27272a',
-                  },
-                  '&:hover': {
-                    transform: 'translateY(-2px)',
-                  }
-                }}
+      {isLoading ? (
+        <div className="max-w-4xl w-full mx-auto px-6 pb-6 flex flex-col gap-3">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <ChatRowSkeleton key={i} />
+          ))}
+        </div>
+      ) : error ? (
+        <div className="flex items-center justify-center flex-1">
+          <p className="text-red-500">{error}</p>
+        </div>
+      ) : (
+        <div className="max-w-4xl w-full mx-auto px-6 pb-6">
+          {/* Chat List */}
+          {chats.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <FiMessageSquare size={64} className="text-gray-400 dark:text-gray-600 mb-4" />
+              <p className="text-xl text-gray-600 dark:text-gray-400 mb-2">
+                {t('assistant.noChats')}
+              </p>
+              <p className="text-sm text-gray-500 dark:text-gray-500 mb-6">
+                {t('assistant.startFirstChat')}
+              </p>
+              <button
+                onClick={handleNewChat}
+                className="bg-primary text-onPrimary px-6 py-3 rounded-lg hover:bg-primaryDark transition-colors mt-5"
               >
-                <CardContent className="p-4">
-                  <Box className="flex items-start justify-between">
-                    <Box className="flex-1">
-                      <Typography variant="h6" className="font-semibold text-black dark:text-white mb-1">
-                        {chat.title || t('assistant.untitledChat')}
-                      </Typography>
-                      {chat.lastMessage && (
-                        <Typography 
-                          variant="body2" 
-                          className="text-gray-600 dark:text-gray-400 line-clamp-2 mb-2"
-                        >
-                          {chat.lastMessage.text}
-                        </Typography>
-                      )}
-                      <Box className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
-                        <span>{t('assistant.messages', { count: chat.messageCount })}</span>
-                        <span>•</span>
-                        <span>{formatDate(chat.lastMessage.timestamp)}</span>
-                      </Box>
-                    </Box>
-                    <FiMessageSquare size={24} className="text-gray-400 dark:text-gray-600 ml-4" />
-                  </Box>
-                </CardContent>
-              </Card>
-            ))}
-          </Box>
-        )}
-      </Box>
-    </Box>
+                {t('assistant.newChat')}
+              </button>
+            </div>
+          ) : (
+            <div className="flex flex-col gap-3">
+              {chats.map((chat) => (
+                <div
+                  key={chat.chatId}
+                  onClick={() => handleChatClick(chat)}
+                  className="cursor-pointer rounded-lg bg-white dark:bg-[#27272a] shadow-[0px_2px_1px_-1px_rgba(0,0,0,0.2),0px_1px_1px_0px_rgba(0,0,0,0.14),0px_1px_3px_0px_rgba(0,0,0,0.12)] transition-all hover:shadow-lg hover:-translate-y-0.5"
+                >
+                  <div className="p-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <p className="text-xl font-semibold text-black dark:text-white mb-1">
+                          {chat.title || t('assistant.untitledChat')}
+                        </p>
+                        {chat.lastMessage && (
+                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
+                            {chat.lastMessage.text}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
+                          <span>{t('assistant.messages', { count: chat.messageCount })}</span>
+                          <span>•</span>
+                          <span>{formatDate(chat.lastMessage.timestamp)}</span>
+                        </div>
+                      </div>
+                      <FiMessageSquare size={24} className="text-gray-400 dark:text-gray-600 ml-4" />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 };
 

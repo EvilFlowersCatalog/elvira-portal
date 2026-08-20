@@ -18,10 +18,10 @@ import {
   COOKIES_TYPE,
   NAVIGATION_PATHS,
 } from '../utils/interfaces/general/general';
-import useAppContext from '../hooks/contexts/useAppContext';
 import useVerifyCredentials from '../hooks/api/verify/useVerifyCredentials';
 import axios, { CancelTokenSource } from 'axios';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
+import { setAxiosAuth } from '../hooks/api/useAxios';
 
 export interface IAuthContext {
   auth: IAuth | null;
@@ -29,6 +29,8 @@ export interface IAuthContext {
   login: (loginForm: IAuthCredentials) => Promise<void>;
   logout: () => void;
   cancelTokenSource: MutableRefObject<CancelTokenSource>;
+  staySigned: boolean;
+  setStaySigned: (value: boolean) => void;
 }
 
 export const AuthContext = createContext<IAuthContext | null>(null);
@@ -38,8 +40,8 @@ const BROADCAST_MESSAGE = 'logout';
 const AuthProvider = ({ children }: IContextProviderParams) => {
   const { t } = useTranslation();
   const { cookies, setCookie, removeCookie } = useCookiesContext();
-  const { selectedCatalogId} = useAppContext(); 
 
+  const [staySigned, setStaySigned] = useState<boolean>(false);
   const [auth, setAuth] = useState<IAuth | null>(
     cookies[COOKIES_TYPE.AUTH_KEY] ?? null
   );
@@ -82,11 +84,14 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
       // Verify given credentials and retrieve user data
       const { response: user } = await verifyCredentials(loginForm);
 
-      // If needed and determine isSuperUser status
-      const catalogId = selectedCatalogId || import.meta.env.ELVIRA_CATALOG_ID;
+      // Show the admin entry point if the user is a superuser or manages ANY
+      // catalog. Don't key this off selectedCatalogId — catalogs load after
+      // auth, so it's usually null here; AdminGuard re-verifies server-side for
+      // the active catalog anyway.
+      const catalogPermissions = user.user.catalog_permissions ?? {};
       const isSuperUser =
         user.user.is_superuser ||
-        (catalogId && user.user.catalog_permissions[catalogId] === 'manage');
+        Object.values(catalogPermissions).includes('manage');
 
       // Set authentication context
       setAuth({
@@ -115,9 +120,10 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
 
   useEffect(() => {
     if (auth) {
-      setCookie(COOKIES_TYPE.AUTH_KEY, auth, {
-        maxAge: 60 * 60 * 24, // 1 day
-      });
+      const maxAge = staySigned 
+      ? 365 * 60 * 60 * 24 // 1 Year (Forever)
+      : 30 * 60; // 30 minutes of inactivity
+      setCookie(COOKIES_TYPE.AUTH_KEY, auth, { maxAge });
     } else {
       removeCookie(COOKIES_TYPE.AUTH_KEY);
       logoutChannel?.postMessage(BROADCAST_MESSAGE);
@@ -142,9 +148,14 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
     setCheck((prev) => !prev); // if auth was already null
   };
 
+  // Feed the shared axios interceptors (registered once in useAxios) the current
+  // auth. Done during render — which runs parent-before-child — so the token is
+  // in place before any child effect or query fires a request.
+  setAxiosAuth({ token: auth?.token, logout, cancelTokenSource });
+
   return (
     <AuthContext.Provider
-      value={{ auth, updateAuth, login, logout, cancelTokenSource }}
+      value={{ auth, updateAuth, login, logout, cancelTokenSource, staySigned, setStaySigned }}
     >
       {children}
     </AuthContext.Provider>

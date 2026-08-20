@@ -1,11 +1,10 @@
-import { MdFeed } from 'react-icons/md';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { FaCircleArrowRight, FaFolder, FaFolderOpen } from 'react-icons/fa6';
+import { FaFolder, FaFolderOpen } from 'react-icons/fa6';
+import { TbBooks } from 'react-icons/tb';
 import { useState } from 'react';
 import { IFeed } from '../../../utils/interfaces/feed';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import useAppContext from '../../../hooks/contexts/useAppContext';
-import useGetFeeds from '../../../hooks/api/feeds/useGetFeeds';
 import useGetFeedDetail from '../../../hooks/api/feeds/useGetFeedDetail';
 
 interface IFeedParams {
@@ -14,7 +13,7 @@ interface IFeedParams {
 
 const Feed = ({ feed }: IFeedParams) => {
   const { umamiTrack } = useAppContext();
-  var getFeedDetails = useGetFeedDetail();
+  const getFeedDetails = useGetFeedDetail();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const [isHovering, setIsHovering] = useState<boolean>(false);
@@ -34,9 +33,9 @@ const Feed = ({ feed }: IFeedParams) => {
       const params = new URLSearchParams(searchParams);
       params.delete('query');
 
-      var searchAll = searchParams.get('search-all') === 'true';
+      const searchAll = searchParams.get('search-all') === 'true';
 
-      var previous;
+      let previous;
       if (searchAll) {
         params.delete('search-all');
         if (feed.parents && feed.parents.length > 0) {
@@ -59,11 +58,11 @@ const Feed = ({ feed }: IFeedParams) => {
       });
       const params = new URLSearchParams();
 
-      var searchAll = searchParams.get('search-all') === 'true';
+      const searchAll = searchParams.get('search-all') === 'true';
 
         if (searchAll) {
           if (feed.parents && feed.parents.length > 0) {
-            var parentPath = await getParentFeed(feed.parents[0]);
+            const parentPath = await getParentFeed(feed.parents[0]);
             params.set('parent-id', parentPath.join("&"));
           }
         } else {
@@ -82,36 +81,20 @@ const Feed = ({ feed }: IFeedParams) => {
   return (
     <div className={'relative flex p-2 w-full md:w-1/2 xl:w-1/4'}>
       <button
-        className={`p-5 py-10 gap-5 w-full h-full flex text-center justify-between items-center bg-primary text-white rounded-md duration-200`}
+        className={`relative h-[126px] w-full bg-primaryLight text-left rounded-[8px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] p-4 flex flex-col gap-2 duration-200 overflow-hidden hover:brightness-95`}
         onClick={() => handleFeedClick()}
         onMouseEnter={() => setIsHovering(true)}
         onMouseOut={() => setIsHovering(false)}
       >
-        <div
-          className={
-            'w-full flex flex-col text-center sm:text-left pointer-events-none'
-          }
-        >
-          <span className={'text-xl font-bold'}>{feed.title}</span>
-          <span className={'text-xs line-clamp-3 text-overflow-ellipsis'}>{feed.content}</span>
-        </div>
-        <div
-          className={
-            'w-20 h-full pointer-events-none flex items-center justify-end'
-          }
-        >
+        <div className='absolute top-4 right-4 pointer-events-none text-secondary'>
           {feed.kind === 'navigation' ? (
-            isHovering ? (
-              <FaFolderOpen size={30} />
-            ) : (
-              <FaFolder size={30} />
-            )
-          ) : isHovering ? (
-            <FaCircleArrowRight size={30} />
+            isHovering ? <FaFolderOpen size={24} /> : <FaFolder size={24} />
           ) : (
-            <MdFeed size={30} />
+            <TbBooks size={24} />
           )}
         </div>
+        <span className='text-base font-bold text-secondary leading-[1.4] pr-10 line-clamp-2'>{feed.title}</span>
+        <span className='text-xs text-darkGray line-clamp-2'>{feed.content}</span>
       </button>
     </div>
   );

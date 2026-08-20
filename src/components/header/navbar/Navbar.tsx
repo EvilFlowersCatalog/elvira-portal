@@ -25,17 +25,16 @@ import {
 import useAuthContext from "../../../hooks/contexts/useAuthContext";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
-import { FiLogOut } from "react-icons/fi";
+import { FiLogOut, FiUser } from "react-icons/fi";
 import Gravatar from "react-gravatar";
 import Button from "../../buttons/Button";
-import { MenuItem, Select } from "@mui/material";
-import { CatalogSelectStyle } from "../../inputs/ElviraSelect";
 import {
   CATALOG_ICON_MAP,
   DEFAULT_CATALOG_ICON,
 } from "../../../utils/catalogIcons";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
+import { RiArrowDownSLine } from "react-icons/ri";
 
 function StuDots({ color }: { color: string }) {
   return (
@@ -98,6 +97,97 @@ function StuDots({ color }: { color: string }) {
     </svg>
   );
 }
+
+function CatalogIcon({ value }: { value: string }) {
+  const iconConfig = CATALOG_ICON_MAP[value] || DEFAULT_CATALOG_ICON;
+  if (iconConfig.type === "stuDots" && iconConfig.color) {
+    return <StuDots color={iconConfig.color} />;
+  }
+  if (iconConfig.type === "customSvg" && iconConfig.svgUrl) {
+    return <img src={iconConfig.svgUrl} alt="" width="19" height="13" />;
+  }
+  return null;
+}
+
+interface ICatalogSelectParams {
+  isCollapsed: boolean;
+  selectedValue: string;
+  selectedLabel: string;
+  catalogs: { catalogId: string; value: string; label: string }[];
+  onSelect: (value: string) => void;
+}
+const CatalogSelect = ({
+  isCollapsed,
+  selectedValue,
+  selectedLabel,
+  catalogs,
+  onSelect,
+}: ICatalogSelectParams) => {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDoc = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("mousedown", onDoc);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDoc);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div className="relative w-full" ref={ref}>
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label="Catalog"
+        className={`w-full flex items-center gap-3 py-2 dark:text-white overflow-hidden ${
+          isCollapsed ? "justify-center" : ""
+        }`}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <CatalogIcon value={selectedValue} />
+        {!isCollapsed && (
+          <>
+            <span className="truncate">{selectedLabel}</span>
+            <RiArrowDownSLine size={18} className="ml-auto shrink-0" aria-hidden="true" />
+          </>
+        )}
+      </button>
+      {open && (
+        <div
+          role="listbox"
+          className="absolute left-0 top-full z-50 mt-1 w-full min-w-[180px] rounded-md border border-[#e5e5e5] dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-[0px_2px_2.5px_rgba(0,0,0,0.25)] overflow-hidden"
+        >
+          {catalogs.map((catalog) => (
+            <button
+              key={catalog.catalogId}
+              type="button"
+              role="option"
+              aria-selected={catalog.value === selectedValue}
+              className={`w-full flex gap-3 items-center overflow-hidden px-3 py-2 text-left hover:bg-zinc-100 dark:hover:bg-zinc-700 ${
+                catalog.value === selectedValue ? "bg-zinc-100 dark:bg-zinc-700" : ""
+              }`}
+              onClick={() => {
+                onSelect(catalog.value);
+                setOpen(false);
+              }}
+            >
+              <CatalogIcon value={catalog.value} />
+              <span className="truncate">{catalog.label}</span>
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 interface INavbarButtonParams {
   name: string;
@@ -196,6 +286,18 @@ const Navbar = () => {
   };
 
   const [isCollapsed, setIsCollapsed] = useState(!isSmallDevice);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const toggleNavbar = () => {
     setIsCollapsed(!isCollapsed);
@@ -230,59 +332,32 @@ const Navbar = () => {
               />
             </button>
             <button
+              aria-label={t('navbar.collapse', { defaultValue: 'Collapse sidebar' })}
               className={`h-full flex items-center text-gray w-fit rounded-md px-1 ml-auto`}
               onClick={toggleNavbar}
             >
-              <RiArrowLeftDoubleFill size={18} />
+              <RiArrowLeftDoubleFill size={18} aria-hidden="true" />
             </button>
           </>
         ) : (
           <button
+            aria-label={t('navbar.expand', { defaultValue: 'Expand sidebar' })}
             className="flex items-center w-7 h-7 justify-center bg-zinc-100 dark:bg-zinc-700 text-black dark:text-white rounded-md mx-auto"
             onClick={toggleNavbar}
           >
-            <RiArrowLeftDoubleFill size={18} className="rotate-180" />
+            <RiArrowLeftDoubleFill size={18} className="rotate-180" aria-hidden="true" />
           </button>
         )}
       </div>
       {auth ? (
         <div className="mb-3">
-        <Select
-          className="ml-auto dark:text-white w-full"
-          sx={CatalogSelectStyle}
-          label={"Catalog"}
-          labelId="catalog-label"
-          value={selectedCatalog?.value || ""}
-          id="catalog-select"
-          variant="standard"
-          onChange={(e) => {
-            switchCatalog(e.target.value);
-          }}
-        >
-          {availableCatalogs.map((catalog) => {
-            const iconConfig =
-              CATALOG_ICON_MAP[catalog.value] || DEFAULT_CATALOG_ICON;
-
-            return (
-              <MenuItem key={catalog.catalogId} value={catalog.value}>
-                <div className="flex gap-3 items-center overflow-hidden">
-                  {iconConfig.type === "stuDots" && iconConfig.color && (
-                    <StuDots color={iconConfig.color} />
-                  )}
-                  {iconConfig.type === "customSvg" && iconConfig.svgUrl && (
-                    <img
-                      src={iconConfig.svgUrl}
-                      alt=""
-                      width="19"
-                      height="13"
-                    />
-                  )}
-                  <span className="truncate">{catalog.label}</span>
-                </div>
-              </MenuItem>
-            );
-          })}
-        </Select>
+          <CatalogSelect
+            isCollapsed={isCollapsed}
+            selectedValue={selectedCatalog?.value || ""}
+            selectedLabel={selectedCatalog?.label || ""}
+            catalogs={availableCatalogs}
+            onSelect={(value) => switchCatalog(value)}
+          />
         </div>
       ) : null}
 
@@ -320,18 +395,18 @@ const Navbar = () => {
                   isActive={location.pathname === NAVIGATION_PATHS.feeds}
                   textVisible={!isCollapsed}
                 />
-                <NavbarButton
-                  name={t("navbarMenu.aiAssistant")}
-                  path={NAVIGATION_PATHS.aiChatHistory}
-                  icon={<ChatIcon size={20} />}
-                  isActive={
-                    location.pathname === NAVIGATION_PATHS.aiAssistant ||
-                    location.pathname === NAVIGATION_PATHS.aiChatHistory
-                  }
-                  textVisible={!isCollapsed}
-                />
               </>
             )}
+            <NavbarButton
+              name={t("navbarMenu.aiAssistant")}
+              path={NAVIGATION_PATHS.aiChatHistory}
+              icon={<ChatIcon size={20} />}
+              isActive={
+                location.pathname === NAVIGATION_PATHS.aiAssistant ||
+                location.pathname === NAVIGATION_PATHS.aiChatHistory
+              }
+              textVisible={!isCollapsed}
+            />
             {/* <NavbarButton
             name={t('navbarMenu.about')}
             path={NAVIGATION_PATHS.about}
@@ -374,13 +449,14 @@ const Navbar = () => {
               isActive={location.pathname === NAVIGATION_PATHS.shelf}
               textVisible={!isCollapsed}
             />
+            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
             <NavbarButton
               name={t("navbarMenu.history")}
               path={NAVIGATION_PATHS.history}
               icon={<ClockIcon size={20} />}
               isActive={location.pathname === NAVIGATION_PATHS.history}
               textVisible={!isCollapsed}
-            />
+            />)}
             {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
               <NavbarButton
                 name={t("navbarMenu.loan")}
@@ -436,48 +512,71 @@ const Navbar = () => {
           />)}
         </div>
       </div>
-      {/* Logout */}
+      {/* Profile */}
       {auth && (
-        <div className="relative w-full pb-4 pt-2">
+        <div className="relative w-full pb-4 pt-2" ref={profileRef}>
+          {profileDropdownOpen && (
+            <div className="absolute bottom-full mb-2 left-0 w-[162px] bg-lightGray dark:bg-zinc-800 rounded-lg shadow-[0px_2px_2.5px_rgba(0,0,0,0.25)] border border-[#e5e5e5] dark:border-zinc-700 overflow-hidden z-50">
+              <button
+                className="w-full flex items-center gap-3 px-4 h-8 text-secondary dark:text-white text-[12px] font-medium hover:brightness-95 dark:hover:bg-zinc-700 text-left"
+                onClick={(e) => {
+                  umamiTrack("Profile Button");
+                  specialNavigation(e, NAVIGATION_PATHS.profile);
+                  setProfileDropdownOpen(false);
+                }}
+              >
+                <FiUser size={15} />
+                {t("navbarMenu.profile")}
+              </button>
+              <div className="w-full h-px bg-[#e5e5e5] dark:bg-zinc-700" />
+              <button
+                className="w-full flex items-center gap-3 px-4 h-8 text-primary text-[12px] font-medium hover:brightness-95 dark:hover:bg-zinc-700 text-left"
+                onClick={() => {
+                  umamiTrack("Logout Button");
+                  logout();
+                  setProfileDropdownOpen(false);
+                }}
+              >
+                <FiLogOut size={15} />
+                {t("navbarMenu.logout")}
+              </button>
+            </div>
+          )}
           {!isCollapsed ? (
-            <div className="w-full flex py-2 mt-auto items-center gap-2 rounded-lg px-3 bg-slate-200 dark:bg-darkGray">
+            <button
+              className="w-full flex h-10 items-center gap-3 rounded-lg px-3 bg-lightGray dark:bg-darkGray shadow-[0px_4px_6px_rgba(0,0,0,0.1)] hover:brightness-95 dark:hover:brightness-110 transition-all"
+              onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+            >
               <Gravatar
                 email={`${auth.username}@stuba.sk`}
-                size={30}
-                className="rounded-full"
+                size={28}
+                className="rounded-full shrink-0"
                 default="monsterid"
               />
-              <div className="flex flex-col items-start">
-                <p className="text-[12px] font-medium overflow-hidden text-ellipsis whitespace-nowrap max-w-[100px]">
-                  {auth.name} {auth.surname}
+              <div className="flex flex-col items-start overflow-hidden">
+                <p className="text-[12px] font-medium overflow-hidden text-ellipsis whitespace-nowrap w-full">
+                  {auth.username}
                 </p>
-                <p className="text-[10px] font-medium shrink-0">
+                <p className="text-[9px] font-light shrink-0">
                   {auth.isSuperUser
                     ? t("navbarMenu.superUser")
                     : t("navbarMenu.user")}
                 </p>
               </div>
-              <Button
-                onClick={() => {
-                  umamiTrack("Logout Button");
-                  logout();
-                }}
-                className="bg-transparent text-black dark:text-white ml-auto hover:text-white p-2"
-              >
-                <FiLogOut />
-              </Button>
-            </div>
+            </button>
           ) : (
-            <div className="w-full flex flex-col gap-2 items-center">
-              <Button
-                onClick={() => {
-                  umamiTrack("Logout Button");
-                  logout();
-                }}
-                className="bg-zinc-100 dark:bg-zinc-700 text-black dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-600 p-2 rounded-md"
+            <div className="w-full flex justify-center">
+              <button
+                className="flex items-center justify-center w-11 h-10 bg-lightGray dark:bg-zinc-700 shadow-[0px_4px_6px_rgba(0,0,0,0.1)] rounded-lg hover:brightness-95 dark:hover:brightness-110 transition-all"
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
               >
-                <FiLogOut size={20} />
-              </Button>
+                <Gravatar
+                  email={`${auth.username}@stuba.sk`}
+                  size={28}
+                  className="rounded-full"
+                  default="monsterid"
+                />
+              </button>
             </div>
           )}
         </div>

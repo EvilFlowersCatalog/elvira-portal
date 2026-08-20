@@ -40,7 +40,7 @@ export function DetailHeader({
                     {entry.feeds.map((feed, index) => (
                         <button
                             key={index}
-                            className="cursor-pointer font-semibold px-2 py-1 text-md bg-primaryLight text-primary rounded-lg"
+                            className="cursor-pointer font-semibold px-2 py-1 text-md bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight rounded-lg"
                             onClick={() => handleFeedClick(feed)}
                         >
                             {feed.title}

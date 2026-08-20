@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { IEntry } from '../../utils/interfaces/entry';
+import { useMemo } from 'react';
+import { IEntry, IEntryQuery } from '../../utils/interfaces/entry';
 import { useSearchParams } from 'react-router-dom';
 import useGetShelf from '../../hooks/api/my-shelf/useGetShelf';
 import ItemContainer from '../../components/items/container/ItemContainer';
@@ -8,108 +8,65 @@ import EntryItem from '../../components/items/entry/display/EntryItem';
 import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
 
 const Shelf = () => {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [loadingNext, setLoadingNext] = useState<boolean>(false);
-  const [isError, setIsError] = useState<boolean>(false);
-  const [page, setPage] = useState<number>(0);
-  const [maxPage, setMaxPage] = useState<number>(0);
-  const [entries, setEntries] = useState<IEntry[]>([]);
-
   const { t } = useTranslation();
   const { selectedCatalogId } = useAppContext();
   const [searchParams] = useSearchParams();
   const getShelf = useGetShelf();
 
-  // Reset when catalog or search params change
-  useEffect(() => {
-    setPage(0);
-    setEntries([]);
-    setIsLoading(true);
-  }, [selectedCatalogId, searchParams]);
+  const filters = useMemo(
+    () => ({
+      title: searchParams.get('title') ?? '',
+      feedId: searchParams.get('feed-id') ?? '',
+      categoryId: searchParams.get('category-id') ?? '',
+      authors: searchParams.get('author') ?? '',
+      publishedAtGte: searchParams.get('publishedAtGte') ?? '',
+      publishedAtLte: searchParams.get('publishedAtLte') ?? '',
+      orderBy: searchParams.get('order-by') ?? '',
+      query: searchParams.get('query') ?? '',
+      languageCode: searchParams.get('languageCode') ?? '',
+    }),
+    [searchParams]
+  );
 
-  useEffect(() => {
-    // skip nitialization
-    if (page === 0) {
-      setPage(1);
-      return;
+  const list = useInfiniteItemContainer<IEntry>(
+    ['shelf', selectedCatalogId, filters],
+    async (page) => {
+      const { items, metadata } = await getShelf({
+        page,
+        limit: 30,
+        ...filters,
+      } as IEntryQuery);
+      // Shelf records wrap the entry; unwrap it and tag it with the record id
+      // (used by EntryItem to remove the item from the shelf).
+      const entries = items.map((item: any) => {
+        const entry = item.entry;
+        entry.shelf_record_id = item.id;
+        return entry;
+      });
+      return { items: entries, metadata };
     }
+  );
 
-    // get entries
-    (async () => {
-      try {
-        const { items, metadata } = await getShelf({
-          page,
-          limit: 30,
-          title: searchParams.get('title') ?? '',
-          feedId: searchParams.get('feed-id') ?? '',
-          categoryId: searchParams.get('category-id') ?? '',
-          authors: searchParams.get('author') ?? '',
-          publishedAtGte: searchParams.get('publishedAtGte') ?? '',
-          publishedAtLte: searchParams.get('publishedAtLte') ?? '',
-          orderBy: searchParams.get('order-by') ?? '',
-          query: searchParams.get('query') ?? '',
-          languageCode: searchParams.get('languageCode') ?? '',
-        });
-
-        setMaxPage(metadata.pages);
-        // extract shelf entries
-        const shelfEntries = items.map((item) => {
-          var entry = item.entry;
-          entry.shelf_record_id = item.id;
-          return entry;
-        });
-
-        const allEntries = [...entries, ...shelfEntries];
-        const uniqueShelfEntries = Array.from(
-          new Map(allEntries.map(entry => [entry.id, entry])).values()
-        );
-
-        setEntries(uniqueShelfEntries);
-      } catch {
-        // if there was error set to true
-        setIsError(true);
-      } finally {
-        // after everything set false
-        setIsLoading(false);
-        setLoadingNext(false);
-      }
-    })();
-  }, [page]);
-
-  const triggerReload = () => {
-    setPage(0);
-    setEntries([]);
-    setIsLoading(true);
-  };
+  const triggerReload = () => list.reset();
 
   return (
     <ItemContainer
-      isLoading={isLoading}
-      setIsLoading={setIsLoading}
-      isError={isError}
-      items={entries}
-      setItems={setEntries}
-      page={page}
-      setPage={setPage}
-      maxPage={maxPage}
-      loadingNext={loadingNext}
-      setLoadingNext={setLoadingNext}
+      list={list}
       triggerReload={triggerReload}
       showLayout
-      searchSpecifier={'query'}
+      searchSpecifier="query"
       title={t('navbarMenu.myShelf')}
       shouldRedirectSuggestions={true}
     >
       <EntriesWrapper>
-        {entries.map((entry, index) => (
+        {list.items.map((entry) => (
           <EntryItem key={entry.id} entry={entry} triggerReload={triggerReload} />
         ))}
-        {loadingNext &&
-          Array.from({ length: 30 }).map((_, index) => (
-            <EntryBoxLoading key={index} />
-          ))}
+        {list.loadingNext &&
+          Array.from({ length: 30 }).map((_, index) => <EntryBoxLoading key={index} fixedSize />)}
       </EntriesWrapper>
     </ItemContainer>
   );

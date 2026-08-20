@@ -1,14 +1,8 @@
-import {
-    Box,
-    Typography,
-    TextField,
-    InputAdornment,
-    IconButton,
-    CircularProgress,
-} from "@mui/material";
+import { CircleLoader } from "react-spinners";
 import { FaPaperPlane } from "react-icons/fa6";
 import { FiClock, FiPlus } from "react-icons/fi";
 import { useEffect, useState, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTranslation } from "react-i18next";
@@ -16,7 +10,7 @@ import useAppContext from "../../hooks/contexts/useAppContext";
 import EntryItem from "../../components/items/entry/display/EntryItem";
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
 import { IEntry } from "../../utils/interfaces/entry";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { Link, useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import useAuth from "../../hooks/contexts/useAuthContext";
 import { AiMessage } from "../../providers/AppProvider";
@@ -32,80 +26,69 @@ interface StreamEvent {
 
 function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, handleSuggestion: (suggestion: string) => void }) {
     return (
-        <Box
+        <div
             className="flex items-center justify-center flex-1 rounded-lg p-3 cursor-pointer transition-colors duration-200 text-center text-sm bg-zinc-200 text-gray-500 hover:bg-zinc-300 dark:bg-zinc-700 dark:text-white dark:hover:bg-zinc-600"
             onClick={() => {
                 handleSuggestion(suggestion);
             }}
         >
             {suggestion}
-        </Box>
+        </div>
     );
 }
 
 function MessageElement({ msg, bookCatalogs }: { msg: AiMessage, bookCatalogs: Record<string, string> }) {
-    const [books, setBooks] = useState<any[]>([]);
-    const getEntryDetail = useGetEntryDetail();
+    const { getEntryDetail } = useGetEntryDetail();
 
-    useEffect(() => {
-        if (msg.content.type === "entries" && Array.isArray(msg.content.data)) {
-            const entryIds = msg.content.data;
-            setBooks([]);
-            (async () => {
-                const details = await Promise.all(
-                    entryIds.map((id: string) => {
-                        const catalogId = bookCatalogs[id];
-                        return getEntryDetail(id, catalogId || undefined);
-                    })
-                );
-                const entries: IEntry[] = details.map(entryDetail => ({
-                    ...entryDetail,
-                    popularity: Number(entryDetail.popularity),
-                }));
-                setBooks(entries);
-            })();
-        }
-    }, [msg.content.type, JSON.stringify(msg.content.data), JSON.stringify(bookCatalogs)])
+    const entryIds =
+        msg.content.type === "entries" && Array.isArray(msg.content.data)
+            ? (msg.content.data as string[])
+            : [];
+
+    // Recommended-book details for an "entries" message (cached/deduped by
+    // React Query; keyed by the ids + their catalog map).
+    const { data: books = [] } = useQuery({
+        queryKey: ["ai-message-books", entryIds, bookCatalogs],
+        queryFn: async () => {
+            const details = await Promise.all(
+                entryIds.map((id) => getEntryDetail(id, bookCatalogs[id] || undefined))
+            );
+            return details.map((entryDetail) => ({
+                ...entryDetail,
+                popularity: Number(entryDetail.popularity),
+            })) as IEntry[];
+        },
+        enabled: entryIds.length > 0,
+    });
 
     switch (msg.content.type) {
         case "message":
-            return <Box className="mb-4 p-4 rounded-lg max-w-[70%]"
-                sx={{
-                    backgroundColor: msg.role === "user" ? "primary.main" : "grey.200",
-                    color: msg.role === "user" ? "white" : "text.primary",
-                    alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-                    ".dark &": {
-                        backgroundColor: msg.role === "user" ? "primary.main" : "#3f3f46",
-                        color: msg.role === "user" ? "white" : "#e5e7eb",
-                    }
-                }}>
+            return <div
+                className={`mb-4 p-4 rounded-lg max-w-[70%] ${
+                    msg.role === "user"
+                        ? "bg-primary text-white self-end"
+                        : "bg-zinc-200 text-black self-start dark:bg-[#3f3f46] dark:text-[#e5e7eb]"
+                }`}>
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content.data as string}</ReactMarkdown>
-            </Box>;
+            </div>;
         case "entries":
-            return <Box className="flex gap-3 mb-4 py-2 shrink-0 overflow-x-auto flex-nowrap"
+            return <div className="flex gap-3 mb-4 py-2 shrink-0 overflow-x-auto flex-nowrap"
             >
                 {books.map((entry: IEntry) => (
-                    <Box key={"ai-" + entry.id} className="flex-shrink-0">
+                    <div key={"ai-" + entry.id} className="flex-shrink-0">
                         <EntryItem entry={entry} id={'ai-' + entry.id} type="ai-recommendation" />
-                    </Box>
+                    </div>
                 ))}
-            </Box>
+            </div>
         case "loading":
-            return <Box className="mb-4 p-4 rounded-lg max-w-[70%] flex items-center gap-2"
-                sx={{
-                    backgroundColor: "grey.200",
-                    alignSelf: "flex-start",
-                    ".dark &": {
-                        backgroundColor: "#3f3f46",
-                    }
-                }}>
-                <CircularProgress size={16} />
-                <Typography variant="body2" className="text-gray-600 dark:text-gray-300">
+            return <div className="mb-4 p-4 rounded-lg max-w-[70%] flex items-center gap-2 bg-zinc-200 self-start dark:bg-[#3f3f46]">
+                <CircleLoader size={16} color={'var(--color-primary)'} />
+                <p className="text-sm text-gray-600 dark:text-gray-300">
                     {msg.content.data || "Generating response..."}
-                </Typography>
-            </Box>;
+                </p>
+            </div>;
         default:
-            return <Typography className="dark:text-white text-center">404</Typography>
+            return <p className="dark:text-white text-center">404</p>
     }
 }
 
@@ -126,11 +109,9 @@ export default function AiAssistantPage() {
         setAiShowSuggestions,
         selectedCatalogId,
     } = useAppContext();
-    const getEntryDetail = useGetEntryDetail();
 
     const [input, setInput] = useState("");
     const [isGeneratingResponse, setGeneratingResponse] = useState(false);
-    const [assistantEntry, setAssistantEntry] = useState<any>(null);
     const [currentCatalogId] = useState<string | undefined>(selectedCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -140,14 +121,7 @@ export default function AiAssistantPage() {
 
     useEffect(() => {
         umamiTrack("AI Assistant Page Visit");
-        
-        // Check if there's an entry-id in the URL params
-        const entryId = searchParams.get('entry-id');
-        if (entryId) {
-            getEntryDetail(entryId, undefined).then((entry) => {
-                setAssistantEntry(entry);
-            });
-        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -174,7 +148,7 @@ export default function AiAssistantPage() {
         }]);
 
         try {
-            var currentChatId = aiChatId;
+            let currentChatId = aiChatId;
             if (!currentChatId) {
                 const response = await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/startchat`, {
                     apiKey: auth?.token || null,
@@ -346,139 +320,109 @@ export default function AiAssistantPage() {
         navigate(NAVIGATION_PATHS.aiAssistant);
     }
 
-    if (import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES !== "true") { return null }
-
     return (
-        <Box className="flex flex-col h-full w-full bg-white dark:bg-zinc-900">
+        <div className="flex flex-col h-full w-full ">
             {/* Desktop Header */}
-            <Box className="hidden lg:flex justify-between items-center p-6">
-                <Typography variant="h4" className="font-bold text-black dark:text-white">
+            <div className="hidden lg:flex justify-between items-center p-6">
+                <h1 className="text-[2.125rem] leading-tight font-bold text-black dark:text-white">
                     Elvira AI
-                </Typography>
-                <Box className="flex gap-2">
-                    <IconButton 
-                        href={NAVIGATION_PATHS.aiChatHistory}
-                        sx={{
-                            color: 'text.primary',
-                            '&:hover': {
-                                backgroundColor: 'action.hover',
-                            }
-                        }}
+                </h1>
+                <div className="flex gap-2">
+                    <Link
+                        to={NAVIGATION_PATHS.aiChatHistory}
+                        aria-label="Chat history"
+                        className="inline-flex items-center justify-center rounded-full p-2 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                     >
                         <FiClock size={20} className="text-black dark:text-white" />
-                    </IconButton>
-                    <IconButton 
+                    </Link>
+                    <button
+                        type="button"
+                        aria-label="New chat"
                         onClick={handleNewChat}
-                        sx={{
-                            backgroundColor: 'primary.main',
-                            color: 'white',
-                            '&:hover': {
-                                backgroundColor: 'primary.dark',
-                            }
-                        }}
+                        className="inline-flex items-center justify-center rounded-full p-2 bg-primary text-white hover:bg-primaryDark transition-colors"
                     >
                         <FiPlus size={20} />
-                    </IconButton>
-                </Box>
-            </Box>
-            
+                    </button>
+                </div>
+            </div>
+
             {/* Mobile Header */}
-            <Box className="flex lg:hidden justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-zinc-700">
-                <Typography variant="h6" className="font-bold text-black dark:text-white">
+            <div className="flex lg:hidden justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-zinc-700">
+                <p className="text-xl font-bold text-black dark:text-white">
                     Elvira AI
-                </Typography>
-                <Box className="flex gap-1">
-                    <IconButton 
-                        href={NAVIGATION_PATHS.aiChatHistory}
-                        size="small"
-                        sx={{
-                            color: 'text.primary',
-                        }}
+                </p>
+                <div className="flex gap-1">
+                    <Link
+                        to={NAVIGATION_PATHS.aiChatHistory}
+                        aria-label="Chat history"
+                        className="inline-flex items-center justify-center rounded-full p-1.5 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                     >
                         <FiClock size={18} className="text-black dark:text-white" />
-                    </IconButton>
-                    <IconButton 
+                    </Link>
+                    <button
+                        type="button"
+                        aria-label="New chat"
                         onClick={handleNewChat}
-                        size="small"
-                        sx={{
-                            backgroundColor: 'primary.main',
-                            color: 'white',
-                            '&:hover': {
-                                backgroundColor: 'primary.dark',
-                            }
-                        }}
+                        className="inline-flex items-center justify-center rounded-full p-1.5 bg-primary text-white hover:bg-primaryDark transition-colors"
                     >
                         <FiPlus size={18} />
-                    </IconButton>
-                </Box>
-            </Box>
+                    </button>
+                </div>
+            </div>
             <EntryDetail  />
             {/* Main Chat Container */}
-            <Box className="flex-1 flex flex-col items-center w-full overflow-hidden">
+            <div className="flex-1 flex flex-col items-center w-full overflow-hidden">
                 {/* Chat Messages Area */}
-                <Box className="flex-1 w-full max-w-4xl overflow-y-auto px-4 py-8">
-                    <Box className="flex flex-col">
+                <div className="flex-1 w-full max-w-4xl overflow-y-auto px-4 py-8">
+                    <div className="flex flex-col">
                         {aiMessages.length === 0 ? (
-                            <Box className="flex flex-col items-center justify-center h-full py-20">
-                                <Typography variant="h4" className="font-bold mb-4 text-black dark:text-white">
+                            <div className="flex flex-col items-center justify-center h-full py-20">
+                                <h2 className="text-[2.125rem] leading-tight font-bold mb-4 text-black dark:text-white">
                                     {t("assistant.title")}
-                                </Typography>
-                                <Typography variant="body1" className="text-gray-600 dark:text-gray-400 mb-8 text-center max-w-md">
+                                </h2>
+                                <p className="text-base text-gray-600 dark:text-gray-400 mb-8 text-center max-w-md">
                                     {t("assistant.welcomeMessage")}
-                                </Typography>
-                            </Box>
+                                </p>
+                            </div>
                         ) : (
                             aiMessages.map((msg, index) => (
                                 <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} bookCatalogs={aiBookCatalogs} />
                             ))
                         )}
                         <div ref={chatEndRef} />
-                    </Box>
-                </Box>
+                    </div>
+                </div>
 
                 {/* Input Area */}
-                <Box className="w-full max-w-4xl px-4 pb-8">
-                    <Box component="form" onSubmit={handleSubmit}>
+                <div className="w-full max-w-4xl px-4 pb-8">
+                    <form onSubmit={handleSubmit}>
                         {aiShowSuggestions && aiMessages.length === 0 ? (
-                            <Box className="flex gap-3 mb-4">
+                            <div className="flex gap-3 mb-4">
                                 <AiSuggestion suggestion={t("assistant.suggestion1")} handleSuggestion={handleSuggestion} />
                                 <AiSuggestion suggestion={t("assistant.suggestion2")} handleSuggestion={handleSuggestion} />
-                            </Box>
+                            </div>
                         ) : null}
-                        <TextField
-                            fullWidth
-                            disabled={isGeneratingResponse}
-                            placeholder={t("assistant.inputPlaceholder")}
-                            sx={{
-                                backgroundColor: "grey.100",
-                                borderRadius: 3,
-                                "&:hover": { backgroundColor: "grey.200" },
-                                ".dark &": {
-                                    backgroundColor: '#3f3f46',
-                                    "&:hover": { backgroundColor: '#4b5563' },
-                                    "& .MuiInputBase-input": {
-                                        color: '#e5e7eb',
-                                    }
-                                },
-                                "& .MuiOutlinedInput-root": {
-                                    borderRadius: 3,
-                                }
-                            }}
-                            value={input}
-                            onChange={(e) => setInput(e.target.value)}
-                            InputProps={{
-                                endAdornment: (
-                                    <InputAdornment position="end">
-                                        <IconButton type="submit" edge="end" disabled={isGeneratingResponse || !input.trim()}>
-                                            <FaPaperPlane size={16} className="dark:text-white" />
-                                        </IconButton>
-                                    </InputAdornment>
-                                ),
-                            }}
-                        />
-                    </Box>
-                </Box>
-            </Box>
-        </Box>
+                        <div className="flex items-center gap-2 rounded-xl px-4 py-2.5 bg-white hover:bg-zinc-100 drop-shadow-lg dark:bg-[#3f3f46] dark:hover:bg-[#4b5563]">
+                            <input
+                                type="text"
+                                disabled={isGeneratingResponse}
+                                placeholder={t("assistant.inputPlaceholder")}
+                                className="flex-1 bg-transparent outline-none text-black dark:text-[#e5e7eb] disabled:opacity-60"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                            />
+                            <button
+                                type="submit"
+                                aria-label="Send"
+                                disabled={isGeneratingResponse || !input.trim()}
+                                className="inline-flex items-center justify-center p-1 disabled:opacity-40"
+                            >
+                                <FaPaperPlane size={16} className="dark:text-white" />
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     );
 }

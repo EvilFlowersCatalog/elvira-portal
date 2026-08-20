@@ -7,8 +7,6 @@ import LanguageAutofill from '../../autofills/LanguageAutofill';
 import { ChangeEvent, useEffect, useState } from 'react';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import useAppContext from '../../../hooks/contexts/useAppContext';
-import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 
 interface IAdditionalDataPartParams extends IPartParams {
   stringImage: string;
@@ -71,21 +69,14 @@ const AdditionalDataPart = ({
     });
   };
 
-  const formatDate = (date: Date): string => {
-    const y = date.getFullYear();
-    const m = (date.getMonth() + 1).toString().padStart(2, '0');
-    const d = date.getDate().toString().padStart(2, '0');
-    return `${y}-${m}-${d}`;
-  };
-
   return (
-    <div className='grid grid-cols-1 md:grid-cols-[auto,1fr] bg-slate-200 dark:bg-darkGray gap-4 rounded-md p-4'>
-      <div className={`relative w-48 m-auto h-full p-2`}>
+    <div className='flex flex-col gap-4'>
+      {/* Cover */}
+      <div className='relative mx-auto aspect-[3/4] w-40 overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700'>
         {stringImage && (
-          <img className='w-full h-full object-cover' src={stringImage} alt='image' />
+          <img className='h-full w-full object-cover' src={stringImage} alt='' />
         )}
-        {/* Image */}
-        <div className='absolute top-0 left-0 w-full h-full bg-white dark:bg-black bg-opacity-30 dark:bg-opacity-30'>
+        <div className='absolute inset-0 bg-white/30 dark:bg-black/30'>
           <ImageDropzone
             title={t('entry.wizard.image')}
             maxSizeDescription='(MAX 5 MB)'
@@ -103,71 +94,45 @@ const AdditionalDataPart = ({
         </div>
       </div>
 
-      {/* Information */}
-      <div className='flex flex-col flex-2'>
-        <div className='flex flex-col gap-4'>
-          <ElviraInput
-            onChange={handleTitleChange}
-            placeholder={t('entry.wizard.title')}
-            invalidMessage={t('entry.wizard.requiredMessages.title')}
-            value={entry.title ?? ''}
-            required
-          />
-          <LanguageAutofill languageCode={languageCode} setLanguageCode={setLanguageCode} setIsSelectionOpen={() => { }} isRequired={true} />
-          <ElviraInput
-            onChange={handlePublisherChange}
-            placeholder={t('entry.wizard.publisher')}
-            value={entry.publisher ?? ''}
-          />
-          <div className='flex flex-col'>
-            <div className='w-fit flex gap-4 mt-4'>
-              <LocalizationProvider dateAdapter={AdapterDateFns}>
-                <DatePicker 
-                  label={t('entry.wizard.year')}
-                  sx= {{
-                    ".MuiInputLabel-formControl": {
-                      color: 'black',
-                    },
-                    ".dark & .MuiInputLabel-formControl": {
-                      color: 'white',
-                    },
-                    ".dark & .MuiButtonBase-root": {
-                      color: 'white'
-                    },
-                     ".dark & :hover .MuiPickersOutlinedInput-notchedOutline" : {
-                      borderColor: 'gray'
-                    },
-                    ".dark & .MuiPickersOutlinedInput-notchedOutline" : {
-                      borderColor: 'white'
-                    },
-                    ".dark & .MuiPickersSectionList-root" : {
-                      color: 'white'
-                    }
-                  }}
-                  value={entry.published_at ? new Date(entry.published_at) : new Date()}
-                  onChange={(date: Date | null) => {
-                    if (date) {
-                      const formatted = formatDate(date);
-                      setEntry({
-                        ...entry,
-                        published_at: formatted,
-                      });
-                      umamiTrack('Date Selection', {
-                        year: date.getFullYear().toString(),
-                        month: (date.getMonth() + 1).toString(),
-                        day: date.getDate().toString(),
-                      });
-                    } else {
-                      setEntry({
-                        ...entry,
-                        published_at: '',
-                      });
-                    }
-                  }}
-                  views={['year', 'month', 'day']}
-                />
-              </LocalizationProvider>
-            </div>
+      {/* Publish details */}
+      <div className='flex flex-col gap-4'>
+        <LanguageAutofill languageCode={languageCode} setLanguageCode={setLanguageCode} setIsSelectionOpen={() => { }} isRequired={true} />
+        <ElviraInput
+          onChange={handlePublisherChange}
+          placeholder={t('entry.wizard.publisher')}
+          value={entry.publisher ?? ''}
+        />
+        <div className='flex flex-col'>
+          <div className='w-full flex flex-col gap-1'>
+            <label htmlFor='published-at' className='text-sm pl-1 text-black dark:text-white'>
+              {t('entry.wizard.year')}
+            </label>
+            <input
+              id='published-at'
+              type='date'
+              className='w-full p-2 bg-white shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A] dark:bg-strongDarkGray dark:text-white outline-none rounded-md border border-black dark:border-white focus:border-primary [color-scheme:light] dark:[color-scheme:dark]'
+              value={entry.published_at ?? ''}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value) {
+                  const [year, month, day] = value.split('-');
+                  setEntry({
+                    ...entry,
+                    published_at: value,
+                  });
+                  umamiTrack('Date Selection', {
+                    year: parseInt(year, 10).toString(),
+                    month: parseInt(month, 10).toString(),
+                    day: parseInt(day, 10).toString(),
+                  });
+                } else {
+                  setEntry({
+                    ...entry,
+                    published_at: '',
+                  });
+                }
+              }}
+            />
           </div>
         </div>
       </div>

@@ -1,12 +1,5 @@
-import {
-    Box,
-    Drawer,
-    Typography,
-    IconButton,
-    TextField,
-    InputAdornment,
-    CircularProgress,
-} from "@mui/material";
+import { createPortal } from "react-dom";
+import { CircleLoader } from "react-spinners";
 import { FaX, FaPaperPlane } from "react-icons/fa6";
 import { FiPlus } from "react-icons/fi";
 import { useEffect, useState } from "react";
@@ -31,21 +24,21 @@ interface StreamEvent {
 
 function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, handleSuggestion: (suggestion: string) => void }) {
     return (
-        <Box
+        <div
             className="flex items-center justify-center flex-1 rounded-lg p-2 cursor-pointer transition-colors duration-200 text-center text-sm bg-zinc-200 text-gray-500 hover:bg-zinc-300 dark:bg-zinc-700 dark:text-white dark:hover:bg-zinc-600"
             onClick={() => {
                 handleSuggestion(suggestion);
             }}
         >
             {suggestion}
-        </Box>
+        </div>
     );
 }
 
 
 function MessageElement({ msg, msgIndex, bookCatalogs }: { msg: AiMessage, msgIndex: number, bookCatalogs: Record<string, string> }) {
     const [books, setBooks] = useState<any[]>([]);
-    const getEntryDetail = useGetEntryDetail();
+    const { getEntryDetail } = useGetEntryDetail();
 
     useEffect(() => {
         if (msg.content.type === "entries" && Array.isArray(msg.content.data)) {
@@ -69,32 +62,28 @@ function MessageElement({ msg, msgIndex, bookCatalogs }: { msg: AiMessage, msgIn
 
     switch (msg.content.type) {
         case "message":
-            return <Box className="mb-2 p-2 rounded-lg max-w-[80%]"
-                sx={{
-                    backgroundColor: msg.role === "user" ? "primary.main" : "grey.200",
-                    color: msg.role === "user" ? "white" : "text.primary",
-                    alignSelf: msg.role === "user" ? "flex-end" : "flex-start",
-                }}>
+            return <div
+                className={`mb-2 p-2 rounded-lg max-w-[80%] ${
+                    msg.role === "user"
+                        ? "bg-primary text-white self-end"
+                        : "bg-zinc-200 text-black self-start"
+                }`}>
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content.data as string}</ReactMarkdown>
-            </Box>;
+            </div>;
         case "entries":
-            return <Box className="flex gap-3 mb-2 py-2 shrink-0"
+            return <div className="flex gap-3 mb-2 py-2 shrink-0"
             >
                 {books.map((entry: IEntry) => (
                     <EntryItem entry={entry} key={"ai-" + entry.id} id={'ai-' + entry.id} type="ai-recommendation" />
                 ))}
-            </Box>
+            </div>
         case "loading":
-            return <Box className="mb-2 p-2 rounded-lg max-w-[80%] flex items-center gap-2"
-                sx={{
-                    backgroundColor: "grey.200",
-                    alignSelf: "flex-start",
-                }}>
-                <CircularProgress size={16} />
-                <Typography variant="body2" className="text-gray-600">
+            return <div className="mb-2 p-2 rounded-lg max-w-[80%] flex items-center gap-2 bg-zinc-200 self-start">
+                <CircleLoader size={16} color={'var(--color-primary)'} />
+                <p className="text-sm text-gray-600">
                     {msg.content.data || "Generating response..."}
-                </Typography>
-            </Box>;
+                </p>
+            </div>;
         default:
             return <p className="dark:text-white text-center">404</p>
     }
@@ -118,7 +107,7 @@ export default function AiAssistant() {
         setAiShowSuggestions,
         selectedCatalogId,
     } = useAppContext();
-    const getEntryDetail = useGetEntryDetail();
+    const { getEntryDetail } = useGetEntryDetail();
 
     const [input, setInput] = useState("");
     const [isGeneratingResponse, setGeneratingResponse] = useState(false);
@@ -147,7 +136,7 @@ export default function AiAssistant() {
     }, [aiMessages]);
 
     useEffect(() => {
-        var assistantEntryId = searchParams.get('assistant-entry-id');
+        const assistantEntryId = searchParams.get('assistant-entry-id');
         if (assistantEntryId) {
             getEntryDetail(assistantEntryId, currentCatalogId).then((entry) => {
                 setAssistantEntry(entry);
@@ -155,6 +144,16 @@ export default function AiAssistant() {
         }
 
     }, [searchParams]);
+
+    useEffect(() => {
+        if (!showAiAssistant) return;
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "Escape") handleCloseDrawer({}, "escapeKeyDown");
+        };
+        document.addEventListener("keydown", onKey);
+        return () => document.removeEventListener("keydown", onKey);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [showAiAssistant, searchParams]);
 
     async function sendMessage(message: string) {
         setAiMessages((prev) => [...prev, {
@@ -177,7 +176,7 @@ export default function AiAssistant() {
         }]);
 
         try {
-            var currentChatId = aiChatId;
+            let currentChatId = aiChatId;
             if (!currentChatId) {
                 const response = await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/startchat`, {
                     apiKey: auth?.token || null,
@@ -350,7 +349,7 @@ export default function AiAssistant() {
         setAiBookCatalogs({});
     }
 
-    const handleCloseDrawer = (event: {}, reason: "backdropClick" | "escapeKeyDown") => {
+    const handleCloseDrawer = (event: object, reason: "backdropClick" | "escapeKeyDown") => {
         if (reason === "backdropClick") {
             setTimeout(() => {
                 setShowAiAssistant(false);
@@ -369,124 +368,99 @@ export default function AiAssistant() {
         setSearchParams(params);
     };
 
-    return (
-        <Drawer
-            anchor="right"
-            open={showAiAssistant}
-            onClose={handleCloseDrawer}
-            transitionDuration={300}
-            sx={{
-                zIndex: searchParams.get('dialog-priority') ?
-                    (searchParams.get('dialog-priority') == 'ai-assistant' ? 1200 : 49)
-                    : 1200
-            }}
-            PaperProps={{
-                sx: {
-                    maxWidth: 800,
-                    width: "100%",
-                    borderTopLeftRadius: 8,
-                    borderBottomLeftRadius: 8,
-                    backgroundColor: "#F4F6F9",
-                    ".dark &": {
-                        backgroundColor: '#27272A'
-                    },
-                    boxShadow: 6,
-                    overflow: "hidden",
-                },
-            }}
+    const drawerZIndex = searchParams.get('dialog-priority') ?
+        (searchParams.get('dialog-priority') == 'ai-assistant' ? 1200 : 49)
+        : 1200;
+
+    // Render through a portal to document.body — the previous MUI <Drawer>
+    // portaled out of the DOM, so this component is mounted inside HomeHeader's
+    // search <form>/<button>; rendering the panel inline would nest a <form>
+    // inside a <form> and a <button> inside a <button> (invalid HTML).
+    return createPortal(
+        <div
+            className={`fixed inset-0 transition-opacity duration-300 ${showAiAssistant ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            style={{ zIndex: drawerZIndex }}
+            aria-hidden={!showAiAssistant}
         >
-            <Box className="p-3 h-full flex flex-col">
-                {/* Header */}
-                <Box className="flex items-center justify-between mb-2">
-                    <Typography variant="h6" fontWeight={600} className="text-black dark:text-white">
-                        {t("assistant.title")}
-                    </Typography>
-                    <Box className="flex gap-1">
-                        <IconButton 
-                            onClick={newSession} 
-                            disabled={isGeneratingResponse}
-                            sx={{
-                                backgroundColor: isGeneratingResponse ? 'action.disabledBackground' : 'primary.main',
-                                color: 'white',
-                                '&:hover': {
-                                    backgroundColor: isGeneratingResponse ? 'action.disabledBackground' : 'primary.dark',
-                                },
-                                '&.Mui-disabled': {
-                                    backgroundColor: 'action.disabledBackground',
-                                    color: 'action.disabled',
-                                }
-                            }}
-                        >
-                            <FiPlus size={18} />
-                        </IconButton>
-                        <IconButton 
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleCloseDrawer({}, "escapeKeyDown");
-                            }}
-                            sx={{
-                                color: 'text.primary',
-                            }}
-                        >
-                            <FaX size={14} className="text-black dark:text-white" />
-                        </IconButton>
-                    </Box>
-                </Box>
+            {/* Backdrop */}
+            <div
+                className="absolute inset-0 bg-black/50"
+                onClick={() => handleCloseDrawer({}, "backdropClick")}
+            />
+            {/* Panel */}
+            <div
+                className={`absolute top-0 right-0 h-full w-full max-w-[800px] rounded-l-lg bg-[#F4F6F9] dark:bg-[#27272A] shadow-2xl overflow-hidden transition-transform duration-300 ${showAiAssistant ? "translate-x-0" : "translate-x-full"}`}
+            >
+                <div className="p-3 h-full flex flex-col">
+                    {/* Header */}
+                    <div className="flex items-center justify-between mb-2">
+                        <p className="text-xl font-semibold text-black dark:text-white">
+                            {t("assistant.title")}
+                        </p>
+                        <div className="flex gap-1">
+                            <button
+                                type="button"
+                                aria-label={t("assistant.title")}
+                                onClick={newSession}
+                                disabled={isGeneratingResponse}
+                                className="inline-flex items-center justify-center rounded-full p-2 bg-primary text-white hover:bg-primaryDark transition-colors disabled:bg-zinc-300 disabled:text-zinc-400"
+                            >
+                                <FiPlus size={18} />
+                            </button>
+                            <button
+                                type="button"
+                                aria-label="Close"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleCloseDrawer({}, "escapeKeyDown");
+                                }}
+                                className="inline-flex items-center justify-center rounded-full p-2 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                            >
+                                <FaX size={14} className="text-black dark:text-white" />
+                            </button>
+                        </div>
+                    </div>
 
-                {/* Body */}
-                <Box id="chat" className="flex flex-col grow overflow-y-auto">
-                    {aiMessages.map((msg, index) => (
-                        <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} msgIndex={index} bookCatalogs={aiBookCatalogs} />
-                    ))}
-                </Box>
+                    {/* Body */}
+                    <div id="chat" className="flex flex-col grow overflow-y-auto">
+                        {aiMessages.map((msg, index) => (
+                            <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} msgIndex={index} bookCatalogs={aiBookCatalogs} />
+                        ))}
+                    </div>
 
-                {/* Input */}
-                <Box component="form" onSubmit={handleSubmit}>
-                    {!assistantEntry && aiShowSuggestions ? <Box className="flex gap-2 mb-2">
-                        <AiSuggestion suggestion={t("assistant.suggestion1")} handleSuggestion={handleSuggestion} />
-                        <AiSuggestion suggestion={t("assistant.suggestion2")} handleSuggestion={handleSuggestion} />
-                    </Box> : null}
-                    {assistantEntry ?
-                        <Box className="mb-0.5 p-0 rounded-lg bg-inherit dark:text-zinc-200 self-start flex w-full items-center">
-                            <Typography className="whitespace-nowrap max-w-full overflow-hidden text-ellipsis text-xs pr-2">
-                                {t("assistant.entryAssistant", { x: assistantEntry.title })}
-                            </Typography>
-                            <Box className="ml-auto" onClick={() => { clearAssistantEntry(); }}>
-                                <FaX size={12} className="text-black dark:text-white cursor-pointer" />
-                            </Box>
-                        </Box> : null
-                    }
-                    <TextField
-                        fullWidth
-                        size="small"
-                        disabled={isGeneratingResponse}
-                        placeholder={t("assistant.inputPlaceholder")}
-                        sx={{
-                            backgroundColor: "grey.100",
-                            borderRadius: 2,
-                            "&:hover": { backgroundColor: "grey.200" },
-                            ".dark &": {
-                                backgroundColor: '#3f3f46',
-                                "&:hover": { backgroundColor: '#4b5563' },
-                                "& .MuiInputBase-input": {
-                                    color: '#e5e7eb',
-                                }
-                            },
-                        }}
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton type="submit" edge="end">
-                                        <FaPaperPlane size={14} className="dark:text-white" />
-                                    </IconButton>
-                                </InputAdornment>
-                            ),
-                        }}
-                    />
-                </Box>
-            </Box>
-        </Drawer >
+                    {/* Input */}
+                    <form onSubmit={handleSubmit}>
+                        {!assistantEntry && aiShowSuggestions ? <div className="flex gap-2 mb-2">
+                            <AiSuggestion suggestion={t("assistant.suggestion1")} handleSuggestion={handleSuggestion} />
+                            <AiSuggestion suggestion={t("assistant.suggestion2")} handleSuggestion={handleSuggestion} />
+                        </div> : null}
+                        {assistantEntry ?
+                            <div className="mb-0.5 p-0 rounded-lg bg-inherit dark:text-zinc-200 self-start flex w-full items-center">
+                                <p className="whitespace-nowrap max-w-full overflow-hidden text-ellipsis text-xs pr-2">
+                                    {t("assistant.entryAssistant", { x: assistantEntry.title })}
+                                </p>
+                                <div className="ml-auto" onClick={() => { clearAssistantEntry(); }}>
+                                    <FaX size={12} className="text-black dark:text-white cursor-pointer" />
+                                </div>
+                            </div> : null
+                        }
+                        <div className="flex items-center gap-2 rounded-lg px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-[#3f3f46] dark:hover:bg-[#4b5563]">
+                            <input
+                                type="text"
+                                disabled={isGeneratingResponse}
+                                placeholder={t("assistant.inputPlaceholder")}
+                                className="flex-1 bg-transparent outline-none text-sm text-black dark:text-[#e5e7eb] disabled:opacity-60"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                            />
+                            <button type="submit" aria-label="Send" className="inline-flex items-center justify-center p-1">
+                                <FaPaperPlane size={14} className="dark:text-white" />
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>,
+        document.body
     );
 }

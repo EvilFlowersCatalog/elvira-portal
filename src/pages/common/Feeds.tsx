@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { IFeed } from '../../utils/interfaces/feed';
 import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
@@ -7,133 +7,84 @@ import ItemContainer from '../../components/items/container/ItemContainer';
 import Feed from '../../components/items/feeds/Feed';
 import LoadNext from '../../components/items/loadings/LoadNext';
 import { useTranslation } from 'react-i18next';
-import { Checkbox, FormControlLabel } from '@mui/material';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
 
 const Feeds = () => {
   const { selectedCatalogId } = useAppContext();
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [loadingNext, setLoadingNext] = useState<boolean>(true);
-  const [isError, setIsError] = useState<boolean>(false);
-  const [page, setPage] = useState<number>(0);
-  const [maxPage, setMaxPage] = useState<number>(0);
-  const [feeds, setFeeds] = useState<IFeed[]>([]);
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [searchAll, setSearchAll] = useState<boolean>(false);
+  const [searchParams] = useSearchParams();
+  const [currentFeedDescription, setCurrentFeedDescription] = useState<string>('');
+  const [currentFeedTitle, setCurrentFeedTitle] = useState<string>('');
 
   const { t } = useTranslation();
   const getFeeds = useGetFeeds();
   const getFeedDetail = useGetFeedDetail();
-  const [currentFeedDescription, setCurrentFeedDescription] = useState<string>('');
-  const [currentFeedTitle, setCurrentFeedTitle] = useState<string>('');
 
-  // Reload feeds when catalog changes
-  useEffect(() => {
-    setPage(0);
-    setFeeds([]);
-    setIsLoading(true);
-  }, [selectedCatalogId]);
+  // Current level in the drill-down chain (parent-id = folderA&folderB&…).
+  const currentFeedId = useMemo(() => {
+    const fp = searchParams.get('parent-id')?.split('&').filter(Boolean) ?? [];
+    return fp.length > 0 ? fp[fp.length - 1] : null;
+  }, [searchParams]);
 
-  useEffect(() => {
-    setSearchParams((prev) => {
-      const newParams = new URLSearchParams(prev);
-      newParams.set('search-all', searchAll.toString());
-      return newParams;
-    });
-  }, [searchAll]);
+  const filters = useMemo(() => {
+    const title = searchParams.get('query') ?? '';
+    // A text query searches everywhere; otherwise scope to the current folder.
+    const parentId = title.length > 0 ? '' : currentFeedId ?? 'null';
+    return { title, parentId, orderBy: searchParams.get('order-by') ?? '' };
+  }, [searchParams, currentFeedId]);
 
+  const list = useInfiniteItemContainer<IFeed>(
+    ['feeds-infinite', selectedCatalogId, filters],
+    () => getFeeds({ paginate: false, ...filters })
+  );
+
+  // Resolve the current folder's title/description for the header.
   useEffect(() => {
-    if (page === 0) {
-      setPage(1);
+    if (!currentFeedId || currentFeedId === 'null') {
+      setCurrentFeedDescription('');
+      setCurrentFeedTitle('');
       return;
     }
-
-    (async () => {
-      const fp = searchParams.get('parent-id')?.split('&') ?? [];
-      const currentFeedId = fp.length > 0 ? fp[fp.length - 1] : null;
-
-      var title = searchParams.get('query') ?? '';
-      var parentId = fp.length > 0 ? fp[fp.length - 1] : 'null'
-      if (searchAll && title.length > 0) {
-        var params = new URLSearchParams(searchParams);
-        params.delete('parent-id');
-        setSearchParams(params);
-        parentId = '';
-      }
-
-      const options = {
-        paginate: false,
-        orderBy: searchParams.get('order-by') ?? '',
-        title,
-        parentId,
-      }
-
-      try {
-        const { items, metadata } = await getFeeds(options);
-
-        // Set items and metadata
-        setMaxPage(metadata.pages);
-        setFeeds([...(feeds ?? []), ...items]);
-        
-        // Fetch and set description from current parent feed
-        if (currentFeedId && currentFeedId !== 'null') {
-          try {
-            const feedDetail = await getFeedDetail(currentFeedId);
-            setCurrentFeedDescription(feedDetail.content || '');
-            setCurrentFeedTitle(feedDetail.title || '');
-          } catch {
-            setCurrentFeedDescription('');
-            setCurrentFeedTitle('');
-          }
-        } else {
-          setCurrentFeedDescription('');
-          setCurrentFeedTitle('');
-        }
-      } catch {
-        // if there was error set to true
-        setIsError(true);
-      } finally {
-        // after everything set false
-        setIsLoading(false);
-        setLoadingNext(false);
-      }
-    })();
-  }, [page]);
+    let alive = true;
+    getFeedDetail(currentFeedId)
+      .then((feed) => {
+        if (!alive) return;
+        setCurrentFeedDescription(feed.content || '');
+        setCurrentFeedTitle(feed.title || '');
+      })
+      .catch(() => {
+        if (!alive) return;
+        setCurrentFeedDescription('');
+        setCurrentFeedTitle('');
+      });
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentFeedId]);
 
   return (
     <ItemContainer
-      isLoading={isLoading}
-      setIsLoading={setIsLoading}
-      isError={isError}
-      items={feeds}
-      setItems={setFeeds}
-      page={page}
-      setPage={setPage}
-      maxPage={maxPage}
-      loadingNext={loadingNext}
-      setLoadingNext={setLoadingNext}
-      isEntries={false}
-      searchSpecifier={'query'}
-      title={`${t('navbarMenu.feeds')} ${ currentFeedTitle ? ` - ${currentFeedTitle}` : ''}`}
+      list={list}
+      isEntries={true}
+      searchSpecifier="query"
+      title={t('navbarMenu.feeds')}
       description={currentFeedDescription}
       shouldRedirectSuggestions={true}
-      customFilters={
-        <div className="flex items-center gap-2">
-          <FormControlLabel control={<Checkbox sx={{
-            '.dark & .MuiSvgIcon-root': {
-              color: 'white',
-            }
-          }} onClick={() => {
-            setSearchAll(true);
-          }} />} label={t('searchBar.searchAll')} />
-        </div>
-      }
+      showResultsHeading={false}
     >
-      <div className='flex flex-wrap px-3 pb-4'>
-        {feeds.map((feed, index) => (
-          <Feed key={index} feed={feed} />
-        ))}
-        {loadingNext && <LoadNext />}
+      <div className='flex flex-col px-3 pb-4 gap-4'>
+        {currentFeedTitle && (
+          <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>
+            {currentFeedTitle}
+          </h2>
+        )}
+        <div className='flex flex-wrap'>
+          {list.items.map((feed, index) => (
+            <Feed key={index} feed={feed} />
+          ))}
+          {list.loadingNext && <LoadNext />}
+        </div>
       </div>
     </ItemContainer>
   );

@@ -1,23 +1,16 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
-import { IoSearchOutline } from "react-icons/io5";
-import { useSearchParams } from "react-router-dom";
-import useAppContext from "../../hooks/contexts/useAppContext";
-import ElviraInput from "../inputs/ElviraInput";
-import { MenuItem, Select, SelectChangeEvent } from "@mui/material";
-import { MUISelectStyle } from "../inputs/ElviraSelect";
-import { RiCloseLine } from "react-icons/ri";
-import AiAssistant from "../dialogs/AiAssistant";
-import SearchSuggestions from "./SearchSuggestions";
-import {
-  AcceptedLanguage,
-  getLanguage,
-} from "../../hooks/api/languages/languages";
-import useGetCategories from "../../hooks/api/categories/useGetCategories";
-import useGetFeeds from "../../hooks/api/feeds/useGetFeeds";
-import { ICategory } from "../../utils/interfaces/category";
-import { IFeed } from "../../utils/interfaces/feed";
-import i18next from "../../utils/i18n/i18next";
+import { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
+import useAppContext from '../../hooks/contexts/useAppContext';
+import { AcceptedLanguage, getLanguage } from '../../hooks/api/languages/languages';
+import useGetCategories from '../../hooks/api/categories/useGetCategories';
+import useFeedsQuery from '../../hooks/api/feeds/useFeedsQuery';
+import { ICategory } from '../../utils/interfaces/category';
+import { IFeed } from '../../utils/interfaces/feed';
+import i18next from '../../utils/i18n/i18next';
+import SearchBar from './SearchBar';
+import FilterChips, { FilterChipItem } from './FilterChips';
+import SortSelect from './SortSelect';
 
 interface IToolsContainerParams {
   advancedSearch?: boolean;
@@ -39,167 +32,85 @@ const ToolsContainer = ({
   shouldRedirectSuggestions = false,
 }: IToolsContainerParams) => {
   const { t } = useTranslation();
-  const {
-    clearFilters,
-    isParamsEmpty,
-    umamiTrack,
-    showAdvancedSearch,
-    setShowAdvancedSearch,
-    setShowAiAssistant,
-  } = useAppContext();
-
+  const { clearFilters, umamiTrack, showAdvancedSearch, setShowAdvancedSearch } = useAppContext();
   const [searchParams, setSearchParams] = useSearchParams();
-  const orderBy = searchParams.get("order-by") || "-created_at";
-  const [input, setInput] = useState<string>("");
-  const [isFocused, setIsFocused] = useState<boolean>(false);
+  const orderBy = searchParams.get('order-by') || '-created_at';
+
   const [categories, setCategories] = useState<ICategory[]>([]);
-  const [feeds, setFeeds] = useState<IFeed[]>([]);
 
   const getCategories = useGetCategories();
-  const getFeeds = useGetFeeds();
+
+  // Collections list (cached/deduped by React Query).
+  const { data: feedsData } = useFeedsQuery({ paginate: false });
+  const feeds: IFeed[] = useMemo(() => feedsData?.items ?? [], [feedsData]);
 
   useEffect(() => {
-    if (!advancedSearch) {
-      setShowAdvancedSearch(false);
-    }
+    if (!advancedSearch) setShowAdvancedSearch(false);
   }, [advancedSearch]);
 
   useEffect(() => {
     (async () => {
-      const { items: itemsCategories } = await getCategories({
-        paginate: false,
-      });
-      const { items: itemsFeeds } = await getFeeds({ paginate: false });
+      const { items: itemsCategories } = await getCategories({ paginate: false });
       setCategories(itemsCategories);
-      setFeeds(itemsFeeds);
     })();
   }, []);
 
-  // submit input (search title)
-  const submit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    // If there is input set it to params else delete it
-
-    if (input) searchParams.set(param, input);
-    else searchParams.delete(param);
-
-    setSearchParams(searchParams);
-  };
-
-  useEffect(() => {
-    const query = searchParams.get("query") || "";
-    setInput(query);
-  }, [searchParams]);
-
-  // Handle input
-  const handleSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
-    setInput(e.target.value);
-  };
-
-  const handleSelectChange = (e: SelectChangeEvent) => {
-    if (e.target.value === "none") searchParams.delete("order-by");
-    else searchParams.set("order-by", e.target.value);
+  const handleSelectChange = (value: string) => {
+    if (value === 'none') searchParams.delete('order-by');
+    else searchParams.set('order-by', value);
     setSearchParams(searchParams);
   };
 
   const handleClear = () => {
-    umamiTrack("Clear Filters Button");
-    setInput("");
+    umamiTrack('Clear Filters Button');
     clearFilters();
   };
 
   const removeFilter = (paramName: string, itemId?: string) => {
-    if (itemId && (paramName === "categories" || paramName === "feeds")) {
-      // Remove individual item from comma-separated list
+    if (itemId && (paramName === 'categories' || paramName === 'feeds')) {
       const currentValue = searchParams.get(paramName);
       if (currentValue) {
-        const items = currentValue.split(",");
-        const updatedItems = items.filter((id) => id !== itemId);
-
-        if (updatedItems.length > 0) {
-          searchParams.set(paramName, updatedItems.join(","));
-        } else {
-          searchParams.delete(paramName);
-        }
+        const items = currentValue.split(',').filter((id) => id !== itemId);
+        if (items.length > 0) searchParams.set(paramName, items.join(','));
+        else searchParams.delete(paramName);
       }
     } else {
-      // Remove entire param
       searchParams.delete(paramName);
-      if (paramName === param) {
-        setInput("");
-      }
     }
     setSearchParams(searchParams);
   };
 
-  const getActiveFilters = () => {
-    const filters: {
-      key: string;
-      value: string;
-      label: string;
-      itemId?: string;
-    }[] = [];
-    const excludedParams = [
-      "order-by",
-      "dialog-priority",
-      "assistant-entry-id",
-      "feed-id-step",
-      "parent-id",
-      "search-all",
-    ];
+  const getActiveFilters = (): FilterChipItem[] => {
+    const filters: FilterChipItem[] = [];
+    const excluded = ['order-by', 'dialog-priority', 'assistant-entry-id', 'feed-id-step', 'parent-id', 'search-all'];
 
     searchParams.forEach((value, key) => {
-      if (!excludedParams.includes(key) && value.trim() !== "") {
-        // Handle categories and feeds separately - create a chip for each item
-        if (key === "categories") {
-          const categoryIds = value.split(",");
-          categoryIds.forEach((categoryId) => {
-            const category = categories.find((cat) => cat.id === categoryId);
-            if (category) {
-              filters.push({
-                key,
-                value: categoryId,
-                label: category.term,
-                itemId: categoryId,
-              });
-            }
-          });
-        } else if (key === "feeds") {
-          const feedIds = value.split(",");
-          feedIds.forEach((feedId) => {
-            const feed = feeds.find((f) => f.id === feedId);
-            if (feed) {
-              filters.push({
-                key,
-                value: feedId,
-                label: feed.title,
-                itemId: feedId,
-              });
-            }
-          });
-        } else {
-          // Handle other filter types normally
-          let displayLabel = value;
+      if (excluded.includes(key) || !value.trim()) return;
 
-          if (key === "languageCode") {
-            const lang = getLanguage(value);
-            displayLabel =
-              lang?.name[i18next.language as AcceptedLanguage] || value;
-          } else if (key === "category-id") {
-            const category = categories.find((cat) => cat.id === value);
-            displayLabel = category?.term || value;
-          } else if (key === "feed-id") {
-            const feed = feeds.find((f) => f.id === value);
-            displayLabel = feed?.title || value;
-          } else if (key === "publishedAtGte") {
-            displayLabel = `${t("searchBar.yearFrom")}: ${value}`;
-          } else if (key === "publishedAtLte") {
-            displayLabel = `${t("searchBar.yearTo")}: ${value}`;
-          }
-
-          filters.push({ key, value, label: displayLabel });
+      if (key === 'categories') {
+        value.split(',').forEach((categoryId) => {
+          const category = categories.find((c) => c.id === categoryId);
+          if (category) filters.push({ key, value: categoryId, label: category.term, itemId: categoryId });
+        });
+      } else if (key === 'feeds') {
+        value.split(',').forEach((feedId) => {
+          const feed = feeds.find((f) => f.id === feedId);
+          if (feed) filters.push({ key, value: feedId, label: feed.title, itemId: feedId });
+        });
+      } else {
+        let label = value;
+        if (key === 'languageCode') {
+          label = getLanguage(value)?.name[i18next.language as AcceptedLanguage] || value;
+        } else if (key === 'category-id') {
+          label = categories.find((c) => c.id === value)?.term || value;
+        } else if (key === 'feed-id') {
+          label = feeds.find((f) => f.id === value)?.title || value;
+        } else if (key === 'publishedAtGte') {
+          label = `${t('searchBar.yearFrom')}: ${value}`;
+        } else if (key === 'publishedAtLte') {
+          label = `${t('searchBar.yearTo')}: ${value}`;
         }
+        filters.push({ key, value, label });
       }
     });
 
@@ -209,143 +120,33 @@ const ToolsContainer = ({
   const activeFilters = getActiveFilters();
 
   return (
-    <div className={`flex gap-4 px-4 item-start flex-col md:flex-row z-10`}>
+    <div className="flex gap-4 px-4 item-start flex-col md:flex-row z-10">
       <div className="w-full pl-1 pb-2 border-b-2 border-gray-300 dark:border-gray-700">
         <div className="flex gap-4 items-center">
-          <form
-            className="relative flex flex-col flex-1 items-center gap-2 text-darkGray dark:text-white"
-            onSubmit={submit}
-          >
-            <ElviraInput
-              type={"text"}
-              value={input}
-              placeholder={t("tools.search")}
-              onChange={handleSearchInput}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setTimeout(() => setIsFocused(false), 200)}
-              className={`border-none ${import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES == "true" && aiEnabled ? "md:pr-32" : "pr-10"}`}
-              paddingLeft={40}
-            />
-
-            <button type="submit" className={"absolute left-2 top-[31px]"}>
-              <IoSearchOutline size={25} />
-            </button>
-
-            {enableSuggestions && isFocused && (
-              <SearchSuggestions 
-                searchQuery={input} 
-                onClose={() => setIsFocused(false)}
-                shouldRedirect={shouldRedirectSuggestions}
-              />
-            )}
-
-            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES == "true" && aiEnabled && (
-              <>
-                <button
-                  onClick={() => {
-                    setShowAiAssistant(true);
-                  }}
-                  className="absolute md:right-4 md:bottom-2 size-fit flex items-center gap-2 text-xs text-primary bg-primaryLight rounded-md px-2 py-1 max-md:relative max-md:w-full max-md:flex max-md:justify-center max-md:p-3"
-                >
-                  <svg
-                    className="w-4"
-                    viewBox="0 0 18 18"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M16.5 8.58333C16.5029 9.68322 16.2459 10.7682 15.75 11.75C15.162 12.9264 14.2581 13.916 13.1395 14.6077C12.021 15.2995 10.7319 15.6662 9.41667 15.6667C8.31678 15.6695 7.23176 15.4126 6.25 14.9167L1.5 16.5L3.08333 11.75C2.58744 10.7682 2.33047 9.68322 2.33333 8.58333C2.33384 7.26812 2.70051 5.97904 3.39227 4.86045C4.08402 3.74187 5.07355 2.83797 6.25 2.24999C7.23176 1.7541 8.31678 1.49713 9.41667 1.49999H9.83333C11.5703 1.59582 13.2109 2.32896 14.441 3.55904C15.671 4.78912 16.4042 6.4297 16.5 8.16666V8.58333Z"
-                      stroke="currentColor"
-                      strokeWidth="1.25"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <p className="whitespace-nowrap">{t("assistant.title")}</p>
-                </button>
-                <AiAssistant />
-              </>
-            )}
-          </form>
+          <SearchBar
+            param={param}
+            aiEnabled={aiEnabled}
+            enableSuggestions={enableSuggestions}
+            shouldRedirectSuggestions={shouldRedirectSuggestions}
+          />
         </div>
 
-        <div className={`transition-all duration-400 w-full mt-2`}>
+        <div className="transition-all duration-400 w-full mt-7">
           <div className="grid lg:grid-cols-[auto_1fr_auto] grid-cols-2 gap-3 w-full text-[15px] items-start">
             {advancedSearch && (
               <button
                 className="text-sm text-secondary dark:text-secondaryLight font-medium hover:underline whitespace-nowrap w-fit"
                 onClick={() => {
-                  umamiTrack("Advanced Search Button");
+                  umamiTrack('Advanced Search Button');
                   setShowAdvancedSearch(!showAdvancedSearch);
                 }}
               >
-                {t("tools.advancedSearch")}
+                {t('tools.advancedSearch')}
               </button>
             )}
             {customFilters}
-            <div className="flex flex-wrap gap-2 w-full max-lg:order-3 max-lg:col-span-2">
-              {activeFilters.length > 0 && activeFilters.map((filter, index) => (
-                    <div
-                      key={`${filter.key}-${filter.itemId || filter.value}-${index}`}
-                      className="flex items-center gap-1 px-3 py-1 rounded-md bg-primaryLight dark:bg-primaryDark text-primary dark:text-primaryDark font-medium text-xs"
-                    >
-                      <span>{filter.label}</span>
-                      <button
-                        onClick={() => removeFilter(filter.key, filter.itemId)}
-                        className="hover:opacity-70 transition-opacity"
-                        aria-label={`Remove ${filter.label} filter`}
-                      >
-                        <RiCloseLine size={18} />
-                      </button>
-                    </div>
-                  ))}
-
-              {activeFilters.length > 0 && (
-                <button
-                  className="text-sm text-secondary dark:text-secondaryLight font-semibold hover:underline"
-                  onClick={handleClear}
-                >
-                  {t("tools.clearFilters")}
-                </button>
-              )}
-            </div>
-
-            {enableSort && (
-              <Select
-                className="ml-auto dark:text-white"
-                sx={MUISelectStyle}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      "& .MuiList-root": { paddingBottom: 0, paddingTop: 0 },
-                    },
-                  },
-                }}
-                label={"Sort By"}
-                value={orderBy}
-                labelId="sort-label"
-                id="orderBy"
-                onChange={handleSelectChange}
-                variant="standard"
-              >
-                <MenuItem value="created_at">
-                  {t("tools.orderBy.createdAtAsc")}
-                </MenuItem>
-                <MenuItem value="-created_at">
-                  {t("tools.orderBy.createdAtDesc")}
-                </MenuItem>
-                <MenuItem value="title">{t("tools.orderBy.titleAsc")}</MenuItem>
-                <MenuItem value="-title">
-                  {t("tools.orderBy.titleDesc")}
-                </MenuItem>
-                <MenuItem value="-popularity">
-                  {t("tools.orderBy.popularityDesc")}
-                </MenuItem>
-                <MenuItem value="popularity">
-                  {t("tools.orderBy.popularityAsc")}
-                </MenuItem>
-              </Select>
-            )}
+            <FilterChips filters={activeFilters} onRemove={removeFilter} onClear={handleClear} />
+            {enableSort && <SortSelect value={orderBy} onChange={handleSelectChange} />}
           </div>
         </div>
       </div>
