@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
 import { addDays, format } from "date-fns";
@@ -31,6 +32,7 @@ function mimeToFormat(mime: string): string {
 export default function LicenseCalendar() {
   const { t } = useTranslation();
   const { auth } = useAuthContext();
+  const queryClient = useQueryClient();
   const [searchParams, setSearchParams] = useSearchParams();
   const { getEntryDetail } = useGetEntryDetail();
   const getUserDetails = useGetUserDetails();
@@ -124,6 +126,7 @@ export default function LicenseCalendar() {
       });
       setCreatedLicense(license);
       setView('success');
+      queryClient.invalidateQueries({ queryKey: ['licenses'] });
     } catch {
       toast.error(t("notifications.license.create.error"));
     } finally {

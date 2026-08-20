@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { RiCloseLine } from 'react-icons/ri';
 import { FiCheckCircle } from 'react-icons/fi';
@@ -23,6 +24,7 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const renewLicense = useRenewLicense();
+  const queryClient = useQueryClient();
   const { auth } = useAuthContext();
   const { t } = useTranslation();
   const dialogRef = useFocusTrap(true);
@@ -58,6 +60,7 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
     try {
       await renewLicense(license.id, newExpiry.toISOString());
       setSuccess(true);
+      queryClient.invalidateQueries({ queryKey: ['licenses'] });
       onSuccess();
     } catch (e) {
       // Surface the API's RFC 7807 `detail` — it explains *why* (embargo, queue,

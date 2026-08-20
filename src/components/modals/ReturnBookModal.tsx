@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { RiCloseLine } from 'react-icons/ri';
 import { RxCalendar } from 'react-icons/rx';
@@ -21,6 +22,7 @@ interface Props {
 export default function ReturnBookModal({ license, onClose, onSuccess }: Props) {
   const [loading, setLoading] = useState(false);
   const updateLicense = useUpdateLicenseState();
+  const queryClient = useQueryClient();
   const { auth } = useAuthContext();
   const { t } = useTranslation();
   const dialogRef = useFocusTrap(true);
@@ -42,6 +44,7 @@ export default function ReturnBookModal({ license, onClose, onSuccess }: Props) 
     try {
       await updateLicense(license.id, LICENSE_ACTION.returned);
       toast.success(t(`${M}.returnSuccess`, { defaultValue: 'The book was returned successfully.' }));
+      queryClient.invalidateQueries({ queryKey: ['licenses'] });
       onSuccess();
       onClose();
     } catch (e) {
