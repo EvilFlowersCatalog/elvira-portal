@@ -331,45 +331,26 @@ export function AdvancedSearch() {
                 />
             </div>
 
-            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' ? (
-                <>
-                    <SectionDivider />
-                    <AdvancedCheckboxes
-                        title={t('searchBar.categories')}
-                        options={categoryOptions}
-                        selected={activeCategories.map(cat => cat.id)}
-                        setSelected={selected => {
-                            setActiveCategories(allCategories.filter(cat => selected.includes(cat.id)));
-                        }}
-                    />
+            <SectionDivider />
+            <AdvancedCheckboxes
+                title={t('searchBar.categories')}
+                options={categoryOptions}
+                selected={activeCategories.map(cat => cat.id)}
+                setSelected={selected => {
+                    setActiveCategories(allCategories.filter(cat => selected.includes(cat.id)));
+                }}
+            />
 
-                    <SectionDivider />
-                    <AdvancedCheckboxes
-                        title={t('searchBar.feeds')}
-                        enableSearch
-                        options={feedOptions}
-                        selected={activeFeeds.map(feed => feed.id)}
-                        setSelected={selected => {
-                            setActiveFeeds(allFeeds.filter(feed => selected.includes(feed.id)));
-                        }}
-                    />
-                </>
-            ) : (
-                <>
-                    <SectionDivider />
-                    <FeedAutofill
-                        entryForm={activeFeeds[0]}
-                        setEntryForm={setActiveFeeds}
-                        single
-                    />
-                    <CategoryAutofill
-                        entryForm={activeCategories[0]}
-                        setEntryForm={setActiveCategories}
-                        single
-                        setIsSelectionOpen={() => {}}
-                    />
-                </>
-            )}
+            <SectionDivider />
+            <AdvancedCheckboxes
+                title={t('searchBar.feeds')}
+                enableSearch
+                options={feedOptions}
+                selected={activeFeeds.map(feed => feed.id)}
+                setSelected={selected => {
+                    setActiveFeeds(allFeeds.filter(feed => selected.includes(feed.id)));
+                }}
+            />
         </div>
     );
 }
