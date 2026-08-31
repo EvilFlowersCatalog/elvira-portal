@@ -3,7 +3,6 @@ import useAppContext from "../../../hooks/contexts/useAppContext"
 import { useTranslation } from "react-i18next";
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { ICategory } from "../../../utils/interfaces/category";
-import LanguageAutofill from "../../autofills/LanguageAutofill";
 import CategoryAutofill from "../../autofills/CategoryAutofill";
 import FeedAutofill from "../../autofills/FeedAutofill";
 import { IoClose } from "react-icons/io5";
@@ -13,6 +12,8 @@ import DualRangeSlider from "../../primitives/DualRangeSlider";
 import useGetCategories from "../../../hooks/api/categories/useGetCategories";
 import useFeedsQuery from "../../../hooks/api/feeds/useFeedsQuery";
 import useGetEntries from "../../../hooks/api/entries/useGetEntries";
+import useEntryFacets from "../../../hooks/api/entries/useEntryFacets";
+import { AcceptedLanguage, getLanguage, getLanguages } from "../../../hooks/api/languages/languages";
 import { IFeed } from "../../../utils/interfaces/feed";
 import { AvailabilityState } from "../entry/details/AvailabilityBadge";
 
@@ -73,10 +74,10 @@ export function AdvancedSearchWrapper({ children }: { children: React.ReactNode 
 
 export function AdvancedSearch() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const [year, setYear] = useState<string[]>(["", ""]);
-    const [languageCode, setLanguageCode] = useState<string>('');
+    const [languageCodes, setLanguageCodes] = useState<string[]>([]);
     const [availability, setAvailability] = useState<AvailabilityState[]>([]);
     const yearDebounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -85,6 +86,7 @@ export function AdvancedSearch() {
 
     const getEntries = useGetEntries();
     const getCategories = useGetCategories();
+    const facets = useEntryFacets();
     const [allCategories, setAllCategories] = useState<ICategory[]>([]);
     const [activeCategories, setActiveCategories] = useState<ICategory[]>([]);
 
@@ -152,7 +154,7 @@ export function AdvancedSearch() {
         if (year[1]) searchParams.set('publishedAtLte', year[1].toString());
         else searchParams.delete('publishedAtLte');
 
-        if (languageCode) searchParams.set('languageCode', languageCode);
+        if (languageCodes.length > 0) searchParams.set('languageCode', languageCodes.join(','));
         else searchParams.delete('languageCode');
 
         if (availability.length > 0) searchParams.set('availability', availability.join(','));
@@ -178,7 +180,11 @@ export function AdvancedSearch() {
         if (year[0] !== publishedAtGte || year[1] !== publishedAtLte) {
             setYear([publishedAtGte, publishedAtLte]);
         }
-        if (languageCode !== languageCodeParam) setLanguageCode(languageCodeParam);
+
+        const newLanguageCodes = languageCodeParam ? languageCodeParam.split(',') : [];
+        if ([...languageCodes].sort().join(',') !== [...newLanguageCodes].sort().join(',')) {
+            setLanguageCodes(newLanguageCodes);
+        }
 
         const newAvailability = availabilityParam
             ? (availabilityParam.split(',') as AvailabilityState[])
@@ -203,7 +209,7 @@ export function AdvancedSearch() {
     useEffect(() => {
         const debounce = setTimeout(() => { performSearch(); }, 300);
         return () => clearTimeout(debounce);
-    }, [languageCode, activeCategories, activeFeeds, availability]);
+    }, [languageCodes, activeCategories, activeFeeds, availability]);
 
     useEffect(() => {
         if (yearDebounceTimeout.current) clearTimeout(yearDebounceTimeout.current);
@@ -220,6 +226,19 @@ export function AdvancedSearch() {
         allFeeds.map(feed => ({ label: feed.title, value: feed.id })),
         [allFeeds]
     );
+
+    // Languages present in the catalog (from the facet sample); falls back to the
+    // full ISO list until the sample is available so the filter still works.
+    const languageOptions = useMemo(() => {
+        const locale = i18n.language as AcceptedLanguage;
+        const sampledCodes = Object.keys(facets.languageCounts);
+        const entries = sampledCodes.length > 0
+            ? sampledCodes.map(code => ({ value: code, label: getLanguage(code)?.name[locale] ?? code }))
+            : getLanguages(locale).map(lang => ({ value: lang.alpha2 ?? lang.alpha3 ?? '', label: lang.name }));
+        return entries
+            .filter(o => o.value)
+            .sort((a, b) => a.label.localeCompare(b.label));
+    }, [facets.languageCounts, i18n.language]);
 
     const handleYearChange = (index: 0 | 1, value: string) => {
         const newYear = [...year];
@@ -316,20 +335,13 @@ export function AdvancedSearch() {
             </div>
 
             <SectionDivider />
-
-            {/* Jazyk */}
-            <div className="flex flex-col gap-3">
-                <p className="text-[14px] font-medium text-darkGray dark:text-white tracking-[0.1px]">
-                    {t('searchBar.language')}
-                </p>
-                <LanguageAutofill
-                    defaultLanguageCode={languageCode}
-                    languageCode={languageCode}
-                    setLanguageCode={setLanguageCode}
-                    setIsSelectionOpen={() => {}}
-                    isRequired={false}
-                />
-            </div>
+            <AdvancedCheckboxes
+                title={t('searchBar.language')}
+                options={languageOptions}
+                selected={languageCodes}
+                setSelected={setLanguageCodes}
+                counts={Object.keys(facets.languageCounts).length ? facets.languageCounts : undefined}
+            />
 
             <SectionDivider />
             <AdvancedCheckboxes
@@ -339,6 +351,7 @@ export function AdvancedSearch() {
                 setSelected={selected => {
                     setActiveCategories(allCategories.filter(cat => selected.includes(cat.id)));
                 }}
+                counts={Object.keys(facets.categoryCounts).length ? facets.categoryCounts : undefined}
             />
 
             <SectionDivider />
@@ -350,6 +363,7 @@ export function AdvancedSearch() {
                 setSelected={selected => {
                     setActiveFeeds(allFeeds.filter(feed => selected.includes(feed.id)));
                 }}
+                counts={Object.keys(facets.feedCounts).length ? facets.feedCounts : undefined}
             />
         </div>
     );

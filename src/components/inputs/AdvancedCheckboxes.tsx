@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { IoSearch } from "react-icons/io5";
 import Checkbox from "../primitives/Checkbox";
@@ -8,24 +8,37 @@ export default function AdvancedCheckboxes({
     selected,
     setSelected,
     title,
+    counts,
     enableSearch = false
 }: {
     options: { label: string; value: string }[];
     selected: string[];
     setSelected: (selected: string[]) => void;
     title?: string;
+    /** Optional per-value book counts. When given, options with no books are hidden and the count is shown next to the label. */
+    counts?: Record<string, number>;
     enableSearch?: boolean;
 }) {
     const { t } = useTranslation();
     const [showMore, setShowMore] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [filteredOptions, setFilteredOptions] = useState(options);
+
+    const visibleOptions = useMemo(
+        () => (counts
+            ? options
+                .filter(o => (counts[o.value] ?? 0) > 0)
+                .sort((a, b) => (counts[b.value] ?? 0) - (counts[a.value] ?? 0))
+            : options),
+        [options, counts]
+    );
+
+    const [filteredOptions, setFilteredOptions] = useState(visibleOptions);
 
     useEffect(() => {
-        setFilteredOptions(options);
+        setFilteredOptions(visibleOptions);
         setShowMore(false);
         setSearchQuery('');
-    }, [options]);
+    }, [visibleOptions]);
 
     const displayedOptions = showMore ? filteredOptions : filteredOptions.slice(0, 5);
     const remainingCount = filteredOptions.length - 5;
@@ -34,8 +47,8 @@ export default function AdvancedCheckboxes({
         setSearchQuery(value);
         setFilteredOptions(
             value
-                ? options.filter(o => o.label.toLowerCase().includes(value.toLowerCase()))
-                : options
+                ? visibleOptions.filter(o => o.label.toLowerCase().includes(value.toLowerCase()))
+                : visibleOptions
         );
         setShowMore(false);
     };
@@ -76,6 +89,9 @@ export default function AdvancedCheckboxes({
                         label={
                             <span className={`text-[14px] tracking-[0.1px] leading-[20px] ${selected.includes(option.value) ? 'font-medium' : 'font-normal'} text-darkGray dark:text-white`}>
                                 {option.label}
+                                {typeof counts?.[option.value] === 'number' && (
+                                    <span className="text-[13px] font-normal text-[#b1b1b1] ml-1">({counts[option.value]})</span>
+                                )}
                             </span>
                         }
                     />
