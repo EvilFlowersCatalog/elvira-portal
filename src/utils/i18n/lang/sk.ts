@@ -623,6 +623,7 @@ export const sk = {
       help: 'Pomoc',
       loan: 'Výpožičky',
       feeds: 'Zbierky',
+      categories: 'Kategórie',
       administration: 'Administrácia',
       darkMode: 'Tmavý Režim',
       lightMode: 'Svetlý Režim',

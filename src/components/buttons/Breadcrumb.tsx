@@ -72,6 +72,13 @@ const Breadcrumb = () => {
     const newBreadcrumbs: { path: string; label: string }[] = [];
     let skip: boolean = false;
 
+    // Where the user actually came from, not what is merely being filtered:
+    // `parent-id`/`feed-id-step` are only ever set by drilling in from /feeds,
+    // and `from` is set by the /categories cards. A facet ticked on /library
+    // changes `feeds=`/`categories=` alone and must not rewrite the trail.
+    const cameFromCategories = searchParams.get('from') === 'categories';
+    const cameFromFeeds = feedsLoading || feeds.length > 0;
+
     // Generate breadcrumbs based on the path parts
     pathParts.forEach((part, index) => {
       if (skip) return;
@@ -82,10 +89,15 @@ const Breadcrumb = () => {
           label: breadcrumbsTranslator[part.toLocaleLowerCase()], // Capitalize the first letter
         });
         skip = true;
-      } else if ((feedsLoading || feeds.length > 0 || resolvedFeedFilter) && pathParts[0] == 'library') {
+      } else if (cameFromFeeds && pathParts[0] == 'library') {
         newBreadcrumbs.push({
           path: "/feeds",
           label: breadcrumbsTranslator['feeds'],
+        });
+      } else if (cameFromCategories && pathParts[0] == 'library') {
+        newBreadcrumbs.push({
+          path: "/categories",
+          label: breadcrumbsTranslator['categories'],
         });
       }
       else {
@@ -139,24 +151,17 @@ const Breadcrumb = () => {
       // Show author filter
       if (authorFilter) {
         newBreadcrumbs.push({
-          path: buildFilterPath({ author: true, feed: !!resolvedFeedFilter, categories: resolvedCategoryFilters.length > 0 }),
+          path: buildFilterPath({ author: true, feed: false, categories: false }),
           label: authorFilter,
         });
       }
-      
-      // Show feed filter (resolved)
-      if (resolvedFeedFilter) {
-        newBreadcrumbs.push({
-          path: buildFilterPath({ author: !!authorFilter, feed: true, categories: resolvedCategoryFilters.length > 0 }),
-          label: resolvedFeedFilter.title,
-        });
-      }
 
-      // Show category filters (resolved)
-      if (resolvedCategoryFilters.length > 0) {
+      // Only name the category when the user navigated in from /categories —
+      // ticking the same category as a facet is a filter, not a step in a trail.
+      if (cameFromCategories && resolvedCategoryFilters.length > 0) {
         resolvedCategoryFilters.forEach((category) => {
           newBreadcrumbs.push({
-            path: buildFilterPath({ author: !!authorFilter, feed: !!resolvedFeedFilter, categories: true }),
+            path: buildFilterPath({ author: !!authorFilter, feed: false, categories: true }),
             label: category.label,
           });
         });
@@ -229,7 +234,7 @@ const Breadcrumb = () => {
               categoryIds.map(async (id) => {
                 try {
                   const detail = await getCategoryDetail(id);
-                  return { id: detail.id, label: detail.label };
+                  return { id: detail.id, label: detail.label || detail.term };
                 } catch {
                   return null;
                 }

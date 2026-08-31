@@ -25,6 +25,7 @@ const SearchBar = ({
   const [searchParams, setSearchParams] = useSearchParams();
   const [input, setInput] = useState<string>('');
   const [isFocused, setIsFocused] = useState<boolean>(false);
+  const [dismissed, setDismissed] = useState<boolean>(false);
 
   useEffect(() => {
     setInput(searchParams.get('query') || '');
@@ -35,10 +36,12 @@ const SearchBar = ({
     if (input) searchParams.set(param, input);
     else searchParams.delete(param);
     setSearchParams(searchParams);
+    setDismissed(true);
   };
 
   const handleSearchInput = (e: ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
+    setDismissed(false);
   };
 
   return (
@@ -61,7 +64,7 @@ const SearchBar = ({
         <IoSearchOutline size={25} aria-hidden="true" />
       </button>
 
-      {enableSuggestions && isFocused && (
+      {enableSuggestions && isFocused && !dismissed && (
         <SearchSuggestions
           searchQuery={input}
           onClose={() => setIsFocused(false)}

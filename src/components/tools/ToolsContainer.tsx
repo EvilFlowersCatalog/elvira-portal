@@ -82,7 +82,7 @@ const ToolsContainer = ({
 
   const getActiveFilters = (): FilterChipItem[] => {
     const filters: FilterChipItem[] = [];
-    const excluded = ['order-by', 'dialog-priority', 'assistant-entry-id', 'feed-id-step', 'parent-id', 'search-all'];
+    const excluded = ['order-by', 'dialog-priority', 'assistant-entry-id', 'feed-id-step', 'parent-id', 'search-all', 'from'];
 
     searchParams.forEach((value, key) => {
       if (excluded.includes(key) || !value.trim()) return;
@@ -90,7 +90,7 @@ const ToolsContainer = ({
       if (key === 'categories') {
         value.split(',').forEach((categoryId) => {
           const category = categories.find((c) => c.id === categoryId);
-          if (category) filters.push({ key, value: categoryId, label: category.term, itemId: categoryId });
+          if (category) filters.push({ key, value: categoryId, label: category.label || category.term, itemId: categoryId });
         });
       } else if (key === 'feeds') {
         value.split(',').forEach((feedId) => {
@@ -102,7 +102,8 @@ const ToolsContainer = ({
         if (key === 'languageCode') {
           label = getLanguage(value)?.name[i18next.language as AcceptedLanguage] || value;
         } else if (key === 'category-id') {
-          label = categories.find((c) => c.id === value)?.term || value;
+          const category = categories.find((c) => c.id === value);
+          label = category?.label || category?.term || value;
         } else if (key === 'feed-id') {
           label = feeds.find((f) => f.id === value)?.title || value;
         } else if (key === 'publishedAtGte') {
