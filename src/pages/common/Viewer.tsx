@@ -22,6 +22,7 @@ import renderViewer from "@evilflowers/evilflowersviewer";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import viewerStyles from "@evilflowers/evilflowersviewer/dist/style.css?inline";
+import type { IPageBookmark } from "@evilflowers/evilflowersviewer";
 import useAppContext from "../../hooks/contexts/useAppContext";
 import { toast } from "react-toastify";
 import { updateMetaTag } from "../../utils/func/functions";
@@ -52,6 +53,9 @@ interface IExplainResult {
 }
 
 const rootId = "elvira-viewer-app";
+
+// Title of the annotation that acts as the page-bookmark container.
+const PAGE_BOOKMARKS_TITLE = "__page_bookmarks__";
 
 const Viewer = () => {
   const { lang, theme, titleLogoDark, titleLogoLight } = useAppContext();
@@ -285,14 +289,115 @@ const Viewer = () => {
       return null;
     }
   };
+  // --- Page bookmarks -------------------------------------------------------
+  // One dedicated annotation per user acquisition holds an item per bookmarked
+  // page (`content: true`) — a page is bookmarked iff its item exists.
+  let bookmarksAnotationId: string | null = null;
+  let bookmarksAnotationRequest: Promise<string | null> | null = null;
+
+  const findBookmarksAnotation = async (): Promise<string | null> => {
+    if (bookmarksAnotationId) return bookmarksAnotationId;
+
+    const { items } = await getAnotations(user_acquisition_id);
+    bookmarksAnotationId =
+      items.find((item) => item.title === PAGE_BOOKMARKS_TITLE)?.id ?? null;
+
+    return bookmarksAnotationId;
+  };
+
+  const ensureBookmarksAnotation = async (): Promise<string | null> => {
+    if (bookmarksAnotationId) return bookmarksAnotationId;
+
+    if (!bookmarksAnotationRequest) {
+      bookmarksAnotationRequest = (async () => {
+        const existing = await findBookmarksAnotation();
+        if (existing) return existing;
+
+        const created = await createAnotation({
+          user_acquisition_id,
+          title: PAGE_BOOKMARKS_TITLE,
+        });
+        bookmarksAnotationId = created.id;
+        return created.id;
+      })().finally(() => {
+        bookmarksAnotationRequest = null;
+      });
+    }
+
+    return bookmarksAnotationRequest;
+  };
+
+  const getPageBookmarksFunc = async (): Promise<IPageBookmark[]> => {
+    try {
+      const anotationId = await findBookmarksAnotation();
+      if (!anotationId) return [];
+
+      const bookmarks: IPageBookmark[] = [];
+      let apiPage = 1;
+      let apiPages = 1;
+
+      do {
+        const { items, metadata } = await getAnotationsItem(anotationId, null, {
+          page: apiPage,
+          limit: 100,
+        });
+        items.forEach((item) => bookmarks.push({ page: item.page, id: item.id }));
+        apiPages = metadata?.pages ?? 1;
+        apiPage += 1;
+      } while (apiPage <= apiPages);
+
+      return bookmarks;
+    } catch {
+      return [];
+    }
+  };
+
+  const addPageBookmarkFunc = async (
+    page: number
+  ): Promise<IPageBookmark | null> => {
+    try {
+      const anotationId = await ensureBookmarksAnotation();
+      if (!anotationId) return null;
+
+      const response = await createAnotationItem({
+        annotation_id: anotationId,
+        page,
+        content: true,
+      });
+
+      return { page, id: response.id };
+    } catch {
+      return null;
+    }
+  };
+
+  const removePageBookmarkFunc = async (page: number, id?: string | null) => {
+    try {
+      if (id) {
+        await deleteAnotationItem(id);
+        return;
+      }
+
+      const anotationId = await findBookmarksAnotation();
+      if (!anotationId) return;
+
+      const { items } = await getAnotationsItem(anotationId, page);
+      await Promise.all(items.map((item) => deleteAnotationItem(item.id)));
+    } catch {
+      // Non-fatal: the viewer keeps its optimistic state either way.
+    }
+  };
+
   const getGroupsFunc = async (): Promise<{ id: string; name: string }[]> => {
     try {
       const { items } = await getAnotations(user_acquisition_id);
-      if (items.length > 0)
-        return items.map((item) => {
+      // The page-bookmark container is an annotation too — keep it out of the
+      // editor's group list.
+      return items
+        .filter((item) => item.title !== PAGE_BOOKMARKS_TITLE)
+        .map((item) => {
           return { id: item.id, name: item.title };
         });
-      return [];
     } catch {
       return [];
     }
@@ -383,6 +488,11 @@ const Viewer = () => {
               getLayerFunc,
               getGroupsFunc,
             },
+          pageBookmarkPackage: {
+            getBookmarksFunc: getPageBookmarksFunc,
+            addBookmarkFunc: addPageBookmarkFunc,
+            removeBookmarkFunc: removePageBookmarkFunc,
+          },
           },
           config: {
             download: entryDetail.config.evilflowers_metadata_fetch,
