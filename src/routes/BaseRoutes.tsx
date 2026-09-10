@@ -16,6 +16,7 @@ const NotFound = lazy(() => import('../pages/common/NotFound'));
 const Viewer = lazy(() => import('../pages/common/Viewer'));
 const Home = lazy(() => import('../pages/common/Home'));
 const Feeds = lazy(() => import('../pages/common/Feeds'));
+const Categories = lazy(() => import('../pages/common/Categories'));
 const Auth = lazy(() => import('../pages/auth/Auth'));
 const Loans = lazy(() => import('../pages/common/Loans'));
 const Profile = lazy(() => import('../pages/common/Profile'));
@@ -103,6 +104,7 @@ const BaseRoutes = () => {
               <Route path='loans' element={<Loans />} />
             )}
             <Route path='feeds' element={<Feeds />} />
+            <Route path='categories' element={<Categories />} />
             <Route path='ai-assistant' element={<AiAssistantPage />} />
             <Route path='ai-chat-history' element={<AiChatHistory />} />
             <Route path='viewer/:entry-id/:index' element={<Viewer />} />

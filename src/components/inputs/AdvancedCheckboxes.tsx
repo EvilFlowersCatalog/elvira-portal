@@ -23,13 +23,16 @@ export default function AdvancedCheckboxes({
     const [showMore, setShowMore] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
 
+    const selectedKey = selected.join(',');
+
     const visibleOptions = useMemo(
         () => (counts
             ? options
-                .filter(o => (counts[o.value] ?? 0) > 0)
+                .filter(o => (counts[o.value] ?? 0) > 0 || selected.includes(o.value))
                 .sort((a, b) => (counts[b.value] ?? 0) - (counts[a.value] ?? 0))
             : options),
-        [options, counts]
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [options, counts, selectedKey]
     );
 
     const [filteredOptions, setFilteredOptions] = useState(visibleOptions);

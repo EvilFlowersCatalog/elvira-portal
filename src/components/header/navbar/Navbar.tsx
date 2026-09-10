@@ -14,6 +14,7 @@ import {
   HomeIcon,
   LibraryIcon,
   FeedsIcon,
+  CategoriesIcon,
   BookmarkIcon,
   ClockIcon,
   LoansIcon,
@@ -386,17 +387,20 @@ const Navbar = () => {
               isActive={location.pathname === NAVIGATION_PATHS.library}
               textVisible={!isCollapsed}
             />
-            { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
-              <>
-                <NavbarButton
-                  name={t("navbarMenu.feeds")}
-                  path={NAVIGATION_PATHS.feeds}
-                  icon={<FeedsIcon size={20} />}
-                  isActive={location.pathname === NAVIGATION_PATHS.feeds}
-                  textVisible={!isCollapsed}
-                />
-              </>
-            )}
+            <NavbarButton
+              name={t("navbarMenu.feeds")}
+              path={NAVIGATION_PATHS.feeds}
+              icon={<FeedsIcon size={20} />}
+              isActive={location.pathname === NAVIGATION_PATHS.feeds}
+              textVisible={!isCollapsed}
+            />
+            <NavbarButton
+              name={t("navbarMenu.categories")}
+              path={NAVIGATION_PATHS.categories}
+              icon={<CategoriesIcon size={20} />}
+              isActive={location.pathname === NAVIGATION_PATHS.categories}
+              textVisible={!isCollapsed}
+            />
             <NavbarButton
               name={t("navbarMenu.aiAssistant")}
               path={NAVIGATION_PATHS.aiChatHistory}

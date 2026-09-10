@@ -9,6 +9,7 @@ export enum NAVIGATION_PATHS {
   profile = '/profile',
   loans = '/loans',
   feeds = '/feeds',
+  categories = '/categories',
   history = '/history',
   licenses = '/licenses',
   viewer = '/viewer/',

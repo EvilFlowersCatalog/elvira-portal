@@ -32,8 +32,11 @@ function SectionDivider() {
     return <div className="h-px w-full bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)]" />;
 }
 
-export function AdvancedSearchWrapper({ children }: { children: React.ReactNode }) {
+export function AdvancedSearchWrapper({ children, enabled = true }: { children: React.ReactNode; enabled?: boolean }) {
     const { showAdvancedSearch, setShowAdvancedSearch } = useAppContext();
+
+    if (!enabled) return <div className="w-full pt-3">{children}</div>;
+
     return (
         <div className="flex flex-col md:flex-row">
             {/* Desktop sidebar */}
@@ -75,6 +78,7 @@ export function AdvancedSearchWrapper({ children }: { children: React.ReactNode 
 export function AdvancedSearch() {
     const [searchParams, setSearchParams] = useSearchParams();
     const { t, i18n } = useTranslation();
+    const { selectedCatalogId } = useAppContext();
 
     const [year, setYear] = useState<string[]>(["", ""]);
     const [languageCodes, setLanguageCodes] = useState<string[]>([]);
@@ -88,20 +92,40 @@ export function AdvancedSearch() {
     const getCategories = useGetCategories();
     const facets = useEntryFacets();
     const [allCategories, setAllCategories] = useState<ICategory[]>([]);
+    const [categoriesLoaded, setCategoriesLoaded] = useState(false);
     const [activeCategories, setActiveCategories] = useState<ICategory[]>([]);
 
     const [activeFeeds, setActiveFeeds] = useState<IFeed[]>([]);
 
     // Collections list (cached/deduped by React Query).
-    const { data: feedsData } = useFeedsQuery({ paginate: false });
+    const { data: feedsData, isSuccess: feedsOk, isError: feedsFailed } = useFeedsQuery({ paginate: false });
     const allFeeds = useMemo<IFeed[]>(() => feedsData?.items ?? [], [feedsData]);
+    const feedsLoaded = feedsOk || feedsFailed;
+
+    const hydrated = useRef(false);
+
+    const unresolvedCategoryIds = useRef<string[]>([]);
+    const unresolvedFeedIds = useRef<string[]>([]);
 
     useEffect(() => {
+        if (!selectedCatalogId) return;
+
+        let cancelled = false;
+        hydrated.current = false;
+        setCategoriesLoaded(false);
+
         (async () => {
-            const { items: itemsCategories } = await getCategories({ paginate: false });
-            setAllCategories(itemsCategories);
+            try {
+                const { items: itemsCategories } = await getCategories({ paginate: false });
+                if (!cancelled) setAllCategories(itemsCategories);
+            } finally {
+                if (!cancelled) setCategoriesLoaded(true);
+            }
         })();
-    }, []);
+
+        return () => { cancelled = true; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedCatalogId]);
 
     useEffect(() => {
         (async () => {
@@ -116,52 +140,68 @@ export function AdvancedSearch() {
     }, []);
 
     const performSearch = () => {
+        if (!hydrated.current) return;
+
+        const params = new URLSearchParams(searchParams);
+
+        const categoryIds = [
+            ...activeCategories.map(cat => cat.id),
+            ...unresolvedCategoryIds.current,
+        ];
+        const feedIds = [
+            ...activeFeeds.map(feed => feed.id),
+            ...unresolvedFeedIds.current,
+        ];
+
         if (import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
-            if (activeCategories.length > 0) {
-                searchParams.set('categories', activeCategories.map(cat => cat.id).join(','));
+            if (categoryIds.length > 0) {
+                params.set('categories', categoryIds.join(','));
             } else {
-                searchParams.delete('categories');
+                params.delete('categories');
             }
-            searchParams.delete('category-id');
+            params.delete('category-id');
 
-            if (activeFeeds.length > 0) {
-                searchParams.set('feeds', activeFeeds.map(feed => feed.id).join(','));
+            if (feedIds.length > 0) {
+                params.set('feeds', feedIds.join(','));
             } else {
-                searchParams.delete('feeds');
+                params.delete('feeds');
             }
-            searchParams.delete('feed-id');
+            params.delete('feed-id');
         } else {
-            const singleCategory = activeCategories[0];
+            const singleCategory = categoryIds[0];
             if (singleCategory) {
-                searchParams.set('category-id', singleCategory.id);
+                params.set('category-id', singleCategory);
             } else {
-                searchParams.delete('category-id');
+                params.delete('category-id');
             }
-            searchParams.delete('categories');
+            params.delete('categories');
 
-            const singleFeed = activeFeeds[0];
+            const singleFeed = feedIds[0];
             if (singleFeed) {
-                searchParams.set('feed-id', singleFeed.id);
+                params.set('feed-id', singleFeed);
             } else {
-                searchParams.delete('feed-id');
+                params.delete('feed-id');
             }
-            searchParams.delete('feeds');
+            params.delete('feeds');
         }
 
-        if (year[0]) searchParams.set('publishedAtGte', year[0].toString());
-        else searchParams.delete('publishedAtGte');
+        if (year[0]) params.set('publishedAtGte', year[0].toString());
+        else params.delete('publishedAtGte');
 
-        if (year[1]) searchParams.set('publishedAtLte', year[1].toString());
-        else searchParams.delete('publishedAtLte');
+        if (year[1]) params.set('publishedAtLte', year[1].toString());
+        else params.delete('publishedAtLte');
 
-        if (languageCodes.length > 0) searchParams.set('languageCode', languageCodes.join(','));
-        else searchParams.delete('languageCode');
+        if (languageCodes.length > 0) params.set('languageCode', languageCodes.join(','));
+        else params.delete('languageCode');
 
-        if (availability.length > 0) searchParams.set('availability', availability.join(','));
-        else searchParams.delete('availability');
+        if (availability.length > 0) params.set('availability', availability.join(','));
+        else params.delete('availability');
 
-        setSearchParams(searchParams);
+        setSearchParams(params, { replace: true });
     };
+
+    const performSearchRef = useRef(performSearch);
+    performSearchRef.current = performSearch;
 
     useEffect(() => {
         const publishedAtGte = searchParams.get('publishedAtGte') || '';
@@ -194,31 +234,37 @@ export function AdvancedSearch() {
         }
 
         const feedIds = feedsParam ? feedsParam.split(',') : [];
+        const matchedFeeds = feedsParam ? allFeeds.filter(feed => feedIds.includes(feed.id)) : [];
+        unresolvedFeedIds.current = feedIds.filter(id => !matchedFeeds.some(f => f.id === id));
         const currentFeedIds = activeFeeds.map(f => f.id).sort().join(',');
-        if (currentFeedIds !== [...feedIds].sort().join(',')) {
-            setActiveFeeds(feedsParam ? allFeeds.filter(feed => feedIds.includes(feed.id)) : []);
+        if (currentFeedIds !== matchedFeeds.map(f => f.id).sort().join(',')) {
+            setActiveFeeds(matchedFeeds);
         }
 
         const categoryIds = categoriesParam ? categoriesParam.split(',') : [];
+        const matchedCategories = categoriesParam ? allCategories.filter(cat => categoryIds.includes(cat.id)) : [];
+        unresolvedCategoryIds.current = categoryIds.filter(id => !matchedCategories.some(c => c.id === id));
         const currentCategoryIds = activeCategories.map(c => c.id).sort().join(',');
-        if (currentCategoryIds !== [...categoryIds].sort().join(',')) {
-            setActiveCategories(categoriesParam ? allCategories.filter(cat => categoryIds.includes(cat.id)) : []);
+        if (currentCategoryIds !== matchedCategories.map(c => c.id).sort().join(',')) {
+            setActiveCategories(matchedCategories);
         }
-    }, [searchParams, allFeeds, allCategories]);
+
+        if (categoriesLoaded && feedsLoaded) hydrated.current = true;
+    }, [searchParams, allFeeds, allCategories, categoriesLoaded, feedsLoaded]);
 
     useEffect(() => {
-        const debounce = setTimeout(() => { performSearch(); }, 300);
+        const debounce = setTimeout(() => { performSearchRef.current(); }, 300);
         return () => clearTimeout(debounce);
     }, [languageCodes, activeCategories, activeFeeds, availability]);
 
     useEffect(() => {
         if (yearDebounceTimeout.current) clearTimeout(yearDebounceTimeout.current);
-        yearDebounceTimeout.current = setTimeout(() => { performSearch(); }, 500);
+        yearDebounceTimeout.current = setTimeout(() => { performSearchRef.current(); }, 500);
         return () => { if (yearDebounceTimeout.current) clearTimeout(yearDebounceTimeout.current); };
     }, [year]);
 
     const categoryOptions = useMemo(() =>
-        allCategories.map(cat => ({ label: cat.term, value: cat.id })),
+        allCategories.map(cat => ({ label: cat.label || cat.term, value: cat.id })),
         [allCategories]
     );
 

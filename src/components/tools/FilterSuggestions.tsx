@@ -197,7 +197,7 @@ const FilterSuggestions = ({ searchQuery }: FilterSuggestionsProps) => {
                         onClick={() => handleCategoryClick(category.id)}
                         className="text-left px-3 py-1.5 text-sm bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight hover:opacity-80 transition-opacity rounded-md"
                       >
-                        {category.term}
+                        {category.label || category.term}
                       </button>
                     ))}
                   </div>
