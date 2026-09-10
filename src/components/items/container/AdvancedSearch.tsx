@@ -3,7 +3,6 @@ import useAppContext from "../../../hooks/contexts/useAppContext"
 import { useTranslation } from "react-i18next";
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { ICategory } from "../../../utils/interfaces/category";
-import LanguageAutofill from "../../autofills/LanguageAutofill";
 import CategoryAutofill from "../../autofills/CategoryAutofill";
 import FeedAutofill from "../../autofills/FeedAutofill";
 import { IoClose } from "react-icons/io5";
@@ -13,6 +12,8 @@ import DualRangeSlider from "../../primitives/DualRangeSlider";
 import useGetCategories from "../../../hooks/api/categories/useGetCategories";
 import useFeedsQuery from "../../../hooks/api/feeds/useFeedsQuery";
 import useGetEntries from "../../../hooks/api/entries/useGetEntries";
+import useEntryFacets from "../../../hooks/api/entries/useEntryFacets";
+import { AcceptedLanguage, getLanguage, getLanguages } from "../../../hooks/api/languages/languages";
 import { IFeed } from "../../../utils/interfaces/feed";
 import { AvailabilityState } from "../entry/details/AvailabilityBadge";
 
@@ -31,8 +32,11 @@ function SectionDivider() {
     return <div className="h-px w-full bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)]" />;
 }
 
-export function AdvancedSearchWrapper({ children }: { children: React.ReactNode }) {
+export function AdvancedSearchWrapper({ children, enabled = true }: { children: React.ReactNode; enabled?: boolean }) {
     const { showAdvancedSearch, setShowAdvancedSearch } = useAppContext();
+
+    if (!enabled) return <div className="w-full pt-3">{children}</div>;
+
     return (
         <div className="flex flex-col md:flex-row">
             {/* Desktop sidebar */}
@@ -73,10 +77,10 @@ export function AdvancedSearchWrapper({ children }: { children: React.ReactNode 
 
 export function AdvancedSearch() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const [year, setYear] = useState<string[]>(["", ""]);
-    const [languageCode, setLanguageCode] = useState<string>('');
+    const [languageCodes, setLanguageCodes] = useState<string[]>([]);
     const [availability, setAvailability] = useState<AvailabilityState[]>([]);
     const yearDebounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -85,20 +89,39 @@ export function AdvancedSearch() {
 
     const getEntries = useGetEntries();
     const getCategories = useGetCategories();
+    const facets = useEntryFacets();
     const [allCategories, setAllCategories] = useState<ICategory[]>([]);
+    const [categoriesLoaded, setCategoriesLoaded] = useState(false);
     const [activeCategories, setActiveCategories] = useState<ICategory[]>([]);
 
     const [activeFeeds, setActiveFeeds] = useState<IFeed[]>([]);
 
     // Collections list (cached/deduped by React Query).
-    const { data: feedsData } = useFeedsQuery({ paginate: false });
+    const { data: feedsData, isSuccess: feedsOk, isError: feedsFailed } = useFeedsQuery({ paginate: false });
     const allFeeds = useMemo<IFeed[]>(() => feedsData?.items ?? [], [feedsData]);
+    const feedsLoaded = feedsOk || feedsFailed;
+
+    const hydrated = useRef(false);
+
+    const unresolvedCategoryIds = useRef<string[]>([]);
+    const unresolvedFeedIds = useRef<string[]>([]);
 
     useEffect(() => {
+        let cancelled = false;
+        hydrated.current = false;
+        setCategoriesLoaded(false);
+
         (async () => {
-            const { items: itemsCategories } = await getCategories({ paginate: false });
-            setAllCategories(itemsCategories);
+            try {
+                const { items: itemsCategories } = await getCategories({ paginate: false });
+                if (!cancelled) setAllCategories(itemsCategories);
+            } finally {
+                if (!cancelled) setCategoriesLoaded(true);
+            }
         })();
+
+        return () => { cancelled = true; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
@@ -114,52 +137,68 @@ export function AdvancedSearch() {
     }, []);
 
     const performSearch = () => {
+        if (!hydrated.current) return;
+
+        const params = new URLSearchParams(searchParams);
+
+        const categoryIds = [
+            ...activeCategories.map(cat => cat.id),
+            ...unresolvedCategoryIds.current,
+        ];
+        const feedIds = [
+            ...activeFeeds.map(feed => feed.id),
+            ...unresolvedFeedIds.current,
+        ];
+
         if (import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
-            if (activeCategories.length > 0) {
-                searchParams.set('categories', activeCategories.map(cat => cat.id).join(','));
+            if (categoryIds.length > 0) {
+                params.set('categories', categoryIds.join(','));
             } else {
-                searchParams.delete('categories');
+                params.delete('categories');
             }
-            searchParams.delete('category-id');
+            params.delete('category-id');
 
-            if (activeFeeds.length > 0) {
-                searchParams.set('feeds', activeFeeds.map(feed => feed.id).join(','));
+            if (feedIds.length > 0) {
+                params.set('feeds', feedIds.join(','));
             } else {
-                searchParams.delete('feeds');
+                params.delete('feeds');
             }
-            searchParams.delete('feed-id');
+            params.delete('feed-id');
         } else {
-            const singleCategory = activeCategories[0];
+            const singleCategory = categoryIds[0];
             if (singleCategory) {
-                searchParams.set('category-id', singleCategory.id);
+                params.set('category-id', singleCategory);
             } else {
-                searchParams.delete('category-id');
+                params.delete('category-id');
             }
-            searchParams.delete('categories');
+            params.delete('categories');
 
-            const singleFeed = activeFeeds[0];
+            const singleFeed = feedIds[0];
             if (singleFeed) {
-                searchParams.set('feed-id', singleFeed.id);
+                params.set('feed-id', singleFeed);
             } else {
-                searchParams.delete('feed-id');
+                params.delete('feed-id');
             }
-            searchParams.delete('feeds');
+            params.delete('feeds');
         }
 
-        if (year[0]) searchParams.set('publishedAtGte', year[0].toString());
-        else searchParams.delete('publishedAtGte');
+        if (year[0]) params.set('publishedAtGte', year[0].toString());
+        else params.delete('publishedAtGte');
 
-        if (year[1]) searchParams.set('publishedAtLte', year[1].toString());
-        else searchParams.delete('publishedAtLte');
+        if (year[1]) params.set('publishedAtLte', year[1].toString());
+        else params.delete('publishedAtLte');
 
-        if (languageCode) searchParams.set('languageCode', languageCode);
-        else searchParams.delete('languageCode');
+        if (languageCodes.length > 0) params.set('languageCode', languageCodes.join(','));
+        else params.delete('languageCode');
 
-        if (availability.length > 0) searchParams.set('availability', availability.join(','));
-        else searchParams.delete('availability');
+        if (availability.length > 0) params.set('availability', availability.join(','));
+        else params.delete('availability');
 
-        setSearchParams(searchParams);
+        setSearchParams(params, { replace: true });
     };
+
+    const performSearchRef = useRef(performSearch);
+    performSearchRef.current = performSearch;
 
     useEffect(() => {
         const publishedAtGte = searchParams.get('publishedAtGte') || '';
@@ -178,7 +217,11 @@ export function AdvancedSearch() {
         if (year[0] !== publishedAtGte || year[1] !== publishedAtLte) {
             setYear([publishedAtGte, publishedAtLte]);
         }
-        if (languageCode !== languageCodeParam) setLanguageCode(languageCodeParam);
+
+        const newLanguageCodes = languageCodeParam ? languageCodeParam.split(',') : [];
+        if ([...languageCodes].sort().join(',') !== [...newLanguageCodes].sort().join(',')) {
+            setLanguageCodes(newLanguageCodes);
+        }
 
         const newAvailability = availabilityParam
             ? (availabilityParam.split(',') as AvailabilityState[])
@@ -188,31 +231,37 @@ export function AdvancedSearch() {
         }
 
         const feedIds = feedsParam ? feedsParam.split(',') : [];
+        const matchedFeeds = feedsParam ? allFeeds.filter(feed => feedIds.includes(feed.id)) : [];
+        unresolvedFeedIds.current = feedIds.filter(id => !matchedFeeds.some(f => f.id === id));
         const currentFeedIds = activeFeeds.map(f => f.id).sort().join(',');
-        if (currentFeedIds !== [...feedIds].sort().join(',')) {
-            setActiveFeeds(feedsParam ? allFeeds.filter(feed => feedIds.includes(feed.id)) : []);
+        if (currentFeedIds !== matchedFeeds.map(f => f.id).sort().join(',')) {
+            setActiveFeeds(matchedFeeds);
         }
 
         const categoryIds = categoriesParam ? categoriesParam.split(',') : [];
+        const matchedCategories = categoriesParam ? allCategories.filter(cat => categoryIds.includes(cat.id)) : [];
+        unresolvedCategoryIds.current = categoryIds.filter(id => !matchedCategories.some(c => c.id === id));
         const currentCategoryIds = activeCategories.map(c => c.id).sort().join(',');
-        if (currentCategoryIds !== [...categoryIds].sort().join(',')) {
-            setActiveCategories(categoriesParam ? allCategories.filter(cat => categoryIds.includes(cat.id)) : []);
+        if (currentCategoryIds !== matchedCategories.map(c => c.id).sort().join(',')) {
+            setActiveCategories(matchedCategories);
         }
-    }, [searchParams, allFeeds, allCategories]);
+
+        if (categoriesLoaded && feedsLoaded) hydrated.current = true;
+    }, [searchParams, allFeeds, allCategories, categoriesLoaded, feedsLoaded]);
 
     useEffect(() => {
-        const debounce = setTimeout(() => { performSearch(); }, 300);
+        const debounce = setTimeout(() => { performSearchRef.current(); }, 300);
         return () => clearTimeout(debounce);
-    }, [languageCode, activeCategories, activeFeeds, availability]);
+    }, [languageCodes, activeCategories, activeFeeds, availability]);
 
     useEffect(() => {
         if (yearDebounceTimeout.current) clearTimeout(yearDebounceTimeout.current);
-        yearDebounceTimeout.current = setTimeout(() => { performSearch(); }, 500);
+        yearDebounceTimeout.current = setTimeout(() => { performSearchRef.current(); }, 500);
         return () => { if (yearDebounceTimeout.current) clearTimeout(yearDebounceTimeout.current); };
     }, [year]);
 
     const categoryOptions = useMemo(() =>
-        allCategories.map(cat => ({ label: cat.term, value: cat.id })),
+        allCategories.map(cat => ({ label: cat.label || cat.term, value: cat.id })),
         [allCategories]
     );
 
@@ -220,6 +269,19 @@ export function AdvancedSearch() {
         allFeeds.map(feed => ({ label: feed.title, value: feed.id })),
         [allFeeds]
     );
+
+    // Languages present in the catalog (from the facet sample); falls back to the
+    // full ISO list until the sample is available so the filter still works.
+    const languageOptions = useMemo(() => {
+        const locale = i18n.language as AcceptedLanguage;
+        const sampledCodes = Object.keys(facets.languageCounts);
+        const entries = sampledCodes.length > 0
+            ? sampledCodes.map(code => ({ value: code, label: getLanguage(code)?.name[locale] ?? code }))
+            : getLanguages(locale).map(lang => ({ value: lang.alpha2 ?? lang.alpha3 ?? '', label: lang.name }));
+        return entries
+            .filter(o => o.value)
+            .sort((a, b) => a.label.localeCompare(b.label));
+    }, [facets.languageCounts, i18n.language]);
 
     const handleYearChange = (index: 0 | 1, value: string) => {
         const newYear = [...year];
@@ -316,20 +378,13 @@ export function AdvancedSearch() {
             </div>
 
             <SectionDivider />
-
-            {/* Jazyk */}
-            <div className="flex flex-col gap-3">
-                <p className="text-[14px] font-medium text-darkGray dark:text-white tracking-[0.1px]">
-                    {t('searchBar.language')}
-                </p>
-                <LanguageAutofill
-                    defaultLanguageCode={languageCode}
-                    languageCode={languageCode}
-                    setLanguageCode={setLanguageCode}
-                    setIsSelectionOpen={() => {}}
-                    isRequired={false}
-                />
-            </div>
+            <AdvancedCheckboxes
+                title={t('searchBar.language')}
+                options={languageOptions}
+                selected={languageCodes}
+                setSelected={setLanguageCodes}
+                counts={Object.keys(facets.languageCounts).length ? facets.languageCounts : undefined}
+            />
 
             <SectionDivider />
             <AdvancedCheckboxes
@@ -339,6 +394,7 @@ export function AdvancedSearch() {
                 setSelected={selected => {
                     setActiveCategories(allCategories.filter(cat => selected.includes(cat.id)));
                 }}
+                counts={Object.keys(facets.categoryCounts).length ? facets.categoryCounts : undefined}
             />
 
             <SectionDivider />
@@ -350,6 +406,7 @@ export function AdvancedSearch() {
                 setSelected={selected => {
                     setActiveFeeds(allFeeds.filter(feed => selected.includes(feed.id)));
                 }}
+                counts={Object.keys(facets.feedCounts).length ? facets.feedCounts : undefined}
             />
         </div>
     );

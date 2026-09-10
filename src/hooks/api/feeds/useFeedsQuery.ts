@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { IFeedQuery } from '../../../utils/interfaces/feed';
 import useGetFeeds from './useGetFeeds';
-import useAppContext from '../../contexts/useAppContext';
 
 /**
  * React Query wrapper around the feeds (collections) endpoint. Reuses
@@ -13,10 +12,9 @@ const useFeedsQuery = (
   options?: { enabled?: boolean }
 ) => {
   const getFeeds = useGetFeeds();
-  const { selectedCatalogId } = useAppContext();
 
   return useQuery({
-    queryKey: ['feeds', selectedCatalogId, query],
+    queryKey: ['feeds', query],
     queryFn: () => getFeeds(query as IFeedQuery),
     enabled: options?.enabled ?? true,
   });

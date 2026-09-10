@@ -629,6 +629,7 @@ export const en = {
       loan: 'Loans',
       loanHistory: 'Loans History',
       feeds: 'Collections',
+      categories: 'Categories',
       administration: 'Administration',
       darkMode: 'Dark Mode',
       lightMode: 'Light Mode',

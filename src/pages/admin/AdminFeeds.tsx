@@ -6,7 +6,6 @@ import { MdOutlineCollectionsBookmark } from 'react-icons/md';
 import { IFeed } from '../../utils/interfaces/feed';
 import { Metadata } from '../../utils/interfaces/general/general';
 import useFeedsQuery from '../../hooks/api/feeds/useFeedsQuery';
-import useAppContext from '../../hooks/contexts/useAppContext';
 import { PageHeader, DataTable, DataTableColumn, SortState, StatusChip, SearchField, IconButton } from '../../components/admin';
 import Button from '../../components/buttons/Button';
 import FeedDrawer from '../../components/admin/collections/FeedDrawer';
@@ -17,7 +16,6 @@ const isFolder = (f: IFeed) => f.kind === 'navigation';
 
 const AdminFeeds = () => {
   const { t } = useTranslation();
-  const { selectedCatalogId } = useAppContext();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -67,8 +65,7 @@ const AdminFeeds = () => {
       parentId: currentParent ?? 'null',
       title: q || undefined,
       orderBy: orderBy || undefined,
-    },
-    { enabled: !!selectedCatalogId }
+    }
   );
   const items = data?.items ?? [];
   const metadata: Metadata = data?.metadata ?? {
@@ -155,7 +152,7 @@ const AdminFeeds = () => {
         title={t('administration.collectionsPage.title')}
         description={t('administration.collectionsPage.description')}
         actions={
-          <Button onClick={openCreate} disabled={!selectedCatalogId} className="flex items-center gap-2">
+          <Button onClick={openCreate} className="flex items-center gap-2">
             <FiPlus size={16} />
             {t('administration.collectionsPage.add')}
           </Button>
@@ -172,8 +169,8 @@ const AdminFeeds = () => {
         loading={loading}
         error={error ? t('administration.collectionsPage.loadError') : undefined}
         onRetry={fetchFeeds}
-        emptyTitle={selectedCatalogId ? t('administration.collectionsPage.empty') : t('administration.collectionsPage.noCatalog')}
-        emptyDescription={selectedCatalogId ? t('administration.collectionsPage.emptyHint') : undefined}
+        emptyTitle={t('administration.collectionsPage.empty')}
+        emptyDescription={t('administration.collectionsPage.emptyHint')}
         sort={sort}
         onSortChange={(s) => patchParams({ order_by: s.dir === 'desc' ? `-${s.key}` : s.key, page: '1' })}
         page={metadata.page}
@@ -198,7 +195,7 @@ const AdminFeeds = () => {
         open={drawerOpen}
         feed={active}
         mode={drawerMode}
-        catalogId={selectedCatalogId}
+        catalogId={import.meta.env.ELVIRA_CATALOG_ID}
         defaultParentId={drawerMode === 'create' ? currentParent : null}
         onClose={() => setDrawerOpen(false)}
         onSaved={fetchFeeds}

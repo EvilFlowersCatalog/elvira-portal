@@ -1,6 +1,5 @@
 import axios from 'axios';
 import useAuth from '../../contexts/useAuthContext';
-import useAppContext from '../../contexts/useAppContext';
 import { IChatMessage } from './useGetChatHistory';
 
 export interface IChat {
@@ -15,10 +14,9 @@ export interface IChat {
 
 const useGetUserChats = () => {
   const { auth } = useAuth();
-  const { selectedCatalogId } = useAppContext();
 
   const getUserChats = async (): Promise<{chats: IChat[], total: number}> => {
-    const catalogId = selectedCatalogId || import.meta.env.ELVIRA_CATALOG_ID;
+    const catalogId = import.meta.env.ELVIRA_CATALOG_ID;
     const response = await axios.get(`${import.meta.env.ELVIRA_ASSISTANT_URL}/user/chats?catalogId=${catalogId}`, {
       headers: {
         'Authorization': auth?.token ? `Bearer ${auth.token}` : '',

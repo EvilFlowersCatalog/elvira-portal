@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { FiPlus } from 'react-icons/fi';
 import useGetCategories from '../../hooks/api/categories/useGetCategories';
-import useAppContext from '../../hooks/contexts/useAppContext';
 import { ICategory } from '../../utils/interfaces/category';
 import { Metadata } from '../../utils/interfaces/general/general';
 import { PageHeader, DataTable, DataTableColumn, SortState, SearchField } from '../../components/admin';
@@ -14,7 +13,6 @@ const DEFAULT_LIMIT = 25;
 
 const AdminCategories = () => {
   const { t } = useTranslation();
-  const { selectedCatalogId } = useAppContext();
   const getCategories = useGetCategories();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -45,11 +43,6 @@ const AdminCategories = () => {
   );
 
   const fetchCategories = useCallback(async () => {
-    if (!selectedCatalogId) {
-      setItems([]);
-      setLoading(false);
-      return;
-    }
     setLoading(true);
     setError(false);
     try {
@@ -69,7 +62,7 @@ const AdminCategories = () => {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, limit, q, orderBy, selectedCatalogId]);
+  }, [page, limit, q, orderBy]);
 
   useEffect(() => {
     fetchCategories();
@@ -113,7 +106,7 @@ const AdminCategories = () => {
         title={t('administration.categoriesPage.title')}
         description={t('administration.categoriesPage.description')}
         actions={
-          <Button onClick={openCreate} disabled={!selectedCatalogId} className="flex items-center gap-2">
+          <Button onClick={openCreate} className="flex items-center gap-2">
             <FiPlus size={16} />
             {t('administration.categoriesPage.add')}
           </Button>
@@ -129,8 +122,8 @@ const AdminCategories = () => {
         loading={loading}
         error={error ? t('administration.categoriesPage.loadError') : undefined}
         onRetry={fetchCategories}
-        emptyTitle={selectedCatalogId ? t('administration.categoriesPage.empty') : t('administration.categoriesPage.noCatalog')}
-        emptyDescription={selectedCatalogId ? t('administration.categoriesPage.emptyHint') : undefined}
+        emptyTitle={t('administration.categoriesPage.empty')}
+        emptyDescription={t('administration.categoriesPage.emptyHint')}
         sort={sort}
         onSortChange={(s) => patchParams({ order_by: s.dir === 'desc' ? `-${s.key}` : s.key, page: '1' })}
         page={metadata.page}
@@ -155,7 +148,7 @@ const AdminCategories = () => {
         open={drawerOpen}
         category={active}
         mode={drawerMode}
-        catalogId={selectedCatalogId}
+        catalogId={import.meta.env.ELVIRA_CATALOG_ID}
         onClose={() => setDrawerOpen(false)}
         onSaved={fetchCategories}
       />

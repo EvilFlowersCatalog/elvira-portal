@@ -1,13 +1,11 @@
 import { IEntryNew } from '../../../utils/interfaces/entry';
 import useAxios from '../useAxios';
-import useAppContext from '../../contexts/useAppContext';
 
 const useEditEntry = () => {
   const axios = useAxios();
-  const { selectedCatalogId } = useAppContext();
 
   const editEntry = async (entryId: string, editedEntry: IEntryNew, catalogId?: string) => {
-    const effectiveCatalogId = catalogId || selectedCatalogId || import.meta.env.ELVIRA_CATALOG_ID;
+    const effectiveCatalogId = catalogId || import.meta.env.ELVIRA_CATALOG_ID;
     const EDIT_ENTRY_URL = `/api/v1/catalogs/${effectiveCatalogId}/entries/${entryId}`;
     await axios.put(EDIT_ENTRY_URL, editedEntry);
   };

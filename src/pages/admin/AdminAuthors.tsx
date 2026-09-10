@@ -2,7 +2,6 @@ import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { FiPlus } from 'react-icons/fi';
-import useAppContext from '../../hooks/contexts/useAppContext';
 import { IAuthor } from '../../utils/interfaces/author';
 import { Metadata } from '../../utils/interfaces/general/general';
 import { useListAuthors } from '../../hooks/api/authors/useAdminAuthors';
@@ -14,7 +13,6 @@ const DEFAULT_LIMIT = 10;
 
 const AdminAuthors = () => {
   const { t } = useTranslation();
-  const { selectedCatalogId } = useAppContext();
   const listAuthors = useListAuthors();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -45,16 +43,11 @@ const AdminAuthors = () => {
   );
 
   const fetchAuthors = useCallback(async () => {
-    if (!selectedCatalogId) {
-      setItems([]);
-      setLoading(false);
-      return;
-    }
     setLoading(true);
     setError(false);
     try {
       const { items, metadata } = await listAuthors({
-        catalog_id: selectedCatalogId,
+        catalog_id: import.meta.env.ELVIRA_CATALOG_ID,
         page,
         limit,
         query: q || undefined,
@@ -69,7 +62,7 @@ const AdminAuthors = () => {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, limit, q, orderBy, selectedCatalogId]);
+  }, [page, limit, q, orderBy]);
 
   useEffect(() => {
     fetchAuthors();
@@ -115,7 +108,7 @@ const AdminAuthors = () => {
         title={t('administration.authorsPage.title')}
         description={t('administration.authorsPage.description')}
         actions={
-          <Button onClick={openCreate} disabled={!selectedCatalogId} className="flex items-center gap-2">
+          <Button onClick={openCreate} className="flex items-center gap-2">
             <FiPlus size={16} />
             {t('administration.authorsPage.add')}
           </Button>
@@ -131,8 +124,8 @@ const AdminAuthors = () => {
         loading={loading}
         error={error ? t('administration.authorsPage.loadError') : undefined}
         onRetry={fetchAuthors}
-        emptyTitle={selectedCatalogId ? t('administration.authorsPage.empty') : t('administration.authorsPage.noCatalog')}
-        emptyDescription={selectedCatalogId ? t('administration.authorsPage.emptyHint') : undefined}
+        emptyTitle={t('administration.authorsPage.empty')}
+        emptyDescription={t('administration.authorsPage.emptyHint')}
         sort={sort}
         onSortChange={(s) => patchParams({ order_by: s.dir === 'desc' ? `-${s.key}` : s.key, page: '1' })}
         page={metadata.page}
@@ -157,7 +150,7 @@ const AdminAuthors = () => {
         open={drawerOpen}
         author={active}
         mode={drawerMode}
-        catalogId={selectedCatalogId}
+        catalogId={import.meta.env.ELVIRA_CATALOG_ID}
         onClose={() => setDrawerOpen(false)}
         onSaved={fetchAuthors}
       />

@@ -357,7 +357,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                           });
                           handleParamClick('category-id', category.id);
                         }}
-                      >{category.term}</span>
+                      >{category.label || category.term}</span>
                     ))
                   )}
                 </div>

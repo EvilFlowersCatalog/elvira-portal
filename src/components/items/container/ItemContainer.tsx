@@ -25,6 +25,7 @@ interface IItemContainer {
   description?: string;
   shouldRedirectSuggestions?: boolean;
   showResultsHeading?: boolean;
+  enableSort?: boolean;
 }
 
 const ItemContainer = ({
@@ -39,6 +40,7 @@ const ItemContainer = ({
   description,
   shouldRedirectSuggestions = false,
   showResultsHeading = true,
+  enableSort = true,
 }: IItemContainer) => {
   const { handleScroll } = useAppContext();
   const { t } = useTranslation();
@@ -88,9 +90,10 @@ const ItemContainer = ({
           advancedSearch={isEntries}
           customFilters={customFilters}
           shouldRedirectSuggestions={shouldRedirectSuggestions}
+          enableSort={enableSort}
         />
 
-        <AdvancedSearchWrapper>
+        <AdvancedSearchWrapper enabled={isEntries}>
           <>
             {showResultsHeading && (
               <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-medium text-left mb-4'>

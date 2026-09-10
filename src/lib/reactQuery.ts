@@ -7,7 +7,7 @@ import { QueryClient } from '@tanstack/react-query';
  * layer (60+ hooks that each return a bare async fetch function with no caching,
  * deduplication, retries or shared loading/error state) onto React Query.
  *
- * Migration pattern (see hooks/api/catalogs/useCatalogsQuery.ts for a worked
+ * Migration pattern (see hooks/api/entries/useEntriesQuery.ts for a worked
  * example): wrap an existing `useAxios()`-based fetch in `useQuery`, give it a
  * stable `queryKey`, and consumers get caching, request dedup, retries and
  * `isLoading`/`isError` for free. Old imperative hooks can be migrated one at a

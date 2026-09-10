@@ -107,12 +107,11 @@ export default function AiAssistantPage() {
         setAiBookCatalogs,
         aiShowSuggestions,
         setAiShowSuggestions,
-        selectedCatalogId,
     } = useAppContext();
 
     const [input, setInput] = useState("");
     const [isGeneratingResponse, setGeneratingResponse] = useState(false);
-    const [currentCatalogId] = useState<string | undefined>(selectedCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined);
+    const [currentCatalogId] = useState<string | undefined>(import.meta.env.ELVIRA_CATALOG_ID || undefined);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {

@@ -5,7 +5,6 @@ import { NAVIGATION_PATHS } from '../utils/interfaces/general/general';
 import RequireAuth from './guards/AuthGuard';
 import useAuthContext from '../hooks/contexts/useAuthContext';
 import RequireAdmin from './guards/AdminGuard';
-import CatalogInitializer from '../components/catalog/CatalogInitializer';
 import { AdminLayout } from '../components/admin';
 
 // Route-level code-splitting: each page becomes its own lazily-loaded chunk so
@@ -16,6 +15,7 @@ const NotFound = lazy(() => import('../pages/common/NotFound'));
 const Viewer = lazy(() => import('../pages/common/Viewer'));
 const Home = lazy(() => import('../pages/common/Home'));
 const Feeds = lazy(() => import('../pages/common/Feeds'));
+const Categories = lazy(() => import('../pages/common/Categories'));
 const Auth = lazy(() => import('../pages/auth/Auth'));
 const Loans = lazy(() => import('../pages/common/Loans'));
 const Profile = lazy(() => import('../pages/common/Profile'));
@@ -52,9 +52,6 @@ const BaseRoutes = () => {
 
   return (
     <>
-      {/* Fetch catalogs from API after authentication is available */}
-      {auth && <CatalogInitializer />}
-
       <Routes>
         <Route element={<App />}>
           {/* Public */}
@@ -103,6 +100,7 @@ const BaseRoutes = () => {
               <Route path='loans' element={<Loans />} />
             )}
             <Route path='feeds' element={<Feeds />} />
+            <Route path='categories' element={<Categories />} />
             <Route path='ai-assistant' element={<AiAssistantPage />} />
             <Route path='ai-chat-history' element={<AiChatHistory />} />
             <Route path='viewer/:entry-id/:index' element={<Viewer />} />

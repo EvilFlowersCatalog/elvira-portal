@@ -120,6 +120,32 @@ export const FeedsIcon = ({ size = 20, ...props }: IconProps) => (
   </svg>
 );
 
+export const CategoriesIcon = ({ size = 20, ...props }: IconProps) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 20 20"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path
+      d="M10.5964 1.98356L17.5 8.88718C17.8189 9.20612 17.8189 9.72322 17.5 10.0422L10.0422 17.5C9.72322 17.8189 9.20612 17.8189 8.88718 17.5L1.98356 10.5964C1.83028 10.4431 1.74414 10.2352 1.74414 10.0184V2.5C1.74414 2.08579 2.07993 1.75 2.49414 1.75H10.0126C10.2294 1.75 10.4373 1.83614 10.5964 1.98356Z"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M5.83331 5.83334H5.84165"
+      stroke="currentColor"
+      strokeWidth="1.66"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
 export const HelpIcon = ({ size = 20, ...props }: IconProps) => (
   <svg
     width={size}

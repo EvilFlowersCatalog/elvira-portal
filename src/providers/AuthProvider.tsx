@@ -85,9 +85,7 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
       const { response: user } = await verifyCredentials(loginForm);
 
       // Show the admin entry point if the user is a superuser or manages ANY
-      // catalog. Don't key this off selectedCatalogId — catalogs load after
-      // auth, so it's usually null here; AdminGuard re-verifies server-side for
-      // the active catalog anyway.
+      // catalog. AdminGuard re-verifies server-side for the configured catalog.
       const catalogPermissions = user.user.catalog_permissions ?? {};
       const isSuperUser =
         user.user.is_superuser ||

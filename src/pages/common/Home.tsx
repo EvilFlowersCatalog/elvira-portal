@@ -8,13 +8,11 @@ import EntryDetail from '../../components/items/entry/details/EntryDetail';
 import EntryDisplay from '../../components/items/entry/display/EntryDisplay';
 import ThemedEntryDisplay from '../../components/items/entry/display/ThemedEntryDisplay';
 import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
-import useAppContext from '../../hooks/contexts/useAppContext';
 import StepEntryDisplay from '../../components/items/entry/display/StepEntryDisplay';
 import useGetFeedDetail from '../../hooks/api/feeds/useGetFeedDetail';
 
 const Home = () => {
   const { t } = useTranslation();
-  const { selectedCatalogId } = useAppContext();
 
   const DBS_FEED_ID = 'afe55681-b71b-4aee-8327-422fbce314e5';
 
@@ -50,7 +48,7 @@ const Home = () => {
       alive = false;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCatalogId]);
+  }, []);
 
   return (
     <>
