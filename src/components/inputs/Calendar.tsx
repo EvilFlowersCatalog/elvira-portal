@@ -108,7 +108,7 @@ const Calendar: React.FC<CalendarProps> = ({ availability, requestAvailability, 
         requestAvailability(startDate, endDate);
     }, [startDate, endDate]);
 
-    let days = [];
+    const days = [];
     let day = startDate;
 
     while (day <= endDate) {

@@ -10,7 +10,7 @@ import useAppContext from '../../../hooks/contexts/useAppContext';
 import AdminEntryForm from './AdminEntryForm';
 
 const AdminAddEntry = () => {
-  const { umamiTrack, selectedCatalogId } = useAppContext();
+  const { umamiTrack } = useAppContext();
   const { t } = useTranslation();
 
   const [entry, setEntry] = useState<IEntryNewForm | null>({
@@ -23,12 +23,21 @@ const AdminAddEntry = () => {
       isbn: '',
     },
     config: {
-      evilflowers_viewer_print: false,
-      evilflowers_share_enabled: false,
-      evilflowres_metadata_fetch: false,
-      evilflowers_annotations_create: false,
+      evilflowers_ocr_enabled: false,
       evilflowers_ocr_rewrite: false,
+
+      evilflowers_annotations_create: true,
+      evilflowers_viewer_print: false,
+
+      evilflowers_render_type: "page",
+      
+      evilflowers_share_enabled: false,
+      evilflowers_metadata_fetch: false,
+      
+      evilflowers_ip_block: false,
+      
       readium_enabled: false,
+      readium_amount: 1,
     },
     categories: [],
     citation: '',
@@ -81,7 +90,7 @@ const AdminAddEntry = () => {
       // Upload
       try {
         setIsLoading(true);
-        const info = await uploadEntry(newEntry, selectedCatalogId || undefined);
+        const info = await uploadEntry(newEntry, import.meta.env.ELVIRA_CATALOG_ID || undefined);
 
         await Promise.all(
           files.map(async (item) => {
@@ -95,7 +104,7 @@ const AdminAddEntry = () => {
               entryAcquisition.append('content', item.file);
               entryAcquisition.append('metadata', JSON.stringify(metadata));
 
-              await createEntryAcquisition(entryAcquisition, info.id, selectedCatalogId || undefined);
+              await createEntryAcquisition(entryAcquisition, info.id, import.meta.env.ELVIRA_CATALOG_ID || undefined);
             } catch {
               // Show error notification
               toast.error(
@@ -114,17 +123,19 @@ const AdminAddEntry = () => {
     }
   };
 
-  return AdminEntryForm({
-    FormType: 'add',
-    handleSubmit,
-    entry,
-    setEntry,
-    isLoading,
-    stringImage,
-    setStringImage,
-    files,
-    setFiles,
-  });
+  return (
+    <AdminEntryForm
+      FormType='add'
+      handleSubmit={handleSubmit}
+      entry={entry}
+      setEntry={setEntry}
+      isLoading={isLoading}
+      stringImage={stringImage}
+      setStringImage={setStringImage}
+      files={files}
+      setFiles={setFiles}
+    />
+  );
 };
 
 export default AdminAddEntry;

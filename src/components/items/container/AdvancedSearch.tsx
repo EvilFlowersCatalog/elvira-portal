@@ -3,29 +3,49 @@ import useAppContext from "../../../hooks/contexts/useAppContext"
 import { useTranslation } from "react-i18next";
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { ICategory } from "../../../utils/interfaces/category";
-import ElviraInput from "../../inputs/ElviraInput";
-import LanguageAutofill from "../../autofills/LanguageAutofill";
 import CategoryAutofill from "../../autofills/CategoryAutofill";
 import FeedAutofill from "../../autofills/FeedAutofill";
-import { Button } from "@mui/material";
-import ElviraNumberInput from "../../inputs/ElviraNumberInput";
 import { IoClose } from "react-icons/io5";
 import AdvancedCheckboxes from "../../inputs/AdvancedCheckboxes";
+import Checkbox from "../../primitives/Checkbox";
+import DualRangeSlider from "../../primitives/DualRangeSlider";
 import useGetCategories from "../../../hooks/api/categories/useGetCategories";
-import useGetFeeds from "../../../hooks/api/feeds/useGetFeeds";
+import useFeedsQuery from "../../../hooks/api/feeds/useFeedsQuery";
+import useGetEntries from "../../../hooks/api/entries/useGetEntries";
+import useEntryFacets from "../../../hooks/api/entries/useEntryFacets";
+import { AcceptedLanguage, getLanguage, getLanguages } from "../../../hooks/api/languages/languages";
 import { IFeed } from "../../../utils/interfaces/feed";
+import { AvailabilityState } from "../entry/details/AvailabilityBadge";
 
-export function AdvancedSearchWrapper({ children }: { children: React.ReactNode }) {
+const DEFAULT_MIN_YEAR = 1900;
+
+type AvailabilityOption = { value: AvailabilityState; labelKey: string };
+
+const AVAILABILITY_OPTIONS: AvailabilityOption[] = [
+    { value: 'available',   labelKey: 'entry.detail.availability.available' },
+    { value: 'unavailable', labelKey: 'entry.detail.availability.unavailable' },
+    { value: 'borrowed',    labelKey: 'entry.detail.availability.borrowed' },
+    { value: 'reserved',    labelKey: 'entry.detail.availability.reserved' },
+];
+
+function SectionDivider() {
+    return <div className="h-px w-full bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)]" />;
+}
+
+export function AdvancedSearchWrapper({ children, enabled = true }: { children: React.ReactNode; enabled?: boolean }) {
     const { showAdvancedSearch, setShowAdvancedSearch } = useAppContext();
+
+    if (!enabled) return <div className="w-full pt-3">{children}</div>;
+
     return (
         <div className="flex flex-col md:flex-row">
             {/* Desktop sidebar */}
             <div
                 className={`
                     hidden md:block
-                    border-r-2 border-gray-300 dark:border-gray-700
-                    transition-all duration-500 ease-in-out 
-                    overflow-auto ${showAdvancedSearch ? 'max-w-[300px] opacity-100 p-3' : 'max-w-0 opacity-0'} w-full
+                    border-r border-[rgba(0,0,0,0.1)] dark:border-[rgba(255,255,255,0.08)]
+                    transition-all duration-500 ease-in-out
+                    overflow-auto ${showAdvancedSearch ? 'max-w-[260px] opacity-100 p-4' : 'max-w-0 opacity-0'} w-full
                     sticky top-0 z-2 pb-32 h-screen
                 `}
             >
@@ -39,11 +59,11 @@ export function AdvancedSearchWrapper({ children }: { children: React.ReactNode 
                     transition-all duration-500 ease-in-out
                     bg-slate-200 dark:bg-darkGray
                     z-30
-                    ${showAdvancedSearch ? 'top-0 bottom-0 opacity-100 p-3' : '-top-full opacity-0 pointer-events-none'}
-                    rounded-none h-screen
+                    ${showAdvancedSearch ? 'top-0 bottom-0 opacity-100 p-4' : '-top-full opacity-0 pointer-events-none'}
+                    rounded-none h-screen overflow-y-auto
                 `}
             >
-                <div className="pt-4">
+                <div className="pt-4 mb-2">
                     <IoClose size={24} className="absolute top-3 right-3 cursor-pointer" onClick={() => setShowAdvancedSearch(false)} />
                 </div>
                 <AdvancedSearch />
@@ -57,174 +77,211 @@ export function AdvancedSearchWrapper({ children }: { children: React.ReactNode 
 
 export function AdvancedSearch() {
     const [searchParams, setSearchParams] = useSearchParams();
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const [year, setYear] = useState<string[]>(["", ""]);
-    const [languageCode, setLanguageCode] = useState<string>('');
-    const yearDebounceTimeout = useRef<NodeJS.Timeout | null>(null);
+    const [languageCodes, setLanguageCodes] = useState<string[]>([]);
+    const [availability, setAvailability] = useState<AvailabilityState[]>([]);
+    const yearDebounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+    const currentYear = new Date().getFullYear();
+    const [minYear, setMinYear] = useState<number>(DEFAULT_MIN_YEAR);
+
+    const getEntries = useGetEntries();
     const getCategories = useGetCategories();
+    const facets = useEntryFacets();
     const [allCategories, setAllCategories] = useState<ICategory[]>([]);
+    const [categoriesLoaded, setCategoriesLoaded] = useState(false);
     const [activeCategories, setActiveCategories] = useState<ICategory[]>([]);
 
-    const getFeeds = useGetFeeds();
-    const [allFeeds, setAllFeeds] = useState<IFeed[]>([]);
     const [activeFeeds, setActiveFeeds] = useState<IFeed[]>([]);
+
+    // Collections list (cached/deduped by React Query).
+    const { data: feedsData, isSuccess: feedsOk, isError: feedsFailed } = useFeedsQuery({ paginate: false });
+    const allFeeds = useMemo<IFeed[]>(() => feedsData?.items ?? [], [feedsData]);
+    const feedsLoaded = feedsOk || feedsFailed;
+
+    const hydrated = useRef(false);
+
+    const unresolvedCategoryIds = useRef<string[]>([]);
+    const unresolvedFeedIds = useRef<string[]>([]);
+
+    useEffect(() => {
+        let cancelled = false;
+        hydrated.current = false;
+        setCategoriesLoaded(false);
+
+        (async () => {
+            try {
+                const { items: itemsCategories } = await getCategories({ paginate: false });
+                if (!cancelled) setAllCategories(itemsCategories);
+            } finally {
+                if (!cancelled) setCategoriesLoaded(true);
+            }
+        })();
+
+        return () => { cancelled = true; };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     useEffect(() => {
         (async () => {
-            const { items: itemsCategories } = await getCategories({
-                paginate: false,
-            });
-            const { items: itemsFeeds } = await getFeeds({
-                paginate: false,
-            });
-            setAllFeeds(itemsFeeds);
-            setAllCategories(itemsCategories);
+            try {
+                const { items } = await getEntries({ page: 1, limit: 1, orderBy: 'published_at' });
+                const earliest = items[0]?.published_at ? new Date(items[0].published_at).getFullYear() : NaN;
+                if (!Number.isNaN(earliest) && earliest > 0) setMinYear(earliest);
+            } catch {
+                // Falls back to DEFAULT_MIN_YEAR when the earliest year can't be determined.
+            }
         })();
     }, []);
 
     const performSearch = () => {
-        // Only handle filters that exist in AdvancedSearch component
+        if (!hydrated.current) return;
+
+        const params = new URLSearchParams(searchParams);
+
+        const categoryIds = [
+            ...activeCategories.map(cat => cat.id),
+            ...unresolvedCategoryIds.current,
+        ];
+        const feedIds = [
+            ...activeFeeds.map(feed => feed.id),
+            ...unresolvedFeedIds.current,
+        ];
+
         if (import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
-            // Experimental: multi-select IDs sent as comma-separated lists (new API, TBD param names)
-            if (activeCategories.length > 0) {
-                searchParams.set('categories', activeCategories.map(cat => cat.id).join(','));
+            if (categoryIds.length > 0) {
+                params.set('categories', categoryIds.join(','));
             } else {
-                searchParams.delete('categories');
+                params.delete('categories');
             }
-            searchParams.delete('category-id');
+            params.delete('category-id');
 
-            if (activeFeeds.length > 0) {
-                searchParams.set('feeds', activeFeeds.map(feed => feed.id).join(','));
+            if (feedIds.length > 0) {
+                params.set('feeds', feedIds.join(','));
             } else {
-                searchParams.delete('feeds');
+                params.delete('feeds');
             }
-            searchParams.delete('feed-id');
+            params.delete('feed-id');
         } else {
-            // Current: single selection mapped to the existing API params
-            const singleCategory = activeCategories[0];
+            const singleCategory = categoryIds[0];
             if (singleCategory) {
-                searchParams.set('category-id', singleCategory.id);
+                params.set('category-id', singleCategory);
             } else {
-                searchParams.delete('category-id');
+                params.delete('category-id');
             }
-            searchParams.delete('categories');
+            params.delete('categories');
 
-            const singleFeed = activeFeeds[0];
+            const singleFeed = feedIds[0];
             if (singleFeed) {
-                searchParams.set('feed-id', singleFeed.id);
+                params.set('feed-id', singleFeed);
             } else {
-                searchParams.delete('feed-id');
+                params.delete('feed-id');
             }
-            searchParams.delete('feeds');
+            params.delete('feeds');
         }
 
-        if (year[0]) {
-            searchParams.set('publishedAtGte', year[0].toString());
-        } else {
-            searchParams.delete('publishedAtGte');
-        }
+        if (year[0]) params.set('publishedAtGte', year[0].toString());
+        else params.delete('publishedAtGte');
 
-        if (year[1]) {
-            searchParams.set('publishedAtLte', year[1].toString());
-        } else {
-            searchParams.delete('publishedAtLte');
-        }
+        if (year[1]) params.set('publishedAtLte', year[1].toString());
+        else params.delete('publishedAtLte');
 
-        if (languageCode) {
-            searchParams.set('languageCode', languageCode);
-        } else {
-            searchParams.delete('languageCode');
-        }
+        if (languageCodes.length > 0) params.set('languageCode', languageCodes.join(','));
+        else params.delete('languageCode');
 
-        setSearchParams(searchParams);
+        if (availability.length > 0) params.set('availability', availability.join(','));
+        else params.delete('availability');
+
+        setSearchParams(params, { replace: true });
     };
+
+    const performSearchRef = useRef(performSearch);
+    performSearchRef.current = performSearch;
 
     useEffect(() => {
         const publishedAtGte = searchParams.get('publishedAtGte') || '';
         const publishedAtLte = searchParams.get('publishedAtLte') || '';
         const languageCodeParam = searchParams.get('languageCode') || '';
+        const availabilityParam = searchParams.get('availability') || '';
 
-        // Read the correct param keys depending on the mode
         const isExperimental = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
-        const feedsParam     = isExperimental
+        const feedsParam = isExperimental
             ? (searchParams.get('feeds') || '')
             : (searchParams.get('feed-id') || '');
         const categoriesParam = isExperimental
             ? (searchParams.get('categories') || '')
             : (searchParams.get('category-id') || '');
 
-        // Only update if values actually changed
         if (year[0] !== publishedAtGte || year[1] !== publishedAtLte) {
             setYear([publishedAtGte, publishedAtLte]);
         }
-        
-        if (languageCode !== languageCodeParam) {
-            setLanguageCode(languageCodeParam);
+
+        const newLanguageCodes = languageCodeParam ? languageCodeParam.split(',') : [];
+        if ([...languageCodes].sort().join(',') !== [...newLanguageCodes].sort().join(',')) {
+            setLanguageCodes(newLanguageCodes);
         }
 
-        // Update feeds only if the IDs actually changed
+        const newAvailability = availabilityParam
+            ? (availabilityParam.split(',') as AvailabilityState[])
+            : [];
+        if (availability.sort().join(',') !== newAvailability.sort().join(',')) {
+            setAvailability(newAvailability);
+        }
+
         const feedIds = feedsParam ? feedsParam.split(',') : [];
+        const matchedFeeds = feedsParam ? allFeeds.filter(feed => feedIds.includes(feed.id)) : [];
+        unresolvedFeedIds.current = feedIds.filter(id => !matchedFeeds.some(f => f.id === id));
         const currentFeedIds = activeFeeds.map(f => f.id).sort().join(',');
-        const newFeedIds = [...feedIds].sort().join(',');
-        
-        if (currentFeedIds !== newFeedIds) {
-            if (feedsParam) {
-                setActiveFeeds(allFeeds.filter(feed => feedIds.includes(feed.id)));
-            } else {
-                setActiveFeeds([]);
-            }
+        if (currentFeedIds !== matchedFeeds.map(f => f.id).sort().join(',')) {
+            setActiveFeeds(matchedFeeds);
         }
 
-        // Update categories only if the IDs actually changed
         const categoryIds = categoriesParam ? categoriesParam.split(',') : [];
+        const matchedCategories = categoriesParam ? allCategories.filter(cat => categoryIds.includes(cat.id)) : [];
+        unresolvedCategoryIds.current = categoryIds.filter(id => !matchedCategories.some(c => c.id === id));
         const currentCategoryIds = activeCategories.map(c => c.id).sort().join(',');
-        const newCategoryIds = [...categoryIds].sort().join(',');
-        
-        if (currentCategoryIds !== newCategoryIds) {
-            if (categoriesParam) {
-                setActiveCategories(allCategories.filter(cat => categoryIds.includes(cat.id)));
-            } else {
-                setActiveCategories([]);
-            }
+        if (currentCategoryIds !== matchedCategories.map(c => c.id).sort().join(',')) {
+            setActiveCategories(matchedCategories);
         }
-    }, [searchParams, allFeeds, allCategories]);
 
-    // Trigger search when advanced options change (debounced for checkbox/select changes)
+        if (categoriesLoaded && feedsLoaded) hydrated.current = true;
+    }, [searchParams, allFeeds, allCategories, categoriesLoaded, feedsLoaded]);
+
     useEffect(() => {
-        const debounce = setTimeout(() => {
-            performSearch();
-        }, 300);
+        const debounce = setTimeout(() => { performSearchRef.current(); }, 300);
         return () => clearTimeout(debounce);
-    }, [languageCode, activeCategories, activeFeeds]);
+    }, [languageCodes, activeCategories, activeFeeds, availability]);
 
-    // Debounce year changes
     useEffect(() => {
-        if (yearDebounceTimeout.current) {
-            clearTimeout(yearDebounceTimeout.current);
-        }
-        yearDebounceTimeout.current = setTimeout(() => {
-            performSearch();
-        }, 500);
-        
-        return () => {
-            if (yearDebounceTimeout.current) {
-                clearTimeout(yearDebounceTimeout.current);
-            }
-        };
+        if (yearDebounceTimeout.current) clearTimeout(yearDebounceTimeout.current);
+        yearDebounceTimeout.current = setTimeout(() => { performSearchRef.current(); }, 500);
+        return () => { if (yearDebounceTimeout.current) clearTimeout(yearDebounceTimeout.current); };
     }, [year]);
 
-    // Memoize options to prevent unnecessary re-renders in AdvancedCheckboxes
-    const categoryOptions = useMemo(() => 
-        allCategories.map(cat => ({ label: cat.term, value: cat.id })),
+    const categoryOptions = useMemo(() =>
+        allCategories.map(cat => ({ label: cat.label || cat.term, value: cat.id })),
         [allCategories]
     );
 
-    const feedOptions = useMemo(() => 
+    const feedOptions = useMemo(() =>
         allFeeds.map(feed => ({ label: feed.title, value: feed.id })),
         [allFeeds]
     );
+
+    // Languages present in the catalog (from the facet sample); falls back to the
+    // full ISO list until the sample is available so the filter still works.
+    const languageOptions = useMemo(() => {
+        const locale = i18n.language as AcceptedLanguage;
+        const sampledCodes = Object.keys(facets.languageCounts);
+        const entries = sampledCodes.length > 0
+            ? sampledCodes.map(code => ({ value: code, label: getLanguage(code)?.name[locale] ?? code }))
+            : getLanguages(locale).map(lang => ({ value: lang.alpha2 ?? lang.alpha3 ?? '', label: lang.name }));
+        return entries
+            .filter(o => o.value)
+            .sort((a, b) => a.label.localeCompare(b.label));
+    }, [facets.languageCounts, i18n.language]);
 
     const handleYearChange = (index: 0 | 1, value: string) => {
         const newYear = [...year];
@@ -233,7 +290,6 @@ export function AdvancedSearch() {
     };
 
     const onYearFinish = () => {
-        // Cancel pending debounce and search immediately
         if (yearDebounceTimeout.current) {
             clearTimeout(yearDebounceTimeout.current);
             yearDebounceTimeout.current = null;
@@ -241,76 +297,117 @@ export function AdvancedSearch() {
         performSearch();
     };
 
-    return <div className='flex flex-col gap-2'>
-        <h2 className="text-[15px] capitalize font-bold">{t('searchBar.yearFromTo')}</h2>
-        <div className='flex gap-2'>
-            <ElviraNumberInput
-                placeholder={t('searchBar.yearFrom')}
-                value={year[0].toString()} 
-                onChange={function (e: ChangeEvent<HTMLInputElement>): void {
-                    handleYearChange(0, e.target.value);
-                }}
-                onBlur={onYearFinish}
+    const availabilityOptions = AVAILABILITY_OPTIONS.map(o => ({
+        label: t(o.labelKey),
+        value: o.value,
+    }));
+
+    return (
+        <div className="flex flex-col gap-5 pt-3">
+            {/* Dostupnosť */}
+            <div className="flex flex-col gap-3">
+                <p className="text-[14px] font-medium text-darkGray dark:text-white tracking-[0.1px]">
+                    {t('searchBar.availability')}
+                </p>
+                <div className="flex flex-col gap-[7px]">
+                    {availabilityOptions.map(opt => (
+                        <Checkbox
+                            key={opt.value}
+                            checked={availability.includes(opt.value as AvailabilityState)}
+                            onChange={e => {
+                                const val = opt.value as AvailabilityState;
+                                setAvailability(e.target.checked
+                                    ? [...availability, val]
+                                    : availability.filter(v => v !== val)
+                                );
+                            }}
+                            label={
+                                <span className={`text-[14px] tracking-[0.1px] leading-[20px] ${availability.includes(opt.value as AvailabilityState) ? 'font-medium' : 'font-normal'} text-darkGray dark:text-white`}>
+                                    {opt.label}
+                                </span>
+                            }
+                        />
+                    ))}
+                </div>
+            </div>
+
+            <SectionDivider />
+
+            {/* Rok vydania */}
+            <div className="flex flex-col gap-3">
+                <p className="text-[14px] font-medium text-darkGray dark:text-white tracking-[0.1px]">
+                    {t('searchBar.yearFromTo')}
+                </p>
+                <div className="px-1.5 pt-1">
+                    <DualRangeSlider
+                        min={minYear}
+                        max={currentYear}
+                        value={[
+                            year[0] ? Number(year[0]) : minYear,
+                            year[1] ? Number(year[1]) : currentYear,
+                        ]}
+                        onChange={([from, to]) => setYear([from.toString(), to.toString()])}
+                        onFinish={onYearFinish}
+                    />
+                </div>
+                <div className="flex items-center gap-2">
+                    <input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder={t('searchBar.yearFrom')}
+                        value={year[0]}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            if (e.target.value === "" || /^\d*$/.test(e.target.value)) handleYearChange(0, e.target.value);
+                        }}
+                        onBlur={onYearFinish}
+                        className="w-full min-w-0 px-3 py-1.5 text-[14px] text-darkGray dark:text-white bg-white dark:bg-strongDarkGray border border-[rgba(0,0,0,0.15)] dark:border-[rgba(255,255,255,0.2)] rounded-md outline-none focus:border-primary"
+                    />
+                    <span className="text-[14px] font-medium text-darkGray dark:text-white flex-shrink-0">-</span>
+                    <input
+                        type="text"
+                        inputMode="numeric"
+                        placeholder={t('searchBar.yearTo')}
+                        value={year[1]}
+                        onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                            if (e.target.value === "" || /^\d*$/.test(e.target.value)) handleYearChange(1, e.target.value);
+                        }}
+                        onBlur={onYearFinish}
+                        className="w-full min-w-0 px-3 py-1.5 text-[14px] text-darkGray dark:text-white bg-white dark:bg-strongDarkGray border border-[rgba(0,0,0,0.15)] dark:border-[rgba(255,255,255,0.2)] rounded-md outline-none focus:border-primary"
+                    />
+                </div>
+            </div>
+
+            <SectionDivider />
+            <AdvancedCheckboxes
+                title={t('searchBar.language')}
+                options={languageOptions}
+                selected={languageCodes}
+                setSelected={setLanguageCodes}
+                counts={Object.keys(facets.languageCounts).length ? facets.languageCounts : undefined}
             />
 
-            <ElviraNumberInput
-                placeholder={t('searchBar.yearTo')}
-                value={year[1].toString()}
-                onChange={function (e: ChangeEvent<HTMLInputElement>): void {
-                    handleYearChange(1, e.target.value);
-                }}
-                onBlur={onYearFinish}
-            />
-        </div>
-
-        <div className="h-[1px] w-full bg-gray-300 my-4"></div>
-
-        <LanguageAutofill
-            defaultLanguageCode={languageCode}
-            languageCode={languageCode}
-            setLanguageCode={setLanguageCode}
-            setIsSelectionOpen={() => { }}
-            isRequired={false} />
-        
-        {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' ? (
-            <>
-            <div className="h-[1px] w-full bg-gray-300 my-4"></div>
+            <SectionDivider />
             <AdvancedCheckboxes
                 title={t('searchBar.categories')}
                 options={categoryOptions}
                 selected={activeCategories.map(cat => cat.id)}
-                setSelected={(selected) => {
-                    const selectedCategories = allCategories.filter(cat => selected.includes(cat.id));
-                    setActiveCategories(selectedCategories);
+                setSelected={selected => {
+                    setActiveCategories(allCategories.filter(cat => selected.includes(cat.id)));
                 }}
-                />
-           
-        <div className="h-[1px] w-full bg-gray-300 my-4"></div>
+                counts={Object.keys(facets.categoryCounts).length ? facets.categoryCounts : undefined}
+            />
+
+            <SectionDivider />
             <AdvancedCheckboxes
                 title={t('searchBar.feeds')}
                 enableSearch
                 options={feedOptions}
                 selected={activeFeeds.map(feed => feed.id)}
-                setSelected={(selected) => {
-                    const selectedFeeds = allFeeds.filter(feed => selected.includes(feed.id));
-                    setActiveFeeds(selectedFeeds);
+                setSelected={selected => {
+                    setActiveFeeds(allFeeds.filter(feed => selected.includes(feed.id)));
                 }}
+                counts={Object.keys(facets.feedCounts).length ? facets.feedCounts : undefined}
             />
-          </>
-        ) : <>
-            <FeedAutofill
-                entryForm={activeFeeds[0]}
-                setEntryForm={setActiveFeeds}
-                single
-            />
-            <CategoryAutofill  
-                entryForm={activeCategories[0]}
-                setEntryForm={setActiveCategories}
-                single
-                setIsSelectionOpen={()=>{
-                    
-                }}
-             />
-        </>}
-    </div>
+        </div>
+    );
 }

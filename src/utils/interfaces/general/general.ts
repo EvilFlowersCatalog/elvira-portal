@@ -6,13 +6,21 @@ export enum NAVIGATION_PATHS {
   home = '/',
   library = '/library',
   shelf = '/shelf',
+  profile = '/profile',
   loans = '/loans',
   feeds = '/feeds',
+  categories = '/categories',
   history = '/history',
   licenses = '/licenses',
   viewer = '/viewer/',
   aiAssistant = '/ai-assistant',
   help = '/help',
+  helpBooks = '/help/books',
+  helpSearch = '/help/search',
+  helpLoans = '/help/loans',
+  helpViewer = '/help/viewer',
+  helpAi = '/help/ai',
+  helpProfile = '/help/profile',
   aiChatHistory = '/ai-chat-history',
   adminHome = '/administration',
   adminEntries = '/administration/entries',
@@ -21,7 +29,11 @@ export enum NAVIGATION_PATHS {
   adminFeeds = '/administration/feeds',
   adminLicenses = '/administration/licenses',
   adminCategories = '/administration/categories',
+  adminAuthors = '/administration/authors',
+  adminCatalogs = '/administration/catalogs',
   adminUsers = '/administration/users',
+  adminAccess = '/administration/access',
+  adminApiKeys = '/administration/api-keys',
   adminLoans = '/administration/loans',
   adminAIUsers = '/administration/ai-users',
 }
@@ -51,7 +63,6 @@ export enum COOKIES_TYPE {
   AUTH_KEY = 'elvira-auth',
   THEME_KEY = 'elvira-theme',
   LANG_KEY = 'elvira-lang',
-  CATALOG_KEY = 'elvira-catalog',
   LAYOUT_KEY = 'elvira-layout',
   INFOMED_KEY = 'elvira-cookie-informed',
   LICENSE_KEY = 'elvira-license-terms',
@@ -65,13 +76,21 @@ export interface IMetadata {
 }
 
 export interface IConfig {
-  evilflowers_viewer_print: boolean;
-  evilflowers_share_enabled: boolean;
-  evilflowres_metadata_fetch: boolean;
-  evilflowers_annotations_create: boolean;
+  evilflowers_ocr_enabled: boolean;
   evilflowers_ocr_rewrite: boolean;
+  
+  evilflowers_annotations_create: boolean;
+  evilflowers_viewer_print: boolean;
+  
+  evilflowers_render_type: "page" | "document";
+
+  evilflowers_share_enabled: boolean;
+  evilflowers_metadata_fetch: boolean;
+
   evilflowers_ip_block: boolean;
+
   readium_enabled: boolean;
+  readium_amount: number;
 }
 
 export interface IModalParams {

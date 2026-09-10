@@ -61,7 +61,7 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
         {/* Action Buttons */}
         <div className='grid grid-cols-2'>
           <button
-            className={`py-2 flex items-center justify-center text-sm font-medium bg-green text-white hover:brightness-110 transition-colors hover:bg-primary`}
+            className={`py-2 flex items-center justify-center text-sm font-medium bg-greenText text-white hover:brightness-110 transition-colors hover:bg-primary`}
             onClick={() => {
               umamiTrack('Edit Category Button', {
                 categoryId: category.id,
@@ -73,7 +73,7 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
             {t('administration.categoriesPage.edit')}
           </button>
           <button
-            className={`py-2 flex items-center justify-center text-sm font-medium bg-red text-white hover:brightness-110 transition-colors hover:bg-primary`}
+            className={`py-2 flex items-center justify-center text-sm font-medium bg-redText text-white hover:brightness-110 transition-colors hover:bg-primary`}
             onClick={() => {
               umamiTrack('Delete Category Button', {
                 categoryId: category.id,

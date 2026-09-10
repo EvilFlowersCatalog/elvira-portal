@@ -1,11 +1,9 @@
 import { IEntryQuery } from '../../../utils/interfaces/entry';
 import { IMyShelfList } from '../../../utils/interfaces/my-shelf';
 import useAxios from '../useAxios';
-import useAppContext from '../../contexts/useAppContext';
 
 const useGetShelf = () => {
   const axios = useAxios();
-  const { selectedCatalogId } = useAppContext();
   const getShelf = async ({
     page,
     limit,
@@ -21,7 +19,7 @@ const useGetShelf = () => {
     const params = new URLSearchParams();
     params.set('page', page.toString());
     params.set('limit', limit.toString());
-    if (selectedCatalogId) params.set('catalog_id', selectedCatalogId);
+    params.set('catalog_id', import.meta.env.ELVIRA_CATALOG_ID);
 
     if (orderBy) params.set('order_by', orderBy);
     else params.set('order_by', '-created_at');
@@ -29,8 +27,11 @@ const useGetShelf = () => {
     // Check if there is param, if yes set it
     if (title) params.set('title', title);
     if (feedId) params.set('feed_id', feedId);
-    if (publishedAtGte) params.set('published_at_gte', publishedAtGte);
-    if (publishedAtLte) params.set('published_at_lte', publishedAtLte);
+    // Django-filter uses the double-underscore lookup convention (matches the
+    // entries endpoint's `published_at__gte`/`__lte`). The single-underscore
+    // spelling used before was silently dropped by the backend.
+    if (publishedAtGte) params.set('published_at__gte', publishedAtGte);
+    if (publishedAtLte) params.set('published_at__lte', publishedAtLte);
     if (authors) params.set('author', authors);
     if (query) params.set('query', query);
 

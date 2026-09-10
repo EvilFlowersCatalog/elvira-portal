@@ -11,14 +11,20 @@
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
-    "isolatedModules": false,
+    "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
+
+    /* Path aliases */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
 
     /* Linting */
     "strict": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "src/components/path/.tsx", "public/images"],
+  "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

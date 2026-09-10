@@ -10,7 +10,27 @@ export interface IEntriesList {
   metadata: IMetadata;
 }
 
-export interface IEntry {
+export type LcpState =
+  | 'not_lcp'
+  | 'available_now'
+  | 'available_in_days'
+  | 'active_loan_for_user'
+  | 'fully_borrowed';
+
+export interface IEntryLcpFields {
+  lcp_state: LcpState;
+  available_slots: number;
+  total_slots: number;
+  active_count: number;
+  over_saturated: boolean;
+  next_available_at: string | null;
+  user_active_license_id: string | null;
+  queue_length: number;
+  user_reservation_id: string | null;
+  user_position: number | null;
+}
+
+export interface IEntry extends Partial<IEntryLcpFields> {
   id: string;
   title: string;
   authors: IEntryAuthor[];
@@ -26,9 +46,10 @@ export interface IEntry {
   updated_at: string;
   shelf_record_id: string;
   thumbnail: string;
+  published_at?: string;
 }
 
-export interface IEntryDetail {
+export interface IEntryDetail extends Partial<IEntryLcpFields> {
   id: string;
   creator_id: string;
   catalog_id: string;

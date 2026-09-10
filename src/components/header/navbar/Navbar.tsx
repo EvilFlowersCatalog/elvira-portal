@@ -14,6 +14,7 @@ import {
   HomeIcon,
   LibraryIcon,
   FeedsIcon,
+  CategoriesIcon,
   BookmarkIcon,
   ClockIcon,
   LoansIcon,
@@ -25,79 +26,11 @@ import {
 import useAuthContext from "../../../hooks/contexts/useAuthContext";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
-import { FiLogOut } from "react-icons/fi";
+import { FiLogOut, FiUser } from "react-icons/fi";
 import Gravatar from "react-gravatar";
 import Button from "../../buttons/Button";
-import { MenuItem, Select } from "@mui/material";
-import { CatalogSelectStyle } from "../../inputs/ElviraSelect";
-import {
-  CATALOG_ICON_MAP,
-  DEFAULT_CATALOG_ICON,
-} from "../../../utils/catalogIcons";
-import { ReactElement, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import { IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
-
-function StuDots({ color }: { color: string }) {
-  return (
-    <svg
-      width="19"
-      height="13"
-      viewBox="0 0 38 27"
-      fill="none"
-      className="shrink-0"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path
-        d="M2.04427 15.321C3.17093 15.321 4.08853 14.4053 4.08853 13.273C4.08853 12.1429 3.17093 11.2345 2.04427 11.2345C0.913599 11.2345 0 12.1429 0 13.273C0 14.4053 0.913599 15.321 2.04427 15.321Z"
-        fill={color}
-      />
-      <path
-        d="M2.04427 26.5486C3.17093 26.5486 4.08853 25.6345 4.08853 24.5069C4.08853 23.3777 3.17093 22.4601 2.04427 22.4601C0.913599 22.4601 0 23.3777 0 24.5069C0 25.6345 0.913599 26.5486 2.04427 26.5486Z"
-        fill={color}
-      />
-      <path
-        d="M13.2764 15.321C14.4046 15.321 15.318 14.4053 15.318 13.273C15.318 12.1429 14.4046 11.2345 13.2764 11.2345C12.1456 11.2345 11.2295 12.1429 11.2295 13.273C11.2295 14.4053 12.1456 15.321 13.2764 15.321Z"
-        fill={color}
-      />
-      <path
-        d="M13.2764 26.5486C14.4046 26.5486 15.318 25.6345 15.318 24.5069C15.318 23.3777 14.4046 22.4601 13.2764 22.4601C12.1456 22.4601 11.2295 23.3777 11.2295 24.5069C11.2295 25.6345 12.1456 26.5486 13.2764 26.5486Z"
-        fill={color}
-      />
-      <path
-        d="M24.5021 15.321C25.6355 15.321 26.5491 14.4053 26.5491 13.273C26.5491 12.1429 25.6355 11.2345 24.5021 11.2345C23.3715 11.2345 22.4609 12.1429 22.4609 13.273C22.4609 14.4053 23.3715 15.321 24.5021 15.321Z"
-        fill={color}
-      />
-      <path
-        d="M2.04427 4.08716C3.17093 4.08716 4.08853 3.17103 4.08853 2.04436C4.08853 0.913694 3.17093 9.33741e-05 2.04427 9.33741e-05C0.913599 9.33741e-05 0 0.913694 0 2.04436C0 3.17103 0.913599 4.08716 2.04427 4.08716Z"
-        fill={color}
-      />
-      <path
-        d="M13.2764 4.08716C14.4046 4.08716 15.318 3.17103 15.318 2.04436C15.318 0.913694 14.4046 9.33741e-05 13.2764 9.33741e-05C12.1456 9.33741e-05 11.2295 0.913694 11.2295 2.04436C11.2295 3.17103 12.1456 4.08716 13.2764 4.08716Z"
-        fill={color}
-      />
-      <path
-        d="M24.5021 4.08716C25.6355 4.08716 26.5491 3.17103 26.5491 2.04436C26.5491 0.913694 25.6355 9.33741e-05 24.5021 9.33741e-05C23.3715 9.33741e-05 22.4609 0.913694 22.4609 2.04436C22.4609 3.17103 23.3715 4.08716 24.5021 4.08716Z"
-        fill={color}
-      />
-      <path
-        d="M24.5021 26.5486C25.6355 26.5486 26.5491 25.6345 26.5491 24.5069C26.5491 23.3777 25.6355 22.4601 24.5021 22.4601C23.3715 22.4601 22.4609 23.3777 22.4609 24.5069C22.4609 25.6345 23.3715 26.5486 24.5021 26.5486Z"
-        fill={color}
-      />
-      <path
-        d="M35.734 15.321C36.8637 15.321 37.7783 14.4053 37.7783 13.273C37.7783 12.1429 36.8637 11.2345 35.734 11.2345C34.6044 11.2345 33.6924 12.1429 33.6924 13.273C33.6924 14.4053 34.6044 15.321 35.734 15.321Z"
-        fill={color}
-      />
-      <path
-        d="M35.734 26.5486C36.8637 26.5486 37.7783 25.6345 37.7783 24.5069C37.7783 23.3777 36.8637 22.4601 35.734 22.4601C34.6044 22.4601 33.6924 23.3777 33.6924 24.5069C33.6924 25.6345 34.6044 26.5486 35.734 26.5486Z"
-        fill={color}
-      />
-      <path
-        d="M35.734 4.08716C36.8637 4.08716 37.7783 3.17103 37.7783 2.04129C37.7783 0.916226 36.8637 9.33741e-05 35.734 9.33741e-05C34.6044 9.33741e-05 33.6924 0.916226 33.6924 2.04129C33.6924 3.17103 34.6044 4.08716 35.734 4.08716Z"
-        fill={color}
-      />
-    </svg>
-  );
-}
 
 interface INavbarButtonParams {
   name: string;
@@ -152,9 +85,6 @@ const Navbar = () => {
     setShowNavbar,
     showNavbar,
     setShowAiAssistant,
-    selectedCatalog,
-    availableCatalogs,
-    switchCatalog,
     umamiTrack,
   } = useAppContext();
   const { auth, logout } = useAuthContext();
@@ -196,6 +126,18 @@ const Navbar = () => {
   };
 
   const [isCollapsed, setIsCollapsed] = useState(!isSmallDevice);
+  const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const toggleNavbar = () => {
     setIsCollapsed(!isCollapsed);
@@ -230,61 +172,23 @@ const Navbar = () => {
               />
             </button>
             <button
+              aria-label={t('navbar.collapse', { defaultValue: 'Collapse sidebar' })}
               className={`h-full flex items-center text-gray w-fit rounded-md px-1 ml-auto`}
               onClick={toggleNavbar}
             >
-              <RiArrowLeftDoubleFill size={18} />
+              <RiArrowLeftDoubleFill size={18} aria-hidden="true" />
             </button>
           </>
         ) : (
           <button
+            aria-label={t('navbar.expand', { defaultValue: 'Expand sidebar' })}
             className="flex items-center w-7 h-7 justify-center bg-zinc-100 dark:bg-zinc-700 text-black dark:text-white rounded-md mx-auto"
             onClick={toggleNavbar}
           >
-            <RiArrowLeftDoubleFill size={18} className="rotate-180" />
+            <RiArrowLeftDoubleFill size={18} className="rotate-180" aria-hidden="true" />
           </button>
         )}
       </div>
-      {auth ? (
-        <div className="mb-3">
-        <Select
-          className="ml-auto dark:text-white w-full"
-          sx={CatalogSelectStyle}
-          label={"Catalog"}
-          labelId="catalog-label"
-          value={selectedCatalog?.value || ""}
-          id="catalog-select"
-          variant="standard"
-          onChange={(e) => {
-            switchCatalog(e.target.value);
-          }}
-        >
-          {availableCatalogs.map((catalog) => {
-            const iconConfig =
-              CATALOG_ICON_MAP[catalog.value] || DEFAULT_CATALOG_ICON;
-
-            return (
-              <MenuItem key={catalog.catalogId} value={catalog.value}>
-                <div className="flex gap-3 items-center overflow-hidden">
-                  {iconConfig.type === "stuDots" && iconConfig.color && (
-                    <StuDots color={iconConfig.color} />
-                  )}
-                  {iconConfig.type === "customSvg" && iconConfig.svgUrl && (
-                    <img
-                      src={iconConfig.svgUrl}
-                      alt=""
-                      width="19"
-                      height="13"
-                    />
-                  )}
-                  <span className="truncate">{catalog.label}</span>
-                </div>
-              </MenuItem>
-            );
-          })}
-        </Select>
-        </div>
-      ) : null}
 
       <div className="flex flex-col gap-6 overflow-auto flex-1">
         {/* Portal container */}
@@ -294,9 +198,7 @@ const Navbar = () => {
               <span className="font-[500] uppercase text-sm">
                 {t("navbarMenu.portal")}
               </span>
-            ) : (
-              <div className="w-full h-[1px] bg-zinc-300 dark:bg-zinc-600" />
-            )}
+            ) : null }
             <NavbarButton
               name={t("navbarMenu.home")}
               path={NAVIGATION_PATHS.home}
@@ -311,27 +213,30 @@ const Navbar = () => {
               isActive={location.pathname === NAVIGATION_PATHS.library}
               textVisible={!isCollapsed}
             />
-            { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
-              <>
-                <NavbarButton
-                  name={t("navbarMenu.feeds")}
-                  path={NAVIGATION_PATHS.feeds}
-                  icon={<FeedsIcon size={20} />}
-                  isActive={location.pathname === NAVIGATION_PATHS.feeds}
-                  textVisible={!isCollapsed}
-                />
-                <NavbarButton
-                  name={t("navbarMenu.aiAssistant")}
-                  path={NAVIGATION_PATHS.aiChatHistory}
-                  icon={<ChatIcon size={20} />}
-                  isActive={
-                    location.pathname === NAVIGATION_PATHS.aiAssistant ||
-                    location.pathname === NAVIGATION_PATHS.aiChatHistory
-                  }
-                  textVisible={!isCollapsed}
-                />
-              </>
-            )}
+            <NavbarButton
+              name={t("navbarMenu.feeds")}
+              path={NAVIGATION_PATHS.feeds}
+              icon={<FeedsIcon size={20} />}
+              isActive={location.pathname === NAVIGATION_PATHS.feeds}
+              textVisible={!isCollapsed}
+            />
+            <NavbarButton
+              name={t("navbarMenu.categories")}
+              path={NAVIGATION_PATHS.categories}
+              icon={<CategoriesIcon size={20} />}
+              isActive={location.pathname === NAVIGATION_PATHS.categories}
+              textVisible={!isCollapsed}
+            />
+            <NavbarButton
+              name={t("navbarMenu.aiAssistant")}
+              path={NAVIGATION_PATHS.aiChatHistory}
+              icon={<ChatIcon size={20} />}
+              isActive={
+                location.pathname === NAVIGATION_PATHS.aiAssistant ||
+                location.pathname === NAVIGATION_PATHS.aiChatHistory
+              }
+              textVisible={!isCollapsed}
+            />
             {/* <NavbarButton
             name={t('navbarMenu.about')}
             path={NAVIGATION_PATHS.about}
@@ -374,13 +279,14 @@ const Navbar = () => {
               isActive={location.pathname === NAVIGATION_PATHS.shelf}
               textVisible={!isCollapsed}
             />
+            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
             <NavbarButton
               name={t("navbarMenu.history")}
               path={NAVIGATION_PATHS.history}
               icon={<ClockIcon size={20} />}
               isActive={location.pathname === NAVIGATION_PATHS.history}
               textVisible={!isCollapsed}
-            />
+            />)}
             {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
               <NavbarButton
                 name={t("navbarMenu.loan")}
@@ -436,48 +342,71 @@ const Navbar = () => {
           />)}
         </div>
       </div>
-      {/* Logout */}
+      {/* Profile */}
       {auth && (
-        <div className="relative w-full pb-4 pt-2">
+        <div className="relative w-full pb-4 pt-2" ref={profileRef}>
+          {profileDropdownOpen && (
+            <div className="absolute bottom-full mb-2 left-0 w-[162px] bg-lightGray dark:bg-zinc-800 rounded-lg shadow-[0px_2px_2.5px_rgba(0,0,0,0.25)] border border-[#e5e5e5] dark:border-zinc-700 overflow-hidden z-50">
+              <button
+                className="w-full flex items-center gap-3 px-4 h-8 text-secondary dark:text-white text-[12px] font-medium hover:brightness-95 dark:hover:bg-zinc-700 text-left"
+                onClick={(e) => {
+                  umamiTrack("Profile Button");
+                  specialNavigation(e, NAVIGATION_PATHS.profile);
+                  setProfileDropdownOpen(false);
+                }}
+              >
+                <FiUser size={15} />
+                {t("navbarMenu.profile")}
+              </button>
+              <div className="w-full h-px bg-[#e5e5e5] dark:bg-zinc-700" />
+              <button
+                className="w-full flex items-center gap-3 px-4 h-8 text-primary text-[12px] font-medium hover:brightness-95 dark:hover:bg-zinc-700 text-left"
+                onClick={() => {
+                  umamiTrack("Logout Button");
+                  logout();
+                  setProfileDropdownOpen(false);
+                }}
+              >
+                <FiLogOut size={15} />
+                {t("navbarMenu.logout")}
+              </button>
+            </div>
+          )}
           {!isCollapsed ? (
-            <div className="w-full flex py-2 mt-auto items-center gap-2 rounded-lg px-3 bg-slate-200 dark:bg-darkGray">
+            <button
+              className="w-full flex h-10 items-center gap-3 rounded-lg px-3 bg-lightGray dark:bg-darkGray shadow-[0px_4px_6px_rgba(0,0,0,0.1)] hover:brightness-95 dark:hover:brightness-110 transition-all"
+              onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
+            >
               <Gravatar
                 email={`${auth.username}@stuba.sk`}
-                size={30}
-                className="rounded-full"
+                size={28}
+                className="rounded-full shrink-0"
                 default="monsterid"
               />
-              <div className="flex flex-col items-start">
-                <p className="text-[12px] font-medium overflow-hidden text-ellipsis whitespace-nowrap max-w-[100px]">
-                  {auth.name} {auth.surname}
+              <div className="flex flex-col items-start overflow-hidden">
+                <p className="text-[12px] font-medium overflow-hidden text-ellipsis whitespace-nowrap w-full">
+                  {auth.username}
                 </p>
-                <p className="text-[10px] font-medium shrink-0">
+                <p className="text-[9px] font-light shrink-0">
                   {auth.isSuperUser
                     ? t("navbarMenu.superUser")
                     : t("navbarMenu.user")}
                 </p>
               </div>
-              <Button
-                onClick={() => {
-                  umamiTrack("Logout Button");
-                  logout();
-                }}
-                className="bg-transparent text-black dark:text-white ml-auto hover:text-white p-2"
-              >
-                <FiLogOut />
-              </Button>
-            </div>
+            </button>
           ) : (
-            <div className="w-full flex flex-col gap-2 items-center">
-              <Button
-                onClick={() => {
-                  umamiTrack("Logout Button");
-                  logout();
-                }}
-                className="bg-zinc-100 dark:bg-zinc-700 text-black dark:text-white hover:bg-zinc-200 dark:hover:bg-zinc-600 p-2 rounded-md"
+            <div className="w-full flex justify-center">
+              <button
+                className="flex items-center justify-center w-11 h-10 bg-lightGray dark:bg-zinc-700 shadow-[0px_4px_6px_rgba(0,0,0,0.1)] rounded-lg hover:brightness-95 dark:hover:brightness-110 transition-all"
+                onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
               >
-                <FiLogOut size={20} />
-              </Button>
+                <Gravatar
+                  email={`${auth.username}@stuba.sk`}
+                  size={28}
+                  className="rounded-full"
+                  default="monsterid"
+                />
+              </button>
             </div>
           )}
         </div>

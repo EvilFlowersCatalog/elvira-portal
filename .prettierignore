@@ -1,0 +1,7 @@
+dist
+node_modules
+temp
+public
+package-lock.json
+src/utils/i18n/lang
+*.min.js

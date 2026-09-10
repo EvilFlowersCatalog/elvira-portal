@@ -1,10 +1,18 @@
 import { IMetadata } from './general/general';
 
 export enum LICENSE_STATE {
-  draft = 'draft',
+  ready = 'ready',
   active = 'active',
   returned = 'returned',
   expired = 'expired',
+  revoked = 'revoked',
+  cancelled = 'cancelled',
+}
+
+export enum LICENSE_ACTION {
+  active = 'active',
+  returned = 'returned',
+  renewed = 'renewed',
   revoked = 'revoked',
   cancelled = 'cancelled',
 }
@@ -15,13 +23,13 @@ export interface ILicenseList {
 }
 
 export interface ILicenseEdit {
-  state: string;
-  duration: string;
+  action: LICENSE_ACTION;
+  requested_end?: string;
 }
 
 export interface ILicenseNew {
   entry_id: string;
-  state: string;
+  state: LICENSE_STATE;
   duration: string;
   starts_at?: string;
 }
@@ -31,12 +39,21 @@ export interface ILicense {
   user_id: string;
   entry_id: string;
   state: LICENSE_STATE;
-  url: string;
+  url?: string;
+  download_url?: string;
+  entry?: {
+    id: string;
+    title: string;
+    catalog_id?: string;
+    thumbnail?: string;
+  };
   lcp_license_id?: string;
   starts_at: string;
   expires_at: string;
   created_at: string;
   updated_at: string;
+  renewal_count: number;
+  renewals_remaining: number | null;
 }
 
 export interface ILicenseDetail {
@@ -49,12 +66,14 @@ export interface ILicenseDetail {
     expires_at: string;
     created_at: string;
     updated_at: string;
+    renewal_count: number;
+    renewals_remaining: number | null;
   };
 }
 
 export interface ILicensePayload {
-  state: LICENSE_STATE;
-  duration: string;
+  action: LICENSE_ACTION;
+  requested_end?: string;
 }
 
 export interface ILicenseQuery {

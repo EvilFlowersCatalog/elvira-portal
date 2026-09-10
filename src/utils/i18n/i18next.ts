@@ -13,4 +13,14 @@ i18next.use(initReactI18next).init({
   },
 });
 
+// Accessibility (WCAG 3.1.1 Language of Page): keep <html lang> in sync with the
+// active UI language so assistive tech announces content in the correct language.
+const syncHtmlLang = (lng: string) => {
+  if (typeof document !== 'undefined' && lng) {
+    document.documentElement.setAttribute('lang', lng);
+  }
+};
+syncHtmlLang(i18next.language);
+i18next.on('languageChanged', syncHtmlLang);
+
 export default i18next;

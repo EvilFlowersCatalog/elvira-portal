@@ -1,4 +1,9 @@
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { IUserAcquisitionShare } from "../../utils/interfaces/acquisition";
@@ -8,6 +13,8 @@ import {
   THEME_TYPE,
 } from "../../utils/interfaces/general/general";
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
+import useGetEntries from "../../hooks/api/entries/useGetEntries";
+import EntryDetail from "../../components/items/entry/details/EntryDetail";
 import useGetUserAcquisition from "../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisition";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -15,6 +22,7 @@ import renderViewer from "@evilflowers/evilflowersviewer";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import viewerStyles from "@evilflowers/evilflowersviewer/dist/style.css?inline";
+import type { IPageBookmark } from "@evilflowers/evilflowersviewer";
 import useAppContext from "../../hooks/contexts/useAppContext";
 import { toast } from "react-toastify";
 import { updateMetaTag } from "../../utils/func/functions";
@@ -27,8 +35,27 @@ import useUpdateAnotation from "../../hooks/api/anotations/useUpdateAnotation";
 import useUpdateAnotationItem from "../../hooks/api/anotations/anotation-items/useUpdateAnotationItem";
 import useCreateAnotationItem from "../../hooks/api/anotations/anotation-items/useCreateAnotationItem";
 import useDeleteAnotationItem from "../../hooks/api/anotations/anotation-items/useDeleteAnotationItem";
+import useAddToShelf from "../../hooks/api/my-shelf/useAddToShelf";
+import useRemoveFromShelf from "../../hooks/api/my-shelf/useRemoveFromShelf";
+
+
+interface ISuggestedEntry {
+  id: string;
+  catalog_id: string;
+  title: string;
+  authors: { name: string; surname: string }[];
+  thumbnail: string;
+  shelf_record_id?: string | null;
+}
+interface IExplainResult {
+  simple: string;
+  examples: { label: string; description: string }[];
+}
 
 const rootId = "elvira-viewer-app";
+
+// Title of the annotation that acts as the page-bookmark container.
+const PAGE_BOOKMARKS_TITLE = "__page_bookmarks__";
 
 const Viewer = () => {
   const { lang, theme, titleLogoDark, titleLogoLight } = useAppContext();
@@ -43,8 +70,12 @@ const Viewer = () => {
   );
 
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const addToShelf = useAddToShelf();
+  const removeFromShelf = useRemoveFromShelf();
   const createUserAcquisition = useCreateUserAcquisition();
-  const getEntryDetail = useGetEntryDetail();
+  const { getEntryDetail } = useGetEntryDetail();
+  const getEntries = useGetEntries();
   const getUserAcquisition = useGetUserAcquisition();
   const getAnotations = useGetAnotations();
   const updateAnotation = useUpdateAnotation();
@@ -77,9 +108,10 @@ const Viewer = () => {
       return "";
     }
   };
-  // Home function for viewer to navigate home
+  // Home function for viewer to navigate back to where the reader was opened from, or home if unknown
   const homeFunction = () => {
-    navigate(NAVIGATION_PATHS.home);
+    const fromPath = (location.state as { fromPath?: string })?.fromPath;
+    navigate(fromPath || NAVIGATION_PATHS.home);
   };
   const closeFunction = () => {
     const catalogParam = entryCatalogId ? `&entry-catalog-id=${entryCatalogId}` : '';
@@ -90,6 +122,88 @@ const Viewer = () => {
 
     navigate(path);
   };
+
+  // Mirrors EntryItem.tsx's openEntryDetail — same modal, same query params.
+  const openEntryDetailFunction = (entry: ISuggestedEntry) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("entry-detail-id", entry.id);
+    params.set("entry-catalog-id", entry.catalog_id);
+    setSearchParams(params);
+  };
+
+  const bookmarkToggleFunction = async (entry: ISuggestedEntry) => {
+    try {
+      if (entry.shelf_record_id != null) {
+        await removeFromShelf(entry.shelf_record_id);
+        toast.success(t("notifications.myShelf.remove.success"));
+        entry.shelf_record_id = null;
+        document.dispatchEvent(
+          new CustomEvent("shelf-updated", {
+            detail: { id: entry.id, isOnShelf: false },
+          })
+        );
+        return { isOnShelf: false, shelfRecordId: null };
+      }
+
+      const created = await addToShelf(entry.id);
+      toast.success(t("notifications.myShelf.add.success"));
+      entry.shelf_record_id = created.response.id;
+      document.dispatchEvent(
+        new CustomEvent("shelf-updated", {
+          detail: {
+            id: entry.id,
+            isOnShelf: true,
+            shelf_record_id: created.response.id,
+          },
+        })
+      );
+      return { isOnShelf: true, shelfRecordId: created.response.id };
+    } catch {
+      toast.error(
+        t(
+          entry.shelf_record_id != null
+            ? "notifications.myShelf.remove.error"
+            : "notifications.myShelf.add.error"
+        )
+      );
+      throw new Error("bookmark-toggle-failed");
+    }
+  };
+
+  const suggestionsFunction =
+    import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true"
+      ? async (kind: string): Promise<ISuggestedEntry[]> => {
+          const pageByKind: Record<string, number> = {
+            similar: 1,
+            prerequisite: 2,
+            advanced: 3,
+          };
+          const { items } = await getEntries({
+            page: pageByKind[kind] ?? 1,
+            limit: 4,
+          });
+          return items.map((entry) => ({
+            id: entry.id,
+            catalog_id: entry.catalog_id,
+            title: entry.title,
+            authors: entry.authors,
+            thumbnail: `${entry.thumbnail}?access_token=${auth?.token}`,
+            shelf_record_id: entry.shelf_record_id,
+          }));
+        }
+      : undefined;
+
+
+  const explainFunction =
+    import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true"
+      ? async (selectedText: string): Promise<IExplainResult> => ({
+          simple: `Jednoducho: ${selectedText}`,
+          examples: [
+            { label: "Príklad", description: `Kontext pre: ${selectedText}` },
+          ],
+        })
+      : undefined;
+
   const saveLayerFunc = async (
     svg: string,
     groupId: string,
@@ -101,22 +215,24 @@ const Viewer = () => {
         page,
         content: svg,
       });
-      toast.success(t("notifications.editPage.layer.save.success"));
+      // toast within editor only  notifications.editPage.layer.save.success
       return { id: response.id, svg: response.content };
     } catch {
       toast.error(t("notifications.editPage.layer.save.error"));
       return null;
     }
   };
-  const saveGroupFunc = async (name: string) => {
+  const saveGroupFunc = async (name: string): Promise<{ response: { id: string } }> => {
     try {
-      await createAnotation({
+      const response = await createAnotation({
         user_acquisition_id,
         title: name,
       });
-      toast.success(t("notifications.editPage.group.add.success"));
+      // toast within editor only notifications.editPage.group.add.success
+      return { response: { id: response.id } };
     } catch {
       toast.error(t("notifications.editPage.group.add.error"));
+      return { response: { id: "" } };
     }
   };
   const updateLayerFunc = async (
@@ -131,7 +247,7 @@ const Viewer = () => {
         page,
         content: svg,
       });
-      toast.success(t("notifications.editPage.layer.edit.success"));
+      // toast within editor only notifications.editPage.layer.edit.error.success
     } catch {
       toast.error(t("notifications.editPage.layer.edit.error"));
     }
@@ -139,7 +255,7 @@ const Viewer = () => {
   const updateGroupFunc = async (id: string, name: string) => {
     try {
       await updateAnotation(id, { title: name });
-      toast.success(t("notifications.editPage.group.edit.success"));
+      // toast within editor only notifications.editPage.group.edit.success
     } catch {
       toast.error(t("notifications.editPage.group.edit.error"));
     }
@@ -147,7 +263,7 @@ const Viewer = () => {
   const deleteLayerFunc = async (id: string) => {
     try {
       await deleteAnotationItem(id);
-      toast.success(t("notifications.editPage.layer.delete.success"));
+      // toast within editor only notifications.editPage.layer.delete.success
     } catch {
       toast.error(t("notifications.editPage.layer.delete.error"));
     }
@@ -155,7 +271,7 @@ const Viewer = () => {
   const deleteGroupFunc = async (id: string) => {
     try {
       await deleteAnotation(id);
-      toast.success(t("notifications.editPage.group.remove.success"));
+      // toast within editor only notifications.editPage.group.remove.success
     } catch {
       toast.error(t("notifications.editPage.group.remove.error"));
     }
@@ -173,14 +289,115 @@ const Viewer = () => {
       return null;
     }
   };
+  // --- Page bookmarks -------------------------------------------------------
+  // One dedicated annotation per user acquisition holds an item per bookmarked
+  // page (`content: true`) — a page is bookmarked iff its item exists.
+  let bookmarksAnotationId: string | null = null;
+  let bookmarksAnotationRequest: Promise<string | null> | null = null;
+
+  const findBookmarksAnotation = async (): Promise<string | null> => {
+    if (bookmarksAnotationId) return bookmarksAnotationId;
+
+    const { items } = await getAnotations(user_acquisition_id);
+    bookmarksAnotationId =
+      items.find((item) => item.title === PAGE_BOOKMARKS_TITLE)?.id ?? null;
+
+    return bookmarksAnotationId;
+  };
+
+  const ensureBookmarksAnotation = async (): Promise<string | null> => {
+    if (bookmarksAnotationId) return bookmarksAnotationId;
+
+    if (!bookmarksAnotationRequest) {
+      bookmarksAnotationRequest = (async () => {
+        const existing = await findBookmarksAnotation();
+        if (existing) return existing;
+
+        const created = await createAnotation({
+          user_acquisition_id,
+          title: PAGE_BOOKMARKS_TITLE,
+        });
+        bookmarksAnotationId = created.id;
+        return created.id;
+      })().finally(() => {
+        bookmarksAnotationRequest = null;
+      });
+    }
+
+    return bookmarksAnotationRequest;
+  };
+
+  const getPageBookmarksFunc = async (): Promise<IPageBookmark[]> => {
+    try {
+      const anotationId = await findBookmarksAnotation();
+      if (!anotationId) return [];
+
+      const bookmarks: IPageBookmark[] = [];
+      let apiPage = 1;
+      let apiPages = 1;
+
+      do {
+        const { items, metadata } = await getAnotationsItem(anotationId, null, {
+          page: apiPage,
+          limit: 100,
+        });
+        items.forEach((item) => bookmarks.push({ page: item.page, id: item.id }));
+        apiPages = metadata?.pages ?? 1;
+        apiPage += 1;
+      } while (apiPage <= apiPages);
+
+      return bookmarks;
+    } catch {
+      return [];
+    }
+  };
+
+  const addPageBookmarkFunc = async (
+    page: number
+  ): Promise<IPageBookmark | null> => {
+    try {
+      const anotationId = await ensureBookmarksAnotation();
+      if (!anotationId) return null;
+
+      const response = await createAnotationItem({
+        annotation_id: anotationId,
+        page,
+        content: true,
+      });
+
+      return { page, id: response.id };
+    } catch {
+      return null;
+    }
+  };
+
+  const removePageBookmarkFunc = async (page: number, id?: string | null) => {
+    try {
+      if (id) {
+        await deleteAnotationItem(id);
+        return;
+      }
+
+      const anotationId = await findBookmarksAnotation();
+      if (!anotationId) return;
+
+      const { items } = await getAnotationsItem(anotationId, page);
+      await Promise.all(items.map((item) => deleteAnotationItem(item.id)));
+    } catch {
+      // Non-fatal: the viewer keeps its optimistic state either way.
+    }
+  };
+
   const getGroupsFunc = async (): Promise<{ id: string; name: string }[]> => {
     try {
       const { items } = await getAnotations(user_acquisition_id);
-      if (items.length > 0)
-        return items.map((item) => {
+      // The page-bookmark container is an annotation too — keep it out of the
+      // editor's group list.
+      return items
+        .filter((item) => item.title !== PAGE_BOOKMARKS_TITLE)
+        .map((item) => {
           return { id: item.id, name: item.title };
         });
-      return [];
     } catch {
       return [];
     }
@@ -189,15 +406,17 @@ const Viewer = () => {
   useEffect(() => {
     if (!id) return;
 
-    // Load and scope the viewer CSS by wrapping everything in #pdf-viewer-page
+    // The viewer library now ships fully self-scoped styles — every rule lives
+    // under its own `.efv-viewer` root class and its global preflight is
+    // disabled — so we inject the stylesheet as-is. No manual `#rootId { … }`
+    // wrapping (which broke @font-face/@tailwind at-rules) is needed anymore.
     const styleElement = document.createElement("style");
     styleElement.id = "pdf-viewer-styles";
-    
-    // Simply wrap all CSS rules within the #pdf-viewer-page selector
-    const scopedCss = `#${rootId} { ${viewerStyles} }`;
-    
-    styleElement.textContent = scopedCss;
-    document.head.appendChild(styleElement);
+    styleElement.textContent = viewerStyles;
+    document.head.insertBefore(styleElement, document.head.firstChild);
+
+    let viewerApp: { unmount: () => void } | undefined;
+    let cancelled = false;
 
     (async () => {
       try {
@@ -245,8 +464,10 @@ const Viewer = () => {
 
         setProgressBar(90);
 
+        if (cancelled) return;
+
         // Render viewer with the provided options and configurations
-        renderViewer({
+        viewerApp = renderViewer({
           rootId: `#${rootId}`,
           data: pdf,
           options: {
@@ -256,19 +477,25 @@ const Viewer = () => {
             closeFunction,
             homeFunction,
             shareFunction,
+            openEntryDetailFunction,
+            bookmarkToggleFunction,
+            suggestionsFunction,
+            explainFunction,
             editPackage: {
               saveLayerFunc,
               saveGroupFunc,
               updateLayerFunc,
-              updateGroupFunc,
-              deleteLayerFunc,
-              deleteGroupFunc,
               getLayerFunc,
               getGroupsFunc,
             },
+          pageBookmarkPackage: {
+            getBookmarksFunc: getPageBookmarksFunc,
+            addBookmarkFunc: addPageBookmarkFunc,
+            removeBookmarkFunc: removePageBookmarkFunc,
+          },
           },
           config: {
-            download: entryDetail.config.evilflowres_metadata_fetch,
+            download: entryDetail.config.evilflowers_metadata_fetch,
             share: entryDetail.config.evilflowers_share_enabled,
             print: entryDetail.config.evilflowers_viewer_print,
             edit: entryDetail.config.evilflowers_annotations_create,
@@ -283,6 +510,9 @@ const Viewer = () => {
     })();
 
     return () => {
+      cancelled = true;
+      viewerApp?.unmount();
+
       // Remove the scoped styles
       const styleElement = document.getElementById("pdf-viewer-styles");
       if (styleElement) {
@@ -338,6 +568,10 @@ const Viewer = () => {
         </div>
       )}
       <div id={rootId}></div>
+      {/* ItemContainer (which normally hosts this) isn't rendered on this
+          route, so entry-detail-id/entry-catalog-id search params set from
+          the viewer's suggestion cards had nowhere to be picked up. */}
+      <EntryDetail triggerReload={null} />
     </>
   );
 };

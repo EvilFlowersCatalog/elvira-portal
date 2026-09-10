@@ -29,12 +29,6 @@ export interface AiMessage {
   bookIds?: string[];
 }
 
-export interface ICatalogOption {
-  label: string;
-  value: string;
-  catalogId: string;
-}
-
 export interface IAppContext {
   theme: THEME_TYPE;
   updateTheme: (theme: THEME_TYPE) => void;
@@ -71,7 +65,7 @@ export interface IAppContext {
     currentSearchParams: URLSearchParams,
   ) => boolean;
   handleScroll: (
-    scrollRef: RefObject<HTMLDivElement>,
+    scrollRef: RefObject<HTMLDivElement | null>,
     page: number,
     setPage: (page: number) => void,
     maxPage: number,
@@ -88,12 +82,7 @@ export interface IAppContext {
   stuLogoLight: string;
   editingEntryTitle: string;
   setEditingEntryTitle: (editingEntryTitle: string) => void;
-  selectedCatalogId: string | null;
-  selectedCatalog: ICatalogOption | null;
-  availableCatalogs: ICatalogOption[];
-  initializeCatalogs: (catalogs: ICatalogOption[]) => void;
-  switchCatalog: (catalogValue: string) => void;
-  umamiTrack: (title: string, data?: Object) => void;
+  umamiTrack: (title: string, data?: object) => void;
 }
 
 export const AppContext = createContext<IAppContext | null>(null);
@@ -112,20 +101,9 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const [showAiAssistant, setShowAiAssistant] = useState<boolean>(false);
   const [editingEntryTitle, setEditingEntryTitle] = useState<string>("");
   
-  // Get initial catalog from cookies or env
-  const getInitialCatalog = (): ICatalogOption | null => {
-    const savedCatalogValue = cookies[COOKIES_TYPE.CATALOG_KEY];
-    const envCatalogId = import.meta.env.ELVIRA_CATALOG_ID;
-    
-    // Return null initially, will be set when catalogs are fetched
-    return null;
-  };
-  
-  const [selectedCatalog, setSelectedCatalog] = useState<ICatalogOption | null>(getInitialCatalog());
-  const [availableCatalogs, setAvailableCatalogs] = useState<ICatalogOption[]>([]);
-  const [elviraTheme, setElviraTheme] = useState<string>(
-    import.meta.env.ELVIRA_THEME || cookies[COOKIES_TYPE.CATALOG_KEY] || 'default'
-  );
+  // Theme is configured via a build-time env var. The catalog UUID lives in
+  // import.meta.env.ELVIRA_CATALOG_ID and is read directly at each call site.
+  const elviraTheme = import.meta.env.ELVIRA_THEME || 'default';
 
   // assets / LOGOS - dynamically generated based on elviraTheme
   // Use 'default' as fallback for unknown catalog values
@@ -200,58 +178,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     setCookie(COOKIES_TYPE.LANG_KEY, lang, { maxAge: 60 * 60 * 24 * 365 }); // year
   };
 
-  // Initialize catalogs from API response
-  const initializeCatalogs = (catalogs: ICatalogOption[]) => {
-    setAvailableCatalogs(catalogs);
-    
-    const savedCatalogValue = cookies[COOKIES_TYPE.CATALOG_KEY];
-    const envCatalogId = import.meta.env.ELVIRA_CATALOG_ID;
-    
-    let initialCatalog: ICatalogOption | null = null;
-    
-    // Try to find saved catalog
-    if (savedCatalogValue) {
-      initialCatalog = catalogs.find(c => c.value === savedCatalogValue) || null;
-    }
-    
-    // Try to find env catalog
-    if (!initialCatalog && envCatalogId) {
-      initialCatalog = catalogs.find(c => c.catalogId === envCatalogId) || null;
-    }
-    
-    // Default to first catalog
-    if (!initialCatalog && catalogs.length > 0) {
-      initialCatalog = catalogs[0];
-    }
-    
-    if (initialCatalog) {
-      setSelectedCatalog(initialCatalog);
-      setElviraTheme(initialCatalog.value);
-         
-      document.documentElement.setAttribute('data-theme', getAssetPath(initialCatalog.value));
-    }
-  };
-
-  // Switch catalog - accepts catalog value (e.g., 'fiit', 'mtf')
-  const switchCatalog = (catalogValue: string) => {
-    const catalog = availableCatalogs.find((c) => c.value === catalogValue);
-    if (!catalog) return;
-    
-    setSelectedCatalog(catalog);
-    setElviraTheme(catalog.value);
-   
-    document.documentElement.setAttribute('data-theme', getAssetPath(catalog.value));
-    
-    // Save to cookies (session)
-    setCookie(COOKIES_TYPE.CATALOG_KEY, catalog.value);
-    
-    umamiTrack("Catalog Switch", { 
-      catalogId: catalog.catalogId,
-      catalogValue: catalog.value,
-      catalogLabel: catalog.label 
-    });
-  };
-
   // Special navigation stands for navigation that can open new window tab with holding ctr/cmd
   const specialNavigation = (
     event: MouseEvent<HTMLButtonElement>,
@@ -270,7 +196,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     }
   };
 
-  const umamiTrack = (title: string, data?: Object) => {
+  const umamiTrack = (title: string, data?: object) => {
     if (typeof umami !== "undefined") umami.track(title, data);
   };
 
@@ -285,7 +211,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
 
   const isParamsEmpty = () => {
     // do not count entry-detail-id
-    for (let [key] of searchParams.entries()) {
+    for (const [key] of searchParams.entries()) {
       if (key !== "entry-detail-id" && key !== "parent-id") {
         return false;
       }
@@ -312,13 +238,13 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     );
 
     // Chcek prev
-    for (let key in prevRest) {
+    for (const key in prevRest) {
       if (prevRest[key] !== currRest[key]) {
         return false;
       }
     }
     // Chcek curr
-    for (let key in currRest) {
+    for (const key in currRest) {
       if (prevRest[key] !== currRest[key]) {
         return false;
       }
@@ -328,7 +254,7 @@ const AppProvider = ({ children }: IContextProviderParams) => {
 
   // handle scrolling and loading next datas
   const handleScroll = (
-    scrollRef: RefObject<HTMLDivElement>,
+    scrollRef: RefObject<HTMLDivElement | null>,
     page: number,
     setPage: (page: number) => void,
     maxPage: number,
@@ -494,11 +420,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         logoLight,
         editingEntryTitle,
         setEditingEntryTitle,
-        selectedCatalogId: selectedCatalog?.catalogId || null,
-        selectedCatalog,
-        availableCatalogs,
-        initializeCatalogs,
-        switchCatalog,
         umamiTrack,
       }}
     >

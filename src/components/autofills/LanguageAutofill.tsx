@@ -85,6 +85,7 @@ const LanguageAutofill = ({
         className={`bg-white ${suggestions.length > 0 ? 'rounded-b-none' : ''}`}
         type='text'
         value={inputValue}
+        label="false"
         onChange={handleInputChange}
         placeholder={t('entry.wizard.lang')}
         required={isRequired}

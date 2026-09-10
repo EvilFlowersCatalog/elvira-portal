@@ -1,0 +1,126 @@
+name: Deploy
+
+# master -> elvira.stuba.sk       (stu config, `npm run build:stu`)
+# dev    -> dev.elvira.stuba.sk   (dev config, `npm run build:dev`)
+#
+# Per-environment configuration lives in the GitHub Environments
+# "elvira.stuba.sk" (master) and "dev.elvira.stuba.sk" (dev):
+#   Variables (Settings > Environments > Variables):
+#     DEPLOY_USER   - ssh user (e.g. elvira)
+#     DEPLOY_HOST   - gateway hostname reachable from the runner
+#     DEPLOY_PATH   - deploy root (e.g. /mnt/data/var/www/dev.elvira.stuba.sk)
+#     DEPLOY_PORT   - ssh port (optional, defaults to 22)
+#   Secrets (Settings > Environments > Secrets):
+#     DEPLOY_PRIVATE_KEY - ssh private key for DEPLOY_USER
+#
+# On-disk layout (nginx `root` points at `<DEPLOY_PATH>/current`):
+#   <DEPLOY_PATH>/
+#     current -> releases/<release>      (symlink, atomically swapped)
+#     releases/<release>/                (last 5 kept, older pruned)
+
+on:
+  push:
+    branches: [master, dev]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build & deploy (${{ github.ref_name }})
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.ref_name == 'master' && 'elvira.stuba.sk' || 'dev.elvira.stuba.sk' }}
+      url: ${{ github.ref_name == 'master' && 'https://elvira.stuba.sk' || 'https://dev.elvira.stuba.sk' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Build
+        # ELVIRA_* config comes from the GitHub Environment variables below.
+        # Vite gives process.env vars (matching envPrefix) priority over the
+        # committed env/.env.<mode> files, so these override them in CI. The
+        # files remain the fallback for local dev only. NOTE: an unset variable
+        # injects an empty string that still overrides the file, so every value
+        # a build needs must be set in the environment (empty UMAMI is fine).
+        env:
+          ELVIRA_BASE_URL: ${{ vars.ELVIRA_BASE_URL }}
+          ELVIRA_CATALOG_ID: ${{ vars.ELVIRA_CATALOG_ID }}
+          ELVIRA_THEME: ${{ vars.ELVIRA_THEME }}
+          ELVIRA_UMAMI_SERVER: ${{ vars.ELVIRA_UMAMI_SERVER }}
+          ELVIRA_UMAMI_WEBSITE: ${{ vars.ELVIRA_UMAMI_WEBSITE }}
+          ELVIRA_ASSISTANT_URL: ${{ vars.ELVIRA_ASSISTANT_URL }}
+          ELVIRA_EXPERIMENTAL_FEATURES: ${{ vars.ELVIRA_EXPERIMENTAL_FEATURES }}
+        run: |
+          if [ "${{ github.ref_name }}" = "master" ]; then
+            npm run build:stu
+          else
+            npm run build:dev
+          fi
+
+      - name: Configure SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+
+      - name: Trust deploy host
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H -p "${DEPLOY_PORT:-22}" "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      - name: Deploy release & swap symlink
+        env:
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+
+          PORT="${DEPLOY_PORT:-22}"
+          SSH="ssh -p ${PORT} ${DEPLOY_USER}@${DEPLOY_HOST}"
+          RELEASE="$(date -u +%Y-%m-%d_%H%M%S)-${GITHUB_SHA::7}"
+          RELEASE_DIR="${DEPLOY_PATH}/releases/${RELEASE}"
+
+          echo "Deploying release ${RELEASE} to ${DEPLOY_HOST}:${RELEASE_DIR}"
+
+          # Ensure the releases directory exists.
+          $SSH "mkdir -p '${DEPLOY_PATH}/releases'"
+
+          # Upload the build into a fresh release dir. --link-dest hardlinks
+          # unchanged files against the currently live release to save space.
+          rsync -az --delete --human-readable \
+            -e "ssh -p ${PORT}" \
+            --link-dest="${DEPLOY_PATH}/current/" \
+            dist/ \
+            "${DEPLOY_USER}@${DEPLOY_HOST}:${RELEASE_DIR}/"
+
+          # Atomically flip `current` -> new release, then prune old releases
+          # keeping the 5 most recent (the just-deployed one is always newest).
+          $SSH "bash -s" <<EOF
+          set -euo pipefail
+          cd '${DEPLOY_PATH}'
+          ln -sfn 'releases/${RELEASE}' current.tmp
+          mv -T current.tmp current
+          cd releases
+          ls -1dt */ | tail -n +6 | xargs -r rm -rf
+          echo "Active release: \$(readlink '${DEPLOY_PATH}/current')"
+          EOF

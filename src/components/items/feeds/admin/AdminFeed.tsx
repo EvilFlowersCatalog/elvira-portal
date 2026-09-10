@@ -93,7 +93,7 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
           {/* Action Buttons */}
           <div className="grid grid-cols-2">
             <button
-              className={`py-2 flex items-center justify-center text-sm font-medium bg-green text-white hover:brightness-110 transition-colors hover:bg-primary`}
+              className={`py-2 flex items-center justify-center text-sm font-medium bg-greenText text-white hover:brightness-110 transition-colors hover:bg-primary`}
               onClick={() => {
                 umamiTrack('Edit Feed Button', { feedId: feed.id });
                 setShowForm(true);
@@ -102,7 +102,7 @@ const AdminFeed = ({ feed, reloadPage, setReloadPage }: IFeedParams) => {
               <MdEdit size={18} className="mr-1" /> {t('administration.feedsPage.edit')}
             </button>
             <button
-              className={`py-2 flex items-center justify-center text-sm font-medium bg-red text-white hover:brightness-110 transition-colors hover:bg-primary`}
+              className={`py-2 flex items-center justify-center text-sm font-medium bg-redText text-white hover:brightness-110 transition-colors hover:bg-primary`}
               onClick={() => {
                 umamiTrack('Delete Feed Button', { feedId: feed.id });
                 setShowDeleteMenu(true);

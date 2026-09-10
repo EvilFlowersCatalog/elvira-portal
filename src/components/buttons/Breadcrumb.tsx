@@ -1,17 +1,17 @@
 import { FaHome } from 'react-icons/fa';
+import { MdChevronRight } from 'react-icons/md';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import {
   LANG_TYPE,
   NAVIGATION_PATHS,
 } from '../../utils/interfaces/general/general';
-import { MdOutlineKeyboardDoubleArrowRight } from 'react-icons/md';
 import { useEffect, useState } from 'react';
-import { useLocation, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import useGetFeedDetail from '../../hooks/api/feeds/useGetFeedDetail';
 import useGetCategoryDetail from '../../hooks/api/categories/useGetCategoryDetail';
 
 const Breadcrumb = () => {
-  const { specialNavigation, lang, editingEntryTitle } = useAppContext();
+  const { lang, editingEntryTitle } = useAppContext();
   const [breadcrumbs, setBreadcrumbs] = useState<
     { path: string; label: string }[]
   >([]);
@@ -29,25 +29,40 @@ const Breadcrumb = () => {
     title: '',
   });
 
+  const location = useLocation();
+
   const isEn = (): boolean => {
     return lang === LANG_TYPE.en;
   };
 
   const breadcrumbsTranslator: { [key: string]: string } = {
     ['library']: isEn() ? 'Library' : 'Knižnica',
-    ['feeds']: isEn() ? 'Feeds' : 'Skupiny',
+    // "Collections" (Zbierky) is the product-wide name for feed resources,
+    // in both the public app and admin.
+    ['feeds']: isEn() ? 'Collections' : 'Zbierky',
     ['about']: isEn() ? 'About' : 'O Projekte',
     ['administration']: isEn() ? 'Administration' : 'Administrácia',
     ['shelf']: isEn() ? 'Shelf' : 'Polička',
-    ['loans']: isEn() ? 'Loans' : 'Výpožičky',
-    ['entries']: isEn() ? 'Entries' : 'Publikácie',
+    ['help']: isEn() ? 'Help' : 'Pomoc',
+    ['loans']: isEn() ? 'Loans & Reservations' : 'Výpožičky a rezervácie',
+    ['entries']: isEn() ? 'Publications' : 'Publikácie',
     ['users']: isEn() ? 'Users' : 'Používatelia',
+    ['authors']: isEn() ? 'Authors' : 'Autori',
+    ['catalogs']: isEn() ? 'Catalogs' : 'Katalógy',
+    ['ai-users']: isEn() ? 'AI Users' : 'AI používatelia',
+    ['access']: isEn() ? 'Access & Keys' : 'Prístup a kľúče',
     ['add']: isEn() ? 'Add' : 'Pridanie',
     ['categories']: isEn() ? 'Categories' : 'Kategórie',
     ['edit']: editingEntryTitle,
+    ['profile']: isEn() ? 'Profile' : 'Profil',
+    ['history']: isEn() ? 'History' : 'História',
+    ['ai-chat']: isEn() ? 'AI Assistant' : 'AI Asistent',
+    ['ai-chat-history']: isEn() ? 'AI Assistant' : 'AI Asistent',
+    ['books']: isEn() ? 'Books' : 'Knihy',
+    ['search']: isEn() ? 'Search' : 'Vyhľadávanie',
+    ['viewer']: isEn() ? 'PDF Viewer' : 'PDF Viewer',
+    ['ai']: isEn() ? 'AI Assistant' : 'AI Asistent',
   };
-
-  const location = useLocation();
   const getFeedDetail = useGetFeedDetail();
   const getCategoryDetail = useGetCategoryDetail();
 
@@ -56,6 +71,13 @@ const Breadcrumb = () => {
     const pathParts = location.pathname.split('/').filter(Boolean);
     const newBreadcrumbs: { path: string; label: string }[] = [];
     let skip: boolean = false;
+
+    // Where the user actually came from, not what is merely being filtered:
+    // `parent-id`/`feed-id-step` are only ever set by drilling in from /feeds,
+    // and `from` is set by the /categories cards. A facet ticked on /library
+    // changes `feeds=`/`categories=` alone and must not rewrite the trail.
+    const cameFromCategories = searchParams.get('from') === 'categories';
+    const cameFromFeeds = feedsLoading || feeds.length > 0;
 
     // Generate breadcrumbs based on the path parts
     pathParts.forEach((part, index) => {
@@ -67,10 +89,15 @@ const Breadcrumb = () => {
           label: breadcrumbsTranslator[part.toLocaleLowerCase()], // Capitalize the first letter
         });
         skip = true;
-      } else if ((feedsLoading || feeds.length > 0 || resolvedFeedFilter) && pathParts[0] == 'library') {
+      } else if (cameFromFeeds && pathParts[0] == 'library') {
         newBreadcrumbs.push({
           path: "/feeds",
           label: breadcrumbsTranslator['feeds'],
+        });
+      } else if (cameFromCategories && pathParts[0] == 'library') {
+        newBreadcrumbs.push({
+          path: "/categories",
+          label: breadcrumbsTranslator['categories'],
         });
       }
       else {
@@ -84,7 +111,7 @@ const Breadcrumb = () => {
 
     if (feeds.length > 0) {
       feeds.map((feed, index) => {
-        var previousFeeds = feeds.slice(0, index);
+        const previousFeeds = feeds.slice(0, index);
         // %26 is the URL encoded version of &
         const part =
           index !== 0
@@ -124,24 +151,17 @@ const Breadcrumb = () => {
       // Show author filter
       if (authorFilter) {
         newBreadcrumbs.push({
-          path: buildFilterPath({ author: true, feed: !!resolvedFeedFilter, categories: resolvedCategoryFilters.length > 0 }),
+          path: buildFilterPath({ author: true, feed: false, categories: false }),
           label: authorFilter,
         });
       }
-      
-      // Show feed filter (resolved)
-      if (resolvedFeedFilter) {
-        newBreadcrumbs.push({
-          path: buildFilterPath({ author: !!authorFilter, feed: true, categories: resolvedCategoryFilters.length > 0 }),
-          label: resolvedFeedFilter.title,
-        });
-      }
 
-      // Show category filters (resolved)
-      if (resolvedCategoryFilters.length > 0) {
+      // Only name the category when the user navigated in from /categories —
+      // ticking the same category as a facet is a filter, not a step in a trail.
+      if (cameFromCategories && resolvedCategoryFilters.length > 0) {
         resolvedCategoryFilters.forEach((category) => {
           newBreadcrumbs.push({
-            path: buildFilterPath({ author: !!authorFilter, feed: !!resolvedFeedFilter, categories: true }),
+            path: buildFilterPath({ author: !!authorFilter, feed: false, categories: true }),
             label: category.label,
           });
         });
@@ -214,7 +234,7 @@ const Breadcrumb = () => {
               categoryIds.map(async (id) => {
                 try {
                   const detail = await getCategoryDetail(id);
-                  return { id: detail.id, label: detail.label };
+                  return { id: detail.id, label: detail.label || detail.term };
                 } catch {
                   return null;
                 }
@@ -237,27 +257,33 @@ const Breadcrumb = () => {
   }, [location.search]);
 
   return (
-    <div className='flex gap-3 flex-wrap items-center p-4 pl-5'>
-      <button onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.home)}>
-        <FaHome size={20} />
-      </button>
-      {breadcrumbs.map((breadcrumb, index) => (
-        <button
-          className={`flex gap-3 w-fit items-center text-sm text-left ${index === breadcrumbs.length - 1
-            ? 'cursor-default'
-            : 'cursor-pointer'
-            }`}
-          key={index}
-          onClick={
-            index !== breadcrumbs.length - 1
-              ? (e) => specialNavigation(e, breadcrumb.path)
-              : undefined
-          }
-        >
-          <MdOutlineKeyboardDoubleArrowRight size={15} />
-          <span>{breadcrumb.label}</span>
-        </button>
-      ))}
+    <div className='flex flex-wrap items-center gap-[7px] px-5 h-10'>
+      <Link
+        to={NAVIGATION_PATHS.home}
+        className='text-darkGray hover:text-secondary dark:text-zinc-400 dark:hover:text-zinc-200 transition-colors shrink-0'
+      >
+        <FaHome size={18} />
+      </Link>
+      {breadcrumbs.map((breadcrumb, index) => {
+        const isLast = index === breadcrumbs.length - 1;
+        return (
+          <span key={index} className='flex items-center gap-[7px]'>
+            <MdChevronRight size={13} className='text-darkGray dark:text-zinc-500 shrink-0' />
+            {isLast ? (
+              <span className='text-[13px] tracking-[0.1px] text-darkGray dark:text-zinc-400 whitespace-nowrap cursor-default'>
+                {breadcrumb.label}
+              </span>
+            ) : (
+              <Link
+                to={breadcrumb.path}
+                className='text-[13px] tracking-[0.1px] text-darkGray dark:text-zinc-400 whitespace-nowrap cursor-pointer hover:text-secondary dark:hover:text-zinc-200 transition-colors'
+              >
+                {breadcrumb.label}
+              </Link>
+            )}
+          </span>
+        );
+      })}
     </div>
   );
 };

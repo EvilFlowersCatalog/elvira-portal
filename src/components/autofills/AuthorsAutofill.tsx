@@ -26,7 +26,7 @@ const AuthorsAutofill = ({
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isHovering, setIsHovering] = useState<boolean>(false);
 
-  const ref = useRef<HTMLInputElement>();
+  const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (entryForm.authors) {
@@ -46,7 +46,7 @@ const AuthorsAutofill = ({
     const value = e.target.value;
     setInputValue(value);
 
-    let a = entryForm.authors;
+    const a = entryForm.authors;
     if (type === 'name') a[index].name = value;
     else a[index].surname = value;
 
@@ -71,7 +71,7 @@ const AuthorsAutofill = ({
 
   const handleSuggestionClick = (name: string) => {
     setInputValue(name);
-    let a = entryForm.authors;
+    const a = entryForm.authors;
     if (type === 'name') a[index].name = name;
     else a[index].surname = name;
 

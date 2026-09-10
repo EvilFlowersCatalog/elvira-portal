@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IFeed } from '../../utils/interfaces/feed';
-import useGetFeeds from '../../hooks/api/feeds/useGetFeeds';
+import useFeedsQuery from '../../hooks/api/feeds/useFeedsQuery';
 import ElviraInput from '../inputs/ElviraInput';
 import useAppContext from '../../hooks/contexts/useAppContext';
 
@@ -40,24 +40,11 @@ const FeedAutofill = ({
     single ? (entryForm?.title || '') : (entryForm?.feeds?.[0]?.title || '')
   );
   const [suggestions, setSuggestions] = useState<IFeed[]>([]);
-  const [feeds, setFeeds] = useState<IFeed[]>([]);
   const [isHovering, setIsHovering] = useState<boolean>(false);
 
-  const getFeeds = useGetFeeds();
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const { items } = await getFeeds({
-          paginate: false,
-          kind,
-        });
-        setFeeds(items);
-      } catch {
-        setFeeds([]);
-      }
-    })();
-  }, []);
+  // Collections list for autocomplete (cached/deduped by React Query).
+  const { data: feedsData } = useFeedsQuery({ paginate: false, kind });
+  const feeds: IFeed[] = feedsData?.items ?? [];
 
   useEffect(() => {
     if (defaultFeedId && feeds) {

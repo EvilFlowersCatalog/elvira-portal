@@ -15,9 +15,9 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
 
   return (
     <>
-      <div className='flex flex-1 flex-col bg-slate-200 dark:bg-darkGray rounded-md p-4 pt-2 gap-2'>
+      <div className='flex flex-1 flex-col gap-2'>
         <div className='flex justify-between w-full'>
-          <h2 className='text-lg'>{t('entry.wizard.categories')}</h2>
+          <h2 className='text-sm font-semibold text-zinc-700 dark:text-zinc-200'>{t('entry.wizard.categories')}</h2>
           <IoMdAdd onClick={() => {
             umamiTrack('try Create Category Bu');
             setOpen(true);
@@ -29,7 +29,7 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
             <div key={index} className={`h-fit`}>
               <button
                 type='button'
-                className={`bg-primary p-2 text-sm hover:bg-red w-full flex gap-2 justify-between items-center text-white rounded-md`}
+                className={`bg-primary p-2 text-sm hover:bg-redText w-full flex gap-2 justify-between items-center text-white rounded-md`}
                 onClick={() => {
                   umamiTrack('Entry Remove Category Button', {
                     categoryId: item.id,
