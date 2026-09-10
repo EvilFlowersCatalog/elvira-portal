@@ -44,11 +44,6 @@ const CategoryCard = ({ category }: ICategoryCardParams) => {
         <span className='text-base font-bold text-secondary leading-[1.4] pr-10 line-clamp-2'>
           {category.label || category.term}
         </span>
-        {category.label && (
-          <span className='text-xs text-darkGray line-clamp-2'>
-            {category.term}
-          </span>
-        )}
       </button>
     </div>
   );
