@@ -7,11 +7,9 @@ import ItemContainer from '../../components/items/container/ItemContainer';
 import Feed from '../../components/items/feeds/Feed';
 import LoadNext from '../../components/items/loadings/LoadNext';
 import { useTranslation } from 'react-i18next';
-import useAppContext from '../../hooks/contexts/useAppContext';
 import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
 
 const Feeds = () => {
-  const { selectedCatalogId } = useAppContext();
   const [searchParams] = useSearchParams();
   const [currentFeedDescription, setCurrentFeedDescription] = useState<string>('');
   const [currentFeedTitle, setCurrentFeedTitle] = useState<string>('');
@@ -34,7 +32,7 @@ const Feeds = () => {
   }, [searchParams, currentFeedId]);
 
   const list = useInfiniteItemContainer<IFeed>(
-    ['feeds-infinite', selectedCatalogId, filters],
+    ['feeds-infinite', filters],
     () => getFeeds({ paginate: false, ...filters })
   );
 

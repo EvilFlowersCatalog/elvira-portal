@@ -7,12 +7,10 @@ import EntryBoxLoading from '../../components/items/entry/EntryBoxLoading';
 import EntryItem from '../../components/items/entry/display/EntryItem';
 import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper';
 import { useTranslation } from 'react-i18next';
-import useAppContext from '../../hooks/contexts/useAppContext';
 import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
 
 const Shelf = () => {
   const { t } = useTranslation();
-  const { selectedCatalogId } = useAppContext();
   const [searchParams] = useSearchParams();
   const getShelf = useGetShelf();
 
@@ -32,7 +30,7 @@ const Shelf = () => {
   );
 
   const list = useInfiniteItemContainer<IEntry>(
-    ['shelf', selectedCatalogId, filters],
+    ['shelf', filters],
     async (page) => {
       const { items, metadata } = await getShelf({
         page,

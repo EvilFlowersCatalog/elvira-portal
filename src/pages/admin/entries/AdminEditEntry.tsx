@@ -11,7 +11,7 @@ import AdminEntryForm from './AdminEntryForm';
 
 const AdminEditEntry = () => {
   const { t } = useTranslation();
-  const { setEditingEntryTitle, umamiTrack, selectedCatalogId } = useAppContext();
+  const { setEditingEntryTitle, umamiTrack } = useAppContext();
   const { 'entry-id': id } = useParams();
   const [entry, setEntry] = useState<IEntryNewForm | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -29,7 +29,7 @@ const AdminEditEntry = () => {
       setIsLoading(true);
       try {
         if (id) {
-          const entryDetail = await getEntryDetail(id, selectedCatalogId || undefined);
+          const entryDetail = await getEntryDetail(id, import.meta.env.ELVIRA_CATALOG_ID || undefined);
           setEditingEntryTitle(entryDetail.title);
           setStringImage(entryDetail.thumbnail || '');
           setEntryCatalogId(entryDetail.catalog_id);
@@ -97,7 +97,7 @@ const AdminEditEntry = () => {
       // Upload
       try {
         setIsLoading(true);
-        await editEntry(id!, newEntry, entryCatalogId || selectedCatalogId || undefined);
+        await editEntry(id!, newEntry, entryCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined);
         toast.success(t('notifications.entry.edit.success'));
         navigate(NAVIGATION_PATHS.adminEntries, { replace: true });
       } catch {

@@ -42,8 +42,7 @@ const AiChatHistory = () => {
     setAiBookCatalogs,
     setAiShowSuggestions,
     clearAiChat,
-    umamiTrack ,
-    selectedCatalogId
+    umamiTrack
   } = useAppContext();
   const getChatHistory = useGetChatHistory();
 
@@ -59,7 +58,7 @@ const AiChatHistory = () => {
       await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/resumechat`, {
         chatId: chat.chatId,
         apiKey: auth?.token || null,
-        catalogId: selectedCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined  // Use undefined instead of null for optional field
+        catalogId: import.meta.env.ELVIRA_CATALOG_ID || undefined  // Use undefined instead of null for optional field
       });
 
       // Load chat history

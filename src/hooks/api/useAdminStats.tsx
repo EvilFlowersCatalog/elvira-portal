@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import useAxios from './useAxios';
-import useAppContext from '../contexts/useAppContext';
 
 export interface AdminStats {
   publications: number | null;
@@ -19,13 +18,12 @@ export interface AdminStats {
  */
 const useAdminStats = () => {
   const axios = useAxios();
-  const { selectedCatalogId } = useAppContext();
 
   return useCallback(async (): Promise<AdminStats> => {
     const total = async (path: string, scoped: boolean): Promise<number | null> => {
       try {
         const params = new URLSearchParams({ page: '1', limit: '1' });
-        if (scoped && selectedCatalogId) params.set('catalog_id', selectedCatalogId);
+        if (scoped) params.set('catalog_id', import.meta.env.ELVIRA_CATALOG_ID);
         const { data } = await axios.get<{ metadata?: { total?: number } }>(`/api/v1/${path}`, { params });
         return data?.metadata?.total ?? null;
       } catch {
@@ -43,7 +41,7 @@ const useAdminStats = () => {
     ]);
 
     return { publications, collections, categories, authors, users, catalogs };
-  }, [axios, selectedCatalogId]);
+  }, [axios]);
 };
 
 export default useAdminStats;

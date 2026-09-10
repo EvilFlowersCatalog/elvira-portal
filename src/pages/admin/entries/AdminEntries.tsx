@@ -26,7 +26,7 @@ const DEFAULT_LIMIT = 10;
 const AdminEntries = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { selectedCatalogId, umamiTrack } = useAppContext();
+  const { umamiTrack } = useAppContext();
   const { auth } = useAuthContext();
   const deleteEntry = useDeleteEntry();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -55,10 +55,7 @@ const AdminEntries = () => {
     isLoading: loading,
     isError: error,
     refetch,
-  } = useEntriesQuery(
-    { page, limit, title: q, orderBy },
-    { enabled: !!selectedCatalogId }
-  );
+  } = useEntriesQuery({ page, limit, title: q, orderBy });
   const items = data?.items ?? [];
   const metadata = data?.metadata ?? {
     page: 1,
@@ -75,7 +72,7 @@ const AdminEntries = () => {
   const doDelete = async () => {
     if (!pendingDelete) return;
     try {
-      await deleteEntry(pendingDelete.id, pendingDelete.catalog_id || selectedCatalogId || undefined);
+      await deleteEntry(pendingDelete.id, pendingDelete.catalog_id || import.meta.env.ELVIRA_CATALOG_ID || undefined);
       toast.success(t('administration.entriesPage.deleted'));
       refetch();
     } catch {
@@ -189,7 +186,7 @@ const AdminEntries = () => {
         title={t('administration.entriesPage.title')}
         description={t('administration.entriesPage.description')}
         actions={
-          <Button onClick={() => navigate(NAVIGATION_PATHS.adminAddEntries)} disabled={!selectedCatalogId} className="flex items-center gap-2">
+          <Button onClick={() => navigate(NAVIGATION_PATHS.adminAddEntries)} className="flex items-center gap-2">
             <FiPlus size={16} />
             {t('administration.entriesPage.add')}
           </Button>
@@ -205,8 +202,8 @@ const AdminEntries = () => {
         loading={loading}
         error={error ? t('administration.entriesPage.loadError') : undefined}
         onRetry={() => refetch()}
-        emptyTitle={selectedCatalogId ? t('administration.entriesPage.empty') : t('administration.entriesPage.noCatalog')}
-        emptyDescription={selectedCatalogId ? t('administration.entriesPage.emptyHint') : undefined}
+        emptyTitle={t('administration.entriesPage.empty')}
+        emptyDescription={t('administration.entriesPage.emptyHint')}
         sort={sort}
         onSortChange={(s) => patchParams({ order_by: s.dir === 'desc' ? `-${s.key}` : s.key, page: '1' })}
         page={metadata.page}

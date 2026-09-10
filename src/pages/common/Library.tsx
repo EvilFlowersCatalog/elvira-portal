@@ -7,13 +7,11 @@ import EntryBoxLoading from '../../components/items/entry/EntryBoxLoading';
 import EntryItem from '../../components/items/entry/display/EntryItem';
 import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper';
 import { useTranslation } from 'react-i18next';
-import useAppContext from '../../hooks/contexts/useAppContext';
 import FilterSuggestions from '../../components/tools/FilterSuggestions';
 import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
 
 const Library = () => {
   const { t } = useTranslation();
-  const { selectedCatalogId } = useAppContext();
   const [searchParams] = useSearchParams();
   const getEntries = useGetEntries();
 
@@ -37,7 +35,7 @@ const Library = () => {
   );
 
   const list = useInfiniteItemContainer<IEntry>(
-    ['entries-infinite', selectedCatalogId, filters],
+    ['entries-infinite', filters],
     (page) => getEntries({ page, limit: 30, ...filters })
   );
 

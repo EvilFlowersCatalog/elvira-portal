@@ -78,7 +78,6 @@ export function AdvancedSearchWrapper({ children, enabled = true }: { children: 
 export function AdvancedSearch() {
     const [searchParams, setSearchParams] = useSearchParams();
     const { t, i18n } = useTranslation();
-    const { selectedCatalogId } = useAppContext();
 
     const [year, setYear] = useState<string[]>(["", ""]);
     const [languageCodes, setLanguageCodes] = useState<string[]>([]);
@@ -108,8 +107,6 @@ export function AdvancedSearch() {
     const unresolvedFeedIds = useRef<string[]>([]);
 
     useEffect(() => {
-        if (!selectedCatalogId) return;
-
         let cancelled = false;
         hydrated.current = false;
         setCategoriesLoaded(false);
@@ -125,7 +122,7 @@ export function AdvancedSearch() {
 
         return () => { cancelled = true; };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [selectedCatalogId]);
+    }, []);
 
     useEffect(() => {
         (async () => {
