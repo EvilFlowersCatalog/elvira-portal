@@ -23,10 +23,6 @@ export interface ICatalog {
   user_catalogs?: IUserCatalog[];
 }
 
-export interface ICatalogsList {
-  items: ICatalog[];
-}
-
 /** Membership entry as accepted by POST/PUT /api/v1/catalogs. */
 export interface ICatalogMemberInput {
   user_id: string;

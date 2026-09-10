@@ -6,11 +6,9 @@ import useGetCategories from '../../hooks/api/categories/useGetCategories';
 import ItemContainer from '../../components/items/container/ItemContainer';
 import CategoryCard from '../../components/items/categories/CategoryCard';
 import LoadNext from '../../components/items/loadings/LoadNext';
-import useAppContext from '../../hooks/contexts/useAppContext';
 import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
 
 const Categories = () => {
-  const { selectedCatalogId } = useAppContext();
   const [searchParams] = useSearchParams();
 
   const { t } = useTranslation();
@@ -22,7 +20,7 @@ const Categories = () => {
   );
 
   const list = useInfiniteItemContainer<ICategory>(
-    ['categories-infinite', selectedCatalogId, filters],
+    ['categories-infinite', filters],
     () => getCategories({ paginate: false, ...filters })
   );
 

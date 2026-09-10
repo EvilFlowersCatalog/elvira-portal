@@ -1,7 +1,6 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import { IEntryQuery } from '../../../utils/interfaces/entry';
 import useGetEntries from './useGetEntries';
-import useAppContext from '../../contexts/useAppContext';
 
 /**
  * React Query wrapper around the entries endpoint. Reuses `useGetEntries` for the
@@ -17,10 +16,9 @@ const useEntriesQuery = (
   options?: { enabled?: boolean }
 ) => {
   const getEntries = useGetEntries();
-  const { selectedCatalogId } = useAppContext();
 
   return useQuery({
-    queryKey: ['entries', selectedCatalogId, query],
+    queryKey: ['entries', query],
     queryFn: () =>
       getEntries({ page: 1, limit: 30, ...query } as IEntryQuery),
     enabled: options?.enabled ?? true,

@@ -5,7 +5,6 @@ import { NAVIGATION_PATHS } from '../utils/interfaces/general/general';
 import RequireAuth from './guards/AuthGuard';
 import useAuthContext from '../hooks/contexts/useAuthContext';
 import RequireAdmin from './guards/AdminGuard';
-import CatalogInitializer from '../components/catalog/CatalogInitializer';
 import { AdminLayout } from '../components/admin';
 
 // Route-level code-splitting: each page becomes its own lazily-loaded chunk so
@@ -53,9 +52,6 @@ const BaseRoutes = () => {
 
   return (
     <>
-      {/* Fetch catalogs from API after authentication is available */}
-      {auth && <CatalogInitializer />}
-
       <Routes>
         <Route element={<App />}>
           {/* Public */}
