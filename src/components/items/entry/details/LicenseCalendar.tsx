@@ -20,6 +20,7 @@ import { ILicense } from "../../../../utils/interfaces/license";
 import useCreateLicense from "../../../../hooks/api/licenses/useCreateLicense";
 import useDownloadLicense from "../../../../hooks/api/licenses/useDownloadLicense";
 import ReserveQueueModal from "../../../modals/ReserveQueueModal";
+import { withAccessToken } from "../../../../utils/func/functions";
 import {
   CONFLICT_REASON,
   getConflictReasonCode,
@@ -271,7 +272,7 @@ export default function LicenseCalendar() {
                 <div className="w-[73px] h-[103px] rounded-[5px] overflow-hidden shrink-0 bg-gray-200">
                   <img
                     className="w-full h-full object-cover"
-                    src={entry.thumbnail + `?access_token=${auth?.token}`}
+                    src={withAccessToken(entry.thumbnail, auth?.token) ?? undefined}
                     alt={entry.title}
                   />
                 </div>
@@ -434,7 +435,7 @@ export default function LicenseCalendar() {
                 <div className="w-[55px] h-[78px] rounded-[5px] overflow-hidden shrink-0 bg-gray-200">
                   <img
                     className="w-full h-full object-cover"
-                    src={entry.thumbnail + `?access_token=${auth?.token}`}
+                    src={withAccessToken(entry.thumbnail, auth?.token) ?? undefined}
                     alt={entry.title}
                   />
                 </div>

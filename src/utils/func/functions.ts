@@ -48,6 +48,20 @@ export const updateMetaTag = (name: string, content: string | number) => {
     ?.setAttribute('content', content.toString());
 };
 
+export const withAccessToken = (
+  url: string | null | undefined,
+  token?: string
+): string | null => {
+  if (!url) return null;
+  try {
+    const parsed = new URL(url, import.meta.env.ELVIRA_BASE_URL);
+    parsed.searchParams.set('access_token', token ?? '');
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+};
+
 export const imageUrlToFile = async (url: string, filename: string) => {
   try {
     const response = await fetch(url);

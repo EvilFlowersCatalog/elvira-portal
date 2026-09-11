@@ -9,6 +9,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { NAVIGATION_PATHS } from "../../../../utils/interfaces/general/general";
 import useAppContext from "../../../../hooks/contexts/useAppContext";
 import { AvailabilityBadge, AvailabilityState } from "../details/AvailabilityBadge";
+import { withAccessToken } from "../../../../utils/func/functions";
 
 
 interface IEntryItem {
@@ -145,7 +146,7 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
                 >
                     <img
                         className={`w-full h-full object-cover select-none transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
-                        src={entry.thumbnail + `?access_token=${auth?.token}`}
+                        src={withAccessToken(entry.thumbnail, auth?.token) ?? undefined}
                         alt={`Thumbnail ${entry.title}`}
                         loading="lazy"
                         decoding="async"

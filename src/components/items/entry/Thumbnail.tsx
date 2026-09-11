@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
+import { withAccessToken } from '../../../utils/func/functions';
 
 const FALLBACK_SRC = '/assets/thumbnail.webp';
 
@@ -36,9 +37,7 @@ export default function Thumbnail({
   const { auth } = useAuthContext();
   const [loaded, setLoaded] = useState(false);
 
-  const src = thumbnail
-    ? `${thumbnail}?access_token=${auth?.token ?? ''}`
-    : FALLBACK_SRC;
+  const src = withAccessToken(thumbnail, auth?.token) ?? FALLBACK_SRC;
 
   return (
     <div

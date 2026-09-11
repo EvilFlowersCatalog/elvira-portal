@@ -9,6 +9,7 @@ import useEntriesQuery from '../../../hooks/api/entries/useEntriesQuery';
 import useDeleteEntry from '../../../hooks/api/entries/useDeleteEntry';
 import { IEntry } from '../../../utils/interfaces/entry';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
+import { withAccessToken } from '../../../utils/func/functions';
 import {
   PageHeader,
   DataTable,
@@ -89,7 +90,7 @@ const AdminEntries = () => {
     return a.length > 1 ? `${first} ${t('administration.entriesPage.moreCount', { count: a.length - 1 })}` : first;
   };
 
-  const thumbSrc = (e: IEntry) => (e.thumbnail ? `${e.thumbnail}?access_token=${auth?.token}` : null);
+  const thumbSrc = (e: IEntry) => withAccessToken(e.thumbnail, auth?.token);
 
   const chips = (arr: { id: string; title?: string; term?: string }[] | undefined, variant: 'info' | 'neutral', param: string) => {
     if (!arr || arr.length === 0) return <span className="text-zinc-400">—</span>;
