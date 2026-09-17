@@ -202,7 +202,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
                       {entry.title}
                     </h4>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {entry.authors?.map(a => a.name).join(', ') || '-'}
+                      {entry.authors?.map(a => a.name + ' ' + a.surname).join(', ') || '-'}
                     </p>
                   </div>
                 </div>
