@@ -42,7 +42,7 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
                   });
                 }}
               >
-                {item.term}
+                {item.label || item.term}
                 <MdRemoveCircle size={15} />
               </button>
             </div>

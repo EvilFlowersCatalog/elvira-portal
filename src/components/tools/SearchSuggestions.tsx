@@ -43,7 +43,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
     const categoriesMap = new Map<string, ICategory>();
     const feedsMap = new Map<string, IFeed>();
     items.forEach((entry) => {
-      entry.authors?.forEach((author) => uniqueAuthors.add(author.name));
+      entry.authors?.forEach((author) => uniqueAuthors.add(author.name + " " + author.surname));
       entry.categories?.forEach((cat) => {
         if (!categoriesMap.has(cat.id)) categoriesMap.set(cat.id, cat);
       });

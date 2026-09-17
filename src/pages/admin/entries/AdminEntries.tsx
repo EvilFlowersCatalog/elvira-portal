@@ -148,7 +148,7 @@ const AdminEntries = () => {
       id: 'categories',
       header: t('administration.entriesPage.categories'),
       defaultHidden: true,
-      cell: (e) => chips(e.categories?.map((c) => ({ id: c.id, term: c.term })), 'neutral', 'category-id'),
+      cell: (e) => chips(e.categories?.map((c) => ({ id: c.id, term: c.label || c.term })), 'neutral', 'category-id'),
     },
     {
       id: 'files',

@@ -88,7 +88,7 @@ const Category = ({ category, reloadPage, setReloadPage }: ICategoryParam) => {
       </div>
       {showDeleteMenu && (
         <ConfirmationDialog
-          name={category.term}
+          name={category.label || category.term}
           close={setShowDeleteMenu}
           yes={handleDelete}
           type='category'
