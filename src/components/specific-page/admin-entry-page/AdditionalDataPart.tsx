@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { getBase64, imageUrlToFile } from '../../../utils/func/functions';
+import { getBase64, imageUrlToFile, withAccessToken } from '../../../utils/func/functions';
 import { IPartParams } from '../../../utils/interfaces/general/general';
 import ImageDropzone from '../../dropzones/ImageDropzone';
 import ElviraInput from '../../inputs/ElviraInput';
@@ -39,7 +39,7 @@ const AdditionalDataPart = ({
       if (entry.thumbnail) {
         try {
           const image = await imageUrlToFile(
-            entry.thumbnail + `?access_token=${auth?.token}`,
+            withAccessToken(entry.thumbnail, auth?.token) ?? entry.thumbnail,
             'Image'
           );
           setImage(image);

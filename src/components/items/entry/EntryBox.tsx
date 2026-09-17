@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { IEntry } from '../../../utils/interfaces/entry';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import useAppContext from '../../../hooks/contexts/useAppContext';
+import { withAccessToken } from '../../../utils/func/functions';
 
 interface IEntryBoxParams {
   entry: IEntry;
@@ -63,7 +64,7 @@ const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
             className={`w-full h-full ${
               isScale ? 'scale-110' : ''
             } duration-1000`}
-            src={entry.thumbnail + `?access_token=${auth?.token}`}
+            src={withAccessToken(entry.thumbnail, auth?.token) ?? undefined}
             alt='Entry Thumbnail'
             onLoad={() => setImageLoaded(true)}
           />

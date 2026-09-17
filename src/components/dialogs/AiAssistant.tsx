@@ -71,10 +71,12 @@ function MessageElement({ msg, msgIndex, bookCatalogs }: { msg: AiMessage, msgIn
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content.data as string}</ReactMarkdown>
             </div>;
         case "entries":
-            return <div className="flex gap-3 mb-2 py-2 shrink-0"
+            return <div className="flex gap-3 mb-2 py-2 shrink-0 overflow-x-auto flex-nowrap"
             >
                 {books.map((entry: IEntry) => (
-                    <EntryItem entry={entry} key={"ai-" + entry.id} id={'ai-' + entry.id} type="ai-recommendation" />
+                    <div key={"ai-" + entry.id} className="w-[150px] shrink-0">
+                        <EntryItem entry={entry} id={'ai-' + entry.id} type="ai-recommendation" />
+                    </div>
                 ))}
             </div>
         case "loading":

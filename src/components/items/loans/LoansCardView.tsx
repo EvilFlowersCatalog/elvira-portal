@@ -20,6 +20,7 @@ import { isPassphraseRequired, problemDetailMessage } from '../../../utils/probl
 import ExtendLoanModal from '../../modals/ExtendLoanModal';
 import ReturnBookModal from '../../modals/ReturnBookModal';
 import CancelReservationModal from '../../modals/CancelReservationModal';
+import { withAccessToken } from '../../../utils/func/functions';
 
 /** All three cards render the same author line — the entry serializer already
  *  ships `authors`, so read it rather than printing a placeholder. */
@@ -149,7 +150,7 @@ function BorrowedCard({
       >
         <img
           alt={license.entry?.title}
-          src={license.entry?.thumbnail ? `${license.entry.thumbnail}?access_token=${token}` : '/assets/thumbnail.webp'}
+          src={withAccessToken(license.entry?.thumbnail, token) ?? '/assets/thumbnail.webp'}
           className="w-full h-full object-cover"
         />
       </div>
@@ -228,7 +229,7 @@ function ReservationCard({
       >
         <img
           alt={reservation.entry?.title}
-          src={reservation.entry?.thumbnail ? `${reservation.entry.thumbnail}?access_token=${token}` : '/assets/thumbnail.webp'}
+          src={withAccessToken(reservation.entry?.thumbnail, token) ?? '/assets/thumbnail.webp'}
           className="w-full h-full object-cover"
         />
       </div>
@@ -332,7 +333,7 @@ function PastCard({
       >
         <img
           alt={title}
-          src={license.entry?.thumbnail ? `${license.entry.thumbnail}?access_token=${token}` : '/assets/thumbnail.webp'}
+          src={withAccessToken(license.entry?.thumbnail, token) ?? '/assets/thumbnail.webp'}
           className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
         />
       </button>

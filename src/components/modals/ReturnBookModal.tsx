@@ -10,6 +10,7 @@ import { problemDetailMessage } from '../../utils/problemDetail';
 import useUpdateLicenseState from '../../hooks/api/licenses/useUpdateLicense';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import useFocusTrap from '../../hooks/useFocusTrap';
+import { withAccessToken } from '../../utils/func/functions';
 
 const M = 'license.loansPage.modals';
 
@@ -81,7 +82,7 @@ export default function ReturnBookModal({ license, onClose, onSuccess }: Props) 
         <div className="bg-lightGray dark:bg-zinc-700 rounded-xl p-4 flex gap-3 items-center mb-8">
           {license.entry?.thumbnail ? (
             <img
-              src={`${license.entry.thumbnail}?access_token=${auth?.token}`}
+              src={withAccessToken(license.entry.thumbnail, auth?.token) ?? undefined}
               alt={license.entry.title}
               className="w-[55px] h-[78px] rounded-[5px] object-cover shrink-0"
             />

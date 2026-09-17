@@ -11,6 +11,7 @@ import useCreateReservation from '../../hooks/api/reservations/useCreateReservat
 import useContactNudge from '../../hooks/api/notification-contacts/useContactNudge';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import useFocusTrap from '../../hooks/useFocusTrap';
+import { withAccessToken } from '../../utils/func/functions';
 
 const M = 'license.queue';
 
@@ -107,7 +108,7 @@ export default function ReserveQueueModal({ entry, onClose, onSuccess, queueLeng
             {entry.thumbnail && (
               <img
                 className="w-full h-full object-cover"
-                src={`${entry.thumbnail}?access_token=${auth?.token}`}
+                src={withAccessToken(entry.thumbnail, auth?.token) ?? undefined}
                 alt={entry.title}
               />
             )}

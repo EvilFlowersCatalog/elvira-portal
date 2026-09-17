@@ -25,7 +25,7 @@ import viewerStyles from "@evilflowers/evilflowersviewer/dist/style.css?inline";
 import type { IPageBookmark } from "@evilflowers/evilflowersviewer";
 import useAppContext from "../../hooks/contexts/useAppContext";
 import { toast } from "react-toastify";
-import { updateMetaTag } from "../../utils/func/functions";
+import { updateMetaTag, withAccessToken } from "../../utils/func/functions";
 import useAuthContext from "../../hooks/contexts/useAuthContext";
 import useGetAnotations from "../../hooks/api/anotations/useGetAnotations";
 import useGetAnotationItem from "../../hooks/api/anotations/anotation-items/useGetAnotationItem";
@@ -187,7 +187,7 @@ const Viewer = () => {
             catalog_id: entry.catalog_id,
             title: entry.title,
             authors: entry.authors,
-            thumbnail: `${entry.thumbnail}?access_token=${auth?.token}`,
+            thumbnail: withAccessToken(entry.thumbnail, auth?.token) ?? "",
             shelf_record_id: entry.shelf_record_id,
           }));
         }
@@ -449,7 +449,7 @@ const Viewer = () => {
             .join("; "),
           citation_title: entryDetail.title,
           citation_first_page: "1",
-          citation_pdf_url: `${userAcquisition.url}?access_token=${auth?.token}`,
+          citation_pdf_url: withAccessToken(userAcquisition.url, auth?.token),
         };
 
         Object.entries(metaTagUpdates).forEach(([key, value]) => {
