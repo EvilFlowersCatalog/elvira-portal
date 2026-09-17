@@ -64,7 +64,7 @@ const Feeds = () => {
   return (
     <ItemContainer
       list={list}
-      isEntries={true}
+      isEntries={false}
       searchSpecifier="query"
       title={t('navbarMenu.feeds')}
       description={currentFeedDescription}

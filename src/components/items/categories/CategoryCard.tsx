@@ -3,6 +3,7 @@ import { FaTag } from 'react-icons/fa6';
 import { ICategory } from '../../../utils/interfaces/category';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import useAppContext from '../../../hooks/contexts/useAppContext';
+import { setCategoryIds } from '../../../utils/func/filterParams';
 
 interface ICategoryCardParams {
   category: ICategory;
@@ -18,11 +19,7 @@ const CategoryCard = ({ category }: ICategoryCardParams) => {
     });
 
     const params = new URLSearchParams();
-    if (import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
-      params.set('categories', category.id);
-    } else {
-      params.set('category-id', category.id);
-    }
+    setCategoryIds(params, [category.id]);
     // Marks the provenance so Breadcrumb can tell this apart from a facet tick.
     params.set('from', 'categories');
 

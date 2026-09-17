@@ -3,8 +3,6 @@ import useAppContext from "../../../hooks/contexts/useAppContext"
 import { useTranslation } from "react-i18next";
 import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
 import { ICategory } from "../../../utils/interfaces/category";
-import CategoryAutofill from "../../autofills/CategoryAutofill";
-import FeedAutofill from "../../autofills/FeedAutofill";
 import { IoClose } from "react-icons/io5";
 import AdvancedCheckboxes from "../../inputs/AdvancedCheckboxes";
 import Checkbox from "../../primitives/Checkbox";
@@ -16,6 +14,7 @@ import useEntryFacets from "../../../hooks/api/entries/useEntryFacets";
 import { AcceptedLanguage, getLanguage, getLanguages } from "../../../hooks/api/languages/languages";
 import { IFeed } from "../../../utils/interfaces/feed";
 import { AvailabilityState } from "../entry/details/AvailabilityBadge";
+import { readCategoryIds, readFeedIds, setCategoryIds, setFeedIds } from "../../../utils/func/filterParams";
 
 const DEFAULT_MIN_YEAR = 1900;
 
@@ -150,37 +149,8 @@ export function AdvancedSearch() {
             ...unresolvedFeedIds.current,
         ];
 
-        if (import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
-            if (categoryIds.length > 0) {
-                params.set('categories', categoryIds.join(','));
-            } else {
-                params.delete('categories');
-            }
-            params.delete('category-id');
-
-            if (feedIds.length > 0) {
-                params.set('feeds', feedIds.join(','));
-            } else {
-                params.delete('feeds');
-            }
-            params.delete('feed-id');
-        } else {
-            const singleCategory = categoryIds[0];
-            if (singleCategory) {
-                params.set('category-id', singleCategory);
-            } else {
-                params.delete('category-id');
-            }
-            params.delete('categories');
-
-            const singleFeed = feedIds[0];
-            if (singleFeed) {
-                params.set('feed-id', singleFeed);
-            } else {
-                params.delete('feed-id');
-            }
-            params.delete('feeds');
-        }
+        setCategoryIds(params, categoryIds);
+        setFeedIds(params, feedIds);
 
         if (year[0]) params.set('publishedAtGte', year[0].toString());
         else params.delete('publishedAtGte');
@@ -206,14 +176,6 @@ export function AdvancedSearch() {
         const languageCodeParam = searchParams.get('languageCode') || '';
         const availabilityParam = searchParams.get('availability') || '';
 
-        const isExperimental = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
-        const feedsParam = isExperimental
-            ? (searchParams.get('feeds') || '')
-            : (searchParams.get('feed-id') || '');
-        const categoriesParam = isExperimental
-            ? (searchParams.get('categories') || '')
-            : (searchParams.get('category-id') || '');
-
         if (year[0] !== publishedAtGte || year[1] !== publishedAtLte) {
             setYear([publishedAtGte, publishedAtLte]);
         }
@@ -230,16 +192,16 @@ export function AdvancedSearch() {
             setAvailability(newAvailability);
         }
 
-        const feedIds = feedsParam ? feedsParam.split(',') : [];
-        const matchedFeeds = feedsParam ? allFeeds.filter(feed => feedIds.includes(feed.id)) : [];
+        const feedIds = readFeedIds(searchParams);
+        const matchedFeeds = allFeeds.filter(feed => feedIds.includes(feed.id));
         unresolvedFeedIds.current = feedIds.filter(id => !matchedFeeds.some(f => f.id === id));
         const currentFeedIds = activeFeeds.map(f => f.id).sort().join(',');
         if (currentFeedIds !== matchedFeeds.map(f => f.id).sort().join(',')) {
             setActiveFeeds(matchedFeeds);
         }
 
-        const categoryIds = categoriesParam ? categoriesParam.split(',') : [];
-        const matchedCategories = categoriesParam ? allCategories.filter(cat => categoryIds.includes(cat.id)) : [];
+        const categoryIds = readCategoryIds(searchParams);
+        const matchedCategories = allCategories.filter(cat => categoryIds.includes(cat.id));
         unresolvedCategoryIds.current = categoryIds.filter(id => !matchedCategories.some(c => c.id === id));
         const currentCategoryIds = activeCategories.map(c => c.id).sort().join(',');
         if (currentCategoryIds !== matchedCategories.map(c => c.id).sort().join(',')) {
