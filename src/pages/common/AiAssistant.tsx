@@ -75,7 +75,7 @@ function MessageElement({ msg, bookCatalogs }: { msg: AiMessage, bookCatalogs: R
             return <div className="flex gap-3 mb-4 py-2 shrink-0 overflow-x-auto flex-nowrap"
             >
                 {books.map((entry: IEntry) => (
-                    <div key={"ai-" + entry.id} className="flex-shrink-0">
+                    <div key={"ai-" + entry.id} className="w-[150px] shrink-0">
                         <EntryItem entry={entry} id={'ai-' + entry.id} type="ai-recommendation" />
                     </div>
                 ))}
