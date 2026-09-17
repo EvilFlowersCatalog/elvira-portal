@@ -9,6 +9,12 @@ import { useEffect, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import useGetFeedDetail from '../../hooks/api/feeds/useGetFeedDetail';
 import useGetCategoryDetail from '../../hooks/api/categories/useGetCategoryDetail';
+import {
+  readCategoryIds,
+  readFeedIds,
+  setCategoryIds,
+  setFeedIds,
+} from '../../utils/func/filterParams';
 
 const Breadcrumb = () => {
   const { lang, editingEntryTitle } = useAppContext();
@@ -20,9 +26,9 @@ const Breadcrumb = () => {
   const [feedsLoading, setFeedsLoading] = useState<boolean>(searchParams.get('parent-id') || searchParams.get('feed-id-step') ? true : false);
   const [feeds, setFeeds] = useState<{ id: string; title: string }[]>([]);
   const [authorFilter, setAuthorFilter] = useState<string | null>(searchParams.get('author'));
-  const [feedFilter, setFeedFilter] = useState<string | null>(searchParams.get('feeds'));
+  const [feedFilter, setFeedFilter] = useState<string | null>(readFeedIds(searchParams)[0] ?? null);
   const [resolvedFeedFilter, setResolvedFeedFilter] = useState<{ id: string; title: string } | null>(null);
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(searchParams.get('categories'));
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(readCategoryIds(searchParams).join(',') || null);
   const [resolvedCategoryFilters, setResolvedCategoryFilters] = useState<{ id: string; label: string }[]>([]);
   const [feedStep, setFeedStep] = useState<{ id: string; title: string }>({
     id: '',
@@ -141,9 +147,9 @@ const Breadcrumb = () => {
       const buildFilterPath = (includeFilters: { author?: boolean; feed?: boolean; categories?: boolean }) => {
         const params = new URLSearchParams();
         if (includeFilters.author && authorFilter) params.set('author', authorFilter);
-        if (includeFilters.feed && resolvedFeedFilter) params.set('feeds', resolvedFeedFilter.id);
+        if (includeFilters.feed && resolvedFeedFilter) setFeedIds(params, [resolvedFeedFilter.id]);
         if (includeFilters.categories && resolvedCategoryFilters.length > 0) {
-          params.set('categories', resolvedCategoryFilters.map(c => c.id).join(','));
+          setCategoryIds(params, resolvedCategoryFilters.map(c => c.id));
         }
         return `/${pathParts[0]}?${params.toString()}`;
       };
@@ -174,8 +180,8 @@ const Breadcrumb = () => {
   useEffect(() => {
     const fp = searchParams.get('parent-id')?.split('&');
     const feedStepId = searchParams.get('feed-id-step');
-    const feedFilterId = searchParams.get('feeds');
-    const categoryFilterIds = searchParams.get('categories');
+    const feedFilterId = readFeedIds(searchParams)[0] ?? null;
+    const categoryFilterIds = readCategoryIds(searchParams).join(',') || null;
 
     setAuthorFilter(searchParams.get('author'));
     setFeedFilter(feedFilterId);

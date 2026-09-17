@@ -14,6 +14,10 @@ const useGetShelf = () => {
     publishedAtLte,
     query,
     authors,
+    categoryId,
+    languageCode,
+    categories,
+    feeds,
   }: IEntryQuery): Promise<IMyShelfList> => {
     // Set params
     const params = new URLSearchParams();
@@ -26,7 +30,6 @@ const useGetShelf = () => {
 
     // Check if there is param, if yes set it
     if (title) params.set('title', title);
-    if (feedId) params.set('feed_id', feedId);
     // Django-filter uses the double-underscore lookup convention (matches the
     // entries endpoint's `published_at__gte`/`__lte`). The single-underscore
     // spelling used before was silently dropped by the backend.
@@ -34,6 +37,16 @@ const useGetShelf = () => {
     if (publishedAtLte) params.set('published_at__lte', publishedAtLte);
     if (authors) params.set('author', authors);
     if (query) params.set('query', query);
+    if (languageCode) params.set('language_code', languageCode);
+
+    // Same shape as the entries endpoint: `feed_id` and `category_id` take a
+    // comma-separated UUID list, so the single-select and multi-select values
+    // merge into one CSV instead of one of them being dropped.
+    const feedIds = [feedId, feeds].filter(Boolean).join(',');
+    if (feedIds) params.set('feed_id', feedIds);
+
+    const categoryIds = [categoryId, categories].filter(Boolean).join(',');
+    if (categoryIds) params.set('category_id', categoryIds);
 
     // Get shelf by params
     const MY_SHELF_URL = '/api/v1/shelf-records';

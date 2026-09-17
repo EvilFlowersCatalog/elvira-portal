@@ -203,8 +203,14 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const clearFilters = () => {
     const params = new URLSearchParams();
 
+    // The open detail dialog survives a filter clear, and its catalog id has to
+    // travel with it — the two are always set and cleared as a pair.
     const entryDetailId = searchParams.get("entry-detail-id");
-    if (entryDetailId) params.set("entry-detail-id", entryDetailId);
+    if (entryDetailId) {
+      params.set("entry-detail-id", entryDetailId);
+      const entryCatalogId = searchParams.get("entry-catalog-id");
+      if (entryCatalogId) params.set("entry-catalog-id", entryCatalogId);
+    }
 
     setSearchParams(params);
   };

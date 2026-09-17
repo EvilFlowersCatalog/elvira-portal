@@ -5,6 +5,7 @@ import useEntriesQuery from "../../hooks/api/entries/useEntriesQuery";
 import { ICategory } from "../../utils/interfaces/category";
 import { IFeed } from "../../utils/interfaces/feed";
 import { MdClose } from "react-icons/md";
+import { addCategoryId, addFeedId } from "../../utils/func/filterParams";
 
 interface FilterSuggestionsProps {
   searchQuery: string;
@@ -57,26 +58,21 @@ const FilterSuggestions = ({ searchQuery }: FilterSuggestionsProps) => {
   }, [searchQuery]);
 
   const handleAuthorClick = (authorName: string) => {
-    searchParams.set('author', authorName);
-    setSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams);
+    params.set('author', authorName);
+    setSearchParams(params);
   };
 
   const handleCategoryClick = (categoryId: string) => {
-    const currentCategories = searchParams.get('categories');
-    if (currentCategories) {
-      const ids = currentCategories.split(',');
-      if (!ids.includes(categoryId)) {
-        searchParams.set('categories', [...ids, categoryId].join(','));
-      }
-    } else {
-      searchParams.set('categories', categoryId);
-    }
-    setSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams);
+    addCategoryId(params, categoryId);
+    setSearchParams(params);
   };
 
   const handleFeedClick = (feedId: string) => {
-    searchParams.set('feeds', feedId);
-    setSearchParams(searchParams);
+    const params = new URLSearchParams(searchParams);
+    addFeedId(params, feedId);
+    setSearchParams(params);
   };
 
   const hasResults = authors.length > 0 || categories.length > 0 || feeds.length > 0;

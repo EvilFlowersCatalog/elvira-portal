@@ -8,6 +8,7 @@ import EntryItem from '../../components/items/entry/display/EntryItem';
 import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper';
 import { useTranslation } from 'react-i18next';
 import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
+import { readCategoryIds, readFeedIds } from '../../utils/func/filterParams';
 
 const Shelf = () => {
   const { t } = useTranslation();
@@ -17,14 +18,14 @@ const Shelf = () => {
   const filters = useMemo(
     () => ({
       title: searchParams.get('title') ?? '',
-      feedId: searchParams.get('feed-id') ?? '',
-      categoryId: searchParams.get('category-id') ?? '',
       authors: searchParams.get('author') ?? '',
       publishedAtGte: searchParams.get('publishedAtGte') ?? '',
       publishedAtLte: searchParams.get('publishedAtLte') ?? '',
       orderBy: searchParams.get('order-by') ?? '',
       query: searchParams.get('query') ?? '',
       languageCode: searchParams.get('languageCode') ?? '',
+      categories: readCategoryIds(searchParams).join(','),
+      feeds: readFeedIds(searchParams).join(','),
     }),
     [searchParams]
   );

@@ -7,6 +7,7 @@ import useDebouncedValue from "../../hooks/useDebouncedValue";
 import { ICategory } from "../../utils/interfaces/category";
 import { IFeed } from "../../utils/interfaces/feed";
 import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
+import { addCategoryId, addFeedId } from "../../utils/func/filterParams";
 
 interface SearchSuggestionsProps {
   searchQuery: string;
@@ -66,12 +67,9 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
     onClose();
   };
 
-  // Commit the free-text search to the full library grid (relevance-ranked
-  // `query`). This is the "see all results" affordance — same as pressing Enter.
-  const handleSeeAll = () => {
-    const params = new URLSearchParams(searchParams);
-    params.set('query', searchQuery.trim());
-    params.delete('entry-detail-id');
+  // Apply a picked facet: stay on the page when the grid is already here,
+  // otherwise carry the params over to the library.
+  const commit = (params: URLSearchParams) => {
     if (shouldRedirect) {
       navigate({ pathname: NAVIGATION_PATHS.library, search: params.toString() });
     } else {
@@ -80,59 +78,31 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
     onClose();
   };
 
+  // Commit the free-text search to the full library grid (relevance-ranked
+  // `query`). This is the "see all results" affordance — same as pressing Enter.
+  const handleSeeAll = () => {
+    const params = new URLSearchParams(searchParams);
+    params.set('query', searchQuery.trim());
+    params.delete('entry-detail-id');
+    commit(params);
+  };
+
   const handleAuthorClick = (authorName: string) => {
-    searchParams.set('author', authorName);
-    if (shouldRedirect) {
-      navigate({
-        pathname: NAVIGATION_PATHS.library,
-        search: searchParams.toString(),
-      });
-    } else {
-      setSearchParams(searchParams);
-    }
-    onClose();
+    const params = new URLSearchParams(searchParams);
+    params.set('author', authorName);
+    commit(params);
   };
 
   const handleCategoryClick = (categoryId: string) => {
-    const currentCategories = searchParams.get('categories');
-    if (currentCategories) {
-      const ids = currentCategories.split(',');
-      if (!ids.includes(categoryId)) {
-        searchParams.set('categories', [...ids, categoryId].join(','));
-      }
-    } else {
-      searchParams.set('categories', categoryId);
-    }
-    if (shouldRedirect) {
-      navigate({
-        pathname: NAVIGATION_PATHS.library,
-        search: searchParams.toString(),
-      });
-    } else {
-      setSearchParams(searchParams);
-    }
-    onClose();
+    const params = new URLSearchParams(searchParams);
+    addCategoryId(params, categoryId);
+    commit(params);
   };
 
   const handleFeedClick = (feedId: string) => {
-    const currentFeeds = searchParams.get('feeds');
-    if (currentFeeds) {
-      const ids = currentFeeds.split(',');
-      if (!ids.includes(feedId)) {
-        searchParams.set('feeds', [...ids, feedId].join(','));
-      }
-    } else {
-      searchParams.set('feeds', feedId);
-    }
-    if (shouldRedirect) {
-      navigate({
-        pathname: NAVIGATION_PATHS.library,
-        search: searchParams.toString(),
-      });
-    } else {
-      setSearchParams(searchParams);
-    }
-    onClose();
+    const params = new URLSearchParams(searchParams);
+    addFeedId(params, feedId);
+    commit(params);
   };
 
   const hasResults = entries.length > 0 || authors.length > 0 || categories.length > 0 || feeds.length > 0;
