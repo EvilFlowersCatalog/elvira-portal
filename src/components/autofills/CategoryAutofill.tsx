@@ -21,6 +21,10 @@ interface ICategoryAutofillParams {
   setIsSelectionOpen: (isOpen: boolean) => void;
 }
 
+/** Human-readable name of a category — `label` is what we show, `term` is the raw code. */
+const categoryName = (category: { label?: string; term?: string }) =>
+  category?.label || category?.term || '';
+
 const CategoryAutofill = ({
   entryForm,
   setEntryForm,
@@ -53,17 +57,17 @@ const CategoryAutofill = ({
   // Portal (single=true) mode: sync display value when the selected item changes externally
   useEffect(() => {
     if (!single) return;
-    setInputValue(entryForm?.term ?? '');
-  }, [single, entryForm?.term]);
+    setInputValue(categoryName(entryForm));
+  }, [single, entryForm?.label, entryForm?.term]);
 
   useEffect(() => {
     if (defaultCategoryId && categories) {
       const defaultCategory = categories.find((category: ICategory) => category.id === defaultCategoryId);
       if (defaultCategory) {
-        setInputValue(defaultCategory.term);
+        setInputValue(categoryName(defaultCategory));
         setEntryForm({
           ...entryForm,
-          categories: [{ term: defaultCategory.term, id: defaultCategory.id }],
+          categories: [defaultCategory],
         });
       }
     }
@@ -75,7 +79,7 @@ const CategoryAutofill = ({
 
     // Filter languages based on input
     const filteredSuggestions = categories.filter((category) =>
-      category.term.toLowerCase().startsWith(value.toLowerCase())
+      categoryName(category).toLowerCase().startsWith(value.toLowerCase())
     );
 
     setSuggestions(filteredSuggestions);
@@ -85,7 +89,7 @@ const CategoryAutofill = ({
     if (single) {
       // Portal mode: setEntryForm is a direct array setter — call with [category]
       setEntryForm([category]);
-      setInputValue(category.term);
+      setInputValue(categoryName(category));
       setIsHovering(false);
       setSuggestions([]);
       return;
@@ -124,10 +128,10 @@ const CategoryAutofill = ({
         onFocus={() => {
           const filteredSuggestions = categories.filter(
             (category) =>
-              category.term
+              categoryName(category)
                 .toLowerCase()
                 .startsWith(inputValue.toLowerCase()) &&
-              category.term !== inputValue
+              categoryName(category) !== inputValue
           );
 
           setSuggestions(filteredSuggestions);
@@ -136,7 +140,7 @@ const CategoryAutofill = ({
         onBlur={() => {
           const category = categories.filter(
             (category) =>
-              category.term.toLocaleLowerCase() ===
+              categoryName(category).toLocaleLowerCase() ===
               inputValue.toLocaleLowerCase()
           );
           if (category.length === 0) {
@@ -168,7 +172,7 @@ const CategoryAutofill = ({
               onClick={() => handleSuggestionClick(category)}
               style={{ padding: '5px', cursor: 'pointer' }}
             >
-              {category.term}
+              {categoryName(category)}
             </li>
           ))}
         </ul>
