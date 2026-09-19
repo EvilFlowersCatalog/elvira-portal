@@ -56,11 +56,11 @@ const AiChatHistory = () => {
 
       const messages: AiMessage[] = history.messages.flatMap((msg, index) => {
         const items: AiMessage[] = [];
-        if (msg.content) {
-          items.push({ role: msg.role, content: { type: 'message', data: msg.content }, id: `history-${index}` });
+        if (msg.text) {
+          items.push({ role: msg.role, content: { type: 'message', data: msg.text }, id: `history-${index}` });
         }
-        if (msg.entry_ids?.length) {
-          items.push({ role: msg.role, content: { type: 'entries', data: msg.entry_ids }, id: `history-${index}-entries` });
+        if (msg.displayed_entries?.length) {
+          items.push({ role: msg.role, content: { type: 'entries', data: msg.displayed_entries }, id: `history-${index}-entries` });
         }
         return items;
       });

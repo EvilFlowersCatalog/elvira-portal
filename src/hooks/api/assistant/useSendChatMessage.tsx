@@ -21,7 +21,6 @@ const useSendChatMessage = () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Accept: 'text/event-stream',
         ...(auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}),
       },
       body: JSON.stringify({ message }),

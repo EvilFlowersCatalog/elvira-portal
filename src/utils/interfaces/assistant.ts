@@ -3,9 +3,10 @@ import { IMetadata } from './general/general';
 export interface IAssistantMessage {
   id: string;
   role: 'user' | 'assistant';
-  content: string;
-  /** Publication ids the assistant recommended alongside this message. */
-  entry_ids?: string[];
+  text: string;
+  /** Publication ids the assistant showed alongside this message. */
+  displayed_entries: string[] | null;
+  tokens_used: number;
   created_at: string;
 }
 
