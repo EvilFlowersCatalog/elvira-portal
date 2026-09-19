@@ -22,6 +22,14 @@ export const sk = {
       today: 'Dnes',
       yesterday: 'Včera',
       daysAgo: 'Pred {{count}} dňami',
+      errors: {
+        generic: 'Pri spracovaní vašej požiadavky nastala chyba.',
+        rateLimited: 'Dosiahli ste denný limit AI asistenta. Skúste to znova o {{retryAfter}}.',
+        rateLimitedNoWait: 'Dosiahli ste denný limit AI asistenta. Skúste to znova neskôr.',
+        forbidden: 'Prístup k AI asistentovi je zablokovaný.',
+        chatNotFound: 'Táto konverzácia už neexistuje. Odoslaním správy začnete novú.',
+        unauthorized: 'Na použitie AI asistenta sa musíte prihlásiť.',
+      },
     },
     // NOTIFICATIONS
     notifications: {

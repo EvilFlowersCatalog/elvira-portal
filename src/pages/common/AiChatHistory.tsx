@@ -1,14 +1,13 @@
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { IChat } from '../../hooks/api/assistant/useGetUserChats';
+import { toast } from 'react-toastify';
+import { IAssistantChat } from '../../utils/interfaces/assistant';
 import useUserChatsQuery from '../../hooks/api/assistant/useUserChatsQuery';
 import useGetChatHistory from '../../hooks/api/assistant/useGetChatHistory';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 import { FiMessageSquare, FiPlus } from 'react-icons/fi';
 import { AiMessage } from '../../providers/AppProvider';
-import axios from 'axios';
-import useAuth from '../../hooks/contexts/useAuthContext';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import { H1 } from '../../components/primitives/Heading';
 
@@ -35,11 +34,9 @@ function ChatRowSkeleton() {
 const AiChatHistory = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { auth } = useAuth();
   const { 
     setAiChatId, 
     setAiMessages,
-    setAiBookCatalogs,
     setAiShowSuggestions,
     clearAiChat,
     umamiTrack
@@ -49,61 +46,33 @@ const AiChatHistory = () => {
   // Page load via React Query (cached / deduped). The per-chat resume fetch
   // below stays imperative — it's a click-driven action, not a page query.
   const { data, isLoading, isError } = useUserChatsQuery();
-  const chats: IChat[] = data?.chats ?? [];
+  const chats: IAssistantChat[] = data?.items ?? [];
   const error = isError ? t('assistant.chatHistoryError') : null;
 
-  const handleChatClick = async (chat: IChat) => {
-    try {      
-      // Resume the chat session on the backend
-      await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/resumechat`, {
-        chatId: chat.chatId,
-        apiKey: auth?.token || null,
-        catalogId: import.meta.env.ELVIRA_CATALOG_ID || undefined  // Use undefined instead of null for optional field
-      });
+  // Turns are stateless, so resuming a chat is just loading its history.
+  const handleChatClick = async (chat: IAssistantChat) => {
+    try {
+      const history = await getChatHistory(chat.id);
 
-      // Load chat history
-      const history = await getChatHistory(chat.chatId);
-
-      // Extract and merge all bookCatalogs from history
-      const mergedBookCatalogs: Record<string, string> = {};
-      history.messages.forEach(msg => {
-        if (msg.bookCatalogs) {
-          Object.assign(mergedBookCatalogs, msg.bookCatalogs);
+      const messages: AiMessage[] = history.messages.flatMap((msg, index) => {
+        const items: AiMessage[] = [];
+        if (msg.content) {
+          items.push({ role: msg.role, content: { type: 'message', data: msg.content }, id: `history-${index}` });
         }
-      });
-
-      // Transform history to AiMessage format
-      const messages: AiMessage[] = history.messages.map((msg, index) => {
-        if (msg.bookIds && msg.bookIds.length > 0) {
-          return {
-            role: msg.sender,
-            content: {
-              type: 'entries',
-              data: msg.bookIds
-            },
-            id: `history-${index}`
-          };
+        if (msg.entry_ids?.length) {
+          items.push({ role: msg.role, content: { type: 'entries', data: msg.entry_ids }, id: `history-${index}-entries` });
         }
-        return {
-          role: msg.sender,
-          content: {
-            type: 'message',
-            data: msg.text
-          },
-          id: `history-${index}`
-        };
+        return items;
       });
 
-      // Set the chat state
-      setAiChatId(chat.chatId);
+      setAiChatId(chat.id);
       setAiMessages(messages);
-      setAiBookCatalogs(mergedBookCatalogs);
       setAiShowSuggestions(false);
 
-      // Navigate to assistant page
       navigate(NAVIGATION_PATHS.aiAssistant);
     } catch (err) {
       console.error('Failed to resume chat:', err);
+      toast.error(t('assistant.chatHistoryError'));
     }
   };
 
@@ -178,7 +147,7 @@ const AiChatHistory = () => {
             <div className="flex flex-col gap-3">
               {chats.map((chat) => (
                 <div
-                  key={chat.chatId}
+                  key={chat.id}
                   onClick={() => handleChatClick(chat)}
                   className="cursor-pointer rounded-lg bg-white dark:bg-[#27272a] shadow-[0px_2px_1px_-1px_rgba(0,0,0,0.2),0px_1px_1px_0px_rgba(0,0,0,0.14),0px_1px_3px_0px_rgba(0,0,0,0.12)] transition-all hover:shadow-lg hover:-translate-y-0.5"
                 >
@@ -188,15 +157,10 @@ const AiChatHistory = () => {
                         <p className="text-xl font-semibold text-black dark:text-white mb-1">
                           {chat.title || t('assistant.untitledChat')}
                         </p>
-                        {chat.lastMessage && (
-                          <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
-                            {chat.lastMessage.text}
-                          </p>
-                        )}
                         <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
-                          <span>{t('assistant.messages', { count: chat.messageCount })}</span>
+                          <span>{t('assistant.messages', { count: chat.message_count })}</span>
                           <span>•</span>
-                          <span>{formatDate(chat.lastMessage.timestamp)}</span>
+                          <span>{formatDate(chat.last_message_at ?? chat.created_at)}</span>
                         </div>
                       </div>
                       <FiMessageSquare size={24} className="text-gray-400 dark:text-gray-600 ml-4" />

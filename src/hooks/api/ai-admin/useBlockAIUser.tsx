@@ -1,19 +1,11 @@
-import axios from 'axios';
-import useAuth from '../../contexts/useAuthContext';
+import useAxios from '../useAxios';
+import { ASSISTANT_URL } from '../assistant/assistantApi';
 
 const useBlockAIUser = () => {
-  const { auth } = useAuth();
+  const axios = useAxios();
 
   const blockAIUser = async (userId: string, blocked: boolean): Promise<{success: boolean, message: string}> => {
-    const response = await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/admin/users/block`, 
-      { userId, blocked },
-      {
-        headers: {
-          'Authorization': auth?.token ? `Bearer ${auth.token}` : '',
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    const response = await axios.post(`${ASSISTANT_URL}/admin/users/block`, { userId, blocked });
     return response.data;
   };
 

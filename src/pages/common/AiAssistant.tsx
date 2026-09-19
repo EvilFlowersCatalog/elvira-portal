@@ -10,19 +10,11 @@ import useAppContext from "../../hooks/contexts/useAppContext";
 import EntryItem from "../../components/items/entry/display/EntryItem";
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
 import { IEntry } from "../../utils/interfaces/entry";
-import { Link, useSearchParams, useNavigate } from "react-router-dom";
-import axios from "axios";
-import useAuth from "../../hooks/contexts/useAuthContext";
+import { Link, useNavigate } from "react-router-dom";
+import useAssistantChat from "../../hooks/api/assistant/useAssistantChat";
 import { AiMessage } from "../../providers/AppProvider";
 import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
 import EntryDetail from "../../components/items/entry/details/EntryDetail";
-
-interface StreamEvent {
-    type: 'chunk' | 'message' | 'entries' | 'done' | 'error';
-    data?: string | string[];
-    msg_id?: string;
-    bookCatalogs?: Record<string, string>;  // bookId -> catalogId mapping
-}
 
 function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, handleSuggestion: (suggestion: string) => void }) {
     return (
@@ -37,7 +29,7 @@ function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, ha
     );
 }
 
-function MessageElement({ msg, bookCatalogs }: { msg: AiMessage, bookCatalogs: Record<string, string> }) {
+function MessageElement({ msg }: { msg: AiMessage }) {
     const { getEntryDetail } = useGetEntryDetail();
 
     const entryIds =
@@ -46,12 +38,12 @@ function MessageElement({ msg, bookCatalogs }: { msg: AiMessage, bookCatalogs: R
             : [];
 
     // Recommended-book details for an "entries" message (cached/deduped by
-    // React Query; keyed by the ids + their catalog map).
+    // React Query; keyed by the ids).
     const { data: books = [] } = useQuery({
-        queryKey: ["ai-message-books", entryIds, bookCatalogs],
+        queryKey: ["ai-message-books", entryIds],
         queryFn: async () => {
             const details = await Promise.all(
-                entryIds.map((id) => getEntryDetail(id, bookCatalogs[id] || undefined))
+                entryIds.map((id) => getEntryDetail(id))
             );
             return details.map((entryDetail) => ({
                 ...entryDetail,
@@ -94,24 +86,18 @@ function MessageElement({ msg, bookCatalogs }: { msg: AiMessage, bookCatalogs: R
 
 export default function AiAssistantPage() {
     const { t } = useTranslation();
-    const { auth } = useAuth();
-    const [searchParams, setSearchParams] = useSearchParams();
     const navigate = useNavigate();
     const { 
         umamiTrack,
-        aiChatId,
         setAiChatId,
         aiMessages,
         setAiMessages,
-        aiBookCatalogs,
-        setAiBookCatalogs,
         aiShowSuggestions,
         setAiShowSuggestions,
     } = useAppContext();
 
     const [input, setInput] = useState("");
-    const [isGeneratingResponse, setGeneratingResponse] = useState(false);
-    const [currentCatalogId] = useState<string | undefined>(import.meta.env.ELVIRA_CATALOG_ID || undefined);
+    const { sendMessage, isGenerating: isGeneratingResponse } = useAssistantChat();
     const chatEndRef = useRef<HTMLDivElement>(null);
 
     const scrollToBottom = () => {
@@ -126,176 +112,6 @@ export default function AiAssistantPage() {
     useEffect(() => {
         scrollToBottom();
     }, [aiMessages]);
-
-    async function sendMessage(message: string) {
-        setAiMessages((prev) => [...prev, {
-            role: "user", content: {
-                type: "message",
-                data: message
-            }
-        }]);
-        setGeneratingResponse(true);
-
-        const loadingMsgId = `loading-${Date.now()}`;
-        setAiMessages((prev) => [...prev, {
-            role: "assistant",
-            content: {
-                type: "loading",
-                data: "Generating response..."
-            },
-            id: loadingMsgId
-        }]);
-
-        try {
-            let currentChatId = aiChatId;
-            if (!currentChatId) {
-                const response = await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/startchat`, {
-                    apiKey: auth?.token || null,
-                    catalogId: currentCatalogId,
-                    entryId: undefined
-                });
-                currentChatId = response.data.chatId;
-                setAiChatId(currentChatId);
-            }
-
-            const response = await fetch(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/sendchat`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chatId: currentChatId,
-                    message: message,
-                    apiKey: auth?.token || null
-                })
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'Request failed');
-            }
-
-            const reader = response.body!.getReader();
-            const decoder = new TextDecoder();
-            let buffer = '';
-            let currentMessageText = '';
-            let hasReceivedFirstChunk = false;
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split('\n');
-                buffer = lines.pop() || '';
-
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const data: StreamEvent = JSON.parse(line.slice(6));
-
-                        switch (data.type) {
-                            case 'chunk':
-                                if (!hasReceivedFirstChunk) {
-                                    hasReceivedFirstChunk = true;
-                                    const streamingMsgId = `streaming-${Date.now()}`;
-                                    setAiMessages((prev) => {
-                                        const filtered = prev.filter(m => m.id !== loadingMsgId);
-                                        return [...filtered, {
-                                            role: "assistant",
-                                            content: {
-                                                type: "message",
-                                                data: data.data as string
-                                            },
-                                            id: streamingMsgId
-                                        }];
-                                    });
-                                    currentMessageText = data.data as string;
-                                } else {
-                                    currentMessageText += data.data;
-                                    setAiMessages((prev) => {
-                                        const newMessages = [...prev];
-                                        const lastMsgIndex = newMessages.length - 1;
-                                        if (newMessages[lastMsgIndex] && newMessages[lastMsgIndex].content.type === 'message') {
-                                            newMessages[lastMsgIndex] = {
-                                                ...newMessages[lastMsgIndex],
-                                                content: {
-                                                    ...newMessages[lastMsgIndex].content,
-                                                    data: currentMessageText
-                                                }
-                                            };
-                                        }
-                                        return newMessages;
-                                    });
-                                }
-                                break;
-                            case 'message':
-                                if (!hasReceivedFirstChunk) {
-                                    setAiMessages((prev) => {
-                                        const filtered = prev.filter(m => m.id !== loadingMsgId);
-                                        return [...filtered, {
-                                            role: "assistant",
-                                            content: {
-                                                type: "message",
-                                                data: data.data as string
-                                            },
-                                            id: `message-${Date.now()}`
-                                        }];
-                                    });
-                                }
-                                break;
-                            case 'entries':
-                                // Store book-to-catalog mapping
-                                if (data.bookCatalogs) {
-                                    setAiBookCatalogs(prev => ({
-                                        ...prev,
-                                        ...data.bookCatalogs
-                                    }));
-                                }
-                                setAiMessages((prev) => [...prev, {
-                                    role: "assistant",
-                                    content: {
-                                        type: "entries",
-                                        data: data.data as string[]
-                                    },
-                                    id: `entries-${Date.now()}`
-                                }]);
-                                break;
-                            case 'done':
-                                setGeneratingResponse(false);
-                                break;
-                            case 'error':
-                                setAiMessages((prev) => {
-                                    const filtered = prev.filter(m => m.id !== loadingMsgId);
-                                    return [...filtered, {
-                                        role: "assistant",
-                                        content: {
-                                            type: "message",
-                                            data: `Error: ${data.data}`
-                                        },
-                                        id: `error-${Date.now()}`
-                                    }];
-                                });
-                                setGeneratingResponse(false);
-                                break;
-                        }
-                    }
-                }
-            }
-        } catch (err) {
-            setAiMessages((prev) => {
-                const filtered = prev.filter(m => m.id !== loadingMsgId);
-                return [...filtered, {
-                    role: "assistant",
-                    content: {
-                        type: 'message',
-                        data: "An error occurred while processing your request."
-                    },
-                    id: `error-${Date.now()}`
-                }];
-            });
-            setGeneratingResponse(false);
-        }
-
-        setInput("");
-    }
 
     const handleSuggestion = (suggestion: string) => {
         sendMessage(suggestion);
@@ -314,7 +130,6 @@ export default function AiAssistantPage() {
         umamiTrack("Start New AI Chat");
         setAiChatId(null);
         setAiMessages([]);
-        setAiBookCatalogs({});
         setAiShowSuggestions(true);
         navigate(NAVIGATION_PATHS.aiAssistant);
     }
@@ -385,7 +200,7 @@ export default function AiAssistantPage() {
                             </div>
                         ) : (
                             aiMessages.map((msg, index) => (
-                                <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} bookCatalogs={aiBookCatalogs} />
+                                <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} />
                             ))
                         )}
                         <div ref={chatEndRef} />

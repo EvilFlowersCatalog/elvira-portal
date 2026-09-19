@@ -1,5 +1,5 @@
-import axios from 'axios';
-import useAuth from '../../contexts/useAuthContext';
+import useAxios from '../useAxios';
+import { ASSISTANT_URL } from '../assistant/assistantApi';
 
 export interface IAIChatMessage {
   id: string;
@@ -10,15 +10,10 @@ export interface IAIChatMessage {
 }
 
 const useGetAIUserChatHistory = () => {
-  const { auth } = useAuth();
+  const axios = useAxios();
 
   const getAIUserChatHistory = async (userId: string, chatId: string): Promise<{history: IAIChatMessage[], chatId: string, messageCount: number}> => {
-    const response = await axios.get(`${import.meta.env.ELVIRA_ASSISTANT_URL}/admin/users/${userId}/chats/${chatId}`, {
-      headers: {
-        'Authorization': auth?.token ? `Bearer ${auth.token}` : '',
-        'Content-Type': 'application/json'
-      }
-    });
+    const response = await axios.get(`${ASSISTANT_URL}/admin/users/${userId}/chats/${chatId}`);
     return response.data;
   };
 

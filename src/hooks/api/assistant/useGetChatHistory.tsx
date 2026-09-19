@@ -1,27 +1,27 @@
-import axios from 'axios';
-import useAuth from '../../contexts/useAuthContext';
+import { IAssistantChatDetail, IAssistantMessage } from '../../../utils/interfaces/assistant';
+import useAxios from '../useAxios';
+import { ASSISTANT_URL } from './assistantApi';
 
-export interface IChatMessage {
-  id: string;
-  chatId: string;
-  sender: 'user' | 'agent';
-  text: string;
-  timestamp: string;
-  bookIds?: string[];
-  bookCatalogs?: Record<string, string>;  // bookId -> catalogId mapping
-}
+type RawMessage = Partial<IAssistantMessage> & { message?: string; text?: string; entries?: string[] };
+type RawChat = Omit<IAssistantChatDetail, 'messages'> & { messages?: RawMessage[] };
 
+/** Loads a chat with its full message history (turns are stateless — this is how a chat is resumed). */
 const useGetChatHistory = () => {
-  const { auth } = useAuth();
+  const axios = useAxios();
 
-  const getChatHistory = async (chatId: string): Promise<{chatId:string, messagesCount: number, messages: IChatMessage[]}> => {
-    const response = await axios.get(`${import.meta.env.ELVIRA_ASSISTANT_URL}/user/chats/${chatId}`, {
-      headers: {
-        'Authorization': auth?.token ? `Bearer ${auth.token}` : '',
-        'Content-Type': 'application/json'
-      }
-    });
-    return response.data;
+  const getChatHistory = async (chatId: string): Promise<IAssistantChatDetail> => {
+    const { data } = await axios.get<RawChat | { response: RawChat }>(`${ASSISTANT_URL}/chats/${chatId}`);
+    // Like start-chat, the payload may come wrapped in `response`.
+    const chat = 'response' in data ? data.response : data;
+
+    return {
+      ...chat,
+      messages: (chat.messages ?? []).map((m) => ({
+        ...m,
+        content: m.content ?? m.message ?? m.text ?? '',
+        entry_ids: m.entry_ids ?? m.entries,
+      })) as IAssistantMessage[],
+    };
   };
 
   return getChatHistory;

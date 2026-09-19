@@ -52,10 +52,6 @@ export interface IAppContext {
   setAiChatId: (chatId: string | null) => void;
   aiMessages: AiMessage[];
   setAiMessages: React.Dispatch<React.SetStateAction<AiMessage[]>>;
-  aiBookCatalogs: Record<string, string>;
-  setAiBookCatalogs: React.Dispatch<
-    React.SetStateAction<Record<string, string>>
-  >;
   aiShowSuggestions: boolean;
   setAiShowSuggestions: (show: boolean) => void;
   clearAiChat: () => void;
@@ -123,15 +119,11 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   // AI Assistant persistent state
   const [aiChatId, setAiChatId] = useState<string | null>(null);
   const [aiMessages, setAiMessages] = useState<AiMessage[]>([]);
-  const [aiBookCatalogs, setAiBookCatalogs] = useState<Record<string, string>>(
-    {},
-  );
   const [aiShowSuggestions, setAiShowSuggestions] = useState<boolean>(true);
 
   const clearAiChat = () => {
     setAiChatId(null);
     setAiMessages([]);
-    setAiBookCatalogs({});
     setAiShowSuggestions(true);
   };
   const [isSmallDevice, setIsSmallDevice] = useState<boolean>(
@@ -407,8 +399,6 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         setAiChatId,
         aiMessages,
         setAiMessages,
-        aiBookCatalogs,
-        setAiBookCatalogs,
         aiShowSuggestions,
         setAiShowSuggestions,
         clearAiChat,

@@ -22,6 +22,14 @@ export const en = {
       today: 'Today',
       yesterday: 'Yesterday',
       daysAgo: '{{count}} days ago',
+      errors: {
+        generic: 'An error occurred while processing your request.',
+        rateLimited: 'You have reached the daily limit of the AI assistant. Try again in {{retryAfter}}.',
+        rateLimitedNoWait: 'You have reached the daily limit of the AI assistant. Try again later.',
+        forbidden: 'Access to the AI assistant is blocked.',
+        chatNotFound: 'This conversation no longer exists. Send a message to start a new one.',
+        unauthorized: 'You need to sign in to use the AI assistant.',
+      },
     },
     // NOTIFICATIONS
     notifications: {

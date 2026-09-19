@@ -1,5 +1,5 @@
-import axios from 'axios';
-import useAuth from '../../contexts/useAuthContext';
+import useAxios from '../useAxios';
+import { ASSISTANT_URL } from '../assistant/assistantApi';
 
 export interface IAIUser {
   id: string;
@@ -18,19 +18,14 @@ interface IAIUsersParams {
 }
 
 const useGetAIUsers = () => {
-  const { auth } = useAuth();
+  const axios = useAxios();
 
   const getAIUsers = async (options: IAIUsersParams = {}): Promise<{users: IAIUser[], total: number, page: number, limit: number, pages: number}> => {
     const params = new URLSearchParams();
     if (options.page) params.set('page', options.page.toString());
     if (options.limit) params.set('limit', options.limit.toString());
 
-    const response = await axios.get(`${import.meta.env.ELVIRA_ASSISTANT_URL}/admin/users?${params.toString()}`, {
-      headers: {
-        'Authorization': auth?.token ? `Bearer ${auth.token}` : '',
-        'Content-Type': 'application/json'
-      }
-    });
+    const response = await axios.get(`${ASSISTANT_URL}/admin/users`, { params });
     return response.data;
   };
 

@@ -1,29 +1,19 @@
-import axios from 'axios';
-import useAuth from '../../contexts/useAuthContext';
-import { IChatMessage } from './useGetChatHistory';
-
-export interface IChat {
-  chatId: string;
-  title: string;
-  userId: string;
-  entryId: string | null;
-  messageCount: number;
-  lastMessage: IChatMessage;
-  startedAt: string;
-}
+import { IAssistantChatList, IAssistantChatQuery } from '../../../utils/interfaces/assistant';
+import useAxios from '../useAxios';
+import { ASSISTANT_URL } from './assistantApi';
 
 const useGetUserChats = () => {
-  const { auth } = useAuth();
+  const axios = useAxios();
 
-  const getUserChats = async (): Promise<{chats: IChat[], total: number}> => {
-    const catalogId = import.meta.env.ELVIRA_CATALOG_ID;
-    const response = await axios.get(`${import.meta.env.ELVIRA_ASSISTANT_URL}/user/chats?catalogId=${catalogId}`, {
-      headers: {
-        'Authorization': auth?.token ? `Bearer ${auth.token}` : '',
-        'Content-Type': 'application/json'
-      }
-    });
-    return response.data;
+  const getUserChats = async ({ page, limit, orderBy }: IAssistantChatQuery = {}): Promise<IAssistantChatList> => {
+    const params = new URLSearchParams();
+    if (page) params.set('page', page.toString());
+    if (limit) params.set('limit', limit.toString());
+    // Newest first is the backend default; only override when asked to.
+    if (orderBy) params.set('order_by', orderBy);
+
+    const { data } = await axios.get<IAssistantChatList>(`${ASSISTANT_URL}/chats`, { params });
+    return data;
   };
 
   return getUserChats;
