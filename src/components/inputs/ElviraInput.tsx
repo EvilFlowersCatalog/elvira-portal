@@ -31,10 +31,12 @@ interface CustomInputProps extends InputHTMLAttributes<HTMLInputElement> {
   tooltip?: React.ReactNode;
   /** aria-label for the `label="icon"` tooltip trigger. */
   tooltipLabel?: string;
+  /** Element rendered inside the input on the right, e.g. a show/hide password toggle. */
+  trailing?: React.ReactNode;
 }
 // Custom input used in step forms in ADMIN
 const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
-  ({ invalidMessage, paddingLeft, nativePlaceholder, label = 'animated', icon, tooltip, tooltipLabel, ...props }, ref) => {
+  ({ invalidMessage, paddingLeft, nativePlaceholder, label = 'animated', icon, tooltip, tooltipLabel, trailing, ...props }, ref) => {
     const id = uuid();
     const [isInvalid, setIsInvalid] = useState<boolean>(false);
     const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -115,6 +117,11 @@ const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
             }
             aria-invalid={isInvalid || undefined}
           />
+          {trailing && (
+            <div className='absolute right-2 top-1/2 -translate-y-1/2 z-50 flex items-center justify-center'>
+              {trailing}
+            </div>
+          )}
         </div>
         {isInvalid && (
           <span role="alert" className='text-redText text-sm text-left'>* {invalidMessage}</span>

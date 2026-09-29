@@ -712,6 +712,8 @@ export const sk = {
         hintPlaceholder: 'Nápoveda k prístupovej fráze',
         hintInfo: 'Voliteľná pripomienka, ktorá vám pomôže zapamätať si prístupovú frázu. Je viditeľná iba vám tu, preto sem nepíšte samotnú frázu.',
         hintInfoLabel: 'O nápovede k prístupovej fráze',
+        show: 'Zobraziť prístupovú frázu',
+        hide: 'Skryť prístupovú frázu',
         required: 'Prístupová fráza je povinná.',
         saveButton: 'Uložiť',
         saving: 'Ukladám...',
