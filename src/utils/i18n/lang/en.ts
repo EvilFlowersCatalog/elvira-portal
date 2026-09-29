@@ -198,6 +198,7 @@ export const en = {
         scopedNote: 'Content totals reflect the selected catalog.',
         quickActions: 'Quick actions',
         addPublication: 'Add publication',
+        feedback: 'Send feedback',
         addUser: 'Add user',
         open: 'Open',
       },

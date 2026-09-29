@@ -198,6 +198,7 @@ export const sk = {
         scopedNote: 'Počty obsahu zodpovedajú vybranému katalógu.',
         quickActions: 'Rýchle akcie',
         addPublication: 'Pridať publikáciu',
+        feedback: 'Spätná väzba',
         addUser: 'Pridať používateľa',
         open: 'Otvoriť',
       },
