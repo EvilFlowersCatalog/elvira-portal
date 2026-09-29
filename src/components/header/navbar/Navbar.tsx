@@ -287,15 +287,13 @@ const Navbar = () => {
               isActive={location.pathname === NAVIGATION_PATHS.history}
               textVisible={!isCollapsed}
             />)}
-            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
-              <NavbarButton
-                name={t("navbarMenu.loan")}
-                path={NAVIGATION_PATHS.loans}
-                icon={<LoansIcon size={20} />}
-                isActive={location.pathname === NAVIGATION_PATHS.loans}
-                textVisible={!isCollapsed}
-              />
-            )}
+            <NavbarButton
+              name={t("navbarMenu.loan")}
+              path={NAVIGATION_PATHS.loans}
+              icon={<LoansIcon size={20} />}
+              isActive={location.pathname === NAVIGATION_PATHS.loans}
+              textVisible={!isCollapsed}
+            />
           </div>
         )}
 

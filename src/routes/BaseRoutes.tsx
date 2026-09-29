@@ -96,9 +96,7 @@ const BaseRoutes = () => {
             {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
               <Route path='history' element={<History />} />
             )}
-            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
-              <Route path='loans' element={<Loans />} />
-            )}
+            <Route path='loans' element={<Loans />} />
             <Route path='feeds' element={<Feeds />} />
             <Route path='categories' element={<Categories />} />
             <Route path='ai-assistant' element={<AiAssistantPage />} />
