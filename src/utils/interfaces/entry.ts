@@ -102,6 +102,9 @@ export interface IEntryFacets {
   languages: { code: string; count: number }[];
   categories: { id: string; count: number }[];
   feeds: { id: string; count: number }[];
+  /** Counts per backend `lcp_state` value plus the `reserved` pseudo-state */
+  availability: { state: string; count: number }[];
+  years: { min: number | null; max: number | null };
 }
 
 export interface IEntryNew {

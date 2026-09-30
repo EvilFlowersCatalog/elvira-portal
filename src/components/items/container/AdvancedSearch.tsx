@@ -9,7 +9,6 @@ import Checkbox from "../../primitives/Checkbox";
 import DualRangeSlider from "../../primitives/DualRangeSlider";
 import useGetCategories from "../../../hooks/api/categories/useGetCategories";
 import useFeedsQuery from "../../../hooks/api/feeds/useFeedsQuery";
-import useGetEntries from "../../../hooks/api/entries/useGetEntries";
 import useEntryFacets from "../../../hooks/api/entries/useEntryFacets";
 import { EntryFilters, useEntryFilters } from "../../../hooks/api/entries/entryFilters";
 import { AcceptedLanguage, getLanguage, getLanguages } from "../../../hooks/api/languages/languages";
@@ -91,9 +90,10 @@ export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
     const yearDebounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const currentYear = new Date().getFullYear();
-    const [minYear, setMinYear] = useState<number>(DEFAULT_MIN_YEAR);
+    // Which year input is being edited — it shows the raw value while focused and
+    // the pre-filled facet bound otherwise.
+    const [focusedYear, setFocusedYear] = useState<0 | 1 | null>(null);
 
-    const getEntries = useGetEntries();
     const getCategories = useGetCategories();
     const filters = useEntryFilters();
     const scopeLoading = entryScope === null;
@@ -105,6 +105,17 @@ export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
     // (facets request failed — don't lock the user out of filtering).
     const facetCounts = (counts: Record<string, number>) =>
         emptyScope ? {} : facets.ready ? counts : facets.failed ? undefined : {};
+    const availabilityCounts = facetCounts(facets.availabilityCounts);
+
+    // Year bounds of the entries the other filters leave (the year filter itself is
+    // ignored). They pre-fill the inputs/slider but are only sent once the user
+    // interacts — entries without a year would drop out of a `published_at` filter.
+    const minYear = facets.years.min ?? DEFAULT_MIN_YEAR;
+    const maxYear = facets.years.max ?? currentYear;
+    const prefilledYear = (index: 0 | 1) => {
+        const bound = index === 0 ? facets.years.min : facets.years.max;
+        return facets.ready && bound != null ? String(bound) : '';
+    };
     const [allCategories, setAllCategories] = useState<ICategory[]>([]);
     const [categoriesLoaded, setCategoriesLoaded] = useState(false);
     const [activeCategories, setActiveCategories] = useState<ICategory[]>([]);
@@ -137,18 +148,6 @@ export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
 
         return () => { cancelled = true; };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    useEffect(() => {
-        (async () => {
-            try {
-                const { items } = await getEntries({ page: 1, limit: 1, orderBy: 'published_at' });
-                const earliest = items[0]?.published_at ? new Date(items[0].published_at).getFullYear() : NaN;
-                if (!Number.isNaN(earliest) && earliest > 0) setMinYear(earliest);
-            } catch {
-                // Falls back to DEFAULT_MIN_YEAR when the earliest year can't be determined.
-            }
-        })();
     }, []);
 
     const performSearch = () => {
@@ -290,7 +289,10 @@ export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
                     {t('searchBar.availability')}
                 </p>
                 <div className="flex flex-col gap-[7px]">
-                    {availabilityOptions.map(opt => (
+                    {availabilityOptions
+                        // Like the other facets: hide states with no entries unless selected.
+                        .filter(opt => !availabilityCounts || (availabilityCounts[opt.value] ?? 0) > 0 || availability.includes(opt.value as AvailabilityState))
+                        .map(opt => (
                         <Checkbox
                             key={opt.value}
                             checked={availability.includes(opt.value as AvailabilityState)}
@@ -304,6 +306,9 @@ export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
                             label={
                                 <span className={`text-[14px] tracking-[0.1px] leading-[20px] ${availability.includes(opt.value as AvailabilityState) ? 'font-medium' : 'font-normal'} text-darkGray dark:text-white`}>
                                     {opt.label}
+                                    {typeof availabilityCounts?.[opt.value] === 'number' && (
+                                        <span className="text-[13px] font-normal text-[#b1b1b1] ml-1">({availabilityCounts[opt.value]})</span>
+                                    )}
                                 </span>
                             }
                         />
@@ -321,10 +326,11 @@ export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
                 <div className="px-1.5 pt-1">
                     <DualRangeSlider
                         min={minYear}
-                        max={currentYear}
+                        // A single-year range would give the slider zero width to work with.
+                        max={Math.max(maxYear, minYear + 1)}
                         value={[
                             year[0] ? Number(year[0]) : minYear,
-                            year[1] ? Number(year[1]) : currentYear,
+                            year[1] ? Number(year[1]) : maxYear,
                         ]}
                         onChange={([from, to]) => setYear([from.toString(), to.toString()])}
                         onFinish={onYearFinish}
@@ -334,24 +340,26 @@ export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
                     <input
                         type="text"
                         inputMode="numeric"
-                        placeholder={t('searchBar.yearFrom')}
-                        value={year[0]}
+                        placeholder={prefilledYear(0) || t('searchBar.yearFrom')}
+                        value={focusedYear === 0 ? year[0] : (year[0] || prefilledYear(0))}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                             if (e.target.value === "" || /^\d*$/.test(e.target.value)) handleYearChange(0, e.target.value);
                         }}
-                        onBlur={onYearFinish}
+                        onFocus={() => setFocusedYear(0)}
+                        onBlur={() => { setFocusedYear(null); onYearFinish(); }}
                         className="w-full min-w-0 px-3 py-1.5 text-[14px] text-darkGray dark:text-white bg-white dark:bg-strongDarkGray border border-[rgba(0,0,0,0.15)] dark:border-[rgba(255,255,255,0.2)] rounded-md outline-none focus:border-primary"
                     />
                     <span className="text-[14px] font-medium text-darkGray dark:text-white flex-shrink-0">-</span>
                     <input
                         type="text"
                         inputMode="numeric"
-                        placeholder={t('searchBar.yearTo')}
-                        value={year[1]}
+                        placeholder={prefilledYear(1) || t('searchBar.yearTo')}
+                        value={focusedYear === 1 ? year[1] : (year[1] || prefilledYear(1))}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                             if (e.target.value === "" || /^\d*$/.test(e.target.value)) handleYearChange(1, e.target.value);
                         }}
-                        onBlur={onYearFinish}
+                        onFocus={() => setFocusedYear(1)}
+                        onBlur={() => { setFocusedYear(null); onYearFinish(); }}
                         className="w-full min-w-0 px-3 py-1.5 text-[14px] text-darkGray dark:text-white bg-white dark:bg-strongDarkGray border border-[rgba(0,0,0,0.15)] dark:border-[rgba(255,255,255,0.2)] rounded-md outline-none focus:border-primary"
                     />
                 </div>

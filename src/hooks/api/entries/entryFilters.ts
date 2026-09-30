@@ -8,7 +8,7 @@ export type EntryFilters = Omit<IEntryQuery, 'page' | 'limit'>;
 
 // Sidebar availability -> backend `lcp_state` values. The backend OR-s the values,
 // and the mapping mirrors the badge logic in EntryItem.
-const AVAILABILITY_TO_LCP_STATE: Record<AvailabilityState, string[]> = {
+export const AVAILABILITY_TO_LCP_STATE: Record<AvailabilityState, string[]> = {
   available: ['available_now'],
   unavailable: ['fully_borrowed', 'available_in_days'],
   borrowed: ['active_loan_for_user'],

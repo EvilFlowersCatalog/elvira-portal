@@ -2,13 +2,17 @@ import { useMemo } from 'react';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { IEntryFacets } from '../../../utils/interfaces/entry';
 import useAxios from '../useAxios';
-import { buildEntryFilterParams, EntryFilters } from './entryFilters';
+import { AVAILABILITY_TO_LCP_STATE, buildEntryFilterParams, EntryFilters } from './entryFilters';
 
 export interface IEntryFacetCounts {
   /** Entry counts keyed by category / feed id and by language code */
   categoryCounts: Record<string, number>;
   feedCounts: Record<string, number>;
   languageCounts: Record<string, number>;
+  /** Entry counts keyed by sidebar availability state (available / unavailable / borrowed / reserved) */
+  availabilityCounts: Record<string, number>;
+  /** Publication year range of the entries the other filters leave (null when none has a year) */
+  years: { min: number | null; max: number | null };
   /** true once counts for the current filters have loaded */
   ready: boolean;
   /** true when the facets request failed — callers should fall back to showing every option */
@@ -40,16 +44,27 @@ const useEntryFacets = (filters: EntryFilters, options?: { enabled?: boolean }):
     placeholderData: keepPreviousData,
   });
 
-  return useMemo(
-    () => ({
+  return useMemo(() => {
+    // The backend counts raw `lcp_state` values; sum them into the sidebar's states
+    // with the same mapping the filter uses.
+    const lcpCounts = toCounts(data?.availability ?? [], (row) => row.state);
+    const availabilityCounts = Object.fromEntries(
+      Object.entries(AVAILABILITY_TO_LCP_STATE).map(([state, lcpStates]) => [
+        state,
+        lcpStates.reduce((sum, lcpState) => sum + (lcpCounts[lcpState] ?? 0), 0),
+      ])
+    );
+
+    return {
       categoryCounts: toCounts(data?.categories ?? [], (row) => row.id),
       feedCounts: toCounts(data?.feeds ?? [], (row) => row.id),
       languageCounts: toCounts(data?.languages ?? [], (row) => row.code),
+      availabilityCounts,
+      years: { min: data?.years?.min ?? null, max: data?.years?.max ?? null },
       ready: isSuccess,
       failed: isError,
-    }),
-    [data, isSuccess, isError]
-  );
+    };
+  }, [data, isSuccess, isError]);
 };
 
 export default useEntryFacets;
