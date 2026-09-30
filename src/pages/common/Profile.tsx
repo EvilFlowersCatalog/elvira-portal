@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { FiHelpCircle } from 'react-icons/fi';
+import { FiEye, FiEyeOff, FiHelpCircle } from 'react-icons/fi';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import PopupInfo from '../../components/common/PopupInfo';
 import NotificationContactsSection from '../../components/common/NotificationContactsSection';
@@ -55,6 +55,7 @@ const Profile = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [passphrase, setPassphrase] = useState<string>('');
   const [passphraseHint, setPassphraseHint] = useState<string>('');
+  const [showPassphrase, setShowPassphrase] = useState<boolean>(false);
 
   useEffect(() => {
     setPassphraseHint(userDetails?.lcp_passphrase_hint || '');
@@ -194,7 +195,18 @@ const Profile = () => {
               </div>
               <form className='flex flex-col gap-3' onSubmit={handleSetPassphrase}>
                 <ElviraInput
-                  type='password'
+                  type={showPassphrase ? 'text' : 'password'}
+                  className='pr-10'
+                  trailing={
+                    <button
+                      type='button'
+                      onClick={() => setShowPassphrase((v) => !v)}
+                      aria-label={showPassphrase ? t('profile.passphrase.hide') : t('profile.passphrase.show')}
+                      className='p-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200'
+                    >
+                      {showPassphrase ? <FiEyeOff size={16} /> : <FiEye size={16} />}
+                    </button>
+                  }
                   placeholder={t('profile.passphrase.placeholder')}
                   invalidMessage={t('profile.passphrase.required')}
                   required

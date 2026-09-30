@@ -9,8 +9,8 @@ import Checkbox from "../../primitives/Checkbox";
 import DualRangeSlider from "../../primitives/DualRangeSlider";
 import useGetCategories from "../../../hooks/api/categories/useGetCategories";
 import useFeedsQuery from "../../../hooks/api/feeds/useFeedsQuery";
-import useGetEntries from "../../../hooks/api/entries/useGetEntries";
 import useEntryFacets from "../../../hooks/api/entries/useEntryFacets";
+import { EntryFilters, useEntryFilters } from "../../../hooks/api/entries/entryFilters";
 import { AcceptedLanguage, getLanguage, getLanguages } from "../../../hooks/api/languages/languages";
 import { IFeed } from "../../../utils/interfaces/feed";
 import { AvailabilityState } from "../entry/details/AvailabilityBadge";
@@ -31,7 +31,9 @@ function SectionDivider() {
     return <div className="h-px w-full bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)]" />;
 }
 
-export function AdvancedSearchWrapper({ children, enabled = true }: { children: React.ReactNode; enabled?: boolean }) {
+type EntryScope = Partial<EntryFilters> | null | undefined;
+
+export function AdvancedSearchWrapper({ children, enabled = true, entryScope }: { children: React.ReactNode; enabled?: boolean; entryScope?: EntryScope }) {
     const { showAdvancedSearch, setShowAdvancedSearch } = useAppContext();
 
     if (!enabled) return <div className="w-full pt-3">{children}</div>;
@@ -48,7 +50,7 @@ export function AdvancedSearchWrapper({ children, enabled = true }: { children: 
                     sticky top-0 z-2 pb-32 h-screen
                 `}
             >
-                <AdvancedSearch />
+                <AdvancedSearch entryScope={entryScope} />
             </div>
             {/* Mobile fixed top/bottom sheet */}
             <div
@@ -65,7 +67,7 @@ export function AdvancedSearchWrapper({ children, enabled = true }: { children: 
                 <div className="pt-4 mb-2">
                     <IoClose size={24} className="absolute top-3 right-3 cursor-pointer" onClick={() => setShowAdvancedSearch(false)} />
                 </div>
-                <AdvancedSearch />
+                <AdvancedSearch entryScope={entryScope} />
             </div>
             <div className="w-full pt-3">
                 {children}
@@ -74,7 +76,11 @@ export function AdvancedSearchWrapper({ children, enabled = true }: { children: 
     );
 }
 
-export function AdvancedSearch() {
+/**
+ * `entryScope` bounds the facet counts to the entries the page lists (e.g. the
+ * shelf's ids). `undefined` = the whole catalog, `null` = scope still loading.
+ */
+export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
     const [searchParams, setSearchParams] = useSearchParams();
     const { t, i18n } = useTranslation();
 
@@ -84,11 +90,32 @@ export function AdvancedSearch() {
     const yearDebounceTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const currentYear = new Date().getFullYear();
-    const [minYear, setMinYear] = useState<number>(DEFAULT_MIN_YEAR);
+    // Which year input is being edited — it shows the raw value while focused and
+    // the pre-filled facet bound otherwise.
+    const [focusedYear, setFocusedYear] = useState<0 | 1 | null>(null);
 
-    const getEntries = useGetEntries();
     const getCategories = useGetCategories();
-    const facets = useEntryFacets();
+    const filters = useEntryFilters();
+    const scopeLoading = entryScope === null;
+    // An empty `ids` scope (empty shelf) would count the whole catalog — nothing to facet.
+    const emptyScope = entryScope?.ids === '';
+    const facets = useEntryFacets({ ...filters, ...entryScope }, { enabled: !scopeLoading && !emptyScope });
+    // Counts drive which options are shown: `{}` hides everything but the selection
+    // (still loading / empty scope), `undefined` shows every option without counts
+    // (facets request failed — don't lock the user out of filtering).
+    const facetCounts = (counts: Record<string, number>) =>
+        emptyScope ? {} : facets.ready ? counts : facets.failed ? undefined : {};
+    const availabilityCounts = facetCounts(facets.availabilityCounts);
+
+    // Year bounds of the entries the other filters leave (the year filter itself is
+    // ignored). They pre-fill the inputs/slider but are only sent once the user
+    // interacts — entries without a year would drop out of a `published_at` filter.
+    const minYear = facets.years.min ?? DEFAULT_MIN_YEAR;
+    const maxYear = facets.years.max ?? currentYear;
+    const prefilledYear = (index: 0 | 1) => {
+        const bound = index === 0 ? facets.years.min : facets.years.max;
+        return facets.ready && bound != null ? String(bound) : '';
+    };
     const [allCategories, setAllCategories] = useState<ICategory[]>([]);
     const [categoriesLoaded, setCategoriesLoaded] = useState(false);
     const [activeCategories, setActiveCategories] = useState<ICategory[]>([]);
@@ -123,18 +150,6 @@ export function AdvancedSearch() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useEffect(() => {
-        (async () => {
-            try {
-                const { items } = await getEntries({ page: 1, limit: 1, orderBy: 'published_at' });
-                const earliest = items[0]?.published_at ? new Date(items[0].published_at).getFullYear() : NaN;
-                if (!Number.isNaN(earliest) && earliest > 0) setMinYear(earliest);
-            } catch {
-                // Falls back to DEFAULT_MIN_YEAR when the earliest year can't be determined.
-            }
-        })();
-    }, []);
-
     const performSearch = () => {
         if (!hydrated.current) return;
 
@@ -149,6 +164,8 @@ export function AdvancedSearch() {
             ...unresolvedFeedIds.current,
         ];
 
+        // Multi-select: the backend OR-s the comma-separated ids within one param and
+        // AND-s the params, i.e. (feed OR feed) AND (category OR category).
         setCategoryIds(params, categoryIds);
         setFeedIds(params, feedIds);
 
@@ -188,7 +205,7 @@ export function AdvancedSearch() {
         const newAvailability = availabilityParam
             ? (availabilityParam.split(',') as AvailabilityState[])
             : [];
-        if (availability.sort().join(',') !== newAvailability.sort().join(',')) {
+        if ([...availability].sort().join(',') !== [...newAvailability].sort().join(',')) {
             setAvailability(newAvailability);
         }
 
@@ -232,18 +249,18 @@ export function AdvancedSearch() {
         [allFeeds]
     );
 
-    // Languages present in the catalog (from the facet sample); falls back to the
-    // full ISO list until the sample is available so the filter still works.
+    // Languages that have entries under the current filters (plus the selected ones,
+    // so they can be unticked). Falls back to the full ISO list if facets failed.
     const languageOptions = useMemo(() => {
         const locale = i18n.language as AcceptedLanguage;
-        const sampledCodes = Object.keys(facets.languageCounts);
-        const entries = sampledCodes.length > 0
-            ? sampledCodes.map(code => ({ value: code, label: getLanguage(code)?.name[locale] ?? code }))
-            : getLanguages(locale).map(lang => ({ value: lang.alpha2 ?? lang.alpha3 ?? '', label: lang.name }));
+        const entries = facets.failed
+            ? getLanguages(locale).map(lang => ({ value: lang.alpha2 ?? lang.alpha3 ?? '', label: lang.name }))
+            : Array.from(new Set([...Object.keys(facets.languageCounts), ...languageCodes]))
+                .map(code => ({ value: code, label: getLanguage(code)?.name[locale] ?? code }));
         return entries
             .filter(o => o.value)
             .sort((a, b) => a.label.localeCompare(b.label));
-    }, [facets.languageCounts, i18n.language]);
+    }, [facets.languageCounts, facets.failed, languageCodes, i18n.language]);
 
     const handleYearChange = (index: 0 | 1, value: string) => {
         const newYear = [...year];
@@ -272,7 +289,10 @@ export function AdvancedSearch() {
                     {t('searchBar.availability')}
                 </p>
                 <div className="flex flex-col gap-[7px]">
-                    {availabilityOptions.map(opt => (
+                    {availabilityOptions
+                        // Like the other facets: hide states with no entries unless selected.
+                        .filter(opt => !availabilityCounts || (availabilityCounts[opt.value] ?? 0) > 0 || availability.includes(opt.value as AvailabilityState))
+                        .map(opt => (
                         <Checkbox
                             key={opt.value}
                             checked={availability.includes(opt.value as AvailabilityState)}
@@ -286,6 +306,9 @@ export function AdvancedSearch() {
                             label={
                                 <span className={`text-[14px] tracking-[0.1px] leading-[20px] ${availability.includes(opt.value as AvailabilityState) ? 'font-medium' : 'font-normal'} text-darkGray dark:text-white`}>
                                     {opt.label}
+                                    {typeof availabilityCounts?.[opt.value] === 'number' && (
+                                        <span className="text-[13px] font-normal text-[#b1b1b1] ml-1">({availabilityCounts[opt.value]})</span>
+                                    )}
                                 </span>
                             }
                         />
@@ -303,10 +326,11 @@ export function AdvancedSearch() {
                 <div className="px-1.5 pt-1">
                     <DualRangeSlider
                         min={minYear}
-                        max={currentYear}
+                        // A single-year range would give the slider zero width to work with.
+                        max={Math.max(maxYear, minYear + 1)}
                         value={[
                             year[0] ? Number(year[0]) : minYear,
-                            year[1] ? Number(year[1]) : currentYear,
+                            year[1] ? Number(year[1]) : maxYear,
                         ]}
                         onChange={([from, to]) => setYear([from.toString(), to.toString()])}
                         onFinish={onYearFinish}
@@ -316,24 +340,26 @@ export function AdvancedSearch() {
                     <input
                         type="text"
                         inputMode="numeric"
-                        placeholder={t('searchBar.yearFrom')}
-                        value={year[0]}
+                        placeholder={prefilledYear(0) || t('searchBar.yearFrom')}
+                        value={focusedYear === 0 ? year[0] : (year[0] || prefilledYear(0))}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                             if (e.target.value === "" || /^\d*$/.test(e.target.value)) handleYearChange(0, e.target.value);
                         }}
-                        onBlur={onYearFinish}
+                        onFocus={() => setFocusedYear(0)}
+                        onBlur={() => { setFocusedYear(null); onYearFinish(); }}
                         className="w-full min-w-0 px-3 py-1.5 text-[14px] text-darkGray dark:text-white bg-white dark:bg-strongDarkGray border border-[rgba(0,0,0,0.15)] dark:border-[rgba(255,255,255,0.2)] rounded-md outline-none focus:border-primary"
                     />
                     <span className="text-[14px] font-medium text-darkGray dark:text-white flex-shrink-0">-</span>
                     <input
                         type="text"
                         inputMode="numeric"
-                        placeholder={t('searchBar.yearTo')}
-                        value={year[1]}
+                        placeholder={prefilledYear(1) || t('searchBar.yearTo')}
+                        value={focusedYear === 1 ? year[1] : (year[1] || prefilledYear(1))}
                         onChange={(e: ChangeEvent<HTMLInputElement>) => {
                             if (e.target.value === "" || /^\d*$/.test(e.target.value)) handleYearChange(1, e.target.value);
                         }}
-                        onBlur={onYearFinish}
+                        onFocus={() => setFocusedYear(1)}
+                        onBlur={() => { setFocusedYear(null); onYearFinish(); }}
                         className="w-full min-w-0 px-3 py-1.5 text-[14px] text-darkGray dark:text-white bg-white dark:bg-strongDarkGray border border-[rgba(0,0,0,0.15)] dark:border-[rgba(255,255,255,0.2)] rounded-md outline-none focus:border-primary"
                     />
                 </div>
@@ -345,7 +371,7 @@ export function AdvancedSearch() {
                 options={languageOptions}
                 selected={languageCodes}
                 setSelected={setLanguageCodes}
-                counts={Object.keys(facets.languageCounts).length ? facets.languageCounts : undefined}
+                counts={facetCounts(facets.languageCounts)}
             />
 
             <SectionDivider />
@@ -356,7 +382,7 @@ export function AdvancedSearch() {
                 setSelected={selected => {
                     setActiveCategories(allCategories.filter(cat => selected.includes(cat.id)));
                 }}
-                counts={Object.keys(facets.categoryCounts).length ? facets.categoryCounts : undefined}
+                counts={facetCounts(facets.categoryCounts)}
             />
 
             <SectionDivider />
@@ -368,7 +394,7 @@ export function AdvancedSearch() {
                 setSelected={selected => {
                     setActiveFeeds(allFeeds.filter(feed => selected.includes(feed.id)));
                 }}
-                counts={Object.keys(facets.feedCounts).length ? facets.feedCounts : undefined}
+                counts={facetCounts(facets.feedCounts)}
             />
         </div>
     );

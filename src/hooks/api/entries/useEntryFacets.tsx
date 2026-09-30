@@ -1,40 +1,70 @@
 import { useMemo } from 'react';
-import useEntriesQuery from './useEntriesQuery';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { IEntryFacets } from '../../../utils/interfaces/entry';
+import useAxios from '../useAxios';
+import { AVAILABILITY_TO_LCP_STATE, buildEntryFilterParams, EntryFilters } from './entryFilters';
 
-export interface IEntryFacets {
-  /** entryId-count keyed by category / feed id and by language code */
+export interface IEntryFacetCounts {
+  /** Entry counts keyed by category / feed id and by language code */
   categoryCounts: Record<string, number>;
   feedCounts: Record<string, number>;
   languageCounts: Record<string, number>;
-  /** true once the sample has loaded — until then callers should not filter */
+  /** Entry counts keyed by sidebar availability state (available / unavailable / borrowed / reserved) */
+  availabilityCounts: Record<string, number>;
+  /** Publication year range of the entries the other filters leave (null when none has a year) */
+  years: { min: number | null; max: number | null };
+  /** true once counts for the current filters have loaded */
   ready: boolean;
+  /** true when the facets request failed — callers should fall back to showing every option */
+  failed: boolean;
 }
 
-// No backend aggregation avaialble
-const FACET_SAMPLE_LIMIT = 100;
+const toCounts = <T extends { count: number }>(rows: T[], key: (row: T) => string) =>
+  Object.fromEntries(rows.map((row) => [key(row), row.count]));
 
-const useEntryFacets = (): IEntryFacets => {
-  const { data, isSuccess } = useEntriesQuery({ page: 1, limit: FACET_SAMPLE_LIMIT });
+/**
+ * Exact per-value counts for the advanced-search sidebar. The backend counts each
+ * dimension with every active filter applied except its own, so a selected
+ * language still lists the other languages that could be OR-ed in.
+ */
+const useEntryFacets = (filters: EntryFilters, options?: { enabled?: boolean }): IEntryFacetCounts => {
+  const axios = useAxios();
+  // Ordering doesn't change the counts — keep it out of the key so sorting doesn't refetch.
+  const facetFilters: EntryFilters = { ...filters, orderBy: undefined };
+
+  const { data, isSuccess, isError } = useQuery({
+    queryKey: ['entry-facets', facetFilters],
+    queryFn: async () => {
+      const { data } = await axios.get<{ response: IEntryFacets }>('/api/v1/entries/facets', {
+        params: buildEntryFilterParams(facetFilters),
+      });
+      return data.response;
+    },
+    enabled: options?.enabled ?? true,
+    placeholderData: keepPreviousData,
+  });
 
   return useMemo(() => {
-    const categoryCounts: Record<string, number> = {};
-    const feedCounts: Record<string, number> = {};
-    const languageCounts: Record<string, number> = {};
+    // The backend counts raw `lcp_state` values; sum them into the sidebar's states
+    // with the same mapping the filter uses.
+    const lcpCounts = toCounts(data?.availability ?? [], (row) => row.state);
+    const availabilityCounts = Object.fromEntries(
+      Object.entries(AVAILABILITY_TO_LCP_STATE).map(([state, lcpStates]) => [
+        state,
+        lcpStates.reduce((sum, lcpState) => sum + (lcpCounts[lcpState] ?? 0), 0),
+      ])
+    );
 
-    (data?.items ?? []).forEach((entry) => {
-      entry.categories?.forEach((category) => {
-        categoryCounts[category.id] = (categoryCounts[category.id] ?? 0) + 1;
-      });
-      entry.feeds?.forEach((feed) => {
-        feedCounts[feed.id] = (feedCounts[feed.id] ?? 0) + 1;
-      });
-      if (entry.language_code) {
-        languageCounts[entry.language_code] = (languageCounts[entry.language_code] ?? 0) + 1;
-      }
-    });
-
-    return { categoryCounts, feedCounts, languageCounts, ready: isSuccess };
-  }, [data, isSuccess]);
+    return {
+      categoryCounts: toCounts(data?.categories ?? [], (row) => row.id),
+      feedCounts: toCounts(data?.feeds ?? [], (row) => row.id),
+      languageCounts: toCounts(data?.languages ?? [], (row) => row.code),
+      availabilityCounts,
+      years: { min: data?.years?.min ?? null, max: data?.years?.max ?? null },
+      ready: isSuccess,
+      failed: isError,
+    };
+  }, [data, isSuccess, isError]);
 };
 
 export default useEntryFacets;

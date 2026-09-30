@@ -62,7 +62,6 @@ jobs:
           ELVIRA_THEME: ${{ vars.ELVIRA_THEME }}
           ELVIRA_UMAMI_SERVER: ${{ vars.ELVIRA_UMAMI_SERVER }}
           ELVIRA_UMAMI_WEBSITE: ${{ vars.ELVIRA_UMAMI_WEBSITE }}
-          ELVIRA_ASSISTANT_URL: ${{ vars.ELVIRA_ASSISTANT_URL }}
           ELVIRA_EXPERIMENTAL_FEATURES: ${{ vars.ELVIRA_EXPERIMENTAL_FEATURES }}
         run: |
           if [ "${{ github.ref_name }}" = "master" ]; then

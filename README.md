@@ -96,7 +96,6 @@ Elvira-specific variables:
 - **`ELVIRA_CATALOG_ID`** — the catalog whose data is shown. Each catalog maps to a
   faculty/department with its own theme and content.
 - **`ELVIRA_THEME`** — faculty theme name (see the list above); selects logos and colors.
-- **`ELVIRA_ASSISTANT_URL`** — base URL of the AI assistant service (chat & recommendations).
 - **`ELVIRA_UMAMI_SERVER`** — analytics (Umami) server URL.
 - **`ELVIRA_UMAMI_WEBSITE`** — Umami website ID for analytics.
 - **`ELVIRA_EXPERIMENTAL_FEATURES`** — `true`/`false`; gates undeveloped features when
@@ -108,7 +107,6 @@ Prefer overriding these via bash rather than editing the `env/.env.*` files dire
 export ELVIRA_BASE_URL=base_url
 export ELVIRA_CATALOG_ID=catalog_id
 export ELVIRA_THEME=theme
-export ELVIRA_ASSISTANT_URL=assistant_url
 export ELVIRA_UMAMI_SERVER=server_url
 export ELVIRA_UMAMI_WEBSITE=website_id
 export ELVIRA_EXPERIMENTAL_FEATURES=false
@@ -119,7 +117,7 @@ npm run build:prod
 🔔 **Gentle reminder** 🔔 — clean up afterward:
 
 ```bash
-unset ELVIRA_BASE_URL ELVIRA_CATALOG_ID ELVIRA_THEME ELVIRA_ASSISTANT_URL \
+unset ELVIRA_BASE_URL ELVIRA_CATALOG_ID ELVIRA_THEME \
       ELVIRA_UMAMI_SERVER ELVIRA_UMAMI_WEBSITE ELVIRA_EXPERIMENTAL_FEATURES
 ```
 

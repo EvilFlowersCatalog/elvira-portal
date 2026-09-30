@@ -2,7 +2,7 @@ import { createPortal } from "react-dom";
 import { CircleLoader } from "react-spinners";
 import { FaX, FaPaperPlane } from "react-icons/fa6";
 import { FiPlus } from "react-icons/fi";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTranslation } from "react-i18next";
@@ -11,16 +11,9 @@ import EntryItem from "../items/entry/display/EntryItem";
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
 import { IEntry, IEntryDetail } from "../../utils/interfaces/entry";
 import { useSearchParams } from "react-router-dom";
-import axios from "axios";
-import useAuth from "../../hooks/contexts/useAuthContext";
-import { AiMessage, AiMessageContent } from "../../providers/AppProvider";
-
-interface StreamEvent {
-    type: 'chunk' | 'message' | 'entries' | 'done' | 'error';
-    data?: string | string[];
-    msg_id?: string;
-    bookCatalogs?: Record<string, string>;  // bookId -> catalogId mapping
-}
+import useAssistantChat from "../../hooks/api/assistant/useAssistantChat";
+import useStickToBottom from "../../hooks/useStickToBottom";
+import { AiMessage } from "../../providers/AppProvider";
 
 function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, handleSuggestion: (suggestion: string) => void }) {
     return (
@@ -36,7 +29,7 @@ function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, ha
 }
 
 
-function MessageElement({ msg, msgIndex, bookCatalogs }: { msg: AiMessage, msgIndex: number, bookCatalogs: Record<string, string> }) {
+function MessageElement({ msg }: { msg: AiMessage }) {
     const [books, setBooks] = useState<any[]>([]);
     const { getEntryDetail } = useGetEntryDetail();
 
@@ -46,10 +39,7 @@ function MessageElement({ msg, msgIndex, bookCatalogs }: { msg: AiMessage, msgIn
             setBooks([]); // Reset books first
             (async () => {
                 const details = await Promise.all(
-                    entryIds.map((id: string) => {
-                        const catalogId = bookCatalogs[id];
-                        return getEntryDetail(id, catalogId || undefined);
-                    })
+                    entryIds.map((id: string) => getEntryDetail(id))
                 );
                 const entries: IEntry[] = details.map(entryDetail => ({
                     ...entryDetail,
@@ -58,7 +48,7 @@ function MessageElement({ msg, msgIndex, bookCatalogs }: { msg: AiMessage, msgIn
                 setBooks(entries);
             })();
         }
-    }, [msg.content.type, JSON.stringify(msg.content.data), JSON.stringify(bookCatalogs)])
+    }, [msg.content.type, JSON.stringify(msg.content.data)])
 
     switch (msg.content.type) {
         case "message":
@@ -68,6 +58,9 @@ function MessageElement({ msg, msgIndex, bookCatalogs }: { msg: AiMessage, msgIn
                         ? "bg-primary text-white self-end"
                         : "bg-zinc-200 text-black self-start"
                 }`}>
+                {msg.reference?.title && (
+                    <p className="text-xs opacity-80 mb-1 truncate">📖 {msg.reference.title}</p>
+                )}
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content.data as string}</ReactMarkdown>
             </div>;
         case "entries":
@@ -93,27 +86,28 @@ function MessageElement({ msg, msgIndex, bookCatalogs }: { msg: AiMessage, msgIn
 
 export default function AiAssistant() {
     const { t } = useTranslation();
-    const { auth } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
     const { 
         showAiAssistant, 
         setShowAiAssistant, 
         umamiTrack,
-        aiChatId,
         setAiChatId,
         aiMessages,
         setAiMessages,
-        aiBookCatalogs,
-        setAiBookCatalogs,
         aiShowSuggestions,
         setAiShowSuggestions,
     } = useAppContext();
     const { getEntryDetail } = useGetEntryDetail();
 
     const [input, setInput] = useState("");
-    const [isGeneratingResponse, setGeneratingResponse] = useState(false);
     const [assistantEntry, setAssistantEntry] = useState<IEntryDetail | null>(null);
     const [currentCatalogId] = useState<string | undefined>(import.meta.env.ELVIRA_CATALOG_ID || undefined);
+    // The id comes straight from the URL so a message sent before the book detail
+    // has loaded still carries the reference; the detail only supplies the title.
+    const assistantEntryId = searchParams.get('assistant-entry-id') || undefined;
+    const { sendMessage, isGenerating: isGeneratingResponse } = useAssistantChat(
+        assistantEntryId ? { id: assistantEntryId, title: assistantEntry?.title } : undefined
+    );
 
 
     function clearAssistantEntry() {
@@ -129,22 +123,22 @@ export default function AiAssistant() {
         }
     }, [showAiAssistant]);
 
-    useEffect(() => {
-        document.getElementById("chat")?.scrollTo({
-            top: document.getElementById("chat")?.scrollHeight,
-            behavior: "smooth",
-        });
-    }, [aiMessages]);
+    const chatScrollRef = useRef<HTMLDivElement>(null);
+    const chatContentRef = useRef<HTMLDivElement>(null);
+    const followChat = useStickToBottom(chatScrollRef, chatContentRef);
 
     useEffect(() => {
-        const assistantEntryId = searchParams.get('assistant-entry-id');
-        if (assistantEntryId) {
-            getEntryDetail(assistantEntryId, currentCatalogId).then((entry) => {
-                setAssistantEntry(entry);
-            });
+        if (!assistantEntryId) {
+            // The reference was cleared (chip closed / drawer closed) — drop the stale chip.
+            setAssistantEntry(null);
+            return;
         }
-
-    }, [searchParams]);
+        if (assistantEntry?.id === assistantEntryId) return;
+        getEntryDetail(assistantEntryId, currentCatalogId).then((entry) => {
+            setAssistantEntry(entry);
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [assistantEntryId]);
 
     useEffect(() => {
         if (!showAiAssistant) return;
@@ -156,182 +150,8 @@ export default function AiAssistant() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showAiAssistant, searchParams]);
 
-    async function sendMessage(message: string) {
-        setAiMessages((prev) => [...prev, {
-            role: "user", content: {
-                type: "message",
-                data: message
-            }
-        }]);
-        setGeneratingResponse(true);
-
-        // Add loading indicator
-        const loadingMsgId = `loading-${Date.now()}`;
-        setAiMessages((prev) => [...prev, {
-            role: "assistant",
-            content: {
-                type: "loading",
-                data: "Generating response..."
-            },
-            id: loadingMsgId
-        }]);
-
-        try {
-            let currentChatId = aiChatId;
-            if (!currentChatId) {
-                const response = await axios.post(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/startchat`, {
-                    apiKey: auth?.token || null,
-                    catalogId: currentCatalogId,
-                    entryId: assistantEntry?.id || undefined
-                });
-                currentChatId = response.data.chatId;
-                setAiChatId(currentChatId);
-            }
-
-            const response = await fetch(`${import.meta.env.ELVIRA_ASSISTANT_URL}/api/sendchat`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chatId: currentChatId,
-                    message: message,
-                    apiKey: auth?.token || null,
-                    entryId: assistantEntry?.id || undefined
-                })
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'Request failed');
-            }
-
-            const reader = response.body!.getReader();
-            const decoder = new TextDecoder();
-            let buffer = '';
-            let currentMessageText = '';
-            let hasReceivedFirstChunk = false;
-
-            while (true) {
-                const { done, value } = await reader.read();
-                if (done) break;
-
-                buffer += decoder.decode(value, { stream: true });
-                const lines = buffer.split('\n');
-                buffer = lines.pop() || '';
-
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const data: StreamEvent = JSON.parse(line.slice(6));
-
-                        switch (data.type) {
-                            case 'chunk':
-                                if (!hasReceivedFirstChunk) {
-                                    // Remove loading indicator and start streaming message
-                                    hasReceivedFirstChunk = true;
-                                    const streamingMsgId = `streaming-${Date.now()}`;
-                                    setAiMessages((prev) => {
-                                        const filtered = prev.filter(m => m.id !== loadingMsgId);
-                                        return [...filtered, {
-                                            role: "assistant",
-                                            content: {
-                                                type: "message",
-                                                data: data.data as string
-                                            },
-                                            id: streamingMsgId
-                                        }];
-                                    });
-                                    currentMessageText = data.data as string;
-                                } else {
-                                    // Append chunk to existing message
-                                    currentMessageText += data.data;
-                                    setAiMessages((prev) => {
-                                        const newMessages = [...prev];
-                                        const lastMsgIndex = newMessages.length - 1;
-                                        if (newMessages[lastMsgIndex] && newMessages[lastMsgIndex].content.type === 'message') {
-                                            newMessages[lastMsgIndex] = {
-                                                ...newMessages[lastMsgIndex],
-                                                content: {
-                                                    ...newMessages[lastMsgIndex].content,
-                                                    data: currentMessageText
-                                                }
-                                            };
-                                        }
-                                        return newMessages;
-                                    });
-                                }
-                                break;
-                            case 'message':
-                                // Final message received (if no chunks were sent)
-                                if (!hasReceivedFirstChunk) {
-                                    setAiMessages((prev) => {
-                                        const filtered = prev.filter(m => m.id !== loadingMsgId);
-                                        return [...filtered, {
-                                            role: "assistant",
-                                            content: {
-                                                type: "message",
-                                                data: data.data as string
-                                            },
-                                            id: `message-${Date.now()}`
-                                        }];
-                                    });
-                                }
-                                break;
-                            case 'entries':
-                                // Store book-to-catalog mapping
-                                if (data.bookCatalogs) {
-                                    setAiBookCatalogs(prev => ({
-                                        ...prev,
-                                        ...data.bookCatalogs
-                                    }));
-                                }
-                                setAiMessages((prev) => [...prev, {
-                                    role: "assistant",
-                                    content: {
-                                        type: "entries",
-                                        data: data.data as string[]
-                                    },
-                                    id: `entries-${Date.now()}`
-                                }]);
-                                break;
-                            case 'done':
-                                setGeneratingResponse(false);
-                                break;
-                            case 'error':
-                                setAiMessages((prev) => {
-                                    const filtered = prev.filter(m => m.id !== loadingMsgId);
-                                    return [...filtered, {
-                                        role: "assistant",
-                                        content: {
-                                            type: "message",
-                                            data: `Error: ${data.data}`
-                                        },
-                                        id: `error-${Date.now()}`
-                                    }];
-                                });
-                                setGeneratingResponse(false);
-                                break;
-                        }
-                    }
-                }
-            }
-        } catch (err) {
-            setAiMessages((prev) => {
-                const filtered = prev.filter(m => m.id !== loadingMsgId);
-                return [...filtered, {
-                    role: "assistant",
-                    content: {
-                        type: 'message',
-                        data: "An error occurred while processing your request."
-                    },
-                    id: `error-${Date.now()}`
-                }];
-            });
-            setGeneratingResponse(false);
-        }
-
-        setInput("");
-    }
-
     const handleSuggestion = (suggestion: string) => {
+        followChat();
         sendMessage(suggestion);
         setAiShowSuggestions(false);
     };
@@ -340,6 +160,7 @@ export default function AiAssistant() {
         e?.preventDefault();
         if (!input.trim()) return;
         setAiShowSuggestions(false);
+        followChat();
         sendMessage(input);
         setInput("");
     };
@@ -347,7 +168,6 @@ export default function AiAssistant() {
     const newSession = () => {
         setAiChatId(null);
         setAiMessages([]);
-        setAiBookCatalogs({});
     }
 
     const handleCloseDrawer = (event: object, reason: "backdropClick" | "escapeKeyDown") => {
@@ -423,10 +243,12 @@ export default function AiAssistant() {
                     </div>
 
                     {/* Body */}
-                    <div id="chat" className="flex flex-col grow overflow-y-auto">
-                        {aiMessages.map((msg, index) => (
-                            <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} msgIndex={index} bookCatalogs={aiBookCatalogs} />
-                        ))}
+                    <div id="chat" ref={chatScrollRef} className="flex flex-col grow overflow-y-auto">
+                        <div ref={chatContentRef} className="flex flex-col">
+                            {aiMessages.map((msg, index) => (
+                                <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} />
+                            ))}
+                        </div>
                     </div>
 
                     {/* Input */}

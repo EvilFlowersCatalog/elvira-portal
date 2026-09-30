@@ -88,10 +88,23 @@ export interface IEntryQuery {
   query?: string;
   config__readium_enabled?: boolean;
   languageCode?: string;
-  /** Comma-separated category IDs — experimental multi-filter API (param name TBD) */
+  /** Comma-separated category IDs (OR-ed; sent as category_id together with categoryId) */
   categories?: string;
-  /** Comma-separated feed IDs — experimental multi-filter API (param name TBD) */
+  /** Comma-separated feed IDs (OR-ed; sent as feed_id together with feedId) */
   feeds?: string;
+  /** Comma-separated backend `lcp_state` values (see availabilityToLcpState) */
+  lcpState?: string;
+  /** Comma-separated entry IDs — restricts the result to these entries (e.g. the shelf) */
+  ids?: string;
+}
+
+export interface IEntryFacets {
+  languages: { code: string; count: number }[];
+  categories: { id: string; count: number }[];
+  feeds: { id: string; count: number }[];
+  /** Counts per backend `lcp_state` value plus the `reserved` pseudo-state */
+  availability: { state: string; count: number }[];
+  years: { min: number | null; max: number | null };
 }
 
 export interface IEntryNew {

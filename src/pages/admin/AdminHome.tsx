@@ -1,7 +1,7 @@
 import { ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaBook, FaRobot } from 'react-icons/fa';
-import { FiPlus, FiTag, FiUsers, FiEdit3, FiKey } from 'react-icons/fi';
+import { FiPlus, FiTag, FiUsers, FiEdit3, FiKey, FiMessageSquare } from 'react-icons/fi';
 import { MdOutlineCollectionsBookmark, MdOutlineLibraryBooks, MdOutlineInventory2 } from 'react-icons/md';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
@@ -70,6 +70,16 @@ const AdminHome = () => {
               <FiUsers size={16} />
               {t('administration.dashboard.addUser')}
             </button>
+            <a
+              href="https://feedback.elvira.stuba.sk"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => umamiTrack('Admin Dashboard Feedback')}
+              className="flex items-center gap-2 rounded-md border border-zinc-300 dark:border-zinc-600 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-200 hover:bg-zinc-100 dark:hover:bg-zinc-700"
+            >
+              <FiMessageSquare size={16} />
+              {t('administration.dashboard.feedback')}
+            </a>
           </div>
         }
       />

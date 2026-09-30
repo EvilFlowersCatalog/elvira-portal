@@ -98,8 +98,8 @@ const AdminLoans = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchLoans = useCallback(async () => {
-    setLoading(true);
+  const fetchLoans = useCallback(async (silent = false) => {
+    if (!silent) setLoading(true);
     setError(false);
     try {
       const { items, metadata } = await getLoans({ page, limit, user_mode: 'all' });
@@ -141,8 +141,9 @@ const AdminLoans = () => {
       if (days) requested_end = new Date(Date.now() + days * 86_400_000).toISOString();
     }
     try {
-      const updated = await updateLoan(license.id, action, requested_end);
-      setItems((prev) => prev.map((l) => (l.id === license.id ? { ...l, ...updated } : l)));
+      await updateLoan(license.id, action, requested_end);
+      // The PUT response doesn't reliably carry the new state — reload the page of loans.
+      await fetchLoans(true);
     } catch (e: any) {
       toast.error(e?.response?.data?.detail || t('notifications.license.edit.error', { defaultValue: 'Action failed' }));
     }
@@ -273,7 +274,7 @@ const AdminLoans = () => {
           getRowId={(l) => l.id}
           loading={loading}
           error={error ? t('administration.loansPage.loadError') : undefined}
-          onRetry={fetchLoans}
+          onRetry={() => fetchLoans()}
           emptyTitle={t('administration.loansPage.empty')}
           page={metadata.page}
           pageCount={metadata.pages}
