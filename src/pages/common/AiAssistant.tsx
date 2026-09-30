@@ -12,6 +12,7 @@ import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
 import { IEntry } from "../../utils/interfaces/entry";
 import { Link, useNavigate } from "react-router-dom";
 import useAssistantChat from "../../hooks/api/assistant/useAssistantChat";
+import useStickToBottom from "../../hooks/useStickToBottom";
 import { AiMessage } from "../../providers/AppProvider";
 import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
 import EntryDetail from "../../components/items/entry/details/EntryDetail";
@@ -98,22 +99,17 @@ export default function AiAssistantPage() {
 
     const [input, setInput] = useState("");
     const { sendMessage, isGenerating: isGeneratingResponse } = useAssistantChat();
-    const chatEndRef = useRef<HTMLDivElement>(null);
-
-    const scrollToBottom = () => {
-        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    };
+    const chatScrollRef = useRef<HTMLDivElement>(null);
+    const chatContentRef = useRef<HTMLDivElement>(null);
+    const followChat = useStickToBottom(chatScrollRef, chatContentRef);
 
     useEffect(() => {
         umamiTrack("AI Assistant Page Visit");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    useEffect(() => {
-        scrollToBottom();
-    }, [aiMessages]);
-
     const handleSuggestion = (suggestion: string) => {
+        followChat();
         sendMessage(suggestion);
         setAiShowSuggestions(false);
     };
@@ -122,6 +118,7 @@ export default function AiAssistantPage() {
         e?.preventDefault();
         if (!input.trim()) return;
         setAiShowSuggestions(false);
+        followChat();
         sendMessage(input);
         setInput("");
     };
@@ -187,8 +184,8 @@ export default function AiAssistantPage() {
             {/* Main Chat Container */}
             <div className="flex-1 flex flex-col items-center w-full overflow-hidden">
                 {/* Chat Messages Area */}
-                <div className="flex-1 w-full max-w-4xl overflow-y-auto px-4 py-8">
-                    <div className="flex flex-col">
+                <div ref={chatScrollRef} className="flex-1 w-full max-w-4xl overflow-y-auto px-4 py-8">
+                    <div ref={chatContentRef} className="flex flex-col">
                         {aiMessages.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full py-20">
                                 <h2 className="text-[2.125rem] leading-tight font-bold mb-4 text-black dark:text-white">
@@ -203,7 +200,6 @@ export default function AiAssistantPage() {
                                 <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} />
                             ))
                         )}
-                        <div ref={chatEndRef} />
                     </div>
                 </div>
 

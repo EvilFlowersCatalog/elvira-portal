@@ -2,7 +2,7 @@ import { createPortal } from "react-dom";
 import { CircleLoader } from "react-spinners";
 import { FaX, FaPaperPlane } from "react-icons/fa6";
 import { FiPlus } from "react-icons/fi";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { useTranslation } from "react-i18next";
@@ -12,6 +12,7 @@ import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
 import { IEntry, IEntryDetail } from "../../utils/interfaces/entry";
 import { useSearchParams } from "react-router-dom";
 import useAssistantChat from "../../hooks/api/assistant/useAssistantChat";
+import useStickToBottom from "../../hooks/useStickToBottom";
 import { AiMessage } from "../../providers/AppProvider";
 
 function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, handleSuggestion: (suggestion: string) => void }) {
@@ -122,12 +123,9 @@ export default function AiAssistant() {
         }
     }, [showAiAssistant]);
 
-    useEffect(() => {
-        document.getElementById("chat")?.scrollTo({
-            top: document.getElementById("chat")?.scrollHeight,
-            behavior: "smooth",
-        });
-    }, [aiMessages]);
+    const chatScrollRef = useRef<HTMLDivElement>(null);
+    const chatContentRef = useRef<HTMLDivElement>(null);
+    const followChat = useStickToBottom(chatScrollRef, chatContentRef);
 
     useEffect(() => {
         if (!assistantEntryId) {
@@ -153,6 +151,7 @@ export default function AiAssistant() {
     }, [showAiAssistant, searchParams]);
 
     const handleSuggestion = (suggestion: string) => {
+        followChat();
         sendMessage(suggestion);
         setAiShowSuggestions(false);
     };
@@ -161,6 +160,7 @@ export default function AiAssistant() {
         e?.preventDefault();
         if (!input.trim()) return;
         setAiShowSuggestions(false);
+        followChat();
         sendMessage(input);
         setInput("");
     };
@@ -243,10 +243,12 @@ export default function AiAssistant() {
                     </div>
 
                     {/* Body */}
-                    <div id="chat" className="flex flex-col grow overflow-y-auto">
-                        {aiMessages.map((msg, index) => (
-                            <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} />
-                        ))}
+                    <div id="chat" ref={chatScrollRef} className="flex flex-col grow overflow-y-auto">
+                        <div ref={chatContentRef} className="flex flex-col">
+                            {aiMessages.map((msg, index) => (
+                                <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} />
+                            ))}
+                        </div>
                     </div>
 
                     {/* Input */}
