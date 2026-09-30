@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
 import useGetEntries from '../../hooks/api/entries/useGetEntries';
+import { useEntryFilters } from '../../hooks/api/entries/entryFilters';
 import { IEntry } from '../../utils/interfaces/entry';
 import { useSearchParams } from 'react-router-dom';
 import ItemContainer from '../../components/items/container/ItemContainer';
@@ -9,31 +9,12 @@ import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper'
 import { useTranslation } from 'react-i18next';
 import FilterSuggestions from '../../components/tools/FilterSuggestions';
 import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
-import { readCategoryIds, readFeedIds } from '../../utils/func/filterParams';
 
 const Library = () => {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const getEntries = useGetEntries();
-
-  // Only params that affect the result set go in the query key, so opening a
-  // book (which adds entry-detail-id) doesn't reset the list or scroll position.
-  const filters = useMemo(() => {
-    const feedIds = readFeedIds(searchParams);
-    return {
-      title: searchParams.get('title') ?? '',
-      // An explicit collection filter wins over the /feeds drill-down step.
-      feedId: feedIds.length > 0 ? '' : searchParams.get('feed-id-step') ?? '',
-      authors: searchParams.get('author') ?? '',
-      publishedAtGte: searchParams.get('publishedAtGte') ?? '',
-      publishedAtLte: searchParams.get('publishedAtLte') ?? '',
-      orderBy: searchParams.get('order-by') ?? '',
-      query: searchParams.get('query') ?? '',
-      languageCode: searchParams.get('languageCode') ?? '',
-      categories: readCategoryIds(searchParams).join(','),
-      feeds: feedIds.join(','),
-    };
-  }, [searchParams]);
+  const filters = useEntryFilters();
 
   const list = useInfiniteItemContainer<IEntry>(
     ['entries-infinite', filters],

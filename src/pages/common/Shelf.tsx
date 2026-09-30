@@ -1,55 +1,39 @@
 import { useMemo } from 'react';
-import { IEntry, IEntryQuery } from '../../utils/interfaces/entry';
-import { useSearchParams } from 'react-router-dom';
-import useGetShelf from '../../hooks/api/my-shelf/useGetShelf';
+import { useQueryClient } from '@tanstack/react-query';
+import { IEntry, IEntriesList } from '../../utils/interfaces/entry';
+import useGetEntries from '../../hooks/api/entries/useGetEntries';
+import { useEntryFilters } from '../../hooks/api/entries/entryFilters';
+import useShelfEntryIds, { SHELF_ENTRY_IDS_KEY } from '../../hooks/api/my-shelf/useShelfEntryIds';
 import ItemContainer from '../../components/items/container/ItemContainer';
 import EntryBoxLoading from '../../components/items/entry/EntryBoxLoading';
 import EntryItem from '../../components/items/entry/display/EntryItem';
 import EntriesWrapper from '../../components/items/entry/display/EntriesWrapper';
 import { useTranslation } from 'react-i18next';
 import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
-import { readCategoryIds, readFeedIds } from '../../utils/func/filterParams';
 
 const Shelf = () => {
   const { t } = useTranslation();
-  const [searchParams] = useSearchParams();
-  const getShelf = useGetShelf();
+  const queryClient = useQueryClient();
+  const getEntries = useGetEntries();
+  const filters = useEntryFilters();
+  const { data: shelfEntryIds } = useShelfEntryIds();
 
-  const filters = useMemo(
-    () => ({
-      title: searchParams.get('title') ?? '',
-      authors: searchParams.get('author') ?? '',
-      publishedAtGte: searchParams.get('publishedAtGte') ?? '',
-      publishedAtLte: searchParams.get('publishedAtLte') ?? '',
-      orderBy: searchParams.get('order-by') ?? '',
-      query: searchParams.get('query') ?? '',
-      languageCode: searchParams.get('languageCode') ?? '',
-      categories: readCategoryIds(searchParams).join(','),
-      feeds: readFeedIds(searchParams).join(','),
-    }),
-    [searchParams]
-  );
+  // The shelf is listed through the entries endpoint restricted to the shelved ids,
+  // so every advanced-search filter applies. `null` while the ids are loading.
+  const ids = useMemo(() => (shelfEntryIds ? shelfEntryIds.join(',') : null), [shelfEntryIds]);
 
   const list = useInfiniteItemContainer<IEntry>(
-    ['shelf', filters],
+    ['shelf', filters, ids],
     async (page) => {
-      const { items, metadata } = await getShelf({
-        page,
-        limit: 30,
-        ...filters,
-      } as IEntryQuery);
-      // Shelf records wrap the entry; unwrap it and tag it with the record id
-      // (used by EntryItem to remove the item from the shelf).
-      const entries = items.map((item: any) => {
-        const entry = item.entry;
-        entry.shelf_record_id = item.id;
-        return entry;
-      });
-      return { items: entries, metadata };
-    }
+      // An empty `id` filter would match the whole catalog — short-circuit instead.
+      if (!ids) return { items: [], metadata: { pages: 1 } } as unknown as IEntriesList;
+      return getEntries({ page, limit: 30, ...filters, ids });
+    },
+    { enabled: ids !== null }
   );
 
-  const triggerReload = () => list.reset();
+  // Removing a book changes the shelved ids, which changes the list's query key.
+  const triggerReload = () => queryClient.invalidateQueries({ queryKey: SHELF_ENTRY_IDS_KEY });
 
   return (
     <ItemContainer
@@ -59,6 +43,7 @@ const Shelf = () => {
       searchSpecifier="query"
       title={t('navbarMenu.myShelf')}
       shouldRedirectSuggestions={true}
+      entryScope={ids === null ? null : { ids }}
     >
       <EntriesWrapper>
         {list.items.map((entry) => (

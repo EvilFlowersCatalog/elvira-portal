@@ -12,6 +12,9 @@ import SearchBar from './SearchBar';
 import FilterChips, { FilterChipItem } from './FilterChips';
 import SortSelect from './SortSelect';
 
+// Comma-separated params rendered as one chip per value (removable individually).
+const MULTI_VALUE_PARAMS = ['categories', 'feeds', 'languageCode', 'availability'];
+
 interface IToolsContainerParams {
   advancedSearch?: boolean;
   param: string;
@@ -67,7 +70,7 @@ const ToolsContainer = ({
   };
 
   const removeFilter = (paramName: string, itemId?: string) => {
-    if (itemId && (paramName === 'categories' || paramName === 'feeds')) {
+    if (itemId && MULTI_VALUE_PARAMS.includes(paramName)) {
       const currentValue = searchParams.get(paramName);
       if (currentValue) {
         const items = currentValue.split(',').filter((id) => id !== itemId);
@@ -97,11 +100,18 @@ const ToolsContainer = ({
           const feed = feeds.find((f) => f.id === feedId);
           if (feed) filters.push({ key, value: feedId, label: feed.title, itemId: feedId });
         });
+      } else if (key === 'languageCode') {
+        value.split(',').filter(Boolean).forEach((code) => {
+          const label = getLanguage(code)?.name[i18next.language as AcceptedLanguage] || code;
+          filters.push({ key, value: code, label, itemId: code });
+        });
+      } else if (key === 'availability') {
+        value.split(',').filter(Boolean).forEach((state) => {
+          filters.push({ key, value: state, label: t(`entry.detail.availability.${state}`), itemId: state });
+        });
       } else {
         let label = value;
-        if (key === 'languageCode') {
-          label = getLanguage(value)?.name[i18next.language as AcceptedLanguage] || value;
-        } else if (key === 'category-id') {
+        if (key === 'category-id') {
           const category = categories.find((c) => c.id === value);
           label = category?.label || category?.term || value;
         } else if (key === 'feed-id') {
