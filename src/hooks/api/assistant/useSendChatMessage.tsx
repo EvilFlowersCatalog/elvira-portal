@@ -15,7 +15,11 @@ const useSendChatMessage = () => {
     chatId: string,
     message: string,
     handlers: IAssistantStreamHandlers,
-    signal?: AbortSignal,
+    options?: {
+      /** Publication the reader is asking about with this message. */
+      entryId?: string;
+      signal?: AbortSignal;
+    },
   ): Promise<void> => {
     const response = await fetch(`${import.meta.env.ELVIRA_BASE_URL}${ASSISTANT_URL}/chats/${chatId}/messages`, {
       method: 'POST',
@@ -23,8 +27,8 @@ const useSendChatMessage = () => {
         'Content-Type': 'application/json',
         ...(auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}),
       },
-      body: JSON.stringify({ message }),
-      signal,
+      body: JSON.stringify({ message, ...(options?.entryId ? { entry_id: options.entryId } : {}) }),
+      signal: options?.signal,
     });
 
     if (!response.ok) {

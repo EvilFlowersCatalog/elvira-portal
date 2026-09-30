@@ -11,9 +11,12 @@ import useStartChat from './useStartChat';
  * starts the chat on the first message, streams the answer into `aiMessages`
  * and turns API failures into a readable assistant message.
  *
- * @param entryId optional publication the chat is about (only used when the chat is created).
+ * @param entry optional publication the reader picked ("ask about this book"). It is
+ *   attached to every message sent while it is set — not only when the chat is
+ *   created — so picking a book mid-conversation still reaches the assistant.
  */
-const useAssistantChat = (entryId?: string) => {
+const useAssistantChat = (entry?: { id: string; title?: string }) => {
+  const entryId = entry?.id;
   const { t } = useTranslation();
   const { aiChatId, setAiChatId, setAiMessages } = useAppContext();
   const startChat = useStartChat();
@@ -45,7 +48,7 @@ const useAssistantChat = (entryId?: string) => {
 
     setAiMessages((prev) => [
       ...prev,
-      { role: 'user', content: { type: 'message', data: message } },
+      { role: 'user', content: { type: 'message', data: message }, reference: entry },
       { role: 'assistant', content: { type: 'loading', data: 'Generating response...' }, id: loadingId },
     ]);
     setGenerating(true);
@@ -82,7 +85,7 @@ const useAssistantChat = (entryId?: string) => {
           showError(detail || t('assistant.errors.generic'));
         },
         onDone: () => {},
-      });
+      }, { entryId });
     } catch (err) {
       const { status, message: detail, retryAfter } = toAssistantError(err);
       switch (status) {

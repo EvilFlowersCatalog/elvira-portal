@@ -57,6 +57,9 @@ function MessageElement({ msg }: { msg: AiMessage }) {
                         ? "bg-primary text-white self-end"
                         : "bg-zinc-200 text-black self-start"
                 }`}>
+                {msg.reference?.title && (
+                    <p className="text-xs opacity-80 mb-1 truncate">📖 {msg.reference.title}</p>
+                )}
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content.data as string}</ReactMarkdown>
             </div>;
         case "entries":
@@ -98,7 +101,12 @@ export default function AiAssistant() {
     const [input, setInput] = useState("");
     const [assistantEntry, setAssistantEntry] = useState<IEntryDetail | null>(null);
     const [currentCatalogId] = useState<string | undefined>(import.meta.env.ELVIRA_CATALOG_ID || undefined);
-    const { sendMessage, isGenerating: isGeneratingResponse } = useAssistantChat(assistantEntry?.id);
+    // The id comes straight from the URL so a message sent before the book detail
+    // has loaded still carries the reference; the detail only supplies the title.
+    const assistantEntryId = searchParams.get('assistant-entry-id') || undefined;
+    const { sendMessage, isGenerating: isGeneratingResponse } = useAssistantChat(
+        assistantEntryId ? { id: assistantEntryId, title: assistantEntry?.title } : undefined
+    );
 
 
     function clearAssistantEntry() {
@@ -122,14 +130,17 @@ export default function AiAssistant() {
     }, [aiMessages]);
 
     useEffect(() => {
-        const assistantEntryId = searchParams.get('assistant-entry-id');
-        if (assistantEntryId) {
-            getEntryDetail(assistantEntryId, currentCatalogId).then((entry) => {
-                setAssistantEntry(entry);
-            });
+        if (!assistantEntryId) {
+            // The reference was cleared (chip closed / drawer closed) — drop the stale chip.
+            setAssistantEntry(null);
+            return;
         }
-
-    }, [searchParams]);
+        if (assistantEntry?.id === assistantEntryId) return;
+        getEntryDetail(assistantEntryId, currentCatalogId).then((entry) => {
+            setAssistantEntry(entry);
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [assistantEntryId]);
 
     useEffect(() => {
         if (!showAiAssistant) return;

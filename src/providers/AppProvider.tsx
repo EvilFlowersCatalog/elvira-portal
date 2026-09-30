@@ -27,6 +27,8 @@ export interface AiMessage {
   content: AiMessageContent;
   id?: string;
   bookIds?: string[];
+  /** Publication the reader attached to this (user) message. */
+  reference?: { id: string; title?: string };
 }
 
 export interface IAppContext {
