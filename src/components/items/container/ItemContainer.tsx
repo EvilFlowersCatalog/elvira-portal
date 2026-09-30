@@ -12,6 +12,7 @@ import { AdvancedSearchWrapper } from './AdvancedSearch';
 import OpenFiltersButton from '../../buttons/OpenFiltersButton';
 import LicenseCalendar from '../entry/details/LicenseCalendar';
 import { IItemContainerList } from '../../../hooks/api/useInfiniteItemContainer';
+import { EntryFilters } from '../../../hooks/api/entries/entryFilters';
 
 interface IItemContainer {
   children: ReactNode;
@@ -26,6 +27,9 @@ interface IItemContainer {
   shouldRedirectSuggestions?: boolean;
   showResultsHeading?: boolean;
   enableSort?: boolean;
+  /** Extra filters that bound the listed entries (e.g. the shelf's ids) so the
+   * sidebar's facet counts match this page. `null` while the scope is loading. */
+  entryScope?: Partial<EntryFilters> | null;
 }
 
 const ItemContainer = ({
@@ -41,6 +45,7 @@ const ItemContainer = ({
   shouldRedirectSuggestions = false,
   showResultsHeading = true,
   enableSort = true,
+  entryScope,
 }: IItemContainer) => {
   const { handleScroll } = useAppContext();
   const { t } = useTranslation();
@@ -93,7 +98,7 @@ const ItemContainer = ({
           enableSort={enableSort}
         />
 
-        <AdvancedSearchWrapper enabled={isEntries}>
+        <AdvancedSearchWrapper enabled={isEntries} entryScope={entryScope}>
           <>
             {showResultsHeading && (
               <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-medium text-left mb-4'>

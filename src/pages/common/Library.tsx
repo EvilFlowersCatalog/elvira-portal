@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
 import useGetEntries from '../../hooks/api/entries/useGetEntries';
+import { useEntryFilters } from '../../hooks/api/entries/entryFilters';
 import { IEntry } from '../../utils/interfaces/entry';
 import { useSearchParams } from 'react-router-dom';
 import ItemContainer from '../../components/items/container/ItemContainer';
@@ -14,25 +14,7 @@ const Library = () => {
   const { t } = useTranslation();
   const [searchParams] = useSearchParams();
   const getEntries = useGetEntries();
-
-  // Only params that affect the result set go in the query key, so opening a
-  // book (which adds entry-detail-id) doesn't reset the list or scroll position.
-  const filters = useMemo(
-    () => ({
-      title: searchParams.get('title') ?? '',
-      categoryId: searchParams.get('category-id') ?? '',
-      feedId: searchParams.get('feed-id') ?? searchParams.get('feed-id-step') ?? '',
-      authors: searchParams.get('author') ?? '',
-      publishedAtGte: searchParams.get('publishedAtGte') ?? '',
-      publishedAtLte: searchParams.get('publishedAtLte') ?? '',
-      orderBy: searchParams.get('order-by') ?? '',
-      query: searchParams.get('query') ?? '',
-      languageCode: searchParams.get('languageCode') ?? '',
-      categories: searchParams.get('categories') ?? '',
-      feeds: searchParams.get('feeds') ?? '',
-    }),
-    [searchParams]
-  );
+  const filters = useEntryFilters();
 
   const list = useInfiniteItemContainer<IEntry>(
     ['entries-infinite', filters],

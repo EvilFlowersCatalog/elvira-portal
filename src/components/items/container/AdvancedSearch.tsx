@@ -13,6 +13,7 @@ import useGetCategories from "../../../hooks/api/categories/useGetCategories";
 import useFeedsQuery from "../../../hooks/api/feeds/useFeedsQuery";
 import useGetEntries from "../../../hooks/api/entries/useGetEntries";
 import useEntryFacets from "../../../hooks/api/entries/useEntryFacets";
+import { EntryFilters, useEntryFilters } from "../../../hooks/api/entries/entryFilters";
 import { AcceptedLanguage, getLanguage, getLanguages } from "../../../hooks/api/languages/languages";
 import { IFeed } from "../../../utils/interfaces/feed";
 import { AvailabilityState } from "../entry/details/AvailabilityBadge";
@@ -28,11 +29,18 @@ const AVAILABILITY_OPTIONS: AvailabilityOption[] = [
     { value: 'reserved',    labelKey: 'entry.detail.availability.reserved' },
 ];
 
+/** Split comma-separated URL params into one de-duplicated id list. */
+function splitParams(...values: (string | null)[]): string[] {
+    return Array.from(new Set(values.flatMap(v => (v ? v.split(',') : [])).filter(Boolean)));
+}
+
 function SectionDivider() {
     return <div className="h-px w-full bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)]" />;
 }
 
-export function AdvancedSearchWrapper({ children, enabled = true }: { children: React.ReactNode; enabled?: boolean }) {
+type EntryScope = Partial<EntryFilters> | null | undefined;
+
+export function AdvancedSearchWrapper({ children, enabled = true, entryScope }: { children: React.ReactNode; enabled?: boolean; entryScope?: EntryScope }) {
     const { showAdvancedSearch, setShowAdvancedSearch } = useAppContext();
 
     if (!enabled) return <div className="w-full pt-3">{children}</div>;
@@ -49,7 +57,7 @@ export function AdvancedSearchWrapper({ children, enabled = true }: { children: 
                     sticky top-0 z-2 pb-32 h-screen
                 `}
             >
-                <AdvancedSearch />
+                <AdvancedSearch entryScope={entryScope} />
             </div>
             {/* Mobile fixed top/bottom sheet */}
             <div
@@ -66,7 +74,7 @@ export function AdvancedSearchWrapper({ children, enabled = true }: { children: 
                 <div className="pt-4 mb-2">
                     <IoClose size={24} className="absolute top-3 right-3 cursor-pointer" onClick={() => setShowAdvancedSearch(false)} />
                 </div>
-                <AdvancedSearch />
+                <AdvancedSearch entryScope={entryScope} />
             </div>
             <div className="w-full pt-3">
                 {children}
@@ -75,7 +83,11 @@ export function AdvancedSearchWrapper({ children, enabled = true }: { children: 
     );
 }
 
-export function AdvancedSearch() {
+/**
+ * `entryScope` bounds the facet counts to the entries the page lists (e.g. the
+ * shelf's ids). `undefined` = the whole catalog, `null` = scope still loading.
+ */
+export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
     const [searchParams, setSearchParams] = useSearchParams();
     const { t, i18n } = useTranslation();
 
@@ -89,7 +101,16 @@ export function AdvancedSearch() {
 
     const getEntries = useGetEntries();
     const getCategories = useGetCategories();
-    const facets = useEntryFacets();
+    const filters = useEntryFilters();
+    const scopeLoading = entryScope === null;
+    // An empty `ids` scope (empty shelf) would count the whole catalog — nothing to facet.
+    const emptyScope = entryScope?.ids === '';
+    const facets = useEntryFacets({ ...filters, ...entryScope }, { enabled: !scopeLoading && !emptyScope });
+    // Counts drive which options are shown: `{}` hides everything but the selection
+    // (still loading / empty scope), `undefined` shows every option without counts
+    // (facets request failed — don't lock the user out of filtering).
+    const facetCounts = (counts: Record<string, number>) =>
+        emptyScope ? {} : facets.ready ? counts : facets.failed ? undefined : {};
     const [allCategories, setAllCategories] = useState<ICategory[]>([]);
     const [categoriesLoaded, setCategoriesLoaded] = useState(false);
     const [activeCategories, setActiveCategories] = useState<ICategory[]>([]);
@@ -150,37 +171,16 @@ export function AdvancedSearch() {
             ...unresolvedFeedIds.current,
         ];
 
-        if (import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true') {
-            if (categoryIds.length > 0) {
-                params.set('categories', categoryIds.join(','));
-            } else {
-                params.delete('categories');
-            }
-            params.delete('category-id');
+        // Multi-select: the backend OR-s the comma-separated ids within one param and
+        // AND-s the params, i.e. (feed OR feed) AND (category OR category). The legacy
+        // single-value params (set by category cards / entry detail links) are folded in.
+        if (categoryIds.length > 0) params.set('categories', categoryIds.join(','));
+        else params.delete('categories');
+        params.delete('category-id');
 
-            if (feedIds.length > 0) {
-                params.set('feeds', feedIds.join(','));
-            } else {
-                params.delete('feeds');
-            }
-            params.delete('feed-id');
-        } else {
-            const singleCategory = categoryIds[0];
-            if (singleCategory) {
-                params.set('category-id', singleCategory);
-            } else {
-                params.delete('category-id');
-            }
-            params.delete('categories');
-
-            const singleFeed = feedIds[0];
-            if (singleFeed) {
-                params.set('feed-id', singleFeed);
-            } else {
-                params.delete('feed-id');
-            }
-            params.delete('feeds');
-        }
+        if (feedIds.length > 0) params.set('feeds', feedIds.join(','));
+        else params.delete('feeds');
+        params.delete('feed-id');
 
         if (year[0]) params.set('publishedAtGte', year[0].toString());
         else params.delete('publishedAtGte');
@@ -206,13 +206,8 @@ export function AdvancedSearch() {
         const languageCodeParam = searchParams.get('languageCode') || '';
         const availabilityParam = searchParams.get('availability') || '';
 
-        const isExperimental = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
-        const feedsParam = isExperimental
-            ? (searchParams.get('feeds') || '')
-            : (searchParams.get('feed-id') || '');
-        const categoriesParam = isExperimental
-            ? (searchParams.get('categories') || '')
-            : (searchParams.get('category-id') || '');
+        const feedIds = splitParams(searchParams.get('feeds'), searchParams.get('feed-id'));
+        const categoryIds = splitParams(searchParams.get('categories'), searchParams.get('category-id'));
 
         if (year[0] !== publishedAtGte || year[1] !== publishedAtLte) {
             setYear([publishedAtGte, publishedAtLte]);
@@ -226,20 +221,18 @@ export function AdvancedSearch() {
         const newAvailability = availabilityParam
             ? (availabilityParam.split(',') as AvailabilityState[])
             : [];
-        if (availability.sort().join(',') !== newAvailability.sort().join(',')) {
+        if ([...availability].sort().join(',') !== [...newAvailability].sort().join(',')) {
             setAvailability(newAvailability);
         }
 
-        const feedIds = feedsParam ? feedsParam.split(',') : [];
-        const matchedFeeds = feedsParam ? allFeeds.filter(feed => feedIds.includes(feed.id)) : [];
+        const matchedFeeds = allFeeds.filter(feed => feedIds.includes(feed.id));
         unresolvedFeedIds.current = feedIds.filter(id => !matchedFeeds.some(f => f.id === id));
         const currentFeedIds = activeFeeds.map(f => f.id).sort().join(',');
         if (currentFeedIds !== matchedFeeds.map(f => f.id).sort().join(',')) {
             setActiveFeeds(matchedFeeds);
         }
 
-        const categoryIds = categoriesParam ? categoriesParam.split(',') : [];
-        const matchedCategories = categoriesParam ? allCategories.filter(cat => categoryIds.includes(cat.id)) : [];
+        const matchedCategories = allCategories.filter(cat => categoryIds.includes(cat.id));
         unresolvedCategoryIds.current = categoryIds.filter(id => !matchedCategories.some(c => c.id === id));
         const currentCategoryIds = activeCategories.map(c => c.id).sort().join(',');
         if (currentCategoryIds !== matchedCategories.map(c => c.id).sort().join(',')) {
@@ -270,18 +263,18 @@ export function AdvancedSearch() {
         [allFeeds]
     );
 
-    // Languages present in the catalog (from the facet sample); falls back to the
-    // full ISO list until the sample is available so the filter still works.
+    // Languages that have entries under the current filters (plus the selected ones,
+    // so they can be unticked). Falls back to the full ISO list if facets failed.
     const languageOptions = useMemo(() => {
         const locale = i18n.language as AcceptedLanguage;
-        const sampledCodes = Object.keys(facets.languageCounts);
-        const entries = sampledCodes.length > 0
-            ? sampledCodes.map(code => ({ value: code, label: getLanguage(code)?.name[locale] ?? code }))
-            : getLanguages(locale).map(lang => ({ value: lang.alpha2 ?? lang.alpha3 ?? '', label: lang.name }));
+        const entries = facets.failed
+            ? getLanguages(locale).map(lang => ({ value: lang.alpha2 ?? lang.alpha3 ?? '', label: lang.name }))
+            : Array.from(new Set([...Object.keys(facets.languageCounts), ...languageCodes]))
+                .map(code => ({ value: code, label: getLanguage(code)?.name[locale] ?? code }));
         return entries
             .filter(o => o.value)
             .sort((a, b) => a.label.localeCompare(b.label));
-    }, [facets.languageCounts, i18n.language]);
+    }, [facets.languageCounts, facets.failed, languageCodes, i18n.language]);
 
     const handleYearChange = (index: 0 | 1, value: string) => {
         const newYear = [...year];
@@ -383,7 +376,7 @@ export function AdvancedSearch() {
                 options={languageOptions}
                 selected={languageCodes}
                 setSelected={setLanguageCodes}
-                counts={Object.keys(facets.languageCounts).length ? facets.languageCounts : undefined}
+                counts={facetCounts(facets.languageCounts)}
             />
 
             <SectionDivider />
@@ -394,7 +387,7 @@ export function AdvancedSearch() {
                 setSelected={selected => {
                     setActiveCategories(allCategories.filter(cat => selected.includes(cat.id)));
                 }}
-                counts={Object.keys(facets.categoryCounts).length ? facets.categoryCounts : undefined}
+                counts={facetCounts(facets.categoryCounts)}
             />
 
             <SectionDivider />
@@ -406,7 +399,7 @@ export function AdvancedSearch() {
                 setSelected={selected => {
                     setActiveFeeds(allFeeds.filter(feed => selected.includes(feed.id)));
                 }}
-                counts={Object.keys(facets.feedCounts).length ? facets.feedCounts : undefined}
+                counts={facetCounts(facets.feedCounts)}
             />
         </div>
     );
