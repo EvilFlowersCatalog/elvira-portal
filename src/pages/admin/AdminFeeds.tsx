@@ -62,7 +62,8 @@ const AdminFeeds = () => {
       limit,
       paginate: true,
       // 'null' returns top-level feeds; a folder id returns that folder's children.
-      parentId: currentParent ?? 'null',
+      // While searching, drop the level restriction so matches in any subfolder show up.
+      parentId: q ? undefined : currentParent ?? 'null',
       title: q || undefined,
       orderBy: orderBy || undefined,
     }

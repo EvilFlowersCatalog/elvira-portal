@@ -257,7 +257,10 @@ export default function DataTable<T>({
             <div className="h-full w-1/3 animate-[loadingbar_1s_ease-in-out_infinite] bg-primary" />
           </div>
         )}
-        <div className={twMerge('overflow-x-auto rounded-t-xl', !hasPagination && 'rounded-b-xl')}>
+        {/* Horizontal scroll only: `overflow-x:auto` alone makes y compute to auto
+            too, so invisible absolutely-positioned bits (tooltips) produced a
+            vertical scrollbar. */}
+        <div className={twMerge('overflow-x-auto overflow-y-hidden rounded-t-xl', !hasPagination && 'rounded-b-xl')}>
           <table className="w-full border-collapse text-sm" aria-busy={isRefreshing}>
             <caption className="sr-only">{caption}</caption>
             <thead>

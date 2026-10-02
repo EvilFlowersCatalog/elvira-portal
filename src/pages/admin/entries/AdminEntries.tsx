@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FiPlus, FiEdit2, FiTrash2, FiBookOpen } from 'react-icons/fi';
 import useAppContext from '../../../hooks/contexts/useAppContext';
@@ -27,6 +27,7 @@ const DEFAULT_LIMIT = 10;
 const AdminEntries = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { umamiTrack } = useAppContext();
   const { auth } = useAuthContext();
   const deleteEntry = useDeleteEntry();
@@ -56,7 +57,16 @@ const AdminEntries = () => {
     isLoading: loading,
     isError: error,
     refetch,
-  } = useEntriesQuery({ page, limit, title: q, orderBy });
+  } = useEntriesQuery({
+    page,
+    limit,
+    // Relevance-ranked full-text search (title, summary, author, publisher,
+    // category) — same as the public search — instead of title-only.
+    query: q || undefined,
+    feedId: searchParams.get('feed-id') || undefined,
+    categoryId: searchParams.get('category-id') || undefined,
+    orderBy,
+  });
   const items = data?.items ?? [];
   const metadata = data?.metadata ?? {
     page: 1,
@@ -67,7 +77,8 @@ const AdminEntries = () => {
 
   const openEdit = (e: IEntry) => {
     umamiTrack('Edit Entry Button', { entryId: e.id });
-    navigate(NAVIGATION_PATHS.adminEditEntries + e.id);
+    // Remember the list state (search, filters, page, sort) so saving can return to it.
+    navigate(NAVIGATION_PATHS.adminEditEntries + e.id, { state: { from: location.search } });
   };
 
   const doDelete = async () => {
@@ -187,7 +198,7 @@ const AdminEntries = () => {
         title={t('administration.entriesPage.title')}
         description={t('administration.entriesPage.description')}
         actions={
-          <Button onClick={() => navigate(NAVIGATION_PATHS.adminAddEntries)} className="flex items-center gap-2">
+          <Button onClick={() => navigate(NAVIGATION_PATHS.adminAddEntries, { state: { from: location.search } })} className="flex items-center gap-2">
             <FiPlus size={16} />
             {t('administration.entriesPage.add')}
           </Button>
