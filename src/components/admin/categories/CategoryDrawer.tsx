@@ -8,6 +8,7 @@ import { Field, TextInput } from '../Field';
 import Button from '../../buttons/Button';
 import { ICategory } from '../../../utils/interfaces/category';
 import useCreateCategory from '../../../hooks/api/categories/useCreateCategory';
+import useGetCategories from '../../../hooks/api/categories/useGetCategories';
 import useEditCategory from '../../../hooks/api/categories/useEditCategory';
 import useDeleteCategory from '../../../hooks/api/categories/useDeleteCategory';
 
@@ -18,10 +19,13 @@ interface CategoryDrawerProps {
   catalogId: string | null;
   onClose: () => void;
   onSaved: () => void;
+  /** Called after a successful create with the new category, so callers can assign it right away. */
+  onCreated?: (category: ICategory) => void;
 }
 
-export default function CategoryDrawer({ open, category, mode, catalogId, onClose, onSaved }: CategoryDrawerProps) {
+export default function CategoryDrawer({ open, category, mode, catalogId, onClose, onSaved, onCreated }: CategoryDrawerProps) {
   const { t } = useTranslation();
+  const getCategories = useGetCategories();
   const createCategory = useCreateCategory();
   const editCategory = useEditCategory();
   const deleteCategory = useDeleteCategory();
@@ -58,8 +62,21 @@ export default function CategoryDrawer({ open, category, mode, catalogId, onClos
     try {
       const payload = { label: label.trim(), term: term.trim(), scheme: scheme.trim(), catalog_id: cid };
       if (mode === 'create') {
-        await createCategory(payload);
+        const res = await createCategory(payload);
         toast.success(t('administration.categoriesPage.created'));
+        if (onCreated) {
+          // Prefer the id from the response; otherwise find the new category by term + label.
+          let id = res?.response?.id ?? res?.id;
+          if (!id) {
+            try {
+              const list = await getCategories({ query: payload.term, paginate: false });
+              id = list.items.find((c) => c.term === payload.term && c.label === payload.label)?.id;
+            } catch {
+              /* created, but couldn't resolve it — the user can still pick it manually */
+            }
+          }
+          if (id) onCreated({ id, ...payload });
+        }
       } else if (category) {
         await editCategory(category.id, payload);
         toast.success(t('administration.categoriesPage.saved'));

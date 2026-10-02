@@ -2,7 +2,7 @@ import { MdRemoveCircle } from 'react-icons/md';
 import { IPartParams } from '../../../utils/interfaces/general/general';
 import CategoryAutofill from '../../autofills/CategoryAutofill';
 import { useState } from 'react';
-import CategoryForm from '../../items/categories/CategoryForm';
+import CategoryDrawer from '../../admin/categories/CategoryDrawer';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import { IoMdAdd } from 'react-icons/io';
@@ -12,6 +12,8 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
   const { umamiTrack } = useAppContext();
 
   const [open, setOpen] = useState<boolean>(false);
+  // Remounts the autofill so it refetches the category list after a create.
+  const [autofillKey, setAutofillKey] = useState<number>(0);
 
   return (
     <>
@@ -24,7 +26,7 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
           }} className='ml-auto cursor-pointer' size={20} />
         </div>
         <div className='flex flex-1 flex-col gap-2 w-full rounded-md'>
-          <CategoryAutofill entryForm={entry} setEntryForm={setEntry} setIsSelectionOpen={() => { }} />
+          <CategoryAutofill key={autofillKey} entryForm={entry} setEntryForm={setEntry} setIsSelectionOpen={() => { }} />
           {entry?.categories?.map((item, index) => (
             <div key={index} className={`h-fit`}>
               <button
@@ -49,7 +51,19 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
           ))}
         </div>
       </div>
-      {open && <CategoryForm setOpen={setOpen} />}
+      <CategoryDrawer
+        open={open}
+        category={null}
+        mode='create'
+        catalogId={import.meta.env.ELVIRA_CATALOG_ID}
+        onClose={() => setOpen(false)}
+        onSaved={() => setAutofillKey((k) => k + 1)}
+        onCreated={(category) => {
+          if (!entry.categories?.some((c) => c.id === category.id)) {
+            setEntry({ ...entry, categories: [...(entry.categories ?? []), category] });
+          }
+        }}
+      />
     </>
   );
 };

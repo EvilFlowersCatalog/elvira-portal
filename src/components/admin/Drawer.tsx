@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { FiX } from 'react-icons/fi';
 import IconButton from './IconButton';
 
@@ -51,7 +52,9 @@ export default function Drawer({
 
   if (!open) return null;
 
-  return (
+  // Portal to <body> so the drawer's inputs/buttons never end up nested inside
+  // an ancestor <form> (e.g. the entry form), where Enter would submit that form.
+  return createPortal(
     <div className="fixed inset-0 z-50 flex justify-end">
       <div
         className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"
@@ -85,6 +88,7 @@ export default function Drawer({
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

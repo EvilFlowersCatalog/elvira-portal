@@ -6,7 +6,8 @@ const useUploadFeed = () => {
 
   const uploadFeed = async (feed: IFeedNew) => {
     const UPLOAD_FEED_URL = '/api/v1/feeds';
-    await axios.post(UPLOAD_FEED_URL, feed);
+    const { data } = await axios.post<{ response?: { id?: string }; id?: string } | undefined>(UPLOAD_FEED_URL, feed);
+    return data;
   };
 
   return uploadFeed;

@@ -7,7 +7,8 @@ const useCreateCategory = () => {
   const createCategory = async (category: ICategoryNew) => {
     const CREATE_CATEGORY_URL = '/api/v1/categories';
 
-    await axios.post(CREATE_CATEGORY_URL, category);
+    const { data } = await axios.post<{ response?: { id?: string }; id?: string } | undefined>(CREATE_CATEGORY_URL, category);
+    return data;
   };
 
   return createCategory;

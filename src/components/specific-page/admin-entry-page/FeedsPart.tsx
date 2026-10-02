@@ -2,7 +2,7 @@ import { MdRemoveCircle } from 'react-icons/md';
 import { IPartParams } from '../../../utils/interfaces/general/general';
 import FeedAutofill from '../../autofills/FeedAutofill';
 import { useState } from 'react';
-import FeedForm from '../../items/feeds/admin/FeedForm';
+import FeedDrawer from '../../admin/collections/FeedDrawer';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import { IoMdAdd } from 'react-icons/io';
@@ -49,7 +49,20 @@ const FeedsPart = ({ entry, setEntry }: IPartParams) => {
           ))}
         </div>
       </div>
-      {open && <FeedForm setOpen={setOpen} />}
+      <FeedDrawer
+        open={open}
+        feed={null}
+        mode='create'
+        catalogId={import.meta.env.ELVIRA_CATALOG_ID}
+        onClose={() => setOpen(false)}
+        onSaved={() => {}}
+        onCreated={(feed) => {
+          umamiTrack('Entry Add Created Feed', { feedId: feed.id });
+          if (!entry.feeds?.some((f) => f.id === feed.id)) {
+            setEntry({ ...entry, feeds: [...(entry.feeds ?? []), feed] });
+          }
+        }}
+      />
     </>
   );
 };

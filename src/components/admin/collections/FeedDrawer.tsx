@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
+import { useQueryClient } from '@tanstack/react-query';
 import { FiTrash2, FiX, FiSearch, FiFolder } from 'react-icons/fi';
 import Drawer from '../Drawer';
 import ConfirmDialog from '../ConfirmDialog';
@@ -10,6 +11,7 @@ import Button from '../../buttons/Button';
 import { IFeed } from '../../../utils/interfaces/feed';
 import { uuid } from '../../../utils/func/functions';
 import useFeedsQuery from '../../../hooks/api/feeds/useFeedsQuery';
+import useGetFeeds from '../../../hooks/api/feeds/useGetFeeds';
 import useGetFeedDetail from '../../../hooks/api/feeds/useGetFeedDetail';
 import useUploadFeed from '../../../hooks/api/feeds/useUploadFeed';
 import useEditFeed from '../../../hooks/api/feeds/useEditFeed';
@@ -29,6 +31,8 @@ interface FeedDrawerProps {
   defaultParentId?: string | null;
   onClose: () => void;
   onSaved: () => void;
+  /** Called after a successful create with the new feed, so callers can assign it right away. */
+  onCreated?: (feed: FeedRef) => void;
 }
 
 /** Inline picker over navigation (folder) feeds. */
@@ -108,8 +112,10 @@ function ParentPicker({
   );
 }
 
-export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentId, onClose, onSaved }: FeedDrawerProps) {
+export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentId, onClose, onSaved, onCreated }: FeedDrawerProps) {
   const { t } = useTranslation();
+  const queryClient = useQueryClient();
+  const getFeeds = useGetFeeds();
   const getFeedDetail = useGetFeedDetail();
   const uploadFeed = useUploadFeed();
   const editFeed = useEditFeed();
@@ -198,12 +204,27 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
         parents: parents.map((p) => p.id),
       };
       if (mode === 'create') {
-        await uploadFeed(payload);
+        const res = await uploadFeed(payload);
         toast.success(t('administration.collectionsPage.created'));
+        if (onCreated) {
+          // Prefer the id from the response; otherwise find the new feed by its (unique) url_name.
+          let id = res?.response?.id ?? res?.id;
+          if (!id) {
+            try {
+              const list = await getFeeds({ paginate: false, title: payload.title });
+              id = list.items.find((f) => f.url_name === payload.url_name)?.id;
+            } catch {
+              /* created, but couldn't resolve it — the user can still pick it manually */
+            }
+          }
+          if (id) onCreated({ id, title: payload.title });
+        }
       } else if (feed) {
         await editFeed(feed.id, payload);
         toast.success(t('administration.collectionsPage.saved'));
       }
+      // Refresh every feeds list (pickers/autocompletes elsewhere included).
+      queryClient.invalidateQueries({ queryKey: ['feeds'] });
       onSaved();
       onClose();
     } catch {
@@ -220,6 +241,7 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
       await deleteFeed(feed.id);
       toast.success(t('administration.collectionsPage.deleted'));
       setConfirmDelete(false);
+      queryClient.invalidateQueries({ queryKey: ['feeds'] });
       onSaved();
       onClose();
     } catch {
