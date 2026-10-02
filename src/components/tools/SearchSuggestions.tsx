@@ -112,7 +112,12 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
   }
 
   return (
-    <div className="absolute top-[70px] left-0 right-0 bg-white dark:bg-darkGray border border-gray-300 dark:border-gray-700 rounded-md shadow-lg z-50 max-h-[500px] overflow-auto">
+    <div
+      // Keep focus on the input so its blur handler doesn't unmount this panel
+      // before the click on a suggestion lands.
+      onMouseDown={(e) => e.preventDefault()}
+      className="absolute top-[70px] left-0 right-0 bg-white dark:bg-darkGray border border-gray-300 dark:border-gray-700 rounded-md shadow-lg z-50 max-h-[500px] overflow-auto"
+    >
       {/* Thin top progress bar for background refreshes — the previous
           suggestions stay visible underneath instead of a loading wipe. */}
       {isRefreshing && (

@@ -189,9 +189,11 @@ export default function AiAssistant() {
         setSearchParams(params);
     };
 
-    const drawerZIndex = searchParams.get('dialog-priority') ?
-        (searchParams.get('dialog-priority') == 'ai-assistant' ? 1200 : 49)
-        : 1200;
+    // Only yield to the entry detail while one is actually open; a stale
+    // `dialog-priority=entry-detail` left over from a closed detail must not
+    // push the assistant under the header / other overlays.
+    const detailOpen = !!searchParams.get('entry-detail-id');
+    const drawerZIndex = searchParams.get('dialog-priority') == 'entry-detail' && detailOpen ? 49 : 1200;
 
     // Render through a portal to document.body — the previous MUI <Drawer>
     // portaled out of the DOM, so this component is mounted inside HomeHeader's

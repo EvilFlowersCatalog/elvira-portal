@@ -366,7 +366,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
 
               <Tooltip content={t('entry.detail.askAi')} placement='left'>
                 <button
-                  className="absolute right-6 bottom-4 p-3 rounded-full bg-primary text-white font-semibold hover:bg-primaryDark transition-colors duration-150 hidden mdlg:block"
+                  className="absolute right-6 bottom-4 z-10 p-3 rounded-full bg-primary text-white font-semibold hover:bg-primaryDark transition-colors duration-150 hidden mdlg:block"
                   onClick={askAi}
                 >
                   <div className='relative h-7 w-auto aspect-square'>
@@ -419,7 +419,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                     </span>
                   </TabContent>
                   <TabContent id="related">
-                    <span className="text-gray-600 dark:text-gray-300 flex flex-wrap gap-4">
+                    <span className="text-gray-600 dark:text-gray-300 grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4">
                       <EntryItem entry={entry} />
                       <EntryItem entry={entry} />
                       <EntryItem entry={entry} />
