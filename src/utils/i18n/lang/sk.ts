@@ -907,6 +907,11 @@ export const sk = {
     },
 
     license: {
+      success: {
+        openThorium: 'Otvoriť v Thorium',
+        downloadFile: 'Stiahnuť súbor',
+        thoriumHint: 'Thorium sa otvorí automaticky. Ak sa nič nestalo, stiahnite si súbor a otvorte ho ručne.',
+      },
       queue: {
         title: 'Zaradiť sa do poradovníka?',
         allBorrowed: 'Všetky výtlačky ({{total}}) sú momentálne požičané. Hneď ako bude niektorý dostupný, pošleme vám e-mail.',

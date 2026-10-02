@@ -919,6 +919,11 @@ export const en = {
     },
 
     license: {
+      success: {
+        openThorium: 'Open in Thorium',
+        downloadFile: 'Download file',
+        thoriumHint: "Thorium opens automatically. If nothing happened, download the file and open it manually.",
+      },
       queue: {
         title: 'Join the waiting list?',
         allBorrowed: "All {{total}} copies are currently on loan. We'll email you as soon as one is available for you.",

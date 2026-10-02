@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { addDays, format } from "date-fns";
 import { CircleLoader } from "react-spinners";
 import { toast } from "react-toastify";
-import { FiCheckCircle, FiEye, FiEyeOff, FiInfo } from "react-icons/fi";
+import { FiCheckCircle, FiEye, FiEyeOff, FiInfo, FiExternalLink } from "react-icons/fi";
 import { LuDownload } from "react-icons/lu";
 import { RiArrowLeftLine, RiCloseLine } from "react-icons/ri";
 import { BsQuestionCircle } from "react-icons/bs";
@@ -56,6 +56,7 @@ export default function LicenseCalendar() {
   const [userDetails, setUserDetails] = useState<IUser | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isCreatingLicense, setIsCreatingLicense] = useState(false);
+  const [thoriumTried, setThoriumTried] = useState(false);
   const [view, setView] = useState<View>('main');
   const [createdLicense, setCreatedLicense] = useState<ILicense | null>(null);
   // Set when a borrow raced into a 409 `no_available_slots` — offers the queue.
@@ -113,18 +114,18 @@ export default function LicenseCalendar() {
   const endDate1Week = addDays(today, 7);
   const endDate2Weeks = addDays(today, 14);
 
-  const downloadLoan = (license: ILicense) => {
-    const licenseRef = { id: license.lcp_license_id || license.id, download_url: license.download_url };
-    openInThorium(licenseRef);
-    toast.info(
-      <div className="flex flex-col gap-1">
-        <span>{t("notifications.license.download.thoriumOpened", { defaultValue: "Opening in Thorium..." })}</span>
-        <button className="text-xs underline text-left" onClick={() => downloadDirect(licenseRef)}>
-          {t("notifications.license.download.fallback", { defaultValue: "Not opening? Download file directly" })}
-        </button>
-      </div>,
-      { autoClose: 8000 },
-    );
+  const licenseRefOf = (license: ILicense) => ({ id: license.lcp_license_id || license.id, download_url: license.download_url });
+
+  // Two explicit actions instead of a toast with a hidden fallback link: most
+  // people never noticed the toast, so "Open in Thorium" and "Download file"
+  // are both always visible on the success screen.
+  const openLoanInThorium = (license: ILicense) => {
+    setThoriumTried(true);
+    openInThorium(licenseRefOf(license)).catch(() => toast.error(t("notifications.license.download.error")));
+  };
+
+  const downloadLoanFile = (license: ILicense) => {
+    downloadDirect(licenseRefOf(license)).catch(() => toast.error(t("notifications.license.download.error")));
   };
 
   const doLendBook = async () => {
@@ -469,14 +470,28 @@ export default function LicenseCalendar() {
                 </ul>
               </div>
               {createdLicense && (
-                <div className="flex justify-center pt-2">
-                  <button
-                    onClick={() => downloadLoan(createdLicense)}
-                    className="h-[35px] px-6 rounded-[7px] bg-primary text-white text-sm font-semibold hover:bg-blue-700 transition-colors shadow flex items-center gap-2"
-                  >
-                    <LuDownload size={16} />
-                    {t('license.success.download', { defaultValue: 'Stiahnuť' })}
-                  </button>
+                <div className="flex flex-col items-center gap-2 pt-2">
+                  <div className="flex flex-wrap justify-center gap-2">
+                    <button
+                      onClick={() => openLoanInThorium(createdLicense)}
+                      className="h-[35px] px-6 rounded-[7px] bg-primary text-white text-sm font-semibold hover:bg-blue-700 transition-colors shadow flex items-center gap-2"
+                    >
+                      <FiExternalLink size={16} />
+                      {t('license.success.openThorium')}
+                    </button>
+                    <button
+                      onClick={() => downloadLoanFile(createdLicense)}
+                      className="h-[35px] px-6 rounded-[7px] border border-primary text-primaryText dark:text-primaryLight text-sm font-semibold hover:bg-primaryLight dark:hover:bg-primaryDark transition-colors flex items-center gap-2"
+                    >
+                      <LuDownload size={16} />
+                      {t('license.success.downloadFile')}
+                    </button>
+                  </div>
+                  {thoriumTried && (
+                    <p role="status" className="text-xs text-center text-gray-500 dark:text-gray-400">
+                      {t('license.success.thoriumHint')}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
