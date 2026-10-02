@@ -17,6 +17,8 @@ interface SelectProps {
   disabled?: boolean;
   className?: string;
   triggerClassName?: string;
+  /** Open the list above the trigger (for controls at the bottom of a container). */
+  dropUp?: boolean;
   'aria-label'?: string;
 }
 
@@ -31,6 +33,7 @@ const Select = ({
   disabled,
   className,
   triggerClassName,
+  dropUp = false,
   ...rest
 }: SelectProps) => {
   const [open, setOpen] = useState(false);
@@ -94,7 +97,10 @@ const Select = ({
         <ul
           role="listbox"
           aria-labelledby={selectId}
-          className="absolute left-0 top-full z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-[#e5e5e5] dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_rgba(0,0,0,0.15)] py-1"
+          className={twMerge(
+            'absolute left-0 z-50 max-h-60 w-full overflow-auto rounded-md border border-[#e5e5e5] dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_rgba(0,0,0,0.15)] py-1',
+            dropUp ? 'bottom-full mb-1' : 'top-full mt-1'
+          )}
         >
           {options.map((opt) => {
             const isSelected = opt.value === value;

@@ -176,6 +176,18 @@ export const sk = {
     // ADMINISTRATION PAGE
     administration: {
       sectionLabel: 'Administrácia',
+      table: {
+        columns: 'Zobraziť alebo skryť stĺpce',
+        empty: 'Zatiaľ tu nič nie je',
+        retry: 'Skúsiť znova',
+        rows: 'Riadkov',
+        total: '{{total}} celkom',
+        pageOf: 'Strana {{page}} z {{pages}}',
+        firstPage: 'Prvá strana',
+        previousPage: 'Predchádzajúca strana',
+        nextPage: 'Ďalšia strana',
+        lastPage: 'Posledná strana',
+      },
       nav: {
         groupContent: 'Obsah',
         groupPeople: 'Ľudia a prístup',

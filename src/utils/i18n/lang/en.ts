@@ -176,6 +176,18 @@ export const en = {
     // ADMINISTRATION PAGE
     administration: {
       sectionLabel: 'Administration',
+      table: {
+        columns: 'Show or hide columns',
+        empty: 'Nothing here yet',
+        retry: 'Try again',
+        rows: 'Rows',
+        total: '{{total}} total',
+        pageOf: 'Page {{page}} of {{pages}}',
+        firstPage: 'First page',
+        previousPage: 'Previous page',
+        nextPage: 'Next page',
+        lastPage: 'Last page',
+      },
       nav: {
         groupContent: 'Content',
         groupPeople: 'People & access',
