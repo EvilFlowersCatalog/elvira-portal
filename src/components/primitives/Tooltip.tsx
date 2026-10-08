@@ -1,4 +1,5 @@
 import { cloneElement, FocusEvent, MouseEvent, ReactElement, ReactNode, useId, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { twMerge } from 'tailwind-merge';
 
 interface TooltipProps {
@@ -8,32 +9,45 @@ interface TooltipProps {
   className?: string;
 }
 
-const PLACEMENT: Record<NonNullable<TooltipProps['placement']>, string> = {
-  top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-  bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
-  left: 'right-full top-1/2 -translate-y-1/2 mr-2',
-  right: 'left-full top-1/2 -translate-y-1/2 ml-2',
+const GAP = 8;
+
+// Anchor point on the trigger's rect + the transform that places the bubble around it.
+const ANCHOR: Record<
+  NonNullable<TooltipProps['placement']>,
+  { point: (r: DOMRect) => { x: number; y: number }; transform: string }
+> = {
+  top: { point: (r) => ({ x: r.left + r.width / 2, y: r.top }), transform: `translate(-50%, calc(-100% - ${GAP}px))` },
+  bottom: { point: (r) => ({ x: r.left + r.width / 2, y: r.bottom }), transform: `translate(-50%, ${GAP}px)` },
+  left: { point: (r) => ({ x: r.left, y: r.top + r.height / 2 }), transform: `translate(calc(-100% - ${GAP}px), -50%)` },
+  right: { point: (r) => ({ x: r.right, y: r.top + r.height / 2 }), transform: `translate(${GAP}px, -50%)` },
 };
 
 /**
  * Styled tooltip shown on hover/focus — replaces the browser's default `title=""` bubble.
  * Clones the trigger in place (rather than wrapping it in an extra element) so it doesn't
  * disturb a trigger that's already absolutely/relatively positioned by its parent.
+ *
+ * The bubble is only rendered while visible and is portaled to <body> with fixed
+ * positioning, so it never extends the scrollable area of an overflow container
+ * (e.g. a table cell near the edge of a scrolling DataTable).
  */
 const Tooltip = ({ content, children, placement = 'top', className }: TooltipProps) => {
-  const [visible, setVisible] = useState(false);
+  const [anchor, setAnchor] = useState<DOMRect | null>(null);
   const id = useId();
   const childProps = children.props as Record<string, any>;
 
-  const show = () => setVisible(true);
-  const hide = () => setVisible(false);
+  const show = (e: { currentTarget: Element }) => setAnchor(e.currentTarget.getBoundingClientRect());
+  const hide = () => setAnchor(null);
+
+  const { point, transform } = ANCHOR[placement];
+  const pos = anchor ? point(anchor) : null;
 
   return cloneElement(children, {
-    'aria-describedby': visible ? id : undefined,
+    'aria-describedby': anchor ? id : undefined,
     className: twMerge('relative', childProps.className),
     onMouseEnter: (e: MouseEvent) => {
       childProps.onMouseEnter?.(e);
-      show();
+      show(e);
     },
     onMouseLeave: (e: MouseEvent) => {
       childProps.onMouseLeave?.(e);
@@ -41,7 +55,7 @@ const Tooltip = ({ content, children, placement = 'top', className }: TooltipPro
     },
     onFocus: (e: FocusEvent) => {
       childProps.onFocus?.(e);
-      show();
+      show(e);
     },
     onBlur: (e: FocusEvent) => {
       childProps.onBlur?.(e);
@@ -50,18 +64,21 @@ const Tooltip = ({ content, children, placement = 'top', className }: TooltipPro
     children: (
       <>
         {childProps.children}
-        <span
-          role="tooltip"
-          id={id}
-          className={twMerge(
-            'pointer-events-none absolute z-50 whitespace-nowrap rounded-md bg-darkGray px-2.5 py-1.5 text-xs font-medium text-white shadow-[0px_4px_12px_rgba(0,0,0,0.25)] transition-opacity duration-150 dark:bg-zinc-900',
-            PLACEMENT[placement],
-            visible ? 'opacity-100' : 'opacity-0',
-            className
+        {pos &&
+          createPortal(
+            <span
+              role="tooltip"
+              id={id}
+              style={{ position: 'fixed', left: pos.x, top: pos.y, transform }}
+              className={twMerge(
+                'pointer-events-none z-[1300] whitespace-nowrap rounded-md bg-darkGray px-2.5 py-1.5 text-xs font-medium text-white shadow-[0px_4px_12px_rgba(0,0,0,0.25)] dark:bg-zinc-900',
+                className
+              )}
+            >
+              {content}
+            </span>,
+            document.body
           )}
-        >
-          {content}
-        </span>
       </>
     ),
   });

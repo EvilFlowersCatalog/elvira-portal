@@ -8,6 +8,7 @@ import {
   FiArrowUp,
   FiArrowDown,
 } from 'react-icons/fi';
+import { useTranslation } from 'react-i18next';
 import { twMerge } from 'tailwind-merge';
 import IconButton from './IconButton';
 import Select from '../primitives/Select';
@@ -192,7 +193,7 @@ export default function DataTable<T>({
   loading,
   error,
   onRetry,
-  emptyTitle = 'Nothing here yet',
+  emptyTitle,
   emptyDescription,
   emptyAction,
   page,
@@ -206,6 +207,7 @@ export default function DataTable<T>({
   storageKey,
   density = 'comfortable',
 }: DataTableProps<T>) {
+  const { t } = useTranslation();
   const [hidden, setHidden] = useHiddenColumns(columns, storageKey);
   const visible = columns.filter((c) => !hidden.has(c.id));
   const rowPad = density === 'compact' ? 'px-4 py-2' : 'px-4 py-3';
@@ -240,12 +242,14 @@ export default function DataTable<T>({
                 return next;
               })
             }
-            label="Show or hide columns"
+            label={t('administration.table.columns')}
           />
         </div>
       )}
 
-      <div className="relative overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
+      {/* No overflow-hidden here: it clipped the page-size dropdown. Corners are
+          rounded on the scroll area and footer instead. */}
+      <div className="relative rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
         {/* Indeterminate progress bar for background refetches (page / search /
             sort) — the rows below stay visible instead of wiping to a skeleton. */}
         {isRefreshing && (
@@ -253,7 +257,10 @@ export default function DataTable<T>({
             <div className="h-full w-1/3 animate-[loadingbar_1s_ease-in-out_infinite] bg-primary" />
           </div>
         )}
-        <div className="overflow-x-auto">
+        {/* Horizontal scroll only: `overflow-x:auto` alone makes y compute to auto
+            too, so invisible absolutely-positioned bits (tooltips) produced a
+            vertical scrollbar. */}
+        <div className={twMerge('overflow-x-auto overflow-y-hidden rounded-t-xl', !hasPagination && 'rounded-b-xl')}>
           <table className="w-full border-collapse text-sm" aria-busy={isRefreshing}>
             <caption className="sr-only">{caption}</caption>
             <thead>
@@ -335,7 +342,7 @@ export default function DataTable<T>({
                         onClick={onRetry}
                         className="mt-3 text-sm font-medium text-primaryText dark:text-primaryLight hover:underline"
                       >
-                        Try again
+                        {t('administration.table.retry')}
                       </button>
                     )}
                   </td>
@@ -343,7 +350,7 @@ export default function DataTable<T>({
               ) : rows.length === 0 ? (
                 <tr>
                   <td colSpan={visible.length} className="px-4 py-16 text-center">
-                    <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{emptyTitle}</p>
+                    <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{emptyTitle ?? t('administration.table.empty')}</p>
                     {emptyDescription && (
                       <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{emptyDescription}</p>
                     )}
@@ -409,13 +416,14 @@ function DataTableFooter({
   onPageChange: (page: number) => void;
   onPageSizeChange?: (size: number) => void;
 }) {
+  const { t } = useTranslation();
   return (
-    <div className="flex flex-col gap-3 border-t border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/40 px-4 py-2.5 text-sm text-zinc-600 dark:text-zinc-300 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-3 rounded-b-xl border-t border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/40 px-4 py-2.5 text-sm text-zinc-600 dark:text-zinc-300 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-2">
         {onPageSizeChange && pageSize != null && (
           <>
             <label htmlFor="dt-page-size" className="text-zinc-500 dark:text-zinc-400">
-              Rows
+              {t('administration.table.rows')}
             </label>
             <Select
               id="dt-page-size"
@@ -424,28 +432,29 @@ function DataTableFooter({
               options={pageSizeOptions.map((n) => ({ value: String(n), label: String(n) }))}
               className="w-20"
               triggerClassName="py-1"
+              dropUp
             />
           </>
         )}
         {total != null && (
           <span className="text-zinc-400 dark:text-zinc-500">
-            {total.toLocaleString()} total
+            {t('administration.table.total', { total: total.toLocaleString() })}
           </span>
         )}
       </div>
 
       <div className="flex items-center gap-1">
         <span className="mr-2 tabular-nums">
-          Page {page} of {Math.max(pageCount, 1)}
+          {t('administration.table.pageOf', { page, pages: Math.max(pageCount, 1) })}
         </span>
-        <IconButton label="First page" variant="ghost" size="sm" disabled={page <= 1} onClick={() => onPageChange(1)}>
+        <IconButton label={t('administration.table.firstPage')} variant="ghost" size="sm" disabled={page <= 1} onClick={() => onPageChange(1)}>
           <FiChevronsLeft size={16} />
         </IconButton>
-        <IconButton label="Previous page" variant="ghost" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
+        <IconButton label={t('administration.table.previousPage')} variant="ghost" size="sm" disabled={page <= 1} onClick={() => onPageChange(page - 1)}>
           <FiChevronLeft size={16} />
         </IconButton>
         <IconButton
-          label="Next page"
+          label={t('administration.table.nextPage')}
           variant="ghost"
           size="sm"
           disabled={page >= pageCount}
@@ -454,7 +463,7 @@ function DataTableFooter({
           <FiChevronRight size={16} />
         </IconButton>
         <IconButton
-          label="Last page"
+          label={t('administration.table.lastPage')}
           variant="ghost"
           size="sm"
           disabled={page >= pageCount}

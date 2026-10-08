@@ -16,7 +16,7 @@ import useReservationsQuery from '../../../hooks/api/reservations/useReservation
 import useUpdateReservation from '../../../hooks/api/reservations/useUpdateReservation';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import useDownloadLicense from '../../../hooks/api/licenses/useDownloadLicense';
-import { isPassphraseRequired, problemDetailMessage } from '../../../utils/problemDetail';
+import { CONFLICT_REASON, getConflictReasonCode, isPassphraseRequired, problemDetailMessage } from '../../../utils/problemDetail';
 import ExtendLoanModal from '../../modals/ExtendLoanModal';
 import ReturnBookModal from '../../modals/ReturnBookModal';
 import CancelReservationModal from '../../modals/CancelReservationModal';
@@ -418,7 +418,7 @@ export default function LoansCardView() {
   // URL), so opening an entry-detail modal no longer refetches the whole page,
   // and a background refetch after claim/return keeps the current cards visible
   // instead of flashing the "loading" state.
-  const licensesQuery = useLicensesQuery({ page: 1, limit: 50 });
+  const licensesQuery = useLicensesQuery({ page: 1, limit: 50, orderBy: '-starts_at' });
   const reservationsQuery = useReservationsQuery({
     status: [RESERVATION_STATUS.queued, RESERVATION_STATUS.available],
   });
@@ -503,6 +503,9 @@ export default function LoansCardView() {
           </div>,
           { autoClose: 8000 },
         );
+      } else if (getConflictReasonCode(e) === CONFLICT_REASON.notReadiumEnabled) {
+        // Lending was switched off for the title after the reservation was made.
+        toast.error(t(`${CARD}.claimNotLendable`));
       } else {
         toast.error(problemDetailMessage(e, t(`${CARD}.claimFailed`, { defaultValue: 'Could not claim. The window may have passed.' })));
       }

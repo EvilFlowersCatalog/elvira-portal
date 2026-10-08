@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import useGetEntryDetail from '../../../hooks/api/entries/useGetEntryDetail';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { IEntryNew, IEntryNewForm } from '../../../utils/interfaces/entry';
@@ -20,6 +20,8 @@ const AdminEditEntry = () => {
 
   const { getEntryDetail } = useGetEntryDetail();
   const navigate = useNavigate();
+  // Search/filters/page of the entries list we came from, so saving returns to it.
+  const listSearch = (useLocation().state as { from?: string } | null)?.from ?? '';
   const editEntry = useEditEntry();
 
   useEffect(() => {
@@ -99,7 +101,7 @@ const AdminEditEntry = () => {
         setIsLoading(true);
         await editEntry(id!, newEntry, entryCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined);
         toast.success(t('notifications.entry.edit.success'));
-        navigate(NAVIGATION_PATHS.adminEntries, { replace: true });
+        navigate(NAVIGATION_PATHS.adminEntries + listSearch, { replace: true });
       } catch {
         toast.error(t('notifications.entry.edit.error'));
       } finally {

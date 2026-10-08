@@ -1,7 +1,10 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import useEntriesQuery from "../../hooks/api/entries/useEntriesQuery";
+import useFeedsQuery from "../../hooks/api/feeds/useFeedsQuery";
+import useGetCategories from "../../hooks/api/categories/useGetCategories";
 import Thumbnail from "../items/entry/Thumbnail";
 import useDebouncedValue from "../../hooks/useDebouncedValue";
 import { ICategory } from "../../utils/interfaces/category";
@@ -32,17 +35,56 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
     { enabled }
   );
 
+  // Collections / categories are also searched directly by name, so e.g. "history"
+  // suggests the History collection even when none of the top books are in it.
+  // Same debounce + keepPreviousData behaviour as the books query.
+  const { data: feedMatches } = useFeedsQuery(
+    { title: debouncedQuery, kind: 'acquisition', page: 1, limit: 6, paginate: true },
+    { enabled }
+  );
+  const getCategories = useGetCategories();
+  const { data: categoryMatches } = useQuery({
+    queryKey: ['categories', 'suggest', debouncedQuery],
+    queryFn: () => getCategories({ query: debouncedQuery, page: 1, limit: 6, paginate: true }),
+    enabled,
+    placeholderData: keepPreviousData,
+  });
+
+  // When the text matched a category / collection by name, also show books from
+  // it — otherwise "Fiction" would suggest the category but zero books.
+  const categoryIds = (categoryMatches?.items ?? []).map((c) => c.id).join(',');
+  const feedIds = (feedMatches?.items ?? []).map((f) => f.id).join(',');
+  const { data: categoryBooks } = useEntriesQuery(
+    { categories: categoryIds, limit: 6 },
+    { enabled: enabled && !!categoryIds }
+  );
+  const { data: feedBooks } = useEntriesQuery(
+    { feeds: feedIds, limit: 6 },
+    { enabled: enabled && !!feedIds }
+  );
+
   // Only show the skeleton on the very first fetch (nothing cached to show yet).
   const showInitialLoading = isFetching && !data;
   // Background refresh while previous suggestions stay on screen.
   const isRefreshing = isFetching && isPlaceholderData;
 
-  // Derive the books preview plus author / category / collection facets.
+  // Books preview plus author / category / collection facets. Direct name matches
+  // come first, then the ones derived from the matching books; each list is
+  // de-duplicated and a section with nothing in it is simply not shown.
   const { entries, authors, categories, feeds } = useMemo(() => {
-    const items = data?.items ?? [];
+    // Text matches first (most relevant), then books from the matched categories
+    // and collections to fill the list; de-duplicated by id.
+    const seen = new Set<string>();
+    const items = [
+      ...(data?.items ?? []),
+      ...(categoryIds ? categoryBooks?.items ?? [] : []),
+      ...(feedIds ? feedBooks?.items ?? [] : []),
+    ].filter((e) => !seen.has(e.id) && seen.add(e.id));
     const uniqueAuthors = new Set<string>();
     const categoriesMap = new Map<string, ICategory>();
     const feedsMap = new Map<string, IFeed>();
+    (categoryMatches?.items ?? []).forEach((cat) => categoriesMap.set(cat.id, cat));
+    (feedMatches?.items ?? []).forEach((feed) => feedsMap.set(feed.id, feed));
     items.forEach((entry) => {
       entry.authors?.forEach((author) => uniqueAuthors.add(author.name + " " + author.surname));
       entry.categories?.forEach((cat) => {
@@ -58,7 +100,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
       categories: Array.from(categoriesMap.values()).slice(0, 10),
       feeds: Array.from(feedsMap.values()).slice(0, 10),
     };
-  }, [data]);
+  }, [data, feedMatches, categoryMatches, categoryBooks, feedBooks, categoryIds, feedIds]);
 
   const handleBookClick = (entryId: string) => {
     searchParams.set('entry-detail-id', entryId);
@@ -112,7 +154,12 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
   }
 
   return (
-    <div className="absolute top-[70px] left-0 right-0 bg-white dark:bg-darkGray border border-gray-300 dark:border-gray-700 rounded-md shadow-lg z-50 max-h-[500px] overflow-auto">
+    <div
+      // Keep focus on the input so its blur handler doesn't unmount this panel
+      // before the click on a suggestion lands.
+      onMouseDown={(e) => e.preventDefault()}
+      className="absolute top-[70px] left-0 right-0 bg-white dark:bg-darkGray border border-gray-300 dark:border-gray-700 rounded-md shadow-lg z-50 max-h-[500px] overflow-auto"
+    >
       {/* Thin top progress bar for background refreshes — the previous
           suggestions stay visible underneath instead of a loading wipe. */}
       {isRefreshing && (

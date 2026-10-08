@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { IEntryNew, IEntryNewForm } from '../../../utils/interfaces/entry';
 import { useTranslation } from 'react-i18next';
@@ -51,6 +51,8 @@ const AdminAddEntry = () => {
   >([]);
 
   const navigate = useNavigate();
+  // Search/filters/page of the entries list we came from, so saving returns to it.
+  const listSearch = (useLocation().state as { from?: string } | null)?.from ?? '';
   const uploadEntry = useUploadEntry();
   const createEntryAcquisition = useCreateEntryAcquistion();
 
@@ -114,7 +116,7 @@ const AdminAddEntry = () => {
           })
         );
         toast.success(t('notifications.entry.add.success'));
-        navigate(NAVIGATION_PATHS.adminEntries, { replace: true });
+        navigate(NAVIGATION_PATHS.adminEntries + listSearch, { replace: true });
       } catch {
         toast.error(t('notifications.entry.add.error'));
       } finally {

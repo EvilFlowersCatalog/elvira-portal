@@ -176,6 +176,18 @@ export const en = {
     // ADMINISTRATION PAGE
     administration: {
       sectionLabel: 'Administration',
+      table: {
+        columns: 'Show or hide columns',
+        empty: 'Nothing here yet',
+        retry: 'Try again',
+        rows: 'Rows',
+        total: '{{total}} total',
+        pageOf: 'Page {{page}} of {{pages}}',
+        firstPage: 'First page',
+        previousPage: 'Previous page',
+        nextPage: 'Next page',
+        lastPage: 'Last page',
+      },
       nav: {
         groupContent: 'Content',
         groupPeople: 'People & access',
@@ -907,6 +919,11 @@ export const en = {
     },
 
     license: {
+      success: {
+        openThorium: 'Open in Thorium',
+        downloadFile: 'Download file',
+        thoriumHint: "Thorium opens automatically. If nothing happened, download the file and open it manually.",
+      },
       queue: {
         title: 'Join the waiting list?',
         allBorrowed: "All {{total}} copies are currently on loan. We'll email you as soon as one is available for you.",
@@ -958,6 +975,7 @@ export const en = {
           return: 'Return',
           download: 'Download',
           pickUp: 'Pick up',
+          claimNotLendable: 'This title is no longer offered for lending. Cancel the reservation or contact the library.',
           pickingUp: 'Picking up...',
           cancel: 'Cancel',
           borrowAgain: 'Borrow again',

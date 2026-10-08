@@ -176,6 +176,18 @@ export const sk = {
     // ADMINISTRATION PAGE
     administration: {
       sectionLabel: 'Administrácia',
+      table: {
+        columns: 'Zobraziť alebo skryť stĺpce',
+        empty: 'Zatiaľ tu nič nie je',
+        retry: 'Skúsiť znova',
+        rows: 'Riadkov',
+        total: '{{total}} celkom',
+        pageOf: 'Strana {{page}} z {{pages}}',
+        firstPage: 'Prvá strana',
+        previousPage: 'Predchádzajúca strana',
+        nextPage: 'Ďalšia strana',
+        lastPage: 'Posledná strana',
+      },
       nav: {
         groupContent: 'Obsah',
         groupPeople: 'Ľudia a prístup',
@@ -895,6 +907,11 @@ export const sk = {
     },
 
     license: {
+      success: {
+        openThorium: 'Otvoriť v Thorium',
+        downloadFile: 'Stiahnuť súbor',
+        thoriumHint: 'Thorium sa otvorí automaticky. Ak sa nič nestalo, stiahnite si súbor a otvorte ho ručne.',
+      },
       queue: {
         title: 'Zaradiť sa do poradovníka?',
         allBorrowed: 'Všetky výtlačky ({{total}}) sú momentálne požičané. Hneď ako bude niektorý dostupný, pošleme vám e-mail.',
@@ -948,6 +965,7 @@ export const sk = {
           return: 'Vrátiť',
           download: 'Stiahnuť',
           pickUp: 'Vyzdvihnúť',
+          claimNotLendable: 'Tento titul sa už nepožičiava. Zrušte rezerváciu alebo kontaktujte knižnicu.',
           pickingUp: 'Vyzdvihujem...',
           cancel: 'Zrušiť',
           borrowAgain: 'Znovu si požičať',

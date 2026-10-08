@@ -106,6 +106,13 @@ export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
     const facetCounts = (counts: Record<string, number>) =>
         emptyScope ? {} : facets.ready ? counts : facets.failed ? undefined : {};
     const availabilityCounts = facetCounts(facets.availabilityCounts);
+    const languageCounts = facetCounts(facets.languageCounts);
+    const categoryCounts = facetCounts(facets.categoryCounts);
+    const feedCounts = facetCounts(facets.feedCounts);
+    // Mirrors AdvancedCheckboxes' own filtering: with counts, only options that
+    // have books (or are currently selected) are listed.
+    const hasOptions = (options: { value: string }[], counts: Record<string, number> | undefined, selected: string[]) =>
+        !counts || options.some(o => (counts[o.value] ?? 0) > 0 || selected.includes(o.value));
 
     // Year bounds of the entries the other filters leave (the year filter itself is
     // ignored). They pre-fill the inputs/slider but are only sent once the user
@@ -365,37 +372,51 @@ export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
                 </div>
             </div>
 
-            <SectionDivider />
-            <AdvancedCheckboxes
-                title={t('searchBar.language')}
-                options={languageOptions}
-                selected={languageCodes}
-                setSelected={setLanguageCodes}
-                counts={facetCounts(facets.languageCounts)}
-            />
+            {/* A facet group with no options to show (no counts, nothing selected)
+                is dropped entirely — title and divider included. */}
+            {hasOptions(languageOptions, languageCounts, languageCodes) && (
+                <>
+                    <SectionDivider />
+                    <AdvancedCheckboxes
+                        title={t('searchBar.language')}
+                        options={languageOptions}
+                        selected={languageCodes}
+                        setSelected={setLanguageCodes}
+                        counts={languageCounts}
+                    />
+                </>
+            )}
 
-            <SectionDivider />
-            <AdvancedCheckboxes
-                title={t('searchBar.categories')}
-                options={categoryOptions}
-                selected={activeCategories.map(cat => cat.id)}
-                setSelected={selected => {
-                    setActiveCategories(allCategories.filter(cat => selected.includes(cat.id)));
-                }}
-                counts={facetCounts(facets.categoryCounts)}
-            />
+            {hasOptions(categoryOptions, categoryCounts, activeCategories.map(cat => cat.id)) && (
+                <>
+                    <SectionDivider />
+                    <AdvancedCheckboxes
+                        title={t('searchBar.categories')}
+                        options={categoryOptions}
+                        selected={activeCategories.map(cat => cat.id)}
+                        setSelected={selected => {
+                            setActiveCategories(allCategories.filter(cat => selected.includes(cat.id)));
+                        }}
+                        counts={categoryCounts}
+                    />
+                </>
+            )}
 
-            <SectionDivider />
-            <AdvancedCheckboxes
-                title={t('searchBar.feeds')}
-                enableSearch
-                options={feedOptions}
-                selected={activeFeeds.map(feed => feed.id)}
-                setSelected={selected => {
-                    setActiveFeeds(allFeeds.filter(feed => selected.includes(feed.id)));
-                }}
-                counts={facetCounts(facets.feedCounts)}
-            />
+            {hasOptions(feedOptions, feedCounts, activeFeeds.map(feed => feed.id)) && (
+                <>
+                    <SectionDivider />
+                    <AdvancedCheckboxes
+                        title={t('searchBar.feeds')}
+                        enableSearch
+                        options={feedOptions}
+                        selected={activeFeeds.map(feed => feed.id)}
+                        setSelected={selected => {
+                            setActiveFeeds(allFeeds.filter(feed => selected.includes(feed.id)));
+                        }}
+                        counts={feedCounts}
+                    />
+                </>
+            )}
         </div>
     );
 }

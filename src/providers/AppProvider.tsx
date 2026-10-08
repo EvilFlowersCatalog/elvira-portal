@@ -321,7 +321,10 @@ const AppProvider = ({ children }: IContextProviderParams) => {
 
     // handle esc
     const handleESC = (e?: KeyboardEvent) => {
-      if (e?.code?.toLocaleLowerCase() === "escape") {
+      // Only act when an entry detail is actually open. Otherwise this rewrote
+      // the URL on every Esc press (e.g. closing an admin drawer) and, since
+      // AppProvider sits above the routes, sent the user back to the homepage.
+      if (e?.code?.toLocaleLowerCase() === "escape" && searchParams.has("entry-detail-id")) {
         searchParams.delete("entry-detail-id");
         setSearchParams(searchParams);
       }
