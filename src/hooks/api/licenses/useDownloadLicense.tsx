@@ -34,7 +34,15 @@ const useDownloadLicense = () => {
 
     const downloadDirect = async (license: LicenseRef): Promise<void> => {
         const url = await resolveDownloadUrl(license);
-        window.location.href = url;
+        const { data } = await axios.get<Blob>(url, { responseType: 'blob' });
+        const objectUrl = URL.createObjectURL(new Blob([data], { type: 'application/octet-stream' }));
+        const link = document.createElement('a');
+        link.href = objectUrl;
+        link.download = `${license.id}.lcpl`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
     };
 
     return { openInThorium, downloadDirect };
