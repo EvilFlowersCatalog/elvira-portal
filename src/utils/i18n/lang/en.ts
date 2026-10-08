@@ -975,6 +975,7 @@ export const en = {
           return: 'Return',
           download: 'Download',
           pickUp: 'Pick up',
+          claimNotLendable: 'This title is no longer offered for lending. Cancel the reservation or contact the library.',
           pickingUp: 'Picking up...',
           cancel: 'Cancel',
           borrowAgain: 'Borrow again',

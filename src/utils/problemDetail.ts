@@ -20,6 +20,7 @@ export const PROBLEM_DETAIL_TYPE = {
 export const CONFLICT_REASON = {
 	noAvailableSlots: 'no_available_slots',
 	alreadyBorrowed: 'already_borrowed',
+	notReadiumEnabled: 'not_readium_enabled',
 } as const;
 
 /** `additional_data` of a 409 `no_available_slots` borrow conflict. */

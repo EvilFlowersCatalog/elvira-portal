@@ -965,6 +965,7 @@ export const sk = {
           return: 'Vrátiť',
           download: 'Stiahnuť',
           pickUp: 'Vyzdvihnúť',
+          claimNotLendable: 'Tento titul sa už nepožičiava. Zrušte rezerváciu alebo kontaktujte knižnicu.',
           pickingUp: 'Vyzdvihujem...',
           cancel: 'Zrušiť',
           borrowAgain: 'Znovu si požičať',

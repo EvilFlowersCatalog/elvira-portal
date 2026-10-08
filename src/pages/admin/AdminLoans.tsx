@@ -14,6 +14,7 @@ import {
   PageHeader,
   DataTable,
   DataTableColumn,
+  SortState,
   StatusChip,
   StatusVariant,
   SearchField,
@@ -21,6 +22,8 @@ import {
 } from '../../components/admin';
 
 const DEFAULT_LIMIT = 10;
+// Newest loans first; the API's own default is oldest-created first.
+const DEFAULT_ORDER = '-starts_at';
 
 // Valid license state-machine transitions — never offer an action the API rejects.
 const VALID_ACTIONS: Partial<Record<LICENSE_STATE, LICENSE_ACTION[]>> = {
@@ -76,6 +79,8 @@ const AdminLoans = () => {
   const page = parseInt(searchParams.get('page') || '1', 10);
   const limit = parseInt(searchParams.get('limit') || String(DEFAULT_LIMIT), 10);
   const q = (searchParams.get('q') || '').toLowerCase();
+  const orderBy = searchParams.get('order_by') || DEFAULT_ORDER;
+  const sort: SortState = { key: orderBy.replace(/^-/, ''), dir: orderBy.startsWith('-') ? 'desc' : 'asc' };
 
   const patchParams = useCallback(
     (patch: Record<string, string | null>) => {
@@ -102,7 +107,7 @@ const AdminLoans = () => {
     if (!silent) setLoading(true);
     setError(false);
     try {
-      const { items, metadata } = await getLoans({ page, limit, user_mode: 'all' });
+      const { items, metadata } = await getLoans({ page, limit, user_mode: 'all', orderBy });
       setItems(items);
       setMetadata(metadata);
     } catch {
@@ -112,7 +117,7 @@ const AdminLoans = () => {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, limit]);
+  }, [page, limit, orderBy]);
 
   const fetchReservations = useCallback(async () => {
     setResLoading(true);
@@ -164,23 +169,27 @@ const AdminLoans = () => {
       id: 'title',
       header: t('administration.loansPage.table.entry'),
       hideable: false,
+      sortKey: 'entry__title',
       cell: (l) => <span className="font-medium text-secondary dark:text-secondaryLight">{entryTitle(l.entry)}</span>,
     },
     {
       id: 'user',
       header: t('administration.loansPage.table.user'),
+      sortKey: 'user__surname',
       cell: (l) => userMap[l.user_id] ?? '…',
     },
     {
       id: 'state',
       header: t('administration.loansPage.table.state'),
+      sortKey: 'state',
       cell: (l) => <StatusChip variant={STATE_VARIANT[l.state] ?? 'neutral'}>{t(`license.loansPage.table.states.${l.state}`, { defaultValue: l.state })}</StatusChip>,
     },
-    { id: 'starts_at', header: t('administration.loansPage.table.starts_at'), cell: (l) => fmt(l.starts_at) },
-    { id: 'ends_at', header: t('administration.loansPage.table.ends_at'), cell: (l) => fmt(l.expires_at) },
+    { id: 'starts_at', header: t('administration.loansPage.table.starts_at'), sortKey: 'starts_at', cell: (l) => fmt(l.starts_at) },
+    { id: 'ends_at', header: t('administration.loansPage.table.ends_at'), sortKey: 'expires_at', cell: (l) => fmt(l.expires_at) },
     {
       id: 'renewals',
       header: t('administration.loansPage.table.renewals'),
+      sortKey: 'renewal_count',
       defaultHidden: true,
       cell: (l) =>
         l.renewals_remaining == null
@@ -272,6 +281,8 @@ const AdminLoans = () => {
           columns={loanColumns}
           rows={visibleLoans}
           getRowId={(l) => l.id}
+          sort={sort}
+          onSortChange={(s) => patchParams({ order_by: s.dir === 'desc' ? `-${s.key}` : s.key, page: '1' })}
           loading={loading}
           error={error ? t('administration.loansPage.loadError') : undefined}
           onRetry={() => fetchLoans()}

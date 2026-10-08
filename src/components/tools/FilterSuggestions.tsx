@@ -36,7 +36,10 @@ const FilterSuggestions = ({ searchQuery }: FilterSuggestionsProps) => {
     const categoriesMap = new Map<string, ICategory>();
     const feedsMap = new Map<string, IFeed>();
     items.forEach((entry) => {
-      entry.authors?.forEach((author) => uniqueAuthors.add(author.name));
+      entry.authors?.forEach((author) => {
+        const fullName = `${author.name ?? ''} ${author.surname ?? ''}`.trim();
+        if (fullName) uniqueAuthors.add(fullName);
+      });
       entry.categories?.forEach((cat) => {
         if (!categoriesMap.has(cat.id)) categoriesMap.set(cat.id, cat);
       });
