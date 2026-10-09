@@ -270,6 +270,7 @@ export default function CatalogDrawer({ open, catalog, mode, onClose, onSaved }:
                           onChange={(value) => setMemberMode(m.id, value as CatalogAccessMode)}
                           options={[
                             { value: 'read', label: t('administration.catalogsPage.modeRead') },
+                            { value: 'write', label: t('administration.catalogsPage.modeWrite') },
                             { value: 'manage', label: t('administration.catalogsPage.modeManage') },
                           ]}
                           className="w-36 shrink-0"

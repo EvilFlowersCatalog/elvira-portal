@@ -9,7 +9,7 @@ import {
   FiTag,
   FiEdit3,
 } from 'react-icons/fi';
-import { FaBook, FaRobot } from 'react-icons/fa';
+import { FaBook } from 'react-icons/fa';
 import { MdOutlineCollectionsBookmark, MdOutlineLibraryBooks, MdOutlineInventory2 } from 'react-icons/md';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
@@ -53,7 +53,6 @@ const GROUPS: NavGroup[] = [
     labelKey: 'administration.nav.groupPeople',
     items: [
       { key: 'users', path: NAVIGATION_PATHS.adminUsers, icon: <FiUsers size={ICON} /> },
-      { key: 'aiUsers', path: NAVIGATION_PATHS.adminAIUsers, icon: <FaRobot size={ICON} /> },
       { key: 'access', path: NAVIGATION_PATHS.adminAccess, icon: <FiKey size={ICON} /> },
     ],
   },

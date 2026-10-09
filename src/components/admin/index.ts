@@ -11,3 +11,6 @@ export { default as Drawer } from './Drawer';
 export { default as ConfirmDialog } from './ConfirmDialog';
 export { Field, TextInput, Switch } from './Field';
 export { default as UserPicker } from './UserPicker';
+export { default as Tabs } from './Tabs';
+export type { TabItem } from './Tabs';
+export { default as UserLink } from './UserLink';

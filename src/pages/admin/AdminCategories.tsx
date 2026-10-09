@@ -96,6 +96,7 @@ const AdminCategories = () => {
     {
       id: 'scheme',
       header: t('administration.categoriesPage.scheme'),
+      sortKey: 'scheme',
       cell: (c) => c.scheme || <span className="text-zinc-400">{t('administration.categoriesPage.none')}</span>,
     },
   ];

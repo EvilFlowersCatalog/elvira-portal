@@ -291,7 +291,9 @@ export default function DataTable<T>({
                           type="button"
                           onClick={() => handleSort(col)}
                           className={twMerge(
-                            'inline-flex items-center gap-1 hover:text-zinc-800 dark:hover:text-zinc-100 transition-colors',
+                            // Buttons reset text-transform/weight, so restate the header style —
+                            // sortable and plain headers must look the same.
+                            'inline-flex items-center gap-1 font-semibold uppercase tracking-wide hover:text-zinc-800 dark:hover:text-zinc-100 transition-colors',
                             col.align === 'right' && 'flex-row-reverse',
                             isSorted && 'text-zinc-800 dark:text-zinc-100'
                           )}

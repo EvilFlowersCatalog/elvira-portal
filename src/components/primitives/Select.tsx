@@ -1,6 +1,11 @@
-import { KeyboardEvent, useEffect, useId, useRef, useState } from 'react';
+import { CSSProperties, KeyboardEvent, useEffect, useId, useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { RiArrowDownSLine } from 'react-icons/ri';
 import { twMerge } from 'tailwind-merge';
+
+const LIST_MAX_HEIGHT = 240;
+const LIST_GAP = 4;
+const VIEWPORT_MARGIN = 8;
 
 export interface SelectOption {
   value: string;
@@ -17,7 +22,7 @@ interface SelectProps {
   disabled?: boolean;
   className?: string;
   triggerClassName?: string;
-  /** Open the list above the trigger (for controls at the bottom of a container). */
+  /** Prefer opening above the trigger. Without it the list still flips up when it would not fit below. */
   dropUp?: boolean;
   'aria-label'?: string;
 }
@@ -38,14 +43,47 @@ const Select = ({
 }: SelectProps) => {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLUListElement>(null);
+  const [listStyle, setListStyle] = useState<CSSProperties>({ visibility: 'hidden' });
   const generatedId = useId();
   const selectId = id ?? generatedId;
   const selected = options.find((o) => o.value === value);
 
+  // The list is portalled to <body> and positioned against the viewport, so no
+  // ancestor with `overflow` (table scroll area, drawer body, card) can clip it.
+  // It flips above the trigger when there is not enough room below.
+  useLayoutEffect(() => {
+    if (!open) return;
+    const place = () => {
+      const trigger = ref.current?.getBoundingClientRect();
+      if (!trigger) return;
+      const listHeight = Math.min(listRef.current?.scrollHeight ?? 0, LIST_MAX_HEIGHT);
+      const below = window.innerHeight - trigger.bottom - LIST_GAP - VIEWPORT_MARGIN;
+      const above = trigger.top - LIST_GAP - VIEWPORT_MARGIN;
+      const up = dropUp ? above >= listHeight || above > below : below < listHeight && above > below;
+      setListStyle({
+        left: trigger.left,
+        width: trigger.width,
+        maxHeight: Math.max(Math.min(LIST_MAX_HEIGHT, up ? above : below), 96),
+        ...(up ? { bottom: window.innerHeight - trigger.top + LIST_GAP } : { top: trigger.bottom + LIST_GAP }),
+      });
+    };
+    place();
+    // Capture phase: also follow scrolling of any ancestor, not just the window.
+    window.addEventListener('scroll', place, true);
+    window.addEventListener('resize', place);
+    return () => {
+      window.removeEventListener('scroll', place, true);
+      window.removeEventListener('resize', place);
+    };
+  }, [open, dropUp, options.length]);
+
   useEffect(() => {
     if (!open) return;
     const onDoc = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      const target = e.target as Node;
+      if (ref.current?.contains(target) || listRef.current?.contains(target)) return;
+      setOpen(false);
     };
     const onKey = (e: globalThis.KeyboardEvent) => e.key === 'Escape' && setOpen(false);
     document.addEventListener('mousedown', onDoc);
@@ -93,14 +131,14 @@ const Select = ({
         />
       </button>
 
-      {open && (
+      {open && createPortal(
         <ul
+          ref={listRef}
           role="listbox"
           aria-labelledby={selectId}
-          className={twMerge(
-            'absolute left-0 z-50 max-h-60 w-full overflow-auto rounded-md border border-[#e5e5e5] dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_rgba(0,0,0,0.15)] py-1',
-            dropUp ? 'bottom-full mb-1' : 'top-full mt-1'
-          )}
+          style={listStyle}
+          // Above drawers (z-50) and confirm dialogs (z-60), which host selects too.
+          className="fixed z-[70] overflow-auto rounded-md border border-[#e5e5e5] dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_rgba(0,0,0,0.15)] py-1"
         >
           {options.map((opt) => {
             const isSelected = opt.value === value;
@@ -122,7 +160,8 @@ const Select = ({
               </li>
             );
           })}
-        </ul>
+        </ul>,
+        document.body
       )}
     </div>
   );

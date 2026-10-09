@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { FiPlus } from 'react-icons/fi';
 import { ICatalog } from '../../utils/interfaces/catalog';
 import { Metadata } from '../../utils/interfaces/general/general';
+import { fmtDate } from '../../utils/func/adminDate';
 import { useListCatalogs } from '../../hooks/api/catalogs/useAdminCatalogs';
 import {
   PageHeader,
@@ -97,6 +98,7 @@ const AdminCatalogs = () => {
     {
       id: 'is_public',
       header: t('administration.catalogsPage.visibility'),
+      sortKey: 'is_public',
       cell: (c) =>
         c.is_public ? (
           <StatusChip variant="success">{t('administration.catalogsPage.public')}</StatusChip>
@@ -109,7 +111,7 @@ const AdminCatalogs = () => {
       header: t('administration.catalogsPage.createdAt'),
       sortKey: 'created_at',
       defaultHidden: true,
-      cell: (c) => (c.created_at ? new Date(c.created_at).toLocaleDateString() : '—'),
+      cell: (c) => fmtDate(c.created_at) ?? '—',
     },
   ];
 

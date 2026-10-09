@@ -55,7 +55,6 @@ const Breadcrumb = () => {
     ['users']: isEn() ? 'Users' : 'Používatelia',
     ['authors']: isEn() ? 'Authors' : 'Autori',
     ['catalogs']: isEn() ? 'Catalogs' : 'Katalógy',
-    ['ai-users']: isEn() ? 'AI Users' : 'AI používatelia',
     ['access']: isEn() ? 'Access & Keys' : 'Prístup a kľúče',
     ['add']: isEn() ? 'Add' : 'Pridanie',
     ['categories']: isEn() ? 'Categories' : 'Kategórie',
@@ -109,7 +108,9 @@ const Breadcrumb = () => {
       else {
         newBreadcrumbs.push({
           path: `/${pathParts.slice(0, index + 1).join('/')}`,
-          label: breadcrumbsTranslator[part.toLocaleLowerCase()], // Capitalize the first letter
+          // An id segment (e.g. /administration/users/<id>) has no translation;
+          // the detail page names it through `editingEntryTitle`.
+          label: breadcrumbsTranslator[part.toLocaleLowerCase()] ?? editingEntryTitle,
         });
       }
     });

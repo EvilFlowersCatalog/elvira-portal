@@ -7,6 +7,7 @@ export interface IUpdateUserPayload {
   surname: string;
   /** Optional partial changes. */
   is_active?: boolean;
+  is_superuser?: boolean;
   password?: string;
   lcp_passphrase?: string;
   lcp_passphrase_hint?: string;

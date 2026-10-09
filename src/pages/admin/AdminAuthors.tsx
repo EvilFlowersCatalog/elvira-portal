@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { FiPlus } from 'react-icons/fi';
 import { IAuthor } from '../../utils/interfaces/author';
 import { Metadata } from '../../utils/interfaces/general/general';
+import { fmtDate } from '../../utils/func/adminDate';
 import { useListAuthors } from '../../hooks/api/authors/useAdminAuthors';
 import { PageHeader, DataTable, DataTableColumn, SortState, SearchField } from '../../components/admin';
 import Button from '../../components/buttons/Button';
@@ -98,7 +99,7 @@ const AdminAuthors = () => {
       header: t('administration.authorsPage.createdAt'),
       sortKey: 'created_at',
       defaultHidden: true,
-      cell: (a) => (a.created_at ? new Date(a.created_at).toLocaleDateString() : '—'),
+      cell: (a) => fmtDate(a.created_at) ?? '—',
     },
   ];
 

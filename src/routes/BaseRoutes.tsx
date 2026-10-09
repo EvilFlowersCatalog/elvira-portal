@@ -44,7 +44,7 @@ const AdminCatalogs = lazy(() => import('../pages/admin/AdminCatalogs'));
 const AdminAuthors = lazy(() => import('../pages/admin/AdminAuthors'));
 const AdminAccess = lazy(() => import('../pages/admin/AdminAccess'));
 const AdminUsers = lazy(() => import('../pages/admin/AdminUsers'));
-const AdminAIUsers = lazy(() => import('../pages/admin/AdminAIUsers'));
+const AdminUserProfile = lazy(() => import('../pages/admin/AdminUserProfile'));
 const AdminLoans = lazy(() => import('../pages/admin/AdminLoans'));
 
 const BaseRoutes = () => {
@@ -115,8 +115,12 @@ const BaseRoutes = () => {
                 <Route path='catalogs' element={<AdminCatalogs />} />
                 <Route path='authors' element={<AdminAuthors />} />
                 <Route path='access' element={<AdminAccess />} />
-                <Route path='users' element={<AdminUsers />} />
-                <Route path='ai-users' element={<AdminAIUsers />} />
+                <Route path='users'>
+                  <Route index element={<AdminUsers />} />
+                  <Route path=':user-id' element={<AdminUserProfile />} />
+                </Route>
+                {/* The separate AI users page is gone; keep old links working. */}
+                <Route path='ai-users' element={<Navigate to={NAVIGATION_PATHS.adminUsers} replace />} />
                 <Route path='loans' element={<AdminLoans />} />
               </Route>
             </Route>
