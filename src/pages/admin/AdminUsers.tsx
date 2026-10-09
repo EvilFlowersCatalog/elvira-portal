@@ -1,58 +1,47 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { FiPlus } from 'react-icons/fi';
 import useGetUsers from '../../hooks/api/users/useGetUsers';
+import { useListCatalogs } from '../../hooks/api/catalogs/useAdminCatalogs';
+import useTableParams from '../../hooks/useTableParams';
 import { IUser } from '../../utils/interfaces/user';
-import { Metadata } from '../../utils/interfaces/general/general';
-import {
-  PageHeader,
-  DataTable,
-  DataTableColumn,
-  SortState,
-  StatusChip,
-  SearchField,
-} from '../../components/admin';
+import { ICatalog } from '../../utils/interfaces/catalog';
+import { Metadata, NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
+import { fmtDate } from '../../utils/func/adminDate';
+import { PageHeader, DataTable, DataTableColumn, StatusChip, SearchField } from '../../components/admin';
+import Select from '../../components/primitives/Select';
 import Button from '../../components/buttons/Button';
 import UserDrawer from '../../components/admin/users/UserDrawer';
 
 const DEFAULT_LIMIT = 10;
+const FILTER_TRIGGER = 'h-11 rounded-xl border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm';
 
 const AdminUsers = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const getUsers = useGetUsers();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const listCatalogs = useListCatalogs();
+  const { searchParams, page, limit, q, orderBy, patch, setQuery, tableProps } = useTableParams({ limit: DEFAULT_LIMIT });
 
   const [items, setItems] = useState<IUser[]>([]);
   const [metadata, setMetadata] = useState<Metadata>({ page: 1, limit: DEFAULT_LIMIT, pages: 1, total: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-
+  const [catalogs, setCatalogs] = useState<ICatalog[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerMode, setDrawerMode] = useState<'create' | 'edit'>('edit');
-  const [activeUser, setActiveUser] = useState<IUser | null>(null);
 
-  // Derive request state from the URL (shareable, back-button friendly).
-  const page = parseInt(searchParams.get('page') || '1', 10);
-  const limit = parseInt(searchParams.get('limit') || String(DEFAULT_LIMIT), 10);
-  const q = searchParams.get('q') || '';
-  const orderBy = searchParams.get('order_by') || '';
+  // Filters live in the URL next to search/sort/page (shareable, back-button friendly).
+  const role = searchParams.get('role') || '';
+  const status = searchParams.get('status') || '';
+  const catalogId = searchParams.get('catalog') || '';
 
-  const sort: SortState | null = orderBy
-    ? { key: orderBy.replace(/^-/, ''), dir: orderBy.startsWith('-') ? 'desc' : 'asc' }
-    : null;
-
-  const patchParams = useCallback(
-    (patch: Record<string, string | null>) => {
-      const next = new URLSearchParams(searchParams);
-      Object.entries(patch).forEach(([k, v]) => {
-        if (v === null || v === '') next.delete(k);
-        else next.set(k, v);
-      });
-      setSearchParams(next);
-    },
-    [searchParams, setSearchParams]
-  );
+  useEffect(() => {
+    listCatalogs({ orderBy: 'title' })
+      .then(({ items }) => setCatalogs(items))
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -61,7 +50,10 @@ const AdminUsers = () => {
       const { items, metadata } = await getUsers({
         page,
         limit,
-        username: q || undefined,
+        query: q || undefined,
+        is_superuser: role ? role === 'admin' : undefined,
+        is_active: status ? status === 'active' : undefined,
+        catalog_id: catalogId || undefined,
         orderBy: orderBy || undefined,
       });
       setItems(items);
@@ -73,24 +65,14 @@ const AdminUsers = () => {
       setLoading(false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, limit, q, orderBy]);
+  }, [page, limit, q, orderBy, role, status, catalogId]);
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
-  const openEdit = (user: IUser) => {
-    setActiveUser(user);
-    setDrawerMode('edit');
-    setDrawerOpen(true);
-  };
-  const openCreate = () => {
-    setActiveUser(null);
-    setDrawerMode('create');
-    setDrawerOpen(true);
-  };
+  const openProfile = (user: IUser) => navigate(`${NAVIGATION_PATHS.adminUsers}/${user.id}`);
 
-  const fmtDate = (v?: string) => (v ? new Date(v).toLocaleDateString() : t('administration.usersPage.never'));
 
   const columns: DataTableColumn<IUser>[] = [
     {
@@ -98,17 +80,14 @@ const AdminUsers = () => {
       header: t('administration.usersPage.username'),
       sortKey: 'username',
       hideable: false,
-      cell: (u) => (
-        <span className={u.is_superuser ? 'font-semibold text-secondary dark:text-secondaryLight' : 'font-medium'}>
-          {u.username}
-        </span>
-      ),
+      cell: (u) => <span className="font-medium text-secondary dark:text-secondaryLight">{u.username}</span>,
     },
     { id: 'name', header: t('administration.usersPage.name'), sortKey: 'name', cell: (u) => u.name || '—' },
     { id: 'surname', header: t('administration.usersPage.surname'), sortKey: 'surname', cell: (u) => u.surname || '—' },
     {
       id: 'role',
       header: t('administration.usersPage.role'),
+      sortKey: 'is_superuser',
       cell: (u) =>
         u.is_superuser ? (
           <StatusChip variant="info">{t('administration.usersPage.admin')}</StatusChip>
@@ -118,7 +97,8 @@ const AdminUsers = () => {
     },
     {
       id: 'is_active',
-      header: t('administration.usersPage.isActive'),
+      header: t('administration.usersPage.status'),
+      sortKey: 'is_active',
       cell: (u) =>
         u.is_active ? (
           <StatusChip variant="success">{t('administration.usersPage.active')}</StatusChip>
@@ -130,15 +110,14 @@ const AdminUsers = () => {
       id: 'last_login',
       header: t('administration.usersPage.lastLogin'),
       sortKey: 'last_login',
-      defaultHidden: true,
-      cell: (u) => fmtDate(u.last_login),
+      cell: (u) => fmtDate(u.last_login) ?? t('administration.usersPage.never'),
     },
     {
       id: 'created_at',
       header: t('administration.usersPage.createdAt'),
       sortKey: 'created_at',
       defaultHidden: true,
-      cell: (u) => fmtDate(u.created_at),
+      cell: (u) => fmtDate(u.created_at) ?? '—',
     },
   ];
 
@@ -148,7 +127,7 @@ const AdminUsers = () => {
         title={t('administration.usersPage.title')}
         description={t('administration.usersPage.description')}
         actions={
-          <Button onClick={openCreate} className="flex items-center gap-2">
+          <Button onClick={() => setDrawerOpen(true)} className="flex items-center gap-2">
             <FiPlus size={16} />
             {t('administration.usersPage.addUser')}
           </Button>
@@ -160,38 +139,73 @@ const AdminUsers = () => {
         columns={columns}
         rows={items}
         getRowId={(u) => u.id}
-        onRowClick={openEdit}
+        onRowClick={openProfile}
         loading={loading}
         error={error ? t('administration.usersPage.loadError') : undefined}
         onRetry={fetchUsers}
         emptyTitle={t('administration.usersPage.empty')}
         emptyDescription={t('administration.usersPage.emptyHint')}
-        sort={sort}
-        onSortChange={(s) => patchParams({ order_by: s.dir === 'desc' ? `-${s.key}` : s.key, page: '1' })}
         page={metadata.page}
         pageCount={metadata.pages}
         total={metadata.total}
         pageSize={metadata.limit}
-        onPageChange={(p) => patchParams({ page: String(p) })}
-        onPageSizeChange={(n) => patchParams({ limit: String(n), page: '1' })}
-        storageKey="admin-users"
+        {...tableProps}
+        storageKey="admin-users-v2"
         toolbar={
-          <SearchField
-            value={q}
-            onChange={(v) => patchParams({ q: v || null, page: '1' })}
-            label={t('administration.usersPage.searchPlaceholder')}
-            placeholder={t('administration.usersPage.searchPlaceholder')}
-            className="max-w-sm"
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <SearchField
+              value={q}
+              onChange={setQuery}
+              label={t('administration.usersPage.searchPlaceholder')}
+              placeholder={t('administration.usersPage.searchPlaceholder')}
+              className="w-full max-w-sm"
+            />
+            <Select
+              aria-label={t('administration.usersPage.role')}
+              value={role}
+              onChange={(v) => patch({ role: v || null, page: null })}
+              options={[
+                { value: '', label: t('administration.usersPage.filterAllRoles') },
+                { value: 'admin', label: t('administration.usersPage.admin') },
+                { value: 'user', label: t('administration.usersPage.student') },
+              ]}
+              className="w-44"
+              triggerClassName={FILTER_TRIGGER}
+            />
+            <Select
+              aria-label={t('administration.usersPage.status')}
+              value={status}
+              onChange={(v) => patch({ status: v || null, page: null })}
+              options={[
+                { value: '', label: t('administration.usersPage.filterAllStatuses') },
+                { value: 'active', label: t('administration.usersPage.active') },
+                { value: 'inactive', label: t('administration.usersPage.inactive') },
+              ]}
+              className="w-44"
+              triggerClassName={FILTER_TRIGGER}
+            />
+            <Select
+              aria-label={t('administration.nav.catalogs')}
+              value={catalogId}
+              onChange={(v) => patch({ catalog: v || null, page: null })}
+              options={[
+                { value: '', label: t('administration.usersPage.filterAllCatalogs') },
+                ...catalogs.map((c) => ({ value: c.id, label: c.title })),
+              ]}
+              className="w-52"
+              triggerClassName={FILTER_TRIGGER}
+            />
+          </div>
         }
       />
 
       <UserDrawer
         open={drawerOpen}
-        user={activeUser}
-        mode={drawerMode}
+        user={null}
+        mode="create"
         onClose={() => setDrawerOpen(false)}
-        onSaved={fetchUsers}
+        // Land on the new profile: catalogs, loans and the rest are one click away.
+        onSaved={(created) => (created ? openProfile(created) : fetchUsers())}
       />
     </div>
   );

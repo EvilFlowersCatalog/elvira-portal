@@ -1,6 +1,6 @@
 import { ReactElement, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FaBook, FaRobot } from 'react-icons/fa';
+import { FaBook } from 'react-icons/fa';
 import { FiPlus, FiTag, FiUsers, FiEdit3, FiKey, FiMessageSquare } from 'react-icons/fi';
 import { MdOutlineCollectionsBookmark, MdOutlineLibraryBooks, MdOutlineInventory2 } from 'react-icons/md';
 import useAppContext from '../../hooks/contexts/useAppContext';
@@ -26,13 +26,12 @@ const TILES: Tile[] = [
   { key: 'authors', labelKey: 'administration.nav.authors', statKey: 'authors', icon: <FiEdit3 size={22} />, path: NAVIGATION_PATHS.adminAuthors },
   { key: 'catalogs', labelKey: 'administration.nav.catalogs', statKey: 'catalogs', icon: <MdOutlineLibraryBooks size={22} />, path: NAVIGATION_PATHS.adminCatalogs },
   { key: 'users', labelKey: 'administration.nav.users', statKey: 'users', icon: <FiUsers size={22} />, path: NAVIGATION_PATHS.adminUsers },
-  { key: 'aiUsers', labelKey: 'administration.nav.aiUsers', statKey: 'users', icon: <FaRobot size={22} />, path: NAVIGATION_PATHS.adminAIUsers },
   { key: 'access', labelKey: 'administration.nav.access', statKey: 'users', icon: <FiKey size={22} />, path: NAVIGATION_PATHS.adminAccess },
 ];
 
 TILES.push({ key: 'loans', labelKey: 'administration.nav.loans', statKey: 'users', icon: <MdOutlineInventory2 size={22} />, path: NAVIGATION_PATHS.adminLoans });
 
-// AI Users / Access / Loans tiles show no numeric stat.
+// Access / Loans tiles show no numeric stat.
 const STAT_TILES = new Set(['publications', 'collections', 'categories', 'authors', 'catalogs', 'users']);
 
 const AdminHome = () => {

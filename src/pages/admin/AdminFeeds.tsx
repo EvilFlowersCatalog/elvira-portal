@@ -107,6 +107,7 @@ const AdminFeeds = () => {
     {
       id: 'kind',
       header: t('administration.collectionsPage.kind'),
+      sortKey: 'kind',
       cell: (f) =>
         isFolder(f) ? (
           <StatusChip variant="info" dot={false}>{t('administration.collectionsPage.kindNavigation')}</StatusChip>
@@ -123,6 +124,7 @@ const AdminFeeds = () => {
     {
       id: 'url_name',
       header: t('administration.collectionsPage.urlName'),
+      sortKey: 'url_name',
       defaultHidden: true,
       cell: (f) => <code className="text-xs text-zinc-500 dark:text-zinc-400">{f.url_name}</code>,
     },

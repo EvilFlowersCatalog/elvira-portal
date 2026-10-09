@@ -22,6 +22,8 @@ export type ActivityAction =
 
 export interface IActivity {
   id: string;
+  /** Owner of the row; lets the admin view verify whose history it received. */
+  user_id?: string;
   action: ActivityAction;
   // How many times the action repeated in a row; the row keeps the latest timestamp.
   count: number;

@@ -10,6 +10,7 @@ import useDeleteEntry from '../../../hooks/api/entries/useDeleteEntry';
 import { IEntry } from '../../../utils/interfaces/entry';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import { withAccessToken } from '../../../utils/func/functions';
+import { fmtDate } from '../../../utils/func/adminDate';
 import {
   PageHeader,
   DataTable,
@@ -172,7 +173,7 @@ const AdminEntries = () => {
       header: t('administration.entriesPage.created'),
       sortKey: 'created_at',
       defaultHidden: true,
-      cell: (e) => (e.created_at ? new Date(e.created_at).toLocaleDateString() : '—'),
+      cell: (e) => fmtDate(e.created_at) ?? '—',
     },
     {
       id: 'actions',

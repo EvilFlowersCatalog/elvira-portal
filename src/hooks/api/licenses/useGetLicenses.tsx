@@ -6,6 +6,8 @@ interface GetLicensesParams {
   user_mode?: "all" | "current" | "query";
   user_id?: string;
   entry_id?: string;
+  /** Entry title or borrower name. */
+  query?: string;
   pagination?: boolean;
   page?: number;
   limit?: number;
@@ -55,6 +57,7 @@ const useGetLicenses = () => {
     // Backend orders via `order_by` (Ordering.create_from_request); the old
     // `sort_by` param was silently ignored. Only send when a field is requested.
     if (query.orderBy) params.set("order_by", query.orderBy);
+    if (query.query) params.set("query", query.query);
 
     const GET_LICENCES_URL = "/readium/v1/licenses";
     const { data } = await axios.get<{

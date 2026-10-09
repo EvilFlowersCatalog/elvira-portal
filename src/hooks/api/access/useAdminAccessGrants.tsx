@@ -17,8 +17,11 @@ export interface IAccessGrantListParams {
   user_id?: string;
   acquisition_id?: string;
   type?: string;
+  /** Entry title or user name. */
+  query?: string;
   page?: number;
   limit?: number;
+  orderBy?: string;
 }
 
 export const useListAccessGrants = () => {
@@ -34,6 +37,8 @@ export const useListAccessGrants = () => {
     if (opts.user_id) params.set('user_id', opts.user_id);
     if (opts.acquisition_id) params.set('acquisition_id', opts.acquisition_id);
     if (opts.type) params.set('type', opts.type);
+    if (opts.query) params.set('query', opts.query);
+    if (opts.orderBy) params.set('order_by', opts.orderBy);
     const { data } = await axios.get<{ items: IAccessGrant[]; metadata: Metadata }>('/api/v1/user-acquisitions', {
       params,
     });

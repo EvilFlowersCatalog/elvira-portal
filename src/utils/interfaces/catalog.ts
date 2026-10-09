@@ -1,4 +1,4 @@
-export type CatalogAccessMode = 'read' | 'manage';
+export type CatalogAccessMode = 'read' | 'write' | 'manage';
 
 export interface IUserCatalog {
   mode: CatalogAccessMode;

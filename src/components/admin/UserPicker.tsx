@@ -29,7 +29,7 @@ export default function UserPicker({ onSelect, exclude = [], placeholder, label 
       return;
     }
     setLoading(true);
-    getUsers({ page: 1, limit: 8, username: debounced.trim() })
+    getUsers({ page: 1, limit: 8, query: debounced.trim() })
       .then(({ items }) => alive && setResults(items))
       .catch(() => alive && setResults([]))
       .finally(() => alive && setLoading(false));

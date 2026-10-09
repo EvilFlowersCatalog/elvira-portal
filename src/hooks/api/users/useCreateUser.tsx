@@ -7,6 +7,7 @@ export interface ICreateUserPayload {
   surname: string;
   password: string;
   is_active?: boolean;
+  is_superuser?: boolean;
   lcp_passphrase?: string;
   lcp_passphrase_hint?: string;
 }
