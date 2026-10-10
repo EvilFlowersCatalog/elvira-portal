@@ -65,8 +65,13 @@ const Viewer = () => {
   const location = useLocation();
   const [loading, setLoading] = useState<boolean>(true);
   const [progressBar, setProgressBar] = useState<number>(0);
+  // Where the reader was opened from. Kept from mount: opening a dialog here
+  // rewrites the URL and drops the navigation state.
+  const [origin] = useState(
+    location.state as { from?: string; catalogId?: string; fromPath?: string } | null
+  );
   const [entryCatalogId, setEntryCatalogId] = useState<string | null>(
-    (location.state as { catalogId?: string })?.catalogId || null
+    origin?.catalogId || null
   );
 
   const navigate = useNavigate();
@@ -110,17 +115,17 @@ const Viewer = () => {
   };
   // Home function for viewer to navigate back to where the reader was opened from, or home if unknown
   const homeFunction = () => {
-    const fromPath = (location.state as { fromPath?: string })?.fromPath;
-    navigate(fromPath || NAVIGATION_PATHS.home);
+    navigate(origin?.fromPath || NAVIGATION_PATHS.home);
   };
   const closeFunction = () => {
-    const catalogParam = entryCatalogId ? `&entry-catalog-id=${entryCatalogId}` : '';
-    const path =
-      location.state?.from === "shelf"
-        ? `${NAVIGATION_PATHS.shelf}?entry-detail-id=${id}${catalogParam}`
-        : `${NAVIGATION_PATHS.library}?entry-detail-id=${id}${catalogParam}`;
+    const base = origin?.from === "shelf" ? NAVIGATION_PATHS.shelf : NAVIGATION_PATHS.library;
+    // Reopen the detail on top of the search/filters the reader was opened from.
+    const [fromPathname, fromSearch = ''] = origin?.fromPath?.split('?') ?? [];
+    const params = new URLSearchParams(fromPathname === base ? fromSearch : '');
+    if (id) params.set('entry-detail-id', id);
+    if (entryCatalogId) params.set('entry-catalog-id', entryCatalogId);
 
-    navigate(path);
+    navigate(`${base}?${params.toString()}`);
   };
 
   // Mirrors EntryItem.tsx's openEntryDetail — same modal, same query params.

@@ -15,6 +15,7 @@ import {
   setCategoryIds,
   setFeedIds,
 } from '../../utils/func/filterParams';
+import { withRememberedSearch } from '../../utils/func/listSearch';
 
 const Breadcrumb = () => {
   const { lang, editingEntryTitle } = useAppContext();
@@ -263,6 +264,12 @@ const Breadcrumb = () => {
 
   }, [location.search]);
 
+  // A crumb leading back to another page restores the search/filters that page
+  // was left with. Crumbs of the current page stay bare (they step out of its
+  // filters), and so does /feeds, whose drill-down levels are their own crumbs.
+  const crumbTarget = (path: string) =>
+    path === location.pathname || path === NAVIGATION_PATHS.feeds ? path : withRememberedSearch(path);
+
   return (
     <div className='flex flex-wrap items-center gap-[7px] px-5 h-10'>
       <Link
@@ -282,7 +289,7 @@ const Breadcrumb = () => {
               </span>
             ) : (
               <Link
-                to={breadcrumb.path}
+                to={crumbTarget(breadcrumb.path)}
                 className='text-[13px] tracking-[0.1px] text-darkGray dark:text-zinc-400 whitespace-nowrap cursor-pointer hover:text-secondary dark:hover:text-zinc-200 transition-colors'
               >
                 {breadcrumb.label}
