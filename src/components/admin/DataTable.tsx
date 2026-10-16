@@ -28,6 +28,8 @@ export interface DataTableColumn<T> {
   cell: (row: T) => ReactNode;
   /** Server sort key; presence enables sorting on this column. */
   sortKey?: string;
+  /** Direction of the first click. Defaults to 'desc' (newest first) for timestamp keys, else 'asc'. */
+  firstSortDir?: SortDir;
   align?: 'left' | 'center' | 'right';
   width?: string;
   /** Can the user hide this column? Defaults to true. */
@@ -171,6 +173,12 @@ function ColumnsMenu<T>({
   );
 }
 
+// Dates show day precision only, so oldest-first would bury the newest rows at
+// the end of the list. The server still orders by the full timestamp.
+const TIMESTAMP_KEY = /(_at|_login)$/;
+const firstSortDir = <T,>(col: DataTableColumn<T>): SortDir =>
+  col.firstSortDir ?? (col.sortKey && TIMESTAMP_KEY.test(col.sortKey) ? 'desc' : 'asc');
+
 const ALIGN: Record<string, string> = {
   left: 'text-left',
   center: 'text-center',
@@ -222,8 +230,9 @@ export default function DataTable<T>({
 
   const handleSort = (col: DataTableColumn<T>) => {
     if (!col.sortKey || !onSortChange) return;
-    const nextDir: SortDir =
-      sort?.key === col.sortKey && sort.dir === 'asc' ? 'desc' : 'asc';
+    const first = firstSortDir(col);
+    const flip: SortDir = first === 'asc' ? 'desc' : 'asc';
+    const nextDir: SortDir = sort?.key === col.sortKey && sort.dir === first ? flip : first;
     onSortChange({ key: col.sortKey, dir: nextDir });
   };
 
@@ -305,6 +314,8 @@ export default function DataTable<T>({
                             ) : (
                               <FiArrowDown size={13} aria-hidden="true" />
                             )
+                          ) : firstSortDir(col) === 'desc' ? (
+                            <FiArrowDown size={13} className="opacity-25" aria-hidden="true" />
                           ) : (
                             <FiArrowUp size={13} className="opacity-25" aria-hidden="true" />
                           )}
