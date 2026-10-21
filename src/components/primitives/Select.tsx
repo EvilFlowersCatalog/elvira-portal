@@ -138,7 +138,8 @@ const Select = ({
           aria-labelledby={selectId}
           style={listStyle}
           // Above drawers (z-50) and confirm dialogs (z-60), which host selects too.
-          className="fixed z-[70] overflow-auto rounded-md border border-[#e5e5e5] dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-[0px_4px_12px_rgba(0,0,0,0.15)] py-1"
+          // Portalled to <body>, so it inherits nothing — set the text color explicitly.
+          className="fixed z-[70] overflow-auto rounded-md border border-[#e5e5e5] dark:border-zinc-700 bg-white dark:bg-zinc-800 text-black dark:text-white shadow-[0px_4px_12px_rgba(0,0,0,0.15)] py-1"
         >
           {options.map((opt) => {
             const isSelected = opt.value === value;
