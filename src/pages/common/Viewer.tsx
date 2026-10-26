@@ -179,19 +179,18 @@ const Viewer = () => {
   // and leaving it out hides the viewer's "Podobné" and suggestion popups.
 
 
-  const explainFunction =
-    import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true"
-      ? async (
-          selectedText: string,
-          context?: { page?: number }
-        ): Promise<IExplainResult> =>
-          explainPassage({
-            user_acquisition_id,
-            text: selectedText,
-            page: context?.page,
-            language: lang,
-          })
-      : undefined;
+  // Shipped feature — deliberately not behind ELVIRA_EXPERIMENTAL_FEATURES
+  // (false on elvira.stuba.sk), which used to hide "Vysvetliť" in production.
+  const explainFunction = async (
+    selectedText: string,
+    context?: { page?: number }
+  ): Promise<IExplainResult> =>
+    explainPassage({
+      user_acquisition_id,
+      text: selectedText,
+      page: context?.page,
+      language: lang,
+    });
 
   const saveLayerFunc = async (
     svg: string,
