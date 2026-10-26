@@ -6,10 +6,14 @@ import useUserChatsQuery from '../../hooks/api/assistant/useUserChatsQuery';
 import useGetChatHistory from '../../hooks/api/assistant/useGetChatHistory';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
-import { FiMessageSquare, FiPlus } from 'react-icons/fi';
+import { FiMessageSquare, FiPlus, FiTrash2 } from 'react-icons/fi';
+import { useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 import { AiMessage } from '../../providers/AppProvider';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import { H1 } from '../../components/primitives/Heading';
+import ConfirmDialog from '../../components/admin/ConfirmDialog';
+import useDeleteChat from '../../hooks/api/assistant/useDeleteChat';
 
 function ChatRowSkeleton() {
   return (
@@ -34,14 +38,19 @@ function ChatRowSkeleton() {
 const AiChatHistory = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { 
-    setAiChatId, 
+  const {
+    aiChatId,
+    setAiChatId,
     setAiMessages,
     setAiShowSuggestions,
     clearAiChat,
     umamiTrack
   } = useAppContext();
   const getChatHistory = useGetChatHistory();
+  const deleteChat = useDeleteChat();
+  const queryClient = useQueryClient();
+  const [pendingDelete, setPendingDelete] = useState<IAssistantChat | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   // Page load via React Query (cached / deduped). The per-chat resume fetch
   // below stays imperative — it's a click-driven action, not a page query.
@@ -73,6 +82,24 @@ const AiChatHistory = () => {
     } catch (err) {
       console.error('Failed to resume chat:', err);
       toast.error(t('assistant.chatHistoryError'));
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!pendingDelete) return;
+    setDeleting(true);
+    try {
+      await deleteChat(pendingDelete.id);
+      umamiTrack('Delete AI Chat');
+      // The open assistant must not keep sending into a deleted chat.
+      if (aiChatId === pendingDelete.id) clearAiChat();
+      await queryClient.invalidateQueries({ queryKey: ['user-chats'] });
+      setPendingDelete(null);
+    } catch (err) {
+      console.error('Failed to delete chat:', err);
+      toast.error(t('assistant.deleteChatError'));
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -163,7 +190,18 @@ const AiChatHistory = () => {
                           <span>{formatDate(chat.last_message_at ?? chat.created_at)}</span>
                         </div>
                       </div>
-                      <FiMessageSquare size={24} className="text-gray-400 dark:text-gray-600 ml-4" />
+                      <button
+                        type="button"
+                        aria-label={t('assistant.deleteChat')}
+                        title={t('assistant.deleteChat')}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPendingDelete(chat);
+                        }}
+                        className="ml-4 -mr-1 -mt-1 rounded-md p-2 text-gray-400 dark:text-gray-500 hover:bg-red/10 hover:text-redText dark:hover:text-red transition-colors"
+                      >
+                        <FiTrash2 size={20} />
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -172,6 +210,20 @@ const AiChatHistory = () => {
           )}
         </div>
       )}
+
+      <ConfirmDialog
+        open={pendingDelete != null}
+        title={t('assistant.deleteChat')}
+        message={t('assistant.deleteChatConfirm', {
+          title: pendingDelete?.title || t('assistant.untitledChat'),
+        })}
+        confirmLabel={t('assistant.deleteChat')}
+        cancelLabel={t('assistant.cancel')}
+        destructive
+        loading={deleting}
+        onConfirm={handleDelete}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   );
 };

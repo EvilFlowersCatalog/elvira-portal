@@ -212,7 +212,7 @@ export default function AiAssistant() {
             />
             {/* Panel */}
             <div
-                className={`absolute top-0 right-0 h-full w-full max-w-[800px] rounded-l-lg bg-[#F4F6F9] dark:bg-[#27272A] shadow-2xl overflow-hidden transition-transform duration-300 ${showAiAssistant ? "translate-x-0" : "translate-x-full"}`}
+                className={`absolute top-0 right-0 h-full w-full max-w-[800px] rounded-l-lg bg-[#F4F6F9] dark:bg-[#27272A] text-black dark:text-white shadow-2xl overflow-hidden transition-transform duration-300 ${showAiAssistant ? "translate-x-0" : "translate-x-full"}`}
             >
                 <div className="p-3 h-full flex flex-col">
                     {/* Header */}

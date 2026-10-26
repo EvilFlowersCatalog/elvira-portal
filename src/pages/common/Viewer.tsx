@@ -13,7 +13,6 @@ import {
   THEME_TYPE,
 } from "../../utils/interfaces/general/general";
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
-import useGetEntries from "../../hooks/api/entries/useGetEntries";
 import EntryDetail from "../../components/items/entry/details/EntryDetail";
 import useGetUserAcquisition from "../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisition";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -37,6 +36,7 @@ import useCreateAnotationItem from "../../hooks/api/anotations/anotation-items/u
 import useDeleteAnotationItem from "../../hooks/api/anotations/anotation-items/useDeleteAnotationItem";
 import useAddToShelf from "../../hooks/api/my-shelf/useAddToShelf";
 import useRemoveFromShelf from "../../hooks/api/my-shelf/useRemoveFromShelf";
+import useExplainPassage from "../../hooks/api/assistant/useExplainPassage";
 
 
 interface ISuggestedEntry {
@@ -65,8 +65,13 @@ const Viewer = () => {
   const location = useLocation();
   const [loading, setLoading] = useState<boolean>(true);
   const [progressBar, setProgressBar] = useState<number>(0);
+  // Where the reader was opened from. Kept from mount: opening a dialog here
+  // rewrites the URL and drops the navigation state.
+  const [origin] = useState(
+    location.state as { from?: string; catalogId?: string; fromPath?: string } | null
+  );
   const [entryCatalogId, setEntryCatalogId] = useState<string | null>(
-    (location.state as { catalogId?: string })?.catalogId || null
+    origin?.catalogId || null
   );
 
   const navigate = useNavigate();
@@ -75,8 +80,8 @@ const Viewer = () => {
   const removeFromShelf = useRemoveFromShelf();
   const createUserAcquisition = useCreateUserAcquisition();
   const { getEntryDetail } = useGetEntryDetail();
-  const getEntries = useGetEntries();
   const getUserAcquisition = useGetUserAcquisition();
+  const explainPassage = useExplainPassage();
   const getAnotations = useGetAnotations();
   const updateAnotation = useUpdateAnotation();
   const createAnotation = useCreateAnotation();
@@ -110,17 +115,17 @@ const Viewer = () => {
   };
   // Home function for viewer to navigate back to where the reader was opened from, or home if unknown
   const homeFunction = () => {
-    const fromPath = (location.state as { fromPath?: string })?.fromPath;
-    navigate(fromPath || NAVIGATION_PATHS.home);
+    navigate(origin?.fromPath || NAVIGATION_PATHS.home);
   };
   const closeFunction = () => {
-    const catalogParam = entryCatalogId ? `&entry-catalog-id=${entryCatalogId}` : '';
-    const path =
-      location.state?.from === "shelf"
-        ? `${NAVIGATION_PATHS.shelf}?entry-detail-id=${id}${catalogParam}`
-        : `${NAVIGATION_PATHS.library}?entry-detail-id=${id}${catalogParam}`;
+    const base = origin?.from === "shelf" ? NAVIGATION_PATHS.shelf : NAVIGATION_PATHS.library;
+    // Reopen the detail on top of the search/filters the reader was opened from.
+    const [fromPathname, fromSearch = ''] = origin?.fromPath?.split('?') ?? [];
+    const params = new URLSearchParams(fromPathname === base ? fromSearch : '');
+    if (id) params.set('entry-detail-id', id);
+    if (entryCatalogId) params.set('entry-catalog-id', entryCatalogId);
 
-    navigate(path);
+    navigate(`${base}?${params.toString()}`);
   };
 
   // Mirrors EntryItem.tsx's openEntryDetail — same modal, same query params.
@@ -170,38 +175,22 @@ const Viewer = () => {
     }
   };
 
-  const suggestionsFunction =
-    import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true"
-      ? async (kind: string): Promise<ISuggestedEntry[]> => {
-          const pageByKind: Record<string, number> = {
-            similar: 1,
-            prerequisite: 2,
-            advanced: 3,
-          };
-          const { items } = await getEntries({
-            page: pageByKind[kind] ?? 1,
-            limit: 4,
-          });
-          return items.map((entry) => ({
-            id: entry.id,
-            catalog_id: entry.catalog_id,
-            title: entry.title,
-            authors: entry.authors,
-            thumbnail: withAccessToken(entry.thumbnail, auth?.token) ?? "",
-            shelf_record_id: entry.shelf_record_id,
-          }));
-        }
-      : undefined;
+  // No `suggestionsFunction`: the catalog has no recommendation backend yet,
+  // and leaving it out hides the viewer's "Podobné" and suggestion popups.
 
 
   const explainFunction =
     import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true"
-      ? async (selectedText: string): Promise<IExplainResult> => ({
-          simple: `Jednoducho: ${selectedText}`,
-          examples: [
-            { label: "Príklad", description: `Kontext pre: ${selectedText}` },
-          ],
-        })
+      ? async (
+          selectedText: string,
+          context?: { page?: number }
+        ): Promise<IExplainResult> =>
+          explainPassage({
+            user_acquisition_id,
+            text: selectedText,
+            page: context?.page,
+            language: lang,
+          })
       : undefined;
 
   const saveLayerFunc = async (
@@ -479,7 +468,6 @@ const Viewer = () => {
             shareFunction,
             openEntryDetailFunction,
             bookmarkToggleFunction,
-            suggestionsFunction,
             explainFunction,
             editPackage: {
               saveLayerFunc,

@@ -3,6 +3,7 @@ import { ChangeEvent, FormEvent, useState } from 'react';
 import { IEntryNew, IEntryNewForm } from '../../../utils/interfaces/entry';
 import { useTranslation } from 'react-i18next';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
+import { withRememberedSearch } from '../../../utils/func/listSearch';
 import { toast } from 'react-toastify';
 import useUploadEntry from '../../../hooks/api/entries/useUploadEntry';
 import useCreateEntryAcquistion from '../../../hooks/api/acquisitiions/useCreateEntryAcquistion';
@@ -52,7 +53,10 @@ const AdminAddEntry = () => {
 
   const navigate = useNavigate();
   // Search/filters/page of the entries list we came from, so saving returns to it.
-  const listSearch = (useLocation().state as { from?: string } | null)?.from ?? '';
+  // Opened without that state (direct link, new tab): the list as it was last left.
+  const listSearch = (useLocation().state as { from?: string } | null)?.from;
+  const listPath =
+    listSearch != null ? NAVIGATION_PATHS.adminEntries + listSearch : withRememberedSearch(NAVIGATION_PATHS.adminEntries);
   const uploadEntry = useUploadEntry();
   const createEntryAcquisition = useCreateEntryAcquistion();
 
@@ -116,7 +120,7 @@ const AdminAddEntry = () => {
           })
         );
         toast.success(t('notifications.entry.add.success'));
-        navigate(NAVIGATION_PATHS.adminEntries + listSearch, { replace: true });
+        navigate(listPath, { replace: true });
       } catch {
         toast.error(t('notifications.entry.add.error'));
       } finally {

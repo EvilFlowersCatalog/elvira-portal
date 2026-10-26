@@ -11,6 +11,7 @@ import { forgetUser } from '../../hooks/api/users/useUserLookup';
 import { IUser } from '../../utils/interfaces/user';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 import { fmtDateTime } from '../../utils/func/adminDate';
+import { withRememberedSearch } from '../../utils/func/listSearch';
 import { StatusChip, Tabs, ConfirmDialog } from '../../components/admin';
 import { userDisplayName } from '../../components/admin/UserLink';
 import Button from '../../components/buttons/Button';
@@ -98,7 +99,7 @@ const AdminUserProfile = () => {
 
   const backLink = (
     <Link
-      to={NAVIGATION_PATHS.adminUsers}
+      to={withRememberedSearch(NAVIGATION_PATHS.adminUsers)}
       className="mx-5 mb-2 inline-flex items-center gap-1.5 text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:text-primaryText dark:hover:text-primaryLight"
     >
       <FiArrowLeft size={15} />
@@ -253,7 +254,7 @@ const AdminUserProfile = () => {
         mode="edit"
         onClose={() => setDrawerOpen(false)}
         onSaved={fetchUser}
-        onDeleted={() => navigate(NAVIGATION_PATHS.adminUsers, { replace: true })}
+        onDeleted={() => navigate(withRememberedSearch(NAVIGATION_PATHS.adminUsers), { replace: true })}
       />
 
       <ConfirmDialog

@@ -5,6 +5,7 @@ import { IEntryNew, IEntryNewForm } from '../../../utils/interfaces/entry';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
+import { withRememberedSearch } from '../../../utils/func/listSearch';
 import { toast } from 'react-toastify';
 import useEditEntry from '../../../hooks/api/entries/useEditEntry';
 import AdminEntryForm from './AdminEntryForm';
@@ -21,7 +22,10 @@ const AdminEditEntry = () => {
   const { getEntryDetail } = useGetEntryDetail();
   const navigate = useNavigate();
   // Search/filters/page of the entries list we came from, so saving returns to it.
-  const listSearch = (useLocation().state as { from?: string } | null)?.from ?? '';
+  // Opened without that state (direct link, new tab): the list as it was last left.
+  const listSearch = (useLocation().state as { from?: string } | null)?.from;
+  const listPath =
+    listSearch != null ? NAVIGATION_PATHS.adminEntries + listSearch : withRememberedSearch(NAVIGATION_PATHS.adminEntries);
   const editEntry = useEditEntry();
 
   useEffect(() => {
@@ -101,7 +105,7 @@ const AdminEditEntry = () => {
         setIsLoading(true);
         await editEntry(id!, newEntry, entryCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined);
         toast.success(t('notifications.entry.edit.success'));
-        navigate(NAVIGATION_PATHS.adminEntries + listSearch, { replace: true });
+        navigate(listPath, { replace: true });
       } catch {
         toast.error(t('notifications.entry.edit.error'));
       } finally {

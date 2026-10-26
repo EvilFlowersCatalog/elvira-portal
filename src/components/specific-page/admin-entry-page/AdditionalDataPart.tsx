@@ -4,6 +4,7 @@ import { IPartParams } from '../../../utils/interfaces/general/general';
 import ImageDropzone from '../../dropzones/ImageDropzone';
 import ElviraInput from '../../inputs/ElviraInput';
 import LanguageAutofill from '../../autofills/LanguageAutofill';
+import PartialDateInput from '../../inputs/PartialDateInput';
 import { ChangeEvent, useEffect, useState } from 'react';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import useAppContext from '../../../hooks/contexts/useAppContext';
@@ -102,39 +103,24 @@ const AdditionalDataPart = ({
           placeholder={t('entry.wizard.publisher')}
           value={entry.publisher ?? ''}
         />
-        <div className='flex flex-col'>
-          <div className='w-full flex flex-col gap-1'>
-            <label htmlFor='published-at' className='text-sm pl-1 text-black dark:text-white'>
-              {t('entry.wizard.year')}
-            </label>
-            <input
-              id='published-at'
-              type='date'
-              className='w-full p-2 bg-white shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A] dark:bg-strongDarkGray dark:text-white outline-none rounded-md border border-black dark:border-white focus:border-primary [color-scheme:light] dark:[color-scheme:dark]'
-              value={entry.published_at ?? ''}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (value) {
-                  const [year, month, day] = value.split('-');
-                  setEntry({
-                    ...entry,
-                    published_at: value,
-                  });
-                  umamiTrack('Date Selection', {
-                    year: parseInt(year, 10).toString(),
-                    month: parseInt(month, 10).toString(),
-                    day: parseInt(day, 10).toString(),
-                  });
-                } else {
-                  setEntry({
-                    ...entry,
-                    published_at: '',
-                  });
-                }
-              }}
-            />
-          </div>
-        </div>
+        <PartialDateInput
+          label={t('entry.wizard.year')}
+          value={entry.published_at ?? ''}
+          onChange={(value) => {
+            setEntry({
+              ...entry,
+              published_at: value,
+            });
+            if (value) {
+              const [year, month, day] = value.split('-');
+              umamiTrack('Date Selection', {
+                year,
+                ...(month && { month: parseInt(month, 10).toString() }),
+                ...(day && { day: parseInt(day, 10).toString() }),
+              });
+            }
+          }}
+        />
       </div>
     </div>
   );

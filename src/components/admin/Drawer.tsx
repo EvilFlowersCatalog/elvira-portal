@@ -66,7 +66,7 @@ export default function Drawer({
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative flex h-full w-full ${width} flex-col bg-white dark:bg-zinc-800 shadow-2xl animate-fly-right`}
+        className={`relative flex h-full w-full ${width} flex-col bg-white dark:bg-zinc-800 text-black dark:text-white shadow-2xl animate-fly-right`}
       >
         <div className="flex items-start justify-between gap-4 border-b border-zinc-200 dark:border-zinc-700 px-5 py-4">
           <div className="min-w-0">

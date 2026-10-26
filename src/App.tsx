@@ -9,6 +9,7 @@ import Header from './components/header/Header';
 import useAppContext from './hooks/contexts/useAppContext';
 import PageLoading from './components/page/PageLoading';
 import RouteErrorBoundary from './components/page/RouteErrorBoundary';
+import { rememberSearch } from './utils/func/listSearch';
 
 const App = () => {
   const { informed } = useCookiesContext();
@@ -22,6 +23,11 @@ const App = () => {
       !location.pathname.includes(NAVIGATION_PATHS.viewer)
     );
   };
+
+  // Keep each page's last query so in-app back links can return to it as it was left.
+  useEffect(() => {
+    rememberSearch(location.pathname, location.search);
+  }, [location.pathname, location.search]);
 
   // Scripts for analytics
   useEffect(() => {
