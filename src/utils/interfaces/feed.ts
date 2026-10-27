@@ -1,4 +1,4 @@
-import { IMetadata } from './general/general';
+import { IMetadata, LocalizedText } from './general/general';
 
 export interface IFeedsList {
   items: IFeed[];
@@ -7,7 +7,7 @@ export interface IFeedsList {
 
 export interface IFeed {
   id: string;
-  title: string;
+  title: LocalizedText;
   content: string;
   url_name: string;
   kind: string;
@@ -17,7 +17,7 @@ export interface IFeed {
 
 export interface IFeedDetail {
   id: string;
-  title: string;
+  title: LocalizedText;
   content: string;
   url_name: string;
   kind: string;
@@ -43,7 +43,7 @@ export interface IFeedQuery {
 export interface IFeedNew {
   catalog_id: string;
   parents?: string[];
-  title: string;
+  title: LocalizedText;
   url_name: string;
   content: string;
   kind: string;

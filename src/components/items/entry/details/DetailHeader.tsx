@@ -1,9 +1,11 @@
 import React from "react";
 import { IEntryDetail } from "../../../../utils/interfaces/entry";
+import { localize } from '../../../../utils/func/localized';
+import { LocalizedText } from '../../../../utils/interfaces/general/general';
 
 type Feed = {
     id: string | number;
-    title: string;
+    title: LocalizedText;
 };
 
 type Author = {
@@ -43,7 +45,7 @@ export function DetailHeader({
                             className="cursor-pointer font-semibold px-2 py-1 text-md bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight rounded-lg"
                             onClick={() => handleFeedClick(feed)}
                         >
-                            {feed.title}
+                            {localize(feed.title)}
                         </button>
                     ))}
                 </div>

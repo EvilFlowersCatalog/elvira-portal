@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ICategory } from '../../utils/interfaces/category';
+import { LocalizedText } from '../../utils/interfaces/general/general';
 import useGetCategories from '../../hooks/api/categories/useGetCategories';
 import ElviraInput from '../inputs/ElviraInput';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import { localize } from '../../utils/func/localized';
 
 interface ICategoryAutofillParams {
   /**
@@ -22,8 +24,8 @@ interface ICategoryAutofillParams {
 }
 
 /** Human-readable name of a category — `label` is what we show, `term` is the raw code. */
-const categoryName = (category: { label?: string; term?: string }) =>
-  category?.label || category?.term || '';
+const categoryName = (category: { label?: LocalizedText | string; term?: string }) =>
+  localize(category?.label) || category?.term || '';
 
 const CategoryAutofill = ({
   entryForm,

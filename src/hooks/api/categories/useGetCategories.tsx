@@ -2,6 +2,7 @@ import {
   ICategoryQuery,
   IListCategory,
 } from '../../../utils/interfaces/category';
+import i18next from 'i18next';
 import useAxios from '../useAxios';
 
 const useGetCategories = () => {
@@ -21,6 +22,8 @@ const useGetCategories = () => {
     if (limit) params.set('limit', limit.toString());
     params.set('catalog_id', import.meta.env.ELVIRA_CATALOG_ID);
     if (orderBy) params.set('order_by', orderBy);
+    // `order_by=label` sorts by the label in the UI language
+    params.set('language', i18next.language);
 
     if (query) params.set('query', query);
     params.set('paginate', paginate.toString());

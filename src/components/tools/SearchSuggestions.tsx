@@ -11,6 +11,7 @@ import { ICategory } from "../../utils/interfaces/category";
 import { IFeed } from "../../utils/interfaces/feed";
 import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
 import { addCategoryId, addFeedId } from "../../utils/func/filterParams";
+import { localize } from '../../utils/func/localized';
 
 interface SearchSuggestionsProps {
   searchQuery: string;
@@ -258,7 +259,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
                       onClick={() => handleFeedClick(feed.id)}
                       className="px-2 py-1 text-xs bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight font-medium transition-colors rounded-md"
                     >
-                      {feed.title}
+                      {localize(feed.title)}
                     </button>
                   ))}
                 </div>
@@ -276,7 +277,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
                       onClick={() => handleCategoryClick(category.id)}
                       className="px-2 py-1 text-xs bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight font-medium transition-colors rounded-md"
                     >
-                      {category.label || category.term}
+                      {localize(category.label) || category.term}
                     </button>
                   ))}
                 </div>

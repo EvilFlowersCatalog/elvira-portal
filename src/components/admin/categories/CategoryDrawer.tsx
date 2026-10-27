@@ -5,12 +5,15 @@ import { FiTrash2 } from 'react-icons/fi';
 import Drawer from '../Drawer';
 import ConfirmDialog from '../ConfirmDialog';
 import { Field, TextInput } from '../Field';
+import LocalizedTextInput from '../LocalizedTextInput';
 import Button from '../../buttons/Button';
 import { ICategory } from '../../../utils/interfaces/category';
 import useCreateCategory from '../../../hooks/api/categories/useCreateCategory';
 import useGetCategories from '../../../hooks/api/categories/useGetCategories';
 import useEditCategory from '../../../hooks/api/categories/useEditCategory';
 import useDeleteCategory from '../../../hooks/api/categories/useDeleteCategory';
+import { LocalizedText } from '../../../utils/interfaces/general/general';
+import { DEFAULT_CONTENT_LANGUAGE, cleanLocalized, localize, toLocalized, useLocalize } from '../../../utils/func/localized';
 
 interface CategoryDrawerProps {
   open: boolean;
@@ -25,12 +28,13 @@ interface CategoryDrawerProps {
 
 export default function CategoryDrawer({ open, category, mode, catalogId, onClose, onSaved, onCreated }: CategoryDrawerProps) {
   const { t } = useTranslation();
+  const tl = useLocalize();
   const getCategories = useGetCategories();
   const createCategory = useCreateCategory();
   const editCategory = useEditCategory();
   const deleteCategory = useDeleteCategory();
 
-  const [label, setLabel] = useState('');
+  const [label, setLabel] = useState<LocalizedText>({});
   const [term, setTerm] = useState('');
   const [scheme, setScheme] = useState('');
   const [errors, setErrors] = useState<{ label?: string; term?: string }>({});
@@ -41,14 +45,14 @@ export default function CategoryDrawer({ open, category, mode, catalogId, onClos
   useEffect(() => {
     if (!open) return;
     setErrors({});
-    setLabel(mode === 'edit' && category ? category.label : '');
+    setLabel(mode === 'edit' && category ? toLocalized(category.label) : {});
     setTerm(mode === 'edit' && category ? category.term : '');
     setScheme(mode === 'edit' && category ? category.scheme ?? '' : '');
   }, [open, mode, category]);
 
   const validate = () => {
     const e: typeof errors = {};
-    if (!label.trim()) e.label = t('administration.categoriesPage.labelRequired');
+    if (!cleanLocalized(label)[DEFAULT_CONTENT_LANGUAGE]) e.label = t('administration.categoriesPage.labelRequired');
     if (!term.trim()) e.term = t('administration.categoriesPage.termRequired');
     setErrors(e);
     return Object.keys(e).length === 0;
@@ -60,7 +64,7 @@ export default function CategoryDrawer({ open, category, mode, catalogId, onClos
     if (!cid) return;
     setSaving(true);
     try {
-      const payload = { label: label.trim(), term: term.trim(), scheme: scheme.trim(), catalog_id: cid };
+      const payload = { label: cleanLocalized(label), term: term.trim(), scheme: scheme.trim(), catalog_id: cid };
       if (mode === 'create') {
         const res = await createCategory(payload);
         toast.success(t('administration.categoriesPage.created'));
@@ -70,7 +74,7 @@ export default function CategoryDrawer({ open, category, mode, catalogId, onClos
           if (!id) {
             try {
               const list = await getCategories({ query: payload.term, paginate: false });
-              id = list.items.find((c) => c.term === payload.term && c.label === payload.label)?.id;
+              id = list.items.find((c) => c.term === payload.term && localize(c.label) === localize(payload.label))?.id;
             } catch {
               /* created, but couldn't resolve it — the user can still pick it manually */
             }
@@ -112,7 +116,7 @@ export default function CategoryDrawer({ open, category, mode, catalogId, onClos
         open={open}
         onClose={onClose}
         title={mode === 'create' ? t('administration.categoriesPage.createTitle') : t('administration.categoriesPage.editTitle')}
-        description={mode === 'edit' && category ? category.label : undefined}
+        description={mode === 'edit' && category ? tl(category.label) : undefined}
         footer={
           <>
             {mode === 'edit' && category && (
@@ -139,8 +143,8 @@ export default function CategoryDrawer({ open, category, mode, catalogId, onClos
         }
       >
         <div className="flex flex-col gap-4">
-          <Field label={t('administration.categoriesPage.label')} htmlFor="cat-label" required error={errors.label}>
-            <TextInput id="cat-label" value={label} invalid={!!errors.label} onChange={(e) => setLabel(e.target.value)} />
+          <Field label={t('administration.categoriesPage.label')} htmlFor="cat-label" hint={t('administration.categoriesPage.labelHint')} required error={errors.label}>
+            <LocalizedTextInput id="cat-label" value={label} invalid={!!errors.label} onChange={setLabel} />
           </Field>
           <Field
             label={t('administration.categoriesPage.term')}
@@ -160,7 +164,7 @@ export default function CategoryDrawer({ open, category, mode, catalogId, onClos
       <ConfirmDialog
         open={confirmDelete}
         title={t('administration.categoriesPage.deleteConfirmTitle')}
-        message={t('administration.categoriesPage.deleteConfirmBody', { name: category?.label ?? '' })}
+        message={t('administration.categoriesPage.deleteConfirmBody', { name: tl(category?.label) })}
         confirmLabel={t('administration.categoriesPage.delete')}
         cancelLabel={t('administration.categoriesPage.cancel')}
         destructive

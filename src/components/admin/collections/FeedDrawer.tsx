@@ -6,6 +6,7 @@ import { FiTrash2, FiX, FiSearch, FiFolder } from 'react-icons/fi';
 import Drawer from '../Drawer';
 import ConfirmDialog from '../ConfirmDialog';
 import { Field, TextInput } from '../Field';
+import LocalizedTextInput from '../LocalizedTextInput';
 import Select from '../../primitives/Select';
 import Button from '../../buttons/Button';
 import { IFeed } from '../../../utils/interfaces/feed';
@@ -16,6 +17,8 @@ import useGetFeedDetail from '../../../hooks/api/feeds/useGetFeedDetail';
 import useUploadFeed from '../../../hooks/api/feeds/useUploadFeed';
 import useEditFeed from '../../../hooks/api/feeds/useEditFeed';
 import useDeleteFeed from '../../../hooks/api/feeds/useDeleteFeed';
+import { LocalizedText } from '../../../utils/interfaces/general/general';
+import { DEFAULT_CONTENT_LANGUAGE, cleanLocalized, toLocalized, useLocalize } from '../../../utils/func/localized';
 
 interface FeedRef {
   id: string;
@@ -114,6 +117,7 @@ function ParentPicker({
 
 export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentId, onClose, onSaved, onCreated }: FeedDrawerProps) {
   const { t } = useTranslation();
+  const tl = useLocalize();
   const queryClient = useQueryClient();
   const getFeeds = useGetFeeds();
   const getFeedDetail = useGetFeedDetail();
@@ -121,7 +125,7 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
   const editFeed = useEditFeed();
   const deleteFeed = useDeleteFeed();
 
-  const [title, setTitle] = useState('');
+  const [title, setTitle] = useState<LocalizedText>({});
   const [urlName, setUrlName] = useState('');
   const [content, setContent] = useState('');
   const [kind, setKind] = useState('acquisition');
@@ -138,15 +142,15 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
     { enabled: open }
   );
   const folders: FeedRef[] = useMemo(
-    () => (foldersData?.items ?? []).map((f) => ({ id: f.id, title: f.title })),
-    [foldersData]
+    () => (foldersData?.items ?? []).map((f) => ({ id: f.id, title: tl(f.title) })),
+    [foldersData, tl]
   );
 
   useEffect(() => {
     if (!open) return;
     setErrors({});
     if (mode === 'edit' && feed) {
-      setTitle(feed.title);
+      setTitle(toLocalized(feed.title));
       setKind(feed.kind || 'acquisition');
       setUrlName(feed.url_name);
       setContent('');
@@ -160,7 +164,7 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
         })
         .catch(() => {});
     } else {
-      setTitle('');
+      setTitle({});
       setUrlName('');
       setContent('');
       setKind('acquisition');
@@ -185,7 +189,7 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
 
   const validate = () => {
     const e: typeof errors = {};
-    if (!title.trim()) e.title = t('administration.collectionsPage.titleRequired');
+    if (!cleanLocalized(title)[DEFAULT_CONTENT_LANGUAGE]) e.title = t('administration.collectionsPage.titleRequired');
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -197,7 +201,7 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
     try {
       const payload = {
         catalog_id: catalogId ?? '',
-        title: title.trim(),
+        title: cleanLocalized(title),
         url_name: urlName.trim() || uuid(),
         content,
         kind,
@@ -211,13 +215,13 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
           let id = res?.response?.id ?? res?.id;
           if (!id) {
             try {
-              const list = await getFeeds({ paginate: false, title: payload.title });
+              const list = await getFeeds({ paginate: false, title: tl(payload.title) });
               id = list.items.find((f) => f.url_name === payload.url_name)?.id;
             } catch {
               /* created, but couldn't resolve it — the user can still pick it manually */
             }
           }
-          if (id) onCreated({ id, title: payload.title });
+          if (id) onCreated({ id, title: tl(payload.title) });
         }
       } else if (feed) {
         await editFeed(feed.id, payload);
@@ -284,8 +288,8 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
         }
       >
         <div className="flex flex-col gap-4">
-          <Field label={t('administration.collectionsPage.titleCol')} htmlFor="feed-title" required error={errors.title}>
-            <TextInput id="feed-title" value={title} invalid={!!errors.title} onChange={(e) => setTitle(e.target.value)} />
+          <Field label={t('administration.collectionsPage.titleCol')} htmlFor="feed-title" hint={t('administration.collectionsPage.titleHint')} required error={errors.title}>
+            <LocalizedTextInput id="feed-title" value={title} invalid={!!errors.title} onChange={setTitle} />
           </Field>
 
           <Field label={t('administration.collectionsPage.kind')} htmlFor="feed-kind">
@@ -356,7 +360,7 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
       <ConfirmDialog
         open={confirmDelete}
         title={t('administration.collectionsPage.deleteConfirmTitle')}
-        message={t('administration.collectionsPage.deleteConfirmBody', { name: feed?.title ?? '' })}
+        message={t('administration.collectionsPage.deleteConfirmBody', { name: tl(feed?.title) })}
         confirmLabel={t('administration.collectionsPage.delete')}
         cancelLabel={t('administration.collectionsPage.cancel')}
         destructive

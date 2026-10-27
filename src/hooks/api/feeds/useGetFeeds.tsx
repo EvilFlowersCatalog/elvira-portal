@@ -1,4 +1,5 @@
 import { IFeedQuery, IFeedsList } from '../../../utils/interfaces/feed';
+import i18next from 'i18next';
 import useAxios from '../useAxios';
 
 const useGetFeeds = () => {
@@ -19,6 +20,8 @@ const useGetFeeds = () => {
 
     if (orderBy) params.set('order_by', orderBy);
     else params.set('order_by', '-created_at');
+    // `order_by=title` sorts by the title in the UI language
+    params.set('language', i18next.language);
 
     // Check if there is param, if yes set it
     if (paginate === false) params.set('paginate', 'false');

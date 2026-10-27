@@ -67,6 +67,9 @@ export enum COOKIES_TYPE {
   LICENSE_KEY = 'elvira-license-terms',
 }
 
+/** Text stored in several languages, keyed by ISO 639-1 code: { sk: 'Informatika', en: 'Computer science' }. */
+export type LocalizedText = Record<string, string>;
+
 export interface IMetadata {
   page: number;
   limit: number;

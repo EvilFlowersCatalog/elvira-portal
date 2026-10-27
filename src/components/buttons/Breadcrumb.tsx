@@ -16,6 +16,8 @@ import {
   setFeedIds,
 } from '../../utils/func/filterParams';
 import { withRememberedSearch } from '../../utils/func/listSearch';
+import { localize } from '../../utils/func/localized';
+import { LocalizedText } from '../../utils/interfaces/general/general';
 
 const Breadcrumb = () => {
   const { lang, editingEntryTitle } = useAppContext();
@@ -25,13 +27,13 @@ const Breadcrumb = () => {
   const [searchParams] = useSearchParams();
 
   const [feedsLoading, setFeedsLoading] = useState<boolean>(searchParams.get('parent-id') || searchParams.get('feed-id-step') ? true : false);
-  const [feeds, setFeeds] = useState<{ id: string; title: string }[]>([]);
+  const [feeds, setFeeds] = useState<{ id: string; title: LocalizedText | string }[]>([]);
   const [authorFilter, setAuthorFilter] = useState<string | null>(searchParams.get('author'));
   const [feedFilter, setFeedFilter] = useState<string | null>(readFeedIds(searchParams)[0] ?? null);
-  const [resolvedFeedFilter, setResolvedFeedFilter] = useState<{ id: string; title: string } | null>(null);
+  const [resolvedFeedFilter, setResolvedFeedFilter] = useState<{ id: string; title: LocalizedText | string } | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(readCategoryIds(searchParams).join(',') || null);
-  const [resolvedCategoryFilters, setResolvedCategoryFilters] = useState<{ id: string; label: string }[]>([]);
-  const [feedStep, setFeedStep] = useState<{ id: string; title: string }>({
+  const [resolvedCategoryFilters, setResolvedCategoryFilters] = useState<{ id: string; label: LocalizedText | string }[]>([]);
+  const [feedStep, setFeedStep] = useState<{ id: string; title: LocalizedText | string }>({
     id: '',
     title: '',
   });
@@ -131,20 +133,20 @@ const Breadcrumb = () => {
 
         newBreadcrumbs.push({
           path,
-          label: feed.title,
+          label: localize(feed.title),
         });
       });
     }
 
-    if (feedStep.title) {
+    if (localize(feedStep.title)) {
       newBreadcrumbs.push({
         path: pathParts.join('/') + `?feed-id-step=${feedStep.id}`,
-        label: feedStep.title,
+        label: localize(feedStep.title),
       });
     }
 
     // Only show filters if no feed hierarchy is active
-    if (!feeds.length && !feedStep.title && location.pathname.includes('/library')) {
+    if (!feeds.length && !localize(feedStep.title) && location.pathname.includes('/library')) {
       // Build current filter params
       const buildFilterPath = (includeFilters: { author?: boolean; feed?: boolean; categories?: boolean }) => {
         const params = new URLSearchParams();
@@ -170,7 +172,7 @@ const Breadcrumb = () => {
         resolvedCategoryFilters.forEach((category) => {
           newBreadcrumbs.push({
             path: buildFilterPath({ author: !!authorFilter, feed: false, categories: true }),
-            label: category.label,
+            label: localize(category.label),
           });
         });
       }
@@ -242,7 +244,7 @@ const Breadcrumb = () => {
               categoryIds.map(async (id) => {
                 try {
                   const detail = await getCategoryDetail(id);
-                  return { id: detail.id, label: detail.label || detail.term };
+                  return { id: detail.id, label: localize(detail.label) || detail.term };
                 } catch {
                   return null;
                 }

@@ -4,6 +4,7 @@ import { ICategory } from '../../../utils/interfaces/category';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import { setCategoryIds } from '../../../utils/func/filterParams';
+import { localize } from '../../../utils/func/localized';
 
 interface ICategoryCardParams {
   category: ICategory;
@@ -39,7 +40,7 @@ const CategoryCard = ({ category }: ICategoryCardParams) => {
           <FaTag size={24} />
         </div>
         <span className='text-base font-bold text-secondary leading-[1.4] pr-10 line-clamp-2'>
-          {category.label || category.term}
+          {localize(category.label) || category.term}
         </span>
       </button>
     </div>

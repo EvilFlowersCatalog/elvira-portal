@@ -10,6 +10,8 @@ import ThemedEntryDisplay from '../../components/items/entry/display/ThemedEntry
 import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
 import StepEntryDisplay from '../../components/items/entry/display/StepEntryDisplay';
 import useGetFeedDetail from '../../hooks/api/feeds/useGetFeedDetail';
+import { localize } from '../../utils/func/localized';
+import { LocalizedText } from '../../utils/interfaces/general/general';
 
 const Home = () => {
   const { t } = useTranslation();
@@ -38,7 +40,7 @@ const Home = () => {
 
   // The DBS collection's title (its entries come from the query above).
   const getFeedDetail = useGetFeedDetail();
-  const [themedFeedTitle, setThemedFeedTitle] = useState('');
+  const [themedFeedTitle, setThemedFeedTitle] = useState<LocalizedText | string>('');
   useEffect(() => {
     let alive = true;
     getFeedDetail(DBS_FEED_ID)
@@ -84,7 +86,7 @@ const Home = () => {
         {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
           <div className='mt-12'>
             <ThemedEntryDisplay
-              title={themedFeedTitle}
+              title={localize(themedFeedTitle)}
               color="rgba(145, 48, 169)"
               isLoading={isThemedLoading}
               entries={themedEntries}

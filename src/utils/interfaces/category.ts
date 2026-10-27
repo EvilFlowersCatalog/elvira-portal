@@ -1,17 +1,17 @@
-import { IMetadata } from './general/general';
+import { IMetadata, LocalizedText } from './general/general';
 
 export interface ICategory {
   id: string;
   term: string;
   catalog_id: string;
-  label: string;
+  label: LocalizedText;
   scheme: string;
 }
 
 export interface ICategoryNew {
   term: string;
   catalog_id: string;
-  label: string;
+  label: LocalizedText;
   scheme: string;
 }
 

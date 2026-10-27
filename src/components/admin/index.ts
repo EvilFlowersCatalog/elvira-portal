@@ -14,3 +14,4 @@ export { default as UserPicker } from './UserPicker';
 export { default as Tabs } from './Tabs';
 export type { TabItem } from './Tabs';
 export { default as UserLink } from './UserLink';
+export { default as LocalizedTextInput } from './LocalizedTextInput';

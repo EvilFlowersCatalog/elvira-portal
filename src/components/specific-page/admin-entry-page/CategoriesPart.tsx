@@ -6,6 +6,7 @@ import CategoryDrawer from '../../admin/categories/CategoryDrawer';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import { IoMdAdd } from 'react-icons/io';
+import { localize } from '../../../utils/func/localized';
 
 const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
   const { t } = useTranslation();
@@ -44,7 +45,7 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
                   });
                 }}
               >
-                {item.label || item.term}
+                {localize(item.label) || item.term}
                 <MdRemoveCircle size={15} />
               </button>
             </div>

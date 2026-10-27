@@ -6,6 +6,7 @@ import { IFeed } from '../../../utils/interfaces/feed';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import useGetFeedDetail from '../../../hooks/api/feeds/useGetFeedDetail';
+import { localize } from '../../../utils/func/localized';
 
 interface IFeedParams {
   feed: IFeed;
@@ -93,7 +94,7 @@ const Feed = ({ feed }: IFeedParams) => {
             <TbBooks size={24} />
           )}
         </div>
-        <span className='text-base font-bold text-secondary leading-[1.4] pr-10 line-clamp-2'>{feed.title}</span>
+        <span className='text-base font-bold text-secondary leading-[1.4] pr-10 line-clamp-2'>{localize(feed.title)}</span>
         <span className='text-xs text-darkGray line-clamp-2'>{feed.content}</span>
       </button>
     </div>

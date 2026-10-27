@@ -8,11 +8,13 @@ import Feed from '../../components/items/feeds/Feed';
 import LoadNext from '../../components/items/loadings/LoadNext';
 import { useTranslation } from 'react-i18next';
 import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
+import { localize } from '../../utils/func/localized';
+import { LocalizedText } from '../../utils/interfaces/general/general';
 
 const Feeds = () => {
   const [searchParams] = useSearchParams();
   const [currentFeedDescription, setCurrentFeedDescription] = useState<string>('');
-  const [currentFeedTitle, setCurrentFeedTitle] = useState<string>('');
+  const [currentFeedTitle, setCurrentFeedTitle] = useState<LocalizedText | string>('');
 
   const { t } = useTranslation();
   const getFeeds = useGetFeeds();
@@ -48,7 +50,7 @@ const Feeds = () => {
       .then((feed) => {
         if (!alive) return;
         setCurrentFeedDescription(feed.content || '');
-        setCurrentFeedTitle(feed.title || '');
+        setCurrentFeedTitle(feed.title ?? '');
       })
       .catch(() => {
         if (!alive) return;
@@ -72,9 +74,9 @@ const Feeds = () => {
       showResultsHeading={false}
     >
       <div className='flex flex-col px-3 pb-4 gap-4'>
-        {currentFeedTitle && (
+        {localize(currentFeedTitle) && (
           <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>
-            {currentFeedTitle}
+            {localize(currentFeedTitle)}
           </h2>
         )}
         <div className='flex flex-wrap'>
