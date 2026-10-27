@@ -4,6 +4,7 @@ import { IFeed } from '../../utils/interfaces/feed';
 import useFeedsQuery from '../../hooks/api/feeds/useFeedsQuery';
 import ElviraInput from '../inputs/ElviraInput';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import { localize } from '../../utils/func/localized';
 
 interface IFeedAutofillParams {
   /**
@@ -37,7 +38,7 @@ const FeedAutofill = ({
   const [inputValue, setInputValue] = useState<string>(
     // Portal (single=true): entryForm is the IFeed item itself
     // Admin (single=false): entryForm is the full entry object with a .feeds array
-    single ? (entryForm?.title || '') : (entryForm?.feeds?.[0]?.title || '')
+    single ? localize(entryForm?.title) : localize(entryForm?.feeds?.[0]?.title)
   );
   const [suggestions, setSuggestions] = useState<IFeed[]>([]);
   const [isHovering, setIsHovering] = useState<boolean>(false);
@@ -50,13 +51,13 @@ const FeedAutofill = ({
     if (defaultFeedId && feeds) {
       const defaultFeed = feeds.find((feed: IFeed) => feed.id === defaultFeedId);
       if (defaultFeed) {
-        setInputValue(defaultFeed.title);
+        setInputValue(localize(defaultFeed.title));
         if (single) {
           setEntryForm([defaultFeed]);
         } else {
           setEntryForm({
             ...entryForm,
-            feeds: [{ title: defaultFeed.title, id: defaultFeed.id }],
+            feeds: [{ title: localize(defaultFeed.title), id: defaultFeed.id }],
           });
         }
       }
@@ -66,7 +67,7 @@ const FeedAutofill = ({
   // Portal (single=true) mode: sync display value when the selected item changes externally
   useEffect(() => {
     if (!single) return;
-    setInputValue(entryForm?.title ?? '');
+    setInputValue(localize(entryForm?.title));
   }, [single, entryForm?.title]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -75,7 +76,7 @@ const FeedAutofill = ({
 
     // Filter languages based on input
     const filteredSuggestions = feeds.filter((feed) =>
-      feed.title.toLowerCase().startsWith(value.toLowerCase())
+      localize(feed.title).toLowerCase().startsWith(value.toLowerCase())
     );
 
     setSuggestions(filteredSuggestions);
@@ -85,7 +86,7 @@ const FeedAutofill = ({
     if (single) {
       // Portal mode: setEntryForm is a direct array setter — call with [feed]
       setEntryForm([feed]);
-      setInputValue(feed.title);
+      setInputValue(localize(feed.title));
       setIsHovering(false);
       setSuggestions([]);
       return;
@@ -104,7 +105,7 @@ const FeedAutofill = ({
         title: item.title,
         id: item.id,
       })),
-      { title: feed.title, id: feed.id },
+      { title: localize(feed.title), id: feed.id },
     ];
     setEntryForm({
       ...entryForm,
@@ -126,8 +127,8 @@ const FeedAutofill = ({
         onFocus={() => {
           const filteredSuggestions = feeds.filter(
             (feed) =>
-              feed.title.toLowerCase().startsWith(inputValue.toLowerCase()) &&
-              feed.title !== inputValue
+              localize(feed.title).toLowerCase().startsWith(inputValue.toLowerCase()) &&
+              localize(feed.title) !== inputValue
           );
 
           setSuggestions(filteredSuggestions);
@@ -136,7 +137,7 @@ const FeedAutofill = ({
         onBlur={() => {
           const feed = feeds.filter(
             (feed) =>
-              feed.title.toLocaleLowerCase() === inputValue.toLocaleLowerCase()
+              localize(feed.title).toLocaleLowerCase() === inputValue.toLocaleLowerCase()
           );
           if (feed.length === 0) {
             setInputValue('');
@@ -166,7 +167,7 @@ const FeedAutofill = ({
               onClick={() => handleSuggestionClick(feed)}
               style={{ padding: '5px', cursor: 'pointer' }}
             >
-              {feed.title}
+              {localize(feed.title)}
             </li>
           ))}
         </ul>

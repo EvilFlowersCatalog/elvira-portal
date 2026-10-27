@@ -9,6 +9,7 @@ import useFeedsQuery from '../../hooks/api/feeds/useFeedsQuery';
 import { PageHeader, DataTable, DataTableColumn, SortState, StatusChip, SearchField, IconButton } from '../../components/admin';
 import Button from '../../components/buttons/Button';
 import FeedDrawer from '../../components/admin/collections/FeedDrawer';
+import { localize } from '../../utils/func/localized';
 
 const DEFAULT_LIMIT = 25;
 
@@ -99,7 +100,7 @@ const AdminFeeds = () => {
           <span className={isFolder(f) ? 'text-primaryText dark:text-primaryLight' : 'text-zinc-400'}>
             {isFolder(f) ? <FiFolder size={17} /> : <MdOutlineCollectionsBookmark size={17} />}
           </span>
-          <span className="font-medium text-secondary dark:text-secondaryLight">{f.title}</span>
+          <span className="font-medium text-secondary dark:text-secondaryLight">{localize(f.title)}</span>
           {isFolder(f) && <FiChevronRight size={15} className="text-zinc-400" aria-hidden="true" />}
         </span>
       ),

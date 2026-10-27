@@ -9,6 +9,7 @@ import { withRememberedSearch } from '../../../utils/func/listSearch';
 import { toast } from 'react-toastify';
 import useEditEntry from '../../../hooks/api/entries/useEditEntry';
 import AdminEntryForm from './AdminEntryForm';
+import { localize } from '../../../utils/func/localized';
 
 const AdminEditEntry = () => {
   const { t } = useTranslation();
@@ -44,7 +45,7 @@ const AdminEditEntry = () => {
             title: entryDetail.title,
             authors: entryDetail.authors,
             feeds: entryDetail.feeds.map((feed) => ({
-              title: feed.title,
+              title: localize(feed.title),
               id: feed.id,
             })),
             summary: entryDetail.summary,

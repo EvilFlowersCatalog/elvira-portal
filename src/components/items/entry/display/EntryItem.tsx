@@ -10,6 +10,7 @@ import { NAVIGATION_PATHS } from "../../../../utils/interfaces/general/general";
 import useAppContext from "../../../../hooks/contexts/useAppContext";
 import { AvailabilityBadge, AvailabilityState } from "../details/AvailabilityBadge";
 import { withAccessToken } from "../../../../utils/func/functions";
+import { localize } from '../../../../utils/func/localized';
 
 
 interface IEntryItem {
@@ -191,15 +192,15 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
                             type="button"
                             key={id ? `${id}-${entry.feeds[0].id}` : entry.feeds[0].id}
                             onClick={() => handleParamClick('feed-id', entry.feeds[0].id)}
-                            aria-label={`${t('search.filterByFeed', { defaultValue: 'Filter by category' })}: ${entry.feeds[0].title}`}
+                            aria-label={`${t('search.filterByFeed', { defaultValue: 'Filter by category' })}: ${localize(entry.feeds[0].title)}`}
                             className="cursor-pointer font-medium px-[4px] py-[3px] text-[9px] tracking-[0.1px] bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight rounded-[4px] truncate min-w-0 shrink"
                         >
-                            {entry.feeds[0].title}
+                            {localize(entry.feeds[0].title)}
                         </button>
                     )}
                     {entry.feeds.length > 1 && (
                         <span
-                            title={entry.feeds.slice(1).map(f => f.title).join(', ')}
+                            title={entry.feeds.slice(1).map(f => localize(f.title)).join(', ')}
                             className="font-medium px-[4px] py-[3px] text-[9px] tracking-[0.1px] bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight rounded-[4px] flex-shrink-0 whitespace-nowrap"
                         >
                             +{entry.feeds.length - 1}

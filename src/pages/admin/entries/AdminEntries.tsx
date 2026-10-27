@@ -22,6 +22,7 @@ import {
   ConfirmDialog,
 } from '../../../components/admin';
 import Button from '../../../components/buttons/Button';
+import { localize } from '../../../utils/func/localized';
 
 const DEFAULT_LIMIT = 10;
 
@@ -155,12 +156,12 @@ const AdminEntries = () => {
         );
       },
     },
-    { id: 'collections', header: t('administration.entriesPage.collections'), cell: (e) => chips(e.feeds, 'info', 'feed-id') },
+    { id: 'collections', header: t('administration.entriesPage.collections'), cell: (e) => chips(e.feeds?.map((f) => ({ id: f.id, title: localize(f.title) })), 'info', 'feed-id') },
     {
       id: 'categories',
       header: t('administration.entriesPage.categories'),
       defaultHidden: true,
-      cell: (e) => chips(e.categories?.map((c) => ({ id: c.id, term: c.label || c.term })), 'neutral', 'category-id'),
+      cell: (e) => chips(e.categories?.map((c) => ({ id: c.id, term: localize(c.label) || c.term })), 'neutral', 'category-id'),
     },
     {
       id: 'files',

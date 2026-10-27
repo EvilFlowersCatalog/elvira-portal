@@ -8,6 +8,7 @@ import { Metadata } from '../../utils/interfaces/general/general';
 import { PageHeader, DataTable, DataTableColumn, SortState, SearchField } from '../../components/admin';
 import Button from '../../components/buttons/Button';
 import CategoryDrawer from '../../components/admin/categories/CategoryDrawer';
+import { localize } from '../../utils/func/localized';
 
 const DEFAULT_LIMIT = 25;
 
@@ -85,7 +86,7 @@ const AdminCategories = () => {
       header: t('administration.categoriesPage.label'),
       sortKey: 'label',
       hideable: false,
-      cell: (c) => <span className="font-medium text-secondary dark:text-secondaryLight">{c.label}</span>,
+      cell: (c) => <span className="font-medium text-secondary dark:text-secondaryLight">{localize(c.label) || c.term}</span>,
     },
     {
       id: 'term',

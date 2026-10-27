@@ -15,6 +15,7 @@ import { AcceptedLanguage, getLanguage, getLanguages } from "../../../hooks/api/
 import { IFeed } from "../../../utils/interfaces/feed";
 import { AvailabilityState } from "../entry/details/AvailabilityBadge";
 import { readCategoryIds, readFeedIds, setCategoryIds, setFeedIds } from "../../../utils/func/filterParams";
+import { localize } from '../../../utils/func/localized';
 
 const DEFAULT_MIN_YEAR = 1900;
 
@@ -247,12 +248,12 @@ export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
     }, [year]);
 
     const categoryOptions = useMemo(() =>
-        allCategories.map(cat => ({ label: cat.label || cat.term, value: cat.id })),
+        allCategories.map(cat => ({ label: localize(cat.label) || cat.term, value: cat.id })),
         [allCategories]
     );
 
     const feedOptions = useMemo(() =>
-        allFeeds.map(feed => ({ label: feed.title, value: feed.id })),
+        allFeeds.map(feed => ({ label: localize(feed.title), value: feed.id })),
         [allFeeds]
     );
 

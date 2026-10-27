@@ -6,6 +6,7 @@ import { ICategory } from "../../utils/interfaces/category";
 import { IFeed } from "../../utils/interfaces/feed";
 import { MdClose } from "react-icons/md";
 import { addCategoryId, addFeedId } from "../../utils/func/filterParams";
+import { localize } from '../../utils/func/localized';
 
 interface FilterSuggestionsProps {
   searchQuery: string;
@@ -162,7 +163,7 @@ const FilterSuggestions = ({ searchQuery }: FilterSuggestionsProps) => {
                         onClick={() => handleFeedClick(feed.id)}
                         className="text-left px-3 py-1.5 text-sm bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight hover:opacity-80 transition-opacity rounded-md"
                       >
-                        {feed.title}
+                        {localize(feed.title)}
                       </button>
                     ))}
                   </div>
@@ -196,7 +197,7 @@ const FilterSuggestions = ({ searchQuery }: FilterSuggestionsProps) => {
                         onClick={() => handleCategoryClick(category.id)}
                         className="text-left px-3 py-1.5 text-sm bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight hover:opacity-80 transition-opacity rounded-md"
                       >
-                        {category.label || category.term}
+                        {localize(category.label) || category.term}
                       </button>
                     ))}
                   </div>

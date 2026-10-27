@@ -26,6 +26,7 @@ import { twMerge } from 'tailwind-merge';
 import EntryItem from '../display/EntryItem';
 import { AvailabilityBadge, AvailabilityState } from './AvailabilityBadge';
 import Tooltip from '../../../primitives/Tooltip';
+import { localize } from '../../../../utils/func/localized';
 
 interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
@@ -357,7 +358,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                           });
                           handleParamClick('category-id', category.id);
                         }}
-                      >{category.label || category.term}</span>
+                      >{localize(category.label) || category.term}</span>
                     ))
                   )}
                 </div>

@@ -4,6 +4,7 @@ import { IEntry } from '../../../utils/interfaces/entry';
 import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import { withAccessToken } from '../../../utils/func/functions';
+import { localize } from '../../../utils/func/localized';
 
 interface IEntryBoxParams {
   entry: IEntry;
@@ -75,7 +76,7 @@ const EntryBox = ({ entry, isActive }: IEntryBoxParams) => {
               key={feed.id}
               className={`px-2 py-1 text-sm bg-primary text-white rounded-md`}
             >
-              {feed.title}
+              {localize(feed.title)}
             </div>
           ))}
         </div>

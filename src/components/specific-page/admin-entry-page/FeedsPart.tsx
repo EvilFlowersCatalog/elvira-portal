@@ -6,6 +6,7 @@ import FeedDrawer from '../../admin/collections/FeedDrawer';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import { IoMdAdd } from 'react-icons/io';
+import { localize } from '../../../utils/func/localized';
 
 const FeedsPart = ({ entry, setEntry }: IPartParams) => {
   const { t } = useTranslation();
@@ -42,7 +43,7 @@ const FeedsPart = ({ entry, setEntry }: IPartParams) => {
                   });
                 }}
               >
-                {item.title}
+                {localize(item.title)}
                 <MdRemoveCircle size={15} />
               </button>
             </div>

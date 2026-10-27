@@ -11,6 +11,7 @@ import i18next from '../../utils/i18n/i18next';
 import SearchBar from './SearchBar';
 import FilterChips, { FilterChipItem } from './FilterChips';
 import SortSelect from './SortSelect';
+import { localize } from '../../utils/func/localized';
 
 // Comma-separated params rendered as one chip per value (removable individually).
 const MULTI_VALUE_PARAMS = ['categories', 'feeds', 'languageCode', 'availability'];
@@ -93,12 +94,12 @@ const ToolsContainer = ({
       if (key === 'categories') {
         value.split(',').forEach((categoryId) => {
           const category = categories.find((c) => c.id === categoryId);
-          if (category) filters.push({ key, value: categoryId, label: category.label || category.term, itemId: categoryId });
+          if (category) filters.push({ key, value: categoryId, label: localize(category.label) || category.term, itemId: categoryId });
         });
       } else if (key === 'feeds') {
         value.split(',').forEach((feedId) => {
           const feed = feeds.find((f) => f.id === feedId);
-          if (feed) filters.push({ key, value: feedId, label: feed.title, itemId: feedId });
+          if (feed) filters.push({ key, value: feedId, label: localize(feed.title), itemId: feedId });
         });
       } else if (key === 'languageCode') {
         value.split(',').filter(Boolean).forEach((code) => {
@@ -113,9 +114,9 @@ const ToolsContainer = ({
         let label = value;
         if (key === 'category-id') {
           const category = categories.find((c) => c.id === value);
-          label = category?.label || category?.term || value;
+          label = localize(category?.label) || category?.term || value;
         } else if (key === 'feed-id') {
-          label = feeds.find((f) => f.id === value)?.title || value;
+          label = localize(feeds.find((f) => f.id === value)?.title) || value;
         } else if (key === 'publishedAtGte') {
           label = `${t('searchBar.yearFrom')}: ${value}`;
         } else if (key === 'publishedAtLte') {
