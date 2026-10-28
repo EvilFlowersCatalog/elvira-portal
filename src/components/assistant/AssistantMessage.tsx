@@ -70,11 +70,11 @@ export default function AssistantMessage({
     [msg.text, messages, t],
   );
 
-  const bubble = compact ? 'p-2 max-w-[85%]' : 'p-4 max-w-[75%]';
+  const bubble = compact ? 'p-2 max-w-[85%]' : 'px-4 py-3 max-w-[85%]';
 
   if (msg.role === 'user') {
     return (
-      <div className={`self-end flex flex-col items-end gap-1 ${compact ? 'mb-2 max-w-[85%]' : 'mb-4 max-w-[75%]'}`}>
+      <div className={`self-end flex flex-col items-end gap-1 ${compact ? 'mb-2 max-w-[85%]' : 'mb-4 max-w-[85%]'}`}>
         {msg.contexts?.length ? (
           <div className="flex flex-wrap justify-end gap-1">
             {msg.contexts.map((ctx, index) => (

@@ -69,35 +69,14 @@ export default function AiAssistantPage() {
 
     return (
         <div className="flex flex-col h-full w-full ">
-            {/* Desktop Header */}
-            <div className="hidden lg:flex justify-between items-center p-6">
-                <h1 className="text-[2.125rem] leading-tight font-bold text-black dark:text-white">
-                    Elvira AI
-                </h1>
-                <div className="flex gap-2">
-                    <Link
-                        to={NAVIGATION_PATHS.aiChatHistory}
-                        aria-label="Chat history"
-                        className="inline-flex items-center justify-center rounded-full p-2 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
-                    >
-                        <FiClock size={20} className="text-black dark:text-white" />
-                    </Link>
-                    <button
-                        type="button"
-                        aria-label="New chat"
-                        onClick={handleNewChat}
-                        className="inline-flex items-center justify-center rounded-full p-2 bg-primary text-white hover:bg-primaryDark transition-colors"
-                    >
-                        <FiPlus size={20} />
-                    </button>
-                </div>
-            </div>
-
-            {/* Mobile Header */}
-            <div className="flex lg:hidden justify-between items-center px-4 py-3 border-b border-gray-200 dark:border-zinc-700">
-                <p className="text-xl font-bold text-black dark:text-white">
+            {/* Header: one compact row so the conversation gets the height */}
+            <div className="flex justify-between items-center gap-3 px-4 py-2 border-b border-gray-200 dark:border-zinc-700">
+                <p className="text-lg font-semibold text-black dark:text-white">
                     Elvira AI
                 </p>
+                <div className="flex-1 min-w-0 max-w-3xl">
+                    <ChatSubjectBar compact />
+                </div>
                 <div className="flex gap-1">
                     <Link
                         to={NAVIGATION_PATHS.aiChatHistory}
@@ -119,11 +98,8 @@ export default function AiAssistantPage() {
             <EntryDetail  />
             {/* Main Chat Container */}
             <div className="flex-1 flex flex-col items-center w-full overflow-hidden">
-                <div className="w-full max-w-4xl px-4 pt-2">
-                    <ChatSubjectBar />
-                </div>
                 {/* Chat Messages Area */}
-                <div ref={chatScrollRef} className="flex-1 w-full max-w-4xl overflow-y-auto px-4 py-8">
+                <div ref={chatScrollRef} className="flex-1 w-full max-w-5xl overflow-y-auto px-4 py-4">
                     <div ref={chatContentRef} className="flex flex-col">
                         {aiMessages.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-full py-20">
@@ -143,7 +119,7 @@ export default function AiAssistantPage() {
                 </div>
 
                 {/* Input Area */}
-                <div className="w-full max-w-4xl px-4 pb-8">
+                <div className="w-full max-w-5xl px-4 pb-4">
                     <form onSubmit={handleSubmit}>
                         {aiShowSuggestions && aiMessages.length === 0 ? (
                             <div className="flex gap-3 mb-4">
