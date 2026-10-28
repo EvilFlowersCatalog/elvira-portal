@@ -32,6 +32,7 @@ export const sk = {
       aboutBook: 'O publikácii {{title}}',
       aboutThisBook: 'O tejto publikácii',
       openInReader: 'Otvoriť v čítačke',
+      openDetail: 'Otvoriť detail a vypožičať',
       context: {
         explain: 'Vysvetlenie',
       },

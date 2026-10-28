@@ -32,6 +32,7 @@ export const en = {
       aboutBook: 'About {{title}}',
       aboutThisBook: 'About this publication',
       openInReader: 'Open in reader',
+      openDetail: 'Open details to borrow',
       context: {
         explain: 'Explanation',
       },

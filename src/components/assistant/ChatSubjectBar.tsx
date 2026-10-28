@@ -1,18 +1,33 @@
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { FiBookOpen } from 'react-icons/fi';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import useOpenInViewer from '../../hooks/api/assistant/useOpenInViewer';
 
 /**
  * The publication the open chat is about, like the subject line in the
- * viewer's chat, with a shortcut back into the book. Hidden for general chats.
+ * viewer's chat. The title opens the publication's detail; the action opens it
+ * in the reader, or — for a Readium book, which is borrowed and never read
+ * here — its detail, where it can be borrowed. Hidden for general chats.
  */
 export default function ChatSubjectBar({ onNavigate, compact }: { onNavigate?: () => void; compact?: boolean }) {
   const { t } = useTranslation();
   const { aiChatSubject } = useAppContext();
   const openInViewer = useOpenInViewer();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   if (!aiChatSubject) return null;
+
+  const readable = aiChatSubject.readable !== false;
+
+  // Same query params as EntryItem's openEntryDetail; the detail yields to nothing.
+  const openDetail = () => {
+    const params = new URLSearchParams(searchParams);
+    params.set('entry-detail-id', aiChatSubject.entryId);
+    if (aiChatSubject.catalogId) params.set('entry-catalog-id', aiChatSubject.catalogId);
+    params.set('dialog-priority', 'entry-detail');
+    setSearchParams(params);
+  };
 
   return (
     <div
@@ -21,21 +36,23 @@ export default function ChatSubjectBar({ onNavigate, compact }: { onNavigate?: (
       }`}
     >
       <FiBookOpen size={14} className="shrink-0" />
-      <span className="truncate flex-1">
+      <button type="button" className="truncate flex-1 text-left hover:underline" onClick={openDetail}>
         {aiChatSubject.title ? t('assistant.aboutBook', { title: aiChatSubject.title }) : t('assistant.aboutThisBook')}
-      </span>
-      {aiChatSubject.readable !== false && (
+      </button>
       <button
         type="button"
         className="shrink-0 font-medium text-sky-700 dark:text-sky-300 hover:underline"
         onClick={() => {
+          if (!readable) {
+            openDetail();
+            return;
+          }
           onNavigate?.();
           openInViewer(aiChatSubject);
         }}
       >
-        {t('assistant.openInReader')}
+        {readable ? t('assistant.openInReader') : t('assistant.openDetail')}
       </button>
-      )}
     </div>
   );
 }
