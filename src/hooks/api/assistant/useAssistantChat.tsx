@@ -15,10 +15,12 @@ import useStartChat from './useStartChat';
  *   attached to every message sent while it is set — not only when the chat is
  *   created — so picking a book mid-conversation still reaches the assistant.
  */
-const useAssistantChat = (entry?: { id: string; title?: string }) => {
+const useAssistantChat = (
+  entry?: { id: string; title?: string; catalogId?: string | null; readable?: boolean },
+) => {
   const entryId = entry?.id;
   const { t } = useTranslation();
-  const { aiChatId, setAiChatId, setAiMessages, aiChatSubject, setAiChatSubject } = useAppContext();
+  const { aiChatId, setAiChatId, setAiMessages, aiChatSubject, setAiChatSubject, lang } = useAppContext();
   const startChat = useStartChat();
   const sendChatMessage = useSendChatMessage();
   const [isGenerating, setGenerating] = useState(false);
@@ -33,7 +35,7 @@ const useAssistantChat = (entry?: { id: string; title?: string }) => {
 
     setAiMessages((prev) => [
       ...prev,
-      { id: `user-${stamp}`, role: 'user', text: message, reference: entry },
+      { id: `user-${stamp}`, role: 'user', text: message, reference: entry && { id: entry.id, title: entry.title } },
       { id: answerId, role: 'assistant', text: '', status: 'streaming' },
     ]);
     setGenerating(true);
@@ -49,7 +51,7 @@ const useAssistantChat = (entry?: { id: string; title?: string }) => {
         setAiChatId(chatId);
       }
       // A chat started from a book is about that book: its page citations open it.
-      if (entryId && !aiChatSubject) setAiChatSubject({ entryId, title: entry?.title });
+      if (entryId && !aiChatSubject) setAiChatSubject({ entryId, title: entry?.title, catalogId: entry?.catalogId, readable: entry?.readable });
 
       let text = '';
       await sendChatMessage(chatId, message, {
@@ -67,7 +69,7 @@ const useAssistantChat = (entry?: { id: string; title?: string }) => {
         onPages: (pages) => updateAnswer({ pagesRead: pages }),
         onError: (detail) => showError(detail || t('assistant.errors.generic')),
         onDone: () => {},
-      }, { entryId });
+      }, { entryId, language: lang });
       setAiMessages((prev) =>
         prev.map((m) => (m.id === answerId && m.status === 'streaming' ? { ...m, status: 'done' } : m)),
       );

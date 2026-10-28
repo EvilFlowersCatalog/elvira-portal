@@ -118,7 +118,7 @@ const AiChatHistory = () => {
   };
 
   return (
-    <div className="flex flex-col h-full w-full overflow-auto">
+    <div className="flex flex-col h-full w-full overflow-auto [&>*]:shrink-0">
       <Breadcrumb />
       <div className="flex justify-between items-center pr-4">
         <H1>{t('assistant.chatHistory')}</H1>

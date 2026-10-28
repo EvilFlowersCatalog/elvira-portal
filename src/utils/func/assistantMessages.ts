@@ -23,6 +23,7 @@ export const subjectOf = (chat: IAssistantChat): AiChatSubject | null =>
         catalogId: chat.entry?.catalog_id ?? chat.catalog_id,
         title: chat.entry?.title,
         acquisitionId: chat.acquisition_id,
+        readable: !chat.entry?.readium_enabled,
       }
     : null;
 

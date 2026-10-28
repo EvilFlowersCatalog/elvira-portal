@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { RiAddLine, RiCloseLine } from 'react-icons/ri';
 
 type SummaryTextProps = {
-    html: string;
+    html: string | null;
     readMoreText: string;
     readLessText: string;
 };
 
-export function SummaryText({ html, readMoreText, readLessText }: SummaryTextProps) {
+export function SummaryText({ html: rawHtml, readMoreText, readLessText }: SummaryTextProps) {
     const [expanded, setExpanded] = useState(false);
+    // Entries without a summary come back as null; render nothing rather than crash.
+    const html = rawHtml ?? '';
     const isLong = html.length > 240;
     const visibleHtml = !expanded
         ? html.slice(0, 240) + (isLong ? '...' : '')

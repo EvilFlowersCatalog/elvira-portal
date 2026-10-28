@@ -47,7 +47,7 @@ export default function ChatContextChip({
       className={`inline-flex items-center max-w-full gap-1 px-1.5 py-0.5 rounded-md text-xs disabled:cursor-default ${
         inverted
           ? 'bg-white/20 text-white enabled:hover:bg-white/30'
-          : 'bg-primary/10 text-primary dark:text-white enabled:hover:bg-primary/20'
+          : 'bg-sky-500/10 text-sky-700 dark:bg-sky-400/15 dark:text-sky-300 enabled:hover:bg-sky-500/20 dark:enabled:hover:bg-sky-400/25'
       }`}
     >
       <Icon size={12} className="shrink-0" />

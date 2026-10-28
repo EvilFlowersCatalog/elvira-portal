@@ -25,6 +25,8 @@ export interface IAssistantChatEntry {
   id: string;
   catalog_id: string;
   title: string;
+  /** Lent through Readium LCP: borrowed, never opened in the viewer. */
+  readium_enabled?: boolean;
 }
 
 export interface IAssistantChat {
@@ -80,6 +82,8 @@ export interface IAssistantMessageOptions {
   page?: number;
   /** The reader's current copy of the chat's publication. */
   userAcquisitionId?: string;
+  /** UI language (`sk`, `en`); the answer is written in it. */
+  language?: string;
   signal?: AbortSignal;
 }
 

@@ -47,6 +47,8 @@ export interface AiChatSubject {
   title?: string;
   /** The file the chat was read from; the viewer opens this one. */
   acquisitionId?: string | null;
+  /** False for Readium LCP books: they are borrowed, so nothing opens them in the viewer. */
+  readable?: boolean;
 }
 
 export interface IAppContext {

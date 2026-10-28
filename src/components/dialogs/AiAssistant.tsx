@@ -47,7 +47,14 @@ export default function AiAssistant() {
     // has loaded still carries the reference; the detail only supplies the title.
     const assistantEntryId = searchParams.get('assistant-entry-id') || undefined;
     const { sendMessage, isGenerating: isGeneratingResponse } = useAssistantChat(
-        assistantEntryId ? { id: assistantEntryId, title: assistantEntry?.title } : undefined
+        assistantEntryId
+            ? {
+                  id: assistantEntryId,
+                  title: assistantEntry?.title,
+                  catalogId: searchParams.get('entry-catalog-id') || assistantEntry?.catalog_id || null,
+                  readable: !assistantEntry?.config?.readium_enabled,
+              }
+            : undefined
     );
 
 
@@ -75,7 +82,7 @@ export default function AiAssistant() {
             return;
         }
         if (assistantEntry?.id === assistantEntryId) return;
-        getEntryDetail(assistantEntryId, currentCatalogId).then((entry) => {
+        getEntryDetail(assistantEntryId, searchParams.get('entry-catalog-id') || currentCatalogId).then((entry) => {
             setAssistantEntry(entry);
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps

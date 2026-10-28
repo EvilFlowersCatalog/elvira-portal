@@ -29,6 +29,7 @@ const useSendChatMessage = () => {
         ...(options?.contexts?.length ? { contexts: options.contexts } : {}),
         ...(options?.page ? { page: options.page } : {}),
         ...(options?.userAcquisitionId ? { user_acquisition_id: options.userAcquisitionId } : {}),
+        ...(options?.language ? { language: options.language } : {}),
       }),
       signal: options?.signal,
     });

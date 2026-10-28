@@ -284,7 +284,7 @@ const Viewer = () => {
           onError: (detail) => handlers.onError(detail || t("assistant.errors.generic")),
           onDone: () => {},
         },
-        { contexts, page: meta.page, userAcquisitionId: user_acquisition_id }
+        { contexts, page: meta.page, userAcquisitionId: user_acquisition_id, language: lang }
       );
       await Promise.all(pending);
       queryClient.invalidateQueries({ queryKey: ["user-chats"] });

@@ -24,9 +24,10 @@ export default function ChatSubjectBar({ onNavigate, compact }: { onNavigate?: (
       <span className="truncate flex-1">
         {aiChatSubject.title ? t('assistant.aboutBook', { title: aiChatSubject.title }) : t('assistant.aboutThisBook')}
       </span>
+      {aiChatSubject.readable !== false && (
       <button
         type="button"
-        className="shrink-0 font-medium text-primary dark:text-white hover:underline"
+        className="shrink-0 font-medium text-sky-700 dark:text-sky-300 hover:underline"
         onClick={() => {
           onNavigate?.();
           openInViewer(aiChatSubject);
@@ -34,6 +35,7 @@ export default function ChatSubjectBar({ onNavigate, compact }: { onNavigate?: (
       >
         {t('assistant.openInReader')}
       </button>
+      )}
     </div>
   );
 }

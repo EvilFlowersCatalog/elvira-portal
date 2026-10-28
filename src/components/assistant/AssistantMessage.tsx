@@ -14,7 +14,7 @@ import EntryItem from '../items/entry/display/EntryItem';
 import ChatContextChip from './ChatContextChip';
 
 const citeClass =
-  'inline-flex items-center px-1.5 py-px mx-0.5 rounded-md text-xs font-medium align-baseline bg-primary/15 text-primary dark:text-white no-underline enabled:hover:bg-primary/25 disabled:cursor-default';
+  'inline-flex items-center px-1.5 py-px mx-0.5 rounded-md text-xs font-medium align-baseline bg-sky-500/10 text-sky-700 dark:bg-sky-400/15 dark:text-sky-300 no-underline enabled:hover:underline enabled:hover:bg-sky-500/20 dark:enabled:hover:bg-sky-400/25 disabled:cursor-default';
 
 /**
  * One chat message, rendered the way the viewer's chat renders it: the
@@ -40,7 +40,8 @@ export default function AssistantMessage({
   const openInViewer = useOpenInViewer();
   const { getEntryDetail } = useGetEntryDetail();
 
-  const openPage = aiChatSubject
+  // A Readium book is borrowed, never opened here, so its page citations stay plain labels.
+  const openPage = aiChatSubject && aiChatSubject.readable !== false
     ? (page: number) => {
         onNavigate?.();
         openInViewer(aiChatSubject, page);
