@@ -65,10 +65,6 @@ interface IExplainResult {
   examples: { label: string; description: string }[];
 }
 
-// Fields the viewer reads after 0.7.0; harmless for older versions.
-type ChatHandlersWithPages = IChatStreamHandlers & { onPages?: (pages: number[]) => void };
-type ChatMessageWithPages = IChatMessage & { pages?: number[] };
-
 const rootId = "elvira-viewer-app";
 
 // Title of the annotation that acts as the page-bookmark container.
@@ -284,8 +280,7 @@ const Viewer = () => {
           onEntries: (ids) => {
             if (ids.length) pending.push(toSuggestedEntries(ids).then(handlers.onEntries));
           },
-          // `onPages` is new in the viewer after 0.7.0; older ones leave it out.
-          onPages: (pages) => (handlers as ChatHandlersWithPages).onPages?.(pages),
+          onPages: (pages) => handlers.onPages?.(pages),
           onError: (detail) => handlers.onError(detail || t("assistant.errors.generic")),
           onDone: () => {},
         },
@@ -315,7 +310,7 @@ const Viewer = () => {
   const getChatFunc = async (chatId: string): Promise<IChatMessage[]> => {
     const chat = await getChatHistory(chatId);
     return Promise.all(
-      chat.messages.map(async (msg): Promise<ChatMessageWithPages> => ({
+      chat.messages.map(async (msg): Promise<IChatMessage> => ({
         id: msg.id,
         role: msg.role,
         text: msg.text,
@@ -598,8 +593,6 @@ const Viewer = () => {
 
         if (cancelled) return;
 
-        const initialPageOption = { initialPage: Number(searchParams.get("page")) || undefined };
-
         // Render viewer with the provided options and configurations
         viewerApp = renderViewer({
           rootId: `#${rootId}`,
@@ -620,9 +613,8 @@ const Viewer = () => {
               getChatFunc,
               deleteChatFunc,
             },
-            // Opens at the page a chat citation pointed to. Spread because
-            // `initialPage` is new in the viewer after 0.7.0, which ignores it.
-            ...initialPageOption,
+            // Opens at the page a chat citation pointed to.
+            initialPage: Number(searchParams.get("page")) || undefined,
             editPackage: {
               saveLayerFunc,
               saveGroupFunc,
