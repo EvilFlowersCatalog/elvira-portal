@@ -1,6 +1,6 @@
-import { IAssistantStreamHandlers } from '../../../utils/interfaces/assistant';
+import { IAssistantMessageOptions, IAssistantStreamHandlers } from '../../../utils/interfaces/assistant';
 import useAuth from '../../contexts/useAuthContext';
-import { ASSISTANT_URL, AssistantApiError, idsOf, parseSseData, readSse, textOf } from './assistantApi';
+import { ASSISTANT_URL, AssistantApiError, idsOf, pagesOf, parseSseData, readSse, textOf } from './assistantApi';
 
 /**
  * Sends a message and dispatches the SSE answer to `handlers`. Uses `fetch`
@@ -15,11 +15,7 @@ const useSendChatMessage = () => {
     chatId: string,
     message: string,
     handlers: IAssistantStreamHandlers,
-    options?: {
-      /** Publication the reader is asking about with this message. */
-      entryId?: string;
-      signal?: AbortSignal;
-    },
+    options?: IAssistantMessageOptions,
   ): Promise<void> => {
     const response = await fetch(`${import.meta.env.ELVIRA_BASE_URL}${ASSISTANT_URL}/chats/${chatId}/messages`, {
       method: 'POST',
@@ -27,7 +23,13 @@ const useSendChatMessage = () => {
         'Content-Type': 'application/json',
         ...(auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}),
       },
-      body: JSON.stringify({ message, ...(options?.entryId ? { entry_id: options.entryId } : {}) }),
+      body: JSON.stringify({
+        message,
+        ...(options?.entryId ? { entry_id: options.entryId } : {}),
+        ...(options?.contexts?.length ? { contexts: options.contexts } : {}),
+        ...(options?.page ? { page: options.page } : {}),
+        ...(options?.userAcquisitionId ? { user_acquisition_id: options.userAcquisitionId } : {}),
+      }),
       signal: options?.signal,
     });
 
@@ -54,6 +56,9 @@ const useSendChatMessage = () => {
           break;
         case 'entries':
           handlers.onEntries(idsOf(payload));
+          break;
+        case 'pages':
+          handlers.onPages?.(pagesOf(payload));
           break;
         case 'error':
           handlers.onError(textOf(payload));

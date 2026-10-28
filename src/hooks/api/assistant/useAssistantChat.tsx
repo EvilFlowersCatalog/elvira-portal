@@ -18,38 +18,23 @@ import useStartChat from './useStartChat';
 const useAssistantChat = (entry?: { id: string; title?: string }) => {
   const entryId = entry?.id;
   const { t } = useTranslation();
-  const { aiChatId, setAiChatId, setAiMessages } = useAppContext();
+  const { aiChatId, setAiChatId, setAiMessages, aiChatSubject, setAiChatSubject } = useAppContext();
   const startChat = useStartChat();
   const sendChatMessage = useSendChatMessage();
   const [isGenerating, setGenerating] = useState(false);
 
   const sendMessage = async (message: string) => {
     const stamp = Date.now();
-    const loadingId = `loading-${stamp}`;
     const answerId = `answer-${stamp}`;
 
-    const withoutLoading = (messages: AiMessage[]) => messages.filter((m) => m.id !== loadingId);
-
-    // Shows `text` as the answer, creating the message on first use.
-    const setAnswer = (text: string) =>
-      setAiMessages((prev) => {
-        const rest = withoutLoading(prev);
-        const answer: AiMessage = { role: 'assistant', content: { type: 'message', data: text }, id: answerId };
-        return rest.some((m) => m.id === answerId)
-          ? rest.map((m) => (m.id === answerId ? answer : m))
-          : [...rest, answer];
-      });
-
-    const showError = (text: string) =>
-      setAiMessages((prev) => [
-        ...withoutLoading(prev),
-        { role: 'assistant', content: { type: 'message', data: text }, id: `error-${stamp}` },
-      ]);
+    const updateAnswer = (patch: Partial<AiMessage>) =>
+      setAiMessages((prev) => prev.map((m) => (m.id === answerId ? { ...m, ...patch } : m)));
+    const showError = (text: string) => updateAnswer({ text, status: 'error' });
 
     setAiMessages((prev) => [
       ...prev,
-      { role: 'user', content: { type: 'message', data: message }, reference: entry },
-      { role: 'assistant', content: { type: 'loading', data: 'Generating response...' }, id: loadingId },
+      { id: `user-${stamp}`, role: 'user', text: message, reference: entry },
+      { id: answerId, role: 'assistant', text: '', status: 'streaming' },
     ]);
     setGenerating(true);
 
@@ -63,29 +48,29 @@ const useAssistantChat = (entry?: { id: string; title?: string }) => {
         chatId = chat.id;
         setAiChatId(chatId);
       }
+      // A chat started from a book is about that book: its page citations open it.
+      if (entryId && !aiChatSubject) setAiChatSubject({ entryId, title: entry?.title });
 
       let text = '';
       await sendChatMessage(chatId, message, {
         onChunk: (chunk) => {
           text += chunk;
-          setAnswer(text);
+          updateAnswer({ text });
         },
         onMessage: (full) => {
           text = full;
-          setAnswer(full);
+          updateAnswer({ text });
         },
         onEntries: (ids) => {
-          if (ids.length === 0) return;
-          setAiMessages((prev) => [
-            ...withoutLoading(prev),
-            { role: 'assistant', content: { type: 'entries', data: ids }, id: `entries-${Date.now()}` },
-          ]);
+          if (ids.length) updateAnswer({ entryIds: ids });
         },
-        onError: (detail) => {
-          showError(detail || t('assistant.errors.generic'));
-        },
+        onPages: (pages) => updateAnswer({ pagesRead: pages }),
+        onError: (detail) => showError(detail || t('assistant.errors.generic')),
         onDone: () => {},
       }, { entryId });
+      setAiMessages((prev) =>
+        prev.map((m) => (m.id === answerId && m.status === 'streaming' ? { ...m, status: 'done' } : m)),
+      );
     } catch (err) {
       const { status, message: detail, retryAfter } = toAssistantError(err);
       switch (status) {
@@ -109,8 +94,6 @@ const useAssistantChat = (entry?: { id: string; title?: string }) => {
           showError(t('assistant.errors.generic'));
       }
     } finally {
-      // Drops a leftover spinner if the stream ended without any answer.
-      setAiMessages((prev) => (prev.some((m) => m.id === loadingId) ? withoutLoading(prev) : prev));
       setGenerating(false);
     }
   };

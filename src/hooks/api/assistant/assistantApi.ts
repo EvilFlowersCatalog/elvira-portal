@@ -130,3 +130,12 @@ export const idsOf = (payload: unknown): string[] => {
       : undefined;
   return Array.isArray(list) ? list.map(String) : [];
 };
+
+/** Pulls page numbers out of a `pages` payload. */
+export const pagesOf = (payload: unknown): number[] => {
+  const list =
+    Array.isArray(payload) ? payload
+    : payload && typeof payload === 'object' ? (payload as Record<string, unknown>).pages
+    : undefined;
+  return Array.isArray(list) ? list.map(Number).filter((page) => Number.isInteger(page) && page > 0) : [];
+};

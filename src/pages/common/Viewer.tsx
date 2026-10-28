@@ -21,7 +21,13 @@ import renderViewer from "@evilflowers/evilflowersviewer";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import viewerStyles from "@evilflowers/evilflowersviewer/dist/style.css?inline";
-import type { IPageBookmark } from "@evilflowers/evilflowersviewer";
+import type {
+  IChatContext,
+  IChatMessage,
+  IChatStreamHandlers,
+  IChatSummary,
+  IPageBookmark,
+} from "@evilflowers/evilflowersviewer";
 import useAppContext from "../../hooks/contexts/useAppContext";
 import { toast } from "react-toastify";
 import { updateMetaTag, withAccessToken } from "../../utils/func/functions";
@@ -37,6 +43,13 @@ import useDeleteAnotationItem from "../../hooks/api/anotations/anotation-items/u
 import useAddToShelf from "../../hooks/api/my-shelf/useAddToShelf";
 import useRemoveFromShelf from "../../hooks/api/my-shelf/useRemoveFromShelf";
 import useExplainPassage from "../../hooks/api/assistant/useExplainPassage";
+import useStartChat from "../../hooks/api/assistant/useStartChat";
+import useSendChatMessage from "../../hooks/api/assistant/useSendChatMessage";
+import useGetUserChats from "../../hooks/api/assistant/useGetUserChats";
+import useGetChatHistory from "../../hooks/api/assistant/useGetChatHistory";
+import useDeleteChat from "../../hooks/api/assistant/useDeleteChat";
+import { formatRetryAfter, toAssistantError } from "../../hooks/api/assistant/assistantApi";
+import { useQueryClient } from "@tanstack/react-query";
 
 
 interface ISuggestedEntry {
@@ -52,13 +65,17 @@ interface IExplainResult {
   examples: { label: string; description: string }[];
 }
 
+// Fields the viewer reads after 0.7.0; harmless for older versions.
+type ChatHandlersWithPages = IChatStreamHandlers & { onPages?: (pages: number[]) => void };
+type ChatMessageWithPages = IChatMessage & { pages?: number[] };
+
 const rootId = "elvira-viewer-app";
 
 // Title of the annotation that acts as the page-bookmark container.
 const PAGE_BOOKMARKS_TITLE = "__page_bookmarks__";
 
 const Viewer = () => {
-  const { lang, theme, titleLogoDark, titleLogoLight } = useAppContext();
+  const { lang, theme, titleLogoDark, titleLogoLight, aiChatId, clearAiChat } = useAppContext();
   const { auth } = useAuthContext();
   const { "entry-id": id, index } = useParams();
   const { t } = useTranslation();
@@ -82,6 +99,12 @@ const Viewer = () => {
   const { getEntryDetail } = useGetEntryDetail();
   const getUserAcquisition = useGetUserAcquisition();
   const explainPassage = useExplainPassage();
+  const startChat = useStartChat();
+  const sendChatMessage = useSendChatMessage();
+  const getUserChats = useGetUserChats();
+  const getChatHistory = useGetChatHistory();
+  const deleteChat = useDeleteChat();
+  const queryClient = useQueryClient();
   const getAnotations = useGetAnotations();
   const updateAnotation = useUpdateAnotation();
   const createAnotation = useCreateAnotation();
@@ -191,6 +214,127 @@ const Viewer = () => {
       page: context?.page,
       language: lang,
     });
+
+  // --- Reading chat ---------------------------------------------------------
+  // The viewer's chat is stored as an ordinary assistant chat, bound to this
+  // copy of the book, so it shows up in the portal's chat history too and can
+  // be continued from there (and the other way round).
+
+  // Recommended publications arrive as ids; the viewer renders full cards.
+  const toSuggestedEntries = async (ids: string[]): Promise<ISuggestedEntry[]> => {
+    const details = await Promise.all(
+      ids.map((entryId) => getEntryDetail(entryId).catch(() => null))
+    );
+    return details
+      .filter((detail): detail is NonNullable<typeof detail> => detail != null)
+      .map((detail) => ({
+        id: detail.id,
+        catalog_id: detail.catalog_id,
+        title: detail.title,
+        authors: detail.authors.map((author) => ({ name: author.name, surname: author.surname })),
+        thumbnail: withAccessToken(detail.thumbnail, auth?.token) ?? detail.thumbnail,
+        shelf_record_id: detail.shelf_record_id ?? null,
+      }));
+  };
+
+  const chatErrorText = (err: unknown) => {
+    const { status, message: detail, retryAfter } = toAssistantError(err);
+    switch (status) {
+      case 429: {
+        const wait = formatRetryAfter(retryAfter);
+        return wait
+          ? t("assistant.errors.rateLimited", { retryAfter: wait })
+          : t("assistant.errors.rateLimitedNoWait");
+      }
+      case 403:
+        return detail || t("assistant.errors.forbidden");
+      case 404:
+        return t("assistant.errors.chatNotFound");
+      case 401:
+        return t("assistant.errors.unauthorized");
+      default:
+        return t("assistant.errors.generic");
+    }
+  };
+
+  const sendChatMessageFunc = async (
+    message: string,
+    contexts: IChatContext[],
+    handlers: IChatStreamHandlers,
+    meta: { page: number; chatId: string | null }
+  ): Promise<{ chatId: string } | void> => {
+    let chatId = meta.chatId;
+    try {
+      if (!chatId) {
+        const chat = await startChat({
+          entry_id: id,
+          user_acquisition_id,
+          catalog_id: entryCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined,
+        });
+        chatId = chat.id;
+      }
+
+      const pending: Promise<void>[] = [];
+      await sendChatMessage(
+        chatId,
+        message,
+        {
+          onChunk: handlers.onChunk,
+          onMessage: handlers.onMessage,
+          onEntries: (ids) => {
+            if (ids.length) pending.push(toSuggestedEntries(ids).then(handlers.onEntries));
+          },
+          // `onPages` is new in the viewer after 0.7.0; older ones leave it out.
+          onPages: (pages) => (handlers as ChatHandlersWithPages).onPages?.(pages),
+          onError: (detail) => handlers.onError(detail || t("assistant.errors.generic")),
+          onDone: () => {},
+        },
+        { contexts, page: meta.page, userAcquisitionId: user_acquisition_id }
+      );
+      await Promise.all(pending);
+      queryClient.invalidateQueries({ queryKey: ["user-chats"] });
+      return { chatId };
+    } catch (err) {
+      handlers.onError(chatErrorText(err));
+      // A deleted chat cannot be continued; the next message starts a new one.
+      if (toAssistantError(err).status !== 404 && chatId) return { chatId };
+    }
+  };
+
+  const getChatsFunc = async (): Promise<IChatSummary[]> => {
+    const { items } = await getUserChats({ limit: 50 });
+    return items.map((chat) => ({
+      id: chat.id,
+      title: chat.title || t("assistant.untitledChat"),
+      updatedAt: chat.last_message_at ?? chat.created_at,
+      messageCount: chat.message_count,
+      aboutThisBook: chat.entry_id === id,
+    }));
+  };
+
+  const getChatFunc = async (chatId: string): Promise<IChatMessage[]> => {
+    const chat = await getChatHistory(chatId);
+    return Promise.all(
+      chat.messages.map(async (msg): Promise<ChatMessageWithPages> => ({
+        id: msg.id,
+        role: msg.role,
+        text: msg.text,
+        contexts: msg.contexts ?? undefined,
+        pages: msg.pages_read ?? undefined,
+        entries: msg.displayed_entries?.length
+          ? await toSuggestedEntries(msg.displayed_entries)
+          : undefined,
+        status: "done" as const,
+      }))
+    );
+  };
+
+  const deleteChatFunc = async (chatId: string) => {
+    await deleteChat(chatId);
+    // The portal assistant must not keep sending into a deleted chat.
+    if (aiChatId === chatId) clearAiChat();
+    queryClient.invalidateQueries({ queryKey: ["user-chats"] });
+  };
 
   const saveLayerFunc = async (
     svg: string,
@@ -454,6 +598,8 @@ const Viewer = () => {
 
         if (cancelled) return;
 
+        const initialPageOption = { initialPage: Number(searchParams.get("page")) || undefined };
+
         // Render viewer with the provided options and configurations
         viewerApp = renderViewer({
           rootId: `#${rootId}`,
@@ -468,6 +614,15 @@ const Viewer = () => {
             openEntryDetailFunction,
             bookmarkToggleFunction,
             explainFunction,
+            chatPackage: {
+              sendMessageFunc: sendChatMessageFunc,
+              getChatsFunc,
+              getChatFunc,
+              deleteChatFunc,
+            },
+            // Opens at the page a chat citation pointed to. Spread because
+            // `initialPage` is new in the viewer after 0.7.0, which ignores it.
+            ...initialPageOption,
             editPackage: {
               saveLayerFunc,
               saveGroupFunc,

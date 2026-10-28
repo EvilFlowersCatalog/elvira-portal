@@ -6,10 +6,10 @@ import useUserChatsQuery from '../../hooks/api/assistant/useUserChatsQuery';
 import useGetChatHistory from '../../hooks/api/assistant/useGetChatHistory';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
-import { FiMessageSquare, FiPlus, FiTrash2 } from 'react-icons/fi';
+import { FiBookOpen, FiMessageSquare, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { AiMessage } from '../../providers/AppProvider';
+import { fromApiMessages, subjectOf } from '../../utils/func/assistantMessages';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import { H1 } from '../../components/primitives/Heading';
 import ConfirmDialog from '../../components/admin/ConfirmDialog';
@@ -43,6 +43,7 @@ const AiChatHistory = () => {
     setAiChatId,
     setAiMessages,
     setAiShowSuggestions,
+    setAiChatSubject,
     clearAiChat,
     umamiTrack
   } = useAppContext();
@@ -63,19 +64,9 @@ const AiChatHistory = () => {
     try {
       const history = await getChatHistory(chat.id);
 
-      const messages: AiMessage[] = history.messages.flatMap((msg, index) => {
-        const items: AiMessage[] = [];
-        if (msg.text) {
-          items.push({ role: msg.role, content: { type: 'message', data: msg.text }, id: `history-${index}` });
-        }
-        if (msg.displayed_entries?.length) {
-          items.push({ role: msg.role, content: { type: 'entries', data: msg.displayed_entries }, id: `history-${index}-entries` });
-        }
-        return items;
-      });
-
       setAiChatId(chat.id);
-      setAiMessages(messages);
+      setAiMessages(fromApiMessages(history.messages));
+      setAiChatSubject(subjectOf(history));
       setAiShowSuggestions(false);
 
       navigate(NAVIGATION_PATHS.aiAssistant);
@@ -184,6 +175,12 @@ const AiChatHistory = () => {
                         <p className="text-xl font-semibold text-black dark:text-white mb-1">
                           {chat.title || t('assistant.untitledChat')}
                         </p>
+                        {chat.entry && (
+                          <p className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400 mb-1 truncate">
+                            <FiBookOpen size={14} className="shrink-0" />
+                            <span className="truncate">{chat.entry.title}</span>
+                          </p>
+                        )}
                         <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-500">
                           <span>{t('assistant.messages', { count: chat.message_count })}</span>
                           <span>•</span>

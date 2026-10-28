@@ -26,6 +26,20 @@ export const sk = {
       deleteChatConfirm: 'Vymazať „{{title}}“? Konverzácia bude natrvalo odstránená.',
       deleteChatError: 'Konverzáciu sa nepodarilo vymazať',
       cancel: 'Zrušiť',
+      thinking: 'Premýšľam…',
+      pageShort: 's. {{page}}',
+      sources: 'Zdroje',
+      aboutBook: 'O publikácii {{title}}',
+      aboutThisBook: 'O tejto publikácii',
+      openInReader: 'Otvoriť v čítačke',
+      context: {
+        explain: 'Vysvetlenie',
+      },
+      region: {
+        figure: 'Obrázok',
+        table: 'Tabuľka',
+        equation: 'Rovnica',
+      },
       errors: {
         generic: 'Pri spracovaní vašej požiadavky nastala chyba.',
         rateLimited: 'Dosiahli ste denný limit AI asistenta. Skúste to znova o {{retryAfter}}.',

@@ -16,19 +16,37 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { IContextProviderParams } from "../utils/interfaces/contexts";
 import i18next from "../utils/i18n/i18next";
 import useCookiesContext from "../hooks/contexts/useCookiesContext";
+import type { IChatContext } from "../utils/interfaces/assistant";
 
-export interface AiMessageContent {
-  type: "message" | "entries" | "loading";
-  data: any;
-}
-
+/**
+ * One message of the assistant chat, the same shape everywhere it is shown
+ * (portal page, drawer, and — through `chatPackage` — the viewer).
+ */
 export interface AiMessage {
-  role: string;
-  content: AiMessageContent;
-  id?: string;
-  bookIds?: string[];
+  id: string;
+  role: "user" | "assistant";
+  /** Markdown. Assistant text may cite `[[page:N]]` and `[[region:ID]]`. */
+  text: string;
   /** Publication the reader attached to this (user) message. */
   reference?: { id: string; title?: string };
+  /** What the reader attached in the viewer. */
+  contexts?: IChatContext[];
+  /** Viewer page the reader was on. */
+  page?: number | null;
+  /** Publications the assistant recommended with this answer. */
+  entryIds?: string[];
+  /** Viewer pages the answer was drawn from. */
+  pagesRead?: number[];
+  status?: "streaming" | "done" | "error";
+}
+
+/** The publication the open chat is about, so page citations can open it in the viewer. */
+export interface AiChatSubject {
+  entryId: string;
+  catalogId?: string | null;
+  title?: string;
+  /** The file the chat was read from; the viewer opens this one. */
+  acquisitionId?: string | null;
 }
 
 export interface IAppContext {
@@ -56,6 +74,8 @@ export interface IAppContext {
   setAiMessages: React.Dispatch<React.SetStateAction<AiMessage[]>>;
   aiShowSuggestions: boolean;
   setAiShowSuggestions: (show: boolean) => void;
+  aiChatSubject: AiChatSubject | null;
+  setAiChatSubject: (subject: AiChatSubject | null) => void;
   clearAiChat: () => void;
   isParamsEmpty: () => boolean;
   searchParamsEqual: (
@@ -122,10 +142,12 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const [aiChatId, setAiChatId] = useState<string | null>(null);
   const [aiMessages, setAiMessages] = useState<AiMessage[]>([]);
   const [aiShowSuggestions, setAiShowSuggestions] = useState<boolean>(true);
+  const [aiChatSubject, setAiChatSubject] = useState<AiChatSubject | null>(null);
 
   const clearAiChat = () => {
     setAiChatId(null);
     setAiMessages([]);
+    setAiChatSubject(null);
     setAiShowSuggestions(true);
   };
   const [isSmallDevice, setIsSmallDevice] = useState<boolean>(
@@ -406,6 +428,8 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         setAiMessages,
         aiShowSuggestions,
         setAiShowSuggestions,
+        aiChatSubject,
+        setAiChatSubject,
         clearAiChat,
         specialNavigation,
         clearFilters,

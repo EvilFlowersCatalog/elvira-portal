@@ -26,6 +26,20 @@ export const en = {
       deleteChatConfirm: 'Delete "{{title}}"? The conversation will be gone for good.',
       deleteChatError: 'Failed to delete the chat',
       cancel: 'Cancel',
+      thinking: 'Thinking…',
+      pageShort: 'p. {{page}}',
+      sources: 'Sources',
+      aboutBook: 'About {{title}}',
+      aboutThisBook: 'About this publication',
+      openInReader: 'Open in reader',
+      context: {
+        explain: 'Explanation',
+      },
+      region: {
+        figure: 'Figure',
+        table: 'Table',
+        equation: 'Equation',
+      },
       errors: {
         generic: 'An error occurred while processing your request.',
         rateLimited: 'You have reached the daily limit of the AI assistant. Try again in {{retryAfter}}.',

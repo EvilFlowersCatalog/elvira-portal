@@ -1,19 +1,16 @@
 import { createPortal } from "react-dom";
-import { CircleLoader } from "react-spinners";
 import { FaX, FaPaperPlane } from "react-icons/fa6";
 import { FiPlus } from "react-icons/fi";
 import { useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { useTranslation } from "react-i18next";
 import useAppContext from "../../hooks/contexts/useAppContext";
-import EntryItem from "../items/entry/display/EntryItem";
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
-import { IEntry, IEntryDetail } from "../../utils/interfaces/entry";
+import { IEntryDetail } from "../../utils/interfaces/entry";
 import { useSearchParams } from "react-router-dom";
 import useAssistantChat from "../../hooks/api/assistant/useAssistantChat";
 import useStickToBottom from "../../hooks/useStickToBottom";
-import { AiMessage } from "../../providers/AppProvider";
+import AssistantMessage from "../assistant/AssistantMessage";
+import ChatSubjectBar from "../assistant/ChatSubjectBar";
 
 function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, handleSuggestion: (suggestion: string) => void }) {
     return (
@@ -29,61 +26,6 @@ function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, ha
 }
 
 
-function MessageElement({ msg }: { msg: AiMessage }) {
-    const [books, setBooks] = useState<any[]>([]);
-    const { getEntryDetail } = useGetEntryDetail();
-
-    useEffect(() => {
-        if (msg.content.type === "entries" && Array.isArray(msg.content.data)) {
-            const entryIds = msg.content.data;
-            setBooks([]); // Reset books first
-            (async () => {
-                const details = await Promise.all(
-                    entryIds.map((id: string) => getEntryDetail(id))
-                );
-                const entries: IEntry[] = details.map(entryDetail => ({
-                    ...entryDetail,
-                    popularity: Number(entryDetail.popularity),
-                }));
-                setBooks(entries);
-            })();
-        }
-    }, [msg.content.type, JSON.stringify(msg.content.data)])
-
-    switch (msg.content.type) {
-        case "message":
-            return <div
-                className={`mb-2 p-2 rounded-lg max-w-[80%] ${
-                    msg.role === "user"
-                        ? "bg-primary text-white self-end"
-                        : "bg-zinc-200 text-black self-start"
-                }`}>
-                {msg.reference?.title && (
-                    <p className="text-xs opacity-80 mb-1 truncate">📖 {msg.reference.title}</p>
-                )}
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content.data as string}</ReactMarkdown>
-            </div>;
-        case "entries":
-            return <div className="flex gap-3 mb-2 py-2 shrink-0 overflow-x-auto flex-nowrap"
-            >
-                {books.map((entry: IEntry) => (
-                    <div key={"ai-" + entry.id} className="w-[150px] shrink-0">
-                        <EntryItem entry={entry} id={'ai-' + entry.id} type="ai-recommendation" />
-                    </div>
-                ))}
-            </div>
-        case "loading":
-            return <div className="mb-2 p-2 rounded-lg max-w-[80%] flex items-center gap-2 bg-zinc-200 self-start">
-                <CircleLoader size={16} color={'var(--color-primary)'} />
-                <p className="text-sm text-gray-600">
-                    {msg.content.data || "Generating response..."}
-                </p>
-            </div>;
-        default:
-            return <p className="dark:text-white text-center">404</p>
-    }
-}
-
 export default function AiAssistant() {
     const { t } = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -91,9 +33,8 @@ export default function AiAssistant() {
         showAiAssistant, 
         setShowAiAssistant, 
         umamiTrack,
-        setAiChatId,
+        clearAiChat,
         aiMessages,
-        setAiMessages,
         aiShowSuggestions,
         setAiShowSuggestions,
     } = useAppContext();
@@ -166,8 +107,7 @@ export default function AiAssistant() {
     };
 
     const newSession = () => {
-        setAiChatId(null);
-        setAiMessages([]);
+        clearAiChat();
     }
 
     const handleCloseDrawer = (event: object, reason: "backdropClick" | "escapeKeyDown") => {
@@ -244,11 +184,19 @@ export default function AiAssistant() {
                         </div>
                     </div>
 
+                    <ChatSubjectBar onNavigate={() => handleCloseDrawer({}, "escapeKeyDown")} />
+
                     {/* Body */}
                     <div id="chat" ref={chatScrollRef} className="flex flex-col grow overflow-y-auto">
                         <div ref={chatContentRef} className="flex flex-col">
-                            {aiMessages.map((msg, index) => (
-                                <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} />
+                            {aiMessages.map((msg) => (
+                                <AssistantMessage
+                                    key={msg.id}
+                                    msg={msg}
+                                    messages={aiMessages}
+                                    compact
+                                    onNavigate={() => handleCloseDrawer({}, "escapeKeyDown")}
+                                />
                             ))}
                         </div>
                     </div>

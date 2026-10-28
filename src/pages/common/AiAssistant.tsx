@@ -1,19 +1,13 @@
-import { CircleLoader } from "react-spinners";
 import { FaPaperPlane } from "react-icons/fa6";
 import { FiClock, FiPlus } from "react-icons/fi";
 import { useEffect, useState, useRef } from "react";
-import { useQuery } from "@tanstack/react-query";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
 import { useTranslation } from "react-i18next";
 import useAppContext from "../../hooks/contexts/useAppContext";
-import EntryItem from "../../components/items/entry/display/EntryItem";
-import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
-import { IEntry } from "../../utils/interfaces/entry";
 import { Link, useNavigate } from "react-router-dom";
 import useAssistantChat from "../../hooks/api/assistant/useAssistantChat";
 import useStickToBottom from "../../hooks/useStickToBottom";
-import { AiMessage } from "../../providers/AppProvider";
+import AssistantMessage from "../../components/assistant/AssistantMessage";
+import ChatSubjectBar from "../../components/assistant/ChatSubjectBar";
 import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
 import EntryDetail from "../../components/items/entry/details/EntryDetail";
 
@@ -30,69 +24,13 @@ function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, ha
     );
 }
 
-function MessageElement({ msg }: { msg: AiMessage }) {
-    const { getEntryDetail } = useGetEntryDetail();
-
-    const entryIds =
-        msg.content.type === "entries" && Array.isArray(msg.content.data)
-            ? (msg.content.data as string[])
-            : [];
-
-    // Recommended-book details for an "entries" message (cached/deduped by
-    // React Query; keyed by the ids).
-    const { data: books = [] } = useQuery({
-        queryKey: ["ai-message-books", entryIds],
-        queryFn: async () => {
-            const details = await Promise.all(
-                entryIds.map((id) => getEntryDetail(id))
-            );
-            return details.map((entryDetail) => ({
-                ...entryDetail,
-                popularity: Number(entryDetail.popularity),
-            })) as IEntry[];
-        },
-        enabled: entryIds.length > 0,
-    });
-
-    switch (msg.content.type) {
-        case "message":
-            return <div
-                className={`mb-4 p-4 rounded-lg max-w-[70%] ${
-                    msg.role === "user"
-                        ? "bg-primary text-white self-end"
-                        : "bg-zinc-200 text-black self-start dark:bg-[#3f3f46] dark:text-[#e5e7eb]"
-                }`}>
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content.data as string}</ReactMarkdown>
-            </div>;
-        case "entries":
-            return <div className="flex gap-3 mb-4 py-2 shrink-0 overflow-x-auto flex-nowrap"
-            >
-                {books.map((entry: IEntry) => (
-                    <div key={"ai-" + entry.id} className="w-[150px] shrink-0">
-                        <EntryItem entry={entry} id={'ai-' + entry.id} type="ai-recommendation" />
-                    </div>
-                ))}
-            </div>
-        case "loading":
-            return <div className="mb-4 p-4 rounded-lg max-w-[70%] flex items-center gap-2 bg-zinc-200 self-start dark:bg-[#3f3f46]">
-                <CircleLoader size={16} color={'var(--color-primary)'} />
-                <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {msg.content.data || "Generating response..."}
-                </p>
-            </div>;
-        default:
-            return <p className="dark:text-white text-center">404</p>
-    }
-}
-
 export default function AiAssistantPage() {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { 
         umamiTrack,
-        setAiChatId,
+        clearAiChat,
         aiMessages,
-        setAiMessages,
         aiShowSuggestions,
         setAiShowSuggestions,
     } = useAppContext();
@@ -125,9 +63,7 @@ export default function AiAssistantPage() {
 
     function handleNewChat(){
         umamiTrack("Start New AI Chat");
-        setAiChatId(null);
-        setAiMessages([]);
-        setAiShowSuggestions(true);
+        clearAiChat();
         navigate(NAVIGATION_PATHS.aiAssistant);
     }
 
@@ -183,6 +119,9 @@ export default function AiAssistantPage() {
             <EntryDetail  />
             {/* Main Chat Container */}
             <div className="flex-1 flex flex-col items-center w-full overflow-hidden">
+                <div className="w-full max-w-4xl px-4 pt-2">
+                    <ChatSubjectBar />
+                </div>
                 {/* Chat Messages Area */}
                 <div ref={chatScrollRef} className="flex-1 w-full max-w-4xl overflow-y-auto px-4 py-8">
                     <div ref={chatContentRef} className="flex flex-col">
@@ -196,8 +135,8 @@ export default function AiAssistantPage() {
                                 </p>
                             </div>
                         ) : (
-                            aiMessages.map((msg, index) => (
-                                <MessageElement key={`msg-${index}-${msg.content.type}`} msg={msg} />
+                            aiMessages.map((msg) => (
+                                <AssistantMessage key={msg.id} msg={msg} messages={aiMessages} />
                             ))
                         )}
                     </div>
