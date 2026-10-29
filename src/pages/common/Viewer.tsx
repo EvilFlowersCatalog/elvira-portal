@@ -21,8 +21,10 @@ import renderViewer from "@evilflowers/evilflowersviewer";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import viewerStyles from "@evilflowers/evilflowersviewer/dist/style.css?inline";
+import type { IAnotationQuad } from "../../utils/interfaces/anotations";
 import type {
   IAgentAnnotation,
+  IAgentHighlight,
   IChatContext,
   IChatMessage,
   IChatStreamHandlers,
@@ -419,6 +421,90 @@ const Viewer = () => {
       return null;
     }
   };
+  // --- Reader highlights ----------------------------------------------------
+  // "Zvýrazniť" in the viewer's selection menu: one annotation of kind
+  // `highlight` per user acquisition, an item per highlight with its text and
+  // line boxes, listed beside the AI highlights (IP-018).
+  let highlightsAnotationId: string | null = null;
+  let highlightsAnotationRequest: Promise<string> | null = null;
+
+  const findHighlightsAnotation = async (): Promise<string | null> => {
+    if (highlightsAnotationId) return highlightsAnotationId;
+    const { items } = await getAnotations(user_acquisition_id);
+    highlightsAnotationId = items.find((item) => item.kind === "highlight")?.id ?? null;
+    return highlightsAnotationId;
+  };
+
+  const ensureHighlightsAnotation = (): Promise<string> => {
+    if (!highlightsAnotationRequest) {
+      highlightsAnotationRequest = (async () => {
+        const existing = await findHighlightsAnotation();
+        if (existing) return existing;
+        const created = await createAnotation({
+          user_acquisition_id,
+          title: t("assistant.myHighlights"),
+          kind: "highlight",
+        });
+        highlightsAnotationId = created.id;
+        return created.id;
+      })().finally(() => {
+        highlightsAnotationRequest = null;
+      });
+    }
+    return highlightsAnotationRequest;
+  };
+
+  const toReaderHighlight = (item: {
+    id: string;
+    page?: number;
+    text?: string | null;
+    quads?: IAnotationQuad[] | null;
+  }): IAgentHighlight => ({
+    id: item.id,
+    seq: 0,
+    page: item.page ?? 1,
+    quads: item.quads ?? [],
+    text: item.text ?? "",
+  });
+
+  const getReaderHighlightsFunc = async (): Promise<IAgentHighlight[]> => {
+    try {
+      const anotationId = await findHighlightsAnotation();
+      if (!anotationId) return [];
+      const { items } = await getAnotationsItem(anotationId, null, { limit: 1000 });
+      return items.filter((item) => item.quads?.length).map(toReaderHighlight);
+    } catch {
+      return [];
+    }
+  };
+
+  const addReaderHighlightFunc = async (highlight: {
+    page: number;
+    text: string;
+    quads: IAnotationQuad[];
+  }): Promise<IAgentHighlight> => {
+    const anotationId = await ensureHighlightsAnotation();
+    // `content` keeps the item drawable by anything that only reads SVG.
+    const rects = highlight.quads
+      .map(
+        (q) =>
+          `<rect x="${q.x0}" y="${q.y0}" width="${q.x1 - q.x0}" height="${q.y1 - q.y0}"/>`
+      )
+      .join("");
+    const created = await createAnotationItem({
+      annotation_id: anotationId,
+      page: highlight.page,
+      content: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><g fill="#eab308" fill-opacity="0.35">${rects}</g></svg>`,
+      text: highlight.text,
+      quads: highlight.quads,
+    });
+    return toReaderHighlight({ ...highlight, ...created });
+  };
+
+  const deleteReaderHighlightFunc = async (highlightId: string) => {
+    await deleteAnotationItem(highlightId);
+  };
+
   // --- Page bookmarks -------------------------------------------------------
   // One dedicated annotation per user acquisition holds an item per bookmarked
   // page (`content: true`) — a page is bookmarked iff its item exists.
@@ -657,6 +743,11 @@ const Viewer = () => {
             requestAnnotationFunc: requestAgentAnnotationFunc,
             deleteHighlightFunc: deleteAgentHighlightFunc,
             deleteAnnotationFunc: deleteAgentAnnotationFunc,
+          },
+          readerHighlightPackage: {
+            getHighlightsFunc: getReaderHighlightsFunc,
+            addHighlightFunc: addReaderHighlightFunc,
+            deleteHighlightFunc: deleteReaderHighlightFunc,
           },
           pageBookmarkPackage: {
             getBookmarksFunc: getPageBookmarksFunc,
