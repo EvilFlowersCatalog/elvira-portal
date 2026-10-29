@@ -744,10 +744,14 @@ const Viewer = () => {
             deleteHighlightFunc: deleteAgentHighlightFunc,
             deleteAnnotationFunc: deleteAgentAnnotationFunc,
           },
-          readerHighlightPackage: {
-            getHighlightsFunc: getReaderHighlightsFunc,
-            addHighlightFunc: addReaderHighlightFunc,
-            deleteHighlightFunc: deleteReaderHighlightFunc,
+          // Viewer 0.7.3+; older viewers ignore it. Spread so the build also
+          // passes against a viewer whose IViewerOptions lacks the key.
+          ...{
+            readerHighlightPackage: {
+              getHighlightsFunc: getReaderHighlightsFunc,
+              addHighlightFunc: addReaderHighlightFunc,
+              deleteHighlightFunc: deleteReaderHighlightFunc,
+            },
           },
           pageBookmarkPackage: {
             getBookmarksFunc: getPageBookmarksFunc,
