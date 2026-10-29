@@ -1,14 +1,19 @@
 import { IMetadata } from './general/general';
 
+/** Viewer layer of an annotation (IP-018). */
+export type AnotationKind = 'drawing' | 'highlight' | 'agent' | 'bookmarks';
+
 export interface IAnotation {
   id: string;
   user_acquisition_id: string;
   title: string;
+  kind?: AnotationKind;
 }
 
 export interface ICreateAnotation {
   user_acquisition_id: string;
   title: string;
+  kind?: Exclude<AnotationKind, 'agent'>;
 }
 
 export interface IAnotationItemBody {
@@ -46,6 +51,7 @@ export interface IListAnitationItem {
 export interface IAnotationNew {
   user_acquisition_id: string;
   title: string;
+  kind?: Exclude<AnotationKind, 'agent'>;
 }
 
 export interface IAnotationUpdate {

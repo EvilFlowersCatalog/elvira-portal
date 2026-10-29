@@ -22,6 +22,7 @@ import renderViewer from "@evilflowers/evilflowersviewer";
 // @ts-ignore
 import viewerStyles from "@evilflowers/evilflowersviewer/dist/style.css?inline";
 import type {
+  IAgentAnnotation,
   IChatContext,
   IChatMessage,
   IChatStreamHandlers,
@@ -48,6 +49,7 @@ import useSendChatMessage from "../../hooks/api/assistant/useSendChatMessage";
 import useGetUserChats from "../../hooks/api/assistant/useGetUserChats";
 import useGetChatHistory from "../../hooks/api/assistant/useGetChatHistory";
 import useDeleteChat from "../../hooks/api/assistant/useDeleteChat";
+import useAgentHighlights from "../../hooks/api/assistant/useAgentHighlights";
 import { formatRetryAfter, toAssistantError } from "../../hooks/api/assistant/assistantApi";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -100,6 +102,7 @@ const Viewer = () => {
   const getUserChats = useGetUserChats();
   const getChatHistory = useGetChatHistory();
   const deleteChat = useDeleteChat();
+  const { getAgentAnnotations, requestAgentAnnotation } = useAgentHighlights();
   const queryClient = useQueryClient();
   const getAnotations = useGetAnotations();
   const updateAnotation = useUpdateAnotation();
@@ -443,6 +446,7 @@ const Viewer = () => {
         const created = await createAnotation({
           user_acquisition_id,
           title: PAGE_BOOKMARKS_TITLE,
+          kind: "bookmarks",
         });
         bookmarksAnotationId = created.id;
         return created.id;
@@ -520,7 +524,10 @@ const Viewer = () => {
       const { items } = await getAnotations(user_acquisition_id);
       // The page-bookmark container is an annotation too — keep it out of the
       // editor's group list.
+      // Only the drawing layer: agent annotations have their own layer and
+      // bookmarks are a container, not a group.
       return items
+        .filter((item) => (item.kind ?? "drawing") === "drawing")
         .filter((item) => item.title !== PAGE_BOOKMARKS_TITLE)
         .map((item) => {
           return { id: item.id, name: item.title };
@@ -528,6 +535,26 @@ const Viewer = () => {
     } catch {
       return [];
     }
+  };
+
+  // Agent highlights (IP-018): the assistant marks passages in the reader's copy.
+  const getAgentAnnotationsFunc = async (): Promise<IAgentAnnotation[]> => {
+    try {
+      return await getAgentAnnotations(user_acquisition_id);
+    } catch {
+      return [];
+    }
+  };
+
+  const requestAgentAnnotationFunc = (prompt: string) =>
+    requestAgentAnnotation(user_acquisition_id, prompt, lang);
+
+  const deleteAgentHighlightFunc = async (_annotationId: string, highlightId: string) => {
+    await deleteAnotationItem(highlightId);
+  };
+
+  const deleteAgentAnnotationFunc = async (annotationId: string) => {
+    await deleteAnotation(annotationId);
   };
 
   useEffect(() => {
@@ -540,7 +567,10 @@ const Viewer = () => {
     const styleElement = document.createElement("style");
     styleElement.id = "pdf-viewer-styles";
     styleElement.textContent = viewerStyles;
-    document.head.insertBefore(styleElement, document.head.firstChild);
+    // Appended last: the portal's own Tailwind emits utilities with the same
+    // names (`.dark .dark:text-gray-300` on <body class="dark">) at the same
+    // specificity as the viewer's scoped ones, and the later stylesheet wins.
+    document.head.appendChild(styleElement);
 
     let viewerApp: { unmount: () => void } | undefined;
     let cancelled = false;
@@ -622,6 +652,12 @@ const Viewer = () => {
               getLayerFunc,
               getGroupsFunc,
             },
+          agentAnnotationPackage: {
+            getAnnotationsFunc: getAgentAnnotationsFunc,
+            requestAnnotationFunc: requestAgentAnnotationFunc,
+            deleteHighlightFunc: deleteAgentHighlightFunc,
+            deleteAnnotationFunc: deleteAgentAnnotationFunc,
+          },
           pageBookmarkPackage: {
             getBookmarksFunc: getPageBookmarksFunc,
             addBookmarkFunc: addPageBookmarkFunc,
