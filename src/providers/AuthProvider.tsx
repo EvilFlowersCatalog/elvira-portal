@@ -22,6 +22,7 @@ import useVerifyCredentials from '../hooks/api/verify/useVerifyCredentials';
 import axios, { CancelTokenSource } from 'axios';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
 import { setAxiosAuth } from '../hooks/api/useAxios';
+import { umamiIdentify } from '../utils/umamiIdentify';
 
 export interface IAuthContext {
   auth: IAuth | null;
@@ -135,6 +136,15 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
       }
     }
   }, [auth, check]);
+
+  // Identify the logged-in user in Umami (on login and on restored sessions)
+  useEffect(() => {
+    if (!auth?.userId) return;
+    return umamiIdentify(String(auth.userId), {
+      username: auth.username,
+      isSuperUser: auth.isSuperUser,
+    });
+  }, [auth?.userId]);
 
   const logout = () => {
     // Cancel all ongoing requests
