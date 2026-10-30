@@ -7,6 +7,7 @@ export const sk = {
     },
     assistant: {
       title: 'AI Asistent',
+      myHighlights: 'Moje zvýraznenia',
       inputPlaceholder: 'Spýtajte sa ma na čokoľvek...',
       suggestion1: 'Ako sa naučím programovať?',
       suggestion2: 'Nájdi knihu o matematike',

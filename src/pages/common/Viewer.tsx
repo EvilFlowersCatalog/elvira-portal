@@ -21,7 +21,10 @@ import renderViewer from "@evilflowers/evilflowersviewer";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import viewerStyles from "@evilflowers/evilflowersviewer/dist/style.css?inline";
+import type { IAnotationQuad } from "../../utils/interfaces/anotations";
 import type {
+  IAgentAnnotation,
+  IAgentHighlight,
   IChatContext,
   IChatMessage,
   IChatStreamHandlers,
@@ -48,6 +51,7 @@ import useSendChatMessage from "../../hooks/api/assistant/useSendChatMessage";
 import useGetUserChats from "../../hooks/api/assistant/useGetUserChats";
 import useGetChatHistory from "../../hooks/api/assistant/useGetChatHistory";
 import useDeleteChat from "../../hooks/api/assistant/useDeleteChat";
+import useAgentHighlights from "../../hooks/api/assistant/useAgentHighlights";
 import { formatRetryAfter, toAssistantError } from "../../hooks/api/assistant/assistantApi";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -100,6 +104,7 @@ const Viewer = () => {
   const getUserChats = useGetUserChats();
   const getChatHistory = useGetChatHistory();
   const deleteChat = useDeleteChat();
+  const { getAgentAnnotations, requestAgentAnnotation } = useAgentHighlights();
   const queryClient = useQueryClient();
   const getAnotations = useGetAnotations();
   const updateAnotation = useUpdateAnotation();
@@ -416,6 +421,90 @@ const Viewer = () => {
       return null;
     }
   };
+  // --- Reader highlights ----------------------------------------------------
+  // "Zvýrazniť" in the viewer's selection menu: one annotation of kind
+  // `highlight` per user acquisition, an item per highlight with its text and
+  // line boxes, listed beside the AI highlights (IP-018).
+  let highlightsAnotationId: string | null = null;
+  let highlightsAnotationRequest: Promise<string> | null = null;
+
+  const findHighlightsAnotation = async (): Promise<string | null> => {
+    if (highlightsAnotationId) return highlightsAnotationId;
+    const { items } = await getAnotations(user_acquisition_id);
+    highlightsAnotationId = items.find((item) => item.kind === "highlight")?.id ?? null;
+    return highlightsAnotationId;
+  };
+
+  const ensureHighlightsAnotation = (): Promise<string> => {
+    if (!highlightsAnotationRequest) {
+      highlightsAnotationRequest = (async () => {
+        const existing = await findHighlightsAnotation();
+        if (existing) return existing;
+        const created = await createAnotation({
+          user_acquisition_id,
+          title: t("assistant.myHighlights"),
+          kind: "highlight",
+        });
+        highlightsAnotationId = created.id;
+        return created.id;
+      })().finally(() => {
+        highlightsAnotationRequest = null;
+      });
+    }
+    return highlightsAnotationRequest;
+  };
+
+  const toReaderHighlight = (item: {
+    id: string;
+    page?: number;
+    text?: string | null;
+    quads?: IAnotationQuad[] | null;
+  }): IAgentHighlight => ({
+    id: item.id,
+    seq: 0,
+    page: item.page ?? 1,
+    quads: item.quads ?? [],
+    text: item.text ?? "",
+  });
+
+  const getReaderHighlightsFunc = async (): Promise<IAgentHighlight[]> => {
+    try {
+      const anotationId = await findHighlightsAnotation();
+      if (!anotationId) return [];
+      const { items } = await getAnotationsItem(anotationId, null, { limit: 1000 });
+      return items.filter((item) => item.quads?.length).map(toReaderHighlight);
+    } catch {
+      return [];
+    }
+  };
+
+  const addReaderHighlightFunc = async (highlight: {
+    page: number;
+    text: string;
+    quads: IAnotationQuad[];
+  }): Promise<IAgentHighlight> => {
+    const anotationId = await ensureHighlightsAnotation();
+    // `content` keeps the item drawable by anything that only reads SVG.
+    const rects = highlight.quads
+      .map(
+        (q) =>
+          `<rect x="${q.x0}" y="${q.y0}" width="${q.x1 - q.x0}" height="${q.y1 - q.y0}"/>`
+      )
+      .join("");
+    const created = await createAnotationItem({
+      annotation_id: anotationId,
+      page: highlight.page,
+      content: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1 1"><g fill="#eab308" fill-opacity="0.35">${rects}</g></svg>`,
+      text: highlight.text,
+      quads: highlight.quads,
+    });
+    return toReaderHighlight({ ...highlight, ...created });
+  };
+
+  const deleteReaderHighlightFunc = async (highlightId: string) => {
+    await deleteAnotationItem(highlightId);
+  };
+
   // --- Page bookmarks -------------------------------------------------------
   // One dedicated annotation per user acquisition holds an item per bookmarked
   // page (`content: true`) — a page is bookmarked iff its item exists.
@@ -443,6 +532,7 @@ const Viewer = () => {
         const created = await createAnotation({
           user_acquisition_id,
           title: PAGE_BOOKMARKS_TITLE,
+          kind: "bookmarks",
         });
         bookmarksAnotationId = created.id;
         return created.id;
@@ -520,7 +610,10 @@ const Viewer = () => {
       const { items } = await getAnotations(user_acquisition_id);
       // The page-bookmark container is an annotation too — keep it out of the
       // editor's group list.
+      // Only the drawing layer: agent annotations have their own layer and
+      // bookmarks are a container, not a group.
       return items
+        .filter((item) => (item.kind ?? "drawing") === "drawing")
         .filter((item) => item.title !== PAGE_BOOKMARKS_TITLE)
         .map((item) => {
           return { id: item.id, name: item.title };
@@ -528,6 +621,26 @@ const Viewer = () => {
     } catch {
       return [];
     }
+  };
+
+  // Agent highlights (IP-018): the assistant marks passages in the reader's copy.
+  const getAgentAnnotationsFunc = async (): Promise<IAgentAnnotation[]> => {
+    try {
+      return await getAgentAnnotations(user_acquisition_id);
+    } catch {
+      return [];
+    }
+  };
+
+  const requestAgentAnnotationFunc = (prompt: string) =>
+    requestAgentAnnotation(user_acquisition_id, prompt, lang);
+
+  const deleteAgentHighlightFunc = async (_annotationId: string, highlightId: string) => {
+    await deleteAnotationItem(highlightId);
+  };
+
+  const deleteAgentAnnotationFunc = async (annotationId: string) => {
+    await deleteAnotation(annotationId);
   };
 
   useEffect(() => {
@@ -540,7 +653,10 @@ const Viewer = () => {
     const styleElement = document.createElement("style");
     styleElement.id = "pdf-viewer-styles";
     styleElement.textContent = viewerStyles;
-    document.head.insertBefore(styleElement, document.head.firstChild);
+    // Appended last: the portal's own Tailwind emits utilities with the same
+    // names (`.dark .dark:text-gray-300` on <body class="dark">) at the same
+    // specificity as the viewer's scoped ones, and the later stylesheet wins.
+    document.head.appendChild(styleElement);
 
     let viewerApp: { unmount: () => void } | undefined;
     let cancelled = false;
@@ -622,6 +738,21 @@ const Viewer = () => {
               getLayerFunc,
               getGroupsFunc,
             },
+          agentAnnotationPackage: {
+            getAnnotationsFunc: getAgentAnnotationsFunc,
+            requestAnnotationFunc: requestAgentAnnotationFunc,
+            deleteHighlightFunc: deleteAgentHighlightFunc,
+            deleteAnnotationFunc: deleteAgentAnnotationFunc,
+          },
+          // Viewer 0.7.3+; older viewers ignore it. Spread so the build also
+          // passes against a viewer whose IViewerOptions lacks the key.
+          ...{
+            readerHighlightPackage: {
+              getHighlightsFunc: getReaderHighlightsFunc,
+              addHighlightFunc: addReaderHighlightFunc,
+              deleteHighlightFunc: deleteReaderHighlightFunc,
+            },
+          },
           pageBookmarkPackage: {
             getBookmarksFunc: getPageBookmarksFunc,
             addBookmarkFunc: addPageBookmarkFunc,

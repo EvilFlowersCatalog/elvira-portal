@@ -7,6 +7,7 @@ export const en = {
     },
     assistant: {
       title: 'AI Assistant',
+      myHighlights: 'My highlights',
       inputPlaceholder: 'Ask me anything...',
       suggestion1: 'How do I learn programming?',
       suggestion2: 'Find a book about mathematics',

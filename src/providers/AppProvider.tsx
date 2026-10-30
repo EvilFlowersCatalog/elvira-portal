@@ -215,7 +215,12 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   };
 
   const umamiTrack = (title: string, data?: object) => {
-    if (typeof umami !== "undefined") umami.track(title, data);
+    const tracker = (
+      window as unknown as {
+        umami?: { track: (title: string, data?: object) => void };
+      }
+    ).umami;
+    tracker?.track(title, data);
   };
 
   const clearFilters = () => {
