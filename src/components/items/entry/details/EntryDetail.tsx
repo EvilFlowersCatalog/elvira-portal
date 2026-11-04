@@ -23,7 +23,8 @@ import { AcceptedLanguage, getLanguage } from '../../../../hooks/api/languages/l
 import AcquisitionsButton from '../../../buttons/AcqusitionsButton';
 import DetailModal from '../../../modals/DetailModal';
 import { twMerge } from 'tailwind-merge';
-import EntryItem from '../display/EntryItem';
+import EntryRelated from './EntryRelated';
+import EntryFigures from './EntryFigures';
 import { AvailabilityBadge, AvailabilityState } from './AvailabilityBadge';
 import Tooltip from '../../../primitives/Tooltip';
 import { localize } from '../../../../utils/func/localized';
@@ -386,6 +387,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                   <TabTitle id="contents">{t('entry.detail.tabs.contents')}</TabTitle>
                   <TabTitle id="reviews">{t('entry.detail.tabs.reviews')}</TabTitle>
                   <TabTitle id="related">{t('entry.detail.tabs.related')}</TabTitle>
+                  <TabTitle id="figures">{t('entry.detail.tabs.figures')}</TabTitle>
                 </TabsHeader>
                 <Tabs>
                   <TabContent id="contents">
@@ -420,12 +422,10 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                     </span>
                   </TabContent>
                   <TabContent id="related">
-                    <span className="text-gray-600 dark:text-gray-300 grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4">
-                      <EntryItem entry={entry} />
-                      <EntryItem entry={entry} />
-                      <EntryItem entry={entry} />
-                      <EntryItem entry={entry} />
-                    </span>
+                    <EntryRelated entryId={entry.id} />
+                  </TabContent>
+                  <TabContent id="figures">
+                    <EntryFigures entryId={entry.id} />
                   </TabContent>
                 </Tabs>
               </TabsComponent>

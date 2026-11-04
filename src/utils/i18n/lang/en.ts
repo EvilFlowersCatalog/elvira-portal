@@ -30,6 +30,13 @@ export const en = {
       thinking: 'Thinking…',
       pageShort: 'p. {{page}}',
       sources: 'Sources',
+      highlights: {
+        title: 'AI highlights',
+        pending: 'Marking passages…',
+        failed: 'Could not mark passages',
+        done: '{{count}} highlights',
+        open: 'Open in viewer',
+      },
       aboutBook: 'About {{title}}',
       aboutThisBook: 'About this publication',
       openInReader: 'Open in reader',
@@ -899,6 +906,15 @@ export const en = {
           contents: 'Contents',
           reviews: 'Reviews',
           related: 'Related',
+          figures: 'Figures',
+        },
+        related: {
+          empty: "No similar publications yet: they appear once this publication's PDF has been processed.",
+        },
+        figures: {
+          empty: "No figures: the PDF is not processed yet, has none, or is lent through Readium.",
+          noImage: 'No image',
+          page: 'Page {{page}}',
         },
         askAi: 'Ask AI',
         availability: {

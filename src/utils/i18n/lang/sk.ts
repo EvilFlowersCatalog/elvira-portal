@@ -30,6 +30,13 @@ export const sk = {
       thinking: 'Premýšľam…',
       pageShort: 's. {{page}}',
       sources: 'Zdroje',
+      highlights: {
+        title: 'AI zvýraznenia',
+        pending: 'Označujem pasáže…',
+        failed: 'Pasáže sa nepodarilo označiť',
+        done: 'Zvýraznení: {{count}}',
+        open: 'Otvoriť v čítačke',
+      },
       aboutBook: 'O publikácii {{title}}',
       aboutThisBook: 'O tejto publikácii',
       openInReader: 'Otvoriť v čítačke',
@@ -893,6 +900,15 @@ export const sk = {
           contents: 'Obsah',
           reviews: 'Recenzie',
           related: 'Súvisiace',
+          figures: 'Obrázky',
+        },
+        related: {
+          empty: "Zatiaľ žiadne podobné publikácie: zobrazia sa, keď bude PDF tejto publikácie spracované.",
+        },
+        figures: {
+          empty: "Žiadne obrázky: PDF ešte nie je spracované, žiadne neobsahuje alebo sa požičiava cez Readium.",
+          noImage: 'Bez obrázka',
+          page: 'Strana {{page}}',
         },
         askAi: 'Spýtať sa AI',
         availability: {
