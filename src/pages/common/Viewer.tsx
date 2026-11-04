@@ -52,7 +52,8 @@ import useSendChatMessage from "../../hooks/api/assistant/useSendChatMessage";
 import useGetUserChats from "../../hooks/api/assistant/useGetUserChats";
 import useGetChatHistory from "../../hooks/api/assistant/useGetChatHistory";
 import useDeleteChat from "../../hooks/api/assistant/useDeleteChat";
-import useAgentHighlights from "../../hooks/api/assistant/useAgentHighlights";
+import useSimilarEntries from "../../hooks/api/entries/useSimilarEntries";
+import useAgentHighlights, { toViewer as toViewerAnnotation } from "../../hooks/api/assistant/useAgentHighlights";
 import { formatRetryAfter, toAssistantError } from "../../hooks/api/assistant/assistantApi";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -98,6 +99,7 @@ const Viewer = () => {
   const removeFromShelf = useRemoveFromShelf();
   const createUserAcquisition = useCreateUserAcquisition();
   const { getEntryDetail } = useGetEntryDetail();
+  const { getSimilarToPassage } = useSimilarEntries();
   const getUserAcquisition = useGetUserAcquisition();
   const explainPassage = useExplainPassage();
   const startChat = useStartChat();
@@ -105,7 +107,7 @@ const Viewer = () => {
   const getUserChats = useGetUserChats();
   const getChatHistory = useGetChatHistory();
   const deleteChat = useDeleteChat();
-  const { getAgentAnnotations, requestAgentAnnotation } = useAgentHighlights();
+  const { getAgentAnnotations, waitForAgentAnnotation, requestAgentAnnotation } = useAgentHighlights();
   const getRegions = useGetRegions();
   const queryClient = useQueryClient();
   const getAnotations = useGetAnotations();
@@ -201,8 +203,21 @@ const Viewer = () => {
     }
   };
 
-  // No `suggestionsFunction`: the catalog has no recommendation backend yet,
-  // and leaving it out hides the viewer's "Podobné" and suggestion popups.
+  // "Podobné" (IP-018 Phase 8): publications whose paragraphs discuss the
+  // selection, or the book as a whole without one. Only `similar` has a backend;
+  // the other kinds stay empty.
+  const suggestionsFunction = async (
+    kind: string,
+    context?: { selectedText?: string; page?: number }
+  ): Promise<ISuggestedEntry[]> => {
+    if (kind !== "similar") return [];
+    try {
+      const similar = await getSimilarToPassage(user_acquisition_id, context?.selectedText ?? "");
+      return await toSuggestedEntries(similar.map((item) => item.entry_id));
+    } catch {
+      return [];
+    }
+  };
 
 
   // Shipped feature — deliberately not behind ELVIRA_EXPERIMENTAL_FEATURES
@@ -288,6 +303,11 @@ const Viewer = () => {
             if (ids.length) pending.push(toSuggestedEntries(ids).then(handlers.onEntries));
           },
           onPages: (pages) => handlers.onPages?.(pages),
+          // Viewer 0.7.6+: AI highlights the assistant started from the chat.
+          onAnnotation: (annotation) =>
+            (handlers as { onAnnotation?: (a: IAgentAnnotation) => void }).onAnnotation?.(
+              toViewerAnnotation(annotation)
+            ),
           onError: (detail) => handlers.onError(detail || t("assistant.errors.generic")),
           onDone: () => {},
         },
@@ -326,6 +346,7 @@ const Viewer = () => {
         entries: msg.displayed_entries?.length
           ? await toSuggestedEntries(msg.displayed_entries)
           : undefined,
+        ...(msg.annotations?.length ? { annotationIds: msg.annotations } : {}),
         status: "done" as const,
       }))
     );
@@ -637,6 +658,8 @@ const Viewer = () => {
   const requestAgentAnnotationFunc = (prompt: string) =>
     requestAgentAnnotation(user_acquisition_id, prompt, lang);
 
+  const waitForAgentAnnotationFunc = (annotationId: string) => waitForAgentAnnotation(annotationId);
+
   const deleteAgentHighlightFunc = async (_annotationId: string, highlightId: string) => {
     await deleteAnotationItem(highlightId);
   };
@@ -649,6 +672,15 @@ const Viewer = () => {
   const getRegionsFunc = async (page: number) => {
     try {
       return await getRegions(user_acquisition_id, page);
+    } catch {
+      return [];
+    }
+  };
+
+  // Every region of the copy, for the viewer's contents "Figures" tab.
+  const getAllRegionsFunc = async () => {
+    try {
+      return await getRegions(user_acquisition_id);
     } catch {
       return [];
     }
@@ -734,6 +766,7 @@ const Viewer = () => {
             openEntryDetailFunction,
             bookmarkToggleFunction,
             explainFunction,
+            suggestionsFunction,
             chatPackage: {
               sendMessageFunc: sendChatMessageFunc,
               getChatsFunc,
@@ -752,6 +785,7 @@ const Viewer = () => {
           agentAnnotationPackage: {
             getAnnotationsFunc: getAgentAnnotationsFunc,
             requestAnnotationFunc: requestAgentAnnotationFunc,
+            waitForAnnotationFunc: waitForAgentAnnotationFunc,
             deleteHighlightFunc: deleteAgentHighlightFunc,
             deleteAnnotationFunc: deleteAgentAnnotationFunc,
           },
@@ -764,7 +798,7 @@ const Viewer = () => {
               deleteHighlightFunc: deleteReaderHighlightFunc,
             },
           },
-          regionPackage: { getRegionsFunc },
+          regionPackage: { getRegionsFunc, getAllRegionsFunc },
           pageBookmarkPackage: {
             getBookmarksFunc: getPageBookmarksFunc,
             addBookmarkFunc: addPageBookmarkFunc,

@@ -10,6 +10,8 @@ interface IRegionResponse {
   page: number;
   bbox: IRegion['bbox'];
   caption: string | null;
+  printed_caption?: string | null;
+  description?: string | null;
   category: string | null;
   markdown: string | null;
   latex: string | null;
@@ -21,10 +23,11 @@ const useGetRegions = () => {
   const axios = useAxios();
   const { auth } = useAuthContext();
 
-  const getRegions = async (userAcquisitionId: string, page: number): Promise<IRegion[]> => {
+  /** One reader page's regions, or with `page` omitted every region of the copy. */
+  const getRegions = async (userAcquisitionId: string, page?: number): Promise<IRegion[]> => {
     const { data } = await axios.get<{ response: { items: IRegionResponse[] } }>(
       `/api/v1/user-acquisitions/${userAcquisitionId}/regions`,
-      { params: { page } }
+      { params: page ? { page } : {} }
     );
     return data.response.items.map((region) => ({
       id: region.id,
@@ -32,6 +35,8 @@ const useGetRegions = () => {
       page: region.page,
       bbox: region.bbox,
       caption: region.caption,
+      printedCaption: region.printed_caption ?? null,
+      description: region.description ?? null,
       category: region.category,
       markdown: region.markdown,
       latex: region.latex,
