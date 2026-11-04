@@ -15,6 +15,7 @@ import {
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
 import EntryDetail from "../../components/items/entry/details/EntryDetail";
 import useGetUserAcquisition from "../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisition";
+import useGetRegions from "../../hooks/api/acquisitiions/user-acquistions/useGetRegions";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import renderViewer from "@evilflowers/evilflowersviewer";
@@ -105,6 +106,7 @@ const Viewer = () => {
   const getChatHistory = useGetChatHistory();
   const deleteChat = useDeleteChat();
   const { getAgentAnnotations, requestAgentAnnotation } = useAgentHighlights();
+  const getRegions = useGetRegions();
   const queryClient = useQueryClient();
   const getAnotations = useGetAnotations();
   const updateAnotation = useUpdateAnotation();
@@ -643,6 +645,15 @@ const Viewer = () => {
     await deleteAnotation(annotationId);
   };
 
+  // Extracted figures, tables and equations (IP-018); no extraction means no regions.
+  const getRegionsFunc = async (page: number) => {
+    try {
+      return await getRegions(user_acquisition_id, page);
+    } catch {
+      return [];
+    }
+  };
+
   useEffect(() => {
     if (!id) return;
 
@@ -753,6 +764,7 @@ const Viewer = () => {
               deleteHighlightFunc: deleteReaderHighlightFunc,
             },
           },
+          regionPackage: { getRegionsFunc },
           pageBookmarkPackage: {
             getBookmarksFunc: getPageBookmarksFunc,
             addBookmarkFunc: addPageBookmarkFunc,
