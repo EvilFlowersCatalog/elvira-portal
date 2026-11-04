@@ -37,6 +37,8 @@ export interface AiMessage {
   entryIds?: string[];
   /** Viewer pages the answer was drawn from. */
   pagesRead?: number[];
+  /** AI highlight layers (agent annotations) the assistant created with this answer. */
+  annotationIds?: string[];
   status?: "streaming" | "done" | "error";
 }
 

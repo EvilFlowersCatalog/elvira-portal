@@ -54,6 +54,7 @@ const useAssistantChat = (
       if (entryId && !aiChatSubject) setAiChatSubject({ entryId, title: entry?.title, catalogId: entry?.catalogId, readable: entry?.readable });
 
       let text = '';
+      const annotationIds: string[] = [];
       await sendChatMessage(chatId, message, {
         onChunk: (chunk) => {
           text += chunk;
@@ -67,6 +68,10 @@ const useAssistantChat = (
           if (ids.length) updateAnswer({ entryIds: ids });
         },
         onPages: (pages) => updateAnswer({ pagesRead: pages }),
+        onAnnotation: (annotation) => {
+          annotationIds.push(annotation.id);
+          updateAnswer({ annotationIds: [...annotationIds] });
+        },
         onError: (detail) => showError(detail || t('assistant.errors.generic')),
         onDone: () => {},
       }, { entryId, language: lang });

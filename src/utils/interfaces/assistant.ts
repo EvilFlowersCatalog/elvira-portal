@@ -17,6 +17,8 @@ export interface IAssistantMessage {
   pages_read: number[] | null;
   /** Publication ids the assistant showed alongside this message. */
   displayed_entries: string[] | null;
+  /** Agent annotation (AI highlights) ids the assistant created with this answer (IP-018). */
+  annotations?: string[] | null;
   tokens_used: number;
   created_at: string;
 }
@@ -97,8 +99,28 @@ export interface IAssistantStreamHandlers {
   onEntries: (entryIds: string[]) => void;
   /** Viewer pages the answer was drawn from. */
   onPages?: (pages: number[]) => void;
+  /** An agent annotation the assistant started (AI highlights), as `/assistant/v1/highlights` returns it. */
+  onAnnotation?: (annotation: IAssistantAnnotation) => void;
   /** An error reported inside the stream. */
   onError: (detail: string) => void;
   /** The stream is finished. */
   onDone: () => void;
+}
+
+/** An agent annotation as `/assistant/v1/highlights` returns it (IP-018). */
+export interface IAssistantAnnotation {
+  id: string;
+  title: string;
+  prompt: string | null;
+  summary: string | null;
+  status: 'pending' | 'done' | 'failed';
+  unresolved_count: number | null;
+  highlights: {
+    id: string;
+    seq: number;
+    page: number;
+    quads: { x0: number; y0: number; x1: number; y1: number }[];
+    text: string;
+    note: string | null;
+  }[];
 }

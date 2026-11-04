@@ -12,6 +12,7 @@ export const fromApiMessages = (messages: IAssistantMessage[]): AiMessage[] =>
     page: msg.page,
     entryIds: msg.displayed_entries ?? undefined,
     pagesRead: msg.pages_read ?? undefined,
+    annotationIds: msg.annotations?.length ? msg.annotations : undefined,
     status: 'done',
   }));
 

@@ -1,4 +1,8 @@
-import { IAssistantMessageOptions, IAssistantStreamHandlers } from '../../../utils/interfaces/assistant';
+import {
+  IAssistantAnnotation,
+  IAssistantMessageOptions,
+  IAssistantStreamHandlers,
+} from '../../../utils/interfaces/assistant';
 import useAuth from '../../contexts/useAuthContext';
 import { ASSISTANT_URL, AssistantApiError, idsOf, pagesOf, parseSseData, readSse, textOf } from './assistantApi';
 
@@ -60,6 +64,11 @@ const useSendChatMessage = () => {
           break;
         case 'pages':
           handlers.onPages?.(pagesOf(payload));
+          break;
+        case 'annotation':
+          if (payload && typeof payload === 'object' && 'id' in payload) {
+            handlers.onAnnotation?.(payload as IAssistantAnnotation);
+          }
           break;
         case 'error':
           handlers.onError(textOf(payload));

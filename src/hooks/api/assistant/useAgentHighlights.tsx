@@ -2,29 +2,13 @@ import type { IAgentAnnotation } from '@evilflowers/evilflowersviewer';
 import useAxios from '../useAxios';
 import { ASSISTANT_URL } from './assistantApi';
 
-/** An agent annotation as `/assistant/v1/highlights` returns it (IP-018). */
-interface IAgentAnnotationResponse {
-  id: string;
-  title: string;
-  prompt: string | null;
-  summary: string | null;
-  status: 'pending' | 'done' | 'failed';
-  unresolved_count: number | null;
-  highlights: {
-    id: string;
-    seq: number;
-    page: number;
-    quads: { x0: number; y0: number; x1: number; y1: number }[];
-    text: string;
-    note: string | null;
-  }[];
-}
+import type { IAssistantAnnotation as IAgentAnnotationResponse } from '../../../utils/interfaces/assistant';
 
 /** How often a pending annotation is polled, and for how long at most. */
 const POLL_INTERVAL_MS = 3000;
 const POLL_TIMEOUT_MS = 15 * 60 * 1000;
 
-const toViewer = (annotation: IAgentAnnotationResponse): IAgentAnnotation => ({
+export const toViewer = (annotation: IAgentAnnotationResponse): IAgentAnnotation => ({
   id: annotation.id,
   title: annotation.title,
   prompt: annotation.prompt ?? '',
@@ -59,6 +43,17 @@ const useAgentHighlights = () => {
     return toViewer(data.response);
   };
 
+  /** Resolves once a pending annotation (one the chat started, say) is done or failed. */
+  const waitForAgentAnnotation = async (id: string): Promise<IAgentAnnotation> => {
+    let annotation = await getAgentAnnotation(id);
+    const deadline = Date.now() + POLL_TIMEOUT_MS;
+    while (annotation.status === 'pending' && Date.now() < deadline) {
+      await sleep(POLL_INTERVAL_MS);
+      annotation = await getAgentAnnotation(id);
+    }
+    return annotation;
+  };
+
   /** Requests highlights and resolves once the background agent has finished. */
   const requestAgentAnnotation = async (
     userAcquisitionId: string,
@@ -81,7 +76,7 @@ const useAgentHighlights = () => {
     return annotation;
   };
 
-  return { getAgentAnnotations, requestAgentAnnotation };
+  return { getAgentAnnotations, getAgentAnnotation, waitForAgentAnnotation, requestAgentAnnotation };
 };
 
 export default useAgentHighlights;

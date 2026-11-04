@@ -12,6 +12,7 @@ import { IEntry } from '../../utils/interfaces/entry';
 import { citationsToLinks, findRegion } from '../../utils/func/assistantMessages';
 import EntryItem from '../items/entry/display/EntryItem';
 import ChatContextChip from './ChatContextChip';
+import AnnotationCard from './AnnotationCard';
 
 const citeClass =
   'inline-flex items-center px-1.5 py-px mx-0.5 rounded-md text-xs font-medium align-baseline bg-sky-500/10 text-sky-700 dark:bg-sky-400/15 dark:text-sky-300 no-underline enabled:hover:underline enabled:hover:bg-sky-500/20 dark:enabled:hover:bg-sky-400/25 disabled:cursor-default';
@@ -152,6 +153,26 @@ export default function AssistantMessage({
             <button key={page} type="button" className={citeClass} disabled={!openPage} onClick={() => openPage?.(page)}>
               {t('assistant.pageShort', { page })}
             </button>
+          ))}
+        </div>
+      ) : null}
+
+      {/* AI highlights the assistant created; they open in the viewer */}
+      {msg.annotationIds?.length ? (
+        <div className="flex flex-col gap-1.5">
+          {msg.annotationIds.map((id) => (
+            <AnnotationCard
+              key={id}
+              annotationId={id}
+              onOpen={
+                aiChatSubject && aiChatSubject.readable !== false
+                  ? (page) => {
+                      onNavigate?.();
+                      openInViewer(aiChatSubject, page);
+                    }
+                  : undefined
+              }
+            />
           ))}
         </div>
       ) : null}
