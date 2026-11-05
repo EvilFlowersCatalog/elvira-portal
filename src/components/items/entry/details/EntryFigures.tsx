@@ -3,12 +3,14 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { CircleLoader } from 'react-spinners';
 import useSimilarEntries, { IEntryFigure } from '../../../../hooks/api/entries/useSimilarEntries';
+import useEscapeLayer from '../../../../hooks/useEscapeLayer';
 
-/** Every figure of the entry's processed PDF, with its printed caption and description (IP-018 Phase 8). */
+/** Every figure, table and equation of the entry's processed PDF, with its printed caption and description (IP-018 Phase 8). */
 export const EntryFigures = ({ entryId }: { entryId: string }) => {
   const { t } = useTranslation();
   const { getEntryFigures } = useSimilarEntries();
   const [open, setOpen] = useState<IEntryFigure | null>(null);
+  useEscapeLayer(() => setOpen(null), !!open);
 
   const { data: figures, isLoading } = useQuery({
     queryKey: ['entry-figures', entryId],
@@ -50,7 +52,9 @@ export const EntryFigures = ({ entryId }: { entryId: string }) => {
               {figure.description && figure.description !== caption && (
                 <p className="text-[11px] text-gray-500 dark:text-gray-400 line-clamp-2">{figure.description}</p>
               )}
-              <p className="text-[11px] text-gray-400">{t('entry.detail.figures.page', { page: figure.page })}</p>
+              <p className="text-[11px] text-gray-400">
+                {t(`entry.detail.figures.kind.${figure.kind}`)} · {t('entry.detail.figures.page', { page: figure.page })}
+              </p>
             </button>
           );
         })}

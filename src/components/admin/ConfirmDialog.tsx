@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import Button from '../buttons/Button';
+import useEscapeLayer from '../../hooks/useEscapeLayer';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -32,14 +33,10 @@ export default function ConfirmDialog({
 
   useEffect(() => {
     if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onCancel();
-    document.addEventListener('keydown', onKey);
     const t = setTimeout(() => confirmRef.current?.focus(), 20);
-    return () => {
-      document.removeEventListener('keydown', onKey);
-      clearTimeout(t);
-    };
-  }, [open, onCancel]);
+    return () => clearTimeout(t);
+  }, [open]);
+  useEscapeLayer(onCancel, open);
 
   if (!open) return null;
 

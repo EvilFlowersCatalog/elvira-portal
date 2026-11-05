@@ -902,13 +902,17 @@ export const sk = {
           related: 'Súvisiace',
           figures: 'Obrázky',
         },
+        contents: {
+          empty: "Obsah zatiaľ nie je k dispozícii: zobrazí sa, keď bude PDF spracované, alebo ho PDF neobsahuje.",
+        },
         related: {
           empty: "Zatiaľ žiadne podobné publikácie: zobrazia sa, keď bude PDF tejto publikácie spracované.",
         },
         figures: {
-          empty: "Žiadne obrázky: PDF ešte nie je spracované, žiadne neobsahuje alebo sa požičiava cez Readium.",
+          empty: "Žiadne obrázky, tabuľky ani rovnice: PDF ešte nie je spracované, žiadne neobsahuje alebo sa požičiava cez Readium.",
           noImage: 'Bez obrázka',
           page: 'Strana {{page}}',
+          kind: { figure: 'Obrázok', table: 'Tabuľka', equation: 'Rovnica' },
         },
         askAi: 'Spýtať sa AI',
         availability: {

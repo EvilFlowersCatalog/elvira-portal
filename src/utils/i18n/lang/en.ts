@@ -908,13 +908,17 @@ export const en = {
           related: 'Related',
           figures: 'Figures',
         },
+        contents: {
+          empty: "No contents yet: they appear once the PDF is processed, or the PDF has no outline.",
+        },
         related: {
           empty: "No similar publications yet: they appear once this publication's PDF has been processed.",
         },
         figures: {
-          empty: "No figures: the PDF is not processed yet, has none, or is lent through Readium.",
+          empty: "No figures, tables or equations: the PDF is not processed yet, has none, or is lent through Readium.",
           noImage: 'No image',
           page: 'Page {{page}}',
+          kind: { figure: 'Figure', table: 'Table', equation: 'Equation' },
         },
         askAi: 'Ask AI',
         availability: {

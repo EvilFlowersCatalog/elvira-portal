@@ -25,6 +25,7 @@ import DetailModal from '../../../modals/DetailModal';
 import { twMerge } from 'tailwind-merge';
 import EntryRelated from './EntryRelated';
 import EntryFigures from './EntryFigures';
+import EntryContents from './EntryContents';
 import { AvailabilityBadge, AvailabilityState } from './AvailabilityBadge';
 import Tooltip from '../../../primitives/Tooltip';
 import { localize } from '../../../../utils/func/localized';
@@ -43,7 +44,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const [catalogId, setCatalogId] = useState<string | null>(null);
 
   const [entry, setEntry] = useState<IEntryDetail | null>(null);
-  const chapters = ["Introduction", "Chapter 1", "Chapter 2"];
   const reviews = [
     {
       name: "John Doe",
@@ -391,16 +391,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                 </TabsHeader>
                 <Tabs>
                   <TabContent id="contents">
-                    <span className="text-gray-600 dark:text-gray-300">
-                      {chapters.map((chapter, index) => (
-                        <p key={index} className={twMerge('font-medium text-black dark:text-white text-lg mb-2 ', index != chapters.length ? 'border-b border-gray-300 dark:border-gray-700 pb-2' : '')}>
-                          <span className="text-primary dark:text-primaryLight font-semibold mr-2">
-                            {index + 1}.
-                          </span>
-                          {chapter}
-                        </p>
-                      ))}
-                    </span>
+                    <EntryContents entry={entry} catalogId={catalogId} />
                   </TabContent>
                   <TabContent id="reviews">
                     <span className="text-gray-600 dark:text-gray-300">

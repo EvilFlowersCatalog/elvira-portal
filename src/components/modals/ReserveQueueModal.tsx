@@ -12,6 +12,7 @@ import useContactNudge from '../../hooks/api/notification-contacts/useContactNud
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import useFocusTrap from '../../hooks/useFocusTrap';
 import { withAccessToken } from '../../utils/func/functions';
+import useEscapeLayer from '../../hooks/useEscapeLayer';
 
 const M = 'license.queue';
 
@@ -38,13 +39,8 @@ export default function ReserveQueueModal({ entry, onClose, onSuccess, queueLeng
   const [loading, setLoading] = useState(false);
   const dialogRef = useFocusTrap(true);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  // Escape closes this dialog only, not the ones below it.
+  useEscapeLayer(onClose);
 
   const waiting = queueLength ?? entry.queue_length ?? 0;
   const nextAt = nextAvailableAt !== undefined ? nextAvailableAt : entry.next_available_at ?? null;

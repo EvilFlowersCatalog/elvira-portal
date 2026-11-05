@@ -9,6 +9,7 @@ import { IReservation, RESERVATION_STATUS } from '../../utils/interfaces/reserva
 import { problemDetailMessage } from '../../utils/problemDetail';
 import useUpdateReservation from '../../hooks/api/reservations/useUpdateReservation';
 import useFocusTrap from '../../hooks/useFocusTrap';
+import useEscapeLayer from '../../hooks/useEscapeLayer';
 
 const M = 'license.loansPage.modals';
 
@@ -29,13 +30,8 @@ export default function CancelReservationModal({ reservation, onClose, onSuccess
   const { t } = useTranslation();
   const dialogRef = useFocusTrap(true);
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  // Escape closes this dialog only, not the ones below it.
+  useEscapeLayer(onClose);
 
   const isAvailable = reservation.status === RESERVATION_STATUS.available;
   const estimatedFrom = reservation.entry?.next_available_at

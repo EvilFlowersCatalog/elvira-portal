@@ -49,6 +49,13 @@ export interface IEntry extends Partial<IEntryLcpFields> {
   published_at?: string;
 }
 
+/** One heading of the publication's outline; `page` is the viewer's page. */
+export interface IEntryHeading {
+  level: number;
+  title: string;
+  page: number;
+}
+
 export interface IEntryDetail extends Partial<IEntryLcpFields> {
   id: string;
   creator_id: string;
@@ -71,6 +78,8 @@ export interface IEntryDetail extends Partial<IEntryLcpFields> {
   citation: string;
   shelf_record_id: string;
   thumbnail: string;
+  page_count?: number | null;
+  table_of_contents?: IEntryHeading[] | null;
 }
 
 export interface IEntryQuery {

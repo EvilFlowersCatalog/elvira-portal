@@ -46,9 +46,25 @@ const useSimilarEntries = () => {
   };
 
   /** Figures of an open-access entry; none for entries lent through Readium LCP. */
+  /** Figures, tables and equations, in reading order (the API serves one kind per call). */
   const getEntryFigures = async (entryId: string): Promise<IEntryFigure[]> => {
-    const { data } = await axios.get<{ response: IEntryFigure[] }>(`/api/v1/entries/${entryId}/figures`);
-    return data.response.map((figure) => ({ ...figure, image_url: withAccessToken(figure.image_url, auth?.token) }));
+    const kinds: IEntryFigure['kind'][] = ['figure', 'table', 'equation'];
+    const lists = await Promise.all(
+      kinds.map(async (kind) => {
+        try {
+          const { data } = await axios.get<{ response: IEntryFigure[] }>(`/api/v1/entries/${entryId}/figures`, {
+            params: { kind },
+          });
+          return data.response;
+        } catch {
+          return [];
+        }
+      })
+    );
+    return lists
+      .flat()
+      .sort((a, b) => a.page - b.page)
+      .map((figure) => ({ ...figure, image_url: withAccessToken(figure.image_url, auth?.token) }));
   };
 
   return { getSimilarToEntry, getSimilarToPassage, getEntryFigures };

@@ -1,8 +1,9 @@
-import { KeyboardEvent, MouseEvent, ReactNode, useEffect, useRef } from 'react';
+import { MouseEvent, ReactNode, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { IModalParams } from '../../utils/interfaces/general/general';
 import Button from '../buttons/Button';
+import useEscapeLayer from '../../hooks/useEscapeLayer';
 
 /**
  * FormModal - A modal component specifically designed for forms
@@ -33,13 +34,8 @@ const FormModal = ({
     if (ref) ref.current?.focus();
   }, []);
 
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.code.toLocaleLowerCase() === 'escape') {
-      event.preventDefault();
-      event.stopPropagation();
-      close(false);
-    }
-  };
+  // Escape closes this modal only when it is the top layer.
+  useEscapeLayer(() => close(false));
   const handleClick = () => {
     umamiTrack('Close Modal Button');
     close(false);
@@ -48,7 +44,6 @@ const FormModal = ({
   return (
     <div
       className='fixed z-50 top-0 left-0 bottom-0 right-0 bg-white bg-opacity-90 dark:bg-darkGray dark:bg-opacity-90'
-      onKeyDown={handleKeyDown}
       onClick={handleClick}
       tabIndex={-1}
       ref={ref}

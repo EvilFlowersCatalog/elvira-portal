@@ -13,6 +13,7 @@ import { twMerge } from 'tailwind-merge';
 import IconButton from './IconButton';
 import Select from '../primitives/Select';
 import Checkbox from '../primitives/Checkbox';
+import useEscapeLayer from '../../hooks/useEscapeLayer';
 
 export type SortDir = 'asc' | 'desc';
 export interface SortState {
@@ -126,14 +127,10 @@ function ColumnsMenu<T>({
     const onDoc = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
     document.addEventListener('mousedown', onDoc);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDoc);
-      document.removeEventListener('keydown', onKey);
-    };
+    return () => document.removeEventListener('mousedown', onDoc);
   }, [open]);
+  useEscapeLayer(() => setOpen(false), open);
 
   const hideable = columns.filter((c) => c.hideable !== false);
   if (hideable.length === 0) return null;

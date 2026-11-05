@@ -1,5 +1,6 @@
-import { KeyboardEvent, MouseEvent, useEffect, useRef } from "react";
+import { MouseEvent, useEffect, useRef } from "react";
 import { RiCloseLine } from "react-icons/ri";
+import useEscapeLayer from '../../hooks/useEscapeLayer';
 
 /**
  * DetailModal - A large modal component for displaying detailed content
@@ -13,13 +14,8 @@ export default function DetailModal({ title, isOpen, onClose, zIndex, children }
         if (ref.current) ref.current.focus();
     }, []);
 
-    const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-        if (event.code.toLowerCase() === 'escape') {
-            event.preventDefault();
-            event.stopPropagation();
-            onClose();
-        }
-    };
+    // Escape closes this modal only when it is the top layer.
+    useEscapeLayer(onClose, isOpen);
 
     const handleBackdropClick = (event: MouseEvent<HTMLDivElement>) => {
         if (event.target === event.currentTarget) {
@@ -33,7 +29,6 @@ export default function DetailModal({ title, isOpen, onClose, zIndex, children }
         <div 
             className={`fixed top-0 right-0 h-full w-full bg-black bg-opacity-60 flex items-center justify-center`} 
             style={{ zIndex }}
-            onKeyDown={handleKeyDown}
             onClick={handleBackdropClick}
             tabIndex={-1}
             ref={ref}

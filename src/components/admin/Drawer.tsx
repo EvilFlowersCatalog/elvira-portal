@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { FiX } from 'react-icons/fi';
 import IconButton from './IconButton';
+import useEscapeLayer from '../../hooks/useEscapeLayer';
 
 interface DrawerProps {
   open: boolean;
@@ -31,11 +32,11 @@ export default function Drawer({
   const panelRef = useRef<HTMLDivElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
 
+  useEscapeLayer(onClose, open);
+
   useEffect(() => {
     if (!open) return;
     previouslyFocused.current = document.activeElement as HTMLElement;
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    document.addEventListener('keydown', onKey);
     // Move focus into the panel.
     const t = setTimeout(() => {
       const focusable = panelRef.current?.querySelector<HTMLElement>(
@@ -44,7 +45,6 @@ export default function Drawer({
       focusable?.focus();
     }, 30);
     return () => {
-      document.removeEventListener('keydown', onKey);
       clearTimeout(t);
       previouslyFocused.current?.focus?.();
     };

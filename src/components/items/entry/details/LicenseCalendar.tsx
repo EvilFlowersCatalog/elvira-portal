@@ -29,6 +29,7 @@ import {
   problemDetailMessage,
   INoSlotsConflictData,
 } from "../../../../utils/problemDetail";
+import useEscapeLayer from '../../../../hooks/useEscapeLayer';
 
 type View = 'main' | 'passphrase' | 'success';
 type Duration = '1week' | '2weeks';
@@ -205,6 +206,9 @@ export default function LicenseCalendar() {
   };
 
   const fileFormat = entry?.acquisitions?.[0]?.mime ? mimeToFormat(entry.acquisitions[0].mime) : 'EPUB';
+
+  // The queue confirmation below registers its own layer.
+  useEscapeLayer(closeModal, !!entryId && !slotsConflict);
 
   if (!entryId) return null;
 

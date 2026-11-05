@@ -11,6 +11,7 @@ import useUpdateLicenseState from '../../hooks/api/licenses/useUpdateLicense';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import useFocusTrap from '../../hooks/useFocusTrap';
 import { withAccessToken } from '../../utils/func/functions';
+import useEscapeLayer from '../../hooks/useEscapeLayer';
 
 const M = 'license.loansPage.modals';
 
@@ -28,14 +29,8 @@ export default function ReturnBookModal({ license, onClose, onSuccess }: Props) 
   const { t } = useTranslation();
   const dialogRef = useFocusTrap(true);
 
-  // Accessibility: dismiss on Escape (WCAG 2.1.2 no keyboard trap / expected dialog behavior)
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', onKey);
-    return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  // Escape closes this dialog only, not the ones below it.
+  useEscapeLayer(onClose);
 
   const expiresAt = parseISO(license.expires_at);
   const daysLeft = differenceInDays(expiresAt, new Date());

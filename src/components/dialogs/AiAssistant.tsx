@@ -11,6 +11,7 @@ import useAssistantChat from "../../hooks/api/assistant/useAssistantChat";
 import useStickToBottom from "../../hooks/useStickToBottom";
 import AssistantMessage from "../assistant/AssistantMessage";
 import ChatSubjectBar from "../assistant/ChatSubjectBar";
+import useEscapeLayer from '../../hooks/useEscapeLayer';
 
 function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, handleSuggestion: (suggestion: string) => void }) {
     return (
@@ -88,15 +89,7 @@ export default function AiAssistant() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [assistantEntryId]);
 
-    useEffect(() => {
-        if (!showAiAssistant) return;
-        const onKey = (e: KeyboardEvent) => {
-            if (e.key === "Escape") handleCloseDrawer({}, "escapeKeyDown");
-        };
-        document.addEventListener("keydown", onKey);
-        return () => document.removeEventListener("keydown", onKey);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [showAiAssistant, searchParams]);
+    useEscapeLayer(() => handleCloseDrawer({}, "escapeKeyDown"), showAiAssistant);
 
     const handleSuggestion = (suggestion: string) => {
         followChat();

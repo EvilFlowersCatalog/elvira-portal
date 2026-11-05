@@ -2,6 +2,7 @@ import { CSSProperties, KeyboardEvent, useEffect, useId, useLayoutEffect, useRef
 import { createPortal } from 'react-dom';
 import { RiArrowDownSLine } from 'react-icons/ri';
 import { twMerge } from 'tailwind-merge';
+import useEscapeLayer from '../../hooks/useEscapeLayer';
 
 const LIST_MAX_HEIGHT = 240;
 const LIST_GAP = 4;
@@ -85,14 +86,10 @@ const Select = ({
       if (ref.current?.contains(target) || listRef.current?.contains(target)) return;
       setOpen(false);
     };
-    const onKey = (e: globalThis.KeyboardEvent) => e.key === 'Escape' && setOpen(false);
     document.addEventListener('mousedown', onDoc);
-    document.addEventListener('keydown', onKey);
-    return () => {
-      document.removeEventListener('mousedown', onDoc);
-      document.removeEventListener('keydown', onKey);
-    };
+    return () => document.removeEventListener('mousedown', onDoc);
   }, [open]);
+  useEscapeLayer(() => setOpen(false), open);
 
   const handleTriggerKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
     if (disabled) return;
