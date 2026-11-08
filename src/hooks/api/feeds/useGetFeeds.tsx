@@ -10,6 +10,7 @@ const useGetFeeds = () => {
     limit,
     parentId,
     title,
+    urlName,
     kind,
     orderBy,
     paginate,
@@ -28,6 +29,7 @@ const useGetFeeds = () => {
     if (page) params.set('page', page.toString());
     if (limit) params.set('limit', limit.toString());
     if (title) params.set('title', title);
+    if (urlName) params.set('url_name', urlName);
     if (parentId) params.set('parent_id', parentId);
     if (kind) params.set('kind', kind);
 

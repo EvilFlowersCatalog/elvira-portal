@@ -34,6 +34,18 @@ export interface INoSlotsConflictData {
 	reservations_url: string;
 }
 
+/** Problem `type` of a 409 when a feed's `url_name` is already used in the catalog. */
+export const FEED_URL_NAME_TAKEN_TYPE = '/feed-url-name-taken';
+
+/** `additional_data` of a 409 `/feed-url-name-taken` (POST/PUT /api/v1/feeds). */
+export interface IFeedUrlNameTakenData {
+	field: 'url_name';
+	url_name: string;
+	/** First free `-2`, `-3`, … variant (max 50 chars); ignores the feed being edited. */
+	suggested_url_name?: string;
+	conflicting_feed?: { id: string; title: Record<string, string> | string; url_name: string };
+}
+
 /** Unwrap the RFC 7807 body from an axios error, if present. */
 export const getProblemDetail = (e: unknown): IProblemDetail | undefined =>
 	(e as AxiosError<IProblemDetail>)?.response?.data;
@@ -59,6 +71,18 @@ export const getNoSlotsConflict = (e: unknown): INoSlotsConflictData | undefined
 	return data?.reason_code === CONFLICT_REASON.noAvailableSlots
 		? (data as unknown as INoSlotsConflictData)
 		: undefined;
+};
+
+/** Typed view of a 409 `/feed-url-name-taken` conflict (with its `detail`), or undefined. */
+export const getFeedUrlNameTaken = (
+	e: unknown
+): { detail?: string; data: Partial<IFeedUrlNameTakenData> } | undefined => {
+	const problem = getProblemDetail(e);
+	if (problem?.type !== FEED_URL_NAME_TAKEN_TYPE) return undefined;
+	return {
+		detail: typeof problem.detail === 'string' ? problem.detail : undefined,
+		data: (problem.additional_data ?? {}) as Partial<IFeedUrlNameTakenData>,
+	};
 };
 
 /**
