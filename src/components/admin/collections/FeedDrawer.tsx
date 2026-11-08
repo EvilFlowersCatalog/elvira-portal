@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useGetCatalogDetail } from '../../../hooks/api/catalogs/useAdminCatalogs';
 import { FiTrash2, FiX, FiSearch, FiFolder, FiInfo } from 'react-icons/fi';
 import Drawer from '../Drawer';
 import ConfirmDialog from '../ConfirmDialog';
@@ -136,7 +137,7 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
   const [content, setContent] = useState('');
   const [kind, setKind] = useState('acquisition');
   const [parents, setParents] = useState<FeedRef[]>([]);
-  const [errors, setErrors] = useState<{ title?: string; urlName?: string }>({});
+  const [errors, setErrors] = useState<{ title?: string; urlName?: string; content?: string }>({});
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -156,6 +157,16 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
     { paginate: false, kind: 'navigation' },
     { enabled: open }
   );
+  // Catalog slug for the OPDS path shown in front of the URL name (/opds/v1.2/<catalog>/feed/<url_name>).
+  const getCatalogDetail = useGetCatalogDetail();
+  const { data: catalog } = useQuery({
+    queryKey: ['catalog', catalogId],
+    queryFn: () => getCatalogDetail(catalogId as string),
+    enabled: open && !!catalogId,
+    staleTime: Infinity,
+  });
+  const feedPathPrefix = `/opds/v1.2/${catalog?.url_name ?? '…'}/feed/`;
+
   const folders: FeedRef[] = useMemo(
     () => (foldersData?.items ?? []).map((f) => ({ id: f.id, title: tl(f.title) })),
     [foldersData, tl]
@@ -258,6 +269,8 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
     const e: typeof errors = {};
     if (!cleanLocalized(title)[DEFAULT_CONTENT_LANGUAGE]) e.title = t('administration.collectionsPage.titleRequired');
     else if (!slugify(urlName)) e.urlName = t('administration.collectionsPage.urlNameRequired');
+    // The catalog rejects an empty `content` with a 422.
+    if (!content.trim()) e.content = t('administration.collectionsPage.contentRequired');
     setErrors(e);
     if (e.urlName) focusUrlName();
     return Object.keys(e).length === 0;
@@ -388,8 +401,8 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
             hint={t('administration.collectionsPage.urlNameHint')}
             error={errors.urlName}
           >
-            <div className="flex items-center gap-2">
-              <span className="shrink-0 font-mono text-xs text-zinc-500 dark:text-zinc-400">/…/feeds/</span>
+            <div className="flex flex-col gap-1">
+              <span className="break-all font-mono text-xs text-zinc-500 dark:text-zinc-400">{feedPathPrefix}</span>
               <TextInput
                 ref={urlInputRef}
                 id="feed-url"
@@ -466,13 +479,23 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
             </div>
           </div>
 
-          <Field label={t('administration.collectionsPage.content')} htmlFor="feed-content">
+          <Field label={t('administration.collectionsPage.content')} htmlFor="feed-content" required error={errors.content}>
             <textarea
               id="feed-content"
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={(e) => {
+                setContent(e.target.value);
+                if (errors.content) setErrors((prev) => ({ ...prev, content: undefined }));
+              }}
               rows={4}
-              className="w-full resize-y rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40 px-3 py-2 text-sm outline-none focus:border-primary"
+              aria-required="true"
+              aria-invalid={!!errors.content}
+              aria-describedby={errors.content ? 'feed-content-error' : undefined}
+              className={`w-full resize-y rounded-lg border bg-white dark:bg-zinc-900/40 px-3 py-2 text-sm outline-none ${
+                errors.content
+                  ? 'border-redText dark:border-red focus:border-redText'
+                  : 'border-zinc-300 dark:border-zinc-600 focus:border-primary'
+              }`}
             />
           </Field>
         </div>

@@ -374,6 +374,7 @@ export const en = {
         createTitle: 'New collection',
         titleRequired: 'Slovak title is required',
         content: 'Description',
+        contentRequired: 'Description is required',
         urlNameHint: 'Unique address of the collection in the catalog. Derived from the title until you edit it.',
         address: 'Address',
         urlNameRequired: 'Address is required (use letters or digits)',

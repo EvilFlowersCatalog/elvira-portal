@@ -374,6 +374,7 @@ export const sk = {
         createTitle: 'Nová zbierka',
         titleRequired: 'Slovenský názov je povinný',
         content: 'Popis',
+        contentRequired: 'Popis je povinný',
         urlNameHint: 'Jedinečná adresa zbierky v katalógu. Odvodí sa z názvu, kým ju neupravíte.',
         address: 'Adresa',
         urlNameRequired: 'Adresa je povinná (použite písmená alebo číslice)',
