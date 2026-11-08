@@ -34,7 +34,14 @@ const useDownloadLicense = () => {
 
     const downloadDirect = async (license: LicenseRef): Promise<void> => {
         const url = await resolveDownloadUrl(license);
-        const { data } = await axios.get<Blob>(url, { responseType: 'blob' });
+        // Plain fetch, not the shared axios instance: its interceptor adds
+        // `Authorization: Bearer`, which EFC rejects on .lcpl (capability token
+        // only), and the resulting 401 would log the user out.
+        const res = await fetch(url);
+        if (!res.ok) {
+            throw new Error(`License download failed: ${res.status}`);
+        }
+        const data = await res.blob();
         const objectUrl = URL.createObjectURL(new Blob([data], { type: 'application/octet-stream' }));
         const link = document.createElement('a');
         link.href = objectUrl;
