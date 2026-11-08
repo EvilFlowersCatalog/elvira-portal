@@ -114,7 +114,7 @@ export default function LicenseCalendar() {
   const endDate1Week = addDays(today, 7);
   const endDate2Weeks = addDays(today, 14);
 
-  const licenseRefOf = (license: ILicense) => ({ id: license.lcp_license_id || license.id, download_url: license.download_url });
+  const licenseRefOf = (license: ILicense) => ({ id: license.id, download_url: license.download_url });
 
   // Two explicit actions instead of a toast with a hidden fallback link: most
   // people never noticed the toast, so "Open in Thorium" and "Download file"
