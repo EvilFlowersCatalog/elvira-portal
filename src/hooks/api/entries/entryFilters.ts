@@ -38,6 +38,8 @@ export const buildEntryFilterParams = (query: EntryFilters): URLSearchParams => 
   if (query.languageCode) params.set('language_code', query.languageCode);
   if (query.lcpState) params.set('lcp_state', query.lcpState);
   if (query.ids) params.set('id', query.ids);
+  if (query.extraction) params.set('extraction', '1');
+  if (query.extractionStatus) params.set('extraction_status', query.extractionStatus);
 
   // Merge the single-select (`feedId`/`categoryId`) and multi-select
   // (`feeds`/`categories`) values into one CSV — the backend expands it to IN (...).

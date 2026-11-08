@@ -16,6 +16,10 @@ import { useParams } from "react-router-dom";
 import Button from "../../../components/buttons/Button";
 import { BiSave } from "react-icons/bi";
 import { PageHeader } from "../../../components/admin";
+import { useSearchParams } from "react-router-dom";
+import { FiCpu } from "react-icons/fi";
+import { twMerge } from "tailwind-merge";
+import EntryExtractionPanel from "../../../components/specific-page/admin-entry-page/extraction/EntryExtractionPanel";
 
 interface IAdminEntryFormProps {
     FormType: "add" | "edit";
@@ -45,6 +49,17 @@ export default function AdminEntryForm({
     const { t } = useTranslation();
     const { 'entry-id': id } = useParams();
     const [isFilesLoading, setIsFilesLoading] = useState<boolean>(false);
+    // Secondary view of an existing publication: its AI processing (IP-018). Kept in the URL
+    // (`?tab=ai`) so the entries list can link straight to it; the form stays mounted underneath,
+    // so switching views never loses unsaved edits.
+    const [searchParams, setSearchParams] = useSearchParams();
+    const showAi = FormType === 'edit' && searchParams.get('tab') === 'ai';
+    const setView = (ai: boolean) => {
+        const next = new URLSearchParams(searchParams);
+        if (ai) next.set('tab', 'ai');
+        else next.delete('tab');
+        setSearchParams(next, { replace: true, state: window.history.state?.usr });
+    };
 
     const handleSummaryChange = (event: ContentEditableEvent) => {
         setEntry((prevEntry) => ({
@@ -75,7 +90,52 @@ export default function AdminEntryForm({
                         title={FormType === 'add' ? t('entry.wizard.new') : (entry.title || t('entry.wizard.edit'))}
                     />
 
-                    <div className='px-5 pb-28'>
+                    {FormType === 'edit' && (
+                        // Primary tab is the publication; the AI view is deliberately quiet —
+                        // most managers never need it.
+                        <div role='tablist' aria-label={t('administration.extraction.viewsLabel')} className='mx-5 mb-4 flex items-end justify-between border-b border-zinc-200 dark:border-zinc-700'>
+                            <button
+                                type='button'
+                                role='tab'
+                                aria-selected={!showAi}
+                                onClick={() => setView(false)}
+                                className={twMerge(
+                                    '-mb-px border-b-2 px-1 pb-2 text-sm font-semibold transition-colors',
+                                    !showAi ? 'border-primary text-secondary dark:text-secondaryLight' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
+                                )}
+                            >
+                                {t('administration.extraction.tabPublication')}
+                            </button>
+                            <button
+                                type='button'
+                                role='tab'
+                                aria-selected={showAi}
+                                onClick={() => setView(true)}
+                                title={t('administration.extraction.tabHint')}
+                                className={twMerge(
+                                    '-mb-px inline-flex items-center gap-1 border-b-2 px-1 pb-2 text-xs transition-colors',
+                                    showAi ? 'border-primary font-semibold text-secondary dark:text-secondaryLight' : 'border-transparent text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300'
+                                )}
+                            >
+                                <FiCpu size={12} />
+                                {t('administration.extraction.tab')}
+                            </button>
+                        </div>
+                    )}
+
+                    {showAi && id && (
+                        // Inside the entry <form>: Enter in the panel's search must not save the publication.
+                        <div
+                            className='px-5 pb-10'
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && (e.target as HTMLElement).tagName === 'INPUT') e.preventDefault();
+                            }}
+                        >
+                            <EntryExtractionPanel entryId={id} />
+                        </div>
+                    )}
+
+                    <div className={twMerge('px-5 pb-28', showAi && 'hidden')}>
                         {/* Prominent title — the primary thing an operator edits */}
                         <div className={cardClass}>
                             <label htmlFor='entry-title' className={sectionTitle}>
@@ -153,7 +213,7 @@ export default function AdminEntryForm({
                     </div>
 
                     {/* Sticky save bar */}
-                    <div className='sticky bottom-0 z-10 mt-auto flex items-center justify-end gap-3 border-t border-zinc-200 bg-lightGray/90 px-5 py-3 backdrop-blur dark:border-zinc-700 dark:bg-darkGray/90'>
+                    <div className={twMerge('sticky bottom-0 z-10 mt-auto flex items-center justify-end gap-3 border-t border-zinc-200 bg-lightGray/90 px-5 py-3 backdrop-blur dark:border-zinc-700 dark:bg-darkGray/90', showAi && 'hidden')}>
                         <Button type='submit' disabled={isFilesLoading} className='flex items-center gap-2'>
                             <BiSave size={18} />
                             {FormType === 'add' ? t('entry.wizard.upload') : t('entry.wizard.edit')}

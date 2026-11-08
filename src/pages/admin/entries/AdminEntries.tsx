@@ -10,7 +10,7 @@ import useDeleteEntry from '../../../hooks/api/entries/useDeleteEntry';
 import { IEntry } from '../../../utils/interfaces/entry';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import { withAccessToken } from '../../../utils/func/functions';
-import { fmtDate } from '../../../utils/func/adminDate';
+import { fmtDate, fmtDateTime } from '../../../utils/func/adminDate';
 import {
   PageHeader,
   DataTable,
@@ -23,6 +23,11 @@ import {
 } from '../../../components/admin';
 import Button from '../../../components/buttons/Button';
 import { localize } from '../../../utils/func/localized';
+import Select from '../../../components/primitives/Select';
+import { ExtractionStatusChip } from '../../../components/specific-page/admin-entry-page/extraction/EntryExtractionPanel';
+
+/** Values of the AI-processing filter (`?ai=`), sent as `extraction_status`. */
+const EXTRACTION_FILTERS = ['available', 'done', 'none', 'queued', 'running', 'failed', 'unsupported'];
 
 const DEFAULT_LIMIT = 10;
 
@@ -67,6 +72,9 @@ const AdminEntries = () => {
     query: q || undefined,
     feedId: searchParams.get('feed-id') || undefined,
     categoryId: searchParams.get('category-id') || undefined,
+    // AI processing (IP-018): the hidden columns below and the filter.
+    extraction: true,
+    extractionStatus: searchParams.get('ai') || undefined,
     orderBy,
   });
   const items = data?.items ?? [];
@@ -77,10 +85,10 @@ const AdminEntries = () => {
     total: 0,
   };
 
-  const openEdit = (e: IEntry) => {
+  const openEdit = (e: IEntry, ai = false) => {
     umamiTrack('Edit Entry Button', { entryId: e.id });
     // Remember the list state (search, filters, page, sort) so saving can return to it.
-    navigate(NAVIGATION_PATHS.adminEditEntries + e.id, { state: { from: location.search } });
+    navigate(NAVIGATION_PATHS.adminEditEntries + e.id + (ai ? '?tab=ai' : ''), { state: { from: location.search } });
   };
 
   const doDelete = async () => {
@@ -177,6 +185,52 @@ const AdminEntries = () => {
       cell: (e) => fmtDate(e.created_at) ?? '—',
     },
     {
+      id: 'extraction_status',
+      header: t('administration.entriesPage.aiStatus'),
+      sortKey: 'extraction_status',
+      defaultHidden: true,
+      cell: (e) =>
+        e.extraction_status ? (
+          <button
+            type="button"
+            title={t('administration.entriesPage.aiOpen')}
+            onClick={(ev) => {
+              ev.stopPropagation();
+              openEdit(e, true);
+            }}
+          >
+            <ExtractionStatusChip status={e.extraction_status} />
+          </button>
+        ) : (
+          '—'
+        ),
+    },
+    {
+      id: 'extraction_regions',
+      header: t('administration.entriesPage.aiRegions'),
+      sortKey: 'extraction_regions',
+      firstSortDir: 'desc',
+      align: 'right',
+      defaultHidden: true,
+      cell: (e) => (e.extraction_regions != null ? e.extraction_regions.toLocaleString() : '—'),
+    },
+    {
+      id: 'extraction_paragraphs',
+      header: t('administration.entriesPage.aiParagraphs'),
+      sortKey: 'extraction_paragraphs',
+      firstSortDir: 'desc',
+      align: 'right',
+      defaultHidden: true,
+      cell: (e) => (e.extraction_paragraphs != null ? e.extraction_paragraphs.toLocaleString() : '—'),
+    },
+    {
+      id: 'extraction_finished_at',
+      header: t('administration.entriesPage.aiProcessedAt'),
+      sortKey: 'extraction_finished_at',
+      defaultHidden: true,
+      cell: (e) => fmtDateTime(e.extraction_finished_at) ?? '—',
+    },
+    {
       id: 'actions',
       header: '',
       hideable: false,
@@ -228,13 +282,28 @@ const AdminEntries = () => {
         onPageSizeChange={(n) => patchParams({ limit: String(n), page: '1' })}
         storageKey="admin-publications"
         toolbar={
-          <SearchField
-            value={q}
-            onChange={(v) => patchParams({ q: v || null, page: '1' })}
-            label={t('administration.entriesPage.searchPlaceholder')}
-            placeholder={t('administration.entriesPage.searchPlaceholder')}
-            className="max-w-sm"
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <SearchField
+              value={q}
+              onChange={(v) => patchParams({ q: v || null, page: '1' })}
+              label={t('administration.entriesPage.searchPlaceholder')}
+              placeholder={t('administration.entriesPage.searchPlaceholder')}
+              className="max-w-sm flex-1"
+            />
+            <Select
+              value={searchParams.get('ai') || ''}
+              onChange={(v) => patchParams({ ai: v || null, page: '1' })}
+              aria-label={t('administration.entriesPage.aiFilter')}
+              className="w-56"
+              options={[
+                { value: '', label: t('administration.entriesPage.aiFilterAll') },
+                ...EXTRACTION_FILTERS.map((value) => ({
+                  value,
+                  label: t(`administration.entriesPage.aiFilterValues.${value}`),
+                })),
+              ]}
+            />
+          </div>
         }
       />
 

@@ -4,6 +4,7 @@ import { ICategory } from './category';
 import { IFeed } from './feed';
 import { IConfig, IMetadata } from './general/general';
 import { ILanguage } from './language';
+import { ExtractionEntryStatus } from './extraction';
 
 export interface IEntriesList {
   items: IEntry[];
@@ -44,6 +45,11 @@ export interface IEntry extends Partial<IEntryLcpFields> {
   catalog_id: string;
   created_at: string;
   updated_at: string;
+  /** AI processing (IP-018), only in lists fetched with `extraction: true`. */
+  extraction_status?: ExtractionEntryStatus | null;
+  extraction_regions?: number | null;
+  extraction_paragraphs?: number | null;
+  extraction_finished_at?: string | null;
   shelf_record_id: string;
   thumbnail: string;
   published_at?: string;
@@ -105,6 +111,10 @@ export interface IEntryQuery {
   lcpState?: string;
   /** Comma-separated entry IDs — restricts the result to these entries (e.g. the shelf) */
   ids?: string;
+  /** Ask the catalog for the AI-processing columns (`extraction_*`) — admin list only. */
+  extraction?: boolean;
+  /** Comma-separated `extraction_status` values (unsupported, none, queued, running, done, failed, available). */
+  extractionStatus?: string;
 }
 
 export interface IEntryFacets {

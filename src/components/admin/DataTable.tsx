@@ -84,7 +84,15 @@ function useHiddenColumns<T>(columns: DataTableColumn<T>[], storageKey?: string)
     if (storageKey) {
       try {
         const raw = localStorage.getItem(`dt:${storageKey}`);
-        if (raw) return new Set<string>(JSON.parse(raw));
+        if (raw) {
+          const stored = JSON.parse(raw);
+          // `{hidden, seen}`; older saves are a bare list of hidden ids with no `seen`.
+          const hidden = new Set<string>(Array.isArray(stored) ? stored : stored.hidden ?? []);
+          const seen = new Set<string>(Array.isArray(stored) ? [] : stored.seen ?? []);
+          // A column added after the choice was saved starts as its default, not visible.
+          fromDefaults.filter((id) => !seen.has(id)).forEach((id) => hidden.add(id));
+          return hidden;
+        }
       } catch {
         /* ignore */
       }
@@ -98,7 +106,10 @@ function useHiddenColumns<T>(columns: DataTableColumn<T>[], storageKey?: string)
   useEffect(() => {
     if (!storageKey) return;
     try {
-      localStorage.setItem(`dt:${storageKey}`, JSON.stringify([...hidden]));
+      localStorage.setItem(
+        `dt:${storageKey}`,
+        JSON.stringify({ hidden: [...hidden], seen: columns.map((c) => c.id) })
+      );
     } catch {
       /* ignore */
     }
