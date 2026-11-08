@@ -87,7 +87,7 @@ export default function AcquisitionsButton({
             type="button"
             className={`${ActionButtonStyle} w-full cursor-pointer`}
             onClick={() => {
-              const licenseRef = { id: activeLicense.lcp_license_id || activeLicense.id, download_url: activeLicense.download_url };
+              const licenseRef = { id: activeLicense.id, download_url: activeLicense.download_url };
               openInThorium(licenseRef);
               toast.info(
                 <div className="flex flex-col gap-1">
