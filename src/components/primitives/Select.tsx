@@ -62,9 +62,14 @@ const Select = ({
       const below = window.innerHeight - trigger.bottom - LIST_GAP - VIEWPORT_MARGIN;
       const above = trigger.top - LIST_GAP - VIEWPORT_MARGIN;
       const up = dropUp ? above >= listHeight || above > below : below < listHeight && above > below;
+      // At least as wide as the trigger, wider when the labels need it (never past the viewport).
+      const maxWidth = Math.max(trigger.width, window.innerWidth - VIEWPORT_MARGIN * 2);
+      const left = Math.max(VIEWPORT_MARGIN, Math.min(trigger.left, window.innerWidth - VIEWPORT_MARGIN - (listRef.current?.offsetWidth ?? trigger.width)));
       setListStyle({
-        left: trigger.left,
-        width: trigger.width,
+        left,
+        minWidth: trigger.width,
+        width: 'max-content',
+        maxWidth,
         maxHeight: Math.max(Math.min(LIST_MAX_HEIGHT, up ? above : below), 96),
         ...(up ? { bottom: window.innerHeight - trigger.top + LIST_GAP } : { top: trigger.bottom + LIST_GAP }),
       });
@@ -118,7 +123,10 @@ const Select = ({
           triggerClassName
         )}
       >
-        <span className={twMerge('truncate', !selected && 'text-zinc-400 dark:text-zinc-500')}>
+        <span
+          title={selected?.label}
+          className={twMerge('truncate', !selected && 'text-zinc-400 dark:text-zinc-500')}
+        >
           {selected ? selected.label : placeholder}
         </span>
         <RiArrowDownSLine

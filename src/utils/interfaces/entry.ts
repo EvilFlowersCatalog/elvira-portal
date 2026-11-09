@@ -76,6 +76,8 @@ export interface IEntry extends Partial<IEntryLcpFields> {
   extraction_regions?: number | null;
   extraction_paragraphs?: number | null;
   extraction_finished_at?: string | null;
+  /** Entry config as stored by the catalog (sent in list responses too). */
+  config?: Partial<IConfig> | null;
   shelf_record_id: string;
   thumbnail: string;
   published_at?: string;
