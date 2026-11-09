@@ -5,6 +5,7 @@ import { IFeed } from './feed';
 import { IConfig, IMetadata, LocalizedText } from './general/general';
 import { ILanguage } from './language';
 import { ExtractionEntryStatus } from './extraction';
+import { IEntryRating } from './review';
 
 export interface IEntriesList {
   items: IEntry[];
@@ -116,6 +117,8 @@ export interface IEntryDetail extends Partial<IEntryLcpFields> {
   thumbnail: string;
   page_count?: number | null;
   table_of_contents?: IEntryHeading[] | null;
+  /** IP-023 average and count of published reviews; null when reviews are disabled. */
+  rating?: IEntryRating | null;
 }
 
 export interface IEntryQuery {

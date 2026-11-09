@@ -22,6 +22,7 @@ const SortSelect = ({ value, onChange, withRelevance = false }: ISortSelect) => 
     { value: '-title', label: t('tools.orderBy.titleDesc') },
     { value: '-popularity', label: t('tools.orderBy.popularityDesc') },
     { value: 'popularity', label: t('tools.orderBy.popularityAsc') },
+    { value: '-rating', label: t('tools.orderBy.ratingDesc') },
   ];
 
   return (
