@@ -9,7 +9,7 @@ import { MdMoreTime } from 'react-icons/md';
 import { IoClose } from 'react-icons/io5';
 import { HiOutlineUsers } from 'react-icons/hi';
 import { useTranslation } from 'react-i18next';
-import { formatAuthors, ILicense, ILicenseEntry, LICENSE_STATE } from '../../../utils/interfaces/license';
+import { formatAuthors, ILicense, ILicenseEntry, LICENSE_STATE, renewalEmbargoUntil } from '../../../utils/interfaces/license';
 import { IReservation, RESERVATION_STATUS } from '../../../utils/interfaces/reservation';
 import useLicensesQuery from '../../../hooks/api/licenses/useLicensesQuery';
 import useReservationsQuery from '../../../hooks/api/reservations/useReservationsQuery';
@@ -95,17 +95,20 @@ function ActionBtn({
   onClick,
   disabled,
   filled,
+  title,
 }: {
   icon: React.ReactNode;
   label: string;
   onClick?: () => void;
   disabled?: boolean;
   filled?: boolean;
+  title?: string;
 }) {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
+      title={title}
       className={`flex items-center justify-center gap-[10px] h-[34px] w-[100px] px-2 py-1 rounded-[6px] text-[12px] tracking-[0.1px] transition-colors shrink-0
         ${disabled
           ? 'border-[0.5px] border-[rgba(0,0,0,0.25)] dark:border-[rgba(255,255,255,0.25)] text-[rgba(0,0,0,0.25)] dark:text-[rgba(255,255,255,0.25)] cursor-default'
@@ -141,6 +144,7 @@ function BorrowedCard({
   const daysLeft = differenceInDays(expiresAt, new Date());
   const borrowedFrom = format(startsAt, 'dd.MM.yyyy');
   const dueDate = format(expiresAt, 'dd.MM.yyyy');
+  const embargoUntil = renewalEmbargoUntil(license);
 
   return (
     <div className="w-full bg-white dark:bg-zinc-800 border border-[#e5e5e5] dark:border-zinc-700 rounded-[6px] p-3 flex gap-3">
@@ -184,7 +188,12 @@ function BorrowedCard({
             <ActionBtn
               icon={<MdMoreTime size={20} />}
               label={t(`${CARD}.extend`)}
-              disabled={license.renewals_remaining === 0}
+              disabled={license.renewals_remaining === 0 || embargoUntil !== null}
+              title={
+                embargoUntil
+                  ? t('license.loansPage.modals.embargoNotice', { date: format(embargoUntil, 'd.M.yyyy HH:mm') })
+                  : undefined
+              }
               onClick={() => onExtend(license)}
             />
             <ActionBtn icon={<BsArrowReturnLeft size={20} />} label={t(`${CARD}.return`)} onClick={() => onReturn(license)} />

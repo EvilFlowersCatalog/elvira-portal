@@ -1227,6 +1227,17 @@ export const en = {
     },
 
     license: {
+      // Refusals keyed by the API's `additional_data.code` (renewal 403, activation 409).
+      errors: {
+        terminal_state: 'The loan has already ended ({{state}}).',
+        renewal_cap: 'Renewal limit reached ({{renewal_count}} of {{max_renewals}}).',
+        queue: 'The loan cannot be extended, other readers are waiting for this title.',
+        embargo: 'It is too early to extend. Extension is possible from {{renewable_from}}.',
+        embargo_no_date: 'It is too early to extend.',
+        exceeds_max_window: 'An extension may reach at most {{max_renew_days}} days ahead.',
+        end_in_past: 'The new end of the loan must be in the future.',
+        activation_by_device_only: 'A loan becomes active only once it is opened in a reading app (e.g. Thorium).',
+      },
       success: {
         openThorium: 'Open in Thorium',
         downloadFile: 'Download file',
@@ -1327,7 +1338,7 @@ export const en = {
           exceedsMaxWindow: 'Exceeds the maximum window of {{days}} days',
           unavailableExceedsWindow: 'Unavailable — exceeds the {{days}}-day window',
           renewalPolicy:
-            'A loan can be extended no sooner than {{embargoDays}} days after borrowing and by at most {{maxRenewDays}} days ahead. Extension is not possible when other users are waiting for the title.',
+            'A loan can first be extended once half of it has passed (at most {{embargoDays}} days after it starts), and by at most {{maxRenewDays}} days ahead. Extension is not possible when other users are waiting for the title.',
           maxRenewals: ' Maximum number of renewals: {{max}}.',
           embargoNotice: 'This loan can be extended starting {{date}}.',
           capReachedNotice: 'You have reached the maximum number of renewals.',

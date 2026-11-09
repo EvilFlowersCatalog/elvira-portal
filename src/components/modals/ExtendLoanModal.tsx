@@ -5,8 +5,8 @@ import { RiCloseLine } from 'react-icons/ri';
 import { FiCheckCircle } from 'react-icons/fi';
 import { format, parseISO, addDays, differenceInDays } from 'date-fns';
 import { toast } from 'react-toastify';
-import { ILicense } from '../../utils/interfaces/license';
-import { problemDetailMessage } from '../../utils/problemDetail';
+import { ILicense, renewalEmbargoUntil } from '../../utils/interfaces/license';
+import { licenseErrorMessage } from '../../utils/problemDetail';
 import useRenewLicense from '../../hooks/api/licenses/useRenewLicense';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import useFocusTrap from '../../hooks/useFocusTrap';
@@ -47,9 +47,9 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
   const renewUpperBound = policy ? addDays(new Date(), policy.max_renew_days) : null;
   const exceedsBound = (d: Date) => (renewUpperBound ? d > renewUpperBound : false);
 
-  // A loan is under embargo until embargo_days after acquisition.
-  const embargoUntil = policy ? addDays(parseISO(license.created_at), policy.embargo_days) : null;
-  const underEmbargo = embargoUntil ? embargoUntil > new Date() : false;
+  // The server computes the embargo (half the loan, capped by embargo_days).
+  const embargoUntil = renewalEmbargoUntil(license);
+  const underEmbargo = embargoUntil !== null;
   const capReached = license.renewals_remaining === 0;
   // Every refusal the policy box already explains — don't let the user fire a
   // request we know the server will 403.
@@ -63,9 +63,9 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
       queryClient.invalidateQueries({ queryKey: ['licenses'] });
       onSuccess();
     } catch (e) {
-      // Surface the API's RFC 7807 `detail` — it explains *why* (embargo, queue,
-      // window, cap). A generic retry message hides a policy refusal as an error.
-      toast.error(problemDetailMessage(e, t(`${M}.extendFailed`, { defaultValue: 'Extension failed. Please try again.' })));
+      // Explain *why* (embargo, queue, window, cap), translated by the refusal's
+      // `code`. A generic retry message hides a policy refusal as an error.
+      toast.error(licenseErrorMessage(e, t, t(`${M}.extendFailed`, { defaultValue: 'Extension failed. Please try again.' })));
     } finally {
       setLoading(false);
     }
@@ -206,14 +206,14 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
                       embargoDays: policy.embargo_days,
                       maxRenewDays: policy.max_renew_days,
                       defaultValue:
-                        'A loan can be extended no sooner than {{embargoDays}} days after borrowing and by at most {{maxRenewDays}} days ahead. Extension is not possible when other users are waiting for the title.',
+                        'A loan can first be extended once half of it has passed (at most {{embargoDays}} days after it starts), and by at most {{maxRenewDays}} days ahead. Extension is not possible when other users are waiting for the title.',
                     })}
                     {policy.max_renewals !== null &&
                       t(`${M}.maxRenewals`, { max: policy.max_renewals, defaultValue: ' Maximum number of renewals: {{max}}.' })}
                   </p>
                   {underEmbargo && embargoUntil && (
                     <p className="text-[11px] text-[#9f6c00] dark:text-yellow-400 mt-1 font-semibold">
-                      {t(`${M}.embargoNotice`, { date: format(embargoUntil, 'd.M.yyyy'), defaultValue: 'This loan can be extended starting {{date}}.' })}
+                      {t(`${M}.embargoNotice`, { date: format(embargoUntil, 'd.M.yyyy HH:mm'), defaultValue: 'This loan can be extended starting {{date}}.' })}
                     </p>
                   )}
                   {capReached && (

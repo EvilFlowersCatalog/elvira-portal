@@ -1219,6 +1219,17 @@ export const sk = {
     },
 
     license: {
+      // Refusals keyed by the API's `additional_data.code` (renewal 403, activation 409).
+      errors: {
+        terminal_state: 'Výpožička sa už skončila ({{state}}).',
+        renewal_cap: 'Dosiahnutý limit predĺžení ({{renewal_count}} z {{max_renewals}}).',
+        queue: 'Výpožičku nemožno predĺžiť, na titul čakajú ďalší čitatelia.',
+        embargo: 'Na predĺženie je ešte priskoro. Predĺžiť bude možné od {{renewable_from}}.',
+        embargo_no_date: 'Na predĺženie je ešte priskoro.',
+        exceeds_max_window: 'Predĺženie môže siahať najviac {{max_renew_days}} dní dopredu.',
+        end_in_past: 'Nový koniec výpožičky musí byť v budúcnosti.',
+        activation_by_device_only: 'Výpožička sa aktivuje až otvorením v čítačke (napr. Thorium).',
+      },
       success: {
         openThorium: 'Otvoriť v Thorium',
         downloadFile: 'Stiahnuť súbor',
@@ -1322,7 +1333,7 @@ export const sk = {
           exceedsMaxWindow: 'Presahuje maximálne okno {{days}} dní',
           unavailableExceedsWindow: 'Nedostupné — presahuje {{days}}-dňové okno',
           renewalPolicy:
-            'Výpožičku možno predĺžiť najskôr {{embargoDays}} dní po vypožičaní a najviac o {{maxRenewDays}} dní dopredu. Predĺženie nie je možné, ak na titul čakajú ďalší používatelia.',
+            'Výpožičku možno prvýkrát predĺžiť po uplynutí polovice výpožičky (najneskôr {{embargoDays}} dní od jej začiatku) a najviac o {{maxRenewDays}} dní dopredu. Predĺženie nie je možné, ak na titul čakajú ďalší používatelia.',
           maxRenewals: ' Maximálny počet predĺžení: {{max}}.',
           embargoNotice: 'Túto výpožičku bude možné predĺžiť až od {{date}}.',
           capReachedNotice: 'Dosiahli ste maximálny počet predĺžení.',
