@@ -9,7 +9,11 @@ export interface IApiKey {
   last_seen_at: string | null;
   created_at: string;
   updated_at: string;
-  token: string;
+  /**
+   * The bearer secret. Only the `POST /api/v1/api_keys` response carries it —
+   * listings never do (the catalog shows a credential once, at creation).
+   */
+  token?: string;
 }
 
 export interface IApiKeyListParams {

@@ -79,7 +79,10 @@ const AdditionalDataPart = ({
         )}
         <div className='absolute inset-0 bg-white/30 dark:bg-black/30'>
           <ImageDropzone
-            title={t('entry.wizard.image')}
+            // Required on both add and edit (save refuses without a cover).
+            // Non-breaking space (char 160) keeps the marker on the word's line.
+            title={t('entry.wizard.image') + String.fromCharCode(160) + '*'}
+            removeLabel={t('entry.wizard.removeImage')}
             maxSizeDescription='(MAX 5 MB)'
             maxSize={1024 * 1024 * 5}
             setFile={async (file) => {

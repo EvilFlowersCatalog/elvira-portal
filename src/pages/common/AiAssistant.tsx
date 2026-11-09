@@ -138,7 +138,7 @@ export default function AiAssistantPage() {
                             />
                             <button
                                 type="submit"
-                                aria-label="Send"
+                                aria-label={t('common.send')}
                                 disabled={isGeneratingResponse || !input.trim()}
                                 className="inline-flex items-center justify-center p-1 disabled:opacity-40"
                             >

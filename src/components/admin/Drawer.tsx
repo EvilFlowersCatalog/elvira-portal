@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { FiX } from 'react-icons/fi';
 import IconButton from './IconButton';
 import useEscapeLayer from '../../hooks/useEscapeLayer';
+import { useTranslation } from 'react-i18next';
 
 interface DrawerProps {
   open: boolean;
@@ -29,6 +30,7 @@ export default function Drawer({
   footer,
   width = 'max-w-md',
 }: DrawerProps) {
+  const { t } = useTranslation();
   const panelRef = useRef<HTMLDivElement>(null);
   const previouslyFocused = useRef<HTMLElement | null>(null);
 
@@ -75,7 +77,7 @@ export default function Drawer({
               <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400 truncate">{description}</p>
             )}
           </div>
-          <IconButton label="Close" variant="ghost" onClick={onClose}>
+          <IconButton label={t('common.close')} variant="ghost" onClick={onClose}>
             <FiX size={18} />
           </IconButton>
         </div>

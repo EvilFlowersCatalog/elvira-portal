@@ -4,6 +4,17 @@ export const en = {
       showMore: '{{count}} more',
       showLess: 'Show less',
       loading: 'Loading',
+      close: 'Close',
+      clearSearch: 'Clear search',
+      sortBy: 'Sort by',
+      thumbnail: 'Cover: {{title}}',
+      send: 'Send',
+      rangeFrom: 'From',
+      rangeTo: 'To',
+    },
+    myShelf: {
+      add: 'Add to shelf',
+      remove: 'Remove from shelf',
     },
     assistant: {
       title: 'AI Assistant',
@@ -776,6 +787,10 @@ export const en = {
           cancel: 'Cancel',
           created: 'API key created',
           createError: 'Could not create the key.',
+          createdTitle: 'Your key is ready',
+          tokenOnceWarning: 'Copy the token now. It is shown only this once — after closing it cannot be displayed again; if it is lost, delete the key and create a new one.',
+          tokenHidden: 'Shown only at creation',
+          done: 'Done',
           delete: 'Delete key',
           deleteConfirmTitle: 'Delete API key?',
           deleteConfirmBody: 'Any integration using “{{name}}” will stop working. This cannot be undone.',
@@ -844,8 +859,8 @@ export const en = {
           cancelled: 'Cancel',
         },
         confirmTitle: 'Confirm action',
-        confirmRevoke: 'Revoke this loan? The reader will immediately lose access.',
-        confirmCancel: 'Cancel this loan?',
+        confirmRevoke: 'Revoke the loan of “{{title}}”{{user}}? The reader will immediately lose access.',
+        confirmCancel: 'Cancel the loan of “{{title}}”{{user}}?',
         confirm: 'Confirm',
         cancelBtn: 'Back',
         reservations: {
@@ -890,6 +905,10 @@ export const en = {
     },
 
     // NAVBAR MENU
+    navbar: {
+      expand: 'Expand sidebar',
+      collapse: 'Collapse sidebar',
+    },
     navbarMenu: {
       portal: 'Main Menu',
       personal: 'Personal',
@@ -935,6 +954,7 @@ export const en = {
       searchSmart: '"books about artificial intelligence", "difference between IPv4 and IPv6"',
     },
     search: {
+      filterByFeed: 'Filter by collection',
       smartOn: 'Enable smart search',
       smartOff: 'Disable smart search',
       // Suggestions dropdown
@@ -1049,6 +1069,7 @@ export const en = {
     // ENTRY COMPONENT
     entry: {
       detail: {
+        openDetail: 'Open detail',
         close: 'Close',
         add: 'Add',
         remove: 'Remove',
@@ -1100,6 +1121,9 @@ export const en = {
           borrowedUntil: 'Borrowed until',
           reserved: 'Reserved',
           unavailable: 'Unavailable',
+          queuePosition: '#{{position}} in queue',
+          availableInDays_one: 'in ~{{count}} day',
+          availableInDays_other: 'in ~{{count}} days',
         },
         cancelReservation: 'Cancel',
         reserve: 'Reserve',
@@ -1166,6 +1190,7 @@ export const en = {
         imageAndFile: 'Image & PDF',
         image: 'Image',
         imageHint: 'Drag your image here or click here to browse',
+        removeImage: 'Remove image',
         pdfHint: 'Drag your PDF files here',
         download: 'Download',
         share: 'Share',

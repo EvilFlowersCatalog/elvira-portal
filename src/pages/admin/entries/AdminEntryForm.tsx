@@ -49,6 +49,9 @@ export default function AdminEntryForm({
     const { t } = useTranslation();
     const { 'entry-id': id } = useParams();
     const [isFilesLoading, setIsFilesLoading] = useState<boolean>(false);
+    // Inline message instead of the browser's bubble (which is in the browser's
+    // language, not the app's) — same pattern as ElviraInput.
+    const [titleInvalid, setTitleInvalid] = useState<boolean>(false);
     // Secondary view of an existing publication: its AI processing (IP-018). Kept in the URL
     // (`?tab=ai`) so the entries list can link straight to it; the form stays mounted underneath,
     // so switching views never loses unsaved edits.
@@ -74,6 +77,7 @@ export default function AdminEntryForm({
         }));
     };
     const handleTitleChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setTitleInvalid(false);
         setEntry((prevEntry) => ({ ...prevEntry!, title: event.target.value }));
     };
 
@@ -146,10 +150,25 @@ export default function AdminEntryForm({
                                 id='entry-title'
                                 value={entry.title ?? ''}
                                 onChange={handleTitleChange}
+                                onInvalid={(e) => {
+                                    e.preventDefault();
+                                    setTitleInvalid(true);
+                                    e.currentTarget.focus();
+                                }}
                                 required
+                                aria-invalid={titleInvalid || undefined}
+                                aria-describedby={titleInvalid ? 'entry-title-error' : undefined}
                                 placeholder={t('entry.wizard.titleNamespace')}
-                                className='mt-2 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-lg font-medium text-zinc-800 outline-none focus:border-primary dark:border-zinc-600 dark:bg-zinc-900/40 dark:text-zinc-100'
+                                className={twMerge(
+                                    'mt-2 w-full rounded-lg border border-zinc-300 bg-white px-3 py-2.5 text-lg font-medium text-zinc-800 outline-none focus:border-primary dark:border-zinc-600 dark:bg-zinc-900/40 dark:text-zinc-100',
+                                    titleInvalid && 'border-redText dark:border-red'
+                                )}
                             />
+                            {titleInvalid && (
+                                <p id='entry-title-error' role='alert' className='mt-1 text-sm text-redText dark:text-red'>
+                                    {t('entry.wizard.requiredMessages.title')}
+                                </p>
+                            )}
                         </div>
 
                         {/* Two-column: main content + settings sidebar */}
@@ -176,7 +195,11 @@ export default function AdminEntryForm({
                                 </div>
 
                                 <div className={`${cardClass} flex flex-col gap-2`}>
-                                    <h2 className={sectionTitle}>{t('entry.wizard.files')}</h2>
+                                    <h2 className={sectionTitle}>
+                                        {t('entry.wizard.files')}
+                                        {/* A PDF is required when creating; on edit files are managed in place. */}
+                                        {FormType === 'add' && <span className='ml-0.5 text-redText dark:text-red'>*</span>}
+                                    </h2>
                                     {FormType === 'add' ? (
                                         <FileDropzone files={files} setFiles={setFiles} isLoading={isFilesLoading} setIsLoading={setIsFilesLoading} />
                                     ) : (

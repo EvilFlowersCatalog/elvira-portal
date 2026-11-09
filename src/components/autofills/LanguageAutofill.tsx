@@ -121,11 +121,16 @@ const LanguageAutofill = ({
       {suggestions.length > 0 && (
         <ul
           className={`absolute top-[60px] rounded-md list-none max-h-40 overflow-y-scroll bg-white dark:bg-darkGray z-20 w-full`}
+          // Keep focus on the input so the click on a suggestion lands (see FeedAutofill).
+          role='listbox'
+          onMouseDown={(e) => e.preventDefault()}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
           {suggestions.map((language, index) => (
             <li
+              role='option'
+              aria-selected={false}
               key={index}
               className='bg-white dark:bg-darkGray hover:bg-zinc-200 dark:hover:bg-darkGray'
               onClick={() => handleSuggestionClick(language)}

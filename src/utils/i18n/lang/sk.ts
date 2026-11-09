@@ -4,6 +4,17 @@ export const sk = {
       showMore: '{{count}} ďalších',
       showLess: 'Zobraziť menej',
       loading: 'Načítavanie',
+      close: 'Zavrieť',
+      clearSearch: 'Vymazať vyhľadávanie',
+      sortBy: 'Zoradiť podľa',
+      thumbnail: 'Obálka: {{title}}',
+      send: 'Odoslať',
+      rangeFrom: 'Od',
+      rangeTo: 'Do',
+    },
+    myShelf: {
+      add: 'Uložiť na poličku',
+      remove: 'Odstrániť z poličky',
     },
     assistant: {
       title: 'AI Asistent',
@@ -778,6 +789,10 @@ export const sk = {
           cancel: 'Zrušiť',
           created: 'API kľúč vytvorený',
           createError: 'Nepodarilo sa vytvoriť kľúč.',
+          createdTitle: 'Kľúč je pripravený',
+          tokenOnceWarning: 'Token si skopírujte teraz. Zobrazí sa len tento raz — po zatvorení ho už nebude možné zobraziť; pri strate kľúč odstráňte a vytvorte nový.',
+          tokenHidden: 'Zobrazený len pri vytvorení',
+          done: 'Hotovo',
           delete: 'Odstrániť kľúč',
           deleteConfirmTitle: 'Odstrániť API kľúč?',
           deleteConfirmBody: 'Každá integrácia používajúca „{{name}}“ prestane fungovať. Túto akciu nie je možné vrátiť.',
@@ -846,8 +861,8 @@ export const sk = {
           cancelled: 'Zrušiť',
         },
         confirmTitle: 'Potvrdiť akciu',
-        confirmRevoke: 'Odobrať túto výpožičku? Čitateľ okamžite stratí prístup.',
-        confirmCancel: 'Zrušiť túto výpožičku?',
+        confirmRevoke: 'Odobrať výpožičku „{{title}}“{{user}}? Čitateľ okamžite stratí prístup.',
+        confirmCancel: 'Zrušiť výpožičku „{{title}}“{{user}}?',
         confirm: 'Potvrdiť',
         cancelBtn: 'Späť',
         reservations: {
@@ -888,6 +903,10 @@ export const sk = {
     },
 
     // NAVBAR MENU
+    navbar: {
+      expand: 'Rozbaliť bočný panel',
+      collapse: 'Zbaliť bočný panel',
+    },
     navbarMenu: {
       portal: 'Hlavné Menu',
       personal: 'Osobné',
@@ -932,6 +951,7 @@ export const sk = {
       searchSmart: '"knihy o umelej inteligencii", "rozdiel medzi IPv4 a IPv6"',
     },
     search: {
+      filterByFeed: 'Filtrovať podľa zbierky',
       smartOn: 'Zapnúť inteligentné vyhľadávanie',
       smartOff: 'Vypnúť inteligentné vyhľadávanie',
       // Suggestions dropdown
@@ -1047,6 +1067,7 @@ export const sk = {
     // ENTRY COMPONENT
     entry: {
       detail: {
+        openDetail: 'Otvoriť detail',
         close: 'Zavrieť',
         add: 'Uložiť',
         remove: 'Odstrániť',
@@ -1097,6 +1118,10 @@ export const sk = {
           borrowedUntil: 'Požičané do',
           reserved: 'Rezervované',
           unavailable: 'Nedostupné',
+          queuePosition: '{{position}}. v poradí',
+          availableInDays_one: 'o ~{{count}} deň',
+          availableInDays_few: 'o ~{{count}} dni',
+          availableInDays_other: 'o ~{{count}} dní',
         },
         cancelReservation: 'Zrušiť',
         reserve: 'Rezervovať',
@@ -1157,6 +1182,7 @@ export const sk = {
         imageAndFile: 'Obrázok a PDF',
         image: 'Obrázok',
         imageHint: 'Presuňte sem váš obrázok alebo kliknite na prehľadávanie',
+        removeImage: 'Odstrániť obrázok',
         pdfHint: 'Presuňte sem Vaše PDF súbory',
         download: 'Stiahnutie',
         share: 'Zdielanie',

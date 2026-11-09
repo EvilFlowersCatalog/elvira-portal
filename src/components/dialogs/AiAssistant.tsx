@@ -172,7 +172,7 @@ export default function AiAssistant() {
                             </button>
                             <button
                                 type="button"
-                                aria-label="Close"
+                                aria-label={t('common.close')}
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     handleCloseDrawer({}, "escapeKeyDown");
@@ -226,7 +226,7 @@ export default function AiAssistant() {
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                             />
-                            <button type="submit" aria-label="Send" className="inline-flex items-center justify-center p-1">
+                            <button type="submit" aria-label={t('common.send')}className="inline-flex items-center justify-center p-1">
                                 <FaPaperPlane size={14} className="dark:text-white" />
                             </button>
                         </div>

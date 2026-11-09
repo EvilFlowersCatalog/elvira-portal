@@ -280,7 +280,7 @@ function ReservationCard({
                 <span className="flex items-center gap-[5px] h-[16px] px-2 rounded-[4px] bg-[#feeecc] dark:bg-yellow-900/30 shrink-0">
                   <HiOutlineUsers size={11} className="text-[#8a5e00] dark:text-yellow-400 shrink-0" />
                   <span className="text-[10px] text-[#8a5e00] dark:text-yellow-400 tracking-[0.1px] whitespace-nowrap">
-                    {t(`${CARD}.queuePosition`)} <strong>{reservation.position}.</strong> /{queueTotal}
+                    {t(`${CARD}.queuePosition`)} <strong>{reservation.position}</strong> / {queueTotal}
                   </span>
                 </span>
               </>

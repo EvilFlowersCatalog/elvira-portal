@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { fmtDate } from '../../../../utils/func/adminDate';
 import { CircleLoader } from 'react-spinners';
 import { RiAddLine, RiBookmarkFill, RiBookmarkLine, RiChatQuoteLine, RiCloseLine, RiShareLine } from 'react-icons/ri';
 import { useTranslation } from 'react-i18next';
@@ -204,16 +205,18 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const getAvailabilityBadge = (): { state: AvailabilityState; date: string | null; position?: number | null; days?: number | null } | null => {
     if (!entry?.config?.readium_enabled) return null;
 
+    // A fresh LCP loan stays `ready` until the .lcpl is first opened in a reader;
+    // it is already the user's loan (reservations are a separate resource).
     const isActiveLoan =
-      activeLicense?.state === LICENSE_STATE.active &&
+      (activeLicense?.state === LICENSE_STATE.active || activeLicense?.state === LICENSE_STATE.ready) &&
       (!activeLicense?.expires_at || new Date(activeLicense.expires_at) > new Date());
 
     if (isActiveLoan && activeLicense) {
       return { state: 'borrowed', date: activeLicense.expires_at };
     }
 
-    if (activeLicense?.state === LICENSE_STATE.ready) {
-      return { state: 'reserved', date: activeLicense.starts_at, position: entry.user_position ?? null };
+    if (entry.user_reservation_id) {
+      return { state: 'reserved', date: null, position: entry.user_position ?? null };
     }
 
     const lcpState = entry.lcp_state;
@@ -307,11 +310,11 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
             />
 
               <StatGroup>
+              {!!entry.page_count && (
+                <StatItem value={entry.page_count} label={t('entry.detail.pages')} />
+              )}
               {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
-                <>
-                  <StatItem value={999} label={t('entry.detail.pages')} />
-                  <StatItem value={9.9} label={t('entry.detail.rating')} />
-                </>
+                <StatItem value={9.9} label={t('entry.detail.rating')} />
               )}
                 <StatItem value={entry.popularity} label={t('entry.detail.views')} />
               </StatGroup>
@@ -325,9 +328,9 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
 
             {/* Info Grid */}
             <InfoGrid>
-              <InfoItem label={t('entry.detail.publisher')}>{entry.publisher ?? '-'}</InfoItem>
+              <InfoItem label={t('entry.detail.publisher')}>{entry.publisher || '-'}</InfoItem>
               <InfoItem label={t('entry.detail.publishDate')}>{entry.published_at ? new Date(entry.published_at).toLocaleDateString('sk-SK', { year: 'numeric', }) : '-'}</InfoItem>
-              <InfoItem label={t('entry.detail.lang')}>{getLanguage(entry.language?.alpha2 || '')?.name[i18n.language as AcceptedLanguage]}</InfoItem>
+              <InfoItem label={t('entry.detail.lang')}>{getLanguage(entry.language?.alpha2 || '')?.name[i18n.language as AcceptedLanguage] || '-'}</InfoItem>
 
               {/* Loan capacity (readium_amount). Only meaningful for LCP entries.
                   `over_saturated` means more loans are live than the cap allows —
@@ -406,7 +409,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                           <div className="flex items-center gap-2">
                             <span className="font-semibold text-primary dark:text-primaryLight">{review.name}</span>
                           </div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{new Date(review.date).toLocaleDateString()}</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">{fmtDate(review.date)}</p>
                           <p className="mt-2">{review.content}</p>
                         </div>
                       ))}

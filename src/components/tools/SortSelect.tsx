@@ -29,7 +29,7 @@ const SortSelect = ({ value, onChange, withRelevance = false }: ISortSelect) => 
       value={value}
       onChange={onChange}
       options={options}
-      aria-label="Sort By"
+      aria-label={t('common.sortBy')}
       className="ml-auto w-fit min-w-[180px]"
       triggerClassName="border-none dark:text-white"
     />

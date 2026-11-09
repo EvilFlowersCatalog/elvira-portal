@@ -36,22 +36,32 @@ function CreateKeyDrawer({ open, ownerId, onClose, onSaved }: CreateKeyDrawerPro
   const [owner, setOwner] = useState<IUser | null>(null);
   const [active, setActive] = useState(true);
   const [saving, setSaving] = useState(false);
+  // The one response that carries the secret; shown once, dropped on close.
+  const [createdToken, setCreatedToken] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
       setName('');
       setOwner(null);
       setActive(true);
+      setCreatedToken(null);
     }
   }, [open]);
+
+  const close = () => {
+    setCreatedToken(null);
+    onClose();
+  };
 
   const submit = async () => {
     setSaving(true);
     try {
-      await createKey({ name: name.trim() || undefined, user_id: ownerId ?? owner?.id, is_active: active });
+      const key = await createKey({ name: name.trim() || undefined, user_id: ownerId ?? owner?.id, is_active: active });
       toast.success(t('administration.accessPage.keys.created'));
       onSaved();
-      onClose();
+      // Keep the drawer open on the token — closing now would lose the only copy.
+      if (key.token) setCreatedToken(key.token);
+      else onClose();
     } catch {
       toast.error(t('administration.accessPage.keys.createError'));
     } finally {
@@ -62,9 +72,14 @@ function CreateKeyDrawer({ open, ownerId, onClose, onSaved }: CreateKeyDrawerPro
   return (
     <Drawer
       open={open}
-      onClose={onClose}
-      title={t('administration.accessPage.keys.createTitle')}
+      onClose={close}
+      title={createdToken ? t('administration.accessPage.keys.createdTitle') : t('administration.accessPage.keys.createTitle')}
       footer={
+        createdToken ? (
+          <Button type="button" onClick={close}>
+            {t('administration.accessPage.keys.done')}
+          </Button>
+        ) : (
         <>
           <button
             type="button"
@@ -77,8 +92,30 @@ function CreateKeyDrawer({ open, ownerId, onClose, onSaved }: CreateKeyDrawerPro
             {saving ? '…' : t('administration.accessPage.keys.create')}
           </Button>
         </>
+        )
       }
     >
+      {createdToken ? (
+        <div className="flex flex-col gap-3">
+          <p className="rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-200">
+            {t('administration.accessPage.keys.tokenOnceWarning')}
+          </p>
+          <div className="flex items-center gap-2 rounded-lg border border-zinc-200 dark:border-zinc-700 p-2">
+            <code className="flex-1 break-all text-xs text-zinc-700 dark:text-zinc-200">{createdToken}</code>
+            <IconButton
+              label={t('administration.accessPage.keys.copy')}
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                navigator.clipboard?.writeText(createdToken);
+                toast.success(t('administration.accessPage.keys.copied'));
+              }}
+            >
+              <FiCopy size={14} />
+            </IconButton>
+          </div>
+        </div>
+      ) : (
       <div className="flex flex-col gap-4">
         <Field label={t('administration.accessPage.keys.nameLabel')} htmlFor="key-name">
           <TextInput id="key-name" value={name} placeholder={t('administration.accessPage.keys.namePlaceholder')} onChange={(e) => setName(e.target.value)} />
@@ -103,13 +140,18 @@ function CreateKeyDrawer({ open, ownerId, onClose, onSaved }: CreateKeyDrawerPro
           <Switch checked={active} onChange={setActive} label={t('administration.accessPage.keys.activeToggle')} />
         </div>
       </div>
+      )}
     </Drawer>
   );
 }
 
-function TokenCell({ token }: { token: string }) {
+function TokenCell({ token }: { token?: string }) {
   const { t } = useTranslation();
   const [revealed, setRevealed] = useState(false);
+  // Listings carry no secret (it is shown once, in the create drawer).
+  if (!token) {
+    return <span className="text-xs text-zinc-400 dark:text-zinc-500">{t('administration.accessPage.keys.tokenHidden')}</span>;
+  }
   const masked = `${token.slice(0, 6)}••••••••${token.slice(-4)}`;
   return (
     <div className="flex items-center gap-1.5">

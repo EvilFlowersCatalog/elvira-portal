@@ -165,7 +165,7 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
                     <img
                         className={`w-full h-full object-cover select-none transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                         src={withAccessToken(entry.thumbnail, auth?.token) ?? undefined}
-                        alt={`Thumbnail ${entry.title}`}
+                        alt={t('common.thumbnail', { title: entry.title })}
                         loading="lazy"
                         decoding="async"
                         onLoad={() => setImgLoaded(true)}

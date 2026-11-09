@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { fmtDate } from '../../utils/func/adminDate';
 import { useSearchParams } from 'react-router-dom';
 import { BiHistory } from 'react-icons/bi';
 import { CircleLoader } from 'react-spinners';
@@ -68,7 +69,7 @@ const History = () => {
     } else if (diffDays < 7) {
       return `${diffDays} ${t('history.timeAgo.days')}`;
     }
-    return date.toLocaleDateString();
+    return fmtDate(date.toISOString());
   };
 
   const hasMore = list.page < list.maxPage;

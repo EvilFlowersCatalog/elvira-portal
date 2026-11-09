@@ -1,4 +1,5 @@
 import { forwardRef, TextareaHTMLAttributes, useState } from 'react';
+import { twMerge } from 'tailwind-merge';
 import { uuid } from '../../utils/func/functions';
 import useAppContext from '../../hooks/contexts/useAppContext';
 
@@ -18,7 +19,8 @@ const ElviraTextarea = forwardRef<HTMLTextAreaElement, CustomTextareaProps>(
       <div className='relative w-full h-full mt-6'>
         <span
           className={`absolute duration-200 z-10 select-none pointer-events-none ${
-            focus || value ? `-top-6 left-0 text-sm text-primary` : 'top-2 left-2'
+            // Resting state is a placeholder: muted, so an empty field doesn't look filled in.
+            focus || value ? `-top-6 left-0 text-sm text-primary` : 'top-2 left-2 text-zinc-400 dark:text-zinc-500'
           }`}
         >
           {placeholder}
@@ -26,11 +28,12 @@ const ElviraTextarea = forwardRef<HTMLTextAreaElement, CustomTextareaProps>(
         <textarea
           ref={ref}
           {...props}
-          className={`w-full h-full min-h-20 p-2 rounded-md bg-transparent border-2 ${
-            value
-              ? 'border-primary'
-              : 'focus:border-primary border-black dark:border-white'
-          } outline-none`}
+          className={twMerge(
+            `w-full h-full min-h-20 p-2 rounded-md bg-transparent border-2 ${
+              value ? 'border-primary' : 'focus:border-primary border-black dark:border-white'
+            } outline-none`,
+            props.className
+          )}
           id={id}
           placeholder=''
           onFocus={() => setFocus(true)}

@@ -1,4 +1,5 @@
 import { FormEvent, ReactNode, useEffect, useMemo, useState } from 'react';
+import { fmtDate } from '../../utils/func/adminDate';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -74,7 +75,8 @@ const Profile = () => {
 
   const formatDate = (value: string | undefined) => {
     if (!value) return '-';
-    return new Date(value).toLocaleDateString();
+    // App-wide dd.MM.yyyy, not the browser locale (en-US browsers showed 07/10/2024).
+    return fmtDate(value) ?? '-';
   };
 
   const handleSetPassphrase = async (e: FormEvent<HTMLFormElement>) => {

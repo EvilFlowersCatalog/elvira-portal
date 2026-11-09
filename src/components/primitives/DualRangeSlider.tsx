@@ -1,5 +1,6 @@
 import { ChangeEvent, useCallback } from 'react';
 import { twMerge } from 'tailwind-merge';
+import { useTranslation } from 'react-i18next';
 
 interface DualRangeSliderProps {
   min: number;
@@ -26,6 +27,7 @@ const THUMB_CLASSES = `
 
 /** Two overlaid native range inputs (track hidden, only thumbs clickable) driving a single [from, to] value. */
 export default function DualRangeSlider({ min, max, value, onChange, onFinish, className }: DualRangeSliderProps) {
+  const { t } = useTranslation();
   const span = Math.max(max - min, 1);
   const [from, to] = value;
   const fromPct = ((from - min) / span) * 100;
@@ -54,7 +56,7 @@ export default function DualRangeSlider({ min, max, value, onChange, onFinish, c
         onChange={handleFromChange}
         onMouseUp={onFinish}
         onTouchEnd={onFinish}
-        aria-label="minimum"
+        aria-label={t('common.rangeFrom')}
         className={twMerge(THUMB_CLASSES, 'z-10')}
       />
       <input
@@ -65,7 +67,7 @@ export default function DualRangeSlider({ min, max, value, onChange, onFinish, c
         onChange={handleToChange}
         onMouseUp={onFinish}
         onTouchEnd={onFinish}
-        aria-label="maximum"
+        aria-label={t('common.rangeTo')}
         className={twMerge(THUMB_CLASSES, 'z-20')}
       />
     </div>

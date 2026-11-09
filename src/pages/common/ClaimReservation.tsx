@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { fmtDateTime } from '../../utils/func/adminDate';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { FiCheckCircle, FiAlertCircle } from 'react-icons/fi';
@@ -134,8 +135,8 @@ const ClaimReservation = () => {
                 {reservation.claim_deadline && (
                   <p className="text-[13px] text-[#9f6c00]">
                     {t('claim.deadline', {
-                      date: new Date(reservation.claim_deadline).toLocaleString(),
-                      defaultValue: `Claim before ${new Date(reservation.claim_deadline).toLocaleString()}`,
+                      date: fmtDateTime(reservation.claim_deadline),
+                      defaultValue: `Claim before ${fmtDateTime(reservation.claim_deadline)}`,
                     })}
                   </p>
                 )}

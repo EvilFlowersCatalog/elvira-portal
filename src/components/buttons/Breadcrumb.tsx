@@ -71,6 +71,7 @@ const Breadcrumb = () => {
     ['search']: isEn() ? 'Search' : 'Vyhľadávanie',
     ['viewer']: isEn() ? 'PDF Viewer' : 'PDF Viewer',
     ['ai']: isEn() ? 'AI Assistant' : 'AI Asistent',
+    ['claim']: isEn() ? 'Claim reservation' : 'Vyzdvihnutie rezervácie',
   };
   const getFeedDetail = useGetFeedDetail();
   const getCategoryDetail = useGetCategoryDetail();
@@ -181,7 +182,9 @@ const Breadcrumb = () => {
       }
     }
 
-    setBreadcrumbs(newBreadcrumbs);
+    // Segments without a label (ids, routes with no page of their own) would
+    // render as an empty "›" crumb — drop them.
+    setBreadcrumbs(newBreadcrumbs.filter((b) => b.label));
   }, [location, lang, editingEntryTitle, feeds, feedStep, authorFilter, feedFilter, resolvedFeedFilter, categoryFilter, resolvedCategoryFilters]);
 
   useEffect(() => {

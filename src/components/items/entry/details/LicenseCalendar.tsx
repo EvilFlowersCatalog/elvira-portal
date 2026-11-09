@@ -321,7 +321,7 @@ export default function LicenseCalendar() {
                       key={opt.val}
                       className={`flex items-center gap-3 px-4 py-3 rounded-[7px] border text-left transition-colors ${
                         selectedDuration === opt.val
-                          ? 'bg-[#e6f3ff] border-primary'
+                          ? 'bg-[#e6f3ff] border-primary dark:bg-sky-900/40'
                           : 'bg-white dark:bg-zinc-700 border-[#e5e5e5] dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-600'
                       }`}
                       onClick={() => setSelectedDuration(opt.val)}

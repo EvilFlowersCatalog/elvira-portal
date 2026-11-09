@@ -12,7 +12,7 @@ import DataTable, { DataTableColumn } from '../DataTable';
 import StatusChip, { StatusVariant } from '../StatusChip';
 import SearchField from '../SearchField';
 import ConfirmDialog from '../ConfirmDialog';
-import UserLink from '../UserLink';
+import UserLink, { userDisplayName } from '../UserLink';
 
 const DEFAULT_LIMIT = 10;
 // Newest loans first; the API's own default is oldest-created first.
@@ -220,11 +220,19 @@ export default function LoansTable({ userId, onTotal }: LoansTableProps) {
       <ConfirmDialog
         open={pendingAction !== null}
         title={t('administration.loansPage.confirmTitle')}
-        message={
-          pendingAction?.action === LICENSE_ACTION.revoked
-            ? t('administration.loansPage.confirmRevoke')
-            : t('administration.loansPage.confirmCancel')
-        }
+        message={(() => {
+          // Name the book and the reader: from a long list, "this loan" is easy to get wrong.
+          const lic = pendingAction?.license;
+          const owner = lic ? users[lic.user_id] : undefined;
+          const params = {
+            title: lic?.entry?.title || '—',
+            user: owner ? ` (${userDisplayName(owner)})` : '',
+            interpolation: { escapeValue: false },
+          };
+          return pendingAction?.action === LICENSE_ACTION.revoked
+            ? t('administration.loansPage.confirmRevoke', params)
+            : t('administration.loansPage.confirmCancel', params);
+        })()}
         confirmLabel={t('administration.loansPage.confirm')}
         cancelLabel={t('administration.loansPage.cancelBtn')}
         destructive

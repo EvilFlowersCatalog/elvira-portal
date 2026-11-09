@@ -71,7 +71,8 @@ const PartialDateInput = ({ label, value, onChange }: PartialDateInputProps) => 
   return (
     <fieldset className='w-full flex flex-col gap-1'>
       <legend className='text-sm pl-1 mb-1 text-black dark:text-white'>{label}</legend>
-      <div className='grid grid-cols-[2fr_1fr_1fr] gap-2'>
+      {/* "Mesiac" is the longest placeholder: give month the widest column so it isn't clipped in the sidebar. */}
+      <div className='grid grid-cols-[minmax(0,1.1fr)_minmax(0,1.3fr)_minmax(0,1fr)] gap-2'>
         <ElviraInput
           label='false'
           inputMode='numeric'

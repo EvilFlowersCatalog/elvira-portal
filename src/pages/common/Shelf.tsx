@@ -44,6 +44,7 @@ const Shelf = () => {
       title={t('navbarMenu.myShelf')}
       shouldRedirectSuggestions={true}
       entryScope={ids === null ? null : { ids }}
+      emptyMessage={t('page.shelfEmpty')}
     >
       <EntriesWrapper>
         {list.items.map((entry) => (

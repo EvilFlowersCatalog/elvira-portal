@@ -51,6 +51,9 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
   const embargoUntil = policy ? addDays(parseISO(license.created_at), policy.embargo_days) : null;
   const underEmbargo = embargoUntil ? embargoUntil > new Date() : false;
   const capReached = license.renewals_remaining === 0;
+  // Every refusal the policy box already explains — don't let the user fire a
+  // request we know the server will 403.
+  const cannotRenew = underEmbargo || capReached || exceedsBound(newExpiry);
 
   const handleExtend = async () => {
     setLoading(true);
@@ -173,7 +176,7 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
                         disabled
                           ? 'bg-gray-100 dark:bg-zinc-800 border-[#e5e5e5] dark:border-zinc-700 opacity-50 cursor-not-allowed'
                           : selected === opt.val
-                            ? 'bg-[#e6f3ff] border-[#0077cc]'
+                            ? 'bg-[#e6f3ff] border-[#0077cc] dark:bg-sky-900/40 dark:border-sky-400'
                             : 'bg-white dark:bg-zinc-700 border-[#e5e5e5] dark:border-zinc-600 hover:bg-gray-50 dark:hover:bg-zinc-600'
                       }`}
                       onClick={() => !disabled && setSelected(opt.val)}
@@ -230,8 +233,8 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
                 {t(`${M}.cancel`, { defaultValue: 'Cancel' })}
               </button>
               <button
-                disabled={loading}
-                className="h-[35px] w-[170px] rounded-[7px] bg-primary text-onPrimary text-sm font-medium hover:bg-primaryDark transition-colors disabled:opacity-60 shadow"
+                disabled={loading || cannotRenew}
+                className="h-[35px] w-[170px] rounded-[7px] bg-primary text-onPrimary text-sm font-medium hover:bg-primaryDark transition-colors disabled:opacity-60 disabled:cursor-not-allowed shadow"
                 onClick={handleExtend}
               >
                 {loading
