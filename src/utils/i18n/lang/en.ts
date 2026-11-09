@@ -1077,8 +1077,7 @@ export const en = {
       language: 'Language',
       availability: 'Availability',
       rating: 'Rating',
-      ratingAny: 'Any rating',
-      ratingAtLeast: '{{value}} stars & up',
+      ratingAtLeast: '{{value}}+',
     },
 
     // ENTRY COMPONENT
