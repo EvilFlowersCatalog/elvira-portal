@@ -8,6 +8,7 @@ import {
   FiKey,
   FiTag,
   FiEdit3,
+  FiStar,
 } from 'react-icons/fi';
 import { FaBook } from 'react-icons/fa';
 import { MdOutlineCollectionsBookmark, MdOutlineLibraryBooks, MdOutlineInventory2 } from 'react-icons/md';
@@ -46,6 +47,7 @@ const GROUPS: NavGroup[] = [
       { key: 'collections', path: NAVIGATION_PATHS.adminFeeds, icon: <MdOutlineCollectionsBookmark size={ICON} /> },
       { key: 'categories', path: NAVIGATION_PATHS.adminCategories, icon: <FiTag size={ICON} /> },
       { key: 'authors', path: NAVIGATION_PATHS.adminAuthors, icon: <FiEdit3 size={ICON} /> },
+      { key: 'reviews', path: NAVIGATION_PATHS.adminReviews, icon: <FiStar size={ICON} /> },
       { key: 'catalogs', path: NAVIGATION_PATHS.adminCatalogs, icon: <MdOutlineLibraryBooks size={ICON} /> },
     ],
   },

@@ -249,6 +249,7 @@ export const sk = {
         users: 'Používatelia',
         access: 'Prístup a kľúče',
         loans: 'Výpožičky a rezervácie',
+        reviews: 'Recenzie',
         soon: 'Čoskoro',
       },
       dashboard: {
@@ -332,6 +333,20 @@ export const sk = {
         deleted: 'Katalóg odstránený',
         saveError: 'Nepodarilo sa uložiť katalóg.',
         deleteError: 'Nepodarilo sa odstrániť katalóg.',
+      },
+      reviewsPage: {
+        title: 'Recenzie',
+        description: 'Hodnotenia a recenzie publikácií katalógu. Recenzie porušujúce pravidlá môžete skryť.',
+        searchPlaceholder: 'Hľadať publikáciu, recenzenta alebo text…',
+        publication: 'Publikácia',
+        reviewer: 'Recenzent',
+        rating: 'Hodnotenie',
+        review: 'Recenzia',
+        state: 'Stav',
+        createdAt: 'Vytvorené',
+        anyRating: 'Akékoľvek hodnotenie',
+        empty: 'Žiadne recenzie.',
+        loadError: 'Recenzie sa nepodarilo načítať.',
       },
       authorsPage: {
         title: 'Autori',

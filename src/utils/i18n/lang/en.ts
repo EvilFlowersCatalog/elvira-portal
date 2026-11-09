@@ -249,6 +249,7 @@ export const en = {
         users: 'Users',
         access: 'Access & Keys',
         loans: 'Loans & Reservations',
+        reviews: 'Reviews',
         soon: 'Soon',
       },
       dashboard: {
@@ -332,6 +333,20 @@ export const en = {
         deleted: 'Catalog deleted',
         saveError: 'Could not save the catalog.',
         deleteError: 'Could not delete the catalog.',
+      },
+      reviewsPage: {
+        title: 'Reviews',
+        description: 'Ratings and reviews of the catalog’s publications. Hide reviews that break the rules.',
+        searchPlaceholder: 'Search publication, reviewer or text…',
+        publication: 'Publication',
+        reviewer: 'Reviewer',
+        rating: 'Rating',
+        review: 'Review',
+        state: 'State',
+        createdAt: 'Created',
+        anyRating: 'Any rating',
+        empty: 'No reviews.',
+        loadError: 'Reviews could not be loaded.',
       },
       authorsPage: {
         title: 'Authors',

@@ -42,6 +42,7 @@ const AdminFeeds = lazy(() => import('../pages/admin/AdminFeeds'));
 const AdminCategories = lazy(() => import('../pages/admin/AdminCategories'));
 const AdminCatalogs = lazy(() => import('../pages/admin/AdminCatalogs'));
 const AdminAuthors = lazy(() => import('../pages/admin/AdminAuthors'));
+const AdminReviews = lazy(() => import('../pages/admin/AdminReviews'));
 const AdminAccess = lazy(() => import('../pages/admin/AdminAccess'));
 const AdminUsers = lazy(() => import('../pages/admin/AdminUsers'));
 const AdminUserProfile = lazy(() => import('../pages/admin/AdminUserProfile'));
@@ -114,6 +115,7 @@ const BaseRoutes = () => {
                 <Route path='categories' element={<AdminCategories />} />
                 <Route path='catalogs' element={<AdminCatalogs />} />
                 <Route path='authors' element={<AdminAuthors />} />
+                <Route path='reviews' element={<AdminReviews />} />
                 <Route path='access' element={<AdminAccess />} />
                 <Route path='users'>
                   <Route index element={<AdminUsers />} />

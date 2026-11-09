@@ -32,6 +32,16 @@ export interface IReview {
   moderation_note?: string;
 }
 
+/** `GET /api/v1/reviews` (moderators): a review with the entry it reviews. */
+export interface IAdminReview extends IReview {
+  entry: { id: string; title: string; catalog_id: string };
+}
+
+export interface IAdminReviewList {
+  items: IAdminReview[];
+  metadata: IMetadata;
+}
+
 export interface IReviewList {
   items: IReview[];
   metadata: IMetadata;
