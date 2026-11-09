@@ -11,7 +11,8 @@ import useCategoriesQuery from "../../../hooks/api/categories/useCategoriesQuery
 import { IItemContainerList } from "../../../hooks/api/useInfiniteItemContainer";
 import useFeedsQuery from "../../../hooks/api/feeds/useFeedsQuery";
 import useEntryFacets from "../../../hooks/api/entries/useEntryFacets";
-import { EntryFilters, useEntryFilters } from "../../../hooks/api/entries/entryFilters";
+import { EntryFilters, RATING_MIN_PARAM, useEntryFilters } from "../../../hooks/api/entries/entryFilters";
+import { RatingStars } from "../entry/details/RatingStars";
 import { AcceptedLanguage, getLanguage, getLanguages } from "../../../hooks/api/languages/languages";
 import { IFeed } from "../../../utils/interfaces/feed";
 import { AvailabilityState } from "../entry/details/AvailabilityBadge";
@@ -28,6 +29,9 @@ const AVAILABILITY_OPTIONS: AvailabilityOption[] = [
     { value: 'borrowed',    labelKey: 'entry.detail.availability.borrowed' },
     { value: 'reserved',    labelKey: 'entry.detail.availability.reserved' },
 ];
+
+/** Minimum average rating choices; '' = any (no filter). */
+const RATING_MIN_OPTIONS = ['', '4', '3', '2'];
 
 function SectionDivider() {
     return <div className="h-px w-full bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)]" />;
@@ -275,6 +279,15 @@ export function AdvancedSearch({ entryScope, facets: providedFacets }: { entrySc
         performSearch();
     };
 
+    // Applied at once (no debounce): one click is one choice.
+    const ratingMin = searchParams.get(RATING_MIN_PARAM) ?? '';
+    const setRatingMin = (value: string) => {
+        const params = new URLSearchParams(searchParams);
+        if (value) params.set(RATING_MIN_PARAM, value);
+        else params.delete(RATING_MIN_PARAM);
+        setSearchParams(params, { replace: true });
+    };
+
     const availabilityOptions = AVAILABILITY_OPTIONS.map(o => ({
         label: t(o.labelKey),
         value: o.value,
@@ -312,6 +325,39 @@ export function AdvancedSearch({ entryScope, facets: providedFacets }: { entrySc
                             }
                         />
                     ))}
+                </div>
+            </div>
+
+            <SectionDivider />
+
+            {/* Hodnotenie: minimum average rating (IP-023) */}
+            <div className="flex flex-col gap-3">
+                <p className="text-[14px] font-medium text-darkGray dark:text-white tracking-[0.1px]">
+                    {t('searchBar.rating')}
+                </p>
+                <div className="flex flex-col gap-[7px]" role="radiogroup" aria-label={t('searchBar.rating')}>
+                    {RATING_MIN_OPTIONS.map(value => {
+                        const checked = ratingMin === value;
+                        return (
+                            <label key={value || 'any'} className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="rating-min"
+                                    className="accent-[var(--color-primary)] w-4 h-4"
+                                    checked={checked}
+                                    onChange={() => setRatingMin(value)}
+                                />
+                                <span className={`flex items-center gap-1.5 text-[14px] tracking-[0.1px] leading-[20px] ${checked ? 'font-medium' : 'font-normal'} text-darkGray dark:text-white`}>
+                                    {value ? (
+                                        <>
+                                            <RatingStars value={Number(value)} size={14} />
+                                            {t('searchBar.ratingAtLeast', { value })}
+                                        </>
+                                    ) : t('searchBar.ratingAny')}
+                                </span>
+                            </label>
+                        );
+                    })}
                 </div>
             </div>
 

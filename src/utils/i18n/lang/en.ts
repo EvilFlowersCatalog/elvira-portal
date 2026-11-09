@@ -1076,6 +1076,9 @@ export const en = {
       yearTo: 'To',
       language: 'Language',
       availability: 'Availability',
+      rating: 'Rating',
+      ratingAny: 'Any rating',
+      ratingAtLeast: '{{value}} stars & up',
     },
 
     // ENTRY COMPONENT

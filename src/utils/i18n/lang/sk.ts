@@ -1074,6 +1074,9 @@ export const sk = {
       yearTo: 'Do',
       language: 'Jazyk',
       availability: 'Dostupnosť',
+      rating: 'Hodnotenie',
+      ratingAny: 'Akékoľvek hodnotenie',
+      ratingAtLeast: '{{value}} a viac hviezdičiek',
     },
 
     // ENTRY COMPONENT
