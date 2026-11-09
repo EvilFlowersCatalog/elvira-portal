@@ -10,6 +10,8 @@ import { problemDetailMessage } from '../../utils/problemDetail';
 import useUpdateReservation from '../../hooks/api/reservations/useUpdateReservation';
 import useFocusTrap from '../../hooks/useFocusTrap';
 import useEscapeLayer from '../../hooks/useEscapeLayer';
+import useAuthContext from '../../hooks/contexts/useAuthContext';
+import { withAccessToken } from '../../utils/func/functions';
 
 const M = 'license.loansPage.modals';
 
@@ -28,6 +30,7 @@ export default function CancelReservationModal({ reservation, onClose, onSuccess
   const [loading, setLoading] = useState(false);
   const { cancelReservation } = useUpdateReservation();
   const { t } = useTranslation();
+  const { auth } = useAuthContext();
   const dialogRef = useFocusTrap(true);
 
   // Escape closes this dialog only, not the ones below it.
@@ -78,7 +81,11 @@ export default function CancelReservationModal({ reservation, onClose, onSuccess
 
         {/* Book info card */}
         <div className="bg-lightGray dark:bg-zinc-700 rounded-xl p-4 flex gap-3 items-center mb-8">
-          <div className="w-[55px] h-[78px] rounded-[5px] bg-gray-300 shrink-0" />
+          <img
+            alt=""
+            src={withAccessToken(reservation.entry?.thumbnail, auth?.token) ?? '/assets/thumbnail.webp'}
+            className="w-[55px] h-[78px] rounded-[5px] object-cover bg-gray-300 shrink-0"
+          />
           <div className="flex flex-col gap-2 min-w-0 flex-1">
             <p className="font-semibold text-sm text-secondary dark:text-secondaryLight truncate">
               {reservation.entry?.title || t(`${M}.unknownTitle`, { defaultValue: 'Unknown title' })}
@@ -87,7 +94,7 @@ export default function CancelReservationModal({ reservation, onClose, onSuccess
               {!isAvailable && (
                 <span className="flex items-center gap-1.5 text-xs px-2 py-0.5 rounded-[7px] bg-[#ffe5dd] border border-[#c30000] text-[#c30000]">
                   <HiOutlineUsers size={12} className="shrink-0" />
-                  {t(`${M}.queuePosition`, { defaultValue: 'Your position:' })} {reservation.position}. /{queueTotal}
+                  {t(`${M}.queuePosition`, { defaultValue: 'Your position:' })} {reservation.position} / {queueTotal}
                 </span>
               )}
               {!isAvailable && estimatedFrom && (

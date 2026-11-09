@@ -42,7 +42,32 @@ export const uuid = (): string => {
   return uuid;
 };
 
-export const updateMetaTag = (name: string, content: string | number) => {
+/** Max length of a feed `url_name` on the catalog side. */
+export const SLUG_MAX_LENGTH = 50;
+
+/**
+ * URL-safe slug: strips diacritics (`Nové knihy` → `nove-knihy`), lowercases,
+ * collapses every non-alphanumeric run into `-` and truncates to `maxLength`.
+ */
+export const slugify = (value: string, maxLength = SLUG_MAX_LENGTH): string =>
+  value
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, maxLength)
+    .replace(/-+$/, '');
+
+/** Next numbered variant of a slug: `novinky` → `novinky-2`, `novinky-2` → `novinky-3` (within `maxLength`). */
+export const nextSlug = (slug: string, maxLength = SLUG_MAX_LENGTH): string => {
+  const match = /^(.*)-(\d+)$/.exec(slug);
+  const base = match ? match[1] : slug;
+  const suffix = `-${match ? Number(match[2]) + 1 : 2}`;
+  return `${base.slice(0, maxLength - suffix.length).replace(/-+$/, '')}${suffix}`;
+};
+
+export const updateMetaTag =(name: string, content: string | number) => {
   document
     .querySelector(`meta[name=${name}]`)
     ?.setAttribute('content', content.toString());

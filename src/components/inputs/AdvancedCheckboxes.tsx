@@ -22,26 +22,29 @@ export default function AdvancedCheckboxes({
     const { t } = useTranslation();
     const [showMore, setShowMore] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
+    // Options with no books under the current search/filters stay hidden unless asked for.
+    const [showEmpty, setShowEmpty] = useState(false);
 
     const selectedKey = selected.join(',');
 
-    const visibleOptions = useMemo(
-        () => (counts
-            ? options
-                .filter(o => (counts[o.value] ?? 0) > 0 || selected.includes(o.value))
-                .sort((a, b) => (counts[b.value] ?? 0) - (counts[a.value] ?? 0))
-            : options),
+    const { visibleOptions, hiddenCount } = useMemo(() => {
+        if (!counts) return { visibleOptions: options, hiddenCount: 0 };
+        const withBooks = (o: { value: string }) => (counts[o.value] ?? 0) > 0 || selected.includes(o.value);
+        const shown = (showEmpty ? options : options.filter(withBooks))
+            .slice()
+            .sort((a, b) => (counts[b.value] ?? 0) - (counts[a.value] ?? 0));
+        return { visibleOptions: shown, hiddenCount: showEmpty ? 0 : options.length - shown.length };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-        [options, counts, selectedKey]
-    );
+    }, [options, counts, selectedKey, showEmpty]);
 
     const [filteredOptions, setFilteredOptions] = useState(visibleOptions);
 
     useEffect(() => {
         setFilteredOptions(visibleOptions);
-        setShowMore(false);
+        // "Show all" expands the list for good; otherwise new options start collapsed.
+        setShowMore(showEmpty);
         setSearchQuery('');
-    }, [visibleOptions]);
+    }, [visibleOptions, showEmpty]);
 
     const displayedOptions = showMore ? filteredOptions : filteredOptions.slice(0, 5);
     const remainingCount = filteredOptions.length - 5;
@@ -116,6 +119,15 @@ export default function AdvancedCheckboxes({
                     className="text-[14px] font-medium text-primary text-center tracking-[0.1px] leading-[20px] cursor-pointer"
                 >
                     {t('common.showLess')}
+                </button>
+            )}
+
+            {hiddenCount > 0 && (showMore || remainingCount <= 0) && (
+                <button
+                    onClick={() => setShowEmpty(true)}
+                    className="text-[13px] text-[#8a8a8a] dark:text-[#b1b1b1] text-center tracking-[0.1px] cursor-pointer hover:underline"
+                >
+                    {t('search.showAll')} (+{hiddenCount})
                 </button>
             )}
         </div>

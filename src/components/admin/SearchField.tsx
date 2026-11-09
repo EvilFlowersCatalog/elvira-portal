@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { FiSearch, FiX } from 'react-icons/fi';
 import { twMerge } from 'tailwind-merge';
 import useDebouncedValue from '../../hooks/useDebouncedValue';
+import { useTranslation } from 'react-i18next';
 import Tooltip from '../primitives/Tooltip';
 
 interface SearchFieldProps {
@@ -31,6 +32,7 @@ export default function SearchField({
   className,
   autoFocus,
 }: SearchFieldProps) {
+  const { t } = useTranslation();
   const [text, setText] = useState(value);
   const debounced = useDebouncedValue(text, debounceMs);
   const lastEmitted = useRef(value);
@@ -67,13 +69,14 @@ export default function SearchField({
         value={text}
         onChange={(e) => setText(e.target.value)}
         placeholder={placeholder}
-        className="flex-1 min-w-0 bg-transparent outline-none text-sm text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-400"
+        // Hide the browser's own clear (×) — the button below is the only one.
+        className="flex-1 min-w-0 bg-transparent outline-none text-sm text-zinc-800 dark:text-zinc-100 placeholder:text-zinc-400 [&::-webkit-search-cancel-button]:appearance-none"
       />
       {text && (
-        <Tooltip content="Clear search">
+        <Tooltip content={t('common.clearSearch')}>
           <button
             type="button"
-            aria-label="Clear search"
+            aria-label={t('common.clearSearch')}
             onClick={() => setText('')}
             className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-200 shrink-0"
           >

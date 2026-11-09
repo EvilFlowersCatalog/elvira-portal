@@ -203,6 +203,7 @@ const AdminFeeds = () => {
         defaultParentId={drawerMode === 'create' ? currentParent : null}
         onClose={() => setDrawerOpen(false)}
         onSaved={fetchFeeds}
+        onOpenFeed={openEdit}
       />
     </div>
   );

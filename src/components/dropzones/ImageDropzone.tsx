@@ -13,6 +13,8 @@ interface IDragzoneParams {
   errorMessage: string;
   value?: File | null;
   setFile: (file: File | null) => void;
+  /** Accessible name of the icon-only remove button. */
+  removeLabel?: string;
 }
 const ImageDropzone = ({
   title,
@@ -22,6 +24,7 @@ const ImageDropzone = ({
   errorMessage,
   value = null,
   setFile,
+  removeLabel,
 }: IDragzoneParams) => {
   const { umamiTrack } = useAppContext();
 
@@ -76,20 +79,21 @@ const ImageDropzone = ({
       })}>
       <input {...getInputProps()} />
       {fileName && fileSize ? (
-        <div className='w-full h-64 flex flex-col justify-center items-center relative p-5'>
+        // The cover itself is the preview (rendered underneath by the parent);
+        // keep the file details to a small caption so they don't cover it.
+        <div className='w-full h-full relative'>
           <button
-            className='absolute z-30 top-2 right-2 p-2 hover:bg-white dark:hover:bg-darkGray text-black dark:text-white rounded-md'
+            className='absolute z-30 top-1 right-1 p-1.5 bg-white/80 hover:bg-white dark:bg-darkGray/80 dark:hover:bg-darkGray text-black dark:text-white rounded-md'
             onClick={handleRemoveFile}
             type='button'
+            aria-label={removeLabel}
+            title={removeLabel}
           >
-            <IoMdClose size={20} />
+            <IoMdClose size={18} />
           </button>
-          <span className='uppercase text-lg text-center font-extrabold text-black dark:text-white'>
-            {fileName}
-          </span>
-          <span className='text-sm italic text-center font-extralight text-black dark:text-white'>
-            {fileSize}
-          </span>
+          <div className='absolute inset-x-0 bottom-0 bg-black/60 px-2 py-1 text-[11px] text-white truncate' title={fileName}>
+            {fileName} · {fileSize}
+          </div>
         </div>
       ) : (
         <div className='w-full h-full flex flex-col justify-center items-center p-5'>

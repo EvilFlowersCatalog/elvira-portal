@@ -27,22 +27,36 @@ const toCounts = <T extends { count: number }>(rows: T[], key: (row: T) => strin
  * dimension with every active filter applied except its own, so a selected
  * language still lists the other languages that could be OR-ed in.
  */
-const useEntryFacets = (filters: EntryFilters, options?: { enabled?: boolean }): IEntryFacetCounts => {
+const useEntryFacets = (
+  filters: EntryFilters,
+  options?: {
+    enabled?: boolean;
+    /** Facets that came with the entries list (`include=facets`) — no request of its own then. */
+    provided?: { data: IEntryFacets | null | undefined; ready: boolean; failed: boolean };
+  }
+): IEntryFacetCounts => {
   const axios = useAxios();
+  const provided = options?.provided;
   // Ordering doesn't change the counts — keep it out of the key so sorting doesn't refetch.
   const facetFilters: EntryFilters = { ...filters, orderBy: undefined };
 
-  const { data, isSuccess, isError } = useQuery({
+  const fetched = useQuery({
     queryKey: ['entry-facets', facetFilters],
-    queryFn: async () => {
+    queryFn: async ({ signal }) => {
       const { data } = await axios.get<{ response: IEntryFacets }>('/api/v1/entries/facets', {
         params: buildEntryFilterParams(facetFilters),
+        signal,
       });
       return data.response;
     },
-    enabled: options?.enabled ?? true,
+    enabled: !provided && (options?.enabled ?? true),
     placeholderData: keepPreviousData,
   });
+
+  const data = provided ? provided.data ?? undefined : fetched.data;
+  const isSuccess = provided ? provided.ready : fetched.isSuccess;
+  // A list without facets (older catalog) counts as a failure: show every option.
+  const isError = provided ? provided.failed || (provided.ready && !provided.data) : fetched.isError;
 
   return useMemo(() => {
     // The backend counts raw `lcp_state` values; sum them into the sidebar's states

@@ -54,6 +54,7 @@ export interface ILicense {
   updated_at: string;
   renewal_count: number;
   renewals_remaining: number | null;
+  renewable_from?: string | null;
 }
 
 export interface ILicenseDetail {

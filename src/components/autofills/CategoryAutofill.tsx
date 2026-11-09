@@ -164,11 +164,16 @@ const CategoryAutofill = ({
         <ul
           className={`absolute top-[60px] rounded-md rounded-t-none border-primary list-none max-h-40 overflow-y-scroll bg-white dark:bg-darkGray z-20 w-full
           shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A]`}
+          // Keep focus on the input so the click on a suggestion lands (see FeedAutofill).
+          role='listbox'
+          onMouseDown={(e) => e.preventDefault()}
           onMouseEnter={() => setIsHovering(true)}
           onMouseLeave={() => setIsHovering(false)}
         >
           {suggestions.map((category, index) => (
             <li
+              role='option'
+              aria-selected={false}
               key={index}
               className='bg-white dark:bg-darkGray hover:bg-zinc-200 dark:hover:bg-darkGray'
               onClick={() => handleSuggestionClick(category)}

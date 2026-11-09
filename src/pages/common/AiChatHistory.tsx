@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { fmtDate } from '../../utils/func/adminDate';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { IAssistantChat } from '../../utils/interfaces/assistant';
@@ -113,7 +114,7 @@ const AiChatHistory = () => {
     } else if (diffDays < 7) {
       return t('assistant.daysAgo', { count: diffDays });
     } else {
-      return date.toLocaleDateString();
+      return fmtDate(date.toISOString());
     }
   };
 

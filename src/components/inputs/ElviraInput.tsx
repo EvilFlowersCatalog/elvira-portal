@@ -105,7 +105,9 @@ const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
               bg-white shadow-[0px_4px_12px_0px_#0000001A] dark:shadow-[0px_4px_12px_0px_#9999991A] dark:bg-strongDarkGray outline-none rounded-md`, className)}
             style={{ paddingLeft: `${resolvedPaddingLeft}px` }}
             required={required}
-            placeholder={nativePlaceholder ?? (!isAnimated ? placeholder : '')}
+            // Static labels ('false'/'icon') have no floating span to carry the
+            // required marker, so it goes on the placeholder itself.
+            placeholder={nativePlaceholder ?? (!isAnimated ? (required && placeholder ? `${placeholder} *` : placeholder) : '')}
             onChange={handleChange}
             onInvalid={handleInvalid}
             onFocus={handleFocus}

@@ -4,6 +4,17 @@ export const sk = {
       showMore: '{{count}} ďalších',
       showLess: 'Zobraziť menej',
       loading: 'Načítavanie',
+      close: 'Zavrieť',
+      clearSearch: 'Vymazať vyhľadávanie',
+      sortBy: 'Zoradiť podľa',
+      thumbnail: 'Obálka: {{title}}',
+      send: 'Odoslať',
+      rangeFrom: 'Od',
+      rangeTo: 'Do',
+    },
+    myShelf: {
+      add: 'Uložiť na poličku',
+      remove: 'Odstrániť z poličky',
     },
     assistant: {
       title: 'AI Asistent',
@@ -374,7 +385,19 @@ export const sk = {
         createTitle: 'Nová zbierka',
         titleRequired: 'Slovenský názov je povinný',
         content: 'Popis',
-        urlNameHint: 'Jedinečný identifikátor použitý v URL. Ak je prázdny, vygeneruje sa automaticky.',
+        contentRequired: 'Popis je povinný',
+        urlNameHint: 'Jedinečná adresa zbierky v katalógu. Odvodí sa z názvu, kým ju neupravíte.',
+        address: 'Adresa',
+        urlNameRequired: 'Adresa je povinná (použite písmená alebo číslice)',
+        urlNameChecking: 'Overujem dostupnosť…',
+        urlNameAvailable: 'Adresa je voľná',
+        urlNameTakenBy: 'Už ju používa zbierka „{{title}}“.',
+        urlNameTakenGeneric: 'Túto adresu už používa iná zbierka.',
+        urlNameOpenConflict: 'Otvoriť',
+        urlNameUseSuggestion: 'Použiť',
+        urlNameAutoAdjusted: '„{{slug}}“ už používa zbierka „{{title}}“, preto sme pridali číslo.',
+        sameTitleHint: 'Rovnaký názov má aj iná zbierka („{{title}}“).',
+        sameTitleHintInFolder: 'Rovnaký názov má aj iná zbierka („{{title}}“ v priečinku {{folder}}).',
         save: 'Uložiť zmeny',
         create: 'Vytvoriť zbierku',
         cancel: 'Zrušiť',
@@ -768,6 +791,10 @@ export const sk = {
           cancel: 'Zrušiť',
           created: 'API kľúč vytvorený',
           createError: 'Nepodarilo sa vytvoriť kľúč.',
+          createdTitle: 'Kľúč je pripravený',
+          tokenOnceWarning: 'Token si skopírujte teraz. Zobrazí sa len tento raz — po zatvorení ho už nebude možné zobraziť; pri strate kľúč odstráňte a vytvorte nový.',
+          tokenHidden: 'Zobrazený len pri vytvorení',
+          done: 'Hotovo',
           delete: 'Odstrániť kľúč',
           deleteConfirmTitle: 'Odstrániť API kľúč?',
           deleteConfirmBody: 'Každá integrácia používajúca „{{name}}“ prestane fungovať. Túto akciu nie je možné vrátiť.',
@@ -836,8 +863,8 @@ export const sk = {
           cancelled: 'Zrušiť',
         },
         confirmTitle: 'Potvrdiť akciu',
-        confirmRevoke: 'Odobrať túto výpožičku? Čitateľ okamžite stratí prístup.',
-        confirmCancel: 'Zrušiť túto výpožičku?',
+        confirmRevoke: 'Odobrať výpožičku „{{title}}“{{user}}? Čitateľ okamžite stratí prístup.',
+        confirmCancel: 'Zrušiť výpožičku „{{title}}“{{user}}?',
         confirm: 'Potvrdiť',
         cancelBtn: 'Späť',
         reservations: {
@@ -878,6 +905,10 @@ export const sk = {
     },
 
     // NAVBAR MENU
+    navbar: {
+      expand: 'Rozbaliť bočný panel',
+      collapse: 'Zbaliť bočný panel',
+    },
     navbarMenu: {
       portal: 'Hlavné Menu',
       personal: 'Osobné',
@@ -922,6 +953,7 @@ export const sk = {
       searchSmart: '"knihy o umelej inteligencii", "rozdiel medzi IPv4 a IPv6"',
     },
     search: {
+      filterByFeed: 'Filtrovať podľa zbierky',
       smartOn: 'Zapnúť inteligentné vyhľadávanie',
       smartOff: 'Vypnúť inteligentné vyhľadávanie',
       // Suggestions dropdown
@@ -931,6 +963,18 @@ export const sk = {
       categories: 'Kategórie',
       noResults: 'Žiadne výsledky pre „{{query}}“',
       seeAll: 'Zobraziť všetky výsledky pre „{{query}}“',
+      didYouMean: 'Mysleli ste',
+      relaxed: 'Presná zhoda sa nenašla, zobrazujeme súvisiace výsledky.',
+      showAll: 'Zobraziť všetky',
+      matchedIn: 'Zhoda v',
+      matched: {
+        title: 'názov',
+        author: 'autor',
+        category: 'kategória',
+        summary: 'text',
+        publisher: 'vydavateľ',
+        semantic: 'súvisiace',
+      },
     },
 
     profile: {
@@ -1025,6 +1069,7 @@ export const sk = {
     // ENTRY COMPONENT
     entry: {
       detail: {
+        openDetail: 'Otvoriť detail',
         close: 'Zavrieť',
         add: 'Uložiť',
         remove: 'Odstrániť',
@@ -1075,6 +1120,10 @@ export const sk = {
           borrowedUntil: 'Požičané do',
           reserved: 'Rezervované',
           unavailable: 'Nedostupné',
+          queuePosition: '{{position}}. v poradí',
+          availableInDays_one: 'o ~{{count}} deň',
+          availableInDays_few: 'o ~{{count}} dni',
+          availableInDays_other: 'o ~{{count}} dní',
         },
         cancelReservation: 'Zrušiť',
         reserve: 'Rezervovať',
@@ -1135,6 +1184,7 @@ export const sk = {
         imageAndFile: 'Obrázok a PDF',
         image: 'Obrázok',
         imageHint: 'Presuňte sem váš obrázok alebo kliknite na prehľadávanie',
+        removeImage: 'Odstrániť obrázok',
         pdfHint: 'Presuňte sem Vaše PDF súbory',
         download: 'Stiahnutie',
         share: 'Zdielanie',
@@ -1171,6 +1221,17 @@ export const sk = {
     },
 
     license: {
+      // Refusals keyed by the API's `additional_data.code` (renewal 403, activation 409).
+      errors: {
+        terminal_state: 'Výpožička sa už skončila ({{state}}).',
+        renewal_cap: 'Dosiahnutý limit predĺžení ({{renewal_count}} z {{max_renewals}}).',
+        queue: 'Výpožičku nemožno predĺžiť, na titul čakajú ďalší čitatelia.',
+        embargo: 'Na predĺženie je ešte priskoro. Predĺžiť bude možné od {{renewable_from}}.',
+        embargo_no_date: 'Na predĺženie je ešte priskoro.',
+        exceeds_max_window: 'Predĺženie môže siahať najviac {{max_renew_days}} dní dopredu.',
+        end_in_past: 'Nový koniec výpožičky musí byť v budúcnosti.',
+        activation_by_device_only: 'Výpožička sa aktivuje až otvorením v čítačke (napr. Thorium).',
+      },
       success: {
         openThorium: 'Otvoriť v Thorium',
         downloadFile: 'Stiahnuť súbor',
@@ -1274,7 +1335,7 @@ export const sk = {
           exceedsMaxWindow: 'Presahuje maximálne okno {{days}} dní',
           unavailableExceedsWindow: 'Nedostupné — presahuje {{days}}-dňové okno',
           renewalPolicy:
-            'Výpožičku možno predĺžiť najskôr {{embargoDays}} dní po vypožičaní a najviac o {{maxRenewDays}} dní dopredu. Predĺženie nie je možné, ak na titul čakajú ďalší používatelia.',
+            'Výpožičku možno prvýkrát predĺžiť po uplynutí polovice výpožičky (najneskôr {{embargoDays}} dní od jej začiatku) a najviac o {{maxRenewDays}} dní dopredu. Predĺženie nie je možné, ak na titul čakajú ďalší používatelia.',
           maxRenewals: ' Maximálny počet predĺžení: {{max}}.',
           embargoNotice: 'Túto výpožičku bude možné predĺžiť až od {{date}}.',
           capReachedNotice: 'Dosiahli ste maximálny počet predĺžení.',
@@ -1386,12 +1447,13 @@ export const sk = {
       clearFilters: 'Zrušiť filtre',
       activeFilters: 'Aktívne filtre:',
       orderBy: {
-        createdAtAsc: 'Najnovšie',
-        createdAtDesc: 'Najstaršie',
+        createdAtAsc: 'Najstaršie',
+        createdAtDesc: 'Najnovšie',
         titleAsc: 'A-Z',
         titleDesc: 'Z-A',
         popularityAsc: 'Najmenej populárne',
         popularityDesc: 'Najpopulárnejšie',
+        relevance: 'Najrelevantnejšie',
       },
     },
 

@@ -7,7 +7,8 @@ import { IoClose } from "react-icons/io5";
 import AdvancedCheckboxes from "../../inputs/AdvancedCheckboxes";
 import Checkbox from "../../primitives/Checkbox";
 import DualRangeSlider from "../../primitives/DualRangeSlider";
-import useGetCategories from "../../../hooks/api/categories/useGetCategories";
+import useCategoriesQuery from "../../../hooks/api/categories/useCategoriesQuery";
+import { IItemContainerList } from "../../../hooks/api/useInfiniteItemContainer";
 import useFeedsQuery from "../../../hooks/api/feeds/useFeedsQuery";
 import useEntryFacets from "../../../hooks/api/entries/useEntryFacets";
 import { EntryFilters, useEntryFilters } from "../../../hooks/api/entries/entryFilters";
@@ -33,8 +34,9 @@ function SectionDivider() {
 }
 
 type EntryScope = Partial<EntryFilters> | null | undefined;
+type ProvidedFacets = IItemContainerList['facets'];
 
-export function AdvancedSearchWrapper({ children, enabled = true, entryScope }: { children: React.ReactNode; enabled?: boolean; entryScope?: EntryScope }) {
+export function AdvancedSearchWrapper({ children, enabled = true, entryScope, facets }: { children: React.ReactNode; enabled?: boolean; entryScope?: EntryScope; facets?: ProvidedFacets }) {
     const { showAdvancedSearch, setShowAdvancedSearch } = useAppContext();
 
     if (!enabled) return <div className="w-full pt-3">{children}</div>;
@@ -51,7 +53,7 @@ export function AdvancedSearchWrapper({ children, enabled = true, entryScope }: 
                     sticky top-0 z-2 pb-32 h-screen
                 `}
             >
-                <AdvancedSearch entryScope={entryScope} />
+                <AdvancedSearch entryScope={entryScope} facets={facets} />
             </div>
             {/* Mobile fixed top/bottom sheet */}
             <div
@@ -68,7 +70,7 @@ export function AdvancedSearchWrapper({ children, enabled = true, entryScope }: 
                 <div className="pt-4 mb-2">
                     <IoClose size={24} className="absolute top-3 right-3 cursor-pointer" onClick={() => setShowAdvancedSearch(false)} />
                 </div>
-                <AdvancedSearch entryScope={entryScope} />
+                <AdvancedSearch entryScope={entryScope} facets={facets} />
             </div>
             <div className="w-full pt-3">
                 {children}
@@ -80,8 +82,10 @@ export function AdvancedSearchWrapper({ children, enabled = true, entryScope }: 
 /**
  * `entryScope` bounds the facet counts to the entries the page lists (e.g. the
  * shelf's ids). `undefined` = the whole catalog, `null` = scope still loading.
+ * `facets` are counts that came with the page's list (`include=facets`); given
+ * them, the sidebar makes no facets request of its own.
  */
-export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
+export function AdvancedSearch({ entryScope, facets: providedFacets }: { entryScope?: EntryScope; facets?: ProvidedFacets }) {
     const [searchParams, setSearchParams] = useSearchParams();
     const { t, i18n } = useTranslation();
 
@@ -95,12 +99,14 @@ export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
     // the pre-filled facet bound otherwise.
     const [focusedYear, setFocusedYear] = useState<0 | 1 | null>(null);
 
-    const getCategories = useGetCategories();
     const filters = useEntryFilters();
     const scopeLoading = entryScope === null;
     // An empty `ids` scope (empty shelf) would count the whole catalog — nothing to facet.
     const emptyScope = entryScope?.ids === '';
-    const facets = useEntryFacets({ ...filters, ...entryScope }, { enabled: !scopeLoading && !emptyScope });
+    const facets = useEntryFacets(
+        { ...filters, ...entryScope },
+        { enabled: !scopeLoading && !emptyScope, provided: providedFacets }
+    );
     // Counts drive which options are shown: `{}` hides everything but the selection
     // (still loading / empty scope), `undefined` shows every option without counts
     // (facets request failed — don't lock the user out of filtering).
@@ -124,8 +130,11 @@ export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
         const bound = index === 0 ? facets.years.min : facets.years.max;
         return facets.ready && bound != null ? String(bound) : '';
     };
-    const [allCategories, setAllCategories] = useState<ICategory[]>([]);
-    const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+    // Categories list (cached/deduped by React Query — one request for the toolbar
+    // and both sidebars).
+    const { data: categoriesData, isSuccess: categoriesOk, isError: categoriesFailed } = useCategoriesQuery();
+    const allCategories = useMemo<ICategory[]>(() => categoriesData?.items ?? [], [categoriesData]);
+    const categoriesLoaded = categoriesOk || categoriesFailed;
     const [activeCategories, setActiveCategories] = useState<ICategory[]>([]);
 
     const [activeFeeds, setActiveFeeds] = useState<IFeed[]>([]);
@@ -139,24 +148,6 @@ export function AdvancedSearch({ entryScope }: { entryScope?: EntryScope }) {
 
     const unresolvedCategoryIds = useRef<string[]>([]);
     const unresolvedFeedIds = useRef<string[]>([]);
-
-    useEffect(() => {
-        let cancelled = false;
-        hydrated.current = false;
-        setCategoriesLoaded(false);
-
-        (async () => {
-            try {
-                const { items: itemsCategories } = await getCategories({ paginate: false });
-                if (!cancelled) setAllCategories(itemsCategories);
-            } finally {
-                if (!cancelled) setCategoriesLoaded(true);
-            }
-        })();
-
-        return () => { cancelled = true; };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const performSearch = () => {
         if (!hydrated.current) return;

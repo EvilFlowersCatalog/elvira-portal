@@ -16,6 +16,7 @@ import {
   setFeedIds,
 } from '../../utils/func/filterParams';
 import { withRememberedSearch } from '../../utils/func/listSearch';
+import { AUTHOR_ID_PARAM, setAuthorParams } from '../../hooks/api/entries/entryFilters';
 import { localize } from '../../utils/func/localized';
 import { LocalizedText } from '../../utils/interfaces/general/general';
 
@@ -70,6 +71,7 @@ const Breadcrumb = () => {
     ['search']: isEn() ? 'Search' : 'Vyhľadávanie',
     ['viewer']: isEn() ? 'PDF Viewer' : 'PDF Viewer',
     ['ai']: isEn() ? 'AI Assistant' : 'AI Asistent',
+    ['claim']: isEn() ? 'Claim reservation' : 'Vyzdvihnutie rezervácie',
   };
   const getFeedDetail = useGetFeedDetail();
   const getCategoryDetail = useGetCategoryDetail();
@@ -150,7 +152,9 @@ const Breadcrumb = () => {
       // Build current filter params
       const buildFilterPath = (includeFilters: { author?: boolean; feed?: boolean; categories?: boolean }) => {
         const params = new URLSearchParams();
-        if (includeFilters.author && authorFilter) params.set('author', authorFilter);
+        if (includeFilters.author && authorFilter) {
+          setAuthorParams(params, { id: searchParams.get(AUTHOR_ID_PARAM), name: authorFilter });
+        }
         if (includeFilters.feed && resolvedFeedFilter) setFeedIds(params, [resolvedFeedFilter.id]);
         if (includeFilters.categories && resolvedCategoryFilters.length > 0) {
           setCategoryIds(params, resolvedCategoryFilters.map(c => c.id));
@@ -178,7 +182,9 @@ const Breadcrumb = () => {
       }
     }
 
-    setBreadcrumbs(newBreadcrumbs);
+    // Segments without a label (ids, routes with no page of their own) would
+    // render as an empty "›" crumb — drop them.
+    setBreadcrumbs(newBreadcrumbs.filter((b) => b.label));
   }, [location, lang, editingEntryTitle, feeds, feedStep, authorFilter, feedFilter, resolvedFeedFilter, categoryFilter, resolvedCategoryFilters]);
 
   useEffect(() => {

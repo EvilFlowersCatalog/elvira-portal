@@ -1,16 +1,17 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { AcceptedLanguage, getLanguage } from '../../hooks/api/languages/languages';
-import useGetCategories from '../../hooks/api/categories/useGetCategories';
+import useCategoriesQuery from '../../hooks/api/categories/useCategoriesQuery';
 import useFeedsQuery from '../../hooks/api/feeds/useFeedsQuery';
+import { AUTHOR_ID_PARAM } from '../../hooks/api/entries/entryFilters';
 import { ICategory } from '../../utils/interfaces/category';
 import { IFeed } from '../../utils/interfaces/feed';
 import i18next from '../../utils/i18n/i18next';
 import SearchBar from './SearchBar';
 import FilterChips, { FilterChipItem } from './FilterChips';
-import SortSelect from './SortSelect';
+import SortSelect, { RELEVANCE } from './SortSelect';
 import { localize } from '../../utils/func/localized';
 
 // Comma-separated params rendered as one chip per value (removable individually).
@@ -38,13 +39,15 @@ const ToolsContainer = ({
   const { t } = useTranslation();
   const { clearFilters, umamiTrack, showAdvancedSearch, setShowAdvancedSearch } = useAppContext();
   const [searchParams, setSearchParams] = useSearchParams();
-  const orderBy = searchParams.get('order-by') || '-created_at';
+  // A search without an explicit sort is relevance-ranked (no `order-by` in the URL),
+  // so "relevance" is only a display value and never stored — clearing the query
+  // falls back to newest first instead of leaving a stale sort behind.
+  const searching = param === 'query' && !!searchParams.get('query');
+  const orderBy = searchParams.get('order-by') || (searching ? RELEVANCE : '-created_at');
 
-  const [categories, setCategories] = useState<ICategory[]>([]);
-
-  const getCategories = useGetCategories();
-
-  // Collections list (cached/deduped by React Query).
+  // Categories and collections lists (cached/deduped by React Query).
+  const { data: categoriesData } = useCategoriesQuery();
+  const categories: ICategory[] = useMemo(() => categoriesData?.items ?? [], [categoriesData]);
   const { data: feedsData } = useFeedsQuery({ paginate: false });
   const feeds: IFeed[] = useMemo(() => feedsData?.items ?? [], [feedsData]);
 
@@ -52,15 +55,8 @@ const ToolsContainer = ({
     if (!advancedSearch) setShowAdvancedSearch(false);
   }, [advancedSearch]);
 
-  useEffect(() => {
-    (async () => {
-      const { items: itemsCategories } = await getCategories({ paginate: false });
-      setCategories(itemsCategories);
-    })();
-  }, []);
-
   const handleSelectChange = (value: string) => {
-    if (value === 'none') searchParams.delete('order-by');
+    if (value === 'none' || value === RELEVANCE) searchParams.delete('order-by');
     else searchParams.set('order-by', value);
     setSearchParams(searchParams);
   };
@@ -80,13 +76,15 @@ const ToolsContainer = ({
       }
     } else {
       searchParams.delete(paramName);
+      // The author chip stands for the name and its id together.
+      if (paramName === 'author') searchParams.delete(AUTHOR_ID_PARAM);
     }
     setSearchParams(searchParams);
   };
 
   const getActiveFilters = (): FilterChipItem[] => {
     const filters: FilterChipItem[] = [];
-    const excluded = ['order-by', 'dialog-priority', 'assistant-entry-id', 'feed-id-step', 'parent-id', 'search-all', 'from'];
+    const excluded = ['order-by', 'dialog-priority', 'assistant-entry-id', 'feed-id-step', 'parent-id', 'search-all', 'from', AUTHOR_ID_PARAM];
 
     searchParams.forEach((value, key) => {
       if (excluded.includes(key) || !value.trim()) return;
@@ -158,7 +156,7 @@ const ToolsContainer = ({
             )}
             {customFilters}
             <FilterChips filters={activeFilters} onRemove={removeFilter} onClear={handleClear} />
-            {enableSort && <SortSelect value={orderBy} onChange={handleSelectChange} />}
+            {enableSort && <SortSelect value={orderBy} onChange={handleSelectChange} withRelevance={searching} />}
           </div>
         </div>
       </div>

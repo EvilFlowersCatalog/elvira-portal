@@ -1,14 +1,10 @@
-import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import useEntriesQuery from "../../hooks/api/entries/useEntriesQuery";
-import useFeedsQuery from "../../hooks/api/feeds/useFeedsQuery";
-import useGetCategories from "../../hooks/api/categories/useGetCategories";
+import useEntrySuggest from "../../hooks/api/entries/useEntrySuggest";
+import { setAuthorParams } from "../../hooks/api/entries/entryFilters";
 import Thumbnail from "../items/entry/Thumbnail";
+import Highlight from "../items/entry/Highlight";
 import useDebouncedValue from "../../hooks/useDebouncedValue";
-import { ICategory } from "../../utils/interfaces/category";
-import { IFeed } from "../../utils/interfaces/feed";
 import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
 import { addCategoryId, addFeedId } from "../../utils/func/filterParams";
 import { localize } from '../../utils/func/localized';
@@ -19,93 +15,36 @@ interface SearchSuggestionsProps {
   shouldRedirect?: boolean;
 }
 
+const Count = ({ count }: { count: number }) => (
+  <span className="ml-1 text-[11px] font-normal opacity-60">({count})</span>
+);
+
 const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: SearchSuggestionsProps) => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
-  
+
   const debouncedQuery = useDebouncedValue(searchQuery, 250);
   const enabled = !!debouncedQuery && debouncedQuery.trim().length >= 2;
-  // Use the backend's relevance-ranked full-text `query` (matches title, summary,
-  // author, publisher and category) instead of the old title-only `title` filter,
-  // which missed most matches. `keepPreviousData` (in useEntriesQuery) keeps the
-  // last suggestions visible while the next set loads, so the panel updates in
-  // place with no flash — the user never sees a loading wipe.
-  const { data, isFetching, isPlaceholderData } = useEntriesQuery(
-    { query: debouncedQuery, limit: 6 },
-    { enabled }
-  );
+  // One request per debounced keystroke: `/entries/suggest` returns the books and
+  // the matching authors, categories and collections (with counts) together. A
+  // stale request is aborted; `keepPreviousData` keeps the last suggestions on
+  // screen while the next ones load, so the panel updates in place.
+  const { data, isFetching, isPlaceholderData } = useEntrySuggest(debouncedQuery.trim(), { enabled });
 
-  // Collections / categories are also searched directly by name, so e.g. "history"
-  // suggests the History collection even when none of the top books are in it.
-  // Same debounce + keepPreviousData behaviour as the books query.
-  const { data: feedMatches } = useFeedsQuery(
-    { title: debouncedQuery, kind: 'acquisition', page: 1, limit: 6, paginate: true },
-    { enabled }
-  );
-  const getCategories = useGetCategories();
-  const { data: categoryMatches } = useQuery({
-    queryKey: ['categories', 'suggest', debouncedQuery],
-    queryFn: () => getCategories({ query: debouncedQuery, page: 1, limit: 6, paginate: true }),
-    enabled,
-    placeholderData: keepPreviousData,
-  });
-
-  // When the text matched a category / collection by name, also show books from
-  // it — otherwise "Fiction" would suggest the category but zero books.
-  const categoryIds = (categoryMatches?.items ?? []).map((c) => c.id).join(',');
-  const feedIds = (feedMatches?.items ?? []).map((f) => f.id).join(',');
-  const { data: categoryBooks } = useEntriesQuery(
-    { categories: categoryIds, limit: 6 },
-    { enabled: enabled && !!categoryIds }
-  );
-  const { data: feedBooks } = useEntriesQuery(
-    { feeds: feedIds, limit: 6 },
-    { enabled: enabled && !!feedIds }
-  );
+  const entries = data?.entries ?? [];
+  const authors = data?.authors ?? [];
+  const categories = data?.categories ?? [];
+  const feeds = data?.feeds ?? [];
 
   // Only show the skeleton on the very first fetch (nothing cached to show yet).
   const showInitialLoading = isFetching && !data;
   // Background refresh while previous suggestions stay on screen.
   const isRefreshing = isFetching && isPlaceholderData;
 
-  // Books preview plus author / category / collection facets. Direct name matches
-  // come first, then the ones derived from the matching books; each list is
-  // de-duplicated and a section with nothing in it is simply not shown.
-  const { entries, authors, categories, feeds } = useMemo(() => {
-    // Text matches first (most relevant), then books from the matched categories
-    // and collections to fill the list; de-duplicated by id.
-    const seen = new Set<string>();
-    const items = [
-      ...(data?.items ?? []),
-      ...(categoryIds ? categoryBooks?.items ?? [] : []),
-      ...(feedIds ? feedBooks?.items ?? [] : []),
-    ].filter((e) => !seen.has(e.id) && seen.add(e.id));
-    const uniqueAuthors = new Set<string>();
-    const categoriesMap = new Map<string, ICategory>();
-    const feedsMap = new Map<string, IFeed>();
-    (categoryMatches?.items ?? []).forEach((cat) => categoriesMap.set(cat.id, cat));
-    (feedMatches?.items ?? []).forEach((feed) => feedsMap.set(feed.id, feed));
-    items.forEach((entry) => {
-      entry.authors?.forEach((author) => uniqueAuthors.add(author.name + " " + author.surname));
-      entry.categories?.forEach((cat) => {
-        if (!categoriesMap.has(cat.id)) categoriesMap.set(cat.id, cat);
-      });
-      entry.feeds?.forEach((feed) => {
-        if (!feedsMap.has(feed.id)) feedsMap.set(feed.id, feed);
-      });
-    });
-    return {
-      entries: items.slice(0, 6),
-      authors: Array.from(uniqueAuthors).slice(0, 10),
-      categories: Array.from(categoriesMap.values()).slice(0, 10),
-      feeds: Array.from(feedsMap.values()).slice(0, 10),
-    };
-  }, [data, feedMatches, categoryMatches, categoryBooks, feedBooks, categoryIds, feedIds]);
-
-  const handleBookClick = (entryId: string) => {
+  const handleBookClick = (entryId: string, catalogId: string) => {
     searchParams.set('entry-detail-id', entryId);
-    searchParams.set('entry-catalog-id', entries.find(e => e.id === entryId)?.catalog_id || '');
+    searchParams.set('entry-catalog-id', catalogId);
     setSearchParams(searchParams);
     onClose();
   };
@@ -121,18 +60,18 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
     onClose();
   };
 
-  // Commit the free-text search to the full library grid (relevance-ranked
+  // Commit a free-text search to the full library grid (relevance-ranked
   // `query`). This is the "see all results" affordance — same as pressing Enter.
-  const handleSeeAll = () => {
+  const searchFor = (query: string) => {
     const params = new URLSearchParams(searchParams);
-    params.set('query', searchQuery.trim());
+    params.set('query', query.trim());
     params.delete('entry-detail-id');
     commit(params);
   };
 
-  const handleAuthorClick = (authorName: string) => {
+  const handleAuthorClick = (author: { id: string; name: string; surname: string }) => {
     const params = new URLSearchParams(searchParams);
-    params.set('author', authorName);
+    setAuthorParams(params, { id: author.id, name: `${author.name} ${author.surname}`.trim() });
     commit(params);
   };
 
@@ -148,7 +87,9 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
     commit(params);
   };
 
-  const hasResults = entries.length > 0 || authors.length > 0 || categories.length > 0 || feeds.length > 0;
+  const hasFacets = authors.length > 0 || categories.length > 0 || feeds.length > 0;
+  const hasResults = entries.length > 0 || hasFacets;
+  const didYouMean = data?.did_you_mean;
 
   if (!searchQuery || searchQuery.trim().length < 2) {
     return null;
@@ -169,6 +110,17 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
         </div>
       )}
 
+      {didYouMean && (
+        <button
+          type="button"
+          onClick={() => searchFor(didYouMean)}
+          className="w-full px-4 pt-3 text-left text-sm text-gray-600 dark:text-gray-300"
+        >
+          {t('search.didYouMean')}{' '}
+          <span className="font-semibold italic text-primaryText dark:text-primaryLight hover:underline">{didYouMean}</span>?
+        </button>
+      )}
+
       {showInitialLoading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-4">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -184,30 +136,30 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
       ) : !hasResults ? (
         <button
           type="button"
-          onClick={handleSeeAll}
+          onClick={() => searchFor(searchQuery)}
           className="w-full p-8 text-center text-gray-500 dark:text-gray-400 hover:text-primary dark:hover:text-primaryLight transition-colors"
         >
           {t('search.noResults', { query: searchQuery.trim() })}
         </button>
       ) : (
         <div className={`grid grid-cols-12 gap-4 transition-opacity duration-150 ${isRefreshing ? 'opacity-70' : 'opacity-100'}`}>
-          {/* Books Section - 8 columns */}
-          <div className="col-span-12 lg:col-span-8 p-4">
+          {/* Books Section - 8 columns, or the full width when there are no facets */}
+          <div className={`col-span-12 p-4 ${hasFacets ? 'lg:col-span-8' : ''}`}>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">{t('search.books')}</h3>
               <button
                 type="button"
-                onClick={handleSeeAll}
+                onClick={() => searchFor(searchQuery)}
                 className="text-xs font-medium text-primaryText dark:text-primaryLight hover:underline"
               >
                 {t('search.seeAll', { query: searchQuery.trim() })}
               </button>
             </div>
-            <div className="grid md:grid-cols-2 gap-3">
+            <div className={`grid md:grid-cols-2 gap-3 ${hasFacets ? '' : 'lg:grid-cols-3'}`}>
               {entries.map((entry) => (
                 <div
                   key={entry.id}
-                  onClick={() => handleBookClick(entry.id)}
+                  onClick={() => handleBookClick(entry.id, entry.catalog_id)}
                   className="flex gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded transition-colors"
                 >
                   <Thumbnail
@@ -216,11 +168,14 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
                     wrapperClassName="flex-shrink-0 h-16 w-10 rounded"
                   />
                   <div className="flex-1 min-w-0">
-                    <h4 className="text-xs font-semibold line-clamp-2 h-8 mb-1 text-secondary dark:text-white">
-                      {entry.title}
-                    </h4>
+                    <Highlight
+                      as="h4"
+                      html={entry.highlight}
+                      text={entry.title}
+                      className="text-xs font-semibold line-clamp-2 h-8 mb-1 text-secondary dark:text-white"
+                    />
                     <p className="text-xs text-gray-500 dark:text-gray-400">
-                      {entry.authors?.map(a => a.name + ' ' + a.surname).join(', ') || '-'}
+                      {entry.authors?.join(', ') || '-'}
                     </p>
                   </div>
                 </div>
@@ -229,19 +184,21 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
           </div>
 
           {/* Right sidebar - 4 columns */}
+          {hasFacets && (
           <div className="col-span-12 lg:col-span-4 flex flex-col px-4 py-1 bg-lightGray dark:bg-strongDarkGray">
             {/* Authors */}
             {authors.length > 0 && (
               <div className="rounded-md p-3">
                 <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">{t('search.authors')}</h3>
                 <div className="flex flex-col gap-1">
-                  {authors.slice(0,5).map((author, index) => (
+                  {authors.slice(0, 5).map((author) => (
                     <button
-                      key={index}
+                      key={author.id}
                       onClick={() => handleAuthorClick(author)}
                       className="text-left text-sm text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primaryLight transition-colors"
                     >
-                      {author}
+                      {`${author.name} ${author.surname}`.trim()}
+                      <Count count={author.count} />
                     </button>
                   ))}
                 </div>
@@ -260,6 +217,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
                       className="px-2 py-1 text-xs bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight font-medium transition-colors rounded-md"
                     >
                       {localize(feed.title)}
+                      <Count count={feed.count} />
                     </button>
                   ))}
                 </div>
@@ -278,12 +236,14 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
                       className="px-2 py-1 text-xs bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight font-medium transition-colors rounded-md"
                     >
                       {localize(category.label) || category.term}
+                      <Count count={category.count} />
                     </button>
                   ))}
                 </div>
               </div>
             )}
           </div>
+          )}
         </div>
       )}
     </div>

@@ -87,9 +87,10 @@ const AdminEntries = () => {
   } = useEntriesQuery({
     page,
     limit,
-    // Relevance-ranked full-text search (title, summary, author, publisher,
-    // category) — same as the public search — instead of title-only.
-    query: q || undefined,
+    // Title substring (`unaccent__icontains`), as the box says. The hybrid
+    // `query` search always appends semantically related titles, which in an
+    // admin list reads as wrong results.
+    title: q || undefined,
     feedId: searchParams.get('feed-id') || undefined,
     categoryId: searchParams.get('category-id') || undefined,
     // AI processing (IP-018): the hidden columns below and the filter.
@@ -178,8 +179,11 @@ const AdminEntries = () => {
                 </div>
               )}
             </div>
-            <div className="min-w-0">
-              <p className="truncate font-medium text-secondary dark:text-secondaryLight">{e.title}</p>
+            {/* A cell in an auto-layout table grows to its content, so `truncate`
+                needs an explicit cap — otherwise one long title pushes every
+                other column off-screen. */}
+            <div className="min-w-0 max-w-[min(28rem,32vw)]">
+              <p className="truncate font-medium text-secondary dark:text-secondaryLight" title={e.title}>{e.title}</p>
               <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">{authorLine(e)}</p>
             </div>
           </div>

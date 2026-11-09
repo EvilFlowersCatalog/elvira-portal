@@ -10,7 +10,8 @@ import PDFButton from "./PDFButtons";
 import { ActionButtonStyle } from "../items/entry/details/DetailActions";
 import { IEntryDetail } from "../../utils/interfaces/entry";
 import { IEntryAcquisition } from "../../utils/interfaces/acquisition";
-import { ILicense, LICENSE_STATE } from "../../utils/interfaces/license";
+import { format } from "date-fns";
+import { ILicense, LICENSE_STATE, renewalEmbargoUntil } from "../../utils/interfaces/license";
 import useDownloadLicense from "../../hooks/api/licenses/useDownloadLicense";
 import { toast } from "react-toastify";
 import ExtendLoanModal from "../modals/ExtendLoanModal";
@@ -80,6 +81,8 @@ export default function AcquisitionsButton({
     (!activeLicense?.expires_at || new Date(activeLicense.expires_at) > new Date());
 
   if (isActiveLoan && activeLicense) {
+    const embargoUntil = renewalEmbargoUntil(activeLicense);
+    const extendBlocked = activeLicense.renewals_remaining === 0 || embargoUntil !== null;
     return (
       <>
         <div className="flex flex-col gap-2 w-full">
@@ -105,7 +108,13 @@ export default function AcquisitionsButton({
           </button>
           <div className="flex gap-2">
             <button
-              className={`${ActionButtonStyle} flex-1 cursor-pointer`}
+              className={`${ActionButtonStyle} flex-1 ${extendBlocked ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+              disabled={extendBlocked}
+              title={
+                embargoUntil
+                  ? t('license.loansPage.modals.embargoNotice', { date: format(embargoUntil, 'd.M.yyyy HH:mm') })
+                  : undefined
+              }
               onClick={() => setShowExtend(true)}
             >
               <LuRepeat2 size={20} className="flex-shrink-0" />

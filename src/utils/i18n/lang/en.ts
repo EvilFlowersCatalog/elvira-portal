@@ -4,6 +4,17 @@ export const en = {
       showMore: '{{count}} more',
       showLess: 'Show less',
       loading: 'Loading',
+      close: 'Close',
+      clearSearch: 'Clear search',
+      sortBy: 'Sort by',
+      thumbnail: 'Cover: {{title}}',
+      send: 'Send',
+      rangeFrom: 'From',
+      rangeTo: 'To',
+    },
+    myShelf: {
+      add: 'Add to shelf',
+      remove: 'Remove from shelf',
     },
     assistant: {
       title: 'AI Assistant',
@@ -374,7 +385,19 @@ export const en = {
         createTitle: 'New collection',
         titleRequired: 'Slovak title is required',
         content: 'Description',
-        urlNameHint: 'Unique identifier used in URLs. Auto-generated if left blank.',
+        contentRequired: 'Description is required',
+        urlNameHint: 'Unique address of the collection in the catalog. Derived from the title until you edit it.',
+        address: 'Address',
+        urlNameRequired: 'Address is required (use letters or digits)',
+        urlNameChecking: 'Checking availability…',
+        urlNameAvailable: 'Address is available',
+        urlNameTakenBy: 'Already used by “{{title}}”.',
+        urlNameTakenGeneric: 'This address is already used by another collection.',
+        urlNameOpenConflict: 'Open',
+        urlNameUseSuggestion: 'Use',
+        urlNameAutoAdjusted: '“{{slug}}” is already used by “{{title}}”, so a number was added.',
+        sameTitleHint: 'Another collection is also called “{{title}}”.',
+        sameTitleHintInFolder: 'Another collection is also called “{{title}}” (in folder {{folder}}).',
         save: 'Save changes',
         create: 'Create collection',
         cancel: 'Cancel',
@@ -766,6 +789,10 @@ export const en = {
           cancel: 'Cancel',
           created: 'API key created',
           createError: 'Could not create the key.',
+          createdTitle: 'Your key is ready',
+          tokenOnceWarning: 'Copy the token now. It is shown only this once — after closing it cannot be displayed again; if it is lost, delete the key and create a new one.',
+          tokenHidden: 'Shown only at creation',
+          done: 'Done',
           delete: 'Delete key',
           deleteConfirmTitle: 'Delete API key?',
           deleteConfirmBody: 'Any integration using “{{name}}” will stop working. This cannot be undone.',
@@ -834,8 +861,8 @@ export const en = {
           cancelled: 'Cancel',
         },
         confirmTitle: 'Confirm action',
-        confirmRevoke: 'Revoke this loan? The reader will immediately lose access.',
-        confirmCancel: 'Cancel this loan?',
+        confirmRevoke: 'Revoke the loan of “{{title}}”{{user}}? The reader will immediately lose access.',
+        confirmCancel: 'Cancel the loan of “{{title}}”{{user}}?',
         confirm: 'Confirm',
         cancelBtn: 'Back',
         reservations: {
@@ -880,6 +907,10 @@ export const en = {
     },
 
     // NAVBAR MENU
+    navbar: {
+      expand: 'Expand sidebar',
+      collapse: 'Collapse sidebar',
+    },
     navbarMenu: {
       portal: 'Main Menu',
       personal: 'Personal',
@@ -925,6 +956,7 @@ export const en = {
       searchSmart: '"books about artificial intelligence", "difference between IPv4 and IPv6"',
     },
     search: {
+      filterByFeed: 'Filter by collection',
       smartOn: 'Enable smart search',
       smartOff: 'Disable smart search',
       // Suggestions dropdown
@@ -934,6 +966,18 @@ export const en = {
       categories: 'Categories',
       noResults: 'No results for “{{query}}”',
       seeAll: 'Search all results for “{{query}}”',
+      didYouMean: 'Did you mean',
+      relaxed: 'No exact match, showing related results.',
+      showAll: 'Show all',
+      matchedIn: 'Matched in',
+      matched: {
+        title: 'title',
+        author: 'author',
+        category: 'category',
+        summary: 'text',
+        publisher: 'publisher',
+        semantic: 'related',
+      },
     },
 
     profile: {
@@ -1027,6 +1071,7 @@ export const en = {
     // ENTRY COMPONENT
     entry: {
       detail: {
+        openDetail: 'Open detail',
         close: 'Close',
         add: 'Add',
         remove: 'Remove',
@@ -1078,6 +1123,9 @@ export const en = {
           borrowedUntil: 'Borrowed until',
           reserved: 'Reserved',
           unavailable: 'Unavailable',
+          queuePosition: '#{{position}} in queue',
+          availableInDays_one: 'in ~{{count}} day',
+          availableInDays_other: 'in ~{{count}} days',
         },
         cancelReservation: 'Cancel',
         reserve: 'Reserve',
@@ -1144,6 +1192,7 @@ export const en = {
         imageAndFile: 'Image & PDF',
         image: 'Image',
         imageHint: 'Drag your image here or click here to browse',
+        removeImage: 'Remove image',
         pdfHint: 'Drag your PDF files here',
         download: 'Download',
         share: 'Share',
@@ -1180,6 +1229,17 @@ export const en = {
     },
 
     license: {
+      // Refusals keyed by the API's `additional_data.code` (renewal 403, activation 409).
+      errors: {
+        terminal_state: 'The loan has already ended ({{state}}).',
+        renewal_cap: 'Renewal limit reached ({{renewal_count}} of {{max_renewals}}).',
+        queue: 'The loan cannot be extended, other readers are waiting for this title.',
+        embargo: 'It is too early to extend. Extension is possible from {{renewable_from}}.',
+        embargo_no_date: 'It is too early to extend.',
+        exceeds_max_window: 'An extension may reach at most {{max_renew_days}} days ahead.',
+        end_in_past: 'The new end of the loan must be in the future.',
+        activation_by_device_only: 'A loan becomes active only once it is opened in a reading app (e.g. Thorium).',
+      },
       success: {
         openThorium: 'Open in Thorium',
         downloadFile: 'Download file',
@@ -1280,7 +1340,7 @@ export const en = {
           exceedsMaxWindow: 'Exceeds the maximum window of {{days}} days',
           unavailableExceedsWindow: 'Unavailable — exceeds the {{days}}-day window',
           renewalPolicy:
-            'A loan can be extended no sooner than {{embargoDays}} days after borrowing and by at most {{maxRenewDays}} days ahead. Extension is not possible when other users are waiting for the title.',
+            'A loan can first be extended once half of it has passed (at most {{embargoDays}} days after it starts), and by at most {{maxRenewDays}} days ahead. Extension is not possible when other users are waiting for the title.',
           maxRenewals: ' Maximum number of renewals: {{max}}.',
           embargoNotice: 'This loan can be extended starting {{date}}.',
           capReachedNotice: 'You have reached the maximum number of renewals.',
@@ -1399,6 +1459,7 @@ export const en = {
         titleDesc: 'Title ↓',
         popularityAsc: 'Popularity ↑',
         popularityDesc: 'Popularity ↓',
+        relevance: 'Relevance',
       },
     },
 

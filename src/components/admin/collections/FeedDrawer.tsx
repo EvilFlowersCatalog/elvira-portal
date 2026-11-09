@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { useQueryClient } from '@tanstack/react-query';
-import { FiTrash2, FiX, FiSearch, FiFolder } from 'react-icons/fi';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useGetCatalogDetail } from '../../../hooks/api/catalogs/useAdminCatalogs';
+import { FiTrash2, FiX, FiSearch, FiFolder, FiInfo } from 'react-icons/fi';
 import Drawer from '../Drawer';
 import ConfirmDialog from '../ConfirmDialog';
 import { Field, TextInput } from '../Field';
@@ -10,8 +11,12 @@ import LocalizedTextInput from '../LocalizedTextInput';
 import Select from '../../primitives/Select';
 import Button from '../../buttons/Button';
 import { IFeed } from '../../../utils/interfaces/feed';
-import { uuid } from '../../../utils/func/functions';
+import { nextSlug, slugify } from '../../../utils/func/functions';
+import { getFeedUrlNameTaken, problemDetailMessage } from '../../../utils/problemDetail';
 import useFeedsQuery from '../../../hooks/api/feeds/useFeedsQuery';
+import useFeedUrlNameCheck from '../../../hooks/api/feeds/useFeedUrlNameCheck';
+import useSameTitleFeed from '../../../hooks/api/feeds/useSameTitleFeed';
+import UrlNameStatusLine from './UrlNameStatusLine';
 import useGetFeeds from '../../../hooks/api/feeds/useGetFeeds';
 import useGetFeedDetail from '../../../hooks/api/feeds/useGetFeedDetail';
 import useUploadFeed from '../../../hooks/api/feeds/useUploadFeed';
@@ -36,6 +41,8 @@ interface FeedDrawerProps {
   onSaved: () => void;
   /** Called after a successful create with the new feed, so callers can assign it right away. */
   onCreated?: (feed: FeedRef) => void;
+  /** Open another feed in the drawer (used to jump to a feed whose URL name clashes). */
+  onOpenFeed?: (feed: IFeed) => void;
 }
 
 /** Inline picker over navigation (folder) feeds. */
@@ -115,7 +122,7 @@ function ParentPicker({
   );
 }
 
-export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentId, onClose, onSaved, onCreated }: FeedDrawerProps) {
+export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentId, onClose, onSaved, onCreated, onOpenFeed }: FeedDrawerProps) {
   const { t } = useTranslation();
   const tl = useLocalize();
   const queryClient = useQueryClient();
@@ -130,10 +137,19 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
   const [content, setContent] = useState('');
   const [kind, setKind] = useState('acquisition');
   const [parents, setParents] = useState<FeedRef[]>([]);
-  const [errors, setErrors] = useState<{ title?: string }>({});
+  const [errors, setErrors] = useState<{ title?: string; urlName?: string; content?: string }>({});
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  // URL name: derived from the sk title until the user edits it by hand (create only —
+  // re-deriving on edit would silently move an existing feed's OPDS address).
+  const [urlNameTouched, setUrlNameTouched] = useState(false);
+  const [originalUrlName, setOriginalUrlName] = useState('');
+  /** Free slug offered by a 409 `/feed-url-name-taken`. */
+  const [serverSuggestion, setServerSuggestion] = useState<string | null>(null);
+  /** Set when the derived slug was taken and we silently moved to a numbered variant. */
+  const [autoAdjusted, setAutoAdjusted] = useState<{ from: string; title: string } | null>(null);
+  const urlInputRef = useRef<HTMLInputElement>(null);
 
   // All navigation folders (fetched once the drawer opens) — used for the parent
   // picker and to resolve parent ids to titles. Cached/deduped by React Query.
@@ -141,6 +157,16 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
     { paginate: false, kind: 'navigation' },
     { enabled: open }
   );
+  // Catalog slug for the OPDS path shown in front of the URL name (/opds/v1.2/<catalog>/feed/<url_name>).
+  const getCatalogDetail = useGetCatalogDetail();
+  const { data: catalog } = useQuery({
+    queryKey: ['catalog', catalogId],
+    queryFn: () => getCatalogDetail(catalogId as string),
+    enabled: open && !!catalogId,
+    staleTime: Infinity,
+  });
+  const feedPathPrefix = `/opds/v1.2/${catalog?.url_name ?? '…'}/feed/`;
+
   const folders: FeedRef[] = useMemo(
     () => (foldersData?.items ?? []).map((f) => ({ id: f.id, title: tl(f.title) })),
     [foldersData, tl]
@@ -149,16 +175,21 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
   useEffect(() => {
     if (!open) return;
     setErrors({});
+    setServerSuggestion(null);
+    setAutoAdjusted(null);
     if (mode === 'edit' && feed) {
       setTitle(toLocalized(feed.title));
       setKind(feed.kind || 'acquisition');
       setUrlName(feed.url_name);
+      setOriginalUrlName(feed.url_name);
+      setUrlNameTouched(true);
       setContent('');
       setParents([]);
       getFeedDetail(feed.id)
         .then((d) => {
           setContent(d.content ?? '');
           setUrlName(d.url_name);
+          setOriginalUrlName(d.url_name);
           setKind(d.kind || 'acquisition');
           setParents((d.parents ?? []).map((id) => ({ id, title: id })));
         })
@@ -166,6 +197,8 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
     } else {
       setTitle({});
       setUrlName('');
+      setOriginalUrlName('');
+      setUrlNameTouched(false);
       setContent('');
       setKind('acquisition');
       setParents(defaultParentId ? [{ id: defaultParentId, title: defaultParentId }] : []);
@@ -184,13 +217,62 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
     );
   }, [folders]);
 
+  // Live URL-name availability; the feed's own saved slug never counts as a conflict.
+  const { status: slugStatus, conflict, checkedSlug } = useFeedUrlNameCheck(urlName, {
+    enabled: open,
+    feedId: feed?.id,
+    ownUrlName: mode === 'edit' ? originalUrlName : undefined,
+  });
+  const suggestion = errors.urlName ? serverSuggestion : slugStatus === 'taken' ? nextSlug(checkedSlug) : null;
+
+  // While the slug is still auto-derived, resolve a clash silently with the next free variant.
+  useEffect(() => {
+    if (mode !== 'create' || urlNameTouched || !conflict) return;
+    setAutoAdjusted((prev) => prev ?? { from: checkedSlug, title: tl(conflict.title) });
+    setUrlName(nextSlug(checkedSlug));
+  }, [mode, urlNameTouched, conflict, checkedSlug, tl]);
+
+  // Non-blocking hint: another feed with the same sk title (allowed, but maybe accidental).
+  const sameTitleFeed = useSameTitleFeed(title[DEFAULT_CONTENT_LANGUAGE] ?? '', { enabled: open, feedId: feed?.id });
+  const sameTitleFolder = sameTitleFeed?.parents?.length
+    ? folders.find((f) => f.id === sameTitleFeed.parents?.[0])?.title
+    : undefined;
+
+  const handleTitleChange = (value: LocalizedText) => {
+    setTitle(value);
+    if (mode === 'create' && !urlNameTouched) {
+      setUrlName(slugify(value[DEFAULT_CONTENT_LANGUAGE] ?? ''));
+      setAutoAdjusted(null);
+      setServerSuggestion(null);
+      setErrors((e) => ({ ...e, urlName: undefined }));
+    }
+  };
+
+  const setUrlNameManually = (value: string) => {
+    setUrlName(value);
+    setUrlNameTouched(true);
+    setAutoAdjusted(null);
+    setServerSuggestion(null);
+    setErrors((e) => ({ ...e, urlName: undefined }));
+  };
+
+  const focusUrlName = () =>
+    requestAnimationFrame(() => {
+      urlInputRef.current?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      urlInputRef.current?.focus();
+    });
+
   const addParent = (f: FeedRef) => setParents((prev) => (prev.some((p) => p.id === f.id) ? prev : [...prev, f]));
   const removeParent = (id: string) => setParents((prev) => prev.filter((p) => p.id !== id));
 
   const validate = () => {
     const e: typeof errors = {};
     if (!cleanLocalized(title)[DEFAULT_CONTENT_LANGUAGE]) e.title = t('administration.collectionsPage.titleRequired');
+    else if (!slugify(urlName)) e.urlName = t('administration.collectionsPage.urlNameRequired');
+    // The catalog rejects an empty `content` with a 422.
+    if (!content.trim()) e.content = t('administration.collectionsPage.contentRequired');
     setErrors(e);
+    if (e.urlName) focusUrlName();
     return Object.keys(e).length === 0;
   };
 
@@ -199,10 +281,12 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
     if (mode === 'create' && !catalogId) return;
     setSaving(true);
     try {
+      const finalUrlName = slugify(urlName);
+      setUrlName(finalUrlName);
       const payload = {
         catalog_id: catalogId ?? '',
         title: cleanLocalized(title),
-        url_name: urlName.trim() || uuid(),
+        url_name: finalUrlName,
         content,
         kind,
         parents: parents.map((p) => p.id),
@@ -231,8 +315,17 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
       queryClient.invalidateQueries({ queryKey: ['feeds'] });
       onSaved();
       onClose();
-    } catch {
-      toast.error(t('administration.collectionsPage.saveError'));
+    } catch (e) {
+      // A taken slug (race or stale live check): keep the drawer open and fix it inline.
+      const taken = getFeedUrlNameTaken(e);
+      if (taken) {
+        setAutoAdjusted(null);
+        setServerSuggestion(taken.data.suggested_url_name ?? null);
+        setErrors((prev) => ({ ...prev, urlName: taken.detail || t('administration.collectionsPage.urlNameTakenGeneric') }));
+        focusUrlName();
+      } else {
+        toast.error(problemDetailMessage(e, t('administration.collectionsPage.saveError')));
+      }
     } finally {
       setSaving(false);
     }
@@ -289,7 +382,52 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
       >
         <div className="flex flex-col gap-4">
           <Field label={t('administration.collectionsPage.titleCol')} htmlFor="feed-title" hint={t('administration.collectionsPage.titleHint')} required error={errors.title}>
-            <LocalizedTextInput id="feed-title" value={title} invalid={!!errors.title} onChange={setTitle} />
+            <LocalizedTextInput id="feed-title" value={title} invalid={!!errors.title} onChange={handleTitleChange} />
+            {sameTitleFeed && (
+              <p className="flex items-start gap-1.5 text-xs text-zinc-500 dark:text-zinc-400" role="status">
+                <FiInfo size={13} className="mt-0.5 shrink-0" aria-hidden="true" />
+                <span>
+                  {sameTitleFolder
+                    ? t('administration.collectionsPage.sameTitleHintInFolder', { title: tl(sameTitleFeed.title), folder: sameTitleFolder })
+                    : t('administration.collectionsPage.sameTitleHint', { title: tl(sameTitleFeed.title) })}
+                </span>
+              </p>
+            )}
+          </Field>
+
+          <Field
+            label={t('administration.collectionsPage.address')}
+            htmlFor="feed-url"
+            hint={t('administration.collectionsPage.urlNameHint')}
+            error={errors.urlName}
+          >
+            <div className="flex flex-col gap-1">
+              <span className="break-all font-mono text-xs text-zinc-500 dark:text-zinc-400">{feedPathPrefix}</span>
+              <TextInput
+                ref={urlInputRef}
+                id="feed-url"
+                value={urlName}
+                invalid={!!errors.urlName}
+                aria-invalid={!!errors.urlName}
+                aria-describedby={errors.urlName ? 'feed-url-error' : 'feed-url-status feed-url-hint'}
+                maxLength={50}
+                spellCheck={false}
+                autoCapitalize="off"
+                className="font-mono"
+                onChange={(e) => setUrlNameManually(e.target.value)}
+                onBlur={() => setUrlName((prev) => slugify(prev))}
+              />
+            </div>
+            <UrlNameStatusLine
+              id="feed-url-status"
+              status={slugStatus}
+              conflict={conflict}
+              hasError={!!errors.urlName}
+              autoAdjusted={autoAdjusted}
+              suggestion={suggestion}
+              onUseSuggestion={setUrlNameManually}
+              onOpenConflict={onOpenFeed}
+            />
           </Field>
 
           <Field label={t('administration.collectionsPage.kind')} htmlFor="feed-kind">
@@ -341,18 +479,24 @@ export default function FeedDrawer({ open, feed, mode, catalogId, defaultParentI
             </div>
           </div>
 
-          <Field label={t('administration.collectionsPage.content')} htmlFor="feed-content">
+          <Field label={t('administration.collectionsPage.content')} htmlFor="feed-content" required error={errors.content}>
             <textarea
               id="feed-content"
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={(e) => {
+                setContent(e.target.value);
+                if (errors.content) setErrors((prev) => ({ ...prev, content: undefined }));
+              }}
               rows={4}
-              className="w-full resize-y rounded-lg border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40 px-3 py-2 text-sm outline-none focus:border-primary"
+              aria-required="true"
+              aria-invalid={!!errors.content}
+              aria-describedby={errors.content ? 'feed-content-error' : undefined}
+              className={`w-full resize-y rounded-lg border bg-white dark:bg-zinc-900/40 px-3 py-2 text-sm outline-none ${
+                errors.content
+                  ? 'border-redText dark:border-red focus:border-redText'
+                  : 'border-zinc-300 dark:border-zinc-600 focus:border-primary'
+              }`}
             />
-          </Field>
-
-          <Field label={t('administration.collectionsPage.urlName')} htmlFor="feed-url" hint={t('administration.collectionsPage.urlNameHint')}>
-            <TextInput id="feed-url" value={urlName} onChange={(e) => setUrlName(e.target.value)} />
           </Field>
         </div>
       </Drawer>

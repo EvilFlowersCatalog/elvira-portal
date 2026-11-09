@@ -13,6 +13,7 @@ import OpenFiltersButton from '../../buttons/OpenFiltersButton';
 import LicenseCalendar from '../entry/details/LicenseCalendar';
 import { IItemContainerList } from '../../../hooks/api/useInfiniteItemContainer';
 import { EntryFilters } from '../../../hooks/api/entries/entryFilters';
+import SearchNotice from './SearchNotice';
 
 interface IItemContainer {
   children: ReactNode;
@@ -30,7 +31,12 @@ interface IItemContainer {
   /** Extra filters that bound the listed entries (e.g. the shelf's ids) so the
    * sidebar's facet counts match this page. `null` while the scope is loading. */
   entryScope?: Partial<EntryFilters> | null;
+  /** Shown instead of "no results" when the list is empty and no search/filter is active. */
+  emptyMessage?: string;
 }
+
+// Params that open dialogs rather than narrow the list.
+const NON_FILTER_PARAMS = /^(entry-detail-id|entry-catalog-id|licensing-|dialog-priority|assistant-)/;
 
 const ItemContainer = ({
   children,
@@ -46,6 +52,7 @@ const ItemContainer = ({
   showResultsHeading = true,
   enableSort = true,
   entryScope,
+  emptyMessage,
 }: IItemContainer) => {
   const { handleScroll } = useAppContext();
   const { t } = useTranslation();
@@ -61,6 +68,10 @@ const ItemContainer = ({
 
   // Background refetch (new filter/search while previous results stay visible).
   const isRefreshing = list.isFetching && !list.isLoading;
+  const hasFilters = [...searchParams.keys()].some((k) => !NON_FILTER_PARAMS.test(k));
+  const resultsHeading =
+    searchParams.get('author') && !searchParams.get('query') ? searchParams.get('author') :
+    searchParams.get('query') ? t('page.resultsQuery') : '';
 
   return (
     <>
@@ -98,16 +109,17 @@ const ItemContainer = ({
           enableSort={enableSort}
         />
 
-        <AdvancedSearchWrapper enabled={isEntries} entryScope={entryScope}>
+        <AdvancedSearchWrapper enabled={isEntries} entryScope={entryScope} facets={list.facets}>
           <>
-            {showResultsHeading && (
+            {showResultsHeading && resultsHeading && (
               <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-medium text-left mb-4'>
-                {searchParams.get('author') && !searchParams.get('query') ? searchParams.get('author') :
-                searchParams.get('query') ? t('page.resultsQuery') :
-                ""}
+                {resultsHeading}
                 {searchParams.get('query') && <span className="font-bold ml-1">"{searchParams.get('query')}"</span>}
               </h2>
             )}
+
+            {/* Outside the results branch: a correction matters most when nothing matched. */}
+            {!list.isLoading && !list.isError && <SearchNotice search={list.search} />}
 
             {list.isLoading && <PageLoading entries={isEntries} showLayout={showLayout} />}
 
@@ -118,7 +130,9 @@ const ItemContainer = ({
                 {list.items.length > 0 ? (
                   children
                 ) : (
-                  <p className='text-center px-4 py-10'>{t('page.noResults')}</p>
+                  <p className='text-center px-4 py-10'>
+                    {emptyMessage && !hasFilters ? emptyMessage : t('page.noResults')}
+                  </p>
                 )}
               </>
             )}

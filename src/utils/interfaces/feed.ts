@@ -36,6 +36,8 @@ export interface IFeedQuery {
   paginate?: boolean;
   parentId?: string;
   title?: string;
+  /** Exact `url_name` match (empty `items` = the slug is free in the catalog). */
+  urlName?: string;
   kind?: string;
   orderBy?: string;
 }

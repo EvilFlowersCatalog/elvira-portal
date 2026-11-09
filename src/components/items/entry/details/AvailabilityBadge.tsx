@@ -48,7 +48,7 @@ export function AvailabilityBadge({ state, date, size = 'big', position, days }:
     ? t('entry.detail.availability.queuePosition', { position, defaultValue: `#${position}` })
     : null;
   const daysLabel = days != null
-    ? t('entry.detail.availability.availableInDays', { days, defaultValue: `~${days}d` })
+    ? t('entry.detail.availability.availableInDays', { count: days, defaultValue: `~${days}d` })
     : null;
 
   const baseLabel = t(`entry.detail.availability.${state}`);

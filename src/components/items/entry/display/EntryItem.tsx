@@ -11,7 +11,12 @@ import useAppContext from "../../../../hooks/contexts/useAppContext";
 import { AvailabilityBadge, AvailabilityState } from "../details/AvailabilityBadge";
 import { withAccessToken } from "../../../../utils/func/functions";
 import { localize } from '../../../../utils/func/localized';
+import { setAuthorParams } from "../../../../hooks/api/entries/entryFilters";
+import Highlight from "../Highlight";
 
+/** `search.matched` values shown as "matched in" badges. A title match is already
+ * visible as the highlighted title, so it gets no badge; unknown values are ignored. */
+const MATCHED_FIELDS = ['author', 'category', 'summary', 'publisher', 'semantic'];
 
 interface IEntryItem {
     entry: IEntry | IEntryDetail;
@@ -89,19 +94,31 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
         setSearchParams(params);
     };
 
-    const handleParamClick = (name: string, value: string) => {
+    const applyFilter = (apply: (params: URLSearchParams) => void) => {
         if (location.pathname === NAVIGATION_PATHS.library) {
-            searchParams.set(name, value);
+            apply(searchParams);
             setSearchParams(searchParams);
         } else {
             const params = new URLSearchParams();
-            params.set(name, value);
+            apply(params);
             navigate({
                 pathname: NAVIGATION_PATHS.library,
                 search: params.toString(),
             });
         }
     };
+    const handleParamClick = (name: string, value: string) => applyFilter((params) => params.set(name, value));
+    const firstAuthor = entry.authors[0];
+    const handleAuthorClick = () => {
+        if (!firstAuthor) return;
+        applyFilter((params) =>
+            setAuthorParams(params, { id: firstAuthor.id, name: `${firstAuthor.name} ${firstAuthor.surname}`.trim() })
+        );
+    };
+
+    // Why this entry matched the search — only lists fetched with `query` carry it.
+    const search = 'search' in entry ? entry.search : undefined;
+    const matchedBadges = (search?.matched ?? []).filter((field) => MATCHED_FIELDS.includes(field));
 
     const [isFallbackImage, setIsFallbackImage] = useState(false);
     const [imgLoaded, setImgLoaded] = useState(false);
@@ -148,7 +165,7 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
                     <img
                         className={`w-full h-full object-cover select-none transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
                         src={withAccessToken(entry.thumbnail, auth?.token) ?? undefined}
-                        alt={`Thumbnail ${entry.title}`}
+                        alt={t('common.thumbnail', { title: entry.title })}
                         loading="lazy"
                         decoding="async"
                         onLoad={() => setImgLoaded(true)}
@@ -214,17 +231,43 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
                         onClick={openEntryDetail}
                         className="cursor-pointer font-semibold text-[14px] leading-[16px] tracking-[0.1px] text-secondary dark:text-white line-clamp-2 group-hover:underline transition-all duration-300 break-words"
                     >
-                        {entry.title}
+                        <Highlight html={search?.highlights?.title} text={entry.title} />
                     </h3>
                     <p
                         className="font-light text-[10px] leading-[18px] tracking-[0.1px] text-[#333] dark:text-white overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"
-                        onClick={() => handleParamClick('author', entry.authors[0]?.name + ' ' + entry.authors[0]?.surname)}
+                        onClick={handleAuthorClick}
                     >
                         {entry.authors.length > 0
                             ? `${entry.authors[0]?.name} ${entry.authors[0]?.surname}`
                             : <span className="text-gray-500">{t('entry.detail.noAuthor')}</span>
                         }
                     </p>
+                    {search?.highlights?.summary && (
+                        <Highlight
+                            as="p"
+                            html={search.highlights.summary}
+                            text=""
+                            className="text-[10px] leading-[13px] text-gray-600 dark:text-gray-300 line-clamp-3 break-words"
+                        />
+                    )}
+                    {matchedBadges.length > 0 && (
+                        <div
+                            className="flex flex-wrap gap-[3px] pt-[2px]"
+                            aria-label={`${t('search.matchedIn')}: ${matchedBadges.map((f) => t(`search.matched.${f}`)).join(', ')}`}
+                            title={t('search.matchedIn')}
+                        >
+                            {matchedBadges.map((field) => (
+                                <span
+                                    key={field}
+                                    className={`px-[4px] py-[1px] text-[8px] leading-[11px] rounded-[3px] ${field === 'semantic'
+                                        ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-200'
+                                        : 'bg-lightGray text-darkGray dark:bg-darkGray dark:text-zinc-300'}`}
+                                >
+                                    {t(`search.matched.${field}`)}
+                                </span>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
 

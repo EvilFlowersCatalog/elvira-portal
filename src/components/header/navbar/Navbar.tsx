@@ -52,6 +52,10 @@ const NavbarButton = ({
 
   return (
     <button
+      // Collapsed: icon only, so name it for screen readers and hover.
+      aria-label={textVisible ? undefined : name}
+      title={textVisible ? undefined : name}
+      aria-current={isActive ? 'page' : undefined}
       className={`text-sm flex gap-2 items-center ${textVisible ? "px-4 w-full" : "px-2 justify-center w-fit mx-auto"} py-1 rounded-md ${
         isActive
           ? "bg-primaryLight text-primary"
@@ -395,6 +399,9 @@ const Navbar = () => {
             <div className="w-full flex justify-center">
               <button
                 className="flex items-center justify-center w-11 h-10 bg-lightGray dark:bg-zinc-700 shadow-[0px_4px_6px_rgba(0,0,0,0.1)] rounded-lg hover:brightness-95 dark:hover:brightness-110 transition-all"
+                aria-label={auth.username}
+                aria-haspopup="menu"
+                aria-expanded={profileDropdownOpen}
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
               >
                 <Gravatar

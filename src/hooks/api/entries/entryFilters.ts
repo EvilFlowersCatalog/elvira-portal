@@ -6,6 +6,16 @@ import { readCategoryIds, readFeedIds } from '../../../utils/func/filterParams';
 
 export type EntryFilters = Omit<IEntryQuery, 'page' | 'limit'>;
 
+/** URL param holding the id of the author named by `author`. */
+export const AUTHOR_ID_PARAM = 'author-id';
+
+/** Filter by one author: the name is shown, the id is sent. Without an id, by name. */
+export const setAuthorParams = (params: URLSearchParams, author: { id?: string | null; name: string }) => {
+  params.set('author', author.name);
+  if (author.id) params.set(AUTHOR_ID_PARAM, author.id);
+  else params.delete(AUTHOR_ID_PARAM);
+};
+
 // Sidebar availability -> backend `lcp_state` values. The backend OR-s the values,
 // and the mapping mirrors the badge logic in EntryItem.
 export const AVAILABILITY_TO_LCP_STATE: Record<AvailabilityState, string[]> = {
@@ -33,7 +43,9 @@ export const buildEntryFilterParams = (query: EntryFilters): URLSearchParams => 
   if (query.title) params.set('title', query.title);
   if (query.publishedAtGte) params.set('published_at__gte', query.publishedAtGte);
   if (query.publishedAtLte) params.set('published_at__lte', query.publishedAtLte);
-  if (query.authors) params.set('author', query.authors);
+  // A known author is filtered by id, so "Smith" doesn't match every Smith.
+  if (query.authorId) params.set('author_id', query.authorId);
+  else if (query.authors) params.set('author', query.authors);
   if (query.query) params.set('query', query.query);
   if (query.languageCode) params.set('language_code', query.languageCode);
   if (query.lcpState) params.set('lcp_state', query.lcpState);
@@ -66,7 +78,10 @@ export const useEntryFilters = (): EntryFilters => {
       title: searchParams.get('title') ?? '',
       // An explicit collection filter wins over the /feeds drill-down step.
       feedId: feedIds.length > 0 ? '' : searchParams.get('feed-id-step') ?? '',
+      // `author` is the display name (chip, breadcrumb, heading); `author-id`,
+      // when present, is what is filtered on.
       authors: searchParams.get('author') ?? '',
+      authorId: searchParams.get(AUTHOR_ID_PARAM) ?? '',
       publishedAtGte: searchParams.get('publishedAtGte') ?? '',
       publishedAtLte: searchParams.get('publishedAtLte') ?? '',
       orderBy: searchParams.get('order-by') ?? '',

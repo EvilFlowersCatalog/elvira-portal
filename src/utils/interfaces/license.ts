@@ -45,7 +45,10 @@ export const formatAuthors = (entry?: ILicenseEntry): string => {
 export interface IRenewPolicy {
 	/** `requested_end` may not exceed now + this many days. */
 	max_renew_days: number;
-	/** A loan cannot be renewed until this many days after acquisition. */
+	/**
+	 * Upper bound of the first-renewal waiting period. The real embargo is half
+	 * the loan from `starts_at`, capped by this — gate on `ILicense.renewable_from`.
+	 */
 	embargo_days: number;
 	/** Per-loan renewal cap; null = uncapped. */
 	max_renewals: number | null;
@@ -67,7 +70,19 @@ export interface ILicense {
 	renewal_count: number;
 	renewals_remaining: number | null;
 	renew_policy?: IRenewPolicy;
+	/** Earliest moment a renewal is accepted (ISO-8601); null = no embargo applies. */
+	renewable_from?: string | null;
 }
+
+/**
+ * When the renewal embargo ends, or null when the loan can be renewed now.
+ * Computed by the server; never derive it from `embargo_days` locally.
+ */
+export const renewalEmbargoUntil = (license: Pick<ILicense, 'renewable_from'>, now = new Date()): Date | null => {
+	if (!license.renewable_from) return null;
+	const from = new Date(license.renewable_from);
+	return Number.isNaN(from.getTime()) || from <= now ? null : from;
+};
 
 export interface INewLicense {
 	entry_id: string;

@@ -1,26 +1,29 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
-import { fmtDate } from '../../../utils/func/adminDate';
+import { fmtDate, fmtDateTime } from '../../../utils/func/adminDate';
 import useGetLicenses from '../../../hooks/api/licenses/useGetLicenses';
 import useUpdateLicenseState from '../../../hooks/api/licenses/useUpdateLicense';
 import useUserLookup from '../../../hooks/api/users/useUserLookup';
 import useTableParams from '../../../hooks/useTableParams';
-import { ILicense, LICENSE_ACTION, LICENSE_STATE } from '../../../utils/interfaces/license';
+import { ILicense, LICENSE_ACTION, LICENSE_STATE, renewalEmbargoUntil } from '../../../utils/interfaces/license';
 import { Metadata } from '../../../utils/interfaces/general/general';
+import { licenseErrorMessage } from '../../../utils/problemDetail';
 import DataTable, { DataTableColumn } from '../DataTable';
 import StatusChip, { StatusVariant } from '../StatusChip';
 import SearchField from '../SearchField';
 import ConfirmDialog from '../ConfirmDialog';
-import UserLink from '../UserLink';
+import UserLink, { userDisplayName } from '../UserLink';
 
 const DEFAULT_LIMIT = 10;
 // Newest loans first; the API's own default is oldest-created first.
 const DEFAULT_ORDER = '-starts_at';
 
 // Valid license state-machine transitions — never offer an action the API rejects.
+// No "activate": a loan becomes active only when a reading app opens it (device
+// registration); the API answers 409 `activation_by_device_only` while `ready`.
 const VALID_ACTIONS: Partial<Record<LICENSE_STATE, LICENSE_ACTION[]>> = {
-  [LICENSE_STATE.ready]: [LICENSE_ACTION.active, LICENSE_ACTION.cancelled],
+  [LICENSE_STATE.ready]: [LICENSE_ACTION.cancelled],
   [LICENSE_STATE.active]: [LICENSE_ACTION.returned, LICENSE_ACTION.renewed, LICENSE_ACTION.revoked],
 };
 
@@ -101,8 +104,8 @@ export default function LoansTable({ userId, onTotal }: LoansTableProps) {
       toast.success(t('administration.loansPage.actionDone'));
       // The PUT response doesn't reliably carry the new state — reload the page of loans.
       await fetchLoans(true);
-    } catch (e: any) {
-      toast.error(e?.response?.data?.detail || t('notifications.license.edit.error', { defaultValue: 'Action failed' }));
+    } catch (e) {
+      toast.error(licenseErrorMessage(e, t, t('notifications.license.edit.error', { defaultValue: 'Action failed' })));
     }
   };
 
@@ -162,13 +165,19 @@ export default function LoansTable({ userId, onTotal }: LoansTableProps) {
         return (
           <div className="flex flex-wrap justify-end gap-1.5">
             {actions.map((a) => {
-              const renewBlocked = a === LICENSE_ACTION.renewed && l.renewals_remaining === 0;
+              const embargoUntil = a === LICENSE_ACTION.renewed ? renewalEmbargoUntil(l) : null;
+              const renewBlocked = a === LICENSE_ACTION.renewed && (l.renewals_remaining === 0 || embargoUntil !== null);
               const destructive = DESTRUCTIVE.includes(a);
               return (
                 <button
                   key={a}
                   type="button"
                   disabled={renewBlocked}
+                  title={
+                    embargoUntil
+                      ? t('license.loansPage.modals.embargoNotice', { date: fmtDateTime(l.renewable_from) })
+                      : undefined
+                  }
                   onClick={(e) => {
                     e.stopPropagation();
                     onAction(l, a);
@@ -220,11 +229,19 @@ export default function LoansTable({ userId, onTotal }: LoansTableProps) {
       <ConfirmDialog
         open={pendingAction !== null}
         title={t('administration.loansPage.confirmTitle')}
-        message={
-          pendingAction?.action === LICENSE_ACTION.revoked
-            ? t('administration.loansPage.confirmRevoke')
-            : t('administration.loansPage.confirmCancel')
-        }
+        message={(() => {
+          // Name the book and the reader: from a long list, "this loan" is easy to get wrong.
+          const lic = pendingAction?.license;
+          const owner = lic ? users[lic.user_id] : undefined;
+          const params = {
+            title: lic?.entry?.title || '—',
+            user: owner ? ` (${userDisplayName(owner)})` : '',
+            interpolation: { escapeValue: false },
+          };
+          return pendingAction?.action === LICENSE_ACTION.revoked
+            ? t('administration.loansPage.confirmRevoke', params)
+            : t('administration.loansPage.confirmCancel', params);
+        })()}
         confirmLabel={t('administration.loansPage.confirm')}
         cancelLabel={t('administration.loansPage.cancelBtn')}
         destructive
