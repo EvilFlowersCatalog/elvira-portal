@@ -22,7 +22,11 @@ export interface IEntryFigure {
   image_url: string | null;
 }
 
-/** Recommendations and figures from the extraction index; empty until a PDF is processed. */
+/**
+ * Recommendations and figures. Entry similarity uses the entry's own vector and
+ * works for every entry (catalog IP-021); passage similarity and figures come
+ * from the extraction index and stay empty until a PDF is processed.
+ */
 const useSimilarEntries = () => {
   const axios = useAxios();
   const { auth } = useAuthContext();

@@ -16,6 +16,7 @@ import {
   setFeedIds,
 } from '../../utils/func/filterParams';
 import { withRememberedSearch } from '../../utils/func/listSearch';
+import { AUTHOR_ID_PARAM, setAuthorParams } from '../../hooks/api/entries/entryFilters';
 import { localize } from '../../utils/func/localized';
 import { LocalizedText } from '../../utils/interfaces/general/general';
 
@@ -150,7 +151,9 @@ const Breadcrumb = () => {
       // Build current filter params
       const buildFilterPath = (includeFilters: { author?: boolean; feed?: boolean; categories?: boolean }) => {
         const params = new URLSearchParams();
-        if (includeFilters.author && authorFilter) params.set('author', authorFilter);
+        if (includeFilters.author && authorFilter) {
+          setAuthorParams(params, { id: searchParams.get(AUTHOR_ID_PARAM), name: authorFilter });
+        }
         if (includeFilters.feed && resolvedFeedFilter) setFeedIds(params, [resolvedFeedFilter.id]);
         if (includeFilters.categories && resolvedCategoryFilters.length > 0) {
           setCategoryIds(params, resolvedCategoryFilters.map(c => c.id));

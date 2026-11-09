@@ -944,6 +944,18 @@ export const en = {
       categories: 'Categories',
       noResults: 'No results for “{{query}}”',
       seeAll: 'Search all results for “{{query}}”',
+      didYouMean: 'Did you mean',
+      relaxed: 'No exact match, showing related results.',
+      showAll: 'Show all',
+      matchedIn: 'Matched in',
+      matched: {
+        title: 'title',
+        author: 'author',
+        category: 'category',
+        summary: 'text',
+        publisher: 'publisher',
+        semantic: 'related',
+      },
     },
 
     profile: {
@@ -1409,6 +1421,7 @@ export const en = {
         titleDesc: 'Title ↓',
         popularityAsc: 'Popularity ↑',
         popularityDesc: 'Popularity ↓',
+        relevance: 'Relevance',
       },
     },
 

@@ -941,6 +941,18 @@ export const sk = {
       categories: 'Kategórie',
       noResults: 'Žiadne výsledky pre „{{query}}“',
       seeAll: 'Zobraziť všetky výsledky pre „{{query}}“',
+      didYouMean: 'Mysleli ste',
+      relaxed: 'Presná zhoda sa nenašla, zobrazujeme súvisiace výsledky.',
+      showAll: 'Zobraziť všetky',
+      matchedIn: 'Zhoda v',
+      matched: {
+        title: 'názov',
+        author: 'autor',
+        category: 'kategória',
+        summary: 'text',
+        publisher: 'vydavateľ',
+        semantic: 'súvisiace',
+      },
     },
 
     profile: {
@@ -1396,12 +1408,13 @@ export const sk = {
       clearFilters: 'Zrušiť filtre',
       activeFilters: 'Aktívne filtre:',
       orderBy: {
-        createdAtAsc: 'Najnovšie',
-        createdAtDesc: 'Najstaršie',
+        createdAtAsc: 'Najstaršie',
+        createdAtDesc: 'Najnovšie',
         titleAsc: 'A-Z',
         titleDesc: 'Z-A',
         popularityAsc: 'Najmenej populárne',
         popularityDesc: 'Najpopulárnejšie',
+        relevance: 'Najrelevantnejšie',
       },
     },
 

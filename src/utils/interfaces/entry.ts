@@ -2,13 +2,39 @@ import { IEntryAcquisition } from './acquisition';
 import { IEntryAuthor } from './author';
 import { ICategory } from './category';
 import { IFeed } from './feed';
-import { IConfig, IMetadata } from './general/general';
+import { IConfig, IMetadata, LocalizedText } from './general/general';
 import { ILanguage } from './language';
 import { ExtractionEntryStatus } from './extraction';
 
 export interface IEntriesList {
   items: IEntry[];
-  metadata: IMetadata;
+  metadata: IMetadata & {
+    /** Set only when the request had `query` (null or absent otherwise). */
+    search?: IEntrySearchMeta | null;
+  };
+  /** Only with `include=facets`. */
+  facets?: IEntryFacets | null;
+}
+
+/** How the catalog answered a `query` (catalog IP-020 / IP-021). */
+export interface IEntrySearchMeta {
+  query: string;
+  mode?: 'hybrid' | 'bm25' | 'fulltext' | 'semantic' | string;
+  /** No entry matched exactly, so the results are related ones (see `fallback`). */
+  relaxed: boolean;
+  fallback?: 'any_word' | 'similar' | 'semantic' | null;
+  /** A spelling correction, e.g. `Hirshberger` → `hirschberger`. */
+  did_you_mean?: string | null;
+  /** The embedding server didn't answer — words-only results. */
+  degraded?: boolean;
+  total?: number;
+}
+
+/** Why one entry matched a `query`. Highlights are server-escaped HTML whose only tag is `<mark>`. */
+export interface IEntrySearchHit {
+  score: number;
+  matched: string[];
+  highlights?: { title?: string | null; summary?: string | null } | null;
 }
 
 export type LcpState =
@@ -53,6 +79,8 @@ export interface IEntry extends Partial<IEntryLcpFields> {
   shelf_record_id: string;
   thumbnail: string;
   published_at?: string;
+  /** Only in lists fetched with `query`. */
+  search?: IEntrySearchHit;
 }
 
 /** One heading of the publication's outline; `page` is the viewer's page. */
@@ -96,7 +124,10 @@ export interface IEntryQuery {
   categoryId?: string;
   /** Single feed ID — current production API (feed_id) */
   feedId?: string;
+  /** Author name substring (`author`) — use `authorId` when the author is known. */
   authors?: string;
+  /** Comma-separated author ids (`author_id`); wins over `authors`. */
+  authorId?: string;
   publishedAtGte?: string;
   publishedAtLte?: string;
   orderBy?: string;
@@ -115,15 +146,43 @@ export interface IEntryQuery {
   extraction?: boolean;
   /** Comma-separated `extraction_status` values (unsupported, none, queued, running, done, failed, available). */
   extractionStatus?: string;
+  /** `facets` adds the facet counts of the same filters to the list response. */
+  include?: 'facets';
 }
 
+/**
+ * `/entries/facets` or `include=facets`. Every dimension ignores its own filter
+ * (disjunctive). A dimension not asked for with `facet=` comes back null.
+ */
 export interface IEntryFacets {
-  languages: { code: string; count: number }[];
-  categories: { id: string; count: number }[];
-  feeds: { id: string; count: number }[];
+  languages?: { code: string; name?: string; count: number }[] | null;
+  categories?: { id: string; term?: string; label?: LocalizedText | string; count: number }[] | null;
+  feeds?: { id: string; title?: LocalizedText | string; count: number }[] | null;
+  /** Top 10 by default */
+  authors?: { id: string; name: string; surname: string; count: number }[] | null;
+  publishers?: { value: string; count: number }[] | null;
+  formats?: { mime: string; count: number }[] | null;
+  fulltext?: { value: boolean; count: number }[] | null;
   /** Counts per backend `lcp_state` value plus the `reserved` pseudo-state */
-  availability: { state: string; count: number }[];
-  years: { min: number | null; max: number | null };
+  availability?: { state: string; count: number }[] | null;
+  years?: { min: number | null; max: number | null } | null;
+}
+
+/** `GET /entries/suggest` — the type-ahead in one request. */
+export interface IEntrySuggestions {
+  query: string;
+  entries: {
+    id: string;
+    catalog_id: string;
+    title: string;
+    authors: string[];
+    thumbnail: string | null;
+    highlight?: string | null;
+  }[];
+  authors: { id: string; name: string; surname: string; count: number }[];
+  categories: { id: string; term: string; label?: LocalizedText | string; count: number }[];
+  feeds: { id: string; title: LocalizedText | string; count: number }[];
+  did_you_mean?: string | null;
 }
 
 export interface IEntryNew {

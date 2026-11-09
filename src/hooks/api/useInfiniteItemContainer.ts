@@ -1,9 +1,11 @@
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { useMemo } from 'react';
+import { IEntryFacets, IEntrySearchMeta } from '../../utils/interfaces/entry';
 
 interface PagedResponse<T> {
   items: T[];
-  metadata: { pages: number };
+  metadata: { pages: number; search?: IEntrySearchMeta | null };
+  facets?: IEntryFacets | null;
 }
 
 /**
@@ -29,6 +31,13 @@ export interface IItemContainerList<T = any> {
   loadingNext: boolean;
   setLoadingNext: (v: boolean) => void;
   reset: () => void;
+  /** How the catalog answered the search (first page; entries lists with `query`). */
+  search?: IEntrySearchMeta | null;
+  /**
+   * Facet counts sent with the first page (`include=facets`). `undefined` means the
+   * list doesn't carry them and the sidebar has to fetch its own.
+   */
+  facets?: { data: IEntryFacets | null | undefined; ready: boolean; failed: boolean };
 }
 
 /**
@@ -44,12 +53,12 @@ export interface IItemContainerList<T = any> {
  */
 export function useInfiniteItemContainer<T extends { id: string }>(
   queryKey: unknown[],
-  fetchPage: (page: number) => Promise<PagedResponse<T>>,
-  options?: { enabled?: boolean }
+  fetchPage: (page: number, signal: AbortSignal) => Promise<PagedResponse<T>>,
+  options?: { enabled?: boolean; withFacets?: boolean }
 ): IItemContainerList<T> {
   const query = useInfiniteQuery({
     queryKey,
-    queryFn: ({ pageParam }) => fetchPage(pageParam),
+    queryFn: ({ pageParam, signal }) => fetchPage(pageParam, signal),
     initialPageParam: 1,
     getNextPageParam: (lastPage, allPages) =>
       allPages.length < (lastPage.metadata?.pages ?? 1)
@@ -72,9 +81,17 @@ export function useInfiniteItemContainer<T extends { id: string }>(
     return Array.from(new Map(all.map((e) => [e.id, e])).values());
   }, [query.data]);
 
+  const firstPage = query.data?.pages[0];
   const page = query.data?.pages.length ?? 0;
-  const maxPage = query.data?.pages[0]?.metadata?.pages ?? 0;
+  const maxPage = firstPage?.metadata?.pages ?? 0;
   const noop = () => {};
+  const facets = useMemo(
+    () =>
+      options?.withFacets
+        ? { data: firstPage?.facets, ready: !!firstPage, failed: query.isError && !firstPage }
+        : undefined,
+    [options?.withFacets, firstPage, query.isError]
+  );
 
   return {
     items,
@@ -100,6 +117,8 @@ export function useInfiniteItemContainer<T extends { id: string }>(
     reset: () => {
       query.refetch();
     },
+    search: firstPage?.metadata?.search,
+    facets,
   };
 }
 

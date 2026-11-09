@@ -16,9 +16,13 @@ const Library = () => {
   const getEntries = useGetEntries();
   const filters = useEntryFilters();
 
+  // The first page carries the facet counts (`include=facets`), so the grid, the
+  // sidebar and the suggestion chips come from one request.
   const list = useInfiniteItemContainer<IEntry>(
     ['entries-infinite', filters],
-    (page) => getEntries({ page, limit: 30, ...filters })
+    (page, signal) =>
+      getEntries({ page, limit: 30, ...filters, include: page === 1 ? 'facets' : undefined }, signal),
+    { withFacets: true }
   );
 
   return (
@@ -29,7 +33,7 @@ const Library = () => {
       title={t('navbarMenu.library')}
     >
       {!list.isLoading && list.items.length > 0 && searchParams.get('query') && (
-        <FilterSuggestions searchQuery={searchParams.get('query') || ''} />
+        <FilterSuggestions searchQuery={searchParams.get('query') || ''} facets={list.facets?.data} />
       )}
       <EntriesWrapper>
         {list.items.map((entry) => (

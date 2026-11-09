@@ -1,59 +1,61 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSearchParams } from "react-router-dom";
-import useEntriesQuery from "../../hooks/api/entries/useEntriesQuery";
-import { ICategory } from "../../utils/interfaces/category";
-import { IFeed } from "../../utils/interfaces/feed";
 import { MdClose } from "react-icons/md";
-import { addCategoryId, addFeedId } from "../../utils/func/filterParams";
+import { IEntryFacets } from "../../utils/interfaces/entry";
+import { addCategoryId, addFeedId, readCategoryIds, readFeedIds } from "../../utils/func/filterParams";
+import { AUTHOR_ID_PARAM, setAuthorParams } from "../../hooks/api/entries/entryFilters";
 import { localize } from '../../utils/func/localized';
 
 interface FilterSuggestionsProps {
   searchQuery: string;
+  /** Facet counts that came with the search results (`include=facets`). */
+  facets?: IEntryFacets | null;
 }
 
-const FilterSuggestions = ({ searchQuery }: FilterSuggestionsProps) => {
+type Chip = { id: string; label: string; count: number };
+
+const byCount = (a: Chip, b: Chip) => b.count - a.count;
+
+/**
+ * Authors, collections and categories of the current search results, with counts,
+ * as one-click refinements. Read from the facets the results came with — no
+ * request of its own. The catalog returns the top 10 authors; categories and
+ * collections are complete and sorted by count here.
+ */
+const FilterSuggestions = ({ searchQuery, facets }: FilterSuggestionsProps) => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-  
+
   const [isVisible, setIsVisible] = useState(true);
   const [showAll, setShowAll] = useState(false);
 
   const MAX_ITEMS_PER_COLUMN = 3;
 
-  const enabled = !!searchQuery && searchQuery.trim().length >= 2;
-  // Derive facets from the same relevance full-text `query` the grid uses (not a
-  // title-only match), so the suggested authors/collections/categories actually
-  // correspond to the results the user is seeing.
-  const { data, isLoading } = useEntriesQuery(
-    { page: 1, limit: 50, query: searchQuery },
-    { enabled }
-  );
+  // Refinements already applied aren't suggested again.
+  const activeAuthor = searchParams.get(AUTHOR_ID_PARAM);
+  const activeCategories = readCategoryIds(searchParams);
+  const activeFeeds = readFeedIds(searchParams);
 
-  // Derive the author / category / collection facets from the returned entries.
   const { authors, categories, feeds } = useMemo(() => {
-    const items = data?.items ?? [];
-    const uniqueAuthors = new Set<string>();
-    const categoriesMap = new Map<string, ICategory>();
-    const feedsMap = new Map<string, IFeed>();
-    items.forEach((entry) => {
-      entry.authors?.forEach((author) => {
-        const fullName = `${author.name ?? ''} ${author.surname ?? ''}`.trim();
-        if (fullName) uniqueAuthors.add(fullName);
-      });
-      entry.categories?.forEach((cat) => {
-        if (!categoriesMap.has(cat.id)) categoriesMap.set(cat.id, cat);
-      });
-      entry.feeds?.forEach((feed) => {
-        if (!feedsMap.has(feed.id)) feedsMap.set(feed.id, feed);
-      });
-    });
-    return {
-      authors: Array.from(uniqueAuthors),
-      categories: Array.from(categoriesMap.values()),
-      feeds: Array.from(feedsMap.values()),
-    };
-  }, [data]);
+    const authors: Chip[] = (facets?.authors ?? [])
+      .filter((a) => a.count > 0 && a.id !== activeAuthor)
+      .map((a) => ({ id: a.id, label: `${a.name ?? ''} ${a.surname ?? ''}`.trim(), count: a.count }))
+      .filter((a) => a.label)
+      .sort(byCount);
+    const categories: Chip[] = (facets?.categories ?? [])
+      .filter((c) => c.count > 0 && !activeCategories.includes(c.id))
+      .map((c) => ({ id: c.id, label: localize(c.label) || c.term || '', count: c.count }))
+      .filter((c) => c.label)
+      .sort(byCount);
+    const feeds: Chip[] = (facets?.feeds ?? [])
+      .filter((f) => f.count > 0 && !activeFeeds.includes(f.id))
+      .map((f) => ({ id: f.id, label: localize(f.title), count: f.count }))
+      .filter((f) => f.label)
+      .sort(byCount);
+    return { authors, categories, feeds };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [facets, activeAuthor, activeCategories.join(','), activeFeeds.join(',')]);
 
   // Reset visibility / show-all whenever the search term changes.
   useEffect(() => {
@@ -61,9 +63,9 @@ const FilterSuggestions = ({ searchQuery }: FilterSuggestionsProps) => {
     setShowAll(false);
   }, [searchQuery]);
 
-  const handleAuthorClick = (authorName: string) => {
+  const handleAuthorClick = (author: Chip) => {
     const params = new URLSearchParams(searchParams);
-    params.set('author', authorName);
+    setAuthorParams(params, { id: author.id, name: author.label });
     setSearchParams(params);
   };
 
@@ -85,17 +87,49 @@ const FilterSuggestions = ({ searchQuery }: FilterSuggestionsProps) => {
     return showAll ? items : items.slice(0, MAX_ITEMS_PER_COLUMN);
   };
 
-  const getRemainingCount = (items: any[]): number => {
+  const getRemainingCount = (items: unknown[]): number => {
     return Math.max(0, items.length - MAX_ITEMS_PER_COLUMN);
   };
 
-  if (!searchQuery || searchQuery.trim().length < 2 || !isVisible) {
+  if (!searchQuery || searchQuery.trim().length < 2 || !isVisible || !hasResults) {
     return null;
   }
 
-  if (!hasResults && !isLoading) {
-    return null;
-  }
+  const count = (n: number) => <span className="ml-1 text-xs opacity-60">({n})</span>;
+
+  const column = (title: string, items: Chip[], onClick: (item: Chip) => void, asText = false) => (
+    <div className="flex flex-col">
+      <h3 className="text-sm font-bold mb-3 text-gray-700 dark:text-gray-300">{title}</h3>
+      {items.length > 0 ? (
+        <>
+          <div className={asText ? "flex flex-col gap-2" : "flex flex-row flex-wrap gap-2"}>
+            {getVisibleItems(items).map((item) => (
+              <button
+                key={item.id}
+                onClick={() => onClick(item)}
+                className={asText
+                  ? "text-left text-sm text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primaryLight transition-colors px-2 py-1 rounded hover:bg-gray-50 dark:hover:bg-gray-800"
+                  : "text-left px-3 py-1.5 text-sm bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight hover:opacity-80 transition-opacity rounded-md"}
+              >
+                {item.label}
+                {count(item.count)}
+              </button>
+            ))}
+          </div>
+          {!showAll && getRemainingCount(items) > 0 && (
+            <button
+              onClick={() => setShowAll(true)}
+              className="text-left text-sm text-primary dark:text-primaryLight hover:underline mt-3 font-semibold"
+            >
+              {t('common.showMore', { count: getRemainingCount(items) })}
+            </button>
+          )}
+        </>
+      ) : (
+        <p className="text-xs text-gray-500 dark:text-gray-400">{t('page.noResults')}</p>
+      )}
+    </div>
+  );
 
   return (
     <div className="w-full px-4 mb-6">
@@ -109,115 +143,11 @@ const FilterSuggestions = ({ searchQuery }: FilterSuggestionsProps) => {
           <MdClose size={20} className="text-gray-500 dark:text-gray-400" />
         </button>
 
-        {isLoading ? (
-          <div className="py-4 text-center text-gray-500 dark:text-gray-400 text-sm">
-            {t('common.loading')}...
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pr-8">
-            {/* Authors Column */}
-            <div className="flex flex-col">
-              <h3 className="text-sm font-bold mb-3 text-gray-700 dark:text-gray-300">
-                {t('entry.wizard.authors')}
-              </h3>
-              {authors.length > 0 ? (
-                <>
-                  <div className="flex flex-col gap-2">
-                    {getVisibleItems(authors).map((author, index) => (
-                      <button
-                        key={index}
-                        onClick={() => handleAuthorClick(author)}
-                        className="text-left text-sm text-gray-700 dark:text-gray-300 hover:text-primary dark:hover:text-primaryLight transition-colors px-2 py-1 rounded hover:bg-gray-50 dark:hover:bg-gray-800"
-                      >
-                        {author}
-                      </button>
-                    ))}
-                  </div>
-                  {!showAll && getRemainingCount(authors) > 0 && (
-                    <button
-                      onClick={() => setShowAll(true)}
-                      className="text-left text-sm text-primary dark:text-primaryLight hover:underline mt-3 font-semibold"
-                    >
-                      {t('common.showMore', { count: getRemainingCount(authors) })}
-                    </button>
-                  )}
-                </>
-              ) : (
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {t('page.noResults')}
-                </p>
-              )}
-            </div>
-
-            {/* Feeds Column */}
-            <div className="flex flex-col">
-              <h3 className="text-sm font-bold mb-3 text-gray-700 dark:text-gray-300">
-                {t('searchBar.feeds')}
-              </h3>
-              {feeds.length > 0 ? (
-                <>
-                  <div className="flex flex-row flex-wrap gap-2">
-                    {getVisibleItems(feeds).map((feed) => (
-                      <button
-                        key={feed.id}
-                        onClick={() => handleFeedClick(feed.id)}
-                        className="text-left px-3 py-1.5 text-sm bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight hover:opacity-80 transition-opacity rounded-md"
-                      >
-                        {localize(feed.title)}
-                      </button>
-                    ))}
-                  </div>
-                  {!showAll && getRemainingCount(feeds) > 0 && (
-                    <button
-                      onClick={() => setShowAll(true)}
-                      className="text-left text-sm text-primary dark:text-primaryLight hover:underline mt-3 font-semibold"
-                    >
-                      {t('common.showMore', { count: getRemainingCount(feeds) })}
-                    </button>
-                  )}
-                </>
-              ) : (
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {t('page.noResults')}
-                </p>
-              )}
-            </div>
-
-            {/* Categories Column */}
-            <div className="flex flex-col">
-              <h3 className="text-sm font-bold mb-3 text-gray-700 dark:text-gray-300">
-                {t('searchBar.categories')}
-              </h3>
-              {categories.length > 0 ? (
-                <>
-                  <div className="flex flex-row flex-wrap gap-2">
-                    {getVisibleItems(categories).map((category) => (
-                      <button
-                        key={category.id}
-                        onClick={() => handleCategoryClick(category.id)}
-                        className="text-left px-3 py-1.5 text-sm bg-primaryLight dark:bg-primaryDark text-primaryText dark:text-primaryLight hover:opacity-80 transition-opacity rounded-md"
-                      >
-                        {localize(category.label) || category.term}
-                      </button>
-                    ))}
-                  </div>
-                  {!showAll && getRemainingCount(categories) > 0 && (
-                    <button
-                      onClick={() => setShowAll(true)}
-                      className="text-left text-sm text-primary dark:text-primaryLight hover:underline mt-3 font-semibold"
-                    >
-                      {t('common.showMore', { count: getRemainingCount(categories) })}
-                    </button>
-                  )}
-                </>
-              ) : (
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {t('page.noResults')}
-                </p>
-              )}
-            </div>
-          </div>
-        )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pr-8">
+          {column(t('entry.wizard.authors'), authors, handleAuthorClick, true)}
+          {column(t('searchBar.feeds'), feeds, (f) => handleFeedClick(f.id))}
+          {column(t('searchBar.categories'), categories, (c) => handleCategoryClick(c.id))}
+        </div>
       </div>
     </div>
   );

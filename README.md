@@ -8,10 +8,14 @@ chat with the built-in AI assistant.
 Crafted with **React 19 + Vite** and **TypeScript**. Sit back and relax — the app
 hot-reloads whenever you tweak any source file.
 
+![Library search: type-ahead suggestions with highlighted matches, collection and category facets with counts, and relevance-ranked results](docs/screenshots/search.png)
+
 ## Highlights
 
-- **Discovery** — keyword search, filters (feeds, categories, authors, language,
-  year), suggestions, and infinite-scroll catalog browsing.
+- **Discovery** — relevance-ranked search (diacritics optional, typo correction
+  with "did you mean"), matched words highlighted in results, one-request
+  type-ahead suggestions, filters with live counts (collections, categories,
+  authors, language, year, availability), and infinite-scroll catalog browsing.
 - **Lending** — borrow / renew / return flows and reservation queues with proper
   availability indicators (available · borrowed · reserved · unavailable).
 - **Reading** — in-app reader (`@evilflowers/evilflowersviewer`) with annotations.

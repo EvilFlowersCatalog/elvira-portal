@@ -13,6 +13,7 @@ import OpenFiltersButton from '../../buttons/OpenFiltersButton';
 import LicenseCalendar from '../entry/details/LicenseCalendar';
 import { IItemContainerList } from '../../../hooks/api/useInfiniteItemContainer';
 import { EntryFilters } from '../../../hooks/api/entries/entryFilters';
+import SearchNotice from './SearchNotice';
 
 interface IItemContainer {
   children: ReactNode;
@@ -98,7 +99,7 @@ const ItemContainer = ({
           enableSort={enableSort}
         />
 
-        <AdvancedSearchWrapper enabled={isEntries} entryScope={entryScope}>
+        <AdvancedSearchWrapper enabled={isEntries} entryScope={entryScope} facets={list.facets}>
           <>
             {showResultsHeading && (
               <h2 className='px-4 text-secondary dark:text-secondaryLight text-lg font-medium text-left mb-4'>
@@ -108,6 +109,9 @@ const ItemContainer = ({
                 {searchParams.get('query') && <span className="font-bold ml-1">"{searchParams.get('query')}"</span>}
               </h2>
             )}
+
+            {/* Outside the results branch: a correction matters most when nothing matched. */}
+            {!list.isLoading && !list.isError && <SearchNotice search={list.search} />}
 
             {list.isLoading && <PageLoading entries={isEntries} showLayout={showLayout} />}
 

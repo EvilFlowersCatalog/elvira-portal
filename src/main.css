@@ -75,6 +75,14 @@ input:focus:not(:focus-visible) {
   outline: none;
 }
 
+/* Search terms marked by the catalog (`<mark>` in search highlights). */
+.search-highlight mark {
+  background-color: color-mix(in srgb, var(--color-primary) 22%, transparent);
+  color: inherit;
+  border-radius: 2px;
+  padding: 0 1px;
+}
+
 /* CSS Variables for faculty themes */
 :root[data-theme="fiit"] {
   --color-primary: #01a9e0;
