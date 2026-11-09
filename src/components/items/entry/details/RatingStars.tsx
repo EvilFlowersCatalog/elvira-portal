@@ -29,15 +29,25 @@ export const RatingStars = ({ value, size = 16, className }: { value: number; si
 };
 
 /** Pick 1–5 stars. Keyboard: the stars are a radio group. */
-export const RatingInput = ({ value, onChange }: { value: number; onChange: (value: number) => void }) => {
+export const RatingInput = ({
+  value,
+  onChange,
+  size = 26,
+  label,
+}: {
+  value: number;
+  onChange: (value: number) => void;
+  size?: number;
+  label?: string;
+}) => {
   const { t } = useTranslation();
   const [hover, setHover] = useState<number | null>(null);
   const shown = hover ?? value;
   return (
     <div
-      className="inline-flex items-center gap-1 text-amber-500"
+      className="inline-flex items-center gap-0.5 text-amber-500"
       role="radiogroup"
-      aria-label={t('entry.detail.reviews.yourRating')}
+      aria-label={label ?? t('entry.detail.reviews.yourRating')}
       onMouseLeave={() => setHover(null)}
     >
       {STARS.map((star) => (
@@ -51,7 +61,7 @@ export const RatingInput = ({ value, onChange }: { value: number; onChange: (val
           onMouseEnter={() => setHover(star)}
           onClick={() => onChange(star)}
         >
-          {shown >= star ? <RiStarFill size={26} /> : <RiStarLine size={26} />}
+          {shown >= star ? <RiStarFill size={size} /> : <RiStarLine size={size} />}
         </button>
       ))}
     </div>

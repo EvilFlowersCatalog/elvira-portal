@@ -12,7 +12,7 @@ import { IItemContainerList } from "../../../hooks/api/useInfiniteItemContainer"
 import useFeedsQuery from "../../../hooks/api/feeds/useFeedsQuery";
 import useEntryFacets from "../../../hooks/api/entries/useEntryFacets";
 import { EntryFilters, RATING_MIN_PARAM, useEntryFilters } from "../../../hooks/api/entries/entryFilters";
-import { RatingStars } from "../entry/details/RatingStars";
+import { RatingInput } from "../entry/details/RatingStars";
 import { AcceptedLanguage, getLanguage, getLanguages } from "../../../hooks/api/languages/languages";
 import { IFeed } from "../../../utils/interfaces/feed";
 import { AvailabilityState } from "../entry/details/AvailabilityBadge";
@@ -29,9 +29,6 @@ const AVAILABILITY_OPTIONS: AvailabilityOption[] = [
     { value: 'borrowed',    labelKey: 'entry.detail.availability.borrowed' },
     { value: 'reserved',    labelKey: 'entry.detail.availability.reserved' },
 ];
-
-/** Minimum average rating choices; '' = any (no filter). */
-const RATING_MIN_OPTIONS = ['', '4', '3', '2'];
 
 function SectionDivider() {
     return <div className="h-px w-full bg-[rgba(0,0,0,0.1)] dark:bg-[rgba(255,255,255,0.1)]" />;
@@ -335,29 +332,19 @@ export function AdvancedSearch({ entryScope, facets: providedFacets }: { entrySc
                 <p className="text-[14px] font-medium text-darkGray dark:text-white tracking-[0.1px]">
                     {t('searchBar.rating')}
                 </p>
-                <div className="flex flex-col gap-[7px]" role="radiogroup" aria-label={t('searchBar.rating')}>
-                    {RATING_MIN_OPTIONS.map(value => {
-                        const checked = ratingMin === value;
-                        return (
-                            <label key={value || 'any'} className="flex items-center gap-2 cursor-pointer">
-                                <input
-                                    type="radio"
-                                    name="rating-min"
-                                    className="accent-[var(--color-primary)] w-4 h-4"
-                                    checked={checked}
-                                    onChange={() => setRatingMin(value)}
-                                />
-                                <span className={`flex items-center gap-1.5 text-[14px] tracking-[0.1px] leading-[20px] ${checked ? 'font-medium' : 'font-normal'} text-darkGray dark:text-white`}>
-                                    {value ? (
-                                        <>
-                                            <RatingStars value={Number(value)} size={14} />
-                                            {t('searchBar.ratingAtLeast', { value })}
-                                        </>
-                                    ) : t('searchBar.ratingAny')}
-                                </span>
-                            </label>
-                        );
-                    })}
+                {/* One row of stars: click N for "N stars and up", click it again to clear. */}
+                <div className="flex items-center gap-2">
+                    <RatingInput
+                        size={20}
+                        label={t('searchBar.rating')}
+                        value={Number(ratingMin) || 0}
+                        onChange={value => setRatingMin(String(value) === ratingMin ? '' : String(value))}
+                    />
+                    {ratingMin && (
+                        <span className="text-[13px] text-darkGray dark:text-white">
+                            {t('searchBar.ratingAtLeast', { value: ratingMin })}
+                        </span>
+                    )}
                 </div>
             </div>
 
