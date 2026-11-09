@@ -24,12 +24,32 @@ import {
 import Button from '../../../components/buttons/Button';
 import { localize } from '../../../utils/func/localized';
 import Select from '../../../components/primitives/Select';
+import { useEntryExtraction } from '../../../hooks/api/entries/useEntryExtraction';
 import { ExtractionStatusChip } from '../../../components/specific-page/admin-entry-page/extraction/EntryExtractionPanel';
 
 /** Values of the AI-processing filter (`?ai=`), sent as `extraction_status`. */
 const EXTRACTION_FILTERS = ['available', 'done', 'none', 'queued', 'running', 'failed', 'unsupported'];
 
 const DEFAULT_LIMIT = 10;
+
+const REGION_STATS = ['figures', 'tables', 'equations'] as const;
+type RegionStat = (typeof REGION_STATS)[number];
+
+/**
+ * Figures / tables / equations of one entry, summed over its active runs like the
+ * list's combined `extraction_regions`. The three cells of a row share one cached
+ * request, and entries without regions skip it.
+ */
+const RegionCountCell = ({ entry, kind }: { entry: IEntry; kind: RegionStat }) => {
+  const hasRegions = (entry.extraction_regions ?? 0) > 0;
+  const { data, isLoading } = useEntryExtraction(entry.id, hasRegions);
+  if (entry.extraction_regions == null) return <>—</>;
+  if (!hasRegions) return <>0</>;
+  if (isLoading) return <span className="text-zinc-400">…</span>;
+  const runs = data?.acquisitions.flatMap((a) => a.runs.filter((r) => r.is_active)) ?? [];
+  if (runs.length === 0) return <>—</>;
+  return <>{runs.reduce((sum, r) => sum + (r.stats?.[kind] ?? 0), 0).toLocaleString()}</>;
+};
 
 const AdminEntries = () => {
   const { t } = useTranslation();
@@ -126,10 +146,12 @@ const AdminEntries = () => {
               ev.stopPropagation();
               patchParams({ [param]: x.id, page: '1' });
             }}
-            className="max-w-[140px] truncate"
+            className="flex min-w-0 max-w-[140px]"
             title={x.title || x.term}
           >
-            <StatusChip variant={variant} dot={false}>{x.title || x.term}</StatusChip>
+            <StatusChip variant={variant} dot={false} className="min-w-0 max-w-full">
+              <span className="truncate">{x.title || x.term}</span>
+            </StatusChip>
           </button>
         ))}
         {arr.length > 2 && <span className="text-xs text-zinc-400">{t('administration.entriesPage.moreCount', { count: arr.length - 2 })}</span>}
@@ -178,6 +200,20 @@ const AdminEntries = () => {
       cell: (e) => (e.acquisitions?.length ?? 0).toString(),
     },
     {
+      id: 'readium',
+      header: t('administration.entriesPage.readium'),
+      defaultHidden: true,
+      cell: (e) =>
+        e.config?.readium_enabled ? (
+          <StatusChip variant="success" title={t('administration.entriesPage.readiumOnHint', { count: e.config.readium_amount ?? 0 })}>
+            {t('administration.entriesPage.readiumOn')}
+            {e.config.readium_amount != null && ` · ${e.config.readium_amount}`}
+          </StatusChip>
+        ) : (
+          <span className="text-zinc-400">—</span>
+        ),
+    },
+    {
       id: 'created_at',
       header: t('administration.entriesPage.created'),
       sortKey: 'created_at',
@@ -205,15 +241,17 @@ const AdminEntries = () => {
           '—'
         ),
     },
-    {
-      id: 'extraction_regions',
-      header: t('administration.entriesPage.aiRegions'),
-      sortKey: 'extraction_regions',
-      firstSortDir: 'desc',
-      align: 'right',
-      defaultHidden: true,
-      cell: (e) => (e.extraction_regions != null ? e.extraction_regions.toLocaleString() : '—'),
-    },
+    // The list only carries the combined region count, so the per-kind numbers come
+    // from each row's extraction detail (fetched only while one of these is shown).
+    ...REGION_STATS.map(
+      (kind): DataTableColumn<IEntry> => ({
+        id: `extraction_${kind}`,
+        header: t(`administration.extraction.stats.${kind}`),
+        align: 'right',
+        defaultHidden: true,
+        cell: (e) => <RegionCountCell entry={e} kind={kind} />,
+      })
+    ),
     {
       id: 'extraction_paragraphs',
       header: t('administration.entriesPage.aiParagraphs'),
@@ -294,7 +332,7 @@ const AdminEntries = () => {
               value={searchParams.get('ai') || ''}
               onChange={(v) => patchParams({ ai: v || null, page: '1' })}
               aria-label={t('administration.entriesPage.aiFilter')}
-              className="w-56"
+              className="w-72"
               options={[
                 { value: '', label: t('administration.entriesPage.aiFilterAll') },
                 ...EXTRACTION_FILTERS.map((value) => ({
