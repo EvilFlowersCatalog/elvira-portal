@@ -1,6 +1,29 @@
 import { AiChatSubject, AiMessage } from '../../providers/AppProvider';
 import { IAssistantChat, IAssistantMessage, IChatContext } from '../interfaces/assistant';
 
+const TOOL_STATUS: Record<string, string> = {
+  search_entries: 'searchCatalog',
+  search_library_text: 'searchTexts',
+  find_similar: 'findSimilar',
+  get_entry: 'readEntry',
+  list_categories: 'listCategories',
+  list_my_loans: 'checkLoans',
+  get_my_shelf: 'checkLoans',
+  read_pdf_page: 'readPublication',
+  search_pdf: 'readPublication',
+  search_paragraphs: 'readPublication',
+};
+
+/**
+ * Translation key of the progress line for a `status` event: `thinking` before
+ * a model round, or what the tool about to run does (unknown tools: "Working…").
+ */
+export const statusLabelKey = (state: 'thinking' | 'tool', tool?: string): string => {
+  if (state === 'thinking') return 'assistant.thinking';
+  const key = tool && (TOOL_STATUS[tool] ?? (tool.includes('region') ? 'readPublication' : undefined));
+  return `assistant.status.${key ?? 'working'}`;
+};
+
 /** Stored messages as the chat shows them — the same fields the viewer reads back. */
 export const fromApiMessages = (messages: IAssistantMessage[]): AiMessage[] =>
   messages.map((msg) => ({

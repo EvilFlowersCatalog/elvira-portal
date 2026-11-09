@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../contexts/useAppContext';
 import { AiMessage } from '../../../providers/AppProvider';
+import { statusLabelKey } from '../../../utils/func/assistantMessages';
 import { formatRetryAfter, toAssistantError } from './assistantApi';
 import useSendChatMessage from './useSendChatMessage';
 import useStartChat from './useStartChat';
@@ -31,7 +32,7 @@ const useAssistantChat = (
 
     const updateAnswer = (patch: Partial<AiMessage>) =>
       setAiMessages((prev) => prev.map((m) => (m.id === answerId ? { ...m, ...patch } : m)));
-    const showError = (text: string) => updateAnswer({ text, status: 'error' });
+    const showError = (text: string) => updateAnswer({ text, status: 'error', progress: undefined });
 
     setAiMessages((prev) => [
       ...prev,
@@ -58,12 +59,13 @@ const useAssistantChat = (
       await sendChatMessage(chatId, message, {
         onChunk: (chunk) => {
           text += chunk;
-          updateAnswer({ text });
+          updateAnswer({ text, progress: undefined });
         },
         onMessage: (full) => {
           text = full;
-          updateAnswer({ text });
+          updateAnswer({ text, progress: undefined });
         },
+        onStatus: (state, tool) => updateAnswer({ progress: statusLabelKey(state, tool) }),
         onEntries: (ids) => {
           if (ids.length) updateAnswer({ entryIds: ids });
         },
@@ -76,7 +78,9 @@ const useAssistantChat = (
         onDone: () => {},
       }, { entryId, language: lang });
       setAiMessages((prev) =>
-        prev.map((m) => (m.id === answerId && m.status === 'streaming' ? { ...m, status: 'done' } : m)),
+        prev.map((m) =>
+          m.id === answerId && m.status === 'streaming' ? { ...m, status: 'done', progress: undefined } : m,
+        ),
       );
     } catch (err) {
       const { status, message: detail, retryAfter } = toAssistantError(err);

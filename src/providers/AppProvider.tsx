@@ -40,6 +40,11 @@ export interface AiMessage {
   /** AI highlight layers (agent annotations) the assistant created with this answer. */
   annotationIds?: string[];
   status?: "streaming" | "done" | "error";
+  /**
+   * Translation key of what the assistant is doing while no text streams
+   * (`status` SSE event). Live only — never stored with the chat.
+   */
+  progress?: string;
 }
 
 /** The publication the open chat is about, so page citations can open it in the viewer. */

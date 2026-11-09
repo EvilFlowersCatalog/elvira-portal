@@ -39,6 +39,16 @@ export const en = {
       deleteChatError: 'Failed to delete the chat',
       cancel: 'Cancel',
       thinking: 'Thinking…',
+      status: {
+        searchCatalog: 'Searching the catalog…',
+        searchTexts: 'Searching inside publications…',
+        findSimilar: 'Looking for similar publications…',
+        readEntry: 'Reading the publication record…',
+        listCategories: 'Looking at subjects…',
+        checkLoans: 'Checking your loans…',
+        readPublication: 'Reading the publication…',
+        working: 'Working…',
+      },
       pageShort: 'p. {{page}}',
       sources: 'Sources',
       highlights: {

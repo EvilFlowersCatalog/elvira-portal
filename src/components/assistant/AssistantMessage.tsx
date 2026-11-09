@@ -93,6 +93,8 @@ export default function AssistantMessage({
   }
 
   const thinking = msg.status === 'streaming' && !msg.text;
+  // A later round (after text already streamed) shows its progress under the answer.
+  const laterProgress = msg.status === 'streaming' && msg.text && msg.progress;
 
   return (
     <div className={`self-start flex flex-col gap-2 w-full ${compact ? 'mb-2' : 'mb-4'}`}>
@@ -107,7 +109,9 @@ export default function AssistantMessage({
           {thinking ? (
             <div className="flex items-center gap-2">
               <CircleLoader size={16} color={'var(--color-primary)'} />
-              <p className="text-sm text-gray-600 dark:text-gray-300">{t('assistant.thinking')}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300" aria-live="polite">
+                {t(msg.progress ?? 'assistant.thinking')}
+              </p>
             </div>
           ) : (
             <div>
@@ -144,6 +148,13 @@ export default function AssistantMessage({
           )}
         </div>
       )}
+
+      {laterProgress ? (
+        <div className="flex items-center gap-2 px-1" aria-live="polite">
+          <CircleLoader size={12} color={'var(--color-primary)'} />
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t(laterProgress)}</p>
+        </div>
+      ) : null}
 
       {/* Pages the answer was drawn from */}
       {msg.pagesRead?.length ? (

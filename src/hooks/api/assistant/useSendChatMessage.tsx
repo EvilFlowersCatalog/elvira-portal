@@ -1,6 +1,7 @@
 import {
   IAssistantAnnotation,
   IAssistantMessageOptions,
+  IAssistantStatus,
   IAssistantStreamHandlers,
 } from '../../../utils/interfaces/assistant';
 import useAuth from '../../contexts/useAuthContext';
@@ -68,6 +69,14 @@ const useSendChatMessage = () => {
         case 'annotation':
           if (payload && typeof payload === 'object' && 'id' in payload) {
             handlers.onAnnotation?.(payload as IAssistantAnnotation);
+          }
+          break;
+        case 'status':
+          if (payload && typeof payload === 'object') {
+            const { state, tool } = payload as IAssistantStatus;
+            if (state === 'thinking' || state === 'tool') {
+              handlers.onStatus?.(state, typeof tool === 'string' ? tool : undefined);
+            }
           }
           break;
         case 'error':

@@ -101,10 +101,24 @@ export interface IAssistantStreamHandlers {
   onPages?: (pages: number[]) => void;
   /** An agent annotation the assistant started (AI highlights), as `/assistant/v1/highlights` returns it. */
   onAnnotation?: (annotation: IAssistantAnnotation) => void;
+  /**
+   * Progress before a model round (`thinking`) or a tool call (`tool`, with its
+   * name). Shown until text streams or the turn ends; never stored (IP-022).
+   */
+  onStatus?: (state: IAssistantStatus['state'], tool?: string) => void;
   /** An error reported inside the stream. */
   onError: (detail: string) => void;
   /** The stream is finished. */
   onDone: () => void;
+}
+
+/** The `status` SSE event: what the assistant is doing before text streams (IP-022). */
+export interface IAssistantStatus {
+  state: 'thinking' | 'tool';
+  /** Model round, numbered from 1 (`thinking` only). */
+  round?: number;
+  /** Tool about to run (`tool` only). */
+  tool?: string;
 }
 
 /** An agent annotation as `/assistant/v1/highlights` returns it (IP-018). */

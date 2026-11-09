@@ -39,6 +39,16 @@ export const sk = {
       deleteChatError: 'Konverzáciu sa nepodarilo vymazať',
       cancel: 'Zrušiť',
       thinking: 'Premýšľam…',
+      status: {
+        searchCatalog: 'Hľadám v katalógu…',
+        searchTexts: 'Hľadám v textoch publikácií…',
+        findSimilar: 'Hľadám podobné publikácie…',
+        readEntry: 'Čítam záznam publikácie…',
+        listCategories: 'Prezerám oblasti…',
+        checkLoans: 'Pozerám tvoje výpožičky…',
+        readPublication: 'Čítam publikáciu…',
+        working: 'Pracujem…',
+      },
       pageShort: 's. {{page}}',
       sources: 'Zdroje',
       highlights: {

@@ -55,6 +55,7 @@ import useDeleteChat from "../../hooks/api/assistant/useDeleteChat";
 import useSimilarEntries from "../../hooks/api/entries/useSimilarEntries";
 import useAgentHighlights, { toViewer as toViewerAnnotation } from "../../hooks/api/assistant/useAgentHighlights";
 import { formatRetryAfter, toAssistantError } from "../../hooks/api/assistant/assistantApi";
+import { statusLabelKey } from "../../utils/func/assistantMessages";
 import { useQueryClient } from "@tanstack/react-query";
 
 
@@ -308,6 +309,10 @@ const Viewer = () => {
             (handlers as { onAnnotation?: (a: IAgentAnnotation) => void }).onAnnotation?.(
               toViewerAnnotation(annotation)
             ),
+          // Progress line until text streams (IP-022); the viewer shows it once its chat
+          // panel takes `onStatus(label)`, older viewers ignore it.
+          onStatus: (state, tool) =>
+            (handlers as { onStatus?: (label: string) => void }).onStatus?.(t(statusLabelKey(state, tool))),
           onError: (detail) => handlers.onError(detail || t("assistant.errors.generic")),
           onDone: () => {},
         },
