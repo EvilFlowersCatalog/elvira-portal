@@ -1115,7 +1115,10 @@ export const sk = {
           hiddenNotice:
             'Moderátor vašu recenziu skryl. Vidíte ju len vy a moderátori a nezapočítava sa do hodnotenia. Úprava ju znova nezverejní.',
           moderationNote: 'Poznámka moderátora',
-          moderationNotePrompt: 'Dôvod skrytia recenzie (nepovinné, autor ho uvidí):',
+          moderationNotePlaceholder: 'Dôvod (nepovinné, autor ho uvidí)',
+          hideTitle: 'Skryť recenziu',
+          hideMessage: 'Recenziu uvidí len jej autor a moderátori a nebude sa započítavať do hodnotenia.',
+          deleteTitle: 'Zmazať recenziu',
           listTitle: 'Recenzie',
           empty: 'Zatiaľ žiadne recenzie. Buďte prvý, kto túto publikáciu ohodnotí.',
           emptyFiltered: 'V tomto zobrazení nie sú žiadne recenzie.',

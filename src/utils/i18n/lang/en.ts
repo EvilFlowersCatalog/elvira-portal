@@ -1118,7 +1118,10 @@ export const en = {
           hiddenNotice:
             'A moderator hid your review. Only you and the moderators can see it, and it does not count in the rating. Editing it does not publish it again.',
           moderationNote: 'Moderator note',
-          moderationNotePrompt: 'Reason for hiding this review (optional, the author sees it):',
+          moderationNotePlaceholder: 'Reason (optional, the author sees it)',
+          hideTitle: 'Hide review',
+          hideMessage: 'The review will be visible only to its author and moderators and will not count in the rating.',
+          deleteTitle: 'Delete review',
           listTitle: 'Reviews',
           empty: 'No reviews yet. Be the first to rate this publication.',
           emptyFiltered: 'No reviews in this view.',

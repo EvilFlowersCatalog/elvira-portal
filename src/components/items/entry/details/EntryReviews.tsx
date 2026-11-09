@@ -16,6 +16,7 @@ import { IReview, ReviewOrder, ReviewState } from '../../../../utils/interfaces/
 import { NAVIGATION_PATHS } from '../../../../utils/interfaces/general/general';
 import { fmtDate } from '../../../../utils/func/adminDate';
 import Select from '../../../primitives/Select';
+import ConfirmDialog from '../../../admin/ConfirmDialog';
 import { RatingInput, RatingStars } from './RatingStars';
 
 const BUTTON =
@@ -52,16 +53,15 @@ const EntryReviews = ({ entryId, onChanged }: IEntryReviews) => {
   const reviews = list.data?.pages.flatMap((page) => page.items) ?? [];
   const total = list.data?.pages[0]?.metadata.total ?? 0;
 
-  const onModerate = async (review: IReview, next: ReviewState) => {
-    let note: string | undefined;
-    if (next === 'hidden') {
-      const answer = window.prompt(t('entry.detail.reviews.moderationNotePrompt'), review.moderation_note ?? '');
-      if (answer === null) return; // cancelled
-      note = answer;
-    }
+  // The review whose "hide" note field is open inline, and its note.
+  const [hiding, setHiding] = useState<string | null>(null);
+  const [hideNote, setHideNote] = useState('');
+
+  const onModerate = async (review: IReview, next: ReviewState, note?: string) => {
     try {
       await moderate.mutateAsync({ reviewId: review.id, state: next, note });
       toast.success(t(next === 'hidden' ? 'entry.detail.reviews.hiddenToast' : 'entry.detail.reviews.publishedToast'));
+      setHiding(null);
     } catch (error) {
       toast.error(apiErrorMessage(error) ?? t('entry.detail.reviews.error'));
     }
@@ -158,7 +158,13 @@ const EntryReviews = ({ entryId, onChanged }: IEntryReviews) => {
                     <button
                       className={twMerge(QUIET_BUTTON, 'ml-auto')}
                       disabled={moderate.isPending}
-                      onClick={() => onModerate(review, review.state === 'hidden' ? 'published' : 'hidden')}
+                      onClick={() => {
+                        if (review.state === 'hidden') onModerate(review, 'published');
+                        else {
+                          setHideNote(review.moderation_note ?? '');
+                          setHiding(review.id);
+                        }
+                      }}
                     >
                       {review.state === 'hidden' ? (
                         <>
@@ -193,6 +199,31 @@ const EntryReviews = ({ entryId, onChanged }: IEntryReviews) => {
             </button>
           </div>
         )}
+
+        <ConfirmDialog
+          open={hiding != null}
+          title={t('entry.detail.reviews.hideTitle')}
+          message={
+            <div className="flex flex-col gap-2">
+              <p>{t('entry.detail.reviews.hideMessage')}</p>
+              <textarea
+                className={twMerge(INPUT, 'min-h-[72px] resize-y')}
+                value={hideNote}
+                onChange={(e) => setHideNote(e.target.value)}
+                placeholder={t('entry.detail.reviews.moderationNotePlaceholder')}
+                aria-label={t('entry.detail.reviews.moderationNote')}
+              />
+            </div>
+          }
+          confirmLabel={t('entry.detail.reviews.hide')}
+          cancelLabel={t('entry.detail.reviews.cancel')}
+          loading={moderate.isPending}
+          onConfirm={() => {
+            const review = reviews.find((r) => r.id === hiding);
+            if (review) onModerate(review, 'hidden', hideNote.trim());
+          }}
+          onCancel={() => setHiding(null)}
+        />
       </div>
     </div>
   );
@@ -236,19 +267,35 @@ const MyReview = ({
     }
   };
 
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
   const onDelete = async () => {
-    if (!window.confirm(t('entry.detail.reviews.deleteConfirm'))) return;
     try {
       await remove.mutateAsync();
+      setConfirmDelete(false);
       toast.success(t('entry.detail.reviews.deletedToast'));
     } catch (error) {
       toast.error(apiErrorMessage(error) ?? t('entry.detail.reviews.error'));
     }
   };
 
+  const deleteDialog = (
+    <ConfirmDialog
+      open={confirmDelete}
+      title={t('entry.detail.reviews.deleteTitle')}
+      message={t('entry.detail.reviews.deleteConfirm')}
+      confirmLabel={t('entry.detail.reviews.delete')}
+      cancelLabel={t('entry.detail.reviews.cancel')}
+      destructive
+      loading={remove.isPending}
+      onConfirm={onDelete}
+      onCancel={() => setConfirmDelete(false)}
+    />
+  );
+
   const hidden = review?.state === 'hidden';
   const hiddenNotice = hidden && (
-    <div className="rounded-md border border-red-300 dark:border-red-800 bg-red-50 dark:bg-red-950/40 p-3 text-sm text-red-800 dark:text-red-200">
+    <div className="text-sm text-red-700 dark:text-red-300">
       <p>{t('entry.detail.reviews.hiddenNotice')}</p>
       {review?.moderation_note && (
         <p className="mt-1">
@@ -270,7 +317,7 @@ const MyReview = ({
               <RiEditLine size={16} />
               {t('entry.detail.reviews.edit')}
             </button>
-            <button className={QUIET_BUTTON} onClick={onDelete} disabled={remove.isPending}>
+            <button className={QUIET_BUTTON} onClick={() => setConfirmDelete(true)} disabled={remove.isPending}>
               <RiDeleteBinLine size={16} />
               {t('entry.detail.reviews.delete')}
             </button>
@@ -279,6 +326,7 @@ const MyReview = ({
         {review.title && <p className="font-semibold">{review.title}</p>}
         {review.body && <p className="whitespace-pre-line">{review.body}</p>}
         {hiddenNotice}
+        {deleteDialog}
       </div>
     );
   }
