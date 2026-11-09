@@ -71,7 +71,7 @@ const EntryReviews = ({ entryId, onChanged }: IEntryReviews) => {
     <div className="flex flex-col gap-6 text-gray-700 dark:text-gray-200">
       {/* The caller's own rating and review */}
       {!auth ? (
-        <div className="flex flex-wrap items-center gap-3 rounded-md bg-lightGray dark:bg-gray-800 p-4">
+        <div className="flex flex-wrap items-center gap-3 pb-6 border-b border-gray-200 dark:border-gray-700">
           <RiInformationLine size={20} className="text-primary dark:text-primaryLight shrink-0" />
           <span className="text-sm flex-1">{t('entry.detail.reviews.loginPrompt')}</span>
           <button
@@ -260,7 +260,7 @@ const MyReview = ({
 
   if (review && !editing) {
     return (
-      <div className="rounded-md bg-lightGray dark:bg-gray-800 p-4 flex flex-col gap-2">
+      <div className="pb-6 border-b border-gray-200 dark:border-gray-700 flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-3">
           <span className="font-semibold">{t('entry.detail.reviews.yourReview')}</span>
           <RatingStars value={review.rating} size={18} />
@@ -284,7 +284,7 @@ const MyReview = ({
   }
 
   return (
-    <form onSubmit={submit} className="rounded-md bg-lightGray dark:bg-gray-800 p-4 flex flex-col gap-3">
+    <form onSubmit={submit} className="pb-6 border-b border-gray-200 dark:border-gray-700 flex flex-col gap-3">
       <span className="font-semibold">
         {review ? t('entry.detail.reviews.editTitle') : t('entry.detail.reviews.writeTitle')}
       </span>

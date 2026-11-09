@@ -254,7 +254,8 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
         </div>
       ) : (
         <div className={'flex h-full flex-col mdlg:flex-row'}>
-          <div className='p-8 bg-lightGray dark:bg-darkGray h-full min-w-[400px] flex flex-col'>
+          {/* Fixed-width left column: the tab content on the right must never change it. */}
+          <div className='p-8 bg-lightGray dark:bg-darkGray h-full w-full mdlg:w-[400px] mdlg:flex-none flex flex-col'>
             <Thumbnail
               thumbnail={entry.thumbnail}
               alt='Entry Thumbnail'
@@ -299,7 +300,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
             </ActionsWrapper>
           </div>
 
-          <div className='p-4 pt-8 bg-white dark:bg-darkGray mdlg:overflow-y-auto h-full pb-20 w-full'>
+          <div className='p-4 pt-8 bg-white dark:bg-darkGray mdlg:overflow-y-auto h-full pb-20 w-full min-w-0 mdlg:flex-1'>
             <DetailHeader
               entry={entry}
               handleParamClick={handleParamClick}
