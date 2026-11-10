@@ -13,6 +13,9 @@ import { citationsToLinks, findRegion } from '../../utils/func/assistantMessages
 import EntryItem from '../items/entry/display/EntryItem';
 import ChatContextChip from './ChatContextChip';
 import AnnotationCard from './AnnotationCard';
+import ToolActivityLog from './ToolActivityLog';
+import RegionCite, { CitedRegion } from './RegionCite';
+import useSimilarEntries from '../../hooks/api/entries/useSimilarEntries';
 
 const citeClass =
   'inline-flex items-center px-1.5 py-px mx-0.5 rounded-md text-xs font-medium align-baseline bg-sky-500/10 text-sky-700 dark:bg-sky-400/15 dark:text-sky-300 no-underline enabled:hover:underline enabled:hover:bg-sky-500/20 dark:enabled:hover:bg-sky-400/25 disabled:cursor-default';
@@ -40,6 +43,7 @@ export default function AssistantMessage({
   const { aiChatSubject } = useAppContext();
   const openInViewer = useOpenInViewer();
   const { getEntryDetail } = useGetEntryDetail();
+  const { getEntryFigures } = useSimilarEntries();
 
   // A Readium book is borrowed, never opened here, so its page citations stay plain labels.
   const openPage = aiChatSubject && aiChatSubject.readable !== false
@@ -60,16 +64,47 @@ export default function AssistantMessage({
     enabled: entryIds.length > 0,
   });
 
+  // Figures the answer cites: the crops come from the entry's extraction, so a hover can show them.
+  const citesRegions = msg.role === 'assistant' && msg.text.includes('[[region:');
+  const { data: figures = [] } = useQuery({
+    queryKey: ['entry-figures', aiChatSubject?.entryId],
+    queryFn: () => getEntryFigures(aiChatSubject!.entryId),
+    enabled: citesRegions && !!aiChatSubject?.entryId && aiChatSubject.readable !== false,
+    staleTime: 5 * 60 * 1000,
+  });
+  const citedRegion = (id: string): CitedRegion | null => {
+    const figure = figures.find((f) => f.id === id);
+    if (figure) {
+      return {
+        kind: figure.kind,
+        page: figure.page,
+        caption: figure.printed_caption || figure.caption,
+        description: figure.description,
+        imageUrl: figure.image_url,
+      };
+    }
+    const region = findRegion(messages, id);
+    return region
+      ? {
+          kind: region.kind,
+          page: region.page,
+          caption: region.printedCaption || region.caption,
+          description: region.description,
+          imageUrl: region.imageUrl,
+        }
+      : null;
+  };
+
   const markdown = useMemo(
     () =>
       citationsToLinks(msg.text, {
         page: (page) => t('assistant.pageShort', { page }),
         region: (id) => {
-          const region = findRegion(messages, id);
-          return t(`assistant.region.${region?.kind ?? 'figure'}`);
+          const kind = figures.find((f) => f.id === id)?.kind ?? findRegion(messages, id)?.kind;
+          return t(`assistant.region.${kind ?? 'figure'}`);
         },
       }),
-    [msg.text, messages, t],
+    [msg.text, messages, figures, t],
   );
 
   const bubble = compact ? 'p-2 max-w-[85%]' : 'px-4 py-3 max-w-[85%]';
@@ -98,6 +133,9 @@ export default function AssistantMessage({
 
   return (
     <div className={`self-start flex flex-col gap-2 w-full ${compact ? 'mb-2' : 'mb-4'}`}>
+      {msg.activity?.length ? (
+        <ToolActivityLog activity={msg.activity} running={msg.status === 'streaming'} />
+      ) : null}
       {(msg.text || thinking || msg.status === 'error') && (
         <div
           className={`rounded-lg break-words ${bubble} ${
@@ -121,8 +159,15 @@ export default function AssistantMessage({
                   a: ({ href, children }) => {
                     const page = href?.match(/^#efv-page-(\d+)$/)?.[1];
                     const regionId = href?.match(/^#efv-region-([\w-]+)$/)?.[1];
-                    if (page || regionId) {
-                      const target = page ? Number(page) : findRegion(messages, regionId!)?.page;
+                    if (regionId) {
+                      return (
+                        <RegionCite region={citedRegion(regionId)} className={citeClass} onOpenPage={openPage}>
+                          {children}
+                        </RegionCite>
+                      );
+                    }
+                    if (page) {
+                      const target = Number(page);
                       return (
                         <button
                           type="button"

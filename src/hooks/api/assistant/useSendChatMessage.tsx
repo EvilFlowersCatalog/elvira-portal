@@ -3,9 +3,28 @@ import {
   IAssistantMessageOptions,
   IAssistantStatus,
   IAssistantStreamHandlers,
+  IAssistantToolActivity,
 } from '../../../utils/interfaces/assistant';
 import useAuth from '../../contexts/useAuthContext';
 import { ASSISTANT_URL, AssistantApiError, idsOf, pagesOf, parseSseData, readSse, textOf } from './assistantApi';
+
+/** The readable fields of a `status`/`activity` payload, each checked; anything else is dropped. */
+const activityOf = (payload: object): Omit<IAssistantToolActivity, 'id' | 'tool' | 'done'> => {
+  const raw = payload as Record<string, unknown>;
+  const pages = Array.isArray(raw.pages) ? raw.pages.filter((p): p is number => Number.isInteger(p)) : [];
+  const entries = Array.isArray(raw.entries)
+    ? raw.entries
+        .filter((e): e is { id?: unknown; title: string } => !!e && typeof e === 'object' && typeof e.title === 'string')
+        .map((e) => ({ title: e.title, ...(typeof e.id === 'string' ? { id: e.id } : {}) }))
+    : [];
+  return {
+    ...(typeof raw.query === 'string' && raw.query ? { query: raw.query } : {}),
+    ...(pages.length ? { pages } : {}),
+    ...(typeof raw.count === 'number' ? { count: raw.count } : {}),
+    ...(entries.length ? { entries } : {}),
+    ...(raw.error === true ? { error: true } : {}),
+  };
+};
 
 /**
  * Sends a message and dispatches the SSE answer to `handlers`. Uses `fetch`
@@ -51,6 +70,10 @@ const useSendChatMessage = () => {
     }
     if (!response.body) throw new AssistantApiError(response.status, '');
 
+    // Tool calls run one after another: `status` opens a call, the next `activity` closes it.
+    let calls = 0;
+    let open: { id: string; tool: string } | null = null;
+
     for await (const { event, data } of readSse(response.body)) {
       const payload = parseSseData(data);
       switch (event) {
@@ -77,6 +100,19 @@ const useSendChatMessage = () => {
             if (state === 'thinking' || state === 'tool') {
               handlers.onStatus?.(state, typeof tool === 'string' ? tool : undefined);
             }
+            if (state === 'tool' && typeof tool === 'string') {
+              open = { id: `call-${++calls}`, tool };
+              handlers.onActivity?.({ ...activityOf(payload), id: open.id, tool, done: false });
+            }
+          }
+          break;
+        case 'activity':
+          if (payload && typeof payload === 'object') {
+            const tool = String((payload as { tool?: unknown }).tool ?? '');
+            // An `activity` with no matching `status` (a skipped one) still gets its own row.
+            const id = open && open.tool === tool ? open.id : `call-${++calls}`;
+            open = null;
+            handlers.onActivity?.({ ...activityOf(payload), id, tool, done: true });
           }
           break;
         case 'error':

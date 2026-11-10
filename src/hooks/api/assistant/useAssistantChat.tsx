@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import useAppContext from '../../contexts/useAppContext';
 import { AiMessage } from '../../../providers/AppProvider';
 import { statusLabelKey } from '../../../utils/func/assistantMessages';
+import { IAssistantToolActivity } from '../../../utils/interfaces/assistant';
 import { formatRetryAfter, toAssistantError } from './assistantApi';
 import useSendChatMessage from './useSendChatMessage';
 import useStartChat from './useStartChat';
@@ -56,6 +57,7 @@ const useAssistantChat = (
 
       let text = '';
       const annotationIds: string[] = [];
+      const activity: IAssistantToolActivity[] = [];
       await sendChatMessage(chatId, message, {
         onChunk: (chunk) => {
           text += chunk;
@@ -66,6 +68,12 @@ const useAssistantChat = (
           updateAnswer({ text, progress: undefined });
         },
         onStatus: (state, tool) => updateAnswer({ progress: statusLabelKey(state, tool) }),
+        onActivity: (call) => {
+          const index = activity.findIndex((a) => a.id === call.id);
+          if (index >= 0) activity[index] = call;
+          else activity.push(call);
+          updateAnswer({ activity: [...activity] });
+        },
         onEntries: (ids) => {
           if (ids.length) updateAnswer({ entryIds: ids });
         },

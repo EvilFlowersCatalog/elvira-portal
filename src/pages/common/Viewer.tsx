@@ -55,7 +55,8 @@ import useDeleteChat from "../../hooks/api/assistant/useDeleteChat";
 import useSimilarEntries from "../../hooks/api/entries/useSimilarEntries";
 import useAgentHighlights, { toViewer as toViewerAnnotation } from "../../hooks/api/assistant/useAgentHighlights";
 import { formatRetryAfter, toAssistantError } from "../../hooks/api/assistant/assistantApi";
-import { statusLabelKey } from "../../utils/func/assistantMessages";
+import { activityLabelKey, statusLabelKey } from "../../utils/func/assistantMessages";
+import type { IAssistantToolActivity } from "../../utils/interfaces/assistant";
 import { useQueryClient } from "@tanstack/react-query";
 
 
@@ -313,6 +314,12 @@ const Viewer = () => {
           // panel takes `onStatus(label)`, older viewers ignore it.
           onStatus: (state, tool) =>
             (handlers as { onStatus?: (label: string) => void }).onStatus?.(t(statusLabelKey(state, tool))),
+          // The tool-call log (viewer with `onActivity`); the label comes translated, ids never shown.
+          onActivity: (call) =>
+            (handlers as { onActivity?: (activity: IAssistantToolActivity & { label: string }) => void }).onActivity?.({
+              ...call,
+              label: t(activityLabelKey(call.tool)),
+            }),
           onError: (detail) => handlers.onError(detail || t("assistant.errors.generic")),
           onDone: () => {},
         },
