@@ -11,18 +11,21 @@ function ActivityRow({ call }: { call: IAssistantToolActivity }) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const titles = call.entries ?? [];
-  const expandable = call.done && titles.length > 0;
+  // A record read is its title on the row itself; searches expand to the titles they found.
+  const single = call.tool === 'get_entry' ? titles[0]?.title : undefined;
+  const object = call.query ?? single;
+  const expandable = call.done && !single && titles.length > 0;
 
   const facts: string[] = [];
   if (call.error) facts.push(t('assistant.activity.failed'));
   else if (call.pages?.length) facts.push(pagesLabel(call.pages, t));
-  else if (call.done && typeof call.count === 'number')
+  else if (call.done && typeof call.count === 'number' && !single)
     facts.push(t('assistant.activity.results', { count: call.count }));
 
   const line = (
     <>
-      <span className={`shrink-0 ${muted}`}>{t(activityLabelKey(call.tool))}</span>
-      {call.query ? <span className="truncate text-black dark:text-[#e5e7eb]">{call.query}</span> : null}
+      <span className={`shrink-0 ${muted}`}>{t(activityLabelKey(call.tool).replace('.activity.', '.activity.row.'))}</span>
+      {object ? <span className="truncate text-black dark:text-[#e5e7eb]">{object}</span> : null}
       {facts.length ? <span className={`shrink-0 ${muted}`}>· {facts.join(' · ')}</span> : null}
       {!call.done ? (
         <span className="shrink-0 w-1.5 h-1.5 rounded-full bg-primary animate-pulse" aria-hidden="true" />
