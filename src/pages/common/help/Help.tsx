@@ -22,7 +22,7 @@ const faqItems = [
   { q: 'Ako fungujú fyzické výpožičky?', a: 'Fyzické výpožičky nie sú momentálne podporované. Elvira poskytuje digitálne výpožičky vo formáte PDF.' },
   { q: 'Kde nájdem knižnicu?', a: 'Knižnica STU sa nachádza v priestoroch Slovenskej technickej univerzity. Presné informácie nájdete na webstránke STU.' },
   { q: 'Koľko stojí zápis do knižnice?', a: 'Informácie o poplatkoch za zápis do knižnice nájdete na webstránke knižnice STU.' },
-  { q: 'Ako funguje AI Asistent? Potrebujem svoj vlastný API kľúč?', a: 'AI Asistent využíva jazykový model na pomoc s vyhľadávaním a štúdiom. API kľúč si môžete nastaviť v sekcii AI Používatelia v administrácii.' },
+  { q: 'Ako funguje AI Asistent? Potrebujem svoj vlastný API kľúč?', a: 'AI Asistent využíva jazykový model, ktorý vám pomôže hľadať knihy a študovať ich obsah. Vlastný API kľúč nepotrebujete, Elvira ho poskytuje všetkým prihláseným používateľom v rámci denného limitu.' },
   { q: 'Prečo Elvira nikdy nefunguje?', a: 'Ak narazíte na problémy, skúste obnoviť stránku alebo nás kontaktujte na elvira-mail@stuba.sk.' },
 ];
 
