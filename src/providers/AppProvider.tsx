@@ -16,7 +16,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { IContextProviderParams } from "../utils/interfaces/contexts";
 import i18next from "../utils/i18n/i18next";
 import useCookiesContext from "../hooks/contexts/useCookiesContext";
-import type { IChatContext } from "../utils/interfaces/assistant";
+import type { IAssistantToolActivity, IChatContext } from "../utils/interfaces/assistant";
 
 /**
  * One message of the assistant chat, the same shape everywhere it is shown
@@ -45,6 +45,8 @@ export interface AiMessage {
    * (`status` SSE event). Live only — never stored with the chat.
    */
   progress?: string;
+  /** Tool calls of this answer, in order, for the activity log. Live only — never stored. */
+  activity?: IAssistantToolActivity[];
 }
 
 /** The publication the open chat is about, so page citations can open it in the viewer. */

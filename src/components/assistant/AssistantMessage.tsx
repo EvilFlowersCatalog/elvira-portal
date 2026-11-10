@@ -2,7 +2,6 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
-import { CircleLoader } from 'react-spinners';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import useGetEntryDetail from '../../hooks/api/entries/useGetEntryDetail';
@@ -13,6 +12,9 @@ import { citationsToLinks, findRegion } from '../../utils/func/assistantMessages
 import EntryItem from '../items/entry/display/EntryItem';
 import ChatContextChip from './ChatContextChip';
 import AnnotationCard from './AnnotationCard';
+import ToolActivityLog from './ToolActivityLog';
+import RegionCite, { CitedRegion } from './RegionCite';
+import useSimilarEntries from '../../hooks/api/entries/useSimilarEntries';
 
 const citeClass =
   'inline-flex items-center px-1.5 py-px mx-0.5 rounded-md text-xs font-medium align-baseline bg-sky-500/10 text-sky-700 dark:bg-sky-400/15 dark:text-sky-300 no-underline enabled:hover:underline enabled:hover:bg-sky-500/20 dark:enabled:hover:bg-sky-400/25 disabled:cursor-default';
@@ -40,12 +42,25 @@ export default function AssistantMessage({
   const { aiChatSubject } = useAppContext();
   const openInViewer = useOpenInViewer();
   const { getEntryDetail } = useGetEntryDetail();
+  const { getEntryFigures } = useSimilarEntries();
+
+  // The book this answer is about: the chat's own, else the one attached to the question before it
+  // (a general chat where the reader picked a book: "a čo v tejto knihe…").
+  const subject = useMemo(() => {
+    if (aiChatSubject) return aiChatSubject;
+    const index = messages.findIndex((m) => m.id === msg.id);
+    const asked = messages
+      .slice(0, index < 0 ? messages.length : index)
+      .reverse()
+      .find((m) => m.role === 'user' && m.reference?.id);
+    return asked?.reference ? { entryId: asked.reference.id, title: asked.reference.title } : null;
+  }, [aiChatSubject, messages, msg.id]);
 
   // A Readium book is borrowed, never opened here, so its page citations stay plain labels.
-  const openPage = aiChatSubject && aiChatSubject.readable !== false
+  const openPage = subject && subject.readable !== false
     ? (page: number) => {
         onNavigate?.();
-        openInViewer(aiChatSubject, page);
+        openInViewer(subject, page);
       }
     : undefined;
 
@@ -60,16 +75,47 @@ export default function AssistantMessage({
     enabled: entryIds.length > 0,
   });
 
+  // Figures the answer cites: the crops come from the entry's extraction, so a hover can show them.
+  const citesRegions = msg.role === 'assistant' && msg.text.includes('region:');
+  const { data: figures = [] } = useQuery({
+    queryKey: ['entry-figures', subject?.entryId],
+    queryFn: () => getEntryFigures(subject!.entryId),
+    enabled: citesRegions && !!subject?.entryId && subject.readable !== false,
+    staleTime: 5 * 60 * 1000,
+  });
+  const citedRegion = (id: string): CitedRegion | null => {
+    const figure = figures.find((f) => f.id === id);
+    if (figure) {
+      return {
+        kind: figure.kind,
+        page: figure.page,
+        caption: figure.printed_caption || figure.caption,
+        description: figure.description,
+        imageUrl: figure.image_url,
+      };
+    }
+    const region = findRegion(messages, id);
+    return region
+      ? {
+          kind: region.kind,
+          page: region.page,
+          caption: region.printedCaption || region.caption,
+          description: region.description,
+          imageUrl: region.imageUrl,
+        }
+      : null;
+  };
+
   const markdown = useMemo(
     () =>
       citationsToLinks(msg.text, {
         page: (page) => t('assistant.pageShort', { page }),
         region: (id) => {
-          const region = findRegion(messages, id);
-          return t(`assistant.region.${region?.kind ?? 'figure'}`);
+          const kind = figures.find((f) => f.id === id)?.kind ?? findRegion(messages, id)?.kind;
+          return t(`assistant.region.${kind ?? 'figure'}`);
         },
       }),
-    [msg.text, messages, t],
+    [msg.text, messages, figures, t],
   );
 
   const bubble = compact ? 'p-2 max-w-[85%]' : 'px-4 py-3 max-w-[85%]';
@@ -92,13 +138,28 @@ export default function AssistantMessage({
     );
   }
 
-  const thinking = msg.status === 'streaming' && !msg.text;
-  // A later round (after text already streamed) shows its progress under the answer.
-  const laterProgress = msg.status === 'streaming' && msg.text && msg.progress;
+  const streaming = msg.status === 'streaming';
+  // What runs right now, as one plain line (no bubble): before any text, and again when a later
+  // round calls a tool after text already streamed. Text streaming clears `progress`.
+  const working = streaming && (!msg.text || !!msg.progress);
+  const runningCall = streaming ? msg.activity?.filter((call) => !call.done).pop() : undefined;
+  const liveLine = working ? (
+    <div className="flex items-center gap-2 px-1 text-xs min-w-0" aria-live="polite">
+      <span className="w-1.5 h-1.5 shrink-0 rounded-full bg-primary animate-pulse" aria-hidden="true" />
+      <span className="shrink-0 text-gray-500 dark:text-gray-400">{t(msg.progress ?? 'assistant.thinking')}</span>
+      {runningCall?.query ? (
+        <span className="truncate text-gray-700 dark:text-gray-300">{runningCall.query}</span>
+      ) : null}
+    </div>
+  ) : null;
 
   return (
     <div className={`self-start flex flex-col gap-2 w-full ${compact ? 'mb-2' : 'mb-4'}`}>
-      {(msg.text || thinking || msg.status === 'error') && (
+      {msg.activity?.some((call) => call.done) ? (
+        <ToolActivityLog activity={msg.activity.filter((call) => call.done)} running={false} />
+      ) : null}
+      {!msg.text ? liveLine : null}
+      {(msg.text || msg.status === 'error') && (
         <div
           className={`rounded-lg break-words ${bubble} ${
             msg.status === 'error'
@@ -106,14 +167,6 @@ export default function AssistantMessage({
               : 'bg-zinc-200 text-black dark:bg-[#3f3f46] dark:text-[#e5e7eb]'
           }`}
         >
-          {thinking ? (
-            <div className="flex items-center gap-2">
-              <CircleLoader size={16} color={'var(--color-primary)'} />
-              <p className="text-sm text-gray-600 dark:text-gray-300" aria-live="polite">
-                {t(msg.progress ?? 'assistant.thinking')}
-              </p>
-            </div>
-          ) : (
             <div>
               <ReactMarkdown
                 remarkPlugins={[remarkGfm]}
@@ -121,8 +174,15 @@ export default function AssistantMessage({
                   a: ({ href, children }) => {
                     const page = href?.match(/^#efv-page-(\d+)$/)?.[1];
                     const regionId = href?.match(/^#efv-region-([\w-]+)$/)?.[1];
-                    if (page || regionId) {
-                      const target = page ? Number(page) : findRegion(messages, regionId!)?.page;
+                    if (regionId) {
+                      return (
+                        <RegionCite region={citedRegion(regionId)} className={citeClass} onOpenPage={openPage}>
+                          {children}
+                        </RegionCite>
+                      );
+                    }
+                    if (page) {
+                      const target = Number(page);
                       return (
                         <button
                           type="button"
@@ -145,16 +205,10 @@ export default function AssistantMessage({
                 {markdown || t('assistant.errors.generic')}
               </ReactMarkdown>
             </div>
-          )}
         </div>
       )}
 
-      {laterProgress ? (
-        <div className="flex items-center gap-2 px-1" aria-live="polite">
-          <CircleLoader size={12} color={'var(--color-primary)'} />
-          <p className="text-xs text-gray-500 dark:text-gray-400">{t(laterProgress)}</p>
-        </div>
-      ) : null}
+      {msg.text ? liveLine : null}
 
       {/* Pages the answer was drawn from */}
       {msg.pagesRead?.length ? (

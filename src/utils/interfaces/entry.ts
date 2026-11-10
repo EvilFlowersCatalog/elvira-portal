@@ -5,6 +5,7 @@ import { IFeed } from './feed';
 import { IConfig, IMetadata, LocalizedText } from './general/general';
 import { ILanguage } from './language';
 import { ExtractionEntryStatus } from './extraction';
+import { IEntryRating } from './review';
 
 export interface IEntriesList {
   items: IEntry[];
@@ -116,6 +117,8 @@ export interface IEntryDetail extends Partial<IEntryLcpFields> {
   thumbnail: string;
   page_count?: number | null;
   table_of_contents?: IEntryHeading[] | null;
+  /** IP-023 average and count of published reviews; null when reviews are disabled. */
+  rating?: IEntryRating | null;
 }
 
 export interface IEntryQuery {
@@ -142,6 +145,8 @@ export interface IEntryQuery {
   feeds?: string;
   /** Comma-separated backend `lcp_state` values (see availabilityToLcpState) */
   lcpState?: string;
+  /** Minimum average rating (`rating_min`, IP-023); entries without ratings drop out. */
+  ratingMin?: string;
   /** Comma-separated entry IDs — restricts the result to these entries (e.g. the shelf) */
   ids?: string;
   /** Ask the catalog for the AI-processing columns (`extraction_*`) — admin list only. */

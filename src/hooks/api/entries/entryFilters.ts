@@ -6,6 +6,9 @@ import { readCategoryIds, readFeedIds } from '../../../utils/func/filterParams';
 
 export type EntryFilters = Omit<IEntryQuery, 'page' | 'limit'>;
 
+/** URL param holding the minimum average rating (1–5), sent as `rating_min`. */
+export const RATING_MIN_PARAM = 'rating-min';
+
 /** URL param holding the id of the author named by `author`. */
 export const AUTHOR_ID_PARAM = 'author-id';
 
@@ -49,6 +52,7 @@ export const buildEntryFilterParams = (query: EntryFilters): URLSearchParams => 
   if (query.query) params.set('query', query.query);
   if (query.languageCode) params.set('language_code', query.languageCode);
   if (query.lcpState) params.set('lcp_state', query.lcpState);
+  if (query.ratingMin) params.set('rating_min', query.ratingMin);
   if (query.ids) params.set('id', query.ids);
   if (query.extraction) params.set('extraction', '1');
   if (query.extractionStatus) params.set('extraction_status', query.extractionStatus);
@@ -90,6 +94,7 @@ export const useEntryFilters = (): EntryFilters => {
       categories: readCategoryIds(searchParams).join(','),
       feeds: feedIds.join(','),
       lcpState: availabilityToLcpState(searchParams.get('availability') ?? ''),
+      ratingMin: searchParams.get(RATING_MIN_PARAM) ?? '',
     };
   }, [searchParams]);
 };

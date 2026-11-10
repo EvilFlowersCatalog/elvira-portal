@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react';
-import { fmtDate } from '../../../../utils/func/adminDate';
 import { CircleLoader } from 'react-spinners';
 import { RiAddLine, RiBookmarkFill, RiBookmarkLine, RiChatQuoteLine, RiCloseLine, RiShareLine } from 'react-icons/ri';
 import { useTranslation } from 'react-i18next';
@@ -23,8 +22,9 @@ import { ActionButtonStyle, ActionsButton, ActionsWrapper } from './DetailAction
 import { AcceptedLanguage, getLanguage } from '../../../../hooks/api/languages/languages';
 import AcquisitionsButton from '../../../buttons/AcqusitionsButton';
 import DetailModal from '../../../modals/DetailModal';
-import { twMerge } from 'tailwind-merge';
 import EntryRelated from './EntryRelated';
+import EntryReviews from './EntryReviews';
+import { RatingStars } from './RatingStars';
 import EntryFigures from './EntryFigures';
 import EntryContents from './EntryContents';
 import { AvailabilityBadge, AvailabilityState } from './AvailabilityBadge';
@@ -45,23 +45,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const [catalogId, setCatalogId] = useState<string | null>(null);
 
   const [entry, setEntry] = useState<IEntryDetail | null>(null);
-  const reviews = [
-    {
-      name: "John Doe",
-      date: "2023-10-01",
-      content: "This is a great entry! I really enjoyed the content and found it very informative.",
-    },
-    {
-      name: "Jane Smith",
-      date: "2023-10-02",
-      content: "An excellent read! The author did a fantastic job explaining the concepts.",
-    },
-    {
-      name: "Alice Johnson",
-      date: "2023-10-03",
-      content: "I learned a lot from this entry. Highly recommend it to anyone interested in the topic.",
-    },
-  ]
 
   const [activeLicense, setActiveLicense] = useState<ILicense | null>(null);
   const [update, setUpdate] = useState<boolean>(false);
@@ -70,7 +53,18 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { getEntryDetailWithLicense } = useGetEntryDetail();
+  const { getEntryDetail, getEntryDetailWithLicense } = useGetEntryDetail();
+
+  // A review changed the entry's rating: refresh only the rating, without reloading the whole detail.
+  const refreshRating = async () => {
+    if (!entryId) return;
+    try {
+      const fresh = await getEntryDetail(entryId, catalogId || undefined);
+      setEntry((prev) => (prev && prev.id === fresh.id ? { ...prev, rating: fresh.rating } : prev));
+    } catch {
+      // the list still updates; the stat catches up on the next open
+    }
+  };
   const addToShelf = useAddToShelf();
   const removeFromShelf = useRemoveFromShelf();
 
@@ -237,6 +231,9 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   };
 
   const availabilityBadge = getAvailabilityBadge();
+  const experimental = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
+  // The catalog sends `rating: null` when reviews are disabled (and no `rating` before IP-023).
+  const reviewsEnabled = !!entry?.rating;
 
   if (!entryId) return <></>;
 
@@ -257,7 +254,8 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
         </div>
       ) : (
         <div className={'flex h-full flex-col mdlg:flex-row'}>
-          <div className='p-8 bg-lightGray dark:bg-darkGray h-full min-w-[400px] flex flex-col'>
+          {/* Fixed-width left column: the tab content on the right must never change it. */}
+          <div className='p-8 bg-lightGray dark:bg-darkGray h-full w-full mdlg:w-[400px] mdlg:flex-none flex flex-col'>
             <Thumbnail
               thumbnail={entry.thumbnail}
               alt='Entry Thumbnail'
@@ -302,7 +300,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
             </ActionsWrapper>
           </div>
 
-          <div className='p-4 pt-8 bg-white dark:bg-darkGray mdlg:overflow-y-auto h-full pb-20 w-full'>
+          <div className='p-4 pt-8 bg-white dark:bg-darkGray mdlg:overflow-y-auto h-full pb-20 w-full min-w-0 mdlg:flex-1'>
             <DetailHeader
               entry={entry}
               handleParamClick={handleParamClick}
@@ -313,8 +311,16 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               {!!entry.page_count && (
                 <StatItem value={entry.page_count} label={t('entry.detail.pages')} />
               )}
-              {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
-                <StatItem value={9.9} label={t('entry.detail.rating')} />
+              {!!entry.rating?.count && entry.rating.average != null && (
+                <StatItem
+                  value={
+                    <span className="inline-flex items-center gap-2">
+                      {entry.rating.average.toFixed(1)}
+                      <RatingStars value={entry.rating.average} size={18} />
+                    </span>
+                  }
+                  label={t('entry.detail.ratingCount', { count: entry.rating.count })}
+                />
               )}
                 <StatItem value={entry.popularity} label={t('entry.detail.views')} />
               </StatGroup>
@@ -384,43 +390,42 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               </Tooltip>
 
             {/* TABS */}
-            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
-              <TabsComponent defaultTab='contents'>
+            {/* TABS: reviews are shipped (shown whenever the catalog has them enabled,
+                i.e. `rating` is present); the other tabs are still experimental. */}
+            {(experimental || reviewsEnabled) && (
+              <TabsComponent key={entry.id} defaultTab={experimental ? 'contents' : 'reviews'}>
                 <TabsHeader>
-                  <TabTitle id="contents">{t('entry.detail.tabs.contents')}</TabTitle>
-                  <TabTitle id="reviews">{t('entry.detail.tabs.reviews')}</TabTitle>
-                  <TabTitle id="related">{t('entry.detail.tabs.related')}</TabTitle>
-                  <TabTitle id="figures">{t('entry.detail.tabs.figures')}</TabTitle>
+                  {experimental && <TabTitle id="contents">{t('entry.detail.tabs.contents')}</TabTitle>}
+                  {reviewsEnabled && (
+                    <TabTitle id="reviews">
+                      {t('entry.detail.tabs.reviews')}
+                      {!!entry.rating?.count && <span className="ml-1 font-normal">({entry.rating.count})</span>}
+                    </TabTitle>
+                  )}
+                  {experimental && <TabTitle id="related">{t('entry.detail.tabs.related')}</TabTitle>}
+                  {experimental && <TabTitle id="figures">{t('entry.detail.tabs.figures')}</TabTitle>}
                 </TabsHeader>
                 <Tabs>
-                  <TabContent id="contents">
-                    <EntryContents entry={entry} catalogId={catalogId} />
-                  </TabContent>
-                  <TabContent id="reviews">
-                    <span className="text-gray-600 dark:text-gray-300">
-                      {reviews.map((review, index) => (
-                        <div
-                          key={index}
-                          className={twMerge(
-                            'mb-2 pb-2',
-                            index !== reviews.length - 1 ? 'border-b border-gray-300 dark:border-gray-700' : ''
-                          )}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold text-primary dark:text-primaryLight">{review.name}</span>
-                          </div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">{fmtDate(review.date)}</p>
-                          <p className="mt-2">{review.content}</p>
-                        </div>
-                      ))}
-                    </span>
-                  </TabContent>
-                  <TabContent id="related">
-                    <EntryRelated entryId={entry.id} />
-                  </TabContent>
-                  <TabContent id="figures">
-                    <EntryFigures entryId={entry.id} />
-                  </TabContent>
+                  {experimental && (
+                    <TabContent id="contents">
+                      <EntryContents entry={entry} catalogId={catalogId} />
+                    </TabContent>
+                  )}
+                  {reviewsEnabled && (
+                    <TabContent id="reviews">
+                      <EntryReviews entryId={entry.id} onChanged={refreshRating} />
+                    </TabContent>
+                  )}
+                  {experimental && (
+                    <TabContent id="related">
+                      <EntryRelated entryId={entry.id} />
+                    </TabContent>
+                  )}
+                  {experimental && (
+                    <TabContent id="figures">
+                      <EntryFigures entryId={entry.id} />
+                    </TabContent>
+                  )}
                 </Tabs>
               </TabsComponent>
             )}

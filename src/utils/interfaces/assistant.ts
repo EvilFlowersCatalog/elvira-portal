@@ -19,6 +19,8 @@ export interface IAssistantMessage {
   displayed_entries: string[] | null;
   /** Agent annotation (AI highlights) ids the assistant created with this answer (IP-018). */
   annotations?: string[] | null;
+  /** The tool calls of the turn this answer closed (the activity log), rebuilt by the catalog. */
+  activity?: Omit<IAssistantToolActivity, 'done'>[] | null;
   tokens_used: number;
   created_at: string;
 }
@@ -106,6 +108,11 @@ export interface IAssistantStreamHandlers {
    * name). Shown until text streams or the turn ends; never stored (IP-022).
    */
   onStatus?: (state: IAssistantStatus['state'], tool?: string) => void;
+  /**
+   * A tool call of this turn for the activity log: sent when it starts (`done: false`, from the
+   * `status` event) and again when it finished (`done: true`, from the `activity` event), same `id`.
+   */
+  onActivity?: (activity: IAssistantToolActivity) => void;
   /** An error reported inside the stream. */
   onError: (detail: string) => void;
   /** The stream is finished. */
@@ -119,6 +126,27 @@ export interface IAssistantStatus {
   round?: number;
   /** Tool about to run (`tool` only). */
   tool?: string;
+  /** Readable query or request of the call (`tool` only). */
+  query?: string;
+  /** Pages the call reads (`tool` only). */
+  pages?: number[];
+}
+
+/** One tool call of a turn, as the chat's activity log shows it (`status` + `activity` SSE events). Never stored. */
+export interface IAssistantToolActivity {
+  /** Stable within the turn. */
+  id: string;
+  tool: string;
+  /** The query or request the model used. */
+  query?: string;
+  /** Pages read or matched. */
+  pages?: number[];
+  /** Number of results. */
+  count?: number;
+  /** Publications it found, by title (ids only for linking). */
+  entries?: { id?: string; title: string }[];
+  error?: boolean;
+  done: boolean;
 }
 
 /** An agent annotation as `/assistant/v1/highlights` returns it (IP-018). */

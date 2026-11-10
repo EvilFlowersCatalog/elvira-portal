@@ -11,7 +11,8 @@ import useCategoriesQuery from "../../../hooks/api/categories/useCategoriesQuery
 import { IItemContainerList } from "../../../hooks/api/useInfiniteItemContainer";
 import useFeedsQuery from "../../../hooks/api/feeds/useFeedsQuery";
 import useEntryFacets from "../../../hooks/api/entries/useEntryFacets";
-import { EntryFilters, useEntryFilters } from "../../../hooks/api/entries/entryFilters";
+import { EntryFilters, RATING_MIN_PARAM, useEntryFilters } from "../../../hooks/api/entries/entryFilters";
+import { RatingInput } from "../entry/details/RatingStars";
 import { AcceptedLanguage, getLanguage, getLanguages } from "../../../hooks/api/languages/languages";
 import { IFeed } from "../../../utils/interfaces/feed";
 import { AvailabilityState } from "../entry/details/AvailabilityBadge";
@@ -275,6 +276,15 @@ export function AdvancedSearch({ entryScope, facets: providedFacets }: { entrySc
         performSearch();
     };
 
+    // Applied at once (no debounce): one click is one choice.
+    const ratingMin = searchParams.get(RATING_MIN_PARAM) ?? '';
+    const setRatingMin = (value: string) => {
+        const params = new URLSearchParams(searchParams);
+        if (value) params.set(RATING_MIN_PARAM, value);
+        else params.delete(RATING_MIN_PARAM);
+        setSearchParams(params, { replace: true });
+    };
+
     const availabilityOptions = AVAILABILITY_OPTIONS.map(o => ({
         label: t(o.labelKey),
         value: o.value,
@@ -312,6 +322,29 @@ export function AdvancedSearch({ entryScope, facets: providedFacets }: { entrySc
                             }
                         />
                     ))}
+                </div>
+            </div>
+
+            <SectionDivider />
+
+            {/* Hodnotenie: minimum average rating (IP-023) */}
+            <div className="flex flex-col gap-3">
+                <p className="text-[14px] font-medium text-darkGray dark:text-white tracking-[0.1px]">
+                    {t('searchBar.rating')}
+                </p>
+                {/* One row of stars: click N for "N stars and up", click it again to clear. */}
+                <div className="flex items-center gap-2">
+                    <RatingInput
+                        size={20}
+                        label={t('searchBar.rating')}
+                        value={Number(ratingMin) || 0}
+                        onChange={value => setRatingMin(String(value) === ratingMin ? '' : String(value))}
+                    />
+                    {ratingMin && (
+                        <span className="text-[13px] text-darkGray dark:text-white">
+                            {t('searchBar.ratingAtLeast', { value: ratingMin })}
+                        </span>
+                    )}
                 </div>
             </div>
 

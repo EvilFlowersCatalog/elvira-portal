@@ -5,7 +5,7 @@ import useAppContext from '../../hooks/contexts/useAppContext';
 import { AcceptedLanguage, getLanguage } from '../../hooks/api/languages/languages';
 import useCategoriesQuery from '../../hooks/api/categories/useCategoriesQuery';
 import useFeedsQuery from '../../hooks/api/feeds/useFeedsQuery';
-import { AUTHOR_ID_PARAM } from '../../hooks/api/entries/entryFilters';
+import { AUTHOR_ID_PARAM, RATING_MIN_PARAM } from '../../hooks/api/entries/entryFilters';
 import { ICategory } from '../../utils/interfaces/category';
 import { IFeed } from '../../utils/interfaces/feed';
 import i18next from '../../utils/i18n/i18next';
@@ -119,6 +119,8 @@ const ToolsContainer = ({
           label = `${t('searchBar.yearFrom')}: ${value}`;
         } else if (key === 'publishedAtLte') {
           label = `${t('searchBar.yearTo')}: ${value}`;
+        } else if (key === RATING_MIN_PARAM) {
+          label = `${t('searchBar.rating')}: ${t('searchBar.ratingAtLeast', { value })}`;
         }
         filters.push({ key, value, label });
       }
