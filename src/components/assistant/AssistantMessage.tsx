@@ -76,7 +76,7 @@ export default function AssistantMessage({
   });
 
   // Figures the answer cites: the crops come from the entry's extraction, so a hover can show them.
-  const citesRegions = msg.role === 'assistant' && msg.text.includes('[[region:');
+  const citesRegions = msg.role === 'assistant' && msg.text.includes('region:');
   const { data: figures = [] } = useQuery({
     queryKey: ['entry-figures', subject?.entryId],
     queryFn: () => getEntryFigures(subject!.entryId),

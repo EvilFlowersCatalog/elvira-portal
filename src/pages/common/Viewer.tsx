@@ -359,6 +359,16 @@ const Viewer = () => {
           ? await toSuggestedEntries(msg.displayed_entries)
           : undefined,
         ...(msg.annotations?.length ? { annotationIds: msg.annotations } : {}),
+        // Viewer with an activity log reads it back from history; older viewers ignore it.
+        ...(msg.activity?.length
+          ? {
+              activities: msg.activity.map((call) => ({
+                ...call,
+                label: t(activityLabelKey(call.tool)),
+                done: true,
+              })),
+            }
+          : {}),
         status: "done" as const,
       }))
     );

@@ -85,6 +85,7 @@ export const fromApiMessages = (messages: IAssistantMessage[]): AiMessage[] =>
     entryIds: msg.displayed_entries ?? undefined,
     pagesRead: msg.pages_read ?? undefined,
     annotationIds: msg.annotations?.length ? msg.annotations : undefined,
+    activity: msg.activity?.length ? msg.activity.map((call) => ({ ...call, done: true })) : undefined,
     status: 'done',
   }));
 
@@ -123,6 +124,20 @@ export const findRegion = (messages: AiMessage[], regionId: string) => {
 };
 
 /**
+ * Citation tokens as the model actually writes them, made canonical: `[[page:7], [page:13]]`,
+ * `[page:7]` and `[[page:7, 13]]` all become one `[[page:N]]` per page (same for regions).
+ */
+export const normalizeCitations = (text: string): string =>
+  text
+    .replace(/\[+\s*page:\s*(\d+(?:\s*,\s*(?:page:\s*)?\d+)+)\s*\]+/g, (_, list: string) =>
+      list
+        .split(',')
+        .map((page) => `[[page:${page.replace(/\D/g, '')}]]`)
+        .join(', '),
+    )
+    .replace(/\[+\s*(page|region):\s*([\w-]+)\s*\]+/g, '[[$1:$2]]');
+
+/**
  * Turns the assistant's citation tokens into markdown links the message
  * renderer recognises: `[[page:12]]` → `#efv-page-12`, `[[region:ID]]` → `#efv-region-ID`.
  */
@@ -130,6 +145,6 @@ export const citationsToLinks = (
   text: string,
   labels: { page: (page: number) => string; region: (id: string) => string },
 ): string =>
-  text
+  normalizeCitations(text)
     .replace(/\[\[page:(\d+)\]\]/g, (_, page) => `[${labels.page(Number(page))}](#efv-page-${page})`)
     .replace(/\[\[region:([\w-]+)\]\]/g, (_, id) => `[${labels.region(id)}](#efv-region-${id})`);

@@ -19,6 +19,8 @@ export interface IAssistantMessage {
   displayed_entries: string[] | null;
   /** Agent annotation (AI highlights) ids the assistant created with this answer (IP-018). */
   annotations?: string[] | null;
+  /** The tool calls of the turn this answer closed (the activity log), rebuilt by the catalog. */
+  activity?: Omit<IAssistantToolActivity, 'done'>[] | null;
   tokens_used: number;
   created_at: string;
 }
