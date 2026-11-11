@@ -1,4 +1,6 @@
 import HelpLayout, { TocSection } from './HelpLayout';
+import useAppContext from '../../../hooks/contexts/useAppContext';
+import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 
 const toc: TocSection[] = [
   {
@@ -24,6 +26,8 @@ const toc: TocSection[] = [
 ];
 
 const HelpLoans = () => {
+  const { specialNavigation } = useAppContext();
+
   return (
     <HelpLayout title="Výpožičky a rezervácie" toc={toc}>
       {/* Výpožičky */}
@@ -39,7 +43,11 @@ const HelpLoans = () => {
 
       <h3 id="format" className="text-base font-semibold text-secondary dark:text-secondaryLight mb-2">Formát a čítačka</h3>
       <p className="text-sm text-gray-600 dark:text-zinc-400 leading-relaxed mb-5">
-        Knihy sú dostupné vo formáte PDF. Na ich otvorenie odporúčame aplikáciu <a href="https://thorium.edrlab.org/en/" target="_blank" rel="noopener noreferrer" className="underline">Thorium Reader</a>, ktorá je bezplatná a dostupná pre Windows, macOS aj Linux. Pri prvom otvorení súboru vás čítačka požiada o zadanie prístupovej frázy na odomknutie.
+        Knihy sú dostupné vo formáte PDF. Na ich otvorenie odporúčame aplikáciu <a href="https://thorium.edrlab.org/en/" target="_blank" rel="noopener noreferrer" className="underline">Thorium Reader</a>, ktorá je bezplatná a dostupná pre Windows, macOS aj Linux. Pri prvom otvorení súboru vás čítačka požiada o zadanie prístupovej frázy na odomknutie. Návod na nastavenie Thorium nájdete v časti{' '}
+        <button className="underline hover:text-primary" onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.helpReaders)}>
+          Čítačky, OPDS a Calibre
+        </button>
+        .
       </p>
 
       <h3 id="pristupova-fraza" className="text-base font-semibold text-secondary dark:text-secondaryLight mb-2">Prístupová fráza</h3>

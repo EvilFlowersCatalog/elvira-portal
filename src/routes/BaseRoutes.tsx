@@ -31,6 +31,7 @@ const HelpSearch = lazy(() => import('../pages/common/help/HelpSearch'));
 const HelpViewer = lazy(() => import('../pages/common/help/HelpViewer'));
 const HelpAi = lazy(() => import('../pages/common/help/HelpAi'));
 const HelpProfile = lazy(() => import('../pages/common/help/HelpProfile'));
+const HelpReaders = lazy(() => import('../pages/common/help/HelpReaders'));
 
 const AdminHome = lazy(() => import('../pages/admin/AdminHome'));
 const AdminEntries = lazy(() => import('../pages/admin/entries/AdminEntries'));
@@ -81,6 +82,7 @@ const BaseRoutes = () => {
               <Route path='help/viewer' element={<HelpViewer />} />
               <Route path='help/ai' element={<HelpAi />} />
               <Route path='help/profile' element={<HelpProfile />} />
+              <Route path='help/readers' element={<HelpReaders />} />
             </>
           )}
 

@@ -189,3 +189,53 @@ input:focus:not(:focus-visible) {
 :root[data-theme="fad"]     { --color-on-primary:#ffffff; --color-primary-text:#007A3A; --color-primary-dark:#103A22; }
 :root[data-theme="ku"]      { --color-on-primary:#ffffff; --color-primary-text:#7A6100; --color-primary-dark:#3A2F0A; }
 :root[data-theme="default"] { --color-on-primary:#ffffff; --color-primary-text:#0077A3; --color-primary-dark:#0A3D52; }
+
+/*
+ * Data-visualization tokens (admin dashboard). Deliberately independent of the
+ * faculty brand theme so a chart reads the same on every faculty deployment.
+ * Categorical slots validated (CVD / normal-vision / band / chroma) against the
+ * card surfaces actually used: white and zinc-800. Light aqua/yellow sit below
+ * 3:1 on white — every chart therefore carries direct labels or a table view.
+ */
+.viz-root {
+  --viz-surface: #ffffff;
+  --viz-ink: #18181b;
+  --viz-ink-2: #52525b;
+  --viz-muted: #898781;
+  --viz-grid: #ececea;
+  --viz-axis: #c3c2b7;
+  --viz-s1: #2a78d6;
+  --viz-s2: #eb6834;
+  --viz-s3: #1baf7a;
+  --viz-s4: #eda100;
+  --viz-seq-0: #eef4fd;
+  --viz-seq-1: #b7d3f6;
+  --viz-seq-2: #6da7ec;
+  --viz-seq-3: #2a78d6;
+  --viz-seq-4: #184f95;
+  --viz-good: #0ca30c;
+  --viz-good-text: #006300;
+  --viz-warning: #fab219;
+  --viz-serious: #ec835a;
+  --viz-critical: #d03b3b;
+  --viz-critical-text: #b42323;
+}
+.dark .viz-root {
+  --viz-surface: #27272a;
+  --viz-ink: #f4f4f5;
+  --viz-ink-2: #c3c2b7;
+  --viz-muted: #8f8d87;
+  --viz-grid: #34343a;
+  --viz-axis: #4a4a50;
+  --viz-s1: #3987e5;
+  --viz-s2: #d95926;
+  --viz-s3: #199e70;
+  --viz-s4: #c98500;
+  --viz-seq-0: #2d3442;
+  --viz-seq-1: #184f95;
+  --viz-seq-2: #2a78d6;
+  --viz-seq-3: #5598e7;
+  --viz-seq-4: #9ec5f4;
+  --viz-good-text: #3fc43f;
+  --viz-critical-text: #f07272;
+}

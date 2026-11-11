@@ -8,9 +8,8 @@ import { toast } from 'react-toastify';
 import { ILicense, renewalEmbargoUntil } from '../../utils/interfaces/license';
 import { licenseErrorMessage } from '../../utils/problemDetail';
 import useRenewLicense from '../../hooks/api/licenses/useRenewLicense';
-import useAuthContext from '../../hooks/contexts/useAuthContext';
 import useFocusTrap from '../../hooks/useFocusTrap';
-import { withAccessToken } from '../../utils/func/functions';
+import Thumbnail from '../items/entry/Thumbnail';
 import useEscapeLayer from '../../hooks/useEscapeLayer';
 
 const M = 'license.loansPage.modals';
@@ -27,7 +26,6 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
   const [success, setSuccess] = useState(false);
   const renewLicense = useRenewLicense();
   const queryClient = useQueryClient();
-  const { auth } = useAuthContext();
   const { t } = useTranslation();
   const dialogRef = useFocusTrap(true);
 
@@ -97,15 +95,11 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
             </h2>
             <FiCheckCircle size={66} className="text-[#008B19] my-2" />
             <div className="w-full bg-lightGray dark:bg-zinc-700 rounded-xl p-4 flex gap-3 items-center">
-              {license.entry?.thumbnail ? (
-                <img
-                  src={withAccessToken(license.entry.thumbnail, auth?.token) ?? undefined}
-                  alt={license.entry.title}
-                  className="w-[55px] h-[78px] rounded-[5px] object-cover shrink-0"
-                />
-              ) : (
-                <div className="w-[55px] h-[78px] rounded-[5px] bg-gray-300 shrink-0" />
-              )}
+              <Thumbnail
+                thumbnail={license.entry?.thumbnail}
+                alt={license.entry?.title ?? ''}
+                wrapperClassName="w-[55px] h-[78px] rounded-[5px] shrink-0"
+              />
               <div className="flex flex-col gap-2 min-w-0">
                 <p className="font-semibold text-sm text-secondary dark:text-secondaryLight truncate">
                   {license.entry?.title || t(`${M}.unknownTitle`, { defaultValue: 'Unknown title' })}
@@ -130,15 +124,11 @@ export default function ExtendLoanModal({ license, onClose, onSuccess }: Props) 
 
             {/* Book info card */}
             <div className="bg-lightGray dark:bg-zinc-700 rounded-xl p-4 flex gap-3 items-center mb-4">
-              {license.entry?.thumbnail ? (
-                <img
-                  src={withAccessToken(license.entry.thumbnail, auth?.token) ?? undefined}
-                  alt={license.entry.title}
-                  className="w-[55px] h-[78px] rounded-[5px] object-cover shrink-0"
-                />
-              ) : (
-                <div className="w-[55px] h-[78px] rounded-[5px] bg-gray-300 shrink-0" />
-              )}
+              <Thumbnail
+                thumbnail={license.entry?.thumbnail}
+                alt={license.entry?.title ?? ''}
+                wrapperClassName="w-[55px] h-[78px] rounded-[5px] shrink-0"
+              />
               <div className="flex flex-col gap-2 min-w-0 flex-1">
                 <p className="font-semibold text-sm text-secondary dark:text-secondaryLight truncate">
                   {license.entry?.title || t(`${M}.unknownTitle`, { defaultValue: 'Unknown title' })}

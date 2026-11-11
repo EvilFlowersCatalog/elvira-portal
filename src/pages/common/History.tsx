@@ -10,9 +10,8 @@ import AiAssistant from '../../components/dialogs/AiAssistant';
 import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
 import useGetActivity from '../../hooks/api/activity/useGetActivity';
 import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
-import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { ActivityAction, IActivity } from '../../utils/interfaces/activity';
-import { withAccessToken } from '../../utils/func/functions';
+import Thumbnail from '../../components/items/entry/Thumbnail';
 
 const ACTION_COLORS: Record<ActivityAction, string> = {
   entry_downloaded: 'text-blue-600 dark:text-blue-400',
@@ -37,7 +36,6 @@ const PAGE_SIZE = 30;
 
 const History = () => {
   const { t } = useTranslation();
-  const { auth } = useAuthContext();
   const [searchParams, setSearchParams] = useSearchParams();
   const getActivity = useGetActivity();
 
@@ -117,13 +115,10 @@ const History = () => {
                     </div>
 
                     {/* Thumbnail */}
-                    <img
-                      src={withAccessToken(item.entry.thumbnail, auth?.token) ?? '/assets/thumbnail.webp'}
-                      onError={(e) => {
-                        e.currentTarget.src = '/assets/thumbnail.webp';
-                      }}
+                    <Thumbnail
+                      thumbnail={item.entry.thumbnail}
                       alt=""
-                      className="flex-shrink-0 w-10 h-14 object-cover rounded"
+                      wrapperClassName="flex-shrink-0 w-10 h-14 rounded"
                     />
 
                     {/* Content */}

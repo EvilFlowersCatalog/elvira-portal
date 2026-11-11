@@ -1,5 +1,7 @@
 import HelpLayout, { TocSection } from './HelpLayout';
 import { HelpH2, HelpH3, HelpList, HelpP } from './HelpTypography';
+import useAppContext from '../../../hooks/contexts/useAppContext';
+import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 
 const toc: TocSection[] = [
   {
@@ -16,7 +18,10 @@ const toc: TocSection[] = [
   },
 ];
 
-const HelpViewer = () => (
+const HelpViewer = () => {
+  const { specialNavigation } = useAppContext();
+
+  return (
   <HelpLayout title="PDF Viewer" toc={toc}>
     <HelpH2 first>PDF Viewer</HelpH2>
 
@@ -27,7 +32,11 @@ const HelpViewer = () => (
     </HelpP>
     <HelpP>
       Chránené knihy, ktoré si treba vypožičať, sa v tejto čítačke neotvárajú. Čítate ich v aplikácii Thorium Reader,
-      ako je popísané v časti Výpožičky a rezervácie.
+      ako je popísané v časti{' '}
+      <button className="underline hover:text-primary" onClick={(e) => specialNavigation(e, NAVIGATION_PATHS.helpReaders)}>
+        Čítačky, OPDS a Calibre
+      </button>
+      .
     </HelpP>
 
     <HelpH3 id="ovladanie">Ovládanie čítačky</HelpH3>
@@ -96,6 +105,7 @@ const HelpViewer = () => (
       ]}
     />
   </HelpLayout>
-);
+  );
+};
 
 export default HelpViewer;

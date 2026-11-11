@@ -13,6 +13,10 @@ import useGetFeedDetail from '../../hooks/api/feeds/useGetFeedDetail';
 import { localize } from '../../utils/func/localized';
 import { LocalizedText } from '../../utils/interfaces/general/general';
 
+// The first visible row of "Popular" is the LCP: on a wide screen (150px+ cards)
+// it holds up to ~8 covers. They load eagerly with high priority, all others lazily.
+const FIRST_ROW_COVERS = 8;
+
 const Home = () => {
   const { t } = useTranslation();
 
@@ -66,6 +70,7 @@ const Home = () => {
           isLoading={isLoading}
           entries={popularEntries}
           limitRows={true}
+          priorityCount={FIRST_ROW_COVERS}
         />
 
 

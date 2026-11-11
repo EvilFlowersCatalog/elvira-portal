@@ -56,7 +56,7 @@ const AdminEditEntry = () => {
             citation: entryDetail.citation,
             published_at: entryDetail.published_at,
             publisher: entryDetail.publisher,
-            thumbnail: entryDetail.thumbnail,
+            thumbnail: entryDetail.thumbnail ?? undefined,
             categories: entryDetail.categories,
           });
         }

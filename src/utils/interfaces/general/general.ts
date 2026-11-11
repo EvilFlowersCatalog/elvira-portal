@@ -21,6 +21,7 @@ export enum NAVIGATION_PATHS {
   helpViewer = '/help/viewer',
   helpAi = '/help/ai',
   helpProfile = '/help/profile',
+  helpReaders = '/help/readers',
   aiChatHistory = '/ai-chat-history',
   adminHome = '/administration',
   adminEntries = '/administration/entries',

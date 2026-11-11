@@ -80,7 +80,8 @@ export interface IEntry extends Partial<IEntryLcpFields> {
   /** Entry config as stored by the catalog (sent in list responses too). */
   config?: Partial<IConfig> | null;
   shelf_record_id: string;
-  thumbnail: string;
+  /** Versioned cover URL (`…?v=<hash>`); `null` when the entry has no cover. Use verbatim. */
+  thumbnail: string | null;
   published_at?: string;
   /** Only in lists fetched with `query`. */
   search?: IEntrySearchHit;
@@ -114,7 +115,8 @@ export interface IEntryDetail extends Partial<IEntryLcpFields> {
   acquisitions: IEntryAcquisition[];
   citation: string;
   shelf_record_id: string;
-  thumbnail: string;
+  /** Versioned cover URL (`…?v=<hash>`); `null` when the entry has no cover. Use verbatim. */
+  thumbnail: string | null;
   page_count?: number | null;
   table_of_contents?: IEntryHeading[] | null;
   /** IP-023 average and count of published reviews; null when reviews are disabled. */

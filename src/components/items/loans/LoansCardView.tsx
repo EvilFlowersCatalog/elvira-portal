@@ -14,13 +14,12 @@ import { IReservation, RESERVATION_STATUS } from '../../../utils/interfaces/rese
 import useLicensesQuery from '../../../hooks/api/licenses/useLicensesQuery';
 import useReservationsQuery from '../../../hooks/api/reservations/useReservationsQuery';
 import useUpdateReservation from '../../../hooks/api/reservations/useUpdateReservation';
-import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import useDownloadLicense from '../../../hooks/api/licenses/useDownloadLicense';
 import { CONFLICT_REASON, getConflictReasonCode, isPassphraseRequired, problemDetailMessage } from '../../../utils/problemDetail';
 import ExtendLoanModal from '../../modals/ExtendLoanModal';
 import ReturnBookModal from '../../modals/ReturnBookModal';
 import CancelReservationModal from '../../modals/CancelReservationModal';
-import { withAccessToken } from '../../../utils/func/functions';
+import Thumbnail from '../entry/Thumbnail';
 
 /** All three cards render the same author line — the entry serializer already
  *  ships `authors`, so read it rather than printing a placeholder. */
@@ -125,14 +124,12 @@ function ActionBtn({
 
 function BorrowedCard({
   license,
-  token,
   onDownload,
   onExtend,
   onReturn,
   onOpenDetail,
 }: {
   license: ILicense;
-  token?: string;
   onDownload: (id: string) => void;
   onExtend: (license: ILicense) => void;
   onReturn: (license: ILicense) => void;
@@ -152,11 +149,7 @@ function BorrowedCard({
         className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] overflow-hidden cursor-pointer"
         onClick={() => onOpenDetail(license.entry_id, license.entry?.catalog_id)}
       >
-        <img
-          alt={license.entry?.title}
-          src={withAccessToken(license.entry?.thumbnail, token) ?? '/assets/thumbnail.webp'}
-          className="w-full h-full object-cover"
-        />
+        <Thumbnail thumbnail={license.entry?.thumbnail} alt={license.entry?.title ?? ''} wrapperClassName="w-full h-full" />
       </div>
 
       <div className="flex-1 min-w-0 flex flex-col gap-2 justify-between py-0.5">
@@ -207,14 +200,12 @@ function BorrowedCard({
 
 function ReservationCard({
   reservation,
-  token,
   claiming,
   onClaim,
   onCancel,
   onOpenDetail,
 }: {
   reservation: IReservation;
-  token?: string;
   claiming: boolean;
   onClaim: (reservation: IReservation) => void;
   onCancel: (reservation: IReservation) => void;
@@ -236,11 +227,7 @@ function ReservationCard({
         className="w-[55px] h-[78px] flex-shrink-0 self-center rounded-[4px] shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] overflow-hidden cursor-pointer"
         onClick={() => onOpenDetail(reservation.entry_id, reservation.entry?.catalog_id)}
       >
-        <img
-          alt={reservation.entry?.title}
-          src={withAccessToken(reservation.entry?.thumbnail, token) ?? '/assets/thumbnail.webp'}
-          className="w-full h-full object-cover"
-        />
+        <Thumbnail thumbnail={reservation.entry?.thumbnail} alt={reservation.entry?.title ?? ''} wrapperClassName="w-full h-full" />
       </div>
 
       <div className="flex-1 min-w-0 flex flex-col gap-2 justify-between py-0.5">
@@ -319,11 +306,9 @@ function ReservationCard({
 // responsive grid so the history no longer dominates the page vertically.
 function PastCard({
   license,
-  token,
   onBorrowAgain,
 }: {
   license: ILicense;
-  token?: string;
   onBorrowAgain: (entryId: string, catalogId?: string) => void;
 }) {
   const { t } = useTranslation();
@@ -340,10 +325,11 @@ function PastCard({
         aria-label={`${t(`${CARD}.borrowAgain`)}: ${title}`}
         className="relative block w-full aspect-[3/4] overflow-hidden"
       >
-        <img
+        <Thumbnail
+          thumbnail={license.entry?.thumbnail}
           alt={title}
-          src={withAccessToken(license.entry?.thumbnail, token) ?? '/assets/thumbnail.webp'}
-          className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-300"
+          className="grayscale group-hover:grayscale-0"
+          wrapperClassName="w-full h-full"
         />
       </button>
 
@@ -417,7 +403,6 @@ function LoanCardSkeleton() {
 
 export default function LoansCardView() {
   const { t } = useTranslation();
-  const { auth } = useAuthContext();
   const { claimReservation } = useUpdateReservation();
   const { openInThorium, downloadDirect } = useDownloadLicense();
   const [, setSearchParams] = useSearchParams();
@@ -436,6 +421,10 @@ export default function LoansCardView() {
   const [extendLicense, setExtendLicense] = useState<ILicense | null>(null);
   const [returnLicense, setReturnLicense] = useState<ILicense | null>(null);
   const [cancelTarget, setCancelTarget] = useState<IReservation | null>(null);
+  // Licences returned on this page. A refetch right after the PUT can still
+  // report them as live (EvilFlowersCatalog#123), so these local copies win
+  // over the server list until the page is left.
+  const [returnedById, setReturnedById] = useState<Map<string, ILicense>>(() => new Map());
   const [showAllPast, setShowAllPast] = useState(false);
   // Collapse the history to ~two grid rows by default so it never dominates the page.
   const PAST_COLLAPSE = 12;
@@ -445,7 +434,7 @@ export default function LoansCardView() {
   const loading = licensesQuery.isLoading;
 
   const { borrowed, past } = useMemo(() => {
-    const items = licensesQuery.data?.items ?? [];
+    const items = (licensesQuery.data?.items ?? []).map((l) => returnedById.get(l.id) ?? l);
     const now = new Date();
     const startsAt = (l: ILicense) => new Date(l.starts_at);
     const expiresAt = (l: ILicense) => new Date(l.expires_at);
@@ -471,7 +460,7 @@ export default function LoansCardView() {
     const past = [...latestByEntry.values()].sort((a, b) => expiresAt(b).getTime() - expiresAt(a).getTime());
 
     return { borrowed, past };
-  }, [licensesQuery.data]);
+  }, [licensesQuery.data, returnedById]);
 
   // Non-terminal reservations = the user's live queue entries (queued/available).
   const reservations = useMemo(
@@ -492,6 +481,11 @@ export default function LoansCardView() {
   const loadAll = () => {
     licensesQuery.refetch();
     reservationsQuery.refetch();
+  };
+
+  const handleReturned = (returned: ILicense) => {
+    setReturnedById((prev) => new Map(prev).set(returned.id, returned));
+    loadAll();
   };
 
   const handleClaimReservation = async (reservation: IReservation) => {
@@ -580,7 +574,6 @@ export default function LoansCardView() {
                 <BorrowedCard
                   key={license.id}
                   license={license}
-                  token={auth?.token}
                   onDownload={handleDownload}
                   onExtend={setExtendLicense}
                   onReturn={setReturnLicense}
@@ -602,7 +595,6 @@ export default function LoansCardView() {
                 <ReservationCard
                   key={reservation.id}
                   reservation={reservation}
-                  token={auth?.token}
                   claiming={claimingId === reservation.id}
                   onClaim={handleClaimReservation}
                   onCancel={setCancelTarget}
@@ -632,7 +624,7 @@ export default function LoansCardView() {
             </div>
             <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-4 w-full">
               {(showAllPast ? past : past.slice(0, PAST_COLLAPSE)).map((license) => (
-                <PastCard key={license.id} license={license} token={auth?.token} onBorrowAgain={openEntryDetail} />
+                <PastCard key={license.id} license={license} onBorrowAgain={openEntryDetail} />
               ))}
             </div>
           </div>
@@ -651,7 +643,7 @@ export default function LoansCardView() {
         <ReturnBookModal
           license={returnLicense}
           onClose={() => setReturnLicense(null)}
-          onSuccess={loadAll}
+          onSuccess={handleReturned}
         />
       )}
 

@@ -9,9 +9,8 @@ import { IEntryDetail } from '../../utils/interfaces/entry';
 import { problemDetailMessage } from '../../utils/problemDetail';
 import useCreateReservation from '../../hooks/api/reservations/useCreateReservation';
 import useContactNudge from '../../hooks/api/notification-contacts/useContactNudge';
-import useAuthContext from '../../hooks/contexts/useAuthContext';
 import useFocusTrap from '../../hooks/useFocusTrap';
-import { withAccessToken } from '../../utils/func/functions';
+import Thumbnail from '../items/entry/Thumbnail';
 import useEscapeLayer from '../../hooks/useEscapeLayer';
 
 const M = 'license.queue';
@@ -33,7 +32,6 @@ interface Props {
  */
 export default function ReserveQueueModal({ entry, onClose, onSuccess, queueLength, nextAvailableAt }: Props) {
   const { t } = useTranslation();
-  const { auth } = useAuthContext();
   const createReservation = useCreateReservation();
   const nudgeIfNoContact = useContactNudge();
   const [loading, setLoading] = useState(false);
@@ -100,15 +98,11 @@ export default function ReserveQueueModal({ entry, onClose, onSuccess, queueLeng
 
         {/* Book info card */}
         <div className="bg-lightGray dark:bg-zinc-700 rounded-xl p-4 flex gap-3 items-center mb-8">
-          <div className="w-[55px] h-[78px] rounded-[5px] overflow-hidden bg-gray-300 shrink-0">
-            {entry.thumbnail && (
-              <img
-                className="w-full h-full object-cover"
-                src={withAccessToken(entry.thumbnail, auth?.token) ?? undefined}
-                alt={entry.title}
-              />
-            )}
-          </div>
+          <Thumbnail
+            thumbnail={entry.thumbnail}
+            alt={entry.title}
+            wrapperClassName="w-[55px] h-[78px] rounded-[5px] shrink-0"
+          />
           <div className="flex flex-col gap-2 min-w-0 flex-1">
             <p className="font-semibold text-sm text-secondary dark:text-secondaryLight truncate">
               {entry.title}

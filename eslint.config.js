@@ -36,6 +36,21 @@ export default tseslint.config(
         'error',
         { allowShortCircuit: true, allowTernary: true },
       ],
+      // Covers are public and versioned: render them through <Thumbnail> with the
+      // API's URL verbatim. A token in an image URL defeats every cache and leaks
+      // the JWT into access logs, history and Referer (issue #38).
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "CallExpression[callee.name='withAccessToken'] MemberExpression[property.name=/^(thumbnail|image)$/]",
+          message: 'Cover URLs must not carry the access token; render them with <Thumbnail> (#38).',
+        },
+        {
+          selector: 'TemplateElement[value.raw=/access_token=/], Literal[value=/access_token=/]',
+          message: 'Do not build `?access_token=` URLs by hand (#38).',
+        },
+      ],
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true },

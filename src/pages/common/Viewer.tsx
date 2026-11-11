@@ -36,6 +36,7 @@ import useAppContext from "../../hooks/contexts/useAppContext";
 import { toast } from "react-toastify";
 import { updateMetaTag, withAccessToken } from "../../utils/func/functions";
 import useAuthContext from "../../hooks/contexts/useAuthContext";
+import { FALLBACK_SRC } from "../../components/items/entry/Thumbnail";
 import useGetAnotations from "../../hooks/api/anotations/useGetAnotations";
 import useGetAnotationItem from "../../hooks/api/anotations/anotation-items/useGetAnotationItem";
 import useCreateAnotation from "../../hooks/api/anotations/useCreateAnotation";
@@ -252,7 +253,9 @@ const Viewer = () => {
         catalog_id: detail.catalog_id,
         title: detail.title,
         authors: detail.authors.map((author) => ({ name: author.name, surname: author.surname })),
-        thumbnail: withAccessToken(detail.thumbnail, auth?.token) ?? detail.thumbnail,
+        // Verbatim cover URL (public, cacheable). The viewer's <img> has no
+        // fallback of its own, so an entry without a cover gets the placeholder.
+        thumbnail: detail.thumbnail ?? FALLBACK_SRC,
         shelf_record_id: detail.shelf_record_id ?? null,
       }));
   };

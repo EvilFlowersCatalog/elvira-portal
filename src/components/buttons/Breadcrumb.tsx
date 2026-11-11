@@ -71,6 +71,7 @@ const Breadcrumb = () => {
     ['search']: isEn() ? 'Search' : 'Vyhľadávanie',
     ['viewer']: isEn() ? 'PDF Viewer' : 'PDF Viewer',
     ['ai']: isEn() ? 'AI Assistant' : 'AI Asistent',
+    ['readers']: isEn() ? 'Readers, OPDS & Calibre' : 'Čítačky, OPDS a Calibre',
     ['claim']: isEn() ? 'Claim reservation' : 'Vyzdvihnutie rezervácie',
   };
   const getFeedDetail = useGetFeedDetail();

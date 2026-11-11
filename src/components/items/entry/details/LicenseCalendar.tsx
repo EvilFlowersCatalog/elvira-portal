@@ -20,7 +20,7 @@ import { ILicense } from "../../../../utils/interfaces/license";
 import useCreateLicense from "../../../../hooks/api/licenses/useCreateLicense";
 import useDownloadLicense from "../../../../hooks/api/licenses/useDownloadLicense";
 import ReserveQueueModal from "../../../modals/ReserveQueueModal";
-import { withAccessToken } from "../../../../utils/func/functions";
+import Thumbnail from "../Thumbnail";
 import {
   CONFLICT_REASON,
   getConflictReasonCode,
@@ -274,13 +274,11 @@ export default function LicenseCalendar() {
             <>
               {/* Book info card */}
               <div className="bg-lightGray dark:bg-zinc-700 rounded-[10px] p-4 flex gap-5 items-start">
-                <div className="w-[73px] h-[103px] rounded-[5px] overflow-hidden shrink-0 bg-gray-200">
-                  <img
-                    className="w-full h-full object-cover"
-                    src={withAccessToken(entry.thumbnail, auth?.token) ?? undefined}
-                    alt={entry.title}
-                  />
-                </div>
+                <Thumbnail
+                  thumbnail={entry.thumbnail}
+                  alt={entry.title}
+                  wrapperClassName="w-[73px] h-[103px] rounded-[5px] shrink-0"
+                />
                 <div className="flex flex-col gap-2 min-w-0 flex-1 pt-1">
                   <p className="font-semibold text-base text-secondary dark:text-secondaryLight line-clamp-2 leading-snug">
                     {entry.title}
@@ -437,13 +435,11 @@ export default function LicenseCalendar() {
             <div className="flex flex-col items-center gap-5 max-w-xl mx-auto w-full py-2">
               <FiCheckCircle size={66} className="text-[#008B19]" />
               <div className="w-full bg-lightGray dark:bg-zinc-700 rounded-xl p-4 flex gap-3 items-center">
-                <div className="w-[55px] h-[78px] rounded-[5px] overflow-hidden shrink-0 bg-gray-200">
-                  <img
-                    className="w-full h-full object-cover"
-                    src={withAccessToken(entry.thumbnail, auth?.token) ?? undefined}
-                    alt={entry.title}
-                  />
-                </div>
+                <Thumbnail
+                  thumbnail={entry.thumbnail}
+                  alt={entry.title}
+                  wrapperClassName="w-[55px] h-[78px] rounded-[5px] shrink-0"
+                />
                 <div className="flex flex-col gap-2 min-w-0">
                   <p className="font-semibold text-sm text-secondary dark:text-secondaryLight line-clamp-2">
                     {entry.title}

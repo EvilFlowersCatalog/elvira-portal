@@ -1,12 +1,11 @@
 import { useTranslation } from 'react-i18next';
-import { getBase64, imageUrlToFile, withAccessToken } from '../../../utils/func/functions';
+import { getBase64, imageUrlToFile } from '../../../utils/func/functions';
 import { IPartParams } from '../../../utils/interfaces/general/general';
 import ImageDropzone from '../../dropzones/ImageDropzone';
 import ElviraInput from '../../inputs/ElviraInput';
 import LanguageAutofill from '../../autofills/LanguageAutofill';
 import PartialDateInput from '../../inputs/PartialDateInput';
 import { ChangeEvent, useEffect, useState } from 'react';
-import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 
 interface IAdditionalDataPartParams extends IPartParams {
@@ -21,7 +20,6 @@ const AdditionalDataPart = ({
   setStringImage,
 }: IAdditionalDataPartParams) => {
   const { t } = useTranslation();
-  const { auth } = useAuthContext();
   const { umamiTrack } = useAppContext();
 
   const [image, setImage] = useState<File | null>(null);
@@ -39,10 +37,8 @@ const AdditionalDataPart = ({
     (async () => {
       if (entry.thumbnail) {
         try {
-          const image = await imageUrlToFile(
-            withAccessToken(entry.thumbnail, auth?.token) ?? entry.thumbnail,
-            'Image'
-          );
+          // Covers are public: the API's URL works as-is, no token needed.
+          const image = await imageUrlToFile(entry.thumbnail, 'Image');
           setImage(image);
 
           const base64image = await getBase64(image);

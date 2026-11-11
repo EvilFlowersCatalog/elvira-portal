@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { FiChevronDown, FiChevronUp, FiSearch, FiUser, FiFileText, FiBook } from 'react-icons/fi';
+import { FiChevronDown, FiChevronUp, FiSearch, FiUser, FiFileText, FiBook, FiTablet } from 'react-icons/fi';
 import { HiOutlineMail } from 'react-icons/hi';
 import { RiAiGenerate } from 'react-icons/ri';
 import { BsDiscord } from 'react-icons/bs';
@@ -23,6 +23,7 @@ const faqItems = [
   { q: 'Kde nájdem knižnicu?', a: 'Knižnica STU sa nachádza v priestoroch Slovenskej technickej univerzity. Presné informácie nájdete na webstránke STU.' },
   { q: 'Koľko stojí zápis do knižnice?', a: 'Informácie o poplatkoch za zápis do knižnice nájdete na webstránke knižnice STU.' },
   { q: 'Ako funguje AI Asistent? Potrebujem svoj vlastný API kľúč?', a: 'AI Asistent využíva jazykový model, ktorý vám pomôže hľadať knihy a študovať ich obsah. Vlastný API kľúč nepotrebujete, Elvira ho poskytuje všetkým prihláseným používateľom v rámci denného limitu.' },
+  { q: 'Prečo niektoré knihy nemajú obálku?', a: 'Ak kniha v katalógu obálku nemá alebo sa ju nepodarí načítať, Elvira namiesto nej zobrazí náhradný obrázok. Obálky si prehliadač ukladá do vyrovnávacej pamäte, takže pri ďalšej návšteve sa načítajú takmer okamžite.' },
   { q: 'Prečo Elvira nikdy nefunguje?', a: 'Ak narazíte na problémy, skúste obnoviť stránku alebo nás kontaktujte na elvira-mail@stuba.sk.' },
 ];
 
@@ -66,6 +67,12 @@ const Help = () => {
       description: 'Spravujte svoj účet, nastavenia a notifikácie.',
       icon: <FiUser size={30} />,
       path: NAVIGATION_PATHS.helpProfile,
+    },
+    {
+      title: 'Čítačky, OPDS a Calibre',
+      description: 'Thorium a Readium LCP, OPDS katalóg v čítačke a doplnok pre Calibre.',
+      icon: <FiTablet size={30} />,
+      path: NAVIGATION_PATHS.helpReaders,
     },
   ];
 

@@ -4,12 +4,11 @@ import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { FiPlus, FiEdit2, FiTrash2, FiBookOpen } from 'react-icons/fi';
 import useAppContext from '../../../hooks/contexts/useAppContext';
-import useAuthContext from '../../../hooks/contexts/useAuthContext';
 import useEntriesQuery from '../../../hooks/api/entries/useEntriesQuery';
 import useDeleteEntry from '../../../hooks/api/entries/useDeleteEntry';
 import { IEntry } from '../../../utils/interfaces/entry';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
-import { withAccessToken } from '../../../utils/func/functions';
+import Thumbnail from '../../../components/items/entry/Thumbnail';
 import { fmtDate, fmtDateTime } from '../../../utils/func/adminDate';
 import {
   PageHeader,
@@ -56,7 +55,6 @@ const AdminEntries = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { umamiTrack } = useAppContext();
-  const { auth } = useAuthContext();
   const deleteEntry = useDeleteEntry();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -132,8 +130,6 @@ const AdminEntries = () => {
     return a.length > 1 ? `${first} ${t('administration.entriesPage.moreCount', { count: a.length - 1 })}` : first;
   };
 
-  const thumbSrc = (e: IEntry) => withAccessToken(e.thumbnail, auth?.token);
-
   const chips = (arr: { id: string; title?: string; term?: string }[] | undefined, variant: 'info' | 'neutral', param: string) => {
     if (!arr || arr.length === 0) return <span className="text-zinc-400">—</span>;
     const shown = arr.slice(0, 2);
@@ -167,18 +163,18 @@ const AdminEntries = () => {
       sortKey: 'title',
       hideable: false,
       cell: (e) => {
-        const src = thumbSrc(e);
         return (
           <div className="flex items-center gap-3">
-            <div className="h-12 w-9 shrink-0 overflow-hidden rounded bg-zinc-100 dark:bg-zinc-700">
-              {src ? (
-                <img src={src} alt="" className="h-full w-full object-cover" />
-              ) : (
-                <div className="flex h-full w-full items-center justify-center text-zinc-300 dark:text-zinc-500">
+            <Thumbnail
+              thumbnail={e.thumbnail}
+              alt=""
+              wrapperClassName="h-12 w-9 shrink-0 rounded"
+              fallback={
+                <div className="flex h-full w-full items-center justify-center bg-zinc-100 text-zinc-300 dark:bg-zinc-700 dark:text-zinc-500">
                   <FiBookOpen size={16} />
                 </div>
-              )}
-            </div>
+              }
+            />
             {/* A cell in an auto-layout table grows to its content, so `truncate`
                 needs an explicit cap — otherwise one long title pushes every
                 other column off-screen. */}

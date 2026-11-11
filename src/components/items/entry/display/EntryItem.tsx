@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import useAuthContext from "../../../../hooks/contexts/useAuthContext";
 import { IEntry, IEntryDetail } from "../../../../utils/interfaces/entry";
 import { useEffect, useState } from "react";
 import useAddToShelf from "../../../../hooks/api/my-shelf/useAddToShelf";
@@ -9,7 +8,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { NAVIGATION_PATHS } from "../../../../utils/interfaces/general/general";
 import useAppContext from "../../../../hooks/contexts/useAppContext";
 import { AvailabilityBadge, AvailabilityState } from "../details/AvailabilityBadge";
-import { withAccessToken } from "../../../../utils/func/functions";
+import Thumbnail, { FALLBACK_SRC } from "../Thumbnail";
 import { localize } from '../../../../utils/func/localized';
 import { setAuthorParams } from "../../../../hooks/api/entries/entryFilters";
 import Highlight from "../Highlight";
@@ -24,11 +23,12 @@ interface IEntryItem {
     id?: string;
     type?: 'ai-recommendation' | 'library-item';
     hasActiveLoan?: boolean;
+    /** Above-the-fold card: load its cover eagerly with high priority (LCP). */
+    priority?: boolean;
 }
 
-export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoan }: IEntryItem) {
+export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoan, priority = false }: IEntryItem) {
     const { titleLogoDark } = useAppContext();
-    const { auth } = useAuthContext();
     const { t } = useTranslation();
     const navigate = useNavigate();
     const [searchParams, setSearchParams] = useSearchParams();
@@ -120,14 +120,6 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
     const search = 'search' in entry ? entry.search : undefined;
     const matchedBadges = (search?.matched ?? []).filter((field) => MATCHED_FIELDS.includes(field));
 
-    const [isFallbackImage, setIsFallbackImage] = useState(false);
-    const [imgLoaded, setImgLoaded] = useState(false);
-    function invalidImageFallback(e: React.SyntheticEvent<HTMLImageElement, Event>) {
-        e.currentTarget.src = '/assets/thumbnail.webp';
-        setIsFallbackImage(true);
-        setImgLoaded(true);
-    }
-
     const hasAcquisitions = entry.acquisitions?.length > 0;
     const readiumEnabled = Boolean((entry as IEntryDetail).config?.readium_enabled);
     const lcpState = entry.lcp_state;
@@ -162,22 +154,23 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
                     }}
                     className="relative w-full h-full cursor-pointer select-none"
                 >
-                    <img
-                        className={`w-full h-full object-cover select-none transition-opacity duration-300 ${imgLoaded ? 'opacity-100' : 'opacity-0'}`}
-                        src={withAccessToken(entry.thumbnail, auth?.token) ?? undefined}
+                    <Thumbnail
+                        thumbnail={entry.thumbnail}
                         alt={t('common.thumbnail', { title: entry.title })}
-                        loading="lazy"
-                        decoding="async"
-                        onLoad={() => setImgLoaded(true)}
-                        onError={invalidImageFallback}
+                        className="select-none"
+                        wrapperClassName="w-full h-full"
+                        priority={priority}
+                        fallback={
+                            <>
+                                <img className="w-full h-full object-cover select-none" src={FALLBACK_SRC} alt="" />
+                                <img
+                                    className="absolute w-[80%] z-[2] top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 group-hover:scale-110 transition-transform duration-300"
+                                    src={titleLogoDark}
+                                    alt='Elvira Logo'
+                                />
+                            </>
+                        }
                     />
-                    {isFallbackImage && (
-                        <img
-                            className="absolute w-[80%] z-[2] top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 group-hover:scale-110 transition-transform duration-300"
-                            src={titleLogoDark}
-                            alt='Elvira Logo'
-                        />
-                    )}
                 </div>
                 <button
                     type="button"
