@@ -1210,6 +1210,10 @@ export const sk = {
         publisher: 'vydavateľ',
         semantic: 'súvisiace',
       },
+      insideBooks: 'V texte kníh',
+      pageShort: 's. {{page}}',
+      passageHidden: 'Text sa pri tejto knihe nezobrazuje. Otvorte ju a čítajte.',
+      unknownBook: 'Kniha',
     },
 
     profile: {

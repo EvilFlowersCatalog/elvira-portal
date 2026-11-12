@@ -1202,6 +1202,10 @@ export const en = {
         publisher: 'publisher',
         semantic: 'related',
       },
+      insideBooks: 'Inside books',
+      pageShort: 'p. {{page}}',
+      passageHidden: 'Text not shown for this book. Open it to read.',
+      unknownBook: 'Book',
     },
 
     profile: {

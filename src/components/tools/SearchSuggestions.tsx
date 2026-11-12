@@ -8,6 +8,8 @@ import useDebouncedValue from "../../hooks/useDebouncedValue";
 import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
 import { addCategoryId, addFeedId } from "../../utils/func/filterParams";
 import { localize } from '../../utils/func/localized';
+import usePassageSearch from "../../hooks/api/entries/usePassageSearch";
+import PassageHits from "../items/entry/PassageHits";
 
 interface SearchSuggestionsProps {
   searchQuery: string;
@@ -31,6 +33,9 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
   // stale request is aborted; `keepPreviousData` keeps the last suggestions on
   // screen while the next ones load, so the panel updates in place.
   const { data, isFetching, isPlaceholderData } = useEntrySuggest(debouncedQuery.trim(), { enabled });
+  // Search inside books: its own request, so the book suggestions don't wait for it.
+  const { data: passageData } = usePassageSearch(debouncedQuery.trim(), { enabled, limit: 3, perEntry: 1 });
+  const passageHits = passageData?.items ?? [];
 
   const entries = data?.entries ?? [];
   const authors = data?.authors ?? [];
@@ -88,7 +93,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
   };
 
   const hasFacets = authors.length > 0 || categories.length > 0 || feeds.length > 0;
-  const hasResults = entries.length > 0 || hasFacets;
+  const hasResults = entries.length > 0 || hasFacets || passageHits.length > 0;
   const didYouMean = data?.did_you_mean;
 
   if (!searchQuery || searchQuery.trim().length < 2) {
@@ -181,6 +186,14 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
                 </div>
               ))}
             </div>
+
+            {/* Inside books: passages that matched, each opens the viewer at its page */}
+            {passageHits.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">{t('search.insideBooks')}</h3>
+                <PassageHits hits={passageHits} compact onOpen={onClose} />
+              </div>
+            )}
           </div>
 
           {/* Right sidebar - 4 columns */}
