@@ -1,5 +1,5 @@
 import { AiChatSubject, AiMessage } from '../../providers/AppProvider';
-import { IAssistantChat, IAssistantMessage, IChatContext } from '../interfaces/assistant';
+import { IAssistantChat, IAssistantCitation, IAssistantMessage, IChatContext } from '../interfaces/assistant';
 
 const TOOL_STATUS: Record<string, string> = {
   search_entries: 'searchCatalog',
@@ -84,6 +84,7 @@ export const fromApiMessages = (messages: IAssistantMessage[]): AiMessage[] =>
     page: msg.page,
     entryIds: msg.displayed_entries ?? undefined,
     pagesRead: msg.pages_read ?? undefined,
+    citations: msg.citations?.length ? msg.citations : undefined,
     annotationIds: msg.annotations?.length ? msg.annotations : undefined,
     activity: msg.activity?.length ? msg.activity.map((call) => ({ ...call, done: true })) : undefined,
     status: 'done',
@@ -144,7 +145,30 @@ export const normalizeCitations = (text: string): string =>
 export const citationsToLinks = (
   text: string,
   labels: { page: (page: number) => string; region: (id: string) => string },
+  citations: IAssistantCitation[] = [],
 ): string =>
-  normalizeCitations(text)
+  evidenceToLinks(normalizeCitations(text), citations)
     .replace(/\[\[page:(\d+)\]\]/g, (_, page) => `[${labels.page(Number(page))}](#efv-page-${page})`)
     .replace(/\[\[region:([\w-]+)\]\]/g, (_, id) => `[${labels.region(id)}](#efv-region-${id})`);
+
+// Evidence labels as the model writes them: `[E3]`, `[E3, E5]`, `[E3; E5]`; `[E3][E5]` is two groups.
+const EVIDENCE_GROUP = /\[\s*(E\d+(?:\s*[,;]\s*E\d+)*)\s*\]/gi;
+
+/**
+ * Evidence labels (IP-024) → `[3](#efv-evidence-E3)` per label the answer's citations resolve; a label they
+ * lack (the `unknown` ones) stays plain text.
+ */
+export const evidenceToLinks = (text: string, citations: IAssistantCitation[]): string => {
+  const known = new Set(citations.map((c) => c.label.toUpperCase()));
+  return text.replace(EVIDENCE_GROUP, (group, list: string) => {
+    const labels = list.split(/\s*[,;]\s*/).map((raw) => `E${Number(raw.slice(1))}`);
+    if (!labels.some((label) => known.has(label))) return group;
+    return labels
+      .map((label) => (known.has(label) ? `[${label.slice(1)}](#efv-evidence-${label})` : `\\[${label}\\]`))
+      .join('');
+  });
+};
+
+/** The citation behind an evidence label, e.g. `E3`. */
+export const findCitation = (citations: IAssistantCitation[] | undefined, label: string) =>
+  citations?.find((c) => c.label.toUpperCase() === label.toUpperCase());

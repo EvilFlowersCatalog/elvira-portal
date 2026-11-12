@@ -21,8 +21,19 @@ export interface IAssistantMessage {
   annotations?: string[] | null;
   /** The tool calls of the turn this answer closed (the activity log), rebuilt by the catalog. */
   activity?: Omit<IAssistantToolActivity, 'done'>[] | null;
+  /** Evidence labels cited in `text` (`[E3]`), resolved to publication and page (IP-024). */
+  citations?: IAssistantCitation[] | null;
   tokens_used: number;
   created_at: string;
+}
+
+/** An evidence label of an answer (`[E3]`) resolved to a publication and page (IP-024). */
+export interface IAssistantCitation {
+  label: string;
+  entry_id: string;
+  title?: string;
+  page?: number;
+  section?: string;
 }
 
 export interface IAssistantChatEntry {
@@ -101,6 +112,8 @@ export interface IAssistantStreamHandlers {
   onEntries: (entryIds: string[]) => void;
   /** Viewer pages the answer was drawn from. */
   onPages?: (pages: number[]) => void;
+  /** Evidence labels of the answer resolved to publication and page (`citations` event, IP-024). */
+  onCitations?: (citations: IAssistantCitation[]) => void;
   /** An agent annotation the assistant started (AI highlights), as `/assistant/v1/highlights` returns it. */
   onAnnotation?: (annotation: IAssistantAnnotation) => void;
   /**

@@ -6,9 +6,10 @@ import { useTranslation } from 'react-i18next';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import useGetEntryDetail from '../../hooks/api/entries/useGetEntryDetail';
 import useOpenInViewer from '../../hooks/api/assistant/useOpenInViewer';
+import useOpenCitation from '../../hooks/api/assistant/useOpenCitation';
 import { AiMessage } from '../../providers/AppProvider';
 import { IEntry } from '../../utils/interfaces/entry';
-import { citationsToLinks, findRegion } from '../../utils/func/assistantMessages';
+import { citationsToLinks, findCitation, findRegion } from '../../utils/func/assistantMessages';
 import EntryItem from '../items/entry/display/EntryItem';
 import ChatContextChip from './ChatContextChip';
 import AnnotationCard from './AnnotationCard';
@@ -41,6 +42,7 @@ export default function AssistantMessage({
   const { t } = useTranslation();
   const { aiChatSubject } = useAppContext();
   const openInViewer = useOpenInViewer();
+  const openCitation = useOpenCitation();
   const { getEntryDetail } = useGetEntryDetail();
   const { getEntryFigures } = useSimilarEntries();
 
@@ -114,8 +116,8 @@ export default function AssistantMessage({
           const kind = figures.find((f) => f.id === id)?.kind ?? findRegion(messages, id)?.kind;
           return t(`assistant.region.${kind ?? 'figure'}`);
         },
-      }),
-    [msg.text, messages, figures, t],
+      }, msg.citations),
+    [msg.text, msg.citations, messages, figures, t],
   );
 
   const bubble = compact ? 'p-2 max-w-[85%]' : 'px-4 py-3 max-w-[85%]';
@@ -174,6 +176,21 @@ export default function AssistantMessage({
                   a: ({ href, children }) => {
                     const page = href?.match(/^#efv-page-(\d+)$/)?.[1];
                     const regionId = href?.match(/^#efv-region-([\w-]+)$/)?.[1];
+                    const evidence = href?.match(/^#efv-evidence-(E\d+)$/)?.[1];
+                    const citation = evidence ? findCitation(msg.citations, evidence) : undefined;
+                    if (citation) {
+                      const where = citation.page ? t('assistant.pageShort', { page: citation.page }) : '';
+                      return (
+                        <button
+                          type="button"
+                          className={citeClass}
+                          title={[citation.title, where].filter(Boolean).join(', ')}
+                          onClick={() => openCitation(citation, onNavigate)}
+                        >
+                          {children}
+                        </button>
+                      );
+                    }
                     if (regionId) {
                       return (
                         <RegionCite region={citedRegion(regionId)} className={citeClass} onOpenPage={openPage}>

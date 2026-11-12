@@ -6,7 +6,7 @@ import {
   IAssistantToolActivity,
 } from '../../../utils/interfaces/assistant';
 import useAuth from '../../contexts/useAuthContext';
-import { ASSISTANT_URL, AssistantApiError, idsOf, pagesOf, parseSseData, readSse, textOf } from './assistantApi';
+import { ASSISTANT_URL, AssistantApiError, citationsOf, idsOf, pagesOf, parseSseData, readSse, textOf } from './assistantApi';
 
 /** The readable fields of a `status`/`activity` payload, each checked; anything else is dropped. */
 const activityOf = (payload: object): Omit<IAssistantToolActivity, 'id' | 'tool' | 'done'> => {
@@ -88,6 +88,9 @@ const useSendChatMessage = () => {
           break;
         case 'pages':
           handlers.onPages?.(pagesOf(payload));
+          break;
+        case 'citations':
+          handlers.onCitations?.(citationsOf(payload));
           break;
         case 'annotation':
           if (payload && typeof payload === 'object' && 'id' in payload) {

@@ -16,7 +16,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { IContextProviderParams } from "../utils/interfaces/contexts";
 import i18next from "../utils/i18n/i18next";
 import useCookiesContext from "../hooks/contexts/useCookiesContext";
-import type { IAssistantToolActivity, IChatContext } from "../utils/interfaces/assistant";
+import type { IAssistantCitation, IAssistantToolActivity, IChatContext } from "../utils/interfaces/assistant";
 
 /**
  * One message of the assistant chat, the same shape everywhere it is shown
@@ -37,6 +37,8 @@ export interface AiMessage {
   entryIds?: string[];
   /** Viewer pages the answer was drawn from. */
   pagesRead?: number[];
+  /** Evidence labels the answer cites (`[E3]`), resolved to publication and page. */
+  citations?: IAssistantCitation[];
   /** AI highlight layers (agent annotations) the assistant created with this answer. */
   annotationIds?: string[];
   status?: "streaming" | "done" | "error";

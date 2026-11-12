@@ -78,6 +78,7 @@ const useAssistantChat = (
           if (ids.length) updateAnswer({ entryIds: ids });
         },
         onPages: (pages) => updateAnswer({ pagesRead: pages }),
+        onCitations: (citations) => updateAnswer({ citations }),
         onAnnotation: (annotation) => {
           annotationIds.push(annotation.id);
           updateAnswer({ annotationIds: [...annotationIds] });

@@ -57,7 +57,8 @@ import useSimilarEntries from "../../hooks/api/entries/useSimilarEntries";
 import useAgentHighlights, { toViewer as toViewerAnnotation } from "../../hooks/api/assistant/useAgentHighlights";
 import { formatRetryAfter, toAssistantError } from "../../hooks/api/assistant/assistantApi";
 import { activityLabelKey, statusLabelKey } from "../../utils/func/assistantMessages";
-import type { IAssistantToolActivity } from "../../utils/interfaces/assistant";
+import type { IAssistantCitation, IAssistantToolActivity } from "../../utils/interfaces/assistant";
+import useOpenCitation from "../../hooks/api/assistant/useOpenCitation";
 import { useQueryClient } from "@tanstack/react-query";
 
 
@@ -78,6 +79,17 @@ const rootId = "elvira-viewer-app";
 
 // Title of the annotation that acts as the page-bookmark container.
 const PAGE_BOOKMARKS_TITLE = "__page_bookmarks__";
+
+/** The viewer's `IChatCitation`, declared here so the build passes against a viewer that lacks it. */
+type ViewerCitation = { label: string; entryId: string; title?: string; page?: number; section?: string };
+
+const toViewerCitation = (citation: IAssistantCitation): ViewerCitation => ({
+  label: citation.label,
+  entryId: citation.entry_id,
+  title: citation.title,
+  page: citation.page,
+  section: citation.section,
+});
 
 const Viewer = () => {
   const { lang, theme, titleLogoDark, titleLogoLight, aiChatId, clearAiChat } = useAppContext();
@@ -112,6 +124,7 @@ const Viewer = () => {
   const deleteChat = useDeleteChat();
   const { getAgentAnnotations, waitForAgentAnnotation, requestAgentAnnotation } = useAgentHighlights();
   const getRegions = useGetRegions();
+  const openCitation = useOpenCitation();
   const queryClient = useQueryClient();
   const getAnotations = useGetAnotations();
   const updateAnotation = useUpdateAnotation();
@@ -308,6 +321,11 @@ const Viewer = () => {
             if (ids.length) pending.push(toSuggestedEntries(ids).then(handlers.onEntries));
           },
           onPages: (pages) => handlers.onPages?.(pages),
+          // Evidence labels `[E3]` (IP-024); viewers without `onCitations` ignore it.
+          onCitations: (citations) =>
+            (handlers as { onCitations?: (c: ViewerCitation[]) => void }).onCitations?.(
+              citations.map(toViewerCitation)
+            ),
           // Viewer 0.7.6+: AI highlights the assistant started from the chat.
           onAnnotation: (annotation) =>
             (handlers as { onAnnotation?: (a: IAgentAnnotation) => void }).onAnnotation?.(
@@ -358,6 +376,7 @@ const Viewer = () => {
         text: msg.text,
         contexts: msg.contexts ?? undefined,
         pages: msg.pages_read ?? undefined,
+        ...(msg.citations?.length ? { citations: msg.citations.map(toViewerCitation) } : {}),
         entries: msg.displayed_entries?.length
           ? await toSuggestedEntries(msg.displayed_entries)
           : undefined,
@@ -797,6 +816,18 @@ const Viewer = () => {
               getChatsFunc,
               getChatFunc,
               deleteChatFunc,
+              // Evidence citations (IP-024): this book jumps to the page, others open here.
+              // Spread so the build passes against a viewer whose IChatPackage lacks the keys.
+              ...{
+                entryId: id,
+                openCitationFunc: (citation: ViewerCitation) =>
+                  openCitation({
+                    label: citation.label,
+                    entry_id: citation.entryId,
+                    title: citation.title,
+                    page: citation.page,
+                  }),
+              },
             },
             // Opens at the page a chat citation pointed to.
             initialPage: Number(searchParams.get("page")) || undefined,

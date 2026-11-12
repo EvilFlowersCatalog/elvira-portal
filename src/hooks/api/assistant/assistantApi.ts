@@ -1,4 +1,5 @@
 import { isAxiosError } from 'axios';
+import type { IAssistantCitation } from '../../../utils/interfaces/assistant';
 
 export const ASSISTANT_URL = '/assistant/v1';
 
@@ -138,4 +139,15 @@ export const pagesOf = (payload: unknown): number[] => {
     : payload && typeof payload === 'object' ? (payload as Record<string, unknown>).pages
     : undefined;
   return Array.isArray(list) ? list.map(Number).filter((page) => Number.isInteger(page) && page > 0) : [];
+};
+
+/** The resolved labels of a `citations` payload; `unknown` labels are left out, so they render as plain text. */
+export const citationsOf = (payload: unknown): IAssistantCitation[] => {
+  const list = payload && typeof payload === 'object' ? (payload as Record<string, unknown>).citations : undefined;
+  return Array.isArray(list)
+    ? list.filter(
+        (c): c is IAssistantCitation =>
+          !!c && typeof c === 'object' && typeof c.label === 'string' && typeof c.entry_id === 'string',
+      )
+    : [];
 };
