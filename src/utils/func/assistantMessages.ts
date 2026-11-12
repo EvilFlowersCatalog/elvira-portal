@@ -146,8 +146,9 @@ export const citationsToLinks = (
   text: string,
   labels: { page: (page: number) => string; region: (id: string) => string },
   citations: IAssistantCitation[] = [],
+  pending = false,
 ): string =>
-  evidenceToLinks(normalizeCitations(text), citations)
+  evidenceToLinks(normalizeCitations(text), citations, pending)
     .replace(/\[\[page:(\d+)\]\]/g, (_, page) => `[${labels.page(Number(page))}](#efv-page-${page})`)
     .replace(/\[\[region:([\w-]+)\]\]/g, (_, id) => `[${labels.region(id)}](#efv-region-${id})`);
 
@@ -156,12 +157,14 @@ const EVIDENCE_GROUP = /\[\s*(E\d+(?:\s*[,;]\s*E\d+)*)\s*\]/gi;
 
 /**
  * Evidence labels (IP-024) → `[3](#efv-evidence-E3)` per label the answer's citations resolve; a label they
- * lack (the `unknown` ones) stays plain text.
+ * lack (the `unknown` ones) stays plain text. While the answer streams (`pending`) the citations are not in yet,
+ * so every label becomes a link; the renderer shows the unresolved ones as inert chips.
  */
-export const evidenceToLinks = (text: string, citations: IAssistantCitation[]): string => {
+export const evidenceToLinks = (text: string, citations: IAssistantCitation[], pending = false): string => {
   const known = new Set(citations.map((c) => c.label.toUpperCase()));
   return text.replace(EVIDENCE_GROUP, (group, list: string) => {
     const labels = list.split(/\s*[,;]\s*/).map((raw) => `E${Number(raw.slice(1))}`);
+    if (pending) return labels.map((label) => `[${label.slice(1)}](#efv-evidence-${label})`).join('');
     if (!labels.some((label) => known.has(label))) return group;
     return labels
       .map((label) => (known.has(label) ? `[${label.slice(1)}](#efv-evidence-${label})` : `\\[${label}\\]`))

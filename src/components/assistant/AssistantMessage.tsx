@@ -116,8 +116,8 @@ export default function AssistantMessage({
           const kind = figures.find((f) => f.id === id)?.kind ?? findRegion(messages, id)?.kind;
           return t(`assistant.region.${kind ?? 'figure'}`);
         },
-      }, msg.citations),
-    [msg.text, msg.citations, messages, figures, t],
+      }, msg.citations, msg.status === 'streaming'),
+    [msg.text, msg.citations, msg.status, messages, figures, t],
   );
 
   const bubble = compact ? 'p-2 max-w-[85%]' : 'px-4 py-3 max-w-[85%]';
@@ -191,6 +191,10 @@ export default function AssistantMessage({
                         </button>
                       );
                     }
+                    if (evidence) {
+                      // Streaming: the label resolves when the answer is complete.
+                      return <span className={`${citeClass} opacity-60`}>{children}</span>;
+                    }
                     if (regionId) {
                       return (
                         <RegionCite region={citedRegion(regionId)} className={citeClass} onOpenPage={openPage}>
@@ -226,6 +230,30 @@ export default function AssistantMessage({
       )}
 
       {msg.text ? liveLine : null}
+
+      {/* What each evidence chip in the answer points to */}
+      {msg.citations?.length && !streaming ? (
+        <div className="flex flex-col gap-1 text-xs">
+          <span className="text-gray-500 dark:text-gray-400">{t('assistant.sources')}:</span>
+          {[...msg.citations]
+            .sort((a, b) => Number(a.label.slice(1)) - Number(b.label.slice(1)))
+            .map((citation) => (
+              <button
+                key={citation.label}
+                type="button"
+                className="flex items-baseline gap-2 text-left min-w-0 group"
+                onClick={() => openCitation(citation, onNavigate)}
+              >
+                <span className={citeClass}>{citation.label.slice(1)}</span>
+                <span className="min-w-0 text-gray-700 dark:text-gray-300 group-hover:underline">
+                  {citation.title ?? citation.entry_id}
+                  {citation.page ? `, ${t('assistant.pageShort', { page: citation.page })}` : ''}
+                  {citation.section ? <span className="text-gray-500 dark:text-gray-400"> · {citation.section}</span> : null}
+                </span>
+              </button>
+            ))}
+        </div>
+      ) : null}
 
       {/* Pages the answer was drawn from */}
       {msg.pagesRead?.length ? (
