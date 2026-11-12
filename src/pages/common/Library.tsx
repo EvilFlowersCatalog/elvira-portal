@@ -29,7 +29,7 @@ const Library = () => {
   // Search inside books, scoped by the same filters (ordering doesn't apply).
   const query = (searchParams.get('query') ?? '').trim();
   const passageFilters = { ...filters, orderBy: '', query: '' };
-  const passages = usePassageSearch(query, { limit: 6, perEntry: 1, filters: passageFilters });
+  const passages = usePassageSearch(query, { limit: 6, perEntry: 3, filters: passageFilters });
 
   return (
     <ItemContainer
@@ -42,7 +42,9 @@ const Library = () => {
         <FilterSuggestions
           searchQuery={searchParams.get('query') || ''}
           facets={list.facets?.data}
-          passageHits={query ? passages.data?.items : undefined}
+          passageHits={passages.data?.items}
+          passagesLoading={passages.isLoading}
+          showPassages={!!query}
         />
       )}
       <EntriesWrapper>

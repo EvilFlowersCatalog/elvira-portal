@@ -15,6 +15,9 @@ interface FilterSuggestionsProps {
   facets?: IEntryFacets | null;
   /** Search inside books (#35): passages that matched, shown as a column of their own. */
   passageHits?: IPassageHit[];
+  passagesLoading?: boolean;
+  /** Reserve the passages column from the start, so the layout doesn't shift when they load. */
+  showPassages?: boolean;
 }
 
 type Chip = { id: string; label: string; count: number };
@@ -27,7 +30,7 @@ const byCount = (a: Chip, b: Chip) => b.count - a.count;
  * request of its own. The catalog returns the top 10 authors; categories and
  * collections are complete and sorted by count here.
  */
-const FilterSuggestions = ({ searchQuery, facets, passageHits = [] }: FilterSuggestionsProps) => {
+const FilterSuggestions = ({ searchQuery, facets, passageHits = [], passagesLoading = false, showPassages = false }: FilterSuggestionsProps) => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -86,7 +89,7 @@ const FilterSuggestions = ({ searchQuery, facets, passageHits = [] }: FilterSugg
   };
 
   const hasResults = authors.length > 0 || categories.length > 0 || feeds.length > 0 || passageHits.length > 0;
-  const hasPassages = passageHits.length > 0;
+  const hasPassages = showPassages || passageHits.length > 0;
 
   const getVisibleItems = <T,>(items: T[]): T[] => {
     return showAll ? items : items.slice(0, MAX_ITEMS_PER_COLUMN);
@@ -148,15 +151,31 @@ const FilterSuggestions = ({ searchQuery, facets, passageHits = [] }: FilterSugg
           <MdClose size={20} className="text-gray-500 dark:text-gray-400" />
         </button>
 
-        <div className={`grid grid-cols-1 gap-6 pr-8 ${hasPassages ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-3'}`}>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pr-8">
           {column(t('entry.wizard.authors'), authors, handleAuthorClick, true)}
           {column(t('searchBar.feeds'), feeds, (f) => handleFeedClick(f.id))}
           {column(t('searchBar.categories'), categories, (c) => handleCategoryClick(c.id))}
           {hasPassages && (
-            <div className="flex flex-col min-w-0">
+            <div className="flex flex-col min-w-0 md:col-span-3">
               <h3 className="text-sm font-bold mb-3 text-gray-700 dark:text-gray-300">{t('search.insideBooks')}</h3>
-              <PassageHits hits={getVisibleItems(passageHits)} compact />
-              {!showAll && getRemainingCount(passageHits) > 0 && (
+              {passagesLoading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <div key={i} className="flex gap-3">
+                      <div className="flex-shrink-0 h-16 w-10 rounded bg-gray-200 dark:bg-zinc-700 animate-pulse" />
+                      <div className="flex-1 flex flex-col gap-2 pt-1">
+                        <div className="h-3 w-3/4 rounded bg-gray-200 dark:bg-zinc-700 animate-pulse" />
+                        <div className="h-3 w-full rounded bg-gray-200 dark:bg-zinc-700 animate-pulse" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : passageHits.length > 0 ? (
+                <PassageHits hits={getVisibleItems(passageHits)} />
+              ) : (
+                <p className="text-xs text-gray-500 dark:text-gray-400">{t('page.noResults')}</p>
+              )}
+              {!passagesLoading && !showAll && getRemainingCount(passageHits) > 0 && (
                 <button
                   onClick={() => setShowAll(true)}
                   className="text-left text-sm text-primary dark:text-primaryLight hover:underline mt-3 font-semibold"
