@@ -150,6 +150,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
         <div className={`grid grid-cols-12 gap-4 transition-opacity duration-150 ${isRefreshing ? 'opacity-70' : 'opacity-100'}`}>
           {/* Books Section - 8 columns, or the full width when there are no facets */}
           <div className={`col-span-12 p-4 ${hasFacets ? 'lg:col-span-8' : ''}`}>
+            {entries.length > 0 && (<>
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300">{t('search.books')}</h3>
               <button
@@ -186,10 +187,11 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
                 </div>
               ))}
             </div>
+            </>)}
 
             {/* Inside books: passages that matched, each opens the viewer at its page */}
             {passageHits.length > 0 && (
-              <div className="mt-4">
+              <div className={entries.length > 0 ? 'mt-4' : ''}>
                 <h3 className="text-sm font-bold mb-2 text-gray-700 dark:text-gray-300">{t('search.insideBooks')}</h3>
                 <PassageHits hits={passageHits} compact onOpen={onClose} />
               </div>
