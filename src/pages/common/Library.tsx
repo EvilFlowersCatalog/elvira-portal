@@ -10,7 +10,6 @@ import { useTranslation } from 'react-i18next';
 import FilterSuggestions from '../../components/tools/FilterSuggestions';
 import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
 import usePassageSearch from '../../hooks/api/entries/usePassageSearch';
-import PassageHits from '../../components/items/entry/PassageHits';
 
 const Library = () => {
   const { t } = useTranslation();
@@ -30,7 +29,7 @@ const Library = () => {
   // Search inside books, scoped by the same filters (ordering doesn't apply).
   const query = (searchParams.get('query') ?? '').trim();
   const passageFilters = { ...filters, orderBy: '', query: '' };
-  const passages = usePassageSearch(query, { limit: 6, perEntry: 3, filters: passageFilters });
+  const passages = usePassageSearch(query, { limit: 6, perEntry: 1, filters: passageFilters });
 
   return (
     <ItemContainer
@@ -40,13 +39,11 @@ const Library = () => {
       title={t('navbarMenu.library')}
     >
       {!list.isLoading && list.items.length > 0 && searchParams.get('query') && (
-        <FilterSuggestions searchQuery={searchParams.get('query') || ''} facets={list.facets?.data} />
-      )}
-      {query && passages.data && passages.data.items.length > 0 && (
-        <div className="w-full px-4 mb-6">
-          <h3 className="text-sm font-bold mb-3 text-gray-700 dark:text-gray-300">{t('search.insideBooks')}</h3>
-          <PassageHits hits={passages.data.items} />
-        </div>
+        <FilterSuggestions
+          searchQuery={searchParams.get('query') || ''}
+          facets={list.facets?.data}
+          passageHits={query ? passages.data?.items : undefined}
+        />
       )}
       <EntriesWrapper>
         {list.items.map((entry) => (

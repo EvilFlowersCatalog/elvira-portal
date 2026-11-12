@@ -47,19 +47,12 @@ const PassageHits = ({ hits, compact = false, onOpen }: IPassageHits) => {
     onOpen?.();
   };
 
-  const authors = (hit: IPassageHit) =>
-    hit.entry?.authors?.map((a) => `${a.name} ${a.surname}`.trim()).join(', ') || '-';
-
   return (
-    <div className={compact ? 'flex flex-col gap-1' : 'grid grid-cols-1 lg:grid-cols-2 gap-3'}>
+    <div className={compact ? 'flex flex-col gap-1' : 'grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-1'}>
       {hits.map((hit) => (
         <div
           key={hit.entry_id}
-          className={
-            compact
-              ? 'flex gap-3 p-2 rounded'
-              : 'flex gap-3 p-3 rounded-lg bg-white dark:bg-darkGray border border-gray-300 dark:border-gray-700'
-          }
+          className="flex gap-3 p-2 rounded min-w-0"
         >
           <button
             type="button"
@@ -70,24 +63,23 @@ const PassageHits = ({ hits, compact = false, onOpen }: IPassageHits) => {
             <Thumbnail
               thumbnail={hit.entry?.thumbnail}
               alt={hit.entry?.title ?? ''}
-              wrapperClassName={compact ? 'h-16 w-10 rounded' : 'h-24 w-16 rounded'}
+              wrapperClassName="h-16 w-10 rounded"
             />
           </button>
           <div className="flex-1 min-w-0 flex flex-col gap-1">
             <button
               type="button"
               onClick={() => openDetail(hit)}
-              className="text-left text-xs font-semibold line-clamp-2 text-secondary dark:text-white hover:underline"
+              className="text-left text-xs font-semibold line-clamp-1 text-secondary dark:text-white hover:underline"
             >
               {hit.entry?.title ?? t('search.unknownBook')}
             </button>
-            {!compact && <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{authors(hit)}</p>}
             {hit.passages.map((passage) => (
               <button
                 key={passage.paragraph_id}
                 type="button"
                 onClick={() => openPassage(hit, passage)}
-                className="text-left text-xs rounded px-2 py-1 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                className="text-left text-xs rounded px-1 py-0.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors line-clamp-2"
               >
                 <span className="font-semibold text-primaryText dark:text-primaryLight mr-1">
                   {t('search.pageShort', { page: passage.page })}
@@ -96,7 +88,7 @@ const PassageHits = ({ hits, compact = false, onOpen }: IPassageHits) => {
                   <Highlight
                     html={passage.snippet}
                     text={passage.text ?? ''}
-                    className={`text-gray-700 dark:text-gray-300 ${compact ? 'line-clamp-2' : 'line-clamp-3'}`}
+                    className="text-gray-700 dark:text-gray-300"
                   />
                 ) : (
                   <span className="italic text-gray-500 dark:text-gray-400">{t('search.passageHidden')}</span>

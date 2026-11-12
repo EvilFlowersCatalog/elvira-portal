@@ -6,11 +6,15 @@ import { IEntryFacets } from "../../utils/interfaces/entry";
 import { addCategoryId, addFeedId, readCategoryIds, readFeedIds } from "../../utils/func/filterParams";
 import { AUTHOR_ID_PARAM, setAuthorParams } from "../../hooks/api/entries/entryFilters";
 import { localize } from '../../utils/func/localized';
+import { IPassageHit } from "../../hooks/api/entries/usePassageSearch";
+import PassageHits from "../items/entry/PassageHits";
 
 interface FilterSuggestionsProps {
   searchQuery: string;
   /** Facet counts that came with the search results (`include=facets`). */
   facets?: IEntryFacets | null;
+  /** Search inside books (#35): passages that matched, shown as a column of their own. */
+  passageHits?: IPassageHit[];
 }
 
 type Chip = { id: string; label: string; count: number };
@@ -23,7 +27,7 @@ const byCount = (a: Chip, b: Chip) => b.count - a.count;
  * request of its own. The catalog returns the top 10 authors; categories and
  * collections are complete and sorted by count here.
  */
-const FilterSuggestions = ({ searchQuery, facets }: FilterSuggestionsProps) => {
+const FilterSuggestions = ({ searchQuery, facets, passageHits = [] }: FilterSuggestionsProps) => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -81,7 +85,8 @@ const FilterSuggestions = ({ searchQuery, facets }: FilterSuggestionsProps) => {
     setSearchParams(params);
   };
 
-  const hasResults = authors.length > 0 || categories.length > 0 || feeds.length > 0;
+  const hasResults = authors.length > 0 || categories.length > 0 || feeds.length > 0 || passageHits.length > 0;
+  const hasPassages = passageHits.length > 0;
 
   const getVisibleItems = <T,>(items: T[]): T[] => {
     return showAll ? items : items.slice(0, MAX_ITEMS_PER_COLUMN);
@@ -143,10 +148,24 @@ const FilterSuggestions = ({ searchQuery, facets }: FilterSuggestionsProps) => {
           <MdClose size={20} className="text-gray-500 dark:text-gray-400" />
         </button>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pr-8">
+        <div className={`grid grid-cols-1 gap-6 pr-8 ${hasPassages ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-3'}`}>
           {column(t('entry.wizard.authors'), authors, handleAuthorClick, true)}
           {column(t('searchBar.feeds'), feeds, (f) => handleFeedClick(f.id))}
           {column(t('searchBar.categories'), categories, (c) => handleCategoryClick(c.id))}
+          {hasPassages && (
+            <div className="flex flex-col min-w-0">
+              <h3 className="text-sm font-bold mb-3 text-gray-700 dark:text-gray-300">{t('search.insideBooks')}</h3>
+              <PassageHits hits={getVisibleItems(passageHits)} compact />
+              {!showAll && getRemainingCount(passageHits) > 0 && (
+                <button
+                  onClick={() => setShowAll(true)}
+                  className="text-left text-sm text-primary dark:text-primaryLight hover:underline mt-3 font-semibold"
+                >
+                  {t('common.showMore', { count: getRemainingCount(passageHits) })}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
