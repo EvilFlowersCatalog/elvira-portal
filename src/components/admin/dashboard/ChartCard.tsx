@@ -17,7 +17,10 @@ export const Responsive = ({
     ignoreDimensions: 'height',
   });
   return (
-    <div ref={parentRef} className='w-full'>
+    <div
+      ref={parentRef}
+      className='w-full min-w-0 overflow-hidden [contain:inline-size]'
+    >
       {width > 0 ? children(width) : null}
     </div>
   );

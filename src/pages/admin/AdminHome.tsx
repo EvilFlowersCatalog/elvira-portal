@@ -299,10 +299,10 @@ const AdminHome = () => {
               subtitle={t('administration.dashboard.sections.demandSub')}
             >
               <div className='grid grid-cols-1 gap-4 xl:grid-cols-5'>
-                <div className='xl:col-span-3'>
+                <div className='min-w-0 xl:col-span-3'>
                   <DemandQuadrant titles={data.titles} onOpen={openEntry} />
                 </div>
-                <div className='xl:col-span-2'>
+                <div className='min-w-0 xl:col-span-2'>
                   <UtilizationLeaderboard
                     titles={data.titles}
                     onOpen={openEntry}
@@ -333,10 +333,10 @@ const AdminHome = () => {
             >
               <LendingTrend series={data.series} bucket={data.period.bucket} />
               <div className='grid grid-cols-1 gap-4 xl:grid-cols-5'>
-                <div className='xl:col-span-3'>
+                <div className='min-w-0 xl:col-span-3'>
                   <BorrowHeatmap cells={data.heatmap} />
                 </div>
-                <div className='xl:col-span-2'>
+                <div className='min-w-0 xl:col-span-2'>
                   <TopCategories categories={data.categories} />
                 </div>
               </div>
