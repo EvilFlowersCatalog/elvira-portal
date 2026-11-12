@@ -19,7 +19,7 @@ export const Responsive = ({
   return (
     <div
       ref={parentRef}
-      className='w-full min-w-0 overflow-hidden [contain:inline-size]'
+      className='w-full min-w-0 [contain:inline-size]'
     >
       {width > 0 ? children(width) : null}
     </div>

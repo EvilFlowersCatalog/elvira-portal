@@ -172,8 +172,8 @@ const AiChatHistory = () => {
                 >
                   <div className="p-4">
                     <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <p className="text-xl font-semibold text-black dark:text-white mb-1">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xl font-semibold text-black dark:text-white mb-1 break-words">
                           {chat.title || t('assistant.untitledChat')}
                         </p>
                         {chat.entry && (
@@ -196,7 +196,7 @@ const AiChatHistory = () => {
                           e.stopPropagation();
                           setPendingDelete(chat);
                         }}
-                        className="ml-4 -mr-1 -mt-1 rounded-md p-2 text-gray-400 dark:text-gray-500 hover:bg-red/10 hover:text-redText dark:hover:text-red transition-colors"
+                        className="ml-4 -mr-1 -mt-1 shrink-0 rounded-md p-2 text-gray-400 dark:text-gray-500 hover:bg-red/10 hover:text-redText dark:hover:text-red transition-colors"
                       >
                         <FiTrash2 size={20} />
                       </button>
