@@ -1066,6 +1066,17 @@ export const en = {
           equation: 'Equations',
           text: 'Text',
           embed: 'Embeddings',
+          figures: 'Figures',
+          tables: 'Tables',
+          equations: 'Equations',
+          paragraphs: 'Paragraphs',
+        },
+        jobGroups: {
+          label: 'Jobs by kind',
+          progress: '{{done}} of {{total}} done',
+          pending: '{{count}} pending',
+          failed: '{{count}} failed',
+          pages: 'pages {{from}}–{{to}}',
         },
         statsTitle: 'In numbers',
         stats: {
@@ -1428,6 +1439,7 @@ export const en = {
       collapse: 'Collapse sidebar',
     },
     navbarMenu: {
+      explore: 'Explore',
       portal: 'Main Menu',
       personal: 'Personal',
       settings: 'Settings',
@@ -1676,9 +1688,35 @@ export const en = {
           reviews: 'Reviews',
           related: 'Related',
           figures: 'Figures',
+          chapters: 'Chapters',
         },
         contents: {
           empty: "No contents yet: they appear once the PDF is processed, or the PDF has no outline.",
+        },
+        chapters: {
+          intro: 'How the chapters of this publication connect: what each builds on and where its material returns. Open a chapter to see what to read first and where other books explain it.',
+          empty: 'No chapter map yet: it appears once the publication is processed.',
+          untitled: 'Section on page {{page}}',
+          buildsOn: 'Builds on',
+          returnsIn: 'Returns in',
+          linkStrength_one: '{{count}} related paragraph',
+          linkStrength_other: '{{count}} related paragraphs',
+          expand: 'Show what to read first and related sections elsewhere',
+          collapse: 'Hide',
+        },
+        insights: {
+          loading: 'Looking for related sections…',
+          none: 'Nothing found for this section yet.',
+          readFirst: 'Read this first',
+          elsewhere: 'Explained differently elsewhere',
+          thisBook: 'This publication',
+          otherBook: 'Another publication',
+          page: 'p. {{page}}',
+          definedLater: 'defined later in this book',
+          viaConcepts: 'same concepts',
+          viaSimilar: 'similar text',
+          openAtPage: 'Open at page',
+          openBook: 'Open',
         },
         related: {
           empty: "No similar publications yet: they appear once this publication's PDF has been processed.",
@@ -2071,6 +2109,35 @@ export const en = {
       information:
         'This website uses cookies to enhance your experience. We use cookies to remember your layout preferences, selected theme and language to provide a better experience.',
       accept: 'I understand',
+    },
+
+    // EXPLORE (library graph, elvira-portal#41)
+    explore: {
+      title: 'Explore',
+      description:
+        'The processed publications as a map. Each mark is a publication, sized by its length; a line joins two publications that are among each other’s closest by content. Click a mark to open it, or pick a class in the legend to isolate it.',
+      empty: 'The map is not available yet: it appears once publications are processed.',
+      error: 'The map could not be loaded.',
+      classes: {
+        general: 'General, computing (0)',
+        philosophy: 'Philosophy, religion (1–2)',
+        social: 'Social sciences (3)',
+        science: 'Mathematics, natural sciences (5)',
+        applied: 'Applied sciences, technology (6)',
+        humanities: 'Arts, language, history (7–9)',
+        none: 'Unclassified',
+      },
+      map: {
+        legend: 'UDC class:',
+        ariaLabel: 'Map of {{count}} publications; use the list view for a text version',
+        pages_one: '{{count}} page',
+        pages_other: '{{count}} pages',
+        neighbours_one: '{{count}} close publication',
+        neighbours_other: '{{count}} close publications',
+        viewLabel: 'View',
+        view: { map: 'Map', list: 'List' },
+        note: 'Closeness is computed from the text of the publications you may read. Books in the same language cluster a little more than their topics alone would explain.',
+      },
     },
 
     // HISTORY

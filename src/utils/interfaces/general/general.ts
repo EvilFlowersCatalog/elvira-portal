@@ -11,6 +11,7 @@ export enum NAVIGATION_PATHS {
   feeds = '/feeds',
   categories = '/categories',
   history = '/history',
+  explore = '/explore',
   licenses = '/licenses',
   viewer = '/viewer/',
   aiAssistant = '/ai-assistant',

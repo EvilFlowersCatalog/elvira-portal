@@ -26,7 +26,7 @@ import {
 import useAuthContext from "../../../hooks/contexts/useAuthContext";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
-import { FiLogOut, FiUser } from "react-icons/fi";
+import { FiCompass, FiLogOut, FiUser } from "react-icons/fi";
 import Gravatar from "react-gravatar";
 import Button from "../../buttons/Button";
 import { ReactElement, useEffect, useRef, useState } from "react";
@@ -239,6 +239,16 @@ const Navbar = () => {
               isActive={location.pathname === NAVIGATION_PATHS.categories}
               textVisible={!isCollapsed}
             />
+            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+              <NavbarButton
+                name={t("navbarMenu.explore")}
+                guide="nav-explore"
+                path={NAVIGATION_PATHS.explore}
+                icon={<FiCompass size={20} />}
+                isActive={location.pathname === NAVIGATION_PATHS.explore}
+                textVisible={!isCollapsed}
+              />
+            )}
             <NavbarButton
               name={t("navbarMenu.aiAssistant")}
               guide="nav-ai"

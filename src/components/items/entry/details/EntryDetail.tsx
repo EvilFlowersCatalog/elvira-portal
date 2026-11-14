@@ -27,6 +27,8 @@ import EntryReviews from './EntryReviews';
 import { RatingStars } from './RatingStars';
 import EntryFigures from './EntryFigures';
 import EntryContents from './EntryContents';
+import EntryChapters from './EntryChapters';
+import { useEntryChapters } from '../../../../hooks/api/graph/useGraph';
 import { AvailabilityBadge, AvailabilityState } from './AvailabilityBadge';
 import Tooltip from '../../../primitives/Tooltip';
 import { localize } from '../../../../utils/func/localized';
@@ -54,6 +56,10 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   const navigate = useNavigate();
 
   const { getEntryDetail, getEntryDetailWithLicense } = useGetEntryDetail();
+  // Library graph (#41): the Chapters tab exists only when the graph knows this publication's sections.
+  const experimentalOn = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
+  const { data: chapterMap } = useEntryChapters(experimentalOn && entry?.id ? entry.id : undefined);
+  const hasChapters = !!chapterMap?.sections.length;
 
   // A review changed the entry's rating: refresh only the rating, without reloading the whole detail.
   const refreshRating = async () => {
@@ -402,6 +408,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                       {!!entry.rating?.count && <span className="ml-1 font-normal">({entry.rating.count})</span>}
                     </TabTitle>
                   )}
+                  {experimental && hasChapters && <TabTitle id="chapters">{t('entry.detail.tabs.chapters')}</TabTitle>}
                   {experimental && <TabTitle id="related">{t('entry.detail.tabs.related')}</TabTitle>}
                   {experimental && <TabTitle id="figures">{t('entry.detail.tabs.figures')}</TabTitle>}
                 </TabsHeader>
@@ -414,6 +421,11 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                   {reviewsEnabled && (
                     <TabContent id="reviews">
                       <EntryReviews entryId={entry.id} onChanged={refreshRating} />
+                    </TabContent>
+                  )}
+                  {experimental && hasChapters && (
+                    <TabContent id="chapters">
+                      <EntryChapters entry={entry} />
                     </TabContent>
                   )}
                   {experimental && (

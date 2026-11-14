@@ -20,6 +20,7 @@ const Auth = lazy(() => import('../pages/auth/Auth'));
 const Loans = lazy(() => import('../pages/common/Loans'));
 const Profile = lazy(() => import('../pages/common/Profile'));
 const History = lazy(() => import('../pages/common/History'));
+const Explore = lazy(() => import('../pages/common/Explore'));
 const ClaimReservation = lazy(() => import('../pages/common/ClaimReservation'));
 const AiAssistantPage = lazy(() => import('../pages/common/AiAssistant'));
 const AiChatHistory = lazy(() => import('../pages/common/AiChatHistory'));
@@ -98,6 +99,7 @@ const BaseRoutes = () => {
             <Route path='shelf' element={<Shelf />} />
             <Route path='profile' element={<Profile />} />
             <Route path='history' element={<History />} />
+            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && <Route path='explore' element={<Explore />} />}
             <Route path='loans' element={<Loans />} />
             <Route path='feeds' element={<Feeds />} />
             <Route path='categories' element={<Categories />} />

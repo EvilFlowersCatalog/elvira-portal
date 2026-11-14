@@ -1092,6 +1092,17 @@ export const sk = {
           equation: 'Vzorce',
           text: 'Text',
           embed: 'Embeddingy',
+          figures: 'Obrázky',
+          tables: 'Tabuľky',
+          equations: 'Vzorce',
+          paragraphs: 'Odseky',
+        },
+        jobGroups: {
+          label: 'Úlohy podľa druhu',
+          progress: '{{done}} z {{total}} hotovo',
+          pending: '{{count}} čaká',
+          failed: '{{count}} zlyhalo',
+          pages: 'strany {{from}}–{{to}}',
         },
         statsTitle: 'V číslach',
         stats: {
@@ -1452,6 +1463,7 @@ export const sk = {
       collapse: 'Zbaliť bočný panel',
     },
     navbarMenu: {
+      explore: 'Preskúmať',
       portal: 'Hlavné Menu',
       personal: 'Osobné',
       settings: 'Nastavenia',
@@ -1699,9 +1711,37 @@ export const sk = {
           reviews: 'Recenzie',
           related: 'Súvisiace',
           figures: 'Obrázky',
+          chapters: 'Kapitoly',
         },
         contents: {
           empty: "Obsah zatiaľ nie je k dispozícii: zobrazí sa, keď bude PDF spracované, alebo ho PDF neobsahuje.",
+        },
+        chapters: {
+          intro: 'Ako spolu súvisia kapitoly tejto publikácie: na čom každá stavia a kde sa jej látka vracia. Rozbaľte kapitolu a uvidíte, čo si prečítať najprv a kde ju vysvetľujú iné knihy.',
+          empty: 'Mapa kapitol zatiaľ nie je: zobrazí sa, keď bude publikácia spracovaná.',
+          untitled: 'Časť na strane {{page}}',
+          buildsOn: 'Stavia na',
+          returnsIn: 'Vracia sa v',
+          linkStrength_one: '{{count}} súvisiaci odsek',
+          linkStrength_few: '{{count}} súvisiace odseky',
+          linkStrength_many: '{{count}} súvisiacich odsekov',
+          linkStrength_other: '{{count}} súvisiacich odsekov',
+          expand: 'Zobraziť, čo si prečítať najprv, a súvisiace časti inde',
+          collapse: 'Skryť',
+        },
+        insights: {
+          loading: 'Hľadám súvisiace časti…',
+          none: 'Pre túto časť sa zatiaľ nič nenašlo.',
+          readFirst: 'Najprv si prečítajte',
+          elsewhere: 'Inak vysvetlené inde',
+          thisBook: 'Táto publikácia',
+          otherBook: 'Iná publikácia',
+          page: 's. {{page}}',
+          definedLater: 'definované ďalej v tejto knihe',
+          viaConcepts: 'rovnaké pojmy',
+          viaSimilar: 'podobný text',
+          openAtPage: 'Otvoriť na strane',
+          openBook: 'Otvoriť',
         },
         related: {
           empty: "Zatiaľ žiadne podobné publikácie: zobrazia sa, keď bude PDF tejto publikácie spracované.",
@@ -2091,6 +2131,39 @@ export const sk = {
       information:
         'Táto webová stránka používa cookies na zlepšenie vášho zážitku. Používame cookies na zapamätanie si vašich preferencií rozloženia, vybraného režimu alebo jazyka, aby sme vám poskytli lepší zážitok.',
       accept: 'Rozumiem',
+    },
+
+    // EXPLORE (library graph, elvira-portal#41)
+    explore: {
+      title: 'Preskúmať',
+      description:
+        'Spracované publikácie ako mapa. Každá značka je publikácia, jej veľkosť podľa rozsahu; čiara spája dve publikácie, ktoré si sú obsahom navzájom najbližšie. Kliknutím publikáciu otvoríte, výberom triedy v legende ju zvýrazníte.',
+      empty: 'Mapa zatiaľ nie je dostupná: zobrazí sa, keď budú publikácie spracované.',
+      error: 'Mapu sa nepodarilo načítať.',
+      classes: {
+        general: 'Všeobecné, informatika (0)',
+        philosophy: 'Filozofia, náboženstvo (1–2)',
+        social: 'Spoločenské vedy (3)',
+        science: 'Matematika, prírodné vedy (5)',
+        applied: 'Aplikované vedy, technika (6)',
+        humanities: 'Umenie, jazyk, história (7–9)',
+        none: 'Nezaradené',
+      },
+      map: {
+        legend: 'Trieda MDT:',
+        ariaLabel: 'Mapa {{count}} publikácií; textovú verziu nájdete v zobrazení Zoznam',
+        pages_one: '{{count}} strana',
+        pages_few: '{{count}} strany',
+        pages_many: '{{count}} strán',
+        pages_other: '{{count}} strán',
+        neighbours_one: '{{count}} blízka publikácia',
+        neighbours_few: '{{count}} blízke publikácie',
+        neighbours_many: '{{count}} blízkych publikácií',
+        neighbours_other: '{{count}} blízkych publikácií',
+        viewLabel: 'Zobrazenie',
+        view: { map: 'Mapa', list: 'Zoznam' },
+        note: 'Blízkosť sa počíta z textu publikácií, ktoré môžete čítať. Knihy v rovnakom jazyku sa zhlukujú o niečo viac, než by vysvetľovala samotná téma.',
+      },
     },
 
     // HISTORY

@@ -65,6 +65,8 @@ const Breadcrumb = () => {
     ['edit']: editingEntryTitle,
     ['profile']: isEn() ? 'Profile' : 'Profil',
     ['history']: isEn() ? 'History' : 'História',
+    ['explore']: isEn() ? 'Explore' : 'Preskúmať',
+    ['jobs']: isEn() ? 'Background jobs' : 'Úlohy na pozadí',
     ['ai-chat']: isEn() ? 'AI Assistant' : 'AI Asistent',
     ['ai-chat-history']: isEn() ? 'AI Assistant' : 'AI Asistent',
     ['books']: isEn() ? 'Books' : 'Knihy',

@@ -22,6 +22,8 @@ import { fmtDateTime } from '../../../../utils/func/adminDate';
 import { ConfirmDialog, SearchField, StatusChip, StatusVariant, Tabs } from '../../../admin';
 import Button from '../../../buttons/Button';
 import { RegionCard, RegionDrawer } from './RegionViews';
+import JobGroups from './JobGroups';
+import { jobGroups } from '../../../../utils/func/extractionJobs';
 
 const card = 'rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 shadow-sm';
 const sectionTitle = 'text-sm font-semibold text-zinc-700 dark:text-zinc-200';
@@ -282,7 +284,10 @@ function QueueStatus({ data }: { data: IEntryExtraction }) {
     <div className="mt-4 flex flex-col gap-3 border-t border-zinc-100 pt-4 dark:border-zinc-700/60">
       {inProgress.map((acquisition) => {
         const latest = acquisition.runs[0];
-        const jobs = Object.entries(latest?.jobs ?? {});
+        // Counts come from the groups: with per-batch dispatch `jobs` holds hundreds of entries.
+        const groups = latest ? jobGroups(latest) : [];
+        const reported = groups.reduce((sum, g) => sum + g.done + g.failed, 0);
+        const total = groups.reduce((sum, g) => sum + g.total, 0);
         return (
           <div key={acquisition.id} className="flex flex-col gap-2 text-sm">
             <p className="text-zinc-700 dark:text-zinc-200">
@@ -294,17 +299,9 @@ function QueueStatus({ data }: { data: IEntryExtraction }) {
                   ? acquisition.task?.waiting === false
                     ? t('administration.extraction.queue.taken')
                     : t('administration.extraction.queue.unknown')
-                  : t('administration.extraction.queue.running', { done: jobs.filter(([, s]) => s !== 'pending').length, total: jobs.length })}
+                  : t('administration.extraction.queue.running', { done: reported, total })}
             </p>
-            {jobs.length > 0 && (
-              <div className="flex flex-wrap gap-1.5">
-                {jobs.map(([job, status]) => (
-                  <StatusChip key={job} variant={STATUS_VARIANT[status as 'done'] ?? 'neutral'}>
-                    {t(`administration.extraction.jobs.${job}`, { defaultValue: job })}: {t(`administration.extraction.status.${status}`)}
-                  </StatusChip>
-                ))}
-              </div>
-            )}
+            {latest && <JobGroups run={latest} />}
           </div>
         );
       })}
@@ -394,15 +391,9 @@ function AcquisitionRow({
                     {run.duration != null && ` · ${fmtDuration(run.duration)}`}
                   </span>
                 </div>
-                {Object.keys(run.jobs).length > 0 && (
-                  <div className="mt-1.5 flex flex-wrap gap-1">
-                    {Object.entries(run.jobs).map(([job, status]) => (
-                      <StatusChip key={job} variant={STATUS_VARIANT[status as 'done'] ?? 'neutral'} className="text-[10px]">
-                        {t(`administration.extraction.jobs.${job}`, { defaultValue: job })}: {t(`administration.extraction.status.${status}`)}
-                      </StatusChip>
-                    ))}
-                  </div>
-                )}
+                <div className="mt-2">
+                  <JobGroups run={run} compact />
+                </div>
                 {run.error && (
                   <pre className="mt-2 whitespace-pre-wrap break-words rounded bg-red/10 p-2 text-[11px] text-redText dark:text-red">{run.error}</pre>
                 )}

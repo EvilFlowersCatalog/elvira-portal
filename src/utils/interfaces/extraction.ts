@@ -24,14 +24,32 @@ export interface IExtractionRunStats {
   has_embedding: boolean;
 }
 
+/**
+ * A run's jobs of one kind (EvilFlowersCatalog#150). With per-batch dispatch a kind has one
+ * job per layout batch (`equations:0009-0016`), so a big book holds hundreds of jobs.
+ */
+export interface IExtractionJobGroup {
+  kind: string;
+  total: number;
+  done: number;
+  pending: number;
+  failed: number;
+  /** First and last page of the kind's pending batches (gaps included); null when none pend or the kind is not batched. */
+  pending_pages: [number, number] | null;
+}
+
+export type ExtractionJobStatus = 'pending' | 'done' | 'failed';
+
 export interface IExtractionRun {
   id: string;
   pipeline_version: number;
   status: ExtractionRunStatus;
   is_active: boolean;
   page_count: number | null;
-  /** `{job: pending | done | failed}` */
-  jobs: Record<string, 'pending' | 'done' | 'failed'>;
+  /** `{job: pending | done | failed}`; a batched job is named `kind:first-last` (pages). */
+  jobs: Record<string, ExtractionJobStatus>;
+  /** `jobs` grouped by kind, sorted by kind; absent on catalogs before #150. */
+  job_groups?: IExtractionJobGroup[];
   provenance: Record<string, unknown>;
   error: string | null;
   storage_dir: string;
