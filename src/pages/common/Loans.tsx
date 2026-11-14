@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import { H1 } from '../../components/primitives/Heading';
 import EntryDetail from '../../components/items/entry/details/EntryDetail';
-import AiAssistant from '../../components/dialogs/AiAssistant';
 import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
 import LoansCardView from '../../components/items/loans/LoansCardView';
 
@@ -16,7 +15,6 @@ const Loans = () => {
         <LoansCardView />
       </div>
       <EntryDetail />
-      <AiAssistant />
       <LicenseCalendar />
     </div>
   );

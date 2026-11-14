@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { IoSearchOutline } from 'react-icons/io5';
 import { useSearchParams } from 'react-router-dom';
 import ElviraInput from '../inputs/ElviraInput';
-import AiAssistant from '../dialogs/AiAssistant';
 import SearchSuggestions from './SearchSuggestions';
 import useAppContext from '../../hooks/contexts/useAppContext';
 
@@ -46,6 +45,7 @@ const SearchBar = ({
 
   return (
     <form
+      data-guide="search"
       className="relative flex flex-col flex-1 items-center gap-2 text-darkGray dark:text-white"
       onSubmit={submit}
     >
@@ -75,6 +75,7 @@ const SearchBar = ({
       {aiEnabled && (
         <>
           <button
+            type="button"
             onClick={() => setShowAiAssistant(true)}
             className="absolute md:right-4 md:bottom-2 size-fit flex items-center gap-2 text-xs text-primaryText dark:text-primaryLight bg-primaryLight dark:bg-primaryDark rounded-md px-2 py-1 max-md:relative max-md:w-full max-md:flex max-md:justify-center max-md:p-3"
           >
@@ -89,7 +90,6 @@ const SearchBar = ({
             </svg>
             <p className="whitespace-nowrap">{t('assistant.title')}</p>
           </button>
-          <AiAssistant />
         </>
       )}
     </form>

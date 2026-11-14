@@ -70,6 +70,21 @@ export interface IAssistantCitation {
   score?: number;
 }
 
+/**
+ * A way through the portal the answer offers (the `navigate` SSE frame, or the portal's own reading of a
+ * "where is …" question). Places are ids of the portal's guide registry, never URLs; unknown ids are dropped.
+ */
+export interface IAssistantGuide {
+  /** Places to show, in order: one is a "show me", several a short walk. */
+  targets: string[];
+  /** A named tour instead (`portal`, `find-book`, `account`, `admin`). */
+  tour?: string;
+  /** Start right away when the answer is finished (live turns only, never from history). */
+  auto?: boolean;
+  /** `assistant`: the model asked for it; `portal`: the portal recognised the question itself. */
+  source: 'assistant' | 'portal';
+}
+
 /** The `evidence` SSE frame (IP-030 §1): what the turn gathered before the model's first token. */
 export interface IAssistantEvidence {
   sources: IAssistantCitation[];
@@ -193,6 +208,8 @@ export interface IAssistantMessageOptions {
   userAcquisitionId?: string;
   /** UI language (`sk`, `en`); the answer is written in it. */
   language?: string;
+  /** The portal page the reader is on (`/administration/users`), so "where is …" can be answered from here. */
+  portalPath?: string;
   signal?: AbortSignal;
 }
 
@@ -218,6 +235,8 @@ export interface IAssistantStreamHandlers {
   onSuggestions?: (suggestions: IAssistantSuggestion[]) => void;
   /** An agent annotation the assistant started (AI highlights), as `/assistant/v1/highlights` returns it. */
   onAnnotation?: (annotation: IAssistantAnnotation) => void;
+  /** A place in the portal to show the reader (`navigate` event). */
+  onNavigate?: (guide: IAssistantGuide) => void;
   /**
    * Progress before a model round (`thinking`) or a tool call (`tool`, with its
    * name). Shown until text streams or the turn ends; never stored (IP-022).

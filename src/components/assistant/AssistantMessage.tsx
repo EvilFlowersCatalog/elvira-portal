@@ -32,6 +32,7 @@ import EvidencePanel from './EvidencePanel';
 import StudyCard from './StudyCard';
 import SuggestionChips from './SuggestionChips';
 import AnswerFeedback from './AnswerFeedback';
+import GuideCard from '../guide/GuideCard';
 import useSimilarEntries from '../../hooks/api/entries/useSimilarEntries';
 import { ISendOptions } from '../../hooks/api/assistant/useAssistantChat';
 
@@ -286,6 +287,9 @@ export default function AssistantMessage({
       )}
 
       {msg.text ? liveLine : null}
+
+      {/* Places in the portal the answer offers to show */}
+      {msg.guide ? <GuideCard guide={msg.guide} /> : null}
 
       {/* The answer as a study card: quiz, walkthrough or glossary */}
       {msg.study ? (

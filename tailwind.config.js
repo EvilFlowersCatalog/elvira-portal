@@ -35,8 +35,19 @@ export default {
           '0%': { opacity: '0' },
           '100%': { opacity: '1' },
         },
+        // The guide's popover and its spotlight ring (assistant navigation).
+        guideIn: {
+          '0%': { opacity: '0', transform: 'translateY(6px) scale(0.98)' },
+          '100%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+        },
+        guidePulse: {
+          '0%': { opacity: '0.9', transform: 'scale(1)' },
+          '100%': { opacity: '0', transform: 'scale(1.12)' },
+        },
       },
       animation: {
+        'guide-in': 'guideIn 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) both',
+        'guide-pulse': 'guidePulse 1.6s cubic-bezier(0.2, 0.8, 0.2, 1) infinite',
         'fly-right': 'flyRight 0.5s ease-out forwards',
         'fly-left': 'flyLeft 0.5s ease-out forwards',
         'fade-in': 'fadeIn 0.35s ease-out forwards',

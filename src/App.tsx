@@ -10,6 +10,9 @@ import useAppContext from './hooks/contexts/useAppContext';
 import PageLoading from './components/page/PageLoading';
 import RouteErrorBoundary from './components/page/RouteErrorBoundary';
 import { rememberSearch } from './utils/func/listSearch';
+import GuideProvider from './providers/GuideProvider';
+import AiAssistant from './components/dialogs/AiAssistant';
+import AssistantLauncher from './components/assistant/AssistantLauncher';
 
 const App = () => {
   const { informed } = useCookiesContext();
@@ -44,7 +47,8 @@ const App = () => {
   }, []);
 
   return (
-    <>
+    // The guide (assistant navigation) lives above the pages so it can move between them.
+    <GuideProvider>
       {/* COOKIE */}
       <ToastContainer
         position='top-right'
@@ -73,7 +77,10 @@ const App = () => {
         </div>
 
       </div>
-    </>
+      {/* One assistant for the whole portal, so it stays open (and keeps its chat) across pages. */}
+      <AiAssistant />
+      <AssistantLauncher />
+    </GuideProvider>
   );
 };
 

@@ -56,6 +56,7 @@ export const buildEntryFilterParams = (query: EntryFilters): URLSearchParams => 
   if (query.ids) params.set('id', query.ids);
   if (query.extraction) params.set('extraction', '1');
   if (query.extractionStatus) params.set('extraction_status', query.extractionStatus);
+  if (query.config__readium_enabled != null) params.set('config__readium_enabled', String(query.config__readium_enabled));
 
   // Merge the single-select (`feedId`/`categoryId`) and multi-select
   // (`feeds`/`categories`) values into one CSV — the backend expands it to IN (...).

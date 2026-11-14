@@ -48,6 +48,7 @@ const AdminAccess = lazy(() => import('../pages/admin/AdminAccess'));
 const AdminUsers = lazy(() => import('../pages/admin/AdminUsers'));
 const AdminUserProfile = lazy(() => import('../pages/admin/AdminUserProfile'));
 const AdminLoans = lazy(() => import('../pages/admin/AdminLoans'));
+const AdminJobs = lazy(() => import('../pages/admin/AdminJobs'));
 
 const BaseRoutes = () => {
   const { auth } = useAuthContext();
@@ -126,6 +127,7 @@ const BaseRoutes = () => {
                 {/* The separate AI users page is gone; keep old links working. */}
                 <Route path='ai-users' element={<Navigate to={NAVIGATION_PATHS.adminUsers} replace />} />
                 <Route path='loans' element={<AdminLoans />} />
+                <Route path='jobs' element={<AdminJobs />} />
               </Route>
             </Route>
           </Route>

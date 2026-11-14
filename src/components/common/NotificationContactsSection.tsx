@@ -87,7 +87,7 @@ export default function NotificationContactsSection() {
   };
 
   return (
-    <section className='rounded-[7px] p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] dark:shadow-[0px_4px_6px_0px_rgba(0,0,0,0.3)] border border-[#e5e5e5] dark:border-zinc-700'>
+    <section data-guide='profile-notifications' className='rounded-[7px] p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] dark:shadow-[0px_4px_6px_0px_rgba(0,0,0,0.3)] border border-[#e5e5e5] dark:border-zinc-700'>
       <div className='flex items-center gap-2 mb-1'>
         <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>
           {t(`${P}.title`, { defaultValue: 'Notifications' })}

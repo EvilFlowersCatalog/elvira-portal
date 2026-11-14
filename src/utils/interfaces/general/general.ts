@@ -37,6 +37,7 @@ export enum NAVIGATION_PATHS {
   adminApiKeys = '/administration/api-keys',
   adminLoans = '/administration/loans',
   adminReviews = '/administration/reviews',
+  adminJobs = '/administration/jobs',
 }
 
 export enum THEME_TYPE {

@@ -21,7 +21,7 @@ export default function PageHeader({ title, description, actions, className }: P
       )}
     >
       <div className="min-w-0">
-        <h1 className="text-secondary dark:text-secondaryLight text-3xl font-extrabold tracking-tight">
+        <h1 data-guide="page-title" className="w-fit max-w-full text-secondary dark:text-secondaryLight text-3xl font-extrabold tracking-tight">
           {title}
         </h1>
         {description && (
@@ -30,7 +30,7 @@ export default function PageHeader({ title, description, actions, className }: P
           </p>
         )}
       </div>
-      {actions && <div className="flex items-center gap-2 shrink-0">{actions}</div>}
+      {actions && <div data-guide="page-actions" className="flex items-center gap-2 shrink-0">{actions}</div>}
     </div>
   );
 }

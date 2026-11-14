@@ -17,7 +17,8 @@ import Button from "../../../components/buttons/Button";
 import { BiSave } from "react-icons/bi";
 import { PageHeader } from "../../../components/admin";
 import { useSearchParams } from "react-router-dom";
-import { FiCpu } from "react-icons/fi";
+import { FiActivity, FiCpu } from "react-icons/fi";
+import EntryJobsPanel from "../../../components/admin/jobs/EntryJobsPanel";
 import { twMerge } from "tailwind-merge";
 import EntryExtractionPanel from "../../../components/specific-page/admin-entry-page/extraction/EntryExtractionPanel";
 
@@ -56,12 +57,17 @@ export default function AdminEntryForm({
     // (`?tab=ai`) so the entries list can link straight to it; the form stays mounted underneath,
     // so switching views never loses unsaved edits.
     const [searchParams, setSearchParams] = useSearchParams();
-    const showAi = FormType === 'edit' && searchParams.get('tab') === 'ai';
-    const setView = (ai: boolean) => {
-        const next = new URLSearchParams(searchParams);
-        if (ai) next.set('tab', 'ai');
-        else next.delete('tab');
-        setSearchParams(next, { replace: true, state: window.history.state?.usr });
+    const view: 'publication' | 'ai' | 'jobs' =
+        FormType === 'edit' && (searchParams.get('tab') === 'ai' || searchParams.get('tab') === 'jobs')
+            ? (searchParams.get('tab') as 'ai' | 'jobs')
+            : 'publication';
+    const showAi = view === 'ai';
+    const showJobs = view === 'jobs';
+    const setView = (next: 'publication' | 'ai' | 'jobs') => {
+        const params = new URLSearchParams(searchParams);
+        if (next === 'publication') params.delete('tab');
+        else params.set('tab', next);
+        setSearchParams(params, { replace: true, state: window.history.state?.usr });
     };
 
     const handleSummaryChange = (event: ContentEditableEvent) => {
@@ -101,29 +107,45 @@ export default function AdminEntryForm({
                             <button
                                 type='button'
                                 role='tab'
-                                aria-selected={!showAi}
-                                onClick={() => setView(false)}
+                                aria-selected={view === 'publication'}
+                                onClick={() => setView('publication')}
                                 className={twMerge(
                                     '-mb-px border-b-2 px-1 pb-2 text-sm font-semibold transition-colors',
-                                    !showAi ? 'border-primary text-secondary dark:text-secondaryLight' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
+                                    view === 'publication' ? 'border-primary text-secondary dark:text-secondaryLight' : 'border-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200'
                                 )}
                             >
                                 {t('administration.extraction.tabPublication')}
                             </button>
-                            <button
-                                type='button'
-                                role='tab'
-                                aria-selected={showAi}
-                                onClick={() => setView(true)}
-                                title={t('administration.extraction.tabHint')}
-                                className={twMerge(
-                                    '-mb-px inline-flex items-center gap-1 border-b-2 px-1 pb-2 text-xs transition-colors',
-                                    showAi ? 'border-primary font-semibold text-secondary dark:text-secondaryLight' : 'border-transparent text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300'
-                                )}
-                            >
-                                <FiCpu size={12} />
-                                {t('administration.extraction.tab')}
-                            </button>
+                            <div className='flex items-end gap-4'>
+                                {(
+                                    [
+                                        { id: 'jobs', icon: <FiActivity size={12} />, label: t('administration.jobs.entryTab'), hint: t('administration.jobs.entryTabHint') },
+                                        { id: 'ai', icon: <FiCpu size={12} />, label: t('administration.extraction.tab'), hint: t('administration.extraction.tabHint') },
+                                    ] as const
+                                ).map((tab) => (
+                                    <button
+                                        key={tab.id}
+                                        type='button'
+                                        role='tab'
+                                        aria-selected={view === tab.id}
+                                        onClick={() => setView(tab.id)}
+                                        title={tab.hint}
+                                        className={twMerge(
+                                            '-mb-px inline-flex items-center gap-1 border-b-2 px-1 pb-2 text-xs transition-colors',
+                                            view === tab.id ? 'border-primary font-semibold text-secondary dark:text-secondaryLight' : 'border-transparent text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300'
+                                        )}
+                                    >
+                                        {tab.icon}
+                                        {tab.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {showJobs && id && (
+                        <div className='px-5 pb-10'>
+                            <EntryJobsPanel entryId={id} title={entry.title} onOpenAi={() => setView('ai')} />
                         </div>
                     )}
 
@@ -139,7 +161,7 @@ export default function AdminEntryForm({
                         </div>
                     )}
 
-                    <div className={twMerge('px-5 pb-28', showAi && 'hidden')}>
+                    <div className={twMerge('px-5 pb-28', view !== 'publication' && 'hidden')}>
                         {/* Prominent title — the primary thing an operator edits */}
                         <div className={cardClass}>
                             <label htmlFor='entry-title' className={sectionTitle}>
@@ -236,7 +258,7 @@ export default function AdminEntryForm({
                     </div>
 
                     {/* Sticky save bar */}
-                    <div className={twMerge('sticky bottom-0 z-10 mt-auto flex items-center justify-end gap-3 border-t border-zinc-200 bg-lightGray/90 px-5 py-3 backdrop-blur dark:border-zinc-700 dark:bg-darkGray/90', showAi && 'hidden')}>
+                    <div className={twMerge('sticky bottom-0 z-10 mt-auto flex items-center justify-end gap-3 border-t border-zinc-200 bg-lightGray/90 px-5 py-3 backdrop-blur dark:border-zinc-700 dark:bg-darkGray/90', view !== 'publication' && 'hidden')}>
                         <Button type='submit' disabled={isFilesLoading} className='flex items-center gap-2'>
                             <BiSave size={18} />
                             {FormType === 'add' ? t('entry.wizard.upload') : t('entry.wizard.edit')}

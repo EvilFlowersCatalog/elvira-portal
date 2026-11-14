@@ -17,11 +17,12 @@ interface Item {
   key: keyof IStatisticsAttention;
   severity: Severity;
   icon: ReactElement;
-  /** Where the operator goes to fix it. (The entries list has no encryption filter yet, so those land unfiltered.) */
+  /** Where the operator goes to fix it. (No API lists jobs by status yet, so encryption lands on all LCP jobs.) */
   target: string;
 }
 
 const RESERVATIONS = `${NAVIGATION_PATHS.adminLoans}?tab=reservations`;
+const LCP_JOBS = NAVIGATION_PATHS.adminJobs;
 
 // Ordered by severity: what blocks lending first.
 const ITEMS: Item[] = [
@@ -29,13 +30,13 @@ const ITEMS: Item[] = [
     key: 'encryption_failed',
     severity: 'critical',
     icon: <FiAlertOctagon size={18} />,
-    target: NAVIGATION_PATHS.adminEntries,
+    target: LCP_JOBS,
   },
   {
     key: 'encryption_stuck',
     severity: 'serious',
     icon: <FiLock size={18} />,
-    target: NAVIGATION_PATHS.adminEntries,
+    target: LCP_JOBS,
   },
   {
     key: 'claims_expiring_24h',
@@ -68,7 +69,7 @@ const AttentionStrip = ({ attention, onNavigate }: Props) => {
 
   if (!open.length) {
     return (
-      <div className='viz-root flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-600 shadow-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'>
+      <div data-guide='admin-attention' className='viz-root flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-600 shadow-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'>
         <FiCheckCircle
           size={18}
           className='text-[color:var(--viz-good)]'
@@ -80,7 +81,7 @@ const AttentionStrip = ({ attention, onNavigate }: Props) => {
   }
 
   return (
-    <div className='viz-root grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4'>
+    <div data-guide='admin-attention' className='viz-root grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4'>
       {open.map((i) => (
         <button
           key={i.key}

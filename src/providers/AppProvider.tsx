@@ -20,6 +20,7 @@ import type {
   IAssistantCitation,
   IAssistantEvidence,
   IAssistantFeedback,
+  IAssistantGuide,
   IAssistantStudy,
   IAssistantSuggestion,
   IAssistantToolActivity,
@@ -55,6 +56,8 @@ export interface AiMessage {
   study?: IAssistantStudy;
   /** Follow-up chips under the answer. Live only — never stored. */
   suggestions?: IAssistantSuggestion[];
+  /** Places in the portal the answer offers to show ("Show me"). Live only — never stored. */
+  guide?: IAssistantGuide;
   /** The stored row of an assistant message, for feedback; a streamed answer learns it from the chat afterwards. */
   serverId?: string;
   /** The reader's rating of this answer. */

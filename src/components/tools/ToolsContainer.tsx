@@ -147,6 +147,7 @@ const ToolsContainer = ({
           <div className="grid lg:grid-cols-[auto_1fr_auto] grid-cols-2 gap-3 w-full text-[15px] items-start">
             {advancedSearch && (
               <button
+                data-guide="advanced-search"
                 className="text-sm text-secondary dark:text-secondaryLight font-medium hover:underline whitespace-nowrap w-fit"
                 onClick={() => {
                   umamiTrack('Advanced Search Button');
@@ -158,7 +159,11 @@ const ToolsContainer = ({
             )}
             {customFilters}
             <FilterChips filters={activeFilters} onRemove={removeFilter} onClear={handleClear} />
-            {enableSort && <SortSelect value={orderBy} onChange={handleSelectChange} withRelevance={searching} />}
+            {enableSort && (
+              <div data-guide="sort" className="w-fit justify-self-end">
+                <SortSelect value={orderBy} onChange={handleSelectChange} withRelevance={searching} />
+              </div>
+            )}
           </div>
         </div>
       </div>

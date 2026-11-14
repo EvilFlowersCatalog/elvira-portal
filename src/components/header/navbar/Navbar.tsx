@@ -39,6 +39,8 @@ interface INavbarButtonParams {
   isActive: boolean;
   onClick?: ((...args: any) => void) | null;
   textVisible?: boolean;
+  /** Anchor the assistant's guide lights up (`data-guide`). */
+  guide?: string;
 }
 const NavbarButton = ({
   name,
@@ -47,11 +49,13 @@ const NavbarButton = ({
   isActive,
   onClick = null,
   textVisible = true,
+  guide,
 }: INavbarButtonParams) => {
   const { specialNavigation, umamiTrack } = useAppContext();
 
   return (
     <button
+      data-guide={guide}
       // Collapsed: icon only, so name it for screen readers and hover.
       aria-label={textVisible ? undefined : name}
       title={textVisible ? undefined : name}
@@ -205,6 +209,7 @@ const Navbar = () => {
             ) : null }
             <NavbarButton
               name={t("navbarMenu.home")}
+              guide="nav-home"
               path={NAVIGATION_PATHS.home}
               icon={<HomeIcon size={20} />}
               isActive={location.pathname === NAVIGATION_PATHS.home}
@@ -212,6 +217,7 @@ const Navbar = () => {
             />
             <NavbarButton
               name={t("navbarMenu.library")}
+              guide="nav-library"
               path={NAVIGATION_PATHS.library}
               icon={<LibraryIcon size={20} />}
               isActive={location.pathname === NAVIGATION_PATHS.library}
@@ -219,6 +225,7 @@ const Navbar = () => {
             />
             <NavbarButton
               name={t("navbarMenu.feeds")}
+              guide="nav-feeds"
               path={NAVIGATION_PATHS.feeds}
               icon={<FeedsIcon size={20} />}
               isActive={location.pathname === NAVIGATION_PATHS.feeds}
@@ -226,6 +233,7 @@ const Navbar = () => {
             />
             <NavbarButton
               name={t("navbarMenu.categories")}
+              guide="nav-categories"
               path={NAVIGATION_PATHS.categories}
               icon={<CategoriesIcon size={20} />}
               isActive={location.pathname === NAVIGATION_PATHS.categories}
@@ -233,6 +241,7 @@ const Navbar = () => {
             />
             <NavbarButton
               name={t("navbarMenu.aiAssistant")}
+              guide="nav-ai"
               path={NAVIGATION_PATHS.aiChatHistory}
               icon={<ChatIcon size={20} />}
               isActive={
@@ -250,6 +259,7 @@ const Navbar = () => {
             {auth.isSuperUser && (
               <NavbarButton
                 name={t("navbarMenu.administration")}
+                guide="nav-admin"
                 path={NAVIGATION_PATHS.adminHome}
                 icon={<AdministrationIcon size={20} />}
                 isActive={location.pathname.includes("administration")}
@@ -278,6 +288,7 @@ const Navbar = () => {
             )}
             <NavbarButton
               name={t("navbarMenu.myShelf")}
+              guide="nav-shelf"
               path={NAVIGATION_PATHS.shelf}
               icon={<BookmarkIcon size={20} />}
               isActive={location.pathname === NAVIGATION_PATHS.shelf}
@@ -285,6 +296,7 @@ const Navbar = () => {
             />
             <NavbarButton
               name={t("navbarMenu.history")}
+              guide="nav-history"
               path={NAVIGATION_PATHS.history}
               icon={<ClockIcon size={20} />}
               isActive={location.pathname === NAVIGATION_PATHS.history}
@@ -292,6 +304,7 @@ const Navbar = () => {
             />
             <NavbarButton
               name={t("navbarMenu.loan")}
+              guide="nav-loans"
               path={NAVIGATION_PATHS.loans}
               icon={<LoansIcon size={20} />}
               isActive={location.pathname === NAVIGATION_PATHS.loans}
@@ -311,6 +324,7 @@ const Navbar = () => {
           )}
           <NavbarButton
             name={lang === LANG_TYPE.sk ? "EN" : "SK"}
+            guide="nav-language"
             onClick={switchLang}
             path=""
             icon={<LanguageIcon size={20} />}
@@ -322,6 +336,7 @@ const Navbar = () => {
               isDark() ? t("navbarMenu.lightMode") : t("navbarMenu.darkMode")
             }
             path=""
+            guide="nav-theme"
             onClick={switchTheme}
             icon={
               isDark() ? (
@@ -336,6 +351,7 @@ const Navbar = () => {
           { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
           <NavbarButton
             name={t("navbarMenu.help")}
+            guide="nav-help"
             path={NAVIGATION_PATHS.help}
             icon={<HelpIcon size={20} />}
             isActive={false}
@@ -375,6 +391,7 @@ const Navbar = () => {
           )}
           {!isCollapsed ? (
             <button
+              data-guide="nav-profile"
               className="w-full flex h-10 items-center gap-3 rounded-lg px-3 bg-lightGray dark:bg-darkGray shadow-[0px_4px_6px_rgba(0,0,0,0.1)] hover:brightness-95 dark:hover:brightness-110 transition-all"
               onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
             >
@@ -398,6 +415,7 @@ const Navbar = () => {
           ) : (
             <div className="w-full flex justify-center">
               <button
+                data-guide="nav-profile"
                 className="flex items-center justify-center w-11 h-10 bg-lightGray dark:bg-zinc-700 shadow-[0px_4px_6px_rgba(0,0,0,0.1)] rounded-lg hover:brightness-95 dark:hover:brightness-110 transition-all"
                 aria-label={auth.username}
                 aria-haspopup="menu"

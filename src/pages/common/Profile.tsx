@@ -182,7 +182,7 @@ const Profile = () => {
           {/* Bottom two-column section */}
           <div className='grid grid-cols-1 lg:grid-cols-2 gap-5'>
             {/* Passphrase section */}
-            <section className='rounded-[7px] p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] dark:shadow-[0px_4px_6px_0px_rgba(0,0,0,0.3)] border border-[#e5e5e5] dark:border-zinc-700'>
+            <section data-guide="profile-passphrase" className='rounded-[7px] p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] dark:shadow-[0px_4px_6px_0px_rgba(0,0,0,0.3)] border border-[#e5e5e5] dark:border-zinc-700'>
               <div className='flex items-center gap-2 mb-4'>
                 <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>
                   {t('profile.passphrase.title')}

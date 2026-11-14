@@ -1,5 +1,6 @@
 import {
   IAssistantAnnotation,
+  IAssistantGuide,
   IAssistantMessageOptions,
   IAssistantStatus,
   IAssistantStreamHandlers,
@@ -42,6 +43,20 @@ const activityOf = (payload: object): Omit<IAssistantToolActivity, 'id' | 'tool'
 };
 
 /**
+ * The `navigate` frame: `{targets: [ids], tour?, auto?}` (or a single `target`). Ids only — the guide registry
+ * decides what they mean and who may see them; anything else in the payload is ignored.
+ */
+const guideOf = (payload: unknown): IAssistantGuide | null => {
+  if (!payload || typeof payload !== 'object') return null;
+  const raw = payload as Record<string, unknown>;
+  const ids = Array.isArray(raw.targets) ? raw.targets : typeof raw.target === 'string' ? [raw.target] : [];
+  const targets = ids.filter((id): id is string => typeof id === 'string' && /^[a-z0-9-]{1,48}$/.test(id));
+  const tour = typeof raw.tour === 'string' && /^[a-z0-9-]{1,48}$/.test(raw.tour) ? raw.tour : undefined;
+  if (!targets.length && !tour) return null;
+  return { targets, ...(tour ? { tour } : {}), ...(raw.auto === true ? { auto: true } : {}), source: 'assistant' };
+};
+
+/**
  * Sends a message and dispatches the SSE answer to `handlers`. Uses `fetch`
  * because the endpoint is a POST (`EventSource` can't POST) and axios can't
  * expose a streamed body. Resolves when the stream ends; rejects with an
@@ -69,6 +84,7 @@ const useSendChatMessage = () => {
         ...(options?.page ? { page: options.page } : {}),
         ...(options?.userAcquisitionId ? { user_acquisition_id: options.userAcquisitionId } : {}),
         ...(options?.language ? { language: options.language } : {}),
+        ...(options?.portalPath ? { portal_path: options.portalPath } : {}),
       }),
       signal: options?.signal,
     });
@@ -125,6 +141,11 @@ const useSendChatMessage = () => {
         case 'suggestions':
           handlers.onSuggestions?.(suggestionsOf(payload));
           break;
+        case 'navigate': {
+          const guide = guideOf(payload);
+          if (guide) handlers.onNavigate?.(guide);
+          break;
+        }
         case 'annotation':
           if (payload && typeof payload === 'object' && 'id' in payload) {
             handlers.onAnnotation?.(payload as IAssistantAnnotation);

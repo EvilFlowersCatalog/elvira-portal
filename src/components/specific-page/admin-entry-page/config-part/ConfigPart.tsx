@@ -3,6 +3,7 @@ import { IPartParams, IConfig } from '../../../../utils/interfaces/general/gener
 import useAppContext from '../../../../hooks/contexts/useAppContext';
 import { Switch } from '../../../admin/Field';
 import Select from '../../../primitives/Select';
+import { OCR_ISSUE_URL } from '../../../admin/jobs/jobsUi';
 
 /** Boolean reader/access flags, rendered data-driven with helper text. */
 type BoolKey = keyof Pick<
@@ -77,6 +78,15 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
             />
             <p className="ml-14 text-xs text-zinc-500 dark:text-zinc-400">
               {t(`entry.wizard.configHelp.${f.helpKey}`)}
+              {/* The catalog stores these but never reads them (EvilFlowersCatalog#146). */}
+              {(f.key === 'evilflowers_ocr_enabled' || f.key === 'evilflowers_ocr_rewrite') && (
+                <span className="mt-0.5 block text-amber-700 dark:text-amber-300">
+                  {t('administration.jobs.ocr.switchNoEffect')}{' '}
+                  <a href={OCR_ISSUE_URL} target="_blank" rel="noreferrer" className="underline">
+                    #146
+                  </a>
+                </span>
+              )}
             </p>
           </div>
         ))}

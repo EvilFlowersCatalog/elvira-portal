@@ -9,6 +9,7 @@ import {
   FiTag,
   FiEdit3,
   FiStar,
+  FiActivity,
 } from 'react-icons/fi';
 import { FaBook } from 'react-icons/fa';
 import { MdOutlineCollectionsBookmark, MdOutlineLibraryBooks, MdOutlineInventory2 } from 'react-icons/md';
@@ -64,6 +65,12 @@ const GROUPS: NavGroup[] = [
       { key: 'loans', path: NAVIGATION_PATHS.adminLoans, icon: <MdOutlineInventory2 size={ICON} /> },
     ],
   },
+  {
+    labelKey: 'administration.nav.groupOperations',
+    items: [
+      { key: 'jobs', path: NAVIGATION_PATHS.adminJobs, icon: <FiActivity size={ICON} /> },
+    ],
+  },
 ];
 
 const experimentalOn = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
@@ -110,6 +117,7 @@ export default function AdminNav() {
                   <NavLink
                     key={item.key}
                     to={item.path}
+                    data-guide={`admin-nav-${item.key}`}
                     end={item.exact}
                     onClick={() => umamiTrack('Admin Nav', { path: item.path })}
                     className={({ isActive }) =>

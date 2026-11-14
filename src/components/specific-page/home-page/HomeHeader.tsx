@@ -10,7 +10,6 @@ import useAppContext from "../../../hooks/contexts/useAppContext";
 import ElviraInput from "../../inputs/ElviraInput";
 import Button from "../../buttons/Button";
 import { H1 } from "../../primitives/Heading";
-import AiAssistant from "../../dialogs/AiAssistant";
 import SearchSuggestions from "../../tools/SearchSuggestions";
 
 const HomeHeader = () => {
@@ -46,6 +45,7 @@ const HomeHeader = () => {
       </div>
 
       <div
+        data-guide="home-ai-banner"
         className="text-white w-full py-4 px-5 rounded-lg relative"
         style={{
           background:
@@ -85,6 +85,7 @@ const HomeHeader = () => {
       </div>
 
       <form
+        data-guide="home-search"
         className="relative flex flex-col w-full items-center gap-1 text-darkGray dark:text-white"
         onSubmit={submit}
       >
@@ -115,6 +116,7 @@ const HomeHeader = () => {
         )}
 
         <button
+          type="button"
           onClick={() => {
             setShowAiAssistant(true);
           }}
@@ -135,7 +137,6 @@ const HomeHeader = () => {
             />
           </svg>
           <p className="whitespace-nowrap">{t("assistant.title")}</p>
-          <AiAssistant />
         </button>
       </form>
     </div>

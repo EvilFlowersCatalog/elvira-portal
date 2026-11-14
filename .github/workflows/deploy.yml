@@ -45,6 +45,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # dev ships the latest viewer `develop` (installed from git; its `prepare`
+      # builds dist/, EvilFlowersViewer#149) instead of the npm version in the
+      # lockfile. master stays on npm until the viewer's `main` has `prepare`
+      # too; then drop the `if` and install
+      # `#${{ github.ref_name == 'master' && 'main' || 'develop' }}`.
+      - name: Viewer (latest develop)
+        if: github.ref_name != 'master'
+        run: npm install --no-save "github:EvilFlowersCatalog/EvilFlowersViewer#develop"
+
       - name: Lint
         run: npm run lint
         continue-on-error: true

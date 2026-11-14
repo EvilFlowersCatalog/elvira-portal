@@ -138,7 +138,7 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
     const queuePosition = availabilityState === 'reserved' ? entry.user_position ?? null : null;
 
     return (
-        <div className="group rounded-[8px] relative w-full bg-white dark:bg-strongDarkGray shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.25)] dark:hover:shadow-strongDarkGray transition-shadow duration-300 flex flex-col gap-[7px] pb-[10px]">
+        <div data-guide={type === 'ai-recommendation' ? undefined : 'entry-card'} className="group rounded-[8px] relative w-full bg-white dark:bg-strongDarkGray shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.25)] dark:hover:shadow-strongDarkGray transition-shadow duration-300 flex flex-col gap-[7px] pb-[10px]">
             {/* Book cover */}
             <div className="h-[163px] relative shrink-0 w-full overflow-hidden rounded-t-[8px] bg-lightGray dark:bg-darkGray">
                 <div

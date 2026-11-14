@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import useAssistantCapabilities from '../../hooks/api/assistant/useAssistantCapabilities';
+import GuideExplore from '../guide/GuideExplore';
 
 /**
  * An empty chat: what the assistant can do here and 3 starter prompts for this context — a plain chat, a chat
@@ -74,6 +75,8 @@ export default function AssistantWelcome({
           </div>
         </div>
       ) : null}
+      {/* Finding the way around is about the portal, not about a book. */}
+      {!entryId ? <GuideExplore compact={compact} /> : null}
     </div>
   );
 }

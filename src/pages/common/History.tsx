@@ -6,7 +6,6 @@ import { CircleLoader } from 'react-spinners';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import { H1 } from '../../components/primitives/Heading';
 import EntryDetail from '../../components/items/entry/details/EntryDetail';
-import AiAssistant from '../../components/dialogs/AiAssistant';
 import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
 import useGetActivity from '../../hooks/api/activity/useGetActivity';
 import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
@@ -155,7 +154,6 @@ const History = () => {
       </div>
 
       <EntryDetail />
-      <AiAssistant />
       <LicenseCalendar />
     </>
   );

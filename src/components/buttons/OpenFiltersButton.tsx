@@ -26,7 +26,8 @@ const OpenFiltersButton = () => {
 
     return (
         <button
-            className="fixed p-3 flex items-center justify-center bottom-5 right-10 z-10 rounded-full bg-primary text-white dark:text-white border-none shadow-lg"
+            // Stacked above the assistant launcher, which owns the bottom-right corner.
+            className="fixed p-3 flex items-center justify-center bottom-[5.5rem] right-5 z-10 rounded-full bg-primary text-white dark:text-white border-none shadow-lg"
             onClick={openFilters}
             aria-label={t('general.scrollUp')}
         >

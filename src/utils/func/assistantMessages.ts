@@ -12,6 +12,7 @@ const TOOL_STATUS: Record<string, string> = {
   read_pdf_page: 'readPublication',
   search_pdf: 'readPublication',
   search_paragraphs: 'readPublication',
+  show_in_portal: 'showInPortal',
 };
 
 /**
@@ -36,6 +37,7 @@ const TOOL_ACTIVITY: Record<string, string> = {
   search_pdf: 'searchPublication',
   search_paragraphs: 'searchPublication',
   create_highlights: 'highlight',
+  show_in_portal: 'showInPortal',
 };
 
 /** Translation key of a finished tool call in the activity log (past tense). */

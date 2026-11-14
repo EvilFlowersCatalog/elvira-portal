@@ -1,9 +1,12 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../contexts/useAppContext';
+import useGuide from '../../contexts/useGuide';
+import { matchGuide } from '../../../components/guide/guideRegistry';
 import { AiMessage } from '../../../providers/AppProvider';
 import { mergeCitations, statusLabelKey } from '../../../utils/func/assistantMessages';
-import { IAssistantToolActivity, IChatContext } from '../../../utils/interfaces/assistant';
+import { IAssistantGuide, IAssistantToolActivity, IChatContext } from '../../../utils/interfaces/assistant';
 import { formatRetryAfter, toAssistantError } from './assistantApi';
 import useSendChatMessage from './useSendChatMessage';
 import useStartChat from './useStartChat';
@@ -38,6 +41,8 @@ const useAssistantChat = (entry?: IAssistantEntryRef) => {
   const { aiChatId, setAiChatId, setAiMessages, aiChatSubject, setAiChatSubject, lang } = useAppContext();
   const startChat = useStartChat();
   const sendChatMessage = useSendChatMessage();
+  const { pathname } = useLocation();
+  const guide = useGuide();
   const [isGenerating, setGenerating] = useState(false);
 
   const sendMessage = async (message: string, options: ISendOptions = {}) => {
@@ -55,6 +60,11 @@ const useAssistantChat = (entry?: IAssistantEntryRef) => {
     const showError = (text: string, extra: Partial<AiMessage> = {}) =>
       updateAnswer({ text, status: 'error', progress: undefined, ...extra });
 
+    // A "where is …" question gets its way shown at once, while the assistant writes the answer. Attached
+    // material (a book, a passage) means the question is about content, not about the portal.
+    const local = !entryId && !contexts ? matchGuide(message, guide.access, pathname) : null;
+    let offered: IAssistantGuide | undefined = local ? { ...local, source: 'portal' } : undefined;
+
     setAiMessages((prev) => [
       // Follow-up chips belong to the last answer only.
       ...prev.map((m) => (m.suggestions ? { ...m, suggestions: undefined } : m)),
@@ -65,7 +75,7 @@ const useAssistantChat = (entry?: IAssistantEntryRef) => {
         reference: attached && { id: attached.id, title: attached.title },
         contexts,
       },
-      { id: answerId, role: 'assistant', text: '', status: 'streaming' },
+      { id: answerId, role: 'assistant', text: '', status: 'streaming', guide: offered },
     ]);
     setGenerating(true);
 
@@ -117,6 +127,11 @@ const useAssistantChat = (entry?: IAssistantEntryRef) => {
           annotationIds.push(annotation.id);
           updateAnswer({ annotationIds: [...annotationIds] });
         },
+        // The assistant's own choice of places replaces the portal's guess.
+        onNavigate: (frame) => {
+          offered = frame;
+          updateAnswer({ guide: frame });
+        },
         onError: (detail, failure) =>
           // A failed turn is stored (IP-030 §5): its row is the answer, and the catalog says whether to retry.
           showError(detail || t('assistant.errors.generic'), {
@@ -127,12 +142,16 @@ const useAssistantChat = (entry?: IAssistantEntryRef) => {
         onDone: (messageId) => {
           if (messageId) updateAnswer({ serverId: messageId });
         },
-      }, { entryId, contexts, language: lang });
+      }, { entryId, contexts, language: lang, portalPath: pathname });
       setAiMessages((prev) =>
         prev.map((m) =>
           m.id === answerId && m.status === 'streaming' ? { ...m, status: 'done', progress: undefined } : m,
         ),
       );
+      // "Take me there": the assistant may start the guide itself once its answer is complete.
+      if (offered?.auto && offered.source === 'assistant') {
+        guide.start(offered, { fromChat: true });
+      }
     } catch (err) {
       const { status, message: detail, retryAfter } = toAssistantError(err);
       // Nothing reached the catalog's chat, so nothing is stored for this answer.
