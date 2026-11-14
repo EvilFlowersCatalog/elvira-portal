@@ -1,36 +1,53 @@
 import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useTranslation } from 'react-i18next';
+import { FiRotateCcw } from 'react-icons/fi';
 import useAppContext from '../../hooks/contexts/useAppContext';
-import useGetEntryDetail from '../../hooks/api/entries/useGetEntryDetail';
+import useAuthContext from '../../hooks/contexts/useAuthContext';
 import useOpenInViewer from '../../hooks/api/assistant/useOpenInViewer';
 import useOpenCitation from '../../hooks/api/assistant/useOpenCitation';
+import useAgentHighlights from '../../hooks/api/assistant/useAgentHighlights';
+import useEntriesByIds from '../../hooks/api/entries/useEntriesByIds';
 import { AiMessage } from '../../providers/AppProvider';
-import { IEntry } from '../../utils/interfaces/entry';
-import { citationsToLinks, findCitation, findRegion } from '../../utils/func/assistantMessages';
+import { IAssistantCitation } from '../../utils/interfaces/assistant';
+import {
+  citationsToLinks,
+  findCitation,
+  findRegion,
+  figureLabelsIn,
+  markdownBlocks,
+  normalizeCitations,
+} from '../../utils/func/assistantMessages';
 import EntryItem from '../items/entry/display/EntryItem';
 import ChatContextChip from './ChatContextChip';
 import AnnotationCard from './AnnotationCard';
 import ToolActivityLog from './ToolActivityLog';
 import RegionCite, { CitedRegion } from './RegionCite';
+import CitationChip from './CitationChip';
+import FigureCard from './FigureCard';
+import { citeClass, figureContext } from './citationUi';
+import EvidencePanel from './EvidencePanel';
+import StudyCard from './StudyCard';
+import SuggestionChips from './SuggestionChips';
+import AnswerFeedback from './AnswerFeedback';
 import useSimilarEntries from '../../hooks/api/entries/useSimilarEntries';
-
-const citeClass =
-  'inline-flex items-center px-1.5 py-px mx-0.5 rounded-md text-xs font-medium align-baseline bg-sky-500/10 text-sky-700 dark:bg-sky-400/15 dark:text-sky-300 no-underline enabled:hover:underline enabled:hover:bg-sky-500/20 dark:enabled:hover:bg-sky-400/25 disabled:cursor-default';
+import { ISendOptions } from '../../hooks/api/assistant/useAssistantChat';
 
 /**
  * One chat message, rendered the way the viewer's chat renders it: the
- * reader's attachments as chips, the answer as markdown with `[[page:N]]` and
- * `[[region:ID]]` citations that open the book there, the pages the answer
- * was drawn from, and recommended publications as cards.
+ * reader's attachments as chips, the answer as markdown with evidence chips (`[E3]`, `[F2]`) and the older
+ * `[[page:N]]` / `[[region:ID]]` citations, the figures it cites as cards under their paragraph, the sources
+ * it was drawn from, a study card when that is the answer, follow-up chips and recommended publications.
  */
 export default function AssistantMessage({
   msg,
   messages,
   compact,
   onNavigate,
+  onSend,
+  onRetry,
 }: {
   msg: AiMessage;
   /** The whole conversation, so region citations can find the region's page. */
@@ -38,13 +55,18 @@ export default function AssistantMessage({
   compact?: boolean;
   /** Called before the viewer opens (the drawer closes itself). */
   onNavigate?: () => void;
+  /** Sends a follow-up (suggestion chips, "ask about this figure", next walkthrough step); unset while busy. */
+  onSend?: (message: string, options?: ISendOptions) => void;
+  /** Sends a failed message again; unset while busy. */
+  onRetry?: (msg: AiMessage) => void;
 }) {
   const { t } = useTranslation();
-  const { aiChatSubject } = useAppContext();
+  const { aiChatSubject, lang } = useAppContext();
+  const { auth } = useAuthContext();
   const openInViewer = useOpenInViewer();
   const openCitation = useOpenCitation();
-  const { getEntryDetail } = useGetEntryDetail();
   const { getEntryFigures } = useSimilarEntries();
+  const { requestAgentAnnotation } = useAgentHighlights();
 
   // The book this answer is about: the chat's own, else the one attached to the question before it
   // (a general chat where the reader picked a book: "a čo v tejto knihe…").
@@ -65,19 +87,12 @@ export default function AssistantMessage({
         openInViewer(subject, page);
       }
     : undefined;
+  const open = (citation: IAssistantCitation) => openCitation(citation, onNavigate);
 
-  const entryIds = msg.entryIds ?? [];
-  // Recommended-book details, cached/deduped by React Query and keyed by the ids.
-  const { data: books = [] } = useQuery({
-    queryKey: ['ai-message-books', entryIds],
-    queryFn: async () => {
-      const details = await Promise.all(entryIds.map((id) => getEntryDetail(id)));
-      return details.map((detail) => ({ ...detail, popularity: Number(detail.popularity) })) as IEntry[];
-    },
-    enabled: entryIds.length > 0,
-  });
+  // Recommended books in one `?id=` request (#14), cached by the ids.
+  const { data: books = [] } = useEntriesByIds(msg.entryIds ?? []);
 
-  // Figures the answer cites: the crops come from the entry's extraction, so a hover can show them.
+  // Figures cited the old way (`[[region:ID]]`): the crops come from the entry's extraction, so a hover can show them.
   const citesRegions = msg.role === 'assistant' && msg.text.includes('region:');
   const { data: figures = [] } = useQuery({
     queryKey: ['entry-figures', subject?.entryId],
@@ -108,17 +123,76 @@ export default function AssistantMessage({
       : null;
   };
 
-  const markdown = useMemo(
+  const streaming = msg.status === 'streaming';
+
+  // The answer in markdown blocks, each with the figures it cites, so their cards go under that paragraph.
+  const blocks = useMemo(
     () =>
-      citationsToLinks(msg.text, {
-        page: (page) => t('assistant.pageShort', { page }),
-        region: (id) => {
-          const kind = figures.find((f) => f.id === id)?.kind ?? findRegion(messages, id)?.kind;
-          return t(`assistant.region.${kind ?? 'figure'}`);
-        },
-      }, msg.citations, msg.status === 'streaming'),
-    [msg.text, msg.citations, msg.status, messages, figures, t],
+      markdownBlocks(normalizeCitations(msg.text)).map((block) => ({
+        markdown: citationsToLinks(block, {
+          page: (page) => t('assistant.pageShort', { page }),
+          region: (id) => {
+            const kind = figures.find((f) => f.id === id)?.kind ?? findRegion(messages, id)?.kind;
+            return t(`assistant.region.${kind ?? 'figure'}`);
+          },
+        }, msg.citations, streaming),
+        figures: figureLabelsIn(block)
+          .map((label) => findCitation(msg.citations, label))
+          .filter((c): c is IAssistantCitation => !!c),
+      })),
+    [msg.text, msg.citations, streaming, messages, figures, t],
   );
+
+  const askAboutFigure = onSend
+    ? (citation: IAssistantCitation) => {
+        const context = figureContext(citation);
+        onSend(t('assistant.figure.askMessage', { label: citation.label }), {
+          contexts: context ? [context] : undefined,
+          entry: { id: citation.entry_id, title: citation.title },
+        });
+      }
+    : undefined;
+
+  const components: Components = {
+    a: ({ href, children }) => {
+      const page = href?.match(/^#efv-page-(\d+)$/)?.[1];
+      const regionId = href?.match(/^#efv-region-([\w-]+)$/)?.[1];
+      const evidence = href?.match(/^#efv-evidence-([EF]\d+)$/)?.[1];
+      if (evidence) {
+        // Inert until its `citation` frame arrives; then hover shows the source, click opens it.
+        return (
+          <CitationChip citation={findCitation(msg.citations, evidence)} onOpen={open}>
+            {children}
+          </CitationChip>
+        );
+      }
+      if (regionId) {
+        return (
+          <RegionCite region={citedRegion(regionId)} className={citeClass} onOpenPage={openPage}>
+            {children}
+          </RegionCite>
+        );
+      }
+      if (page) {
+        const target = Number(page);
+        return (
+          <button
+            type="button"
+            className={citeClass}
+            disabled={!openPage || !target}
+            onClick={() => target && openPage?.(target)}
+          >
+            {children}
+          </button>
+        );
+      }
+      return (
+        <a href={href} target="_blank" rel="noreferrer" className="underline">
+          {children}
+        </a>
+      );
+    },
+  };
 
   const bubble = compact ? 'p-2 max-w-[85%]' : 'px-4 py-3 max-w-[85%]';
 
@@ -140,7 +214,6 @@ export default function AssistantMessage({
     );
   }
 
-  const streaming = msg.status === 'streaming';
   // What runs right now, as one plain line (no bubble): before any text, and again when a later
   // round calls a tool after text already streamed. Text streaming clears `progress`.
   const working = streaming && (!msg.text || !!msg.progress);
@@ -155,104 +228,81 @@ export default function AssistantMessage({
     </div>
   ) : null;
 
+  const failed = msg.status === 'error';
+  // A study card is the whole answer of its turn: there is no text to rate apart from it.
+  const answered = !streaming && !failed && (!!msg.text || !!msg.study || !!msg.entryIds?.length);
+
   return (
     <div className={`self-start flex flex-col gap-2 w-full ${compact ? 'mb-2' : 'mb-4'}`}>
       {msg.activity?.some((call) => call.done) ? (
         <ToolActivityLog activity={msg.activity.filter((call) => call.done)} running={false} />
       ) : null}
+
+      {/* Sources, from the `evidence` frame before the first token; cited ones marked once the answer is in */}
+      {msg.evidence || (msg.citations?.length && !streaming) ? (
+        <EvidencePanel evidence={msg.evidence} citations={msg.citations} streaming={streaming} onOpen={open} />
+      ) : null}
+
       {!msg.text ? liveLine : null}
-      {(msg.text || msg.status === 'error') && (
+      {(msg.text || failed) && (
         <div
           className={`rounded-lg break-words ${bubble} ${
-            msg.status === 'error'
+            failed
               ? 'bg-red/10 text-redText dark:text-red'
               : 'bg-zinc-200 text-black dark:bg-[#3f3f46] dark:text-[#e5e7eb]'
           }`}
         >
-            <div>
-              <ReactMarkdown
-                remarkPlugins={[remarkGfm]}
-                components={{
-                  a: ({ href, children }) => {
-                    const page = href?.match(/^#efv-page-(\d+)$/)?.[1];
-                    const regionId = href?.match(/^#efv-region-([\w-]+)$/)?.[1];
-                    const evidence = href?.match(/^#efv-evidence-(E\d+)$/)?.[1];
-                    const citation = evidence ? findCitation(msg.citations, evidence) : undefined;
-                    if (citation) {
-                      const where = citation.page ? t('assistant.pageShort', { page: citation.page }) : '';
-                      return (
-                        <button
-                          type="button"
-                          className={citeClass}
-                          title={[citation.title, where].filter(Boolean).join(', ')}
-                          onClick={() => openCitation(citation, onNavigate)}
-                        >
-                          {children}
-                        </button>
-                      );
-                    }
-                    if (evidence) {
-                      // Streaming: the label resolves when the answer is complete.
-                      return <span className={`${citeClass} opacity-60`}>{children}</span>;
-                    }
-                    if (regionId) {
-                      return (
-                        <RegionCite region={citedRegion(regionId)} className={citeClass} onOpenPage={openPage}>
-                          {children}
-                        </RegionCite>
-                      );
-                    }
-                    if (page) {
-                      const target = Number(page);
-                      return (
-                        <button
-                          type="button"
-                          className={citeClass}
-                          disabled={!openPage || !target}
-                          onClick={() => target && openPage?.(target)}
-                        >
-                          {children}
-                        </button>
-                      );
-                    }
-                    return (
-                      <a href={href} target="_blank" rel="noreferrer" className="underline">
-                        {children}
-                      </a>
-                    );
-                  },
-                }}
-              >
-                {markdown || t('assistant.errors.generic')}
-              </ReactMarkdown>
-            </div>
+          {failed || !blocks.length ? (
+            <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+              {msg.text || t('assistant.errors.generic')}
+            </ReactMarkdown>
+          ) : (
+            blocks.map((block, index) => (
+              <div key={index} className={index > 0 ? 'mt-3' : undefined}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+                  {block.markdown}
+                </ReactMarkdown>
+                {block.figures.map((figure) => (
+                  <FigureCard
+                    key={figure.label}
+                    citation={figure}
+                    onOpen={figure.readable === false && !figure.page ? undefined : open}
+                    onAsk={askAboutFigure}
+                  />
+                ))}
+              </div>
+            ))
+          )}
+          {failed && msg.retry && onRetry ? (
+            <button
+              type="button"
+              onClick={() => onRetry(msg)}
+              className="mt-2 inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-md bg-white/70 dark:bg-zinc-800 text-black dark:text-white hover:bg-white dark:hover:bg-zinc-700"
+            >
+              <FiRotateCcw size={12} aria-hidden="true" /> {t('assistant.retry')}
+            </button>
+          ) : null}
         </div>
       )}
 
       {msg.text ? liveLine : null}
 
-      {/* What each evidence chip in the answer points to */}
-      {msg.citations?.length && !streaming ? (
-        <div className="flex flex-col gap-1 text-xs">
-          <span className="text-gray-500 dark:text-gray-400">{t('assistant.sources')}:</span>
-          {[...msg.citations]
-            .sort((a, b) => Number(a.label.slice(1)) - Number(b.label.slice(1)))
-            .map((citation) => (
-              <button
-                key={citation.label}
-                type="button"
-                className="flex items-baseline gap-2 text-left min-w-0 group"
-                onClick={() => openCitation(citation, onNavigate)}
-              >
-                <span className={citeClass}>{citation.label.slice(1)}</span>
-                <span className="min-w-0 text-gray-700 dark:text-gray-300 group-hover:underline">
-                  {citation.title ?? citation.entry_id}
-                  {citation.page ? `, ${t('assistant.pageShort', { page: citation.page })}` : ''}
-                  {citation.section ? <span className="text-gray-500 dark:text-gray-400"> · {citation.section}</span> : null}
-                </span>
-              </button>
-            ))}
-        </div>
+      {/* The answer as a study card: quiz, walkthrough or glossary */}
+      {msg.study ? (
+        <StudyCard
+          study={msg.study}
+          resolve={(label) => findCitation(msg.citations, label) ?? findCitation(msg.evidence?.sources, label)}
+          onOpen={open}
+          onSend={onSend ? (message) => onSend(message) : undefined}
+          onHighlight={
+            subject?.userAcquisitionId && msg.study.mode === 'key_concepts'
+              ? async (prompt) => {
+                  const annotation = await requestAgentAnnotation(subject.userAcquisitionId!, prompt, lang);
+                  if (annotation.status === 'failed') throw new Error('highlight-failed');
+                }
+              : undefined
+          }
+        />
       ) : null}
 
       {/* Pages the answer was drawn from */}
@@ -290,13 +340,20 @@ export default function AssistantMessage({
       {/* Recommended publications */}
       {books.length ? (
         <div className="flex gap-3 py-2 shrink-0 overflow-x-auto flex-nowrap">
-          {books.map((entry: IEntry) => (
+          {books.map((entry) => (
             <div key={'ai-' + entry.id} className="w-[150px] shrink-0">
               <EntryItem entry={entry} id={'ai-' + entry.id} type="ai-recommendation" />
             </div>
           ))}
         </div>
       ) : null}
+
+      {msg.suggestions?.length ? (
+        <SuggestionChips suggestions={msg.suggestions} onSend={onSend ? (message) => onSend(message) : undefined} />
+      ) : null}
+
+      {/* Rating needs an account: the catalog stores it on the reader's own chat. */}
+      {answered && auth?.token ? <AnswerFeedback msg={msg} /> : null}
     </div>
   );
 }

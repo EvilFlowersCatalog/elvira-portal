@@ -54,11 +54,13 @@ import useGetUserChats from "../../hooks/api/assistant/useGetUserChats";
 import useGetChatHistory from "../../hooks/api/assistant/useGetChatHistory";
 import useDeleteChat from "../../hooks/api/assistant/useDeleteChat";
 import useSimilarEntries from "../../hooks/api/entries/useSimilarEntries";
+import { useEntriesByIdsFetcher } from "../../hooks/api/entries/useEntriesByIds";
 import useAgentHighlights, { toViewer as toViewerAnnotation } from "../../hooks/api/assistant/useAgentHighlights";
 import { formatRetryAfter, toAssistantError } from "../../hooks/api/assistant/assistantApi";
 import { activityLabelKey, statusLabelKey } from "../../utils/func/assistantMessages";
 import type { IAssistantCitation, IAssistantToolActivity } from "../../utils/interfaces/assistant";
 import useOpenCitation from "../../hooks/api/assistant/useOpenCitation";
+import type { IViewerLocationState } from "../../hooks/api/assistant/useOpenInViewer";
 import { useQueryClient } from "@tanstack/react-query";
 
 
@@ -80,8 +82,27 @@ const rootId = "elvira-viewer-app";
 // Title of the annotation that acts as the page-bookmark container.
 const PAGE_BOOKMARKS_TITLE = "__page_bookmarks__";
 
-/** The viewer's `IChatCitation`, declared here so the build passes against a viewer that lacks it. */
-type ViewerCitation = { label: string; entryId: string; title?: string; page?: number; section?: string };
+/**
+ * The viewer's `IChatCitation`, declared here so the build passes against a viewer that lacks it. The IP-030
+ * fields (paragraph box, sentence quads, quote, figure crop) go along; a viewer that does not know them ignores them.
+ */
+type ViewerCitation = {
+  label: string;
+  entryId: string;
+  title?: string;
+  page?: number;
+  section?: string;
+  kind?: string;
+  paragraphId?: string;
+  regionId?: string;
+  bbox?: IAssistantCitation["bbox"];
+  quads?: IAssistantCitation["quads"];
+  sentencePage?: number;
+  quote?: string;
+  caption?: string;
+  imageUrl?: string;
+  readable?: boolean;
+};
 
 const toViewerCitation = (citation: IAssistantCitation): ViewerCitation => ({
   label: citation.label,
@@ -89,6 +110,30 @@ const toViewerCitation = (citation: IAssistantCitation): ViewerCitation => ({
   title: citation.title,
   page: citation.page,
   section: citation.section,
+  kind: citation.kind,
+  paragraphId: citation.paragraph_id,
+  regionId: citation.region_id,
+  bbox: citation.bbox,
+  quads: citation.quads,
+  sentencePage: citation.sentence_page,
+  quote: citation.quote,
+  caption: citation.caption,
+  imageUrl: citation.image_url,
+  readable: citation.readable,
+});
+
+const fromViewerCitation = (citation: ViewerCitation): IAssistantCitation => ({
+  label: citation.label,
+  entry_id: citation.entryId,
+  title: citation.title,
+  page: citation.page,
+  section: citation.section,
+  kind: citation.kind,
+  paragraph_id: citation.paragraphId,
+  region_id: citation.regionId,
+  bbox: citation.bbox,
+  quads: citation.quads,
+  sentence_page: citation.sentencePage,
 });
 
 const Viewer = () => {
@@ -102,7 +147,7 @@ const Viewer = () => {
   // Where the reader was opened from. Kept from mount: opening a dialog here
   // rewrites the URL and drops the navigation state.
   const [origin] = useState(
-    location.state as { from?: string; catalogId?: string; fromPath?: string } | null
+    location.state as ({ from?: string } & IViewerLocationState) | null
   );
   const [entryCatalogId, setEntryCatalogId] = useState<string | null>(
     origin?.catalogId || null
@@ -115,6 +160,7 @@ const Viewer = () => {
   const createUserAcquisition = useCreateUserAcquisition();
   const { getEntryDetail } = useGetEntryDetail();
   const { getSimilarToPassage } = useSimilarEntries();
+  const fetchEntriesByIds = useEntriesByIdsFetcher();
   const getUserAcquisition = useGetUserAcquisition();
   const explainPassage = useExplainPassage();
   const startChat = useStartChat();
@@ -255,12 +301,10 @@ const Viewer = () => {
   // be continued from there (and the other way round).
 
   // Recommended publications arrive as ids; the viewer renders full cards.
+  // One `?id=` request for all of them (#14), not a detail call per id.
   const toSuggestedEntries = async (ids: string[]): Promise<ISuggestedEntry[]> => {
-    const details = await Promise.all(
-      ids.map((entryId) => getEntryDetail(entryId).catch(() => null))
-    );
+    const details = await fetchEntriesByIds(ids).catch(() => []);
     return details
-      .filter((detail): detail is NonNullable<typeof detail> => detail != null)
       .map((detail) => ({
         id: detail.id,
         catalog_id: detail.catalog_id,
@@ -820,17 +864,26 @@ const Viewer = () => {
               // Spread so the build passes against a viewer whose IChatPackage lacks the keys.
               ...{
                 entryId: id,
-                openCitationFunc: (citation: ViewerCitation) =>
-                  openCitation({
-                    label: citation.label,
-                    entry_id: citation.entryId,
-                    title: citation.title,
-                    page: citation.page,
-                  }),
+                openCitationFunc: (citation: ViewerCitation) => openCitation(fromViewerCitation(citation)),
               },
             },
             // Opens at the page a chat citation pointed to.
             initialPage: Number(searchParams.get("page")) || undefined,
+            // ...and at the cited paragraph or figure (IP-030 Phase 1): outline `bbox`, flash `quads`, then fade.
+            // No released viewer takes it yet (it has `initialPage` only); spread so the build passes, and a
+            // viewer without the key ignores it.
+            ...(origin?.target
+              ? {
+                  initialFocus: {
+                    page: Number(searchParams.get("page")) || undefined,
+                    paragraphId: origin.target.paragraphId,
+                    regionId: origin.target.regionId,
+                    bbox: origin.target.bbox,
+                    quads: origin.target.quads,
+                    quadsPage: origin.target.quadsPage,
+                  },
+                }
+              : {}),
             editPackage: {
               saveLayerFunc,
               saveGroupFunc,

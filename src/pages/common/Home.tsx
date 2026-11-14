@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { IEntry } from '../../utils/interfaces/entry';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useEntriesQuery from '../../hooks/api/entries/useEntriesQuery';
 import HomeHeader from '../../components/specific-page/home-page/HomeHeader';
@@ -8,8 +7,7 @@ import EntryDetail from '../../components/items/entry/details/EntryDetail';
 import EntryDisplay from '../../components/items/entry/display/EntryDisplay';
 import ThemedEntryDisplay from '../../components/items/entry/display/ThemedEntryDisplay';
 import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
-import StepEntryDisplay from '../../components/items/entry/display/StepEntryDisplay';
-import useGetFeedDetail from '../../hooks/api/feeds/useGetFeedDetail';
+import { useCachedFeedDetail } from '../../hooks/api/feeds/useGetFeedDetail';
 import { localize } from '../../utils/func/localized';
 import { LocalizedText } from '../../utils/interfaces/general/general';
 
@@ -20,7 +18,9 @@ const FIRST_ROW_COVERS = 8;
 const Home = () => {
   const { t } = useTranslation();
 
-  const DBS_FEED_ID = 'afe55681-b71b-4aee-8327-422fbce314e5';
+  // The themed row's collection comes from the deployment (ELVIRA_FEATURED_FEED_ID), not the source.
+  const featuredFeedId: string | undefined = import.meta.env.ELVIRA_FEATURED_FEED_ID || undefined;
+  const showThemed = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && !!featuredFeedId;
 
   // Home rows via React Query — each is cached/deduped and refetches when the
   // selected catalog changes (catalog id is part of the query key).
@@ -32,22 +32,23 @@ const Home = () => {
     limit: 30,
     orderBy: '-created_at',
   });
-  const { data: themedData, isLoading: isThemedLoading } = useEntriesQuery({
-    limit: 30,
-    feedId: DBS_FEED_ID,
-  });
+  const { data: themedData, isLoading: isThemedLoading } = useEntriesQuery(
+    { limit: 30, feedId: featuredFeedId },
+    { enabled: showThemed },
+  );
 
   const popularEntries = popularData?.items ?? [];
   const lastAddedEntries = lastAddedData?.items ?? [];
   const themedEntries = themedData?.items ?? [];
   const isLoading = popularLoading || lastAddedLoading;
 
-  // The DBS collection's title (its entries come from the query above).
-  const getFeedDetail = useGetFeedDetail();
+  // The featured collection's title (its entries come from the query above).
+  const getFeedDetail = useCachedFeedDetail();
   const [themedFeedTitle, setThemedFeedTitle] = useState<LocalizedText | string>('');
   useEffect(() => {
+    if (!showThemed || !featuredFeedId) return;
     let alive = true;
-    getFeedDetail(DBS_FEED_ID)
+    getFeedDetail(featuredFeedId)
       .then((f) => alive && setThemedFeedTitle(f.title))
       .catch(() => alive && setThemedFeedTitle(''));
     return () => {
@@ -64,7 +65,7 @@ const Home = () => {
         {/* POPULAR */}
         <div className='flex justify-between items-center mb-5 flex-wrap'>
           <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>{t('home.popular')}</h2>
-          <Link to="/library?order-by=-popularity" className='text-sm text-primary cursor-pointer'>Zobraziť všetko</Link>
+          <Link to="/library?order-by=-popularity" className='text-sm text-primary cursor-pointer'>{t('home.showAll')}</Link>
         </div>
         <EntryDisplay
           isLoading={isLoading}
@@ -77,7 +78,7 @@ const Home = () => {
         {/* LAST ADDED */}
         <div className='flex justify-between items-center mb-5 flex-wrap mt-12'>
           <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>{t('home.lastAdded')}</h2>
-          <Link to="/library?order-by=-created_at" className='text-sm text-primary cursor-pointer'>Zobraziť všetko</Link>
+          <Link to="/library?order-by=-created_at" className='text-sm text-primary cursor-pointer'>{t('home.showAll')}</Link>
         </div>
         <EntryDisplay
           isLoading={isLoading}
@@ -88,7 +89,7 @@ const Home = () => {
 
 
         {/* Themed Feed */}
-        {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+        {showThemed && (
           <div className='mt-12'>
             <ThemedEntryDisplay
               title={localize(themedFeedTitle)}
@@ -99,17 +100,6 @@ const Home = () => {
             />
           </div>
         )}
-
-        {/* <div className='flex justify-between items-center mb-5 flex-wrap mt-12'>
-          <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>Learn Data science in 6 books</h2>
-          <Link to="/library" className='text-sm text-primary cursor-pointer'>Zobraziť všetko</Link>
-        </div>
-        <StepEntryDisplay
-          isLoading={isLoading}
-          entries={lastAddedEntries}
-        />
-
-         */}
 
       </div>
       <EntryDetail />

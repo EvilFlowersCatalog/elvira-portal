@@ -1,4 +1,4 @@
-import useAxios from '../useAxios';
+import useAxios, { LONG_TIMEOUT } from '../useAxios';
 
 const useCreateEntryAcquistion = () => {
   const axios = useAxios();
@@ -13,6 +13,8 @@ const useCreateEntryAcquistion = () => {
     const CREATE_ENTRY_ACQUISITION_URL = `/api/v1/catalogs/${effectiveCatalogId}/entries/${entryId}`;
 
     await axios.post(CREATE_ENTRY_ACQUISITION_URL, acquisition, {
+      // A file upload.
+      timeout: LONG_TIMEOUT,
       headers: {
         'Content-Type': 'multipart/form-data',
       },

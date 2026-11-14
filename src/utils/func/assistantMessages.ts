@@ -73,22 +73,37 @@ export const activitySummary = (tools: string[], t: Translate): string => {
     .join(', ');
 };
 
-/** Stored messages as the chat shows them — the same fields the viewer reads back. */
+/**
+ * Stored messages as the chat shows them — the same fields the viewer reads back. A failed turn's row (IP-030
+ * §5) shows as an error with "try again", which sends the question before it once more.
+ */
 export const fromApiMessages = (messages: IAssistantMessage[]): AiMessage[] =>
-  messages.map((msg) => ({
-    id: msg.id,
-    role: msg.role,
-    text: msg.text,
-    reference: msg.entry_id ? { id: msg.entry_id } : undefined,
-    contexts: msg.contexts ?? undefined,
-    page: msg.page,
-    entryIds: msg.displayed_entries ?? undefined,
-    pagesRead: msg.pages_read ?? undefined,
-    citations: msg.citations?.length ? msg.citations : undefined,
-    annotationIds: msg.annotations?.length ? msg.annotations : undefined,
-    activity: msg.activity?.length ? msg.activity.map((call) => ({ ...call, done: true })) : undefined,
-    status: 'done',
-  }));
+  messages.map((msg, index) => {
+    // Only the chat's last failure is offered again; an earlier one was answered or retried since.
+    const last = !messages.slice(index + 1).some((m) => m.role === 'assistant');
+    const asked =
+      msg.error && last ? messages.slice(0, index).reverse().find((m) => m.role === 'user') : undefined;
+    return {
+      id: msg.id,
+      serverId: msg.role === 'assistant' ? msg.id : undefined,
+      role: msg.role,
+      text: msg.text,
+      reference: msg.entry_id ? { id: msg.entry_id } : undefined,
+      contexts: msg.contexts ?? undefined,
+      page: msg.page,
+      entryIds: msg.displayed_entries ?? undefined,
+      pagesRead: msg.pages_read ?? undefined,
+      citations: msg.citations?.length ? msg.citations : undefined,
+      annotationIds: msg.annotations?.length ? msg.annotations : undefined,
+      activity: msg.activity?.length ? msg.activity.map((call) => ({ ...call, done: true })) : undefined,
+      study: msg.study ?? undefined,
+      feedback: msg.feedback ?? undefined,
+      retry: asked
+        ? { message: asked.text, entryId: asked.entry_id ?? undefined, contexts: asked.contexts ?? undefined }
+        : undefined,
+      status: msg.error ? 'error' : 'done',
+    };
+  });
 
 /** The publication a stored chat is about, or null for a general chat. */
 export const subjectOf = (chat: IAssistantChat): AiChatSubject | null =>
@@ -99,6 +114,7 @@ export const subjectOf = (chat: IAssistantChat): AiChatSubject | null =>
         title: chat.entry?.title,
         acquisitionId: chat.acquisition_id,
         readable: !chat.entry?.readium_enabled,
+        userAcquisitionId: chat.user_acquisition_id,
       }
     : null;
 
@@ -152,26 +168,86 @@ export const citationsToLinks = (
     .replace(/\[\[page:(\d+)\]\]/g, (_, page) => `[${labels.page(Number(page))}](#efv-page-${page})`)
     .replace(/\[\[region:([\w-]+)\]\]/g, (_, id) => `[${labels.region(id)}](#efv-region-${id})`);
 
-// Evidence labels as the model writes them: `[E3]`, `[E3, E5]`, `[E3; E5]`; `[E3][E5]` is two groups.
-const EVIDENCE_GROUP = /\[\s*(E\d+(?:\s*[,;]\s*E\d+)*)\s*\]/gi;
+// Evidence labels as the model writes them: `[E3]`, `[E3, F2]`, `[E3; E5]`; `[E3][E5]` is two groups.
+// `E#` is a passage, `F#` a figure, table or equation (IP-030).
+const EVIDENCE_GROUP = /\[\s*([EF]\d+(?:\s*[,;]\s*[EF]\d+)*)\s*\]/gi;
+
+/** `e03` → `E3`. */
+export const normalizeLabel = (raw: string): string => `${raw.charAt(0).toUpperCase()}${Number(raw.slice(1))}`;
+
+/**
+ * How a label reads on its chip: a passage by its number ("3"), a figure with its series ("F2"), so `E1` and
+ * `F1` never look the same.
+ */
+export const chipText = (label: string): string => (label.charAt(0).toUpperCase() === 'E' ? label.slice(1) : label);
+
+/** Labels in reading order: passages, then figures, each by number. */
+export const compareLabels = (a: string, b: string): number =>
+  a.charAt(0) === b.charAt(0) ? Number(a.slice(1)) - Number(b.slice(1)) : a.charAt(0) < b.charAt(0) ? -1 : 1;
 
 /**
  * Evidence labels (IP-024) → `[3](#efv-evidence-E3)` per label the answer's citations resolve; a label they
- * lack (the `unknown` ones) stays plain text. While the answer streams (`pending`) the citations are not in yet,
+ * lack (the `unknown` ones) stays plain text. While the answer streams (`pending`) not every citation is in yet,
  * so every label becomes a link; the renderer shows the unresolved ones as inert chips.
  */
 export const evidenceToLinks = (text: string, citations: IAssistantCitation[], pending = false): string => {
   const known = new Set(citations.map((c) => c.label.toUpperCase()));
   return text.replace(EVIDENCE_GROUP, (group, list: string) => {
-    const labels = list.split(/\s*[,;]\s*/).map((raw) => `E${Number(raw.slice(1))}`);
-    if (pending) return labels.map((label) => `[${label.slice(1)}](#efv-evidence-${label})`).join('');
+    const labels = list.split(/\s*[,;]\s*/).map(normalizeLabel);
+    const link = (label: string) => `[${chipText(label)}](#efv-evidence-${label})`;
+    if (pending) return labels.map(link).join('');
     if (!labels.some((label) => known.has(label))) return group;
-    return labels
-      .map((label) => (known.has(label) ? `[${label.slice(1)}](#efv-evidence-${label})` : `\\[${label}\\]`))
-      .join('');
+    return labels.map((label) => (known.has(label) ? link(label) : `\\[${label}\\]`)).join('');
   });
 };
 
-/** The citation behind an evidence label, e.g. `E3`. */
+/** The citation behind an evidence label, e.g. `E3` or `F2`. */
 export const findCitation = (citations: IAssistantCitation[] | undefined, label: string) =>
   citations?.find((c) => c.label.toUpperCase() === label.toUpperCase());
+
+/** A figure, table or equation (`F#`), rather than a passage. */
+export const isFigure = (citation: IAssistantCitation): boolean =>
+  citation.label.toUpperCase().startsWith('F') || !!citation.region_id;
+
+/**
+ * Markdown split into its blocks at blank lines, never inside a fenced code block, so figure cards can go under
+ * the paragraph that cites them (IP-030 Phase 3). Joined with blank lines the blocks are the text again.
+ */
+export const markdownBlocks = (text: string): string[] => {
+  const blocks: string[] = [];
+  let current: string[] = [];
+  let fenced = false;
+  for (const line of text.split('\n')) {
+    if (/^\s*(```|~~~)/.test(line)) fenced = !fenced;
+    if (!fenced && !line.trim()) {
+      if (current.length) blocks.push(current.join('\n'));
+      current = [];
+    } else {
+      current.push(line);
+    }
+  }
+  if (current.length) blocks.push(current.join('\n'));
+  return blocks;
+};
+
+/** Figure labels (`F#`) a piece of text cites, each once, in order of first appearance. */
+export const figureLabelsIn = (text: string): string[] => {
+  const found: string[] = [];
+  for (const match of text.matchAll(EVIDENCE_GROUP)) {
+    for (const raw of match[1].split(/\s*[,;]\s*/)) {
+      const label = normalizeLabel(raw);
+      if (label.startsWith('F') && !found.includes(label)) found.push(label);
+    }
+  }
+  return found;
+};
+
+/** Merges citations by label; a later one (the authoritative `citations` frame) replaces an earlier one. */
+export const mergeCitations = (
+  current: IAssistantCitation[] | undefined,
+  incoming: IAssistantCitation[],
+): IAssistantCitation[] => {
+  const byLabel = new Map((current ?? []).map((c) => [c.label.toUpperCase(), c]));
+  incoming.forEach((c) => byLabel.set(c.label.toUpperCase(), { ...byLabel.get(c.label.toUpperCase()), ...c }));
+  return [...byLabel.values()];
+};

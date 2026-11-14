@@ -1,10 +1,18 @@
 import { MutableRefObject } from 'react';
 import axios, { CancelTokenSource } from 'axios';
 
+/** Default request timeout: a hung request surfaces as an error after this, not after minutes. */
+export const DEFAULT_TIMEOUT = 30 * 1000;
+/**
+ * For requests that legitimately run long — file uploads and downloads, and calls that wait on the
+ * model (explain, AI highlights) or start text extraction. Pass it per request: `{ timeout: LONG_TIMEOUT }`.
+ */
+export const LONG_TIMEOUT = 5 * 60 * 1000;
+
 // Shared axios instance. Also imported directly (e.g. login / useGetMe).
 export const baseAxios = axios.create({
   baseURL: import.meta.env.ELVIRA_BASE_URL,
-  timeout: 5 * 60 * 1000,
+  timeout: DEFAULT_TIMEOUT,
   headers: { 'Content-Type': 'application/json' },
 });
 

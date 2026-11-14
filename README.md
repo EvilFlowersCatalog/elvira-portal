@@ -104,6 +104,8 @@ Elvira-specific variables:
 - **`ELVIRA_UMAMI_WEBSITE`** — Umami website ID for analytics.
 - **`ELVIRA_EXPERIMENTAL_FEATURES`** — `true`/`false`; gates undeveloped features when
   shipping a dev build to production.
+- **`ELVIRA_FEATURED_FEED_ID`** — optional; the collection (feed) shown as the themed row
+  on the home page (an experimental feature). Empty or unset hides the row.
 
 Prefer overriding these via bash rather than editing the `env/.env.*` files directly:
 

@@ -26,21 +26,8 @@ export const getBase64 = async (fileBase: File | null) => {
   return base;
 };
 
-export const uuid = (): string => {
-  const hexValues = '0123456789abcdef';
-  let uuid = '';
-
-  for (let i = 0; i < 36; i++) {
-    const randomNumber = Math.random() * 16;
-    const digit = hexValues.charAt(
-      i === 14 ? 4 : i === 19 ? (randomNumber & 3) | 8 : randomNumber
-    );
-    uuid += i === 8 || i === 13 || i === 18 || i === 23 ? '-' : '';
-    uuid += digit;
-  }
-
-  return uuid;
-};
+/** An RFC 4122 version 4 UUID from the platform's CSPRNG. */
+export const uuid = (): string => crypto.randomUUID();
 
 /** Max length of a feed `url_name` on the catalog side. */
 export const SLUG_MAX_LENGTH = 50;

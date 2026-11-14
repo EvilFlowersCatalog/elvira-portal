@@ -1,4 +1,4 @@
-import useAxios from '../useAxios';
+import useAxios, { LONG_TIMEOUT } from '../useAxios';
 import { ASSISTANT_URL } from './assistantApi';
 
 export interface IExplainPassage {
@@ -19,7 +19,10 @@ const useExplainPassage = () => {
   const axios = useAxios();
 
   const explainPassage = async (body: IExplainPassage): Promise<IExplanation> => {
-    const { data } = await axios.post<{ response: IExplanation }>(`${ASSISTANT_URL}/explain`, body);
+    const { data } = await axios.post<{ response: IExplanation }>(`${ASSISTANT_URL}/explain`, body, {
+      // Waits on the model, which reads pages of the copy first.
+      timeout: LONG_TIMEOUT,
+    });
     return data.response;
   };
 

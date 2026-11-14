@@ -23,17 +23,111 @@ export interface IAssistantMessage {
   activity?: Omit<IAssistantToolActivity, 'done'>[] | null;
   /** Evidence labels cited in `text` (`[E3]`), resolved to publication and page (IP-024). */
   citations?: IAssistantCitation[] | null;
+  /** The study card this turn produced (IP-030 §6), as the `study` frame carried it. */
+  study?: IAssistantStudy | null;
+  /** Set on a failed turn (IP-030 §5): the row holds the notice, `text`, instead of an answer. */
+  error?: string | null;
+  /** The reader's rating of this answer. */
+  feedback?: IAssistantFeedback | null;
   tokens_used: number;
   created_at: string;
 }
 
-/** An evidence label of an answer (`[E3]`) resolved to a publication and page (IP-024). */
+/** A box on a page as fractions of its size, origin top-left (the coordinates of agent highlights, IP-018). */
+export interface IAssistantBox {
+  x0: number;
+  y0: number;
+  x1: number;
+  y1: number;
+}
+
+/**
+ * An evidence label of an answer resolved to a publication and page (IP-024), completed for the portal
+ * (IP-030 §2): `E#` a passage, `F#` a figure, table or equation. `quote`, `caption` and `image_url` are absent
+ * where the reader may not read the text outside the viewer (Readium LCP, outside IP ranges): `readable: false`.
+ */
 export interface IAssistantCitation {
   label: string;
   entry_id: string;
+  /** `passage`, or `figure` / `table` / `equation` for an `F#` label. */
+  kind?: string;
   title?: string;
   page?: number;
   section?: string;
+  /** A passage's paragraph, its box on the page and the quads of its best sentence. */
+  paragraph_id?: string;
+  bbox?: IAssistantBox;
+  quads?: IAssistantBox[];
+  /** The page the `quads` are on, when the sentence continues on the next page. */
+  sentence_page?: number;
+  quote?: string;
+  /** A figure's region, its printed caption and the crop. */
+  region_id?: string;
+  caption?: string;
+  image_url?: string;
+  readable?: boolean;
+  /** Relevance of an `evidence` source. */
+  score?: number;
+}
+
+/** The `evidence` SSE frame (IP-030 §1): what the turn gathered before the model's first token. */
+export interface IAssistantEvidence {
+  sources: IAssistantCitation[];
+  /** The library may not cover the question well. */
+  low_relevance: boolean;
+}
+
+/** A chip under the last answer (`suggestions` frame); a click sends `message`. */
+export interface IAssistantSuggestion {
+  label: string;
+  message: string;
+  kind: string;
+}
+
+export interface IAssistantWalkthrough {
+  entry_id: string;
+  title: string;
+  section: string;
+  page_range: [number, number];
+  part: number;
+  has_more: boolean;
+  points: { text: string; labels: string[] }[];
+  /** The step after this one, or null at the end of the publication. */
+  next: { section: string; part: number } | null;
+  prerequisites?: { entry_id: string; section: string; page: number }[];
+}
+
+export interface IAssistantQuiz {
+  entry_id: string;
+  title: string;
+  section: string;
+  page_range: [number, number];
+  questions: { question: string; options: string[]; answer_index: number; explanation: string; labels: string[] }[];
+}
+
+export interface IAssistantKeyConcepts {
+  entry_id: string;
+  title: string;
+  section: string;
+  page_range: [number, number];
+  concepts: { term: string; definition: string; labels: string[] }[];
+}
+
+/** The `study` SSE frame: a card that is the turn's answer (IP-030 §6). */
+export type IAssistantStudy =
+  | { mode: 'walkthrough'; data: IAssistantWalkthrough }
+  | { mode: 'quiz'; data: IAssistantQuiz }
+  | { mode: 'key_concepts'; data: IAssistantKeyConcepts };
+
+export interface IAssistantFeedback {
+  rating: 1 | -1;
+  reason?: string;
+}
+
+/** `GET /assistant/v1/capabilities`: the capability card and starter prompts, in the UI language. */
+export interface IAssistantCapabilities {
+  capabilities: { id: string; label: string; example: string }[];
+  starters: string[];
 }
 
 export interface IAssistantChatEntry {
@@ -114,6 +208,14 @@ export interface IAssistantStreamHandlers {
   onPages?: (pages: number[]) => void;
   /** Evidence labels of the answer resolved to publication and page (`citations` event, IP-024). */
   onCitations?: (citations: IAssistantCitation[]) => void;
+  /** One label, the first time the streamed text cites it (`citation` event, IP-030 §2). */
+  onCitation?: (citation: IAssistantCitation) => void;
+  /** What the turn gathered before the first token (`evidence` event, IP-030 §1). */
+  onEvidence?: (evidence: IAssistantEvidence) => void;
+  /** A study card that is this turn's answer (`study` event). */
+  onStudy?: (study: IAssistantStudy) => void;
+  /** Follow-up chips for the answer (`suggestions` event). */
+  onSuggestions?: (suggestions: IAssistantSuggestion[]) => void;
   /** An agent annotation the assistant started (AI highlights), as `/assistant/v1/highlights` returns it. */
   onAnnotation?: (annotation: IAssistantAnnotation) => void;
   /**
@@ -126,10 +228,16 @@ export interface IAssistantStreamHandlers {
    * `status` event) and again when it finished (`done: true`, from the `activity` event), same `id`.
    */
   onActivity?: (activity: IAssistantToolActivity) => void;
-  /** An error reported inside the stream. */
-  onError: (detail: string) => void;
-  /** The stream is finished. */
-  onDone: () => void;
+  /**
+   * An error reported inside the stream. A failed turn is stored (IP-030 §5): `messageId` is its row, and
+   * `retryable` says the same message may be sent again.
+   */
+  onError: (detail: string, failure?: { messageId?: string; retryable?: boolean }) => void;
+  /**
+   * The stream is finished. `messageId` is the stored row that closed the turn (the answer, or the failure
+   * notice), from `done` (EvilFlowersCatalog#145); absent when the stream ended without a `done` frame.
+   */
+  onDone: (messageId?: string) => void;
 }
 
 /** The `status` SSE event: what the assistant is doing before text streams (IP-022). */

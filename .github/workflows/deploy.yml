@@ -63,6 +63,8 @@ jobs:
           ELVIRA_UMAMI_SERVER: ${{ vars.ELVIRA_UMAMI_SERVER }}
           ELVIRA_UMAMI_WEBSITE: ${{ vars.ELVIRA_UMAMI_WEBSITE }}
           ELVIRA_EXPERIMENTAL_FEATURES: ${{ vars.ELVIRA_EXPERIMENTAL_FEATURES }}
+          # Optional: the collection shown as the themed row on Home (empty hides the row).
+          ELVIRA_FEATURED_FEED_ID: ${{ vars.ELVIRA_FEATURED_FEED_ID }}
         run: |
           if [ "${{ github.ref_name }}" = "master" ]; then
             npm run build:stu

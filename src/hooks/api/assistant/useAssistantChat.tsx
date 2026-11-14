@@ -2,11 +2,27 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../contexts/useAppContext';
 import { AiMessage } from '../../../providers/AppProvider';
-import { statusLabelKey } from '../../../utils/func/assistantMessages';
-import { IAssistantToolActivity } from '../../../utils/interfaces/assistant';
+import { mergeCitations, statusLabelKey } from '../../../utils/func/assistantMessages';
+import { IAssistantToolActivity, IChatContext } from '../../../utils/interfaces/assistant';
 import { formatRetryAfter, toAssistantError } from './assistantApi';
 import useSendChatMessage from './useSendChatMessage';
 import useStartChat from './useStartChat';
+
+/** A publication attached to messages ("ask about this book"). */
+export interface IAssistantEntryRef {
+  id: string;
+  title?: string;
+  catalogId?: string | null;
+  readable?: boolean;
+}
+
+/** What goes with one message besides its text. */
+export interface ISendOptions {
+  /** Attachments, e.g. a figure the reader asks about (`kind: "region"`). */
+  contexts?: IChatContext[];
+  /** A publication for this message only, instead of the hook's `entry`. */
+  entry?: IAssistantEntryRef;
+}
 
 /**
  * Drives one assistant conversation against the shared chat state in AppContext:
@@ -17,27 +33,38 @@ import useStartChat from './useStartChat';
  *   attached to every message sent while it is set — not only when the chat is
  *   created — so picking a book mid-conversation still reaches the assistant.
  */
-const useAssistantChat = (
-  entry?: { id: string; title?: string; catalogId?: string | null; readable?: boolean },
-) => {
-  const entryId = entry?.id;
+const useAssistantChat = (entry?: IAssistantEntryRef) => {
   const { t } = useTranslation();
   const { aiChatId, setAiChatId, setAiMessages, aiChatSubject, setAiChatSubject, lang } = useAppContext();
   const startChat = useStartChat();
   const sendChatMessage = useSendChatMessage();
   const [isGenerating, setGenerating] = useState(false);
 
-  const sendMessage = async (message: string) => {
+  const sendMessage = async (message: string, options: ISendOptions = {}) => {
+    const attached = options.entry ?? entry;
+    const entryId = attached?.id;
+    const contexts = options.contexts?.length ? options.contexts : undefined;
     const stamp = Date.now();
     const answerId = `answer-${stamp}`;
 
-    const updateAnswer = (patch: Partial<AiMessage>) =>
-      setAiMessages((prev) => prev.map((m) => (m.id === answerId ? { ...m, ...patch } : m)));
-    const showError = (text: string) => updateAnswer({ text, status: 'error', progress: undefined });
+    const updateAnswer = (patch: Partial<AiMessage> | ((m: AiMessage) => Partial<AiMessage>)) =>
+      setAiMessages((prev) =>
+        prev.map((m) => (m.id === answerId ? { ...m, ...(typeof patch === 'function' ? patch(m) : patch) } : m)),
+      );
+    const retry = { message, entryId, contexts };
+    const showError = (text: string, extra: Partial<AiMessage> = {}) =>
+      updateAnswer({ text, status: 'error', progress: undefined, ...extra });
 
     setAiMessages((prev) => [
-      ...prev,
-      { id: `user-${stamp}`, role: 'user', text: message, reference: entry && { id: entry.id, title: entry.title } },
+      // Follow-up chips belong to the last answer only.
+      ...prev.map((m) => (m.suggestions ? { ...m, suggestions: undefined } : m)),
+      {
+        id: `user-${stamp}`,
+        role: 'user',
+        text: message,
+        reference: attached && { id: attached.id, title: attached.title },
+        contexts,
+      },
       { id: answerId, role: 'assistant', text: '', status: 'streaming' },
     ]);
     setGenerating(true);
@@ -53,7 +80,9 @@ const useAssistantChat = (
         setAiChatId(chatId);
       }
       // A chat started from a book is about that book: its page citations open it.
-      if (entryId && !aiChatSubject) setAiChatSubject({ entryId, title: entry?.title, catalogId: entry?.catalogId, readable: entry?.readable });
+      if (entryId && !aiChatSubject) {
+        setAiChatSubject({ entryId, title: attached?.title, catalogId: attached?.catalogId, readable: attached?.readable });
+      }
 
       let text = '';
       const annotationIds: string[] = [];
@@ -78,14 +107,27 @@ const useAssistantChat = (
           if (ids.length) updateAnswer({ entryIds: ids });
         },
         onPages: (pages) => updateAnswer({ pagesRead: pages }),
-        onCitations: (citations) => updateAnswer({ citations }),
+        // Chips resolve while the answer streams (`citation`); `citations` after it is the authoritative list.
+        onCitation: (citation) => updateAnswer((m) => ({ citations: mergeCitations(m.citations, [citation]) })),
+        onCitations: (citations) => updateAnswer((m) => ({ citations: mergeCitations(m.citations, citations) })),
+        onEvidence: (evidence) => updateAnswer({ evidence }),
+        onStudy: (study) => updateAnswer({ study }),
+        onSuggestions: (suggestions) => updateAnswer({ suggestions: suggestions.length ? suggestions : undefined }),
         onAnnotation: (annotation) => {
           annotationIds.push(annotation.id);
           updateAnswer({ annotationIds: [...annotationIds] });
         },
-        onError: (detail) => showError(detail || t('assistant.errors.generic')),
-        onDone: () => {},
-      }, { entryId, language: lang });
+        onError: (detail, failure) =>
+          // A failed turn is stored (IP-030 §5): its row is the answer, and the catalog says whether to retry.
+          showError(detail || t('assistant.errors.generic'), {
+            serverId: failure?.messageId,
+            retry: failure?.retryable ? retry : undefined,
+          }),
+        // `done` names the stored row that closed the turn: the id feedback is posted against.
+        onDone: (messageId) => {
+          if (messageId) updateAnswer({ serverId: messageId });
+        },
+      }, { entryId, contexts, language: lang });
       setAiMessages((prev) =>
         prev.map((m) =>
           m.id === answerId && m.status === 'streaming' ? { ...m, status: 'done', progress: undefined } : m,
@@ -93,32 +135,54 @@ const useAssistantChat = (
       );
     } catch (err) {
       const { status, message: detail, retryAfter } = toAssistantError(err);
+      // Nothing reached the catalog's chat, so nothing is stored for this answer.
+      const local = { localOnly: true };
       switch (status) {
         case 429: {
           const wait = formatRetryAfter(retryAfter);
-          showError(wait ? t('assistant.errors.rateLimited', { retryAfter: wait }) : t('assistant.errors.rateLimitedNoWait'));
+          showError(wait ? t('assistant.errors.rateLimited', { retryAfter: wait }) : t('assistant.errors.rateLimitedNoWait'), local);
           break;
         }
         case 403:
-          showError(detail || t('assistant.errors.forbidden'));
+          showError(detail || t('assistant.errors.forbidden'), local);
           break;
         case 404:
           // The chat is gone — the next message starts a fresh one.
           setAiChatId(null);
-          showError(t('assistant.errors.chatNotFound'));
+          showError(t('assistant.errors.chatNotFound'), local);
           break;
         case 401:
-          showError(t('assistant.errors.unauthorized'));
+          showError(t('assistant.errors.unauthorized'), local);
           break;
         default:
-          showError(t('assistant.errors.generic'));
+          // A dropped connection or a server error: worth trying again.
+          showError(t('assistant.errors.generic'), { ...local, retry });
       }
     } finally {
       setGenerating(false);
     }
   };
 
-  return { sendMessage, isGenerating };
+  /** Sends a failed message again, with what was attached to it. */
+  const retryMessage = (failed: AiMessage) => {
+    if (!failed.retry) return;
+    const { message, entryId, contexts } = failed.retry;
+    setAiMessages((prev) => {
+      const index = prev.findIndex((m) => m.id === failed.id);
+      if (index < 0) return prev;
+      // A stored failure stays, as it does when the chat is read back; only its button goes.
+      if (!failed.localOnly) return prev.map((m) => (m.id === failed.id ? { ...m, retry: undefined } : m));
+      // One the catalog never saw gives way to the new attempt.
+      const start = index > 0 && prev[index - 1].role === 'user' ? index - 1 : index;
+      return [...prev.slice(0, start), ...prev.slice(index + 1)];
+    });
+    return sendMessage(message, {
+      contexts,
+      entry: entryId ? (entryId === entry?.id ? entry : { id: entryId }) : undefined,
+    });
+  };
+
+  return { sendMessage, retryMessage, isGenerating };
 };
 
 export default useAssistantChat;

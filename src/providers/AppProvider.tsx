@@ -16,7 +16,15 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { IContextProviderParams } from "../utils/interfaces/contexts";
 import i18next from "../utils/i18n/i18next";
 import useCookiesContext from "../hooks/contexts/useCookiesContext";
-import type { IAssistantCitation, IAssistantToolActivity, IChatContext } from "../utils/interfaces/assistant";
+import type {
+  IAssistantCitation,
+  IAssistantEvidence,
+  IAssistantFeedback,
+  IAssistantStudy,
+  IAssistantSuggestion,
+  IAssistantToolActivity,
+  IChatContext,
+} from "../utils/interfaces/assistant";
 
 /**
  * One message of the assistant chat, the same shape everywhere it is shown
@@ -41,6 +49,20 @@ export interface AiMessage {
   citations?: IAssistantCitation[];
   /** AI highlight layers (agent annotations) the assistant created with this answer. */
   annotationIds?: string[];
+  /** What the turn gathered before the first token (IP-030 §1). Live only — never stored. */
+  evidence?: IAssistantEvidence;
+  /** A study card that is the answer (IP-030 §6). */
+  study?: IAssistantStudy;
+  /** Follow-up chips under the answer. Live only — never stored. */
+  suggestions?: IAssistantSuggestion[];
+  /** The stored row of an assistant message, for feedback; a streamed answer learns it from the chat afterwards. */
+  serverId?: string;
+  /** The reader's rating of this answer. */
+  feedback?: IAssistantFeedback;
+  /** A failure that never reached the catalog (rate limit, network): nothing is stored for it. */
+  localOnly?: boolean;
+  /** On a failed turn the catalog allows to retry: what to send again. */
+  retry?: { message: string; entryId?: string; contexts?: IChatContext[] };
   status?: "streaming" | "done" | "error";
   /**
    * Translation key of what the assistant is doing while no text streams
@@ -60,6 +82,8 @@ export interface AiChatSubject {
   acquisitionId?: string | null;
   /** False for Readium LCP books: they are borrowed, so nothing opens them in the viewer. */
   readable?: boolean;
+  /** The reader's copy the chat is bound to, if any: AI highlights go into it. */
+  userAcquisitionId?: string | null;
 }
 
 export interface IAppContext {

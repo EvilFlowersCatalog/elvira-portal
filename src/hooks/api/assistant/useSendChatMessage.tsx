@@ -6,7 +6,22 @@ import {
   IAssistantToolActivity,
 } from '../../../utils/interfaces/assistant';
 import useAuth from '../../contexts/useAuthContext';
-import { ASSISTANT_URL, AssistantApiError, citationsOf, idsOf, pagesOf, parseSseData, readSse, textOf } from './assistantApi';
+import {
+  ASSISTANT_URL,
+  AssistantApiError,
+  citationOf,
+  citationsOf,
+  doneIdOf,
+  evidenceOf,
+  failureOf,
+  idsOf,
+  pagesOf,
+  parseSseData,
+  readSse,
+  studyOf,
+  suggestionsOf,
+  textOf,
+} from './assistantApi';
 
 /** The readable fields of a `status`/`activity` payload, each checked; anything else is dropped. */
 const activityOf = (payload: object): Omit<IAssistantToolActivity, 'id' | 'tool' | 'done'> => {
@@ -92,6 +107,24 @@ const useSendChatMessage = () => {
         case 'citations':
           handlers.onCitations?.(citationsOf(payload));
           break;
+        case 'citation': {
+          const citation = citationOf(payload);
+          if (citation) handlers.onCitation?.(citation);
+          break;
+        }
+        case 'evidence': {
+          const evidence = evidenceOf(payload);
+          if (evidence) handlers.onEvidence?.(evidence);
+          break;
+        }
+        case 'study': {
+          const study = studyOf(payload);
+          if (study) handlers.onStudy?.(study);
+          break;
+        }
+        case 'suggestions':
+          handlers.onSuggestions?.(suggestionsOf(payload));
+          break;
         case 'annotation':
           if (payload && typeof payload === 'object' && 'id' in payload) {
             handlers.onAnnotation?.(payload as IAssistantAnnotation);
@@ -119,10 +152,10 @@ const useSendChatMessage = () => {
           }
           break;
         case 'error':
-          handlers.onError(textOf(payload));
+          handlers.onError(textOf(payload), failureOf(payload));
           break;
         case 'done':
-          handlers.onDone();
+          handlers.onDone(doneIdOf(payload));
           return;
       }
     }

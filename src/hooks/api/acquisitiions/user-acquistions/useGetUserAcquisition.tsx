@@ -1,5 +1,5 @@
 import { AxiosResponse } from 'axios';
-import useAxios from '../../useAxios';
+import useAxios, { LONG_TIMEOUT } from '../../useAxios';
 
 const useGetUserAcquisition = () => {
   const axios = useAxios();
@@ -11,6 +11,8 @@ const useGetUserAcquisition = () => {
     const USER_ACQUISITION_URL = `/data/v1/user-acquisitions/${userAcquisitionId}`;
     return await axios.get(USER_ACQUISITION_URL, {
       responseType: 'arraybuffer',
+      // The whole PDF, which can be large on a slow connection.
+      timeout: LONG_TIMEOUT,
       transformResponse: [
         async function (data): Promise<any> {
           const blob = new Blob([data], { type: 'application/pdf' });

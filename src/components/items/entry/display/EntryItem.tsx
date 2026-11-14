@@ -34,10 +34,13 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
     const [searchParams, setSearchParams] = useSearchParams();
     const addToShelf = useAddToShelf();
     const removeFromShelf = useRemoveFromShelf();
-    const [isOnShelf, setIsOnShelf] = useState<boolean>(entry.shelf_record_id != null);
+    // The shelf record lives here, never written back into `entry`: that object belongs to the
+    // React Query cache, and mutating it in place would desync the cache from what is rendered.
+    const [shelfRecordId, setShelfRecordId] = useState<string | null>(entry.shelf_record_id ?? null);
+    const isOnShelf = shelfRecordId != null;
 
     useEffect(() => {
-        setIsOnShelf(entry.shelf_record_id != null);
+        setShelfRecordId(entry.shelf_record_id ?? null);
 
         // Keep this card in sync when the same entry is bookmarked/unbookmarked
         // elsewhere. The listener MUST be cleaned up — previously it was added on
@@ -46,9 +49,7 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
         const handleShelfUpdated = (event: Event) => {
             const customEvent = event as CustomEvent;
             if (customEvent.detail.id === entry.id) {
-                const updated = customEvent.detail.isOnShelf;
-                if (updated) entry.shelf_record_id = customEvent.detail.shelf_record_id;
-                setIsOnShelf(updated);
+                setShelfRecordId(customEvent.detail.isOnShelf ? customEvent.detail.shelf_record_id ?? null : null);
             }
         };
         document.addEventListener('shelf-updated', handleShelfUpdated);
@@ -58,9 +59,9 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
     const handleBookmarkToggle = async () => {
         if (isOnShelf) {
             try {
-                await removeFromShelf(entry.shelf_record_id);
+                await removeFromShelf(shelfRecordId);
                 triggerReload?.();
-                setIsOnShelf(false);
+                setShelfRecordId(null);
                 toast.success(t('notifications.myShelf.remove.success')); // Notify user
                 document.dispatchEvent(new CustomEvent('shelf-updated', { detail: { id: entry.id, isOnShelf: false } }));
             } catch {
@@ -68,11 +69,10 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
             }
         } else {
             try {
-                const shelfRecordId = await addToShelf(entry.id);
-                setIsOnShelf(true);
-                entry.shelf_record_id = shelfRecordId.response.id;
+                const created = await addToShelf(entry.id);
+                setShelfRecordId(created.response.id);
                 toast.success(t('notifications.myShelf.add.success')); // Notify user
-                document.dispatchEvent(new CustomEvent('shelf-updated', { detail: { id: entry.id, isOnShelf: true, shelf_record_id: entry.shelf_record_id } }));
+                document.dispatchEvent(new CustomEvent('shelf-updated', { detail: { id: entry.id, isOnShelf: true, shelf_record_id: created.response.id } }));
             } catch {
                 toast.error(t('notifications.myShelf.add.error')); // Notify user
             }

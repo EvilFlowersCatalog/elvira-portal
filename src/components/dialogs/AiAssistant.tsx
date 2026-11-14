@@ -1,63 +1,28 @@
 import { createPortal } from "react-dom";
-import { FaX, FaPaperPlane } from "react-icons/fa6";
+import { FaX } from "react-icons/fa6";
 import { FiPlus } from "react-icons/fi";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import useAppContext from "../../hooks/contexts/useAppContext";
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
 import { IEntryDetail } from "../../utils/interfaces/entry";
 import { useSearchParams } from "react-router-dom";
-import useAssistantChat from "../../hooks/api/assistant/useAssistantChat";
-import useStickToBottom from "../../hooks/useStickToBottom";
-import AssistantMessage from "../assistant/AssistantMessage";
+import AssistantChatPanel from "../assistant/AssistantChatPanel";
 import ChatSubjectBar from "../assistant/ChatSubjectBar";
 import useEscapeLayer from '../../hooks/useEscapeLayer';
 
-function AiSuggestion({ suggestion, handleSuggestion }: { suggestion: string, handleSuggestion: (suggestion: string) => void }) {
-    return (
-        <div
-            className="flex items-center justify-center flex-1 rounded-lg p-2 cursor-pointer transition-colors duration-200 text-center text-sm bg-zinc-200 text-gray-500 hover:bg-zinc-300 dark:bg-zinc-700 dark:text-white dark:hover:bg-zinc-600"
-            onClick={() => {
-                handleSuggestion(suggestion);
-            }}
-        >
-            {suggestion}
-        </div>
-    );
-}
-
-
+/** The assistant as a drawer over any page; the conversation itself is `AssistantChatPanel`. */
 export default function AiAssistant() {
     const { t } = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
-    const { 
-        showAiAssistant, 
-        setShowAiAssistant, 
-        umamiTrack,
-        clearAiChat,
-        aiMessages,
-        aiShowSuggestions,
-        setAiShowSuggestions,
-    } = useAppContext();
+    const { showAiAssistant, setShowAiAssistant, umamiTrack, clearAiChat } = useAppContext();
     const { getEntryDetail } = useGetEntryDetail();
 
-    const [input, setInput] = useState("");
     const [assistantEntry, setAssistantEntry] = useState<IEntryDetail | null>(null);
     const [currentCatalogId] = useState<string | undefined>(import.meta.env.ELVIRA_CATALOG_ID || undefined);
     // The id comes straight from the URL so a message sent before the book detail
     // has loaded still carries the reference; the detail only supplies the title.
     const assistantEntryId = searchParams.get('assistant-entry-id') || undefined;
-    const { sendMessage, isGenerating: isGeneratingResponse } = useAssistantChat(
-        assistantEntryId
-            ? {
-                  id: assistantEntryId,
-                  title: assistantEntry?.title,
-                  catalogId: searchParams.get('entry-catalog-id') || assistantEntry?.catalog_id || null,
-                  readable: !assistantEntry?.config?.readium_enabled,
-              }
-            : undefined
-    );
-
 
     function clearAssistantEntry() {
         setAssistantEntry(null);
@@ -70,11 +35,8 @@ export default function AiAssistant() {
         if (showAiAssistant) {
             umamiTrack("AI Assistant Button");
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [showAiAssistant]);
-
-    const chatScrollRef = useRef<HTMLDivElement>(null);
-    const chatContentRef = useRef<HTMLDivElement>(null);
-    const followChat = useStickToBottom(chatScrollRef, chatContentRef);
 
     useEffect(() => {
         if (!assistantEntryId) {
@@ -89,45 +51,20 @@ export default function AiAssistant() {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [assistantEntryId]);
 
-    useEscapeLayer(() => handleCloseDrawer({}, "escapeKeyDown"), showAiAssistant);
-
-    const handleSuggestion = (suggestion: string) => {
-        followChat();
-        sendMessage(suggestion);
-        setAiShowSuggestions(false);
+    const closeDrawer = (fromBackdrop = false) => {
+        const close = () => {
+            setShowAiAssistant(false);
+            const params = new URLSearchParams(searchParams);
+            params.delete('dialog-priority');
+            params.delete('assistant-entry-id');
+            setSearchParams(params);
+        };
+        // A backdrop click lets the click finish before the drawer goes.
+        if (fromBackdrop) setTimeout(close);
+        else close();
     };
 
-    const handleSubmit = (e?: React.FormEvent) => {
-        e?.preventDefault();
-        if (!input.trim()) return;
-        setAiShowSuggestions(false);
-        followChat();
-        sendMessage(input);
-        setInput("");
-    };
-
-    const newSession = () => {
-        clearAiChat();
-    }
-
-    const handleCloseDrawer = (event: object, reason: "backdropClick" | "escapeKeyDown") => {
-        if (reason === "backdropClick") {
-            setTimeout(() => {
-                setShowAiAssistant(false);
-                const params = new URLSearchParams(searchParams);
-                params.delete('dialog-priority');
-                params.delete('assistant-entry-id');
-                setSearchParams(params);
-            });
-            return;
-        }
-
-        setShowAiAssistant(false);
-        const params = new URLSearchParams(searchParams);
-        params.delete('dialog-priority');
-        params.delete('assistant-entry-id');
-        setSearchParams(params);
-    };
+    useEscapeLayer(() => closeDrawer(), showAiAssistant);
 
     // Only yield to the entry detail while one is actually open; a stale
     // `dialog-priority=entry-detail` left over from a closed detail must not
@@ -146,10 +83,7 @@ export default function AiAssistant() {
             aria-hidden={!showAiAssistant}
         >
             {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-black/50"
-                onClick={() => handleCloseDrawer({}, "backdropClick")}
-            />
+            <div className="absolute inset-0 bg-black/50" onClick={() => closeDrawer(true)} />
             {/* Panel */}
             <div
                 className={`absolute top-0 right-0 h-full w-full max-w-[800px] rounded-l-lg bg-[#F4F6F9] dark:bg-[#27272A] text-black dark:text-white shadow-2xl overflow-hidden transition-transform duration-300 ${showAiAssistant ? "translate-x-0" : "translate-x-full"}`}
@@ -163,9 +97,8 @@ export default function AiAssistant() {
                         <div className="flex gap-1">
                             <button
                                 type="button"
-                                aria-label={t("assistant.title")}
-                                onClick={newSession}
-                                disabled={isGeneratingResponse}
+                                aria-label={t("assistant.newChat")}
+                                onClick={clearAiChat}
                                 className="inline-flex items-center justify-center rounded-full p-2 bg-primary text-white hover:bg-primaryDark transition-colors disabled:bg-zinc-300 disabled:text-zinc-400"
                             >
                                 <FiPlus size={18} />
@@ -175,7 +108,7 @@ export default function AiAssistant() {
                                 aria-label={t('common.close')}
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleCloseDrawer({}, "escapeKeyDown");
+                                    closeDrawer();
                                 }}
                                 className="inline-flex items-center justify-center rounded-full p-2 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
                             >
@@ -184,53 +117,23 @@ export default function AiAssistant() {
                         </div>
                     </div>
 
-                    <ChatSubjectBar onNavigate={() => handleCloseDrawer({}, "escapeKeyDown")} />
+                    <ChatSubjectBar onNavigate={() => closeDrawer()} />
 
-                    {/* Body */}
-                    <div id="chat" ref={chatScrollRef} className="flex flex-col grow overflow-y-auto">
-                        <div ref={chatContentRef} className="flex flex-col">
-                            {aiMessages.map((msg) => (
-                                <AssistantMessage
-                                    key={msg.id}
-                                    msg={msg}
-                                    messages={aiMessages}
-                                    compact
-                                    onNavigate={() => handleCloseDrawer({}, "escapeKeyDown")}
-                                />
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Input */}
-                    <form onSubmit={handleSubmit}>
-                        {!assistantEntry && aiShowSuggestions ? <div className="flex gap-2 mb-2">
-                            <AiSuggestion suggestion={t("assistant.suggestion1")} handleSuggestion={handleSuggestion} />
-                            <AiSuggestion suggestion={t("assistant.suggestion2")} handleSuggestion={handleSuggestion} />
-                        </div> : null}
-                        {assistantEntry ?
-                            <div className="mb-0.5 p-0 rounded-lg bg-inherit dark:text-zinc-200 self-start flex w-full items-center">
-                                <p className="whitespace-nowrap max-w-full overflow-hidden text-ellipsis text-xs pr-2">
-                                    {t("assistant.entryAssistant", { x: assistantEntry.title })}
-                                </p>
-                                <div className="ml-auto" onClick={() => { clearAssistantEntry(); }}>
-                                    <FaX size={12} className="text-black dark:text-white cursor-pointer" />
-                                </div>
-                            </div> : null
+                    <AssistantChatPanel
+                        compact
+                        onNavigate={() => closeDrawer()}
+                        entry={
+                            assistantEntryId
+                                ? {
+                                      id: assistantEntryId,
+                                      title: assistantEntry?.title,
+                                      catalogId: searchParams.get('entry-catalog-id') || assistantEntry?.catalog_id || null,
+                                      readable: !assistantEntry?.config?.readium_enabled,
+                                  }
+                                : undefined
                         }
-                        <div className="flex items-center gap-2 rounded-lg px-3 py-1.5 bg-zinc-100 hover:bg-zinc-200 dark:bg-[#3f3f46] dark:hover:bg-[#4b5563]">
-                            <input
-                                type="text"
-                                disabled={isGeneratingResponse}
-                                placeholder={t("assistant.inputPlaceholder")}
-                                className="flex-1 bg-transparent outline-none text-sm text-black dark:text-[#e5e7eb] disabled:opacity-60"
-                                value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                            />
-                            <button type="submit" aria-label={t('common.send')}className="inline-flex items-center justify-center p-1">
-                                <FaPaperPlane size={14} className="dark:text-white" />
-                            </button>
-                        </div>
-                    </form>
+                        onClearEntry={clearAssistantEntry}
+                    />
                 </div>
             </div>
         </div>,

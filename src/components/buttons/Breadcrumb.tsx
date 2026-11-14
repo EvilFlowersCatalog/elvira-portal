@@ -7,8 +7,8 @@ import {
 } from '../../utils/interfaces/general/general';
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
-import useGetFeedDetail from '../../hooks/api/feeds/useGetFeedDetail';
-import useGetCategoryDetail from '../../hooks/api/categories/useGetCategoryDetail';
+import { useCachedFeedDetail } from '../../hooks/api/feeds/useGetFeedDetail';
+import { useCachedCategoryDetail } from '../../hooks/api/categories/useGetCategoryDetail';
 import {
   readCategoryIds,
   readFeedIds,
@@ -74,8 +74,10 @@ const Breadcrumb = () => {
     ['readers']: isEn() ? 'Readers, OPDS & Calibre' : 'Čítačky, OPDS a Calibre',
     ['claim']: isEn() ? 'Claim reservation' : 'Vyzdvihnutie rezervácie',
   };
-  const getFeedDetail = useGetFeedDetail();
-  const getCategoryDetail = useGetCategoryDetail();
+  // Cached: the names are resolved again on every `location.search` change (each filter tick), and the
+  // catalog has no bulk `?id=` filter for feeds or categories, so each id costs a request when not cached.
+  const getFeedDetail = useCachedFeedDetail();
+  const getCategoryDetail = useCachedCategoryDetail();
 
   useEffect(() => {
     // Split the current path into parts

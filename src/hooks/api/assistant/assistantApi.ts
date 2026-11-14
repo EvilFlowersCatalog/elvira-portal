@@ -1,5 +1,10 @@
 import { isAxiosError } from 'axios';
-import type { IAssistantCitation } from '../../../utils/interfaces/assistant';
+import type {
+  IAssistantCitation,
+  IAssistantEvidence,
+  IAssistantStudy,
+  IAssistantSuggestion,
+} from '../../../utils/interfaces/assistant';
 
 export const ASSISTANT_URL = '/assistant/v1';
 
@@ -115,7 +120,8 @@ export const textOf = (payload: unknown): string => {
   if (typeof payload === 'string') return payload;
   if (payload && typeof payload === 'object') {
     const o = payload as Record<string, unknown>;
-    for (const key of ['text', 'message', 'content', 'detail']) {
+    // `error` last: a failed turn's frame is `{error, message_id, retryable}` (IP-030 §5).
+    for (const key of ['text', 'message', 'content', 'detail', 'error']) {
       if (typeof o[key] === 'string') return o[key] as string;
     }
   }
@@ -141,13 +147,67 @@ export const pagesOf = (payload: unknown): number[] => {
   return Array.isArray(list) ? list.map(Number).filter((page) => Number.isInteger(page) && page > 0) : [];
 };
 
+const isCitation = (c: unknown): c is IAssistantCitation =>
+  !!c &&
+  typeof c === 'object' &&
+  typeof (c as IAssistantCitation).label === 'string' &&
+  typeof (c as IAssistantCitation).entry_id === 'string';
+
 /** The resolved labels of a `citations` payload; `unknown` labels are left out, so they render as plain text. */
 export const citationsOf = (payload: unknown): IAssistantCitation[] => {
   const list = payload && typeof payload === 'object' ? (payload as Record<string, unknown>).citations : undefined;
+  return Array.isArray(list) ? list.filter(isCitation) : [];
+};
+
+/** A `citation` payload: one label, the first time the streamed text cites it. */
+export const citationOf = (payload: unknown): IAssistantCitation | null => (isCitation(payload) ? payload : null);
+
+/** An `evidence` payload: the sources gathered before the first token. */
+export const evidenceOf = (payload: unknown): IAssistantEvidence | null => {
+  if (!payload || typeof payload !== 'object') return null;
+  const raw = payload as Record<string, unknown>;
+  if (!Array.isArray(raw.sources)) return null;
+  return { sources: raw.sources.filter(isCitation), low_relevance: raw.low_relevance === true };
+};
+
+const STUDY_ITEMS: Record<IAssistantStudy['mode'], string> = {
+  walkthrough: 'points',
+  quiz: 'questions',
+  key_concepts: 'concepts',
+};
+
+/** A `study` payload, if it is a card the portal can render (its items list present). */
+export const studyOf = (payload: unknown): IAssistantStudy | null => {
+  if (!payload || typeof payload !== 'object') return null;
+  const { mode, data } = payload as { mode?: unknown; data?: unknown };
+  if (typeof mode !== 'string' || !(mode in STUDY_ITEMS) || !data || typeof data !== 'object') return null;
+  const items = (data as Record<string, unknown>)[STUDY_ITEMS[mode as IAssistantStudy['mode']]];
+  return Array.isArray(items) && items.length ? (payload as IAssistantStudy) : null;
+};
+
+/** A `suggestions` payload. */
+export const suggestionsOf = (payload: unknown): IAssistantSuggestion[] => {
+  const list = payload && typeof payload === 'object' ? (payload as Record<string, unknown>).suggestions : undefined;
   return Array.isArray(list)
     ? list.filter(
-        (c): c is IAssistantCitation =>
-          !!c && typeof c === 'object' && typeof c.label === 'string' && typeof c.entry_id === 'string',
+        (s): s is IAssistantSuggestion =>
+          !!s && typeof s === 'object' && typeof s.label === 'string' && typeof s.message === 'string',
       )
     : [];
+};
+
+/** The stored row that closed the turn, from a `done` payload `{chat_id, message_id}` (EvilFlowersCatalog#145). */
+export const doneIdOf = (payload: unknown): string | undefined => {
+  const id = payload && typeof payload === 'object' ? (payload as Record<string, unknown>).message_id : undefined;
+  return typeof id === 'string' ? id : undefined;
+};
+
+/** The stored row and retry hint of an `error` payload (IP-030 §5). */
+export const failureOf = (payload: unknown): { messageId?: string; retryable?: boolean } => {
+  if (!payload || typeof payload !== 'object') return {};
+  const raw = payload as Record<string, unknown>;
+  return {
+    ...(typeof raw.message_id === 'string' ? { messageId: raw.message_id } : {}),
+    ...(typeof raw.retryable === 'boolean' ? { retryable: raw.retryable } : {}),
+  };
 };
