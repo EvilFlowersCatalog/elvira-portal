@@ -10,6 +10,8 @@ interface DrawerProps {
   onClose: () => void;
   title: string;
   description?: string;
+  /** Quiet line under the description, e.g. the record's id to copy. */
+  meta?: React.ReactNode;
   children: React.ReactNode;
   /** Sticky footer actions (e.g. Save / Cancel). */
   footer?: React.ReactNode;
@@ -26,6 +28,7 @@ export default function Drawer({
   onClose,
   title,
   description,
+  meta,
   children,
   footer,
   width = 'max-w-md',
@@ -50,7 +53,9 @@ export default function Drawer({
       clearTimeout(t);
       previouslyFocused.current?.focus?.();
     };
-  }, [open, onClose]);
+    // Only on open/close: callers pass inline `onClose`, and a list that polls behind the drawer
+    // would otherwise yank focus back to the first control on every refresh.
+  }, [open]);
 
   if (!open) return null;
 
@@ -76,6 +81,7 @@ export default function Drawer({
             {description && (
               <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400 truncate">{description}</p>
             )}
+            {meta && <div className="mt-0.5 flex items-center gap-2">{meta}</div>}
           </div>
           <IconButton label={t('common.close')} variant="ghost" onClick={onClose}>
             <FiX size={18} />

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { FiTrash2, FiX } from 'react-icons/fi';
 import Drawer from '../Drawer';
+import CopyId from '../CopyId';
 import ConfirmDialog from '../ConfirmDialog';
 import { Field, TextInput, Switch } from '../Field';
 import Select from '../../primitives/Select';
@@ -206,6 +207,7 @@ export default function UserDrawer({ open, user, mode, onClose, onSaved, onDelet
         onClose={onClose}
         title={mode === 'create' ? t('administration.usersPage.createTitle') : t('administration.usersPage.editTitle')}
         description={mode === 'edit' && user ? user.username : undefined}
+        meta={mode === 'edit' && user ? <CopyId value={user.id} label={t('administration.copy.userId')} /> : undefined}
         footer={
           <>
             {mode === 'edit' && user && !isSelf && (

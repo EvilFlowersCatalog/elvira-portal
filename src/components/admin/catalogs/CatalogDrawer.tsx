@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { FiTrash2, FiX } from 'react-icons/fi';
 import Drawer from '../Drawer';
+import CopyId from '../CopyId';
 import ConfirmDialog from '../ConfirmDialog';
 import { Field, TextInput, Switch } from '../Field';
 import UserPicker from '../UserPicker';
@@ -172,6 +173,7 @@ export default function CatalogDrawer({ open, catalog, mode, onClose, onSaved }:
         width="max-w-lg"
         title={mode === 'create' ? t('administration.catalogsPage.createTitle') : t('administration.catalogsPage.editTitle')}
         description={mode === 'edit' && catalog ? catalog.url_name : undefined}
+        meta={mode === 'edit' && catalog ? <CopyId value={catalog.id} label={t('administration.copy.catalogId')} /> : undefined}
         footer={
           <>
             {mode === 'edit' && catalog && (

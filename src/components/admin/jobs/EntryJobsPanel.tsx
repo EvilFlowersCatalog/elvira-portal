@@ -4,7 +4,8 @@ import { useEntryExtraction } from '../../../hooks/api/entries/useEntryExtractio
 import { fmtDateTime } from '../../../utils/func/adminDate';
 import { ExtractionStatusChip } from '../../specific-page/admin-entry-page/extraction/EntryExtractionPanel';
 import EntryEncryptionCard from './EntryEncryptionCard';
-import { jobCard, jobTitle, OcrUnavailable } from './jobsUi';
+import JobsTable from './JobsTable';
+import { jobCard, jobTitle } from './jobsUi';
 
 /** AI processing at a glance; the full view and its controls are the "AI processing" tab. */
 const ExtractionSummary = ({ entryId, onOpenAi }: { entryId: string; onOpenAi: () => void }) => {
@@ -42,13 +43,21 @@ const ExtractionSummary = ({ entryId, onOpenAi }: { entryId: string; onOpenAi: (
   );
 };
 
-/** Every background job of one publication, with shortcuts to start it again. */
+/**
+ * Every background job of one publication: the two pipelines at a glance (they can also start what
+ * never ran), then each job the catalog tracks for it — OCR, post-processing, summaries … — which
+ * opens with its tasks and history and can be run again on its own.
+ */
 export default function EntryJobsPanel({ entryId, title, onOpenAi }: { entryId: string; title: string; onOpenAi: () => void }) {
+  const { t } = useTranslation();
   return (
     <div className="flex flex-col gap-4">
       <EntryEncryptionCard entryId={entryId} title={title} />
       <ExtractionSummary entryId={entryId} onOpenAi={onOpenAi} />
-      <OcrUnavailable compact />
+      <section className="-mx-5">
+        <h2 className={`${jobTitle} mb-2 px-5`}>{t('administration.jobs.entryAll')}</h2>
+        <JobsTable entryId={entryId} />
+      </section>
     </div>
   );
 }

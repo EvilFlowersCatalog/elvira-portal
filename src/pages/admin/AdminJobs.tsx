@@ -1,15 +1,20 @@
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { PageHeader, StatusChip, Tabs } from '../../components/admin';
 import EncryptionJobsTable from '../../components/admin/jobs/EncryptionJobsTable';
 import ExtractionJobsTable from '../../components/admin/jobs/ExtractionJobsTable';
-import { JobsNote, OcrUnavailable } from '../../components/admin/jobs/jobsUi';
+import JobsTable from '../../components/admin/jobs/JobsTable';
+import ScheduledJobs from '../../components/admin/jobs/ScheduledJobs';
+import TaskLog from '../../components/admin/jobs/TaskLog';
+import { JobsNote } from '../../components/admin/jobs/jobsUi';
 import useAdminStatistics from '../../hooks/api/statistics/useAdminStatistics';
+import { useJobSummary } from '../../hooks/api/jobs/useJobs';
 
-type JobsTab = 'lcp' | 'ai' | 'ocr';
-const TABS: JobsTab[] = ['lcp', 'ai', 'ocr'];
+type JobsTab = 'all' | 'lcp' | 'ai' | 'scheduled' | 'log';
+const TABS: JobsTab[] = ['all', 'lcp', 'ai', 'scheduled', 'log'];
 
-/** Point-in-time LCP health from `/statistics` — the only catalog-wide job counts the API serves. */
+/** Point-in-time LCP health from `/statistics` (lendability included, which job states alone don't say). */
 const LcpHealth = () => {
   const { t } = useTranslation();
   const { data } = useAdminStatistics('7d');
@@ -33,14 +38,22 @@ const LcpHealth = () => {
 };
 
 /**
- * Background jobs the catalog runs per publication — Readium LCP encryption, AI processing
- * (IP-018) and OCR — with their state and shortcuts to start them again.
+ * Background jobs: every job the catalog tracks (state, tasks, history, retry / cancel), the two
+ * publication pipelines with their bulk tools (LCP, AI — they also start what never ran), the
+ * scheduled maintenance tasks and the raw task log for debugging.
  */
 const AdminJobs = () => {
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const raw = searchParams.get('tab') as JobsTab | null;
-  const tab: JobsTab = raw && TABS.includes(raw) ? raw : 'lcp';
+  const raw = searchParams.get('tab');
+  const tab: JobsTab = raw && (TABS as string[]).includes(raw) ? (raw as JobsTab) : 'all';
+  const { data: summary } = useJobSummary();
+  const failed = summary?.reduce((n, row) => n + (row.states.failed ?? 0), 0);
+
+  // The OCR tab became a kind of the unified list (files.ocr); keep old links working.
+  useEffect(() => {
+    if (raw === 'ocr') setSearchParams({ tab: 'all', kind: 'files.ocr', state: 'all' }, { replace: true });
+  }, [raw, setSearchParams]);
 
   return (
     <div className="pb-10">
@@ -51,12 +64,13 @@ const AdminJobs = () => {
           label={t('administration.jobs.title')}
           active={tab}
           // Each tab has its own search, filter, sort and page — start it clean.
-          onChange={(id) => setSearchParams(id === 'lcp' ? {} : { tab: id })}
-          tabs={TABS.map((id) => ({ id, label: t(`administration.jobs.tabs.${id}`) }))}
+          onChange={(id) => setSearchParams(id === 'all' ? {} : { tab: id })}
+          tabs={TABS.map((id) => ({ id, label: t(`administration.jobs.tabs.${id}`), count: id === 'all' && failed ? failed : null }))}
         />
       </div>
 
       <div className="mt-3">
+        {tab === 'all' && <JobsTable />}
         {tab === 'lcp' && (
           <>
             <LcpHealth />
@@ -70,7 +84,8 @@ const AdminJobs = () => {
             <ExtractionJobsTable />
           </>
         )}
-        {tab === 'ocr' && <OcrUnavailable />}
+        {tab === 'scheduled' && <ScheduledJobs />}
+        {tab === 'log' && <TaskLog />}
       </div>
     </div>
   );

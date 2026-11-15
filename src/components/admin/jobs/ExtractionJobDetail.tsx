@@ -8,6 +8,7 @@ import { IAcquisitionExtraction } from '../../../utils/interfaces/extraction';
 import { fmtDateTime } from '../../../utils/func/adminDate';
 import { problemDetailMessage } from '../../../utils/problemDetail';
 import ConfirmDialog from '../ConfirmDialog';
+import CopyId from '../CopyId';
 import StatusChip from '../StatusChip';
 import {
   ExtractionStatusChip,
@@ -57,6 +58,18 @@ const FileRun = ({ acquisition }: { acquisition: IAcquisitionExtraction }) => {
               <JobGroups run={latest} compact />
             </div>
           )}
+          <p className="mt-1 flex flex-wrap items-center gap-x-3 text-[11px] text-zinc-400">
+            <span className="inline-flex items-center gap-1">
+              {t('administration.jobs.detail.ids.extractionRun')}
+              <CopyId value={latest.id} short />
+            </span>
+            {acquisition.task?.task_id && (
+              <span className="inline-flex items-center gap-1">
+                {t('administration.jobs.detail.ids.task')}
+                <CopyId value={acquisition.task.task_id} short label={t('administration.jobs.detail.copyTaskId')} />
+              </span>
+            )}
+          </p>
           {latest.error && (
             <pre className="mt-2 max-h-48 overflow-y-auto whitespace-pre-wrap break-words rounded bg-red/10 p-2 text-[11px] text-redText dark:text-red">
               {latest.error}

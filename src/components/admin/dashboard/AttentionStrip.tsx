@@ -17,12 +17,13 @@ interface Item {
   key: keyof IStatisticsAttention;
   severity: Severity;
   icon: ReactElement;
-  /** Where the operator goes to fix it. (No API lists jobs by status yet, so encryption lands on all LCP jobs.) */
+  /** Where the operator goes to fix it: the job list already filtered to exactly these jobs. */
   target: string;
 }
 
 const RESERVATIONS = `${NAVIGATION_PATHS.adminLoans}?tab=reservations`;
-const LCP_JOBS = NAVIGATION_PATHS.adminJobs;
+const LCP_FAILED = `${NAVIGATION_PATHS.adminJobs}?kind=readium.encrypt&state=failed`;
+const LCP_STUCK = `${NAVIGATION_PATHS.adminJobs}?kind=readium.encrypt&state=stuck`;
 
 // Ordered by severity: what blocks lending first.
 const ITEMS: Item[] = [
@@ -30,13 +31,13 @@ const ITEMS: Item[] = [
     key: 'encryption_failed',
     severity: 'critical',
     icon: <FiAlertOctagon size={18} />,
-    target: LCP_JOBS,
+    target: LCP_FAILED,
   },
   {
     key: 'encryption_stuck',
     severity: 'serious',
     icon: <FiLock size={18} />,
-    target: LCP_JOBS,
+    target: LCP_STUCK,
   },
   {
     key: 'claims_expiring_24h',

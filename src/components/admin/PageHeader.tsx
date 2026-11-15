@@ -3,6 +3,8 @@ import { twMerge } from 'tailwind-merge';
 interface PageHeaderProps {
   title: string;
   description?: string;
+  /** Quiet line under the description, e.g. the record's id to copy. */
+  meta?: React.ReactNode;
   /** Right-aligned actions (e.g. primary "Add" button). */
   actions?: React.ReactNode;
   className?: string;
@@ -12,7 +14,7 @@ interface PageHeaderProps {
  * Consistent admin page header: large navy H1 + optional description, with a
  * right-aligned action slot. Matches the Figma content-area header language.
  */
-export default function PageHeader({ title, description, actions, className }: PageHeaderProps) {
+export default function PageHeader({ title, description, meta, actions, className }: PageHeaderProps) {
   return (
     <div
       className={twMerge(
@@ -29,6 +31,7 @@ export default function PageHeader({ title, description, actions, className }: P
             {description}
           </p>
         )}
+        {meta && <div className="mt-1 flex flex-wrap items-center gap-3">{meta}</div>}
       </div>
       {actions && <div data-guide="page-actions" className="flex items-center gap-2 shrink-0">{actions}</div>}
     </div>

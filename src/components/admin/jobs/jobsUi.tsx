@@ -1,4 +1,3 @@
-import { useTranslation } from 'react-i18next';
 import { FiExternalLink, FiInfo } from 'react-icons/fi';
 
 export const jobCard = 'rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 shadow-sm';
@@ -24,31 +23,3 @@ export const JobsNote = ({ children, link }: { children: React.ReactNode; link?:
     </p>
   </div>
 );
-
-/** OCR has nothing to show or dispatch until the backend gives it a job model and an API. */
-export const OcrUnavailable = ({ compact }: { compact?: boolean }) => {
-  const { t } = useTranslation();
-  return (
-    <div className={compact ? '' : 'mx-5'}>
-      <div className={jobCard}>
-        <h2 className={jobTitle}>{t('administration.jobs.ocr.title')}</h2>
-        <p className="mt-1.5 text-sm text-zinc-600 dark:text-zinc-300">{t('administration.jobs.ocr.body')}</p>
-        {!compact && (
-          <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-zinc-600 dark:text-zinc-300">
-            <li>{t('administration.jobs.ocr.reasonWorker')}</li>
-            <li>{t('administration.jobs.ocr.reasonFlags')}</li>
-            <li>{t('administration.jobs.ocr.reasonApi')}</li>
-          </ul>
-        )}
-        <a
-          href={OCR_ISSUE_URL}
-          target="_blank"
-          rel="noreferrer"
-          className="mt-3 inline-flex items-center gap-1 text-sm font-medium text-primaryText hover:underline dark:text-primaryLight"
-        >
-          {t('administration.jobs.ocr.issue')} <FiExternalLink size={12} />
-        </a>
-      </div>
-    </div>
-  );
-};

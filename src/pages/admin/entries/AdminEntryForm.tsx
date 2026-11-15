@@ -15,7 +15,7 @@ import { ChangeEvent, useState } from "react";
 import { useParams } from "react-router-dom";
 import Button from "../../../components/buttons/Button";
 import { BiSave } from "react-icons/bi";
-import { PageHeader } from "../../../components/admin";
+import { CopyId, PageHeader } from "../../../components/admin";
 import { useSearchParams } from "react-router-dom";
 import { FiActivity, FiCpu } from "react-icons/fi";
 import EntryJobsPanel from "../../../components/admin/jobs/EntryJobsPanel";
@@ -98,6 +98,7 @@ export default function AdminEntryForm({
                 <form className='flex flex-1 flex-col' onSubmit={handleSubmit}>
                     <PageHeader
                         title={FormType === 'add' ? t('entry.wizard.new') : (entry.title || t('entry.wizard.edit'))}
+                        meta={FormType === 'edit' && id ? <CopyId value={id} label={t('administration.copy.publicationId')} /> : undefined}
                     />
 
                     {FormType === 'edit' && (
