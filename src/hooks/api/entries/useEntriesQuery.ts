@@ -1,5 +1,5 @@
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
-import { IEntryQuery } from '../../../utils/interfaces/entry';
+import { IEntriesList, IEntryQuery } from '../../../utils/interfaces/entry';
 import useGetEntries from './useGetEntries';
 
 /**
@@ -13,7 +13,11 @@ import useGetEntries from './useGetEntries';
  */
 const useEntriesQuery = (
   query: Partial<IEntryQuery>,
-  options?: { enabled?: boolean }
+  options?: {
+    enabled?: boolean;
+    /** Poll (ms) while the last result says so, e.g. while a row's job is still running. */
+    refetchInterval?: (data: IEntriesList | undefined) => number | false;
+  }
 ) => {
   const getEntries = useGetEntries();
 
@@ -22,6 +26,7 @@ const useEntriesQuery = (
     queryFn: () =>
       getEntries({ page: 1, limit: 30, ...query } as IEntryQuery),
     enabled: options?.enabled ?? true,
+    refetchInterval: options?.refetchInterval ? (query) => options.refetchInterval!(query.state.data) : undefined,
     // Keep the previous result on screen while a new query loads (e.g. as the
     // user types in the search suggestions) so the UI never flashes to a
     // loading/empty state — it just updates in place. `isFetching` /

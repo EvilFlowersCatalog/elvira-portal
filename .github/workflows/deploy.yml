@@ -74,6 +74,12 @@ jobs:
           ELVIRA_EXPERIMENTAL_FEATURES: ${{ vars.ELVIRA_EXPERIMENTAL_FEATURES }}
           # Optional: the collection shown as the themed row on Home (empty hides the row).
           ELVIRA_FEATURED_FEED_ID: ${{ vars.ELVIRA_FEATURED_FEED_ID }}
+          # Optional: browser tracing via Grafana Faro (elvira-portal#39). Empty URL = no telemetry.
+          # The API key ships in the bundle (the receiver also checks CORS); kept as a secret anyway.
+          ELVIRA_FARO_URL: ${{ vars.ELVIRA_FARO_URL }}
+          ELVIRA_FARO_API_KEY: ${{ secrets.ELVIRA_FARO_API_KEY }}
+          ELVIRA_FARO_ENVIRONMENT: ${{ vars.ELVIRA_FARO_ENVIRONMENT }}
+          ELVIRA_FARO_SAMPLE_RATE: ${{ vars.ELVIRA_FARO_SAMPLE_RATE }}
         run: |
           if [ "${{ github.ref_name }}" = "master" ]; then
             npm run build:stu

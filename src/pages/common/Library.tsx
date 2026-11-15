@@ -10,10 +10,16 @@ import { useTranslation } from 'react-i18next';
 import FilterSuggestions from '../../components/tools/FilterSuggestions';
 import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
 import usePassageSearch from '../../hooks/api/entries/usePassageSearch';
+import FigureResults from '../../components/items/entry/FigureResults';
+import useAppContext from '../../hooks/contexts/useAppContext';
+
+/** URL param of the active results tab; absent = publications. */
+export const RESULTS_TAB_PARAM = 'results';
 
 const Library = () => {
   const { t } = useTranslation();
-  const [searchParams] = useSearchParams();
+  const { umamiTrack } = useAppContext();
+  const [searchParams, setSearchParams] = useSearchParams();
   const getEntries = useGetEntries();
   const filters = useEntryFilters();
 
@@ -31,12 +37,50 @@ const Library = () => {
   const passageFilters = { ...filters, orderBy: '', query: '' };
   const passages = usePassageSearch(query, { limit: 6, perEntry: 3, filters: passageFilters });
 
+  // Figures and tables across the library (#45), with the other extraction features behind the experimental flag.
+  const figuresTab = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && query.length >= 2;
+  const showFigures = figuresTab && searchParams.get(RESULTS_TAB_PARAM) === 'figures';
+
+  const selectTab = (tab: 'entries' | 'figures') => {
+    const params = new URLSearchParams(searchParams);
+    if (tab === 'figures') params.set(RESULTS_TAB_PARAM, 'figures');
+    else params.delete(RESULTS_TAB_PARAM);
+    setSearchParams(params);
+    umamiTrack('Search Results Tab', { tab });
+  };
+
+  const tabs = figuresTab ? (
+    <div role="tablist" aria-label={t('search.tabs.label')} className="mx-4 mb-4 flex gap-1 border-b border-zinc-200 dark:border-zinc-700">
+      {(['entries', 'figures'] as const).map((tab) => {
+        const active = (tab === 'figures') === showFigures;
+        return (
+          <button
+            key={tab}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={() => selectTab(tab)}
+            className={`-mb-px border-b-2 px-3 py-2 text-sm font-medium ${
+              active
+                ? 'border-primary text-primary dark:text-primaryLight'
+                : 'border-transparent text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white'
+            }`}
+          >
+            {t(`search.tabs.${tab}`)}
+          </button>
+        );
+      })}
+    </div>
+  ) : null;
+
   return (
     <ItemContainer
       list={list}
       showLayout
       searchSpecifier="query"
       title={t('navbarMenu.library')}
+      tabs={tabs}
+      panel={showFigures ? <FigureResults query={query} filters={passageFilters} /> : undefined}
     >
       {!list.isLoading && list.items.length > 0 && searchParams.get('query') && (
         <FilterSuggestions

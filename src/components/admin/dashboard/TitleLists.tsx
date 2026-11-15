@@ -7,7 +7,20 @@ import { dateLocale, fmtCount, fmtPct, fmtRatio } from './format';
 interface ListProps {
   titles: ITitleStatistics[];
   onOpen: (entryId: string) => void;
+  /** Linked highlighting: hovering a row lights the same title up in the other charts. */
+  highlight?: string | null;
+  onHover?: (entryId: string | null) => void;
 }
+
+const hoverProps = (id: string, onHover?: (id: string | null) => void) =>
+  onHover
+    ? {
+        onPointerEnter: () => onHover(id),
+        onPointerLeave: () => onHover(null),
+        onFocus: () => onHover(id),
+        onBlur: () => onHover(null),
+      }
+    : {};
 
 /** Thin meter: the track is a lighter step of the fill's own ramp, so the whole bar reads as one quantity. */
 const Meter = ({ value }: { value: number }) => (
@@ -20,7 +33,12 @@ const Meter = ({ value }: { value: number }) => (
 );
 
 /** "Most-used LCP titles": utilization = loan-days ÷ copy-days, the fairest busy-ness measure across copy counts. */
-export const UtilizationLeaderboard = ({ titles, onOpen }: ListProps) => {
+export const UtilizationLeaderboard = ({
+  titles,
+  onOpen,
+  highlight,
+  onHover,
+}: ListProps) => {
   const { t } = useTranslation();
   const top = titles.filter((d) => d.loans > 0).slice(0, 8);
   return (
@@ -59,7 +77,8 @@ export const UtilizationLeaderboard = ({ titles, onOpen }: ListProps) => {
               <button
                 type='button'
                 onClick={() => onOpen(d.entry_id)}
-                className='group grid w-full grid-cols-[1.25rem_1fr_auto] items-center gap-x-3 gap-y-1 rounded-lg px-2 py-1.5 text-left hover:bg-zinc-50 dark:hover:bg-zinc-700/50'
+                {...hoverProps(d.entry_id, onHover)}
+                className={`group grid w-full grid-cols-[1.25rem_1fr_auto] items-center gap-x-3 gap-y-1 rounded-lg px-2 py-1.5 text-left hover:bg-zinc-50 dark:hover:bg-zinc-700/50 ${highlight === d.entry_id ? 'bg-zinc-50 ring-1 ring-zinc-300 dark:bg-zinc-700/50 dark:ring-zinc-600' : ''}`}
               >
                 <span className='row-span-2 text-xs font-semibold tabular-nums text-zinc-400'>
                   {i + 1}
@@ -101,6 +120,7 @@ export const DormantTitles = ({
   titles,
   onOpen,
   periodFrom,
+  onHover,
 }: ListProps & { periodFrom: string }) => {
   const { t, i18n } = useTranslation();
   const from = parseISO(periodFrom);
@@ -163,6 +183,7 @@ export const DormantTitles = ({
                   <button
                     type='button'
                     onClick={() => onOpen(d.entry_id)}
+                    {...hoverProps(d.entry_id, onHover)}
                     className='flex w-full items-center justify-between gap-3 py-1.5 text-left text-sm hover:underline'
                   >
                     <span className='min-w-0 truncate text-zinc-800 dark:text-zinc-100'>

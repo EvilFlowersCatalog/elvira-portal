@@ -11,11 +11,7 @@ import { ITitleStatistics } from '../../../utils/interfaces/statistics';
 import { ChartCard, Legend, Responsive, TooltipBox } from './ChartCard';
 import { fmtCount, fmtPct, fmtRatio, tooltipStyle } from './format';
 
-/** A title needs copies when it is busy AND more people wait than there are copies. */
-const UTIL_THRESHOLD = 0.8;
-const HOLDS_THRESHOLD = 1;
-const needsCopies = (t: ITitleStatistics) =>
-  t.utilization >= UTIL_THRESHOLD && t.holds_ratio >= HOLDS_THRESHOLD;
+import { HOLDS_THRESHOLD, UTIL_THRESHOLD, needsCopies } from './format';
 
 const M = { top: 12, right: 16, bottom: 46, left: 40 };
 const HEIGHT = 340;
@@ -27,13 +23,27 @@ interface ChartProps {
   titles: ITitleStatistics[];
   width: number;
   onOpen: (entryId: string) => void;
+  /** A title highlighted from another card (linked brushing). */
+  highlight?: string | null;
+  onHover?: (entryId: string | null) => void;
 }
 
-const QuadrantChart = ({ titles, width, onOpen }: ChartProps) => {
+const QuadrantChart = ({
+  titles,
+  width,
+  onOpen,
+  highlight,
+  onHover,
+}: ChartProps) => {
   const { t } = useTranslation();
   const { showTooltip, hideTooltip, tooltipData, tooltipLeft, tooltipTop } =
     useTooltip<ITitleStatistics>();
-  const [hover, setHover] = useState<string | null>(null);
+  const [localHover, setLocalHover] = useState<string | null>(null);
+  const setHover = (id: string | null) => {
+    setLocalHover(id);
+    onHover?.(id);
+  };
+  const hover = localHover ?? highlight ?? null;
 
   const iw = Math.max(0, width - M.left - M.right);
   const ih = HEIGHT - M.top - M.bottom;
@@ -78,11 +88,11 @@ const QuadrantChart = ({ titles, width, onOpen }: ChartProps) => {
     if (!p) return;
     const site = diagram.find(p.x - M.left, p.y - M.top, 36);
     if (!site) {
-      setHover(null);
+      if (localHover) setHover(null);
       hideTooltip();
       return;
     }
-    setHover(site.data.entry_id);
+    if (site.data.entry_id !== localHover) setHover(site.data.entry_id);
     showTooltip({
       tooltipData: site.data,
       tooltipLeft: x(site.data.utilization) + M.left,
@@ -161,8 +171,8 @@ const QuadrantChart = ({ titles, width, onOpen }: ChartProps) => {
                 r={r(d.loans) + (isHover ? 2 : 0)}
                 fill={hot ? 'var(--viz-s2)' : 'var(--viz-s1)'}
                 fillOpacity={hover && !isHover ? 0.3 : hot ? 0.9 : 0.65}
-                stroke='var(--viz-surface)'
-                strokeWidth={2}
+                stroke={isHover ? 'var(--viz-ink)' : 'var(--viz-surface)'}
+                strokeWidth={isHover ? 1.5 : 2}
               />
             );
           })}
@@ -215,13 +225,13 @@ const QuadrantChart = ({ titles, width, onOpen }: ChartProps) => {
             width={iw}
             height={ih}
             fill='transparent'
-            className={hover ? 'cursor-pointer' : ''}
+            className={localHover ? 'cursor-pointer' : ''}
             onPointerMove={onMove}
             onPointerLeave={() => {
               setHover(null);
               hideTooltip();
             }}
-            onClick={() => hover && onOpen(hover)}
+            onClick={() => localHover && onOpen(localHover)}
           />
         </Group>
       </svg>
@@ -264,9 +274,13 @@ const QuadrantChart = ({ titles, width, onOpen }: ChartProps) => {
 const DemandQuadrant = ({
   titles,
   onOpen,
+  highlight,
+  onHover,
 }: {
   titles: ITitleStatistics[];
   onOpen: (id: string) => void;
+  highlight?: string | null;
+  onHover?: (id: string | null) => void;
 }) => {
   const { t } = useTranslation();
   const hot = titles
@@ -325,7 +339,13 @@ const DemandQuadrant = ({
       ) : (
         <Responsive>
           {(width) => (
-            <QuadrantChart titles={titles} width={width} onOpen={onOpen} />
+            <QuadrantChart
+              titles={titles}
+              width={width}
+              onOpen={onOpen}
+              highlight={highlight}
+              onHover={onHover}
+            />
           )}
         </Responsive>
       )}

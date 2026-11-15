@@ -63,6 +63,8 @@ export interface IEntry extends Partial<IEntryLcpFields> {
   title: string;
   authors: IEntryAuthor[];
   language_code?: string;
+  /** What list responses actually carry (`alpha2` "de"); `language_code` is the write-side field. */
+  language?: ILanguage | null;
   popularity: number;
   categories: ICategory[];
   acquisitions: IEntryAcquisition[];

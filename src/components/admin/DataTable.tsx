@@ -72,10 +72,29 @@ export interface DataTableProps<T> {
 
   /** Content rendered above the table (search, filters, actions). */
   toolbar?: ReactNode;
+  /** Content between the toolbar and the table, e.g. a bulk-action bar. */
+  banner?: ReactNode;
+  /**
+   * Opt-in row selection: a checkbox column in front of the columns (not part of `columns`, so it is
+   * never hideable). The header box toggles every selectable row of the page; shift-click selects a range.
+   */
+  selection?: DataTableSelection<T>;
   /** Persist column visibility under this key in localStorage. */
   storageKey?: string;
   className?: string;
   density?: 'comfortable' | 'compact';
+}
+
+export interface DataTableSelection<T> {
+  selected: ReadonlySet<string>;
+  /** Rows whose box was ticked (`true`) or cleared (`false`). */
+  onChange: (rows: T[], selected: boolean) => void;
+  /** Rows that cannot be selected get a disabled box. Defaults to every row. */
+  isSelectable?: (row: T) => boolean;
+  /** Accessible name of a row's box, e.g. "Select <title>". */
+  rowLabel: (row: T) => string;
+  /** Accessible name of the header box. */
+  allLabel: string;
 }
 
 function useHiddenColumns<T>(columns: DataTableColumn<T>[], storageKey?: string) {
@@ -220,6 +239,8 @@ export default function DataTable<T>({
   onPageChange,
   onPageSizeChange,
   toolbar,
+  banner,
+  selection,
   storageKey,
   density = 'comfortable',
 }: DataTableProps<T>) {
@@ -228,6 +249,27 @@ export default function DataTable<T>({
   const visible = columns.filter((c) => !hidden.has(c.id));
   const rowPad = density === 'compact' ? 'px-4 py-2' : 'px-4 py-3';
   const hasPagination = page != null && onPageChange != null;
+  const colCount = visible.length + (selection ? 1 : 0);
+
+  // Selection: which page rows can be ticked, how many are, and the anchor of a shift-click range.
+  const selectable = selection ? rows.filter((r) => selection.isSelectable?.(r) ?? true) : [];
+  const selectedOnPage = selection ? selectable.filter((r) => selection.selected.has(getRowId(r))).length : 0;
+  const allOnPage = selectable.length > 0 && selectedOnPage === selectable.length;
+  const anchor = useRef<number | null>(null);
+  const shiftHeld = useRef(false);
+  // A range never spans pages: the anchor's index means nothing on another one.
+  useEffect(() => {
+    anchor.current = null;
+  }, [page]);
+
+  const toggleRow = (index: number, checked: boolean, shift: boolean) => {
+    if (!selection) return;
+    const from = shift && anchor.current != null ? Math.min(anchor.current, index) : index;
+    const to = shift && anchor.current != null ? Math.max(anchor.current, index) : index;
+    const range = rows.slice(from, to + 1).filter((r) => selection.isSelectable?.(r) ?? true);
+    anchor.current = index;
+    selection.onChange(range, checked);
+  };
 
   // Only wipe to a skeleton on the very first load. Once we have rows, a
   // pagination / search / sort refetch keeps the previous rows on screen (dimmed
@@ -264,6 +306,8 @@ export default function DataTable<T>({
         </div>
       )}
 
+      {banner}
+
       {/* No overflow-hidden here: it clipped the page-size dropdown. Corners are
           rounded on the scroll area and footer instead. */}
       <div className="relative rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
@@ -282,6 +326,17 @@ export default function DataTable<T>({
             <caption className="sr-only">{caption}</caption>
             <thead>
               <tr className="border-b border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900/40">
+                {selection && (
+                  <th scope="col" className="w-10 py-2.5 pl-4 pr-0 text-left">
+                    <Checkbox
+                      aria-label={selection.allLabel}
+                      checked={allOnPage}
+                      indeterminate={selectedOnPage > 0 && !allOnPage}
+                      disabled={selectable.length === 0}
+                      onChange={() => selection.onChange(selectable, !allOnPage)}
+                    />
+                  </th>
+                )}
                 {visible.map((col) => {
                   const isSorted = col.sortKey && sort?.key === col.sortKey;
                   const ariaSort = isSorted
@@ -346,6 +401,7 @@ export default function DataTable<T>({
               {showSkeleton ? (
                 Array.from({ length: 6 }).map((_, i) => (
                   <tr key={`sk-${i}`}>
+                    {selection && <td className="w-10 py-3 pl-4 pr-0" />}
                     {visible.map((col) => (
                       <td key={col.id} className={rowPad}>
                         <div className="h-4 w-full max-w-[180px] animate-pulse rounded bg-zinc-200 dark:bg-zinc-700" />
@@ -355,7 +411,7 @@ export default function DataTable<T>({
                 ))
               ) : error ? (
                 <tr>
-                  <td colSpan={visible.length} className="px-4 py-16 text-center">
+                  <td colSpan={colCount} className="px-4 py-16 text-center">
                     <p className="text-sm text-redText dark:text-red">{error}</p>
                     {onRetry && (
                       <button
@@ -370,7 +426,7 @@ export default function DataTable<T>({
                 </tr>
               ) : rows.length === 0 ? (
                 <tr>
-                  <td colSpan={visible.length} className="px-4 py-16 text-center">
+                  <td colSpan={colCount} className="px-4 py-16 text-center">
                     <p className="text-sm font-medium text-zinc-700 dark:text-zinc-200">{emptyTitle ?? t('administration.table.empty')}</p>
                     {emptyDescription && (
                       <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">{emptyDescription}</p>
@@ -379,16 +435,40 @@ export default function DataTable<T>({
                   </td>
                 </tr>
               ) : (
-                rows.map((row) => (
+                rows.map((row, index) => {
+                  const id = getRowId(row);
+                  const isSelected = !!selection?.selected.has(id);
+                  return (
                   <tr
-                    key={getRowId(row)}
+                    key={id}
                     onClick={onRowClick ? () => onRowClick(row) : undefined}
+                    aria-selected={selection ? isSelected : undefined}
                     className={twMerge(
                       'text-zinc-700 dark:text-zinc-200',
                       onRowClick &&
-                        'cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-700/40 transition-colors'
+                        'cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-700/40 transition-colors',
+                      isSelected && 'bg-primaryLight/40 hover:bg-primaryLight/60 dark:bg-primaryDark/30 dark:hover:bg-primaryDark/40'
                     )}
                   >
+                    {selection && (
+                      // The row is clickable; the box must not open it.
+                      <td
+                        className="w-10 py-0 pl-4 pr-0 align-middle"
+                        // Change events carry no modifier keys; the click that causes them does.
+                        onClickCapture={(e) => (shiftHeld.current = e.shiftKey)}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Checkbox
+                          aria-label={selection.rowLabel(row)}
+                          checked={isSelected}
+                          disabled={!(selection.isSelectable?.(row) ?? true)}
+                          onChange={(e) => {
+                            toggleRow(index, e.currentTarget.checked, shiftHeld.current);
+                            shiftHeld.current = false;
+                          }}
+                        />
+                      </td>
+                    )}
                     {visible.map((col) => (
                       <td
                         key={col.id}
@@ -398,7 +478,8 @@ export default function DataTable<T>({
                       </td>
                     ))}
                   </tr>
-                ))
+                  );
+                })
               )}
             </tbody>
           </table>

@@ -14,6 +14,7 @@ export enum NAVIGATION_PATHS {
   explore = '/explore',
   licenses = '/licenses',
   viewer = '/viewer/',
+  cite = '/cite/',
   aiAssistant = '/ai-assistant',
   help = '/help',
   helpBooks = '/help/books',
@@ -39,6 +40,8 @@ export enum NAVIGATION_PATHS {
   adminLoans = '/administration/loans',
   adminReviews = '/administration/reviews',
   adminJobs = '/administration/jobs',
+  adminSettings = '/administration/settings',
+  adminContentPolicies = '/administration/content-policies',
 }
 
 export enum THEME_TYPE {
@@ -97,6 +100,8 @@ export interface IConfig {
 
   readium_enabled: boolean;
   readium_amount: number;
+  /** Content policy key (EvilFlowersCatalog#174); absent or null = inherit from the catalog. */
+  content_policy?: string | null;
 }
 
 export interface IModalParams {

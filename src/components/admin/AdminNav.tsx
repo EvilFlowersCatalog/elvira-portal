@@ -10,6 +10,8 @@ import {
   FiEdit3,
   FiStar,
   FiActivity,
+  FiSettings,
+  FiShield,
 } from 'react-icons/fi';
 import { FaBook } from 'react-icons/fa';
 import { MdOutlineCollectionsBookmark, MdOutlineLibraryBooks, MdOutlineInventory2 } from 'react-icons/md';
@@ -69,6 +71,9 @@ const GROUPS: NavGroup[] = [
     labelKey: 'administration.nav.groupOperations',
     items: [
       { key: 'jobs', path: NAVIGATION_PATHS.adminJobs, icon: <FiActivity size={ICON} /> },
+      // #47: built ahead of the catalog (#174, #20), so behind the flag like the other unreleased features.
+      { key: 'policies', path: NAVIGATION_PATHS.adminContentPolicies, icon: <FiShield size={ICON} />, experimental: true },
+      { key: 'settings', path: NAVIGATION_PATHS.adminSettings, icon: <FiSettings size={ICON} />, experimental: true },
     ],
   },
 ];

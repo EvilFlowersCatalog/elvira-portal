@@ -82,6 +82,7 @@ export default function FigureImage({
   showMarks,
   activeMark,
   imgClassName,
+  onError,
 }: {
   src: string;
   alt: string;
@@ -89,6 +90,8 @@ export default function FigureImage({
   showMarks: boolean;
   activeMark?: number | null;
   imgClassName: string;
+  /** The crop failed to load (403 / 404): the caller swaps it for a text fallback. */
+  onError?: () => void;
 }) {
   const imgRef = useRef<HTMLImageElement>(null);
   // One arrowhead per overlay: several figure cards share the page, and `:` from useId breaks `url(#…)`.
@@ -113,6 +116,7 @@ export default function FigureImage({
         alt={alt}
         loading="lazy"
         onLoad={() => imgRef.current && setSize({ w: imgRef.current.clientWidth, h: imgRef.current.clientHeight })}
+        onError={onError}
         className={`block ${imgClassName}`}
       />
       {showMarks && marks.length && size ? (

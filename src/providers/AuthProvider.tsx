@@ -23,6 +23,7 @@ import axios, { CancelTokenSource } from 'axios';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
 import { setAxiosAuth } from '../hooks/api/useAxios';
 import { umamiIdentify } from '../utils/umamiIdentify';
+import { identifyTelemetryUser } from '../lib/telemetry';
 
 export interface IAuthContext {
   auth: IAuth | null;
@@ -139,6 +140,8 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
 
   // Identify the logged-in user in Umami (on login and on restored sessions)
   useEffect(() => {
+    // Browser traces carry the user id on dev only (IP-029 Q1); a no-op elsewhere.
+    identifyTelemetryUser(auth?.userId ? String(auth.userId) : undefined);
     if (!auth?.userId) return;
     return umamiIdentify(String(auth.userId), {
       username: auth.username,

@@ -1,4 +1,11 @@
 import { enUS, sk } from 'date-fns/locale';
+import { ITitleStatistics } from '../../../utils/interfaces/statistics';
+
+/** A title needs copies when it is busy AND more people wait than there are copies. */
+export const UTIL_THRESHOLD = 0.8;
+export const HOLDS_THRESHOLD = 1;
+export const needsCopies = (t: ITitleStatistics) =>
+  t.utilization >= UTIL_THRESHOLD && t.holds_ratio >= HOLDS_THRESHOLD;
 
 /** date-fns locale matching the UI language (the portal ships Slovak and English). */
 export const dateLocale = (lang: string) => (lang.startsWith('sk') ? sk : enUS);

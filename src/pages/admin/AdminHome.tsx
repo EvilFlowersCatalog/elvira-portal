@@ -1,5 +1,11 @@
-import { ReactElement, ReactNode, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import {
+  ReactElement,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { format, parseISO } from 'date-fns';
 import { FaBook } from 'react-icons/fa';
@@ -37,13 +43,28 @@ import {
   OutcomeBars,
   TopCategories,
 } from '../../components/admin/dashboard/Patterns';
+import DemandMap from '../../components/admin/dashboard/DemandMap';
+import ExportMenu from '../../components/admin/dashboard/ExportMenu';
+import TitleInspector from '../../components/admin/dashboard/TitleInspector';
+import {
+  SEMANTICS_ON,
+  useDashboardMap,
+  useSemanticIndex,
+} from '../../components/admin/dashboard/semantic';
+import {
+  useHotkeys,
+  usePrintReport,
+} from '../../components/admin/dashboard/useDashboardKeys';
 
 const RANGE_KEY = 'elvira.admin.dashboardRange';
 
-const readRange = (): StatsRange => {
+const isRange = (v: string | null): v is StatsRange =>
+  !!v && (STATS_RANGES as string[]).includes(v);
+
+const storedRange = (): StatsRange => {
   try {
-    const v = localStorage.getItem(RANGE_KEY) as StatsRange | null;
-    return v && STATS_RANGES.includes(v) ? v : '30d';
+    const v = localStorage.getItem(RANGE_KEY);
+    return isRange(v) ? v : '30d';
   } catch {
     return '30d';
   }
@@ -106,7 +127,7 @@ const Section = ({
   subtitle?: string;
   children: ReactNode;
 }) => (
-  <section id={id} className='scroll-mt-20 space-y-3'>
+  <section id={id} className='scroll-mt-20 space-y-3 print:break-inside-auto'>
     <div>
       <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>
         {title}
@@ -125,8 +146,15 @@ const AdminHome = () => {
   const { t } = useTranslation();
   const getStats = useAdminStats();
   const [stats, setStats] = useState<AdminStats | null>(null);
-  const [range, setRange] = useState<StatsRange>(readRange);
+  const [searchParams, setSearchParams] = useSearchParams();
+  // The URL wins (a shared link shows the same view); otherwise the last range this browser used.
+  const urlRange = searchParams.get('range');
+  const range: StatsRange = isRange(urlRange) ? urlRange : storedRange();
+  const inspect = searchParams.get('inspect');
+  const [highlight, setHighlight] = useState<string | null>(null);
+  const [exportSignal, setExportSignal] = useState(0);
   const statistics = useAdminStatistics(range);
+  const graph = useDashboardMap();
 
   useEffect(() => {
     let alive = true;
@@ -138,6 +166,21 @@ const AdminHome = () => {
     };
   }, [getStats]);
 
+  const setParam = useCallback(
+    (key: string, value: string | null) =>
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          if (value == null) next.delete(key);
+          else next.set(key, value);
+          return next;
+        },
+        // Opening/walking the inspector is history (Back steps back); closing and range changes are not.
+        { replace: key === 'range' || value == null }
+      ),
+    [setSearchParams]
+  );
+
   const go = (
     e: React.MouseEvent<HTMLButtonElement>,
     path: NAVIGATION_PATHS | string
@@ -147,73 +190,143 @@ const AdminHome = () => {
   };
 
   const openEntry = (entryId: string) => {
-    umamiTrack('Admin Dashboard Open Entry');
-    navigate(NAVIGATION_PATHS.adminEditEntries + entryId);
+    umamiTrack('Admin Dashboard Inspect');
+    setParam('inspect', entryId);
   };
 
-  const pickRange = (r: StatsRange) => {
-    setRange(r);
-    umamiTrack('Admin Dashboard Range', { range: r });
-    try {
-      localStorage.setItem(RANGE_KEY, r);
-    } catch {
-      /* private mode — the choice simply isn't remembered */
-    }
-  };
+  const track = (what: string) =>
+    umamiTrack('Admin Dashboard Action', { what });
+
+  const pickRange = useCallback(
+    (r: StatsRange) => {
+      setParam('range', r);
+      umamiTrack('Admin Dashboard Range', { range: r });
+      try {
+        localStorage.setItem(RANGE_KEY, r);
+      } catch {
+        /* private mode — the choice simply isn't remembered */
+      }
+    },
+    [setParam, umamiTrack]
+  );
 
   const result = statistics.data;
   const data = result && result.status !== 'unavailable' ? result.data : null;
   const period = data?.period;
+  const semantic = useSemanticIndex(graph.data, data?.titles ?? []);
+  // Only worth a card when the graph actually knows some of the lent titles.
+  const showMap =
+    SEMANTICS_ON && !!graph.data?.nodes.length && !!semantic?.covered;
+  const meta = {
+    catalog: import.meta.env.ELVIRA_CATALOG_ID as string,
+    demo: result?.status === 'demo',
+  };
+
+  const { printing, print: printReport } = usePrintReport();
+
+  useHotkeys({
+    ...Object.fromEntries(
+      STATS_RANGES.map((r, i) => [String(i + 1), () => pickRange(r)])
+    ),
+    e: data ? () => setExportSignal((n) => n + 1) : null,
+    p: data
+      ? () => {
+          track('print-key');
+          printReport();
+        }
+      : null,
+    m: showMap
+      ? () =>
+          document
+            .getElementById('semantics')
+            ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      : null,
+  });
 
   return (
     <div className='pb-10'>
-      <PageHeader
-        title={t('administration.dashboard.title')}
-        description={t('administration.dashboard.description')}
-        actions={
-          <div className='flex flex-wrap gap-2'>
-            <Button
-              onClick={(e) => go(e, NAVIGATION_PATHS.adminAddEntries)}
-              className='flex items-center gap-2'
-            >
-              <FiPlus size={16} />
-              {t('administration.dashboard.addPublication')}
-            </Button>
-            <button
-              onClick={(e) => go(e, NAVIGATION_PATHS.adminUsers)}
-              className='flex items-center gap-2 rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-700'
-            >
-              <FiUsers size={16} />
-              {t('administration.dashboard.addUser')}
-            </button>
-            <a
-              href='https://feedback.elvira.stuba.sk'
-              target='_blank'
-              rel='noopener noreferrer'
-              onClick={() => umamiTrack('Admin Dashboard Feedback')}
-              className='flex items-center gap-2 rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-700'
-            >
-              <FiMessageSquare size={16} />
-              {t('administration.dashboard.feedback')}
-            </a>
-          </div>
-        }
-      />
+      <div className='print:hidden'>
+        <PageHeader
+          title={t('administration.dashboard.title')}
+          description={t('administration.dashboard.description')}
+          actions={
+            <div className='flex flex-wrap gap-2'>
+              <Button
+                onClick={(e) => go(e, NAVIGATION_PATHS.adminAddEntries)}
+                className='flex items-center gap-2'
+              >
+                <FiPlus size={16} />
+                {t('administration.dashboard.addPublication')}
+              </Button>
+              <button
+                onClick={(e) => go(e, NAVIGATION_PATHS.adminUsers)}
+                className='flex items-center gap-2 rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-700'
+              >
+                <FiUsers size={16} />
+                {t('administration.dashboard.addUser')}
+              </button>
+              <a
+                href='https://feedback.elvira.stuba.sk'
+                target='_blank'
+                rel='noopener noreferrer'
+                onClick={() => umamiTrack('Admin Dashboard Feedback')}
+                className='flex items-center gap-2 rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-700'
+              >
+                <FiMessageSquare size={16} />
+                {t('administration.dashboard.feedback')}
+              </a>
+            </div>
+          }
+        />
+      </div>
 
-      <div className='space-y-8 px-5'>
+      <div
+        id='admin-dashboard-report'
+        className={`space-y-8 px-5 ${printing ? 'w-[960px] max-w-none' : ''}`}
+      >
+        {/* Only on paper: what this report is. */}
+        {data && (
+          <div className='hidden print:block'>
+            <h1 className='text-2xl font-bold'>
+              {t('administration.dashboard.export.printTitle')}
+            </h1>
+            <p className='text-sm text-zinc-600'>
+              {t('administration.dashboard.range.period', {
+                from: format(parseISO(data.period.from), 'd. M. yyyy'),
+                to: format(parseISO(data.period.to), 'd. M. yyyy'),
+                prevFrom: format(parseISO(data.period.previous_from), 'd. M.'),
+                prevTo: format(
+                  parseISO(data.period.previous_to),
+                  'd. M. yyyy'
+                ),
+              })}
+              {' · '}
+              {t('administration.dashboard.export.generated', {
+                at: format(parseISO(data.generated_at), 'd. M. yyyy HH:mm'),
+              })}
+              {meta.demo && ` · ${t('administration.dashboard.demo')}`}
+            </p>
+          </div>
+        )}
+
         {/* One filter row scopes everything below it. */}
-        <div className='flex flex-wrap items-center gap-3'>
+        <div className='flex flex-wrap items-center gap-3 print:hidden'>
           <div
             role='radiogroup'
             aria-label={t('administration.dashboard.range.label')}
+            data-guide='admin-dashboard-range'
             className='inline-flex rounded-lg border border-zinc-200 bg-white p-0.5 dark:border-zinc-700 dark:bg-zinc-800'
           >
-            {STATS_RANGES.map((r) => (
+            {STATS_RANGES.map((r, i) => (
               <button
                 key={r}
                 type='button'
                 role='radio'
                 aria-checked={range === r}
+                aria-keyshortcuts={String(i + 1)}
+                title={t('administration.dashboard.shortcuts.rangeKey', {
+                  key: i + 1,
+                })}
                 onClick={() => pickRange(r)}
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition ${
                   range === r
@@ -242,6 +355,24 @@ const AdminHome = () => {
             >
               {t('administration.dashboard.demo')}
             </span>
+          )}
+          {data && (
+            <div className='ml-auto flex items-center gap-3'>
+              <span className='hidden text-[11px] text-zinc-400 xl:inline'>
+                {t(
+                  showMap
+                    ? 'administration.dashboard.shortcuts.hint'
+                    : 'administration.dashboard.shortcuts.hintNoMap'
+                )}
+              </span>
+              <ExportMenu
+                data={data}
+                meta={meta}
+                onTrack={(what) => track(`export-${what}`)}
+                onPrint={printReport}
+                openSignal={exportSignal}
+              />
+            </div>
           )}
         </div>
 
@@ -300,12 +431,19 @@ const AdminHome = () => {
             >
               <div className='grid grid-cols-1 gap-4 xl:grid-cols-5'>
                 <div className='min-w-0 xl:col-span-3'>
-                  <DemandQuadrant titles={data.titles} onOpen={openEntry} />
+                  <DemandQuadrant
+                    titles={data.titles}
+                    onOpen={openEntry}
+                    highlight={highlight}
+                    onHover={setHighlight}
+                  />
                 </div>
                 <div className='min-w-0 xl:col-span-2'>
                   <UtilizationLeaderboard
                     titles={data.titles}
                     onOpen={openEntry}
+                    highlight={highlight}
+                    onHover={setHighlight}
                   />
                 </div>
               </div>
@@ -314,6 +452,7 @@ const AdminHome = () => {
                   titles={data.titles}
                   onOpen={openEntry}
                   periodFrom={data.period.from}
+                  onHover={setHighlight}
                 />
                 <OutcomeBars
                   holds={data.hold_outcomes}
@@ -327,6 +466,27 @@ const AdminHome = () => {
               )}
             </Section>
 
+            {showMap && (
+              <Section
+                id='semantics'
+                title={t('administration.dashboard.sections.semantics')}
+                subtitle={t('administration.dashboard.sections.semanticsSub')}
+              >
+                <div data-guide='admin-dashboard-map'>
+                  <DemandMap
+                    map={graph.data!}
+                    semantic={semantic!}
+                    titles={data.titles}
+                    periodFrom={data.period.from}
+                    highlight={highlight}
+                    onHover={setHighlight}
+                    onOpen={openEntry}
+                    onTrack={track}
+                  />
+                </div>
+              </Section>
+            )}
+
             <Section
               title={t('administration.dashboard.sections.trends')}
               subtitle={t('administration.dashboard.sections.trendsSub')}
@@ -337,45 +497,67 @@ const AdminHome = () => {
                   <BorrowHeatmap cells={data.heatmap} />
                 </div>
                 <div className='min-w-0 xl:col-span-2'>
-                  <TopCategories categories={data.categories} />
+                  <TopCategories
+                    categories={data.categories}
+                    onOpen={(id) => {
+                      track('category');
+                      navigate(
+                        `${NAVIGATION_PATHS.adminEntries}?category-id=${id}`
+                      );
+                    }}
+                  />
                 </div>
               </div>
             </Section>
           </div>
         )}
 
-        <Section title={t('administration.dashboard.sections.inventory')}>
-          <div className='grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6'>
-            {INVENTORY.map((item) => (
-              <button
-                key={item.key}
-                type='button'
-                onClick={(e) => go(e, item.path)}
-                className='flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-left shadow-sm transition hover:border-primary dark:border-zinc-700 dark:bg-zinc-800'
-              >
-                <span className='text-primaryText dark:text-primaryLight'>
-                  {item.icon}
-                </span>
-                <span className='min-w-0'>
-                  <span className='block truncate text-xs text-zinc-500 dark:text-zinc-400'>
-                    {t(item.labelKey)}
+        <div className='print:hidden'>
+          <Section title={t('administration.dashboard.sections.inventory')}>
+            <div className='grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6'>
+              {INVENTORY.map((item) => (
+                <button
+                  key={item.key}
+                  type='button'
+                  onClick={(e) => go(e, item.path)}
+                  className='flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-left shadow-sm transition hover:border-primary dark:border-zinc-700 dark:bg-zinc-800'
+                >
+                  <span className='text-primaryText dark:text-primaryLight'>
+                    {item.icon}
                   </span>
-                  <span className='block text-lg font-bold text-zinc-900 dark:text-zinc-50'>
-                    {stats?.[item.key] == null ? (
-                      <span className='inline-block h-5 w-10 animate-pulse rounded bg-zinc-200 dark:bg-zinc-700' />
-                    ) : (
-                      stats[item.key]!.toLocaleString()
-                    )}
+                  <span className='min-w-0'>
+                    <span className='block truncate text-xs text-zinc-500 dark:text-zinc-400'>
+                      {t(item.labelKey)}
+                    </span>
+                    <span className='block text-lg font-bold text-zinc-900 dark:text-zinc-50'>
+                      {stats?.[item.key] == null ? (
+                        <span className='inline-block h-5 w-10 animate-pulse rounded bg-zinc-200 dark:bg-zinc-700' />
+                      ) : (
+                        stats[item.key]!.toLocaleString()
+                      )}
+                    </span>
                   </span>
-                </span>
-              </button>
-            ))}
-          </div>
-          <p className='text-xs text-zinc-400 dark:text-zinc-500'>
-            {t('administration.dashboard.scopedNote')}
-          </p>
-        </Section>
+                </button>
+              ))}
+            </div>
+            <p className='text-xs text-zinc-400 dark:text-zinc-500'>
+              {t('administration.dashboard.scopedNote')}
+            </p>
+          </Section>
+        </div>
       </div>
+
+      {data && (
+        <TitleInspector
+          entryId={inspect}
+          titles={data.titles}
+          semantic={semantic}
+          periodFrom={data.period.from}
+          onClose={() => setParam('inspect', null)}
+          onSelect={(id) => setParam('inspect', id)}
+          onTrack={(what) => track(`inspector-${what}`)}
+        />
+      )}
     </div>
   );
 };

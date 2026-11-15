@@ -52,7 +52,8 @@ const useOpenInViewer = () => {
       fromPath: `${location.pathname}${location.search}`,
     };
     if (subject.catalogId) state.catalogId = subject.catalogId;
-    if (target && (target.bbox || target.quads?.length)) state.target = target;
+    // A region id alone is enough: the viewer outlines the region with its own box (`regionPackage`).
+    if (target && (target.bbox || target.quads?.length || target.regionId)) state.target = target;
 
     const query = new URLSearchParams();
     if (page) query.set('page', String(page));

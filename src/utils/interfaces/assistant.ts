@@ -70,6 +70,11 @@ export interface IAssistantCitation {
   /** Relevance of an `evidence` source. */
   score?: number;
   /**
+   * Run-independent address of the cited paragraph or region (EvilFlowersCatalog#171). With it the citation opens
+   * through `/cite/{entry_id}/{locator_key}`, which survives re-extraction (elvira-portal#46).
+   */
+  locator_key?: string;
+  /**
    * Marks the assistant draws over a figure's crop (contract: docs/assistant-figure-marks.md). Untrusted:
    * the portal clamps, caps and sanitises them before drawing (`figureMarks`).
    */
@@ -137,7 +142,20 @@ export interface IAssistantQuiz {
   title: string;
   section: string;
   page_range: [number, number];
-  questions: { question: string; options: string[]; answer_index: number; explanation: string; labels: string[] }[];
+  questions: IAssistantQuizQuestion[];
+}
+
+export interface IAssistantQuizQuestion {
+  question: string;
+  options: string[];
+  answer_index: number;
+  explanation: string;
+  labels: string[];
+  /**
+   * The `F#` label of the figure the question asks about (elvira-portal#48); it is also among `labels`, so the
+   * turn's citations resolve it. Only sent with `EVILFLOWERS_ASSISTANT_QUIZ_FIGURES` on.
+   */
+  figure?: string;
 }
 
 export interface IAssistantKeyConcepts {

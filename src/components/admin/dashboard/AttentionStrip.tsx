@@ -67,7 +67,8 @@ const AttentionStrip = ({ attention, onNavigate }: Props) => {
   const { t } = useTranslation();
   const open = ITEMS.filter((i) => attention[i.key] > 0);
 
-  if (!open.length) {
+  // "All clear" only when nothing at all is blocked — an unregistered LCP title is not clear.
+  if (!open.length && attention.lcp_not_lendable === 0) {
     return (
       <div data-guide='admin-attention' className='viz-root flex items-center gap-3 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-600 shadow-sm dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300'>
         <FiCheckCircle

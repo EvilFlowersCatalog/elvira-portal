@@ -33,10 +33,14 @@ interface IItemContainer {
   entryScope?: Partial<EntryFilters> | null;
   /** Shown instead of "no results" when the list is empty and no search/filter is active. */
   emptyMessage?: string;
+  /** Result tabs under the heading (e.g. publications | figures and tables). */
+  tabs?: ReactNode;
+  /** Replaces the list's results (loading, empty, items) while another tab is active. */
+  panel?: ReactNode;
 }
 
 // Params that open dialogs rather than narrow the list.
-const NON_FILTER_PARAMS = /^(entry-detail-id|entry-catalog-id|licensing-|dialog-priority|assistant-)/;
+const NON_FILTER_PARAMS = /^(entry-detail-id|entry-catalog-id|licensing-|dialog-priority|assistant-|results$)/;
 
 const ItemContainer = ({
   children,
@@ -53,6 +57,8 @@ const ItemContainer = ({
   enableSort = true,
   entryScope,
   emptyMessage,
+  tabs,
+  panel,
 }: IItemContainer) => {
   const { handleScroll } = useAppContext();
   const { t } = useTranslation();
@@ -118,14 +124,18 @@ const ItemContainer = ({
               </h2>
             )}
 
+            {tabs}
+
             {/* Outside the results branch: a correction matters most when nothing matched. */}
             {!list.isLoading && !list.isError && <SearchNotice search={list.search} />}
 
-            {list.isLoading && <PageLoading entries={isEntries} showLayout={showLayout} />}
+            {panel}
 
-            {!list.isLoading && list.isError && <PageMessage message={t('page.error')} />}
+            {!panel && list.isLoading && <PageLoading entries={isEntries} showLayout={showLayout} />}
 
-            {!list.isLoading && !list.isError && (
+            {!panel && !list.isLoading && list.isError && <PageMessage message={t('page.error')} />}
+
+            {!panel && !list.isLoading && !list.isError && (
               <>
                 {list.items.length > 0 ? (
                   children

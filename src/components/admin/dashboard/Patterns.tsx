@@ -398,8 +398,11 @@ export const OutcomeBars = ({
 
 export const TopCategories = ({
   categories,
+  onOpen,
 }: {
   categories: ICategoryStatistics[];
+  /** Jump to the publications filed under the category. */
+  onOpen?: (categoryId: string) => void;
 }) => {
   const { t } = useTranslation();
   const max = Math.max(1, ...categories.map((c) => c.loans));
@@ -426,14 +429,24 @@ export const TopCategories = ({
           {t('administration.dashboard.empty')}
         </p>
       ) : (
-        <ul className='space-y-2'>
+        <ul className='space-y-1'>
           {categories.map((c) => (
-            <li
-              key={c.category_id}
-              className='grid grid-cols-[minmax(0,9rem)_1fr] items-center gap-3 text-sm'
-              title={`${c.title}: ${c.loans}`}
-            >
-              <span className='truncate text-zinc-700 dark:text-zinc-200'>
+            <li key={c.category_id}>
+              <button
+                type='button'
+                disabled={!onOpen}
+                onClick={() => onOpen?.(c.category_id)}
+                className='group grid w-full grid-cols-[minmax(0,9rem)_1fr] items-center gap-3 rounded-md px-1 py-0.5 text-left text-sm enabled:hover:bg-zinc-50 dark:enabled:hover:bg-zinc-700/50'
+                title={
+                  onOpen
+                    ? t('administration.dashboard.categories.open', {
+                        title: c.title,
+                        count: c.loans,
+                      })
+                    : `${c.title}: ${c.loans}`
+                }
+              >
+              <span className='truncate text-zinc-700 group-enabled:group-hover:underline dark:text-zinc-200'>
                 {c.title}
               </span>
               <span className='flex items-center gap-2'>
@@ -445,6 +458,7 @@ export const TopCategories = ({
                   {fmtCount(c.loans)}
                 </span>
               </span>
+              </button>
             </li>
           ))}
         </ul>

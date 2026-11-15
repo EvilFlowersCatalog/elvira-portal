@@ -84,7 +84,8 @@ const ToolsContainer = ({
 
   const getActiveFilters = (): FilterChipItem[] => {
     const filters: FilterChipItem[] = [];
-    const excluded = ['order-by', 'dialog-priority', 'assistant-entry-id', 'feed-id-step', 'parent-id', 'search-all', 'from', AUTHOR_ID_PARAM];
+    // `results` picks the results tab (publications | figures), it does not narrow anything.
+    const excluded = ['order-by', 'dialog-priority', 'assistant-entry-id', 'feed-id-step', 'parent-id', 'search-all', 'from', 'results', AUTHOR_ID_PARAM];
 
     searchParams.forEach((value, key) => {
       if (excluded.includes(key) || !value.trim()) return;

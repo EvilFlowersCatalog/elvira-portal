@@ -45,7 +45,7 @@ const fmtBytes = (n: number | null) => {
   return `${(n / 1024 ** 2).toFixed(1)} MB`;
 };
 
-const fmtDuration = (seconds: number | null) => {
+export const fmtDuration = (seconds: number | null) => {
   if (seconds == null) return '—';
   if (seconds < 60) return `${Math.round(seconds)} s`;
   const m = Math.floor(seconds / 60);
@@ -275,7 +275,7 @@ export default function EntryExtractionPanel({ entryId }: { entryId: string }) {
 }
 
 /** Jobs of the run in progress, where its task waits, and how busy every service queue is. */
-function QueueStatus({ data }: { data: IEntryExtraction }) {
+export function QueueStatus({ data }: { data: IEntryExtraction }) {
   const { t } = useTranslation();
   const inProgress = data.acquisitions.filter((a) => a.status === 'queued' || a.status === 'running');
   const anyDepth = data.queues.some((q) => q.waiting != null);

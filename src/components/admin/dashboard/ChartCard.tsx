@@ -90,7 +90,7 @@ export const ChartCard = ({
                 ? t('administration.dashboard.showChart')
                 : t('administration.dashboard.showTable')
             }
-            className='shrink-0 rounded-md border border-zinc-200 p-1.5 text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:border-zinc-600 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100'
+            className='shrink-0 rounded-md border border-zinc-200 p-1.5 print:hidden text-zinc-500 hover:bg-zinc-100 hover:text-zinc-800 dark:border-zinc-600 dark:text-zinc-400 dark:hover:bg-zinc-700 dark:hover:text-zinc-100'
           >
             {asTable ? <FiBarChart2 size={16} /> : <FiList size={16} />}
             <span className='sr-only'>

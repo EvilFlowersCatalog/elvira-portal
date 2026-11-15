@@ -1,5 +1,5 @@
 import { lazy } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Navigate, Route, Routes, useParams } from 'react-router-dom';
 import App from '../App';
 import { NAVIGATION_PATHS } from '../utils/interfaces/general/general';
 import RequireAuth from './guards/AuthGuard';
@@ -13,6 +13,7 @@ const Library = lazy(() => import('../pages/common/Library'));
 const Shelf = lazy(() => import('../pages/common/Shelf'));
 const NotFound = lazy(() => import('../pages/common/NotFound'));
 const Viewer = lazy(() => import('../pages/common/Viewer'));
+const Cite = lazy(() => import('../pages/common/Cite'));
 const Home = lazy(() => import('../pages/common/Home'));
 const Feeds = lazy(() => import('../pages/common/Feeds'));
 const Categories = lazy(() => import('../pages/common/Categories'));
@@ -50,6 +51,17 @@ const AdminUsers = lazy(() => import('../pages/admin/AdminUsers'));
 const AdminUserProfile = lazy(() => import('../pages/admin/AdminUserProfile'));
 const AdminLoans = lazy(() => import('../pages/admin/AdminLoans'));
 const AdminJobs = lazy(() => import('../pages/admin/AdminJobs'));
+const AdminSettings = lazy(() => import('../pages/admin/AdminSettings'));
+const AdminContentPolicies = lazy(() => import('../pages/admin/AdminContentPolicies'));
+
+/**
+ * One viewer per publication file. Without the key, going from one book to another inside the reader (a chat
+ * citation, "explained elsewhere") kept the first book's navigation state: its origin, catalog and focus target.
+ */
+const ViewerRoute = () => {
+  const { 'entry-id': entryId, index } = useParams();
+  return <Viewer key={`${entryId}/${index}`} />;
+};
 
 const BaseRoutes = () => {
   const { auth } = useAuthContext();
@@ -105,7 +117,9 @@ const BaseRoutes = () => {
             <Route path='categories' element={<Categories />} />
             <Route path='ai-assistant' element={<AiAssistantPage />} />
             <Route path='ai-chat-history' element={<AiChatHistory />} />
-            <Route path='viewer/:entry-id/:index' element={<Viewer />} />
+            <Route path='viewer/:entry-id/:index' element={<ViewerRoute />} />
+            {/* Durable citation links (#46); behind login, which returns here afterwards. */}
+            <Route path='cite/:entryId/:key' element={<Cite />} />
 
             {/* Only with admin role */}
             <Route path='administration' element={<RequireAdmin />}>
@@ -130,6 +144,8 @@ const BaseRoutes = () => {
                 <Route path='ai-users' element={<Navigate to={NAVIGATION_PATHS.adminUsers} replace />} />
                 <Route path='loans' element={<AdminLoans />} />
                 <Route path='jobs' element={<AdminJobs />} />
+                <Route path='settings' element={<AdminSettings />} />
+                <Route path='content-policies' element={<AdminContentPolicies />} />
               </Route>
             </Route>
           </Route>

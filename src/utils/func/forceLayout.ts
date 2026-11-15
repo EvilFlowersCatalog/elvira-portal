@@ -9,6 +9,8 @@ export interface LayoutEdge {
   target: string;
   /** 0–1: stronger edges pull harder. */
   weight?: number;
+  /** Rest length of this spring; defaults to the layout's own (26). */
+  length?: number;
 }
 
 export interface Point {
@@ -38,8 +40,10 @@ export function forceLayout(nodes: LayoutNode[], edges: LayoutEdge[], iterations
   const x = nodes.map((node) => (hash01(node.id, 1) - 0.5) * spread);
   const y = nodes.map((node) => (hash01(node.id, 2) - 0.5) * spread);
   const links = edges
-    .map((edge) => [index.get(edge.source), index.get(edge.target), edge.weight ?? 1] as const)
-    .filter((link): link is readonly [number, number, number] => link[0] !== undefined && link[1] !== undefined);
+    .map((edge) => [index.get(edge.source), index.get(edge.target), edge.weight ?? 1, edge.length] as const)
+    .filter(
+      (link): link is readonly [number, number, number, number | undefined] => link[0] !== undefined && link[1] !== undefined
+    );
 
   // Short-range repulsion (like d3's `distanceMax`) so linked groups pull into visible clusters
   // instead of every node spreading evenly over a disc.
@@ -78,11 +82,11 @@ export function forceLayout(nodes: LayoutNode[], edges: LayoutEdge[], iterations
       }
     }
 
-    for (const [a, b, weight] of links) {
+    for (const [a, b, weight, length] of links) {
       const ex = x[b] - x[a];
       const ey = y[b] - y[a];
       const d = Math.sqrt(ex * ex + ey * ey) || 0.01;
-      const force = (d - springLength) * 0.1 * (0.5 + weight);
+      const force = (d - (length ?? springLength)) * 0.1 * (0.5 + weight);
       const fx = (ex / d) * force;
       const fy = (ey / d) * force;
       dx[a] += fx;

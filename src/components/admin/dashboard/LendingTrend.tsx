@@ -15,17 +15,24 @@ import {
   IStatisticsBucket,
   StatsBucket,
 } from '../../../utils/interfaces/statistics';
-import { ChartCard, Legend, Responsive, TooltipBox } from './ChartCard';
+import { ChartCard, Responsive, TooltipBox } from './ChartCard';
 import { dateLocale, fmtCount, tooltipStyle } from './format';
 
 interface Point extends IStatisticsBucket {
   date: Date;
 }
 
+// Fixed order = fixed hue: a series keeps its color whichever others are switched off.
+// Only s1–s3 pass the all-pairs check as lines (s2↔s4 fall below the normal-vision floor),
+// so the fourth series is a dashed neutral rather than a fourth hue.
 const SERIES = [
-  { key: 'loans_started', color: 'var(--viz-s1)' },
-  { key: 'holds_placed', color: 'var(--viz-s2)' },
+  { key: 'loans_started', color: 'var(--viz-s1)', label: 'loansStarted', dash: undefined },
+  { key: 'holds_placed', color: 'var(--viz-s2)', label: 'holdsPlaced', dash: undefined },
+  { key: 'loans_returned', color: 'var(--viz-s3)', label: 'returned', dash: undefined },
+  { key: 'loans_expired', color: 'var(--viz-ink-2)', label: 'expired', dash: '5 4' },
 ] as const;
+type SeriesKey = (typeof SERIES)[number]['key'];
+const DEFAULT_VISIBLE: SeriesKey[] = ['loans_started', 'holds_placed'];
 
 const M = { top: 12, right: 28, bottom: 28, left: 40 };
 const MAIN_H = 260;
@@ -53,11 +60,15 @@ const Chart = ({
   data,
   width,
   bucket,
+  visible,
 }: {
   data: Point[];
   width: number;
   bucket: StatsBucket;
+  visible: SeriesKey[];
 }) => {
+  const series = SERIES.filter((s) => visible.includes(s.key));
+  const lead = series[0] ?? SERIES[0];
   const { t, i18n } = useTranslation();
   const locale = dateLocale(i18n.language);
   const [window_, setWindow] = useState<Point[] | null>(null);
@@ -85,7 +96,7 @@ const Chart = ({
   // Floor of 4 keeps ticks on whole numbers when counts are tiny.
   const yMax = Math.max(
     4,
-    maxOf(shown, (p) => Math.max(p.loans_started, p.holds_placed))
+    maxOf(shown, (p) => Math.max(0, ...series.map((s) => p[s.key])))
   );
   const y = useMemo(
     () => scaleLinear({ domain: [0, yMax], range: [ih, 0], nice: true }),
@@ -123,7 +134,7 @@ const Chart = ({
     showTooltip({
       tooltipData: d,
       tooltipLeft: x(d.date) + M.left,
-      tooltipTop: y(d.loans_started) + M.top,
+      tooltipTop: y(d[lead.key]) + M.top,
     });
   };
 
@@ -146,16 +157,18 @@ const Chart = ({
             numTicks={4}
             stroke='var(--viz-grid)'
           />
-          <AreaClosed<Point>
-            data={complete}
-            x={(p) => x(getDate(p))}
-            y={(p) => y(p.loans_started)}
-            yScale={y}
-            curve={curveLinear}
-            fill='var(--viz-s1)'
-            fillOpacity={0.1}
-          />
-          {SERIES.map((s) => (
+          {series.length > 0 && (
+            <AreaClosed<Point>
+              data={complete}
+              x={(p) => x(getDate(p))}
+              y={(p) => y(p[lead.key])}
+              yScale={y}
+              curve={curveLinear}
+              fill={lead.color}
+              fillOpacity={0.1}
+            />
+          )}
+          {series.map((s) => (
             <g key={s.key}>
               {complete.length < shown.length && (
                 <LinePath<Point>
@@ -176,6 +189,7 @@ const Chart = ({
                 curve={curveLinear}
                 stroke={s.color}
                 strokeWidth={2}
+                strokeDasharray={s.dash}
                 strokeLinecap='round'
                 strokeLinejoin='round'
               />
@@ -184,9 +198,9 @@ const Chart = ({
           {/* End label on the lead series only. */}
           <circle
             cx={x(last.date)}
-            cy={y(last.loans_started)}
+            cy={y(last[lead.key])}
             r={4}
-            fill='var(--viz-s1)'
+            fill={lead.color}
             stroke='var(--viz-surface)'
             strokeWidth={2}
           />
@@ -199,7 +213,7 @@ const Chart = ({
                 y2={ih}
                 stroke='var(--viz-axis)'
               />
-              {SERIES.map((s) => (
+              {series.map((s) => (
                 <circle
                   key={s.key}
                   cx={x(tooltipData.date)}
@@ -316,26 +330,11 @@ const Chart = ({
         >
           <TooltipBox
             title={`${format(tooltipData.date, tooltipDateFmt[bucket], { locale })}${tooltipData.partial ? ` · ${t('administration.dashboard.trend.partial')}` : ''}`}
-            rows={[
-              {
-                label: t('administration.dashboard.trend.loansStarted'),
-                value: fmtCount(tooltipData.loans_started),
-                color: 'var(--viz-s1)',
-              },
-              {
-                label: t('administration.dashboard.trend.holdsPlaced'),
-                value: fmtCount(tooltipData.holds_placed),
-                color: 'var(--viz-s2)',
-              },
-              {
-                label: t('administration.dashboard.trend.returned'),
-                value: fmtCount(tooltipData.loans_returned),
-              },
-              {
-                label: t('administration.dashboard.trend.expired'),
-                value: fmtCount(tooltipData.loans_expired),
-              },
-            ]}
+            rows={SERIES.map((s) => ({
+              label: t(`administration.dashboard.trend.${s.label}`),
+              value: fmtCount(tooltipData[s.key]),
+              color: visible.includes(s.key) ? s.color : undefined,
+            }))}
           />
         </TooltipWithBounds>
       )}
@@ -351,6 +350,15 @@ const LendingTrend = ({
   bucket: StatsBucket;
 }) => {
   const { t, i18n } = useTranslation();
+  const [visible, setVisible] = useState<SeriesKey[]>(DEFAULT_VISIBLE);
+  const toggle = (key: SeriesKey) =>
+    setVisible((v) =>
+      v.includes(key)
+        ? v.length > 1
+          ? v.filter((k) => k !== key)
+          : v
+        : SERIES.map((s) => s.key).filter((k) => k === key || v.includes(k))
+    );
   const data = useMemo(
     () => series.map((b) => ({ ...b, date: parseISO(b.t) })),
     [series]
@@ -410,24 +418,46 @@ const LendingTrend = ({
                 data={data}
                 width={width}
                 bucket={bucket}
+                visible={visible}
               />
             )}
           </Responsive>
-          <div className='mt-2'>
-            <Legend
-              items={[
-                {
-                  label: t('administration.dashboard.trend.loansStarted'),
-                  color: 'var(--viz-s1)',
-                  shape: 'line',
-                },
-                {
-                  label: t('administration.dashboard.trend.holdsPlaced'),
-                  color: 'var(--viz-s2)',
-                  shape: 'line',
-                },
-              ]}
-            />
+          {/* The legend is the series switch: click to show or hide a line (at least one stays). */}
+          <div
+            className='mt-2 flex flex-wrap items-center gap-1.5'
+            role='group'
+            aria-label={t('administration.dashboard.trend.seriesToggle')}
+          >
+            {SERIES.map((s) => {
+              const on = visible.includes(s.key);
+              return (
+                <button
+                  key={s.key}
+                  type='button'
+                  aria-pressed={on}
+                  onClick={() => toggle(s.key)}
+                  className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs transition ${
+                    on
+                      ? 'border-zinc-300 text-zinc-700 dark:border-zinc-600 dark:text-zinc-200'
+                      : 'border-dashed border-zinc-200 text-zinc-400 dark:border-zinc-700 dark:text-zinc-500'
+                  }`}
+                >
+                  <svg width={14} height={4} aria-hidden>
+                    <line
+                      x1={1}
+                      x2={13}
+                      y1={2}
+                      y2={2}
+                      stroke={on ? s.color : 'var(--viz-axis)'}
+                      strokeWidth={2}
+                      strokeDasharray={s.dash ? '3 2' : undefined}
+                      strokeLinecap='round'
+                    />
+                  </svg>
+                  {t(`administration.dashboard.trend.${s.label}`)}
+                </button>
+              );
+            })}
           </div>
         </>
       )}

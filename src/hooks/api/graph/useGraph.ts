@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import useAxios from '../useAxios';
 import useGetEntries from '../entries/useGetEntries';
 import { IChapterMap, ILibraryMap, IPrerequisite, IRelatedSection } from '../../../utils/interfaces/graph';
@@ -9,11 +9,12 @@ import { IEntry } from '../../../utils/interfaces/entry';
 const STALE = 5 * 60 * 1000;
 
 /** Processed publications as a map: nodes and mutual-nearest-neighbour edges. */
-export const useLibraryMap = () => {
+export const useLibraryMap = (opts: { enabled?: boolean; retry?: boolean } = {}) => {
   const axios = useAxios();
   return useQuery({
     queryKey: ['graph-map', import.meta.env.ELVIRA_CATALOG_ID],
     staleTime: STALE,
+    ...opts,
     queryFn: async () => {
       const { data } = await axios.get<{ response: ILibraryMap }>('/api/v1/entries/map', {
         params: { catalog_id: import.meta.env.ELVIRA_CATALOG_ID },
@@ -66,13 +67,15 @@ export const useSectionPrerequisites = (key: string | null) => {
 };
 
 /** Titles, files and config of the publications a graph answer points at (it carries only ids). */
-export const useEntriesById = (ids: string[]) => {
+export const useEntriesById = (ids: string[], opts: { keepPrevious?: boolean } = {}) => {
   const getEntries = useGetEntries();
   const unique = [...new Set(ids)].sort();
   return useQuery({
     queryKey: ['entries-by-id', unique],
     enabled: unique.length > 0,
     staleTime: STALE,
+    // Hopping across the map swaps the id set; keep the last answer up meanwhile instead of flashing.
+    placeholderData: opts.keepPrevious ? keepPreviousData : undefined,
     queryFn: async () => {
       const { items } = await getEntries({ page: 1, limit: unique.length, ids: unique.join(',') });
       return new Map<string, IEntry>(items.map((item) => [item.id, item]));

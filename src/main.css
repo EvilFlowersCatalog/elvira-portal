@@ -239,3 +239,64 @@ input:focus:not(:focus-visible) {
   --viz-good-text: #3fc43f;
   --viz-critical-text: #f07272;
 }
+
+/* Explore: the focused publication breathes, so the eye finds it after a camera flight. */
+@keyframes explore-pulse {
+  0% { stroke-opacity: 0.85; transform: scale(0.85); }
+  70% { stroke-opacity: 0; transform: scale(1.35); }
+  100% { stroke-opacity: 0; transform: scale(1.35); }
+}
+.explore-pulse {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: explore-pulse 1.8s ease-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .explore-pulse { animation: none; stroke-opacity: 0.6; }
+}
+
+/*
+ * Admin dashboard → paper. AdminHome adds `printing-dashboard` to <body> (and drops `.dark`)
+ * around window.print(); only the report column prints, unclipped by the app's scroll panes.
+ * (The A4-landscape @page rule is injected only for that print, so other pages print as before.)
+ */
+@media print {
+  body.printing-dashboard {
+    background: #fff !important;
+  }
+  body.printing-dashboard *:has(#admin-dashboard-report) {
+    overflow: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    position: static !important;
+    display: block !important;
+  }
+  body.printing-dashboard * {
+    visibility: hidden;
+  }
+  /* Floating chrome (assistant launcher, overlays) can animate its visibility; take it out of layout. */
+  body.printing-dashboard .fixed {
+    display: none !important;
+  }
+  body.printing-dashboard #admin-dashboard-report,
+  body.printing-dashboard #admin-dashboard-report * {
+    visibility: visible;
+  }
+  body.printing-dashboard #admin-dashboard-report {
+    position: absolute !important;
+    left: 0;
+    top: 0;
+    padding: 0;
+  }
+  body.printing-dashboard #admin-dashboard-report section {
+    break-inside: avoid;
+    box-shadow: none !important;
+  }
+  body.printing-dashboard #admin-dashboard-report .max-h-96 {
+    max-height: none;
+  }
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

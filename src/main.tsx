@@ -1,4 +1,7 @@
 import './lib/forceHttps';
+// Browser tracing: before any other import can capture fetch/XHR (no-op without ELVIRA_FARO_URL).
+import './lib/telemetry';
+import './lib/errorReference';
 import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';

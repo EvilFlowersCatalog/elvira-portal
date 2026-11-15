@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
+import useEscapeLayer from '../../hooks/useEscapeLayer';
 import { useTranslation } from 'react-i18next';
 import { FiCheck, FiX } from 'react-icons/fi';
 import {
@@ -10,6 +12,9 @@ import {
 } from '../../utils/interfaces/assistant';
 import { chipText } from '../../utils/func/assistantMessages';
 import CitationChip from './CitationChip';
+import FigureImage from './FigureImage';
+import { regionKind, useCropUrl } from './citationUi';
+import { figureMarks } from './figureMarks';
 
 interface StudyActions {
   /** The citation behind a label, if the turn resolved it. */
@@ -50,6 +55,81 @@ function Header({ kind, data }: { kind: string; data: { section: string; title: 
   );
 }
 
+/**
+ * The figure a quiz question asks about (elvira-portal#48): its crop above the options, the caption under it.
+ * Without a crop (unresolved label, Readium LCP, outside IP ranges, or a crop that fails to load) the question
+ * keeps a "see page N" link instead — never an empty image box.
+ */
+function QuizFigure({ citation, onOpen }: { citation: IAssistantCitation | undefined; onOpen: StudyActions['onOpen'] }) {
+  const { t } = useTranslation();
+  const cropUrl = useCropUrl();
+  const [failed, setFailed] = useState(false);
+  const [large, setLarge] = useState(false);
+  useEscapeLayer(() => setLarge(false), large);
+  if (!citation) return null;
+
+  const image = citation.readable === false || failed ? undefined : cropUrl(citation.image_url);
+  const pageLink = citation.page ? (
+    <button
+      type="button"
+      onClick={() => onOpen(citation)}
+      className="self-start text-xs text-sky-700 dark:text-sky-300 hover:underline"
+    >
+      {t('assistant.study.seeFigure', {
+        kind: t(`assistant.region.${regionKind(citation)}`),
+        page: citation.page,
+      })}
+    </button>
+  ) : null;
+
+  if (!image) return pageLink;
+  const alt = citation.caption ?? t(`assistant.region.${regionKind(citation)}`);
+  return (
+    <figure className="flex flex-col gap-1 rounded-md border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+      {/* Enlarges in place: opening the reader from here would leave the quiz mid-question. */}
+      <button
+        type="button"
+        onClick={() => setLarge(true)}
+        className="flex justify-center bg-white cursor-zoom-in"
+        aria-label={t('assistant.figure.enlarge')}
+      >
+        <FigureImage
+          src={image}
+          alt={alt}
+          marks={figureMarks(citation)}
+          showMarks
+          imgClassName="max-h-64 max-w-full"
+          onError={() => setFailed(true)}
+        />
+      </button>
+      <figcaption className="flex flex-col gap-0.5 px-2 pb-1.5 text-[11px] text-gray-600 dark:text-gray-300">
+        {citation.caption ? (
+          <span>
+            <span className="font-semibold">{citation.label}</span> · {citation.caption}
+          </span>
+        ) : null}
+        {pageLink}
+      </figcaption>
+      {large
+        ? createPortal(
+            <div
+              className="fixed inset-0 z-[1001] bg-black/75 flex items-center justify-center p-4"
+              onClick={() => setLarge(false)}
+              role="dialog"
+              aria-modal="true"
+              aria-label={alt}
+            >
+              <div className="max-w-5xl max-h-full overflow-auto bg-white rounded-lg p-4" onClick={(e) => e.stopPropagation()}>
+                <FigureImage src={image} alt={alt} marks={figureMarks(citation)} showMarks imgClassName="max-h-[80vh] max-w-full" />
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
+    </figure>
+  );
+}
+
 function Quiz({ data, resolve, onOpen }: { data: IAssistantQuiz } & StudyActions) {
   const { t } = useTranslation();
   const [index, setIndex] = useState(0);
@@ -87,6 +167,10 @@ function Quiz({ data, resolve, onOpen }: { data: IAssistantQuiz } & StudyActions
         {t('assistant.study.question', { current: index + 1, total: data.questions.length })}
       </span>
       <p className="text-sm text-black dark:text-white">{question.question}</p>
+      {/* Above the options and outside the answered block, so it stays while the explanation shows. */}
+      {question.figure ? (
+        <QuizFigure key={`${index}-${question.figure}`} citation={resolve(question.figure)} onOpen={onOpen} />
+      ) : null}
       <div className="flex flex-col gap-1.5" role="radiogroup" aria-label={question.question}>
         {question.options.map((option, optionIndex) => {
           const answered = picked !== null;

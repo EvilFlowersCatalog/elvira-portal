@@ -49,7 +49,7 @@ export interface GuideRequest {
   tour?: string;
 }
 
-const ADMIN_PAGES: { key: string; path: NAVIGATION_PATHS; keywords: string[] }[] = [
+const ADMIN_PAGES: { key: string; path: NAVIGATION_PATHS; keywords: string[]; experimental?: boolean }[] = [
   { key: 'dashboard', path: NAVIGATION_PATHS.adminHome, keywords: ['dashboard', 'prehlad', 'nastenk', 'statistik', 'statistics'] },
   { key: 'publications', path: NAVIGATION_PATHS.adminEntries, keywords: ['publikaci', 'publication', 'zaznam', 'entries', 'titul'] },
   { key: 'collections', path: NAVIGATION_PATHS.adminFeeds, keywords: ['kolekci', 'collection', 'feed'] },
@@ -61,6 +61,13 @@ const ADMIN_PAGES: { key: string; path: NAVIGATION_PATHS; keywords: string[] }[]
   { key: 'access', path: NAVIGATION_PATHS.adminAccess, keywords: ['pristup', 'opravnen', 'access', 'permission', 'api kluc', 'api key', 'grant'] },
   { key: 'loans', path: NAVIGATION_PATHS.adminLoans, keywords: ['vypozic', 'loan', 'rezervaci', 'reservation', 'cirkulaci', 'circulation'] },
   { key: 'jobs', path: NAVIGATION_PATHS.adminJobs, keywords: ['uloh', 'job', 'sifrovan', 'encrypt', 'queue', 'front'] },
+  {
+    key: 'policies',
+    path: NAVIGATION_PATHS.adminContentPolicies,
+    keywords: ['politik', 'pravidl obsah', 'content polic', 'policy', 'pristup asistent', 'assistant access', 'tier', 'uroven'],
+    experimental: true,
+  },
+  { key: 'settings', path: NAVIGATION_PATHS.adminSettings, keywords: ['nastaven', 'settings', 'konfigur', 'configur'], experimental: true },
 ];
 
 export const GUIDE_TARGETS: GuideTarget[] = [
@@ -181,13 +188,13 @@ export const GUIDE_TARGETS: GuideTarget[] = [
   },
 
   // ── Administration ──────────────────────────────────────────────────────────
-  ...ADMIN_PAGES.map<GuideTarget>(({ key, path, keywords }) => ({
+  ...ADMIN_PAGES.map<GuideTarget>(({ key, path, keywords, experimental }) => ({
     id: `admin-${key}`,
     section: 'admin',
     path,
     anchor: 'page-title',
     via: `admin-nav-${key}`,
-    gates: ['auth', 'admin'],
+    gates: experimental ? ['auth', 'admin', 'experimental'] : ['auth', 'admin'],
     keywords,
   })),
   // The jobs page opens on LCP encryption; OCR and AI processing (and what failed there) are on their own
@@ -201,14 +208,38 @@ export const GUIDE_TARGETS: GuideTarget[] = [
     gates: ['auth', 'admin'],
     keywords: ['ocr', 'extrakci', 'extraction', 'spracovan', 'processing', 'zlyha', 'failed', 'neuspes', 'chyb'],
   },
-  ...ADMIN_PAGES.map<GuideTarget>(({ key }) => ({
+  ...ADMIN_PAGES.map<GuideTarget>(({ key, experimental }) => ({
     id: `admin-menu-${key}`,
     section: 'admin',
     path: NAVIGATION_PATHS.adminHome,
     anchor: `admin-nav-${key}`,
-    gates: ['auth', 'admin'],
+    gates: experimental ? ['auth', 'admin', 'experimental'] : ['auth', 'admin'],
   })),
   { id: 'admin-attention', section: 'admin', path: NAVIGATION_PATHS.adminHome, anchor: 'admin-attention', gates: ['auth', 'admin'], keywords: ['pozornost', 'problem', 'attention', 'issue', 'chyby', 'error'] },
+  {
+    id: 'admin-dashboard-export',
+    section: 'admin',
+    path: NAVIGATION_PATHS.adminHome,
+    anchor: 'admin-dashboard-export',
+    gates: ['auth', 'admin'],
+    keywords: ['export', 'csv', 'excel', 'report', 'sprav', 'statistik', 'statistic', 'pdf', 'tlac', 'print'],
+  },
+  {
+    id: 'admin-dashboard-range',
+    section: 'admin',
+    path: NAVIGATION_PATHS.adminHome,
+    anchor: 'admin-dashboard-range',
+    gates: ['auth', 'admin'],
+    keywords: ['obdobi', 'period', 'range', 'mesiac', 'month', 'rok', 'year'],
+  },
+  {
+    id: 'admin-dashboard-map',
+    section: 'admin',
+    path: NAVIGATION_PATHS.adminHome,
+    anchor: 'admin-dashboard-map',
+    gates: ['auth', 'admin', 'experimental'],
+    keywords: ['dopyt', 'demand', 'tem', 'topic', 'susedst', 'neighbour', 'neighbor', 'nahrad', 'substitut'],
+  },
   {
     id: 'admin-add-entry',
     section: 'admin',

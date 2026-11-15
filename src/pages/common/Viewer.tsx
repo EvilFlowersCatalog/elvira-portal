@@ -62,6 +62,8 @@ import type { IAssistantCitation, IAssistantToolActivity } from "../../utils/int
 import useOpenCitation from "../../hooks/api/assistant/useOpenCitation";
 import type { IViewerLocationState } from "../../hooks/api/assistant/useOpenInViewer";
 import { useQueryClient } from "@tanstack/react-query";
+import useReaderPage from "../../hooks/useReaderPage";
+import ExplainedElsewhere from "../../components/viewer/ExplainedElsewhere";
 
 
 interface ISuggestedEntry {
@@ -102,6 +104,7 @@ type ViewerCitation = {
   caption?: string;
   imageUrl?: string;
   readable?: boolean;
+  locatorKey?: string;
 };
 
 const toViewerCitation = (citation: IAssistantCitation): ViewerCitation => ({
@@ -120,6 +123,7 @@ const toViewerCitation = (citation: IAssistantCitation): ViewerCitation => ({
   caption: citation.caption,
   imageUrl: citation.image_url,
   readable: citation.readable,
+  locatorKey: citation.locator_key,
 });
 
 const fromViewerCitation = (citation: ViewerCitation): IAssistantCitation => ({
@@ -134,6 +138,7 @@ const fromViewerCitation = (citation: ViewerCitation): IAssistantCitation => ({
   bbox: citation.bbox,
   quads: citation.quads,
   sentence_page: citation.sentencePage,
+  locator_key: citation.locatorKey,
 });
 
 const Viewer = () => {
@@ -180,6 +185,9 @@ const Viewer = () => {
   const updateAnotationItem = useUpdateAnotationItem();
   const createAnotationItem = useCreateAnotationItem();
   const deleteAnotationItem = useDeleteAnotationItem();
+  // The library graph panels (#41, #43) ship behind the experimental flag, like the Chapters tab.
+  const graphPanels = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true";
+  const readerPage = useReaderPage(rootId);
 
   let acquisition_id = "";
   let user_acquisition_id = "";
@@ -872,15 +880,16 @@ const Viewer = () => {
             // ...and at the cited paragraph or figure (IP-030 Phase 1): outline `bbox`, flash `quads`, then fade.
             // No released viewer takes it yet (it has `initialPage` only); spread so the build passes, and a
             // viewer without the key ignores it.
-            ...(origin?.target
+            // A copied or reloaded link has no navigation state, only `r` (a region the viewer outlines by itself).
+            ...(origin?.target || searchParams.get("r")
               ? {
                   initialFocus: {
                     page: Number(searchParams.get("page")) || undefined,
-                    paragraphId: origin.target.paragraphId,
-                    regionId: origin.target.regionId,
-                    bbox: origin.target.bbox,
-                    quads: origin.target.quads,
-                    quadsPage: origin.target.quadsPage,
+                    paragraphId: origin?.target?.paragraphId,
+                    regionId: origin?.target?.regionId ?? searchParams.get("r") ?? undefined,
+                    bbox: origin?.target?.bbox,
+                    quads: origin?.target?.quads,
+                    quadsPage: origin?.target?.quadsPage,
                   },
                 }
               : {}),
@@ -988,6 +997,7 @@ const Viewer = () => {
         </div>
       )}
       <div id={rootId}></div>
+      {graphPanels && id && !loading && <ExplainedElsewhere entryId={id} page={readerPage} />}
       {/* ItemContainer (which normally hosts this) isn't rendered on this
           route, so entry-detail-id/entry-catalog-id search params set from
           the viewer's suggestion cards had nowhere to be picked up. */}

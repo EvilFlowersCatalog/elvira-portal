@@ -41,14 +41,16 @@ function MapCanvas({
   width,
   isolated,
   onOpen,
+  focusId,
 }: {
   map: ILibraryMap;
   width: number;
   isolated: UdcClass | null;
   onOpen: (id: string) => void;
+  focusId?: string | null;
 }) {
   const { t } = useTranslation();
-  const [hover, setHover] = useState<PlacedNode | null>(null);
+  const [hoverNode, setHover] = useState<PlacedNode | null>(null);
 
   // Layout once per data set; resizing only rescales.
   const layout = useMemo(() => {
@@ -71,6 +73,8 @@ function MapCanvas({
   }, [layout, width]);
 
   const byId = useMemo(() => new Map(placed.map((n) => [n.id, n])), [placed]);
+  // A deep-linked title (?focus=) stays lit with its neighbourhood until the pointer takes over.
+  const hover = hoverNode ?? (focusId ? (byId.get(focusId) ?? null) : null);
   const neighbours = useMemo(() => {
     if (!hover) return null;
     const set = new Set<string>([hover.id]);
@@ -178,7 +182,16 @@ function MapCanvas({
  * class (hue + shape), lines between mutual nearest neighbours. Click opens the publication; the
  * legend isolates a class. A list view carries the same content without the picture.
  */
-export default function LibraryMap({ map, onOpen }: { map: ILibraryMap; onOpen: (id: string) => void }) {
+export default function LibraryMap({
+  map,
+  onOpen,
+  focusId,
+}: {
+  map: ILibraryMap;
+  onOpen: (id: string) => void;
+  /** Highlight one publication and its neighbours on arrival. */
+  focusId?: string | null;
+}) {
   const { t } = useTranslation();
   const [isolated, setIsolated] = useState<UdcClass | null>(null);
   const [view, setView] = useState<'map' | 'list'>('map');
@@ -241,7 +254,7 @@ export default function LibraryMap({ map, onOpen }: { map: ILibraryMap; onOpen: 
 
       {view === 'map' ? (
         <div className="overflow-hidden rounded-xl border border-zinc-200 bg-[var(--viz-surface)] dark:border-zinc-700">
-          <Responsive>{(width) => <MapCanvas map={map} width={width} isolated={isolated} onOpen={onOpen} />}</Responsive>
+          <Responsive>{(width) => <MapCanvas map={map} width={width} isolated={isolated} onOpen={onOpen} focusId={focusId} />}</Responsive>
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

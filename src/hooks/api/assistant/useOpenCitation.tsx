@@ -1,11 +1,12 @@
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { citePath } from '../../../utils/func/citeLink';
 import { IAssistantCitation } from '../../../utils/interfaces/assistant';
 import useGetEntryDetail from '../entries/useGetEntryDetail';
 import useOpenInViewer, { IViewerTarget } from './useOpenInViewer';
 
 /** The spot on the page a citation points to (IP-030 Phase 1), if the catalog sent one. */
 export const citationTarget = (citation: IAssistantCitation): IViewerTarget | undefined =>
-  citation.bbox || citation.quads?.length
+  citation.bbox || citation.quads?.length || citation.region_id
     ? {
         paragraphId: citation.paragraph_id,
         regionId: citation.region_id,
@@ -24,8 +25,16 @@ const useOpenCitation = () => {
   const openInViewer = useOpenInViewer();
   const { getEntryDetail } = useGetEntryDetail();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   return async (citation: IAssistantCitation, onNavigate?: () => void) => {
+    // A citation with a locator opens through its durable link (#46): the catalog resolves it against the
+    // current extraction and the `/cite` route picks the reader or the detail.
+    if (citation.locator_key) {
+      onNavigate?.();
+      navigate(citePath(citation.entry_id, citation.locator_key));
+      return;
+    }
     const entry = await getEntryDetail(citation.entry_id).catch(() => null);
     onNavigate?.();
     if (entry?.config?.readium_enabled) {

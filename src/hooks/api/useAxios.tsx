@@ -1,5 +1,6 @@
 import { MutableRefObject } from 'react';
 import axios, { CancelTokenSource } from 'axios';
+import { noteFailedRequest } from '../../lib/errorReference';
 
 /** Default request timeout: a hung request surfaces as an error after this, not after minutes. */
 export const DEFAULT_TIMEOUT = 30 * 1000;
@@ -54,6 +55,9 @@ baseAxios.interceptors.request.use(
 baseAxios.interceptors.response.use(
   (response) => response,
   (error) => {
+    // The catalog's trace id for this failure; error toasts show it as "Ref …" (errorReference).
+    const traceId = noteFailedRequest(error?.response?.headers);
+    if (traceId) error.traceId = traceId;
     if (error?.response?.status === 401) authState.logout();
     return Promise.reject(error);
   }

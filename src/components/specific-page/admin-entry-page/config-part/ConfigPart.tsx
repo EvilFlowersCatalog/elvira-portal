@@ -4,6 +4,7 @@ import useAppContext from '../../../../hooks/contexts/useAppContext';
 import { Switch } from '../../../admin/Field';
 import Select from '../../../primitives/Select';
 import { OCR_ISSUE_URL } from '../../../admin/jobs/jobsUi';
+import ContentPolicyPicker from '../../../admin/policies/ContentPolicyPicker';
 
 /** Boolean reader/access flags, rendered data-driven with helper text. */
 type BoolKey = keyof Pick<
@@ -109,6 +110,15 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
           <p className="text-xs text-zinc-500 dark:text-zinc-400">{t('entry.wizard.configHelp.readiumAmount')}</p>
         </div>
       )}
+
+      {/* Content policy (#47): "inherit" drops the key, so an entry without one never sends it. */}
+      <ContentPolicyPicker
+        id="entry-content-policy"
+        value={config?.content_policy}
+        onChange={(key) => setConfig({ content_policy: key ?? undefined })}
+        inheritLabel={t('administration.policies.picker.inheritCatalog')}
+        hint={t('administration.policies.picker.entryHint')}
+      />
     </div>
   );
 };
