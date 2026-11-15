@@ -1,5 +1,6 @@
 import type { IChatContext } from '@evilflowers/evilflowersviewer';
 import { IMetadata } from './general/general';
+import type { IPortalContext } from '../../components/guide/portalContext';
 
 export type { IChatContext };
 
@@ -68,6 +69,25 @@ export interface IAssistantCitation {
   readable?: boolean;
   /** Relevance of an `evidence` source. */
   score?: number;
+  /**
+   * Marks the assistant draws over a figure's crop (contract: docs/assistant-figure-marks.md). Untrusted:
+   * the portal clamps, caps and sanitises them before drawing (`figureMarks`).
+   */
+  marks?: IFigureMark[];
+}
+
+/** One mark over a figure, in fractions of the crop (origin top-left), like a region's `bbox`. */
+export interface IFigureMark {
+  /** `box` / `ellipse` frame an area, `arrow` points from (x0, y0) to (x1, y1), `point` marks (x0, y0). */
+  shape: 'box' | 'ellipse' | 'arrow' | 'point';
+  x0: number;
+  y0: number;
+  x1?: number;
+  y1?: number;
+  /** A few words on the mark ("Component interface"). */
+  label?: string;
+  /** A sentence explaining it, shown in the legend. */
+  note?: string;
 }
 
 /**
@@ -210,6 +230,8 @@ export interface IAssistantMessageOptions {
   language?: string;
   /** The portal page the reader is on (`/administration/users`), so "where is …" can be answered from here. */
   portalPath?: string;
+  /** What the reader is looking at, in the guide registry's vocabulary (`portal_context`). */
+  portalContext?: IPortalContext;
   signal?: AbortSignal;
 }
 

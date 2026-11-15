@@ -8,11 +8,14 @@ const TOOL_STATUS: Record<string, string> = {
   get_entry: 'readEntry',
   list_categories: 'listCategories',
   list_my_loans: 'checkLoans',
-  get_my_shelf: 'checkLoans',
+  get_my_shelf: 'checkShelf',
   read_pdf_page: 'readPublication',
   search_pdf: 'readPublication',
   search_paragraphs: 'readPublication',
   show_in_portal: 'showInPortal',
+  study: 'study',
+  displayBooks: 'showBooks',
+  library_overview: 'libraryOverview',
 };
 
 /**
@@ -32,12 +35,15 @@ const TOOL_ACTIVITY: Record<string, string> = {
   get_entry: 'readEntry',
   list_categories: 'listCategories',
   list_my_loans: 'checkLoans',
-  get_my_shelf: 'checkLoans',
+  get_my_shelf: 'checkShelf',
   read_pdf_page: 'readPages',
   search_pdf: 'searchPublication',
   search_paragraphs: 'searchPublication',
   create_highlights: 'highlight',
   show_in_portal: 'showInPortal',
+  study: 'study',
+  displayBooks: 'showBooks',
+  library_overview: 'libraryOverview',
 };
 
 /** Translation key of a finished tool call in the activity log (past tense). */
@@ -188,18 +194,19 @@ export const compareLabels = (a: string, b: string): number =>
   a.charAt(0) === b.charAt(0) ? Number(a.slice(1)) - Number(b.slice(1)) : a.charAt(0) < b.charAt(0) ? -1 : 1;
 
 /**
- * Evidence labels (IP-024) → `[3](#efv-evidence-E3)` per label the answer's citations resolve; a label they
- * lack (the `unknown` ones) stays plain text. While the answer streams (`pending`) not every citation is in yet,
- * so every label becomes a link; the renderer shows the unresolved ones as inert chips.
+ * Evidence labels (IP-024) → `[3](#efv-evidence-E3)` per label the answer's citations resolve. A label they
+ * lack (the `unknown` ones — the model citing evidence it was never given) is dropped with the space before
+ * it, so a raw "[E2]" never reads as a source. While the answer streams (`pending`) not every citation is in
+ * yet, so every label becomes a link; the renderer shows the unresolved ones as inert chips.
  */
 export const evidenceToLinks = (text: string, citations: IAssistantCitation[], pending = false): string => {
   const known = new Set(citations.map((c) => c.label.toUpperCase()));
-  return text.replace(EVIDENCE_GROUP, (group, list: string) => {
+  const group = new RegExp(`([ \\t]?)${EVIDENCE_GROUP.source}`, EVIDENCE_GROUP.flags);
+  return text.replace(group, (_, space: string, list: string) => {
     const labels = list.split(/\s*[,;]\s*/).map(normalizeLabel);
     const link = (label: string) => `[${chipText(label)}](#efv-evidence-${label})`;
-    if (pending) return labels.map(link).join('');
-    if (!labels.some((label) => known.has(label))) return group;
-    return labels.map((label) => (known.has(label) ? link(label) : `\\[${label}\\]`)).join('');
+    const shown = pending ? labels : labels.filter((label) => known.has(label));
+    return shown.length ? `${space}${shown.map(link).join('')}` : '';
   });
 };
 

@@ -98,7 +98,11 @@ export default function AiAssistant() {
                             <button
                                 type="button"
                                 aria-label={t("assistant.newChat")}
-                                onClick={clearAiChat}
+                                onClick={() => {
+                                    // A new conversation starts without the book the last one was about.
+                                    clearAiChat();
+                                    if (assistantEntryId) clearAssistantEntry();
+                                }}
                                 className="inline-flex items-center justify-center rounded-full p-2 bg-primary text-white hover:bg-primaryDark transition-colors disabled:bg-zinc-300 disabled:text-zinc-400"
                             >
                                 <FiPlus size={18} />
@@ -121,6 +125,7 @@ export default function AiAssistant() {
 
                     <AssistantChatPanel
                         compact
+                        active={showAiAssistant}
                         onNavigate={() => closeDrawer()}
                         entry={
                             assistantEntryId

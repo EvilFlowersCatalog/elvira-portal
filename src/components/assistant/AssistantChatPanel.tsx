@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaPaperPlane, FaX } from 'react-icons/fa6';
 import useAppContext from '../../hooks/contexts/useAppContext';
@@ -6,24 +6,25 @@ import useAssistantChat, { IAssistantEntryRef, ISendOptions } from '../../hooks/
 import useStickToBottom from '../../hooks/useStickToBottom';
 import AssistantMessage from './AssistantMessage';
 import AssistantWelcome from './AssistantWelcome';
+import BookActions from './BookActions';
 import BookPicker from './BookPicker';
-
-type Mode = 'ask' | 'learn' | 'quiz';
-const MODES: Mode[] = ['ask', 'learn', 'quiz'];
 
 /**
  * The assistant conversation — messages, the empty-chat welcome and the composer — shared by the AI page and
  * the drawer, which add only their own chrome (#16: the streaming logic and message rendering used to be
  * duplicated between them).
  *
- * The composer's mode switch (Ask / Learn / Quiz) only prefixes the request; the catalog picks the study tool
- * from it (IP-030 Phase 4). The book picker attaches a publication to the next messages.
+ * One input for everything: there are no Ask / Learn / Quiz modes. The assistant picks the tool (an answer, a
+ * walkthrough, a quiz card, figures) from what the reader writes; with a publication in the chat, shortcut
+ * chips above the input send the common requests in plain words. The book picker attaches a publication to the
+ * next messages.
  */
 export default function AssistantChatPanel({
   entry,
   onClearEntry,
   compact,
   onNavigate,
+  active = true,
 }: {
   /** A publication attached from outside, e.g. "ask about this book" on its detail. */
   entry?: IAssistantEntryRef;
@@ -31,14 +32,22 @@ export default function AssistantChatPanel({
   compact?: boolean;
   /** Called before the viewer opens. */
   onNavigate?: () => void;
+  /** The panel is on screen (the drawer stays mounted while closed); personal suggestions load only then. */
+  active?: boolean;
 }) {
   const { t } = useTranslation();
-  const { aiMessages, aiChatSubject, setAiShowSuggestions } = useAppContext();
+  const { aiChatId, aiMessages, aiChatSubject, setAiShowSuggestions } = useAppContext();
   const [picked, setPicked] = useState<IAssistantEntryRef | null>(null);
+
+  // "New chat" (the chat id goes away) also drops a book picked for the previous conversation.
+  const previousChatId = useRef(aiChatId);
+  useEffect(() => {
+    if (previousChatId.current && !aiChatId) setPicked(null);
+    previousChatId.current = aiChatId;
+  }, [aiChatId]);
   const attached = picked ?? entry;
   const { sendMessage, retryMessage, isGenerating } = useAssistantChat(attached);
   const [input, setInput] = useState('');
-  const [mode, setMode] = useState<Mode>('ask');
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -50,18 +59,11 @@ export default function AssistantChatPanel({
     sendMessage(message, options);
   };
 
-  const request = (text: string): string => {
-    if (mode === 'ask') return text;
-    const prefix = t(mode === 'learn' ? 'assistant.mode.learnPrefix' : 'assistant.mode.quizPrefix');
-    // Without a topic of its own the request is about the chat's publication.
-    return text ? `${prefix}: ${text}` : `${prefix}.`;
-  };
-
   const handleSubmit = (event?: React.FormEvent) => {
     event?.preventDefault();
     const text = input.trim();
-    if (isGenerating || (!text && mode === 'ask')) return;
-    send(request(text));
+    if (isGenerating || !text) return;
+    send(text);
     setInput('');
   };
 
@@ -83,7 +85,9 @@ export default function AssistantChatPanel({
               entryId={subjectId}
               bound={!!aiChatSubject?.userAcquisitionId}
               compact={compact}
+              active={active}
               onSend={(message) => send(message)}
+              onAttach={setPicked}
             />
           ) : (
             aiMessages.map((msg) => (
@@ -115,24 +119,14 @@ export default function AssistantChatPanel({
             </button>
           </div>
         ) : null}
-        <div className="flex items-center gap-1 mb-1.5" role="radiogroup" aria-label={t('assistant.mode.label')}>
-          {MODES.map((value) => (
-            <button
-              key={value}
-              type="button"
-              role="radio"
-              aria-checked={mode === value}
-              onClick={() => setMode(value)}
-              className={`text-xs px-2.5 py-0.5 rounded-full transition-colors ${
-                mode === value
-                  ? 'bg-primary text-white'
-                  : 'text-gray-600 dark:text-gray-300 hover:bg-black/5 dark:hover:bg-white/10'
-              }`}
-            >
-              {t(`assistant.mode.${value}`)}
-            </button>
-          ))}
-        </div>
+        {subjectId ? (
+          <BookActions
+            entryId={subjectId}
+            bound={!!aiChatSubject?.userAcquisitionId}
+            onSend={(message) => send(message)}
+            disabled={busy}
+          />
+        ) : null}
         <div
           className={`flex items-center gap-2 ${
             compact
@@ -154,7 +148,7 @@ export default function AssistantChatPanel({
           <button
             type="submit"
             aria-label={t('common.send')}
-            disabled={busy || (!input.trim() && mode === 'ask')}
+            disabled={busy || !input.trim()}
             className="inline-flex items-center justify-center p-1 disabled:opacity-40"
           >
             <FaPaperPlane size={compact ? 14 : 16} className="dark:text-white" />

@@ -55,14 +55,18 @@ The frame is live only; nothing needs storing.
 
 The source of truth is `src/components/guide/guideRegistry.ts` (`GUIDE_TARGETS`, `GUIDE_TOURS`).
 
-- **Menu:** `menu-home`, `menu-library`, `menu-feeds`, `menu-categories`, `menu-ai`, `menu-admin`, `menu-shelf`,
-  `menu-history`, `menu-loans`, `menu-profile`, `menu-language`, `menu-theme`, `menu-help`, `assistant-launcher`
+- **Menu:** `menu-home`, `menu-library`, `menu-feeds`, `menu-categories`, `menu-ai`, `menu-explore`
+  (experimental), `menu-admin`, `menu-shelf`, `menu-history`, `menu-loans`, `menu-profile`, `menu-language`,
+  `menu-theme`, `menu-help`, `assistant-launcher`
 - **Reader:** `home`, `home-ai`, `library`, `search`, `advanced-search`, `sort`, `book`, `feeds`, `categories`,
-  `ai-chats`
+  `explore` (experimental), `ai-chats`
 - **Personal:** `shelf`, `history`, `loans`, `profile`, `passphrase`, `notifications`
 - **Admin (superusers):** `admin-dashboard`, `admin-publications`, `admin-collections`, `admin-categories`,
   `admin-authors`, `admin-reviews`, `admin-catalogs`, `admin-users`, `admin-access`, `admin-loans`, `admin-jobs`,
-  `admin-attention`, `admin-add-entry`, `admin-add-user`
+  `admin-jobs-processing` (the AI processing / OCR tabs), `admin-attention`, `admin-add-entry`, `admin-add-user`
+
+Every message also carries `portal_context`, with the current page's places and their descriptions in the reader's
+language (see `assistant-portal-context.md`). That is the same vocabulary the assistant answers in with `navigate`.
 
 A page id (`loans`, `admin-users`, …) given alone first highlights its menu entry, then the page, so the
 reader learns the way. A good prompt list pairs each id with one line of what is there.

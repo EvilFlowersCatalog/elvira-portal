@@ -85,6 +85,7 @@ const useSendChatMessage = () => {
         ...(options?.userAcquisitionId ? { user_acquisition_id: options.userAcquisitionId } : {}),
         ...(options?.language ? { language: options.language } : {}),
         ...(options?.portalPath ? { portal_path: options.portalPath } : {}),
+        ...(options?.portalContext ? { portal_context: options.portalContext } : {}),
       }),
       signal: options?.signal,
     });
@@ -104,16 +105,27 @@ const useSendChatMessage = () => {
     // Tool calls run one after another: `status` opens a call, the next `activity` closes it.
     let calls = 0;
     let open: { id: string; tool: string } | null = null;
+    // Every model round streams its own text, and a round that calls a tool usually opens with a preamble
+    // ("Let me search…"). The answer is the last round's text: a round that starts after a tool ran replaces
+    // the text before it, instead of the rounds running together ("…books:Let's try…").
+    let roundText = false;
+    let toolRan = false;
 
     for await (const { event, data } of readSse(response.body)) {
       const payload = parseSseData(data);
       switch (event) {
-        case 'chunk':
-          handlers.onChunk(textOf(payload));
+        case 'chunk': {
+          const chunk = textOf(payload);
+          if (chunk) roundText = true;
+          handlers.onChunk(chunk);
           break;
-        case 'message':
-          handlers.onMessage(textOf(payload));
+        }
+        case 'message': {
+          const text = textOf(payload);
+          if (text) roundText = true;
+          handlers.onMessage(text);
           break;
+        }
         case 'entries':
           handlers.onEntries(idsOf(payload));
           break;
@@ -154,6 +166,12 @@ const useSendChatMessage = () => {
         case 'status':
           if (payload && typeof payload === 'object') {
             const { state, tool } = payload as IAssistantStatus;
+            if (state === 'thinking' && toolRan) {
+              if (roundText) handlers.onMessage('');
+              roundText = false;
+              toolRan = false;
+            }
+            if (state === 'tool') toolRan = true;
             if (state === 'thinking' || state === 'tool') {
               handlers.onStatus?.(state, typeof tool === 'string' ? tool : undefined);
             }
@@ -169,6 +187,7 @@ const useSendChatMessage = () => {
             // An `activity` with no matching `status` (a skipped one) still gets its own row.
             const id = open && open.tool === tool ? open.id : `call-${++calls}`;
             open = null;
+            toolRan = true;
             handlers.onActivity?.({ ...activityOf(payload), id, tool, done: true });
           }
           break;

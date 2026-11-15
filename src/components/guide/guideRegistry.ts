@@ -60,7 +60,7 @@ const ADMIN_PAGES: { key: string; path: NAVIGATION_PATHS; keywords: string[] }[]
   { key: 'users', path: NAVIGATION_PATHS.adminUsers, keywords: ['pouzivatel', 'user', 'citatel', 'account', 'ucet', 'ucty'] },
   { key: 'access', path: NAVIGATION_PATHS.adminAccess, keywords: ['pristup', 'opravnen', 'access', 'permission', 'api kluc', 'api key', 'grant'] },
   { key: 'loans', path: NAVIGATION_PATHS.adminLoans, keywords: ['vypozic', 'loan', 'rezervaci', 'reservation', 'cirkulaci', 'circulation'] },
-  { key: 'jobs', path: NAVIGATION_PATHS.adminJobs, keywords: ['uloh', 'job', 'ocr', 'sifrovan', 'encrypt', 'extrakci', 'extraction', 'spracovan', 'queue', 'front'] },
+  { key: 'jobs', path: NAVIGATION_PATHS.adminJobs, keywords: ['uloh', 'job', 'sifrovan', 'encrypt', 'queue', 'front'] },
 ];
 
 export const GUIDE_TARGETS: GuideTarget[] = [
@@ -70,6 +70,7 @@ export const GUIDE_TARGETS: GuideTarget[] = [
   { id: 'menu-feeds', section: 'menu', anchor: 'nav-feeds', gates: ['auth'] },
   { id: 'menu-categories', section: 'menu', anchor: 'nav-categories', gates: ['auth'] },
   { id: 'menu-ai', section: 'menu', anchor: 'nav-ai', gates: ['auth'] },
+  { id: 'menu-explore', section: 'menu', anchor: 'nav-explore', gates: ['auth', 'experimental'] },
   { id: 'menu-admin', section: 'menu', anchor: 'nav-admin', gates: ['auth', 'admin'] },
   { id: 'menu-shelf', section: 'menu', anchor: 'nav-shelf', gates: ['auth'] },
   { id: 'menu-history', section: 'menu', anchor: 'nav-history', gates: ['auth'] },
@@ -130,6 +131,15 @@ export const GUIDE_TARGETS: GuideTarget[] = [
   { id: 'feeds', section: 'reader', path: NAVIGATION_PATHS.feeds, anchor: 'page-title', via: 'nav-feeds', gates: ['auth'], keywords: ['kolekci', 'collection', 'feed', 'zbierk'] },
   { id: 'categories', section: 'reader', path: NAVIGATION_PATHS.categories, anchor: 'page-title', via: 'nav-categories', gates: ['auth'], keywords: ['kategori', 'categor', 'oblast', 'odbor', 'subject', 'temat'] },
   {
+    id: 'explore',
+    section: 'reader',
+    path: NAVIGATION_PATHS.explore,
+    anchor: 'page-title',
+    via: 'nav-explore',
+    gates: ['auth', 'experimental'],
+    keywords: ['preskuma', 'mapa kniznic', 'graf', 'explore', 'library map', 'graph', 'suvislost', 'connections'],
+  },
+  {
     id: 'ai-chats',
     section: 'reader',
     path: NAVIGATION_PATHS.aiChatHistory,
@@ -180,6 +190,17 @@ export const GUIDE_TARGETS: GuideTarget[] = [
     gates: ['auth', 'admin'],
     keywords,
   })),
+  // The jobs page opens on LCP encryption; OCR and AI processing (and what failed there) are on their own
+  // tabs, so a question about them lights up the tab bar rather than the encryption table.
+  {
+    id: 'admin-jobs-processing',
+    section: 'admin',
+    path: NAVIGATION_PATHS.adminJobs,
+    anchor: 'jobs-tabs',
+    via: 'admin-nav-jobs',
+    gates: ['auth', 'admin'],
+    keywords: ['ocr', 'extrakci', 'extraction', 'spracovan', 'processing', 'zlyha', 'failed', 'neuspes', 'chyb'],
+  },
   ...ADMIN_PAGES.map<GuideTarget>(({ key }) => ({
     id: `admin-menu-${key}`,
     section: 'admin',

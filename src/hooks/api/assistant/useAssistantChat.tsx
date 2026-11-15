@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import useAppContext from '../../contexts/useAppContext';
 import useGuide from '../../contexts/useGuide';
 import { matchGuide } from '../../../components/guide/guideRegistry';
+import { portalContext } from '../../../components/guide/portalContext';
 import { AiMessage } from '../../../providers/AppProvider';
 import { mergeCitations, statusLabelKey } from '../../../utils/func/assistantMessages';
 import { IAssistantGuide, IAssistantToolActivity, IChatContext } from '../../../utils/interfaces/assistant';
@@ -41,7 +42,7 @@ const useAssistantChat = (entry?: IAssistantEntryRef) => {
   const { aiChatId, setAiChatId, setAiMessages, aiChatSubject, setAiChatSubject, lang } = useAppContext();
   const startChat = useStartChat();
   const sendChatMessage = useSendChatMessage();
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const guide = useGuide();
   const [isGenerating, setGenerating] = useState(false);
 
@@ -142,7 +143,13 @@ const useAssistantChat = (entry?: IAssistantEntryRef) => {
         onDone: (messageId) => {
           if (messageId) updateAnswer({ serverId: messageId });
         },
-      }, { entryId, contexts, language: lang, portalPath: pathname });
+      }, {
+        entryId,
+        contexts,
+        language: lang,
+        portalPath: pathname,
+        portalContext: portalContext({ pathname, search }, guide.access, t),
+      });
       setAiMessages((prev) =>
         prev.map((m) =>
           m.id === answerId && m.status === 'streaming' ? { ...m, status: 'done', progress: undefined } : m,

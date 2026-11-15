@@ -46,13 +46,15 @@ const AdminJobs = () => {
     <div className="pb-10">
       <PageHeader title={t('administration.jobs.title')} description={t('administration.jobs.description')} />
 
-      <Tabs
-        label={t('administration.jobs.title')}
-        active={tab}
-        // Each tab has its own search, filter, sort and page — start it clean.
-        onChange={(id) => setSearchParams(id === 'lcp' ? {} : { tab: id })}
-        tabs={TABS.map((id) => ({ id, label: t(`administration.jobs.tabs.${id}`) }))}
-      />
+      <div data-guide="jobs-tabs">
+        <Tabs
+          label={t('administration.jobs.title')}
+          active={tab}
+          // Each tab has its own search, filter, sort and page — start it clean.
+          onChange={(id) => setSearchParams(id === 'lcp' ? {} : { tab: id })}
+          tabs={TABS.map((id) => ({ id, label: t(`administration.jobs.tabs.${id}`) }))}
+        />
+      </div>
 
       <div className="mt-3">
         {tab === 'lcp' && (

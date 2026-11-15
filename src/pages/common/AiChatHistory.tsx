@@ -4,13 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { IAssistantChat } from '../../utils/interfaces/assistant';
 import useUserChatsQuery from '../../hooks/api/assistant/useUserChatsQuery';
-import useGetChatHistory from '../../hooks/api/assistant/useGetChatHistory';
+import useResumeChat from '../../hooks/api/assistant/useResumeChat';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 import { FiBookOpen, FiMessageSquare, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { fromApiMessages, subjectOf } from '../../utils/func/assistantMessages';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import { H1 } from '../../components/primitives/Heading';
 import ConfirmDialog from '../../components/admin/ConfirmDialog';
@@ -39,16 +38,8 @@ function ChatRowSkeleton() {
 const AiChatHistory = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const {
-    aiChatId,
-    setAiChatId,
-    setAiMessages,
-    setAiShowSuggestions,
-    setAiChatSubject,
-    clearAiChat,
-    umamiTrack
-  } = useAppContext();
-  const getChatHistory = useGetChatHistory();
+  const { aiChatId, clearAiChat, umamiTrack } = useAppContext();
+  const resumeChat = useResumeChat();
   const deleteChat = useDeleteChat();
   const queryClient = useQueryClient();
   const [pendingDelete, setPendingDelete] = useState<IAssistantChat | null>(null);
@@ -60,16 +51,9 @@ const AiChatHistory = () => {
   const chats: IAssistantChat[] = data?.items ?? [];
   const error = isError ? t('assistant.chatHistoryError') : null;
 
-  // Turns are stateless, so resuming a chat is just loading its history.
   const handleChatClick = async (chat: IAssistantChat) => {
     try {
-      const history = await getChatHistory(chat.id);
-
-      setAiChatId(chat.id);
-      setAiMessages(fromApiMessages(history.messages));
-      setAiChatSubject(subjectOf(history));
-      setAiShowSuggestions(false);
-
+      await resumeChat(chat.id);
       navigate(NAVIGATION_PATHS.aiAssistant);
     } catch (err) {
       console.error('Failed to resume chat:', err);
