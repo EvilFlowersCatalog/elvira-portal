@@ -197,13 +197,13 @@ export const GUIDE_TARGETS: GuideTarget[] = [
     gates: experimental ? ['auth', 'admin', 'experimental'] : ['auth', 'admin'],
     keywords,
   })),
-  // The jobs page opens on LCP encryption; OCR and AI processing (and what failed there) are on their own
-  // tabs, so a question about them lights up the tab bar rather than the encryption table.
+  // The jobs page opens on its overview of job types (OCR, AI processing, encryption …); a question about
+  // one of them, or about what failed, lights up that list.
   {
     id: 'admin-jobs-processing',
     section: 'admin',
     path: NAVIGATION_PATHS.adminJobs,
-    anchor: 'jobs-tabs',
+    anchor: 'jobs-types',
     via: 'admin-nav-jobs',
     gates: ['auth', 'admin'],
     keywords: ['ocr', 'extrakci', 'extraction', 'spracovan', 'processing', 'zlyha', 'failed', 'neuspes', 'chyb'],

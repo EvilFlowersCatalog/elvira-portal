@@ -31,14 +31,14 @@ const chip = (active: boolean) =>
  * Every Celery task execution the catalog recorded, newest first — jobs' tasks, their follow-ups,
  * e-mails and embedding batches. For debugging: task ids, workers, runtimes and errors in one list.
  */
-export default function TaskLog() {
+export default function TaskLog({ kind }: { kind?: string } = {}) {
   const { t } = useTranslation();
   const { data: kinds } = useJobKinds();
   const runLabel = useRunLabel(kinds);
   const { searchParams, page, limit, q, orderBy, patch, setQuery, tableProps } = useTableParams({ limit: 50, orderBy: '-created_at' });
   const preset = PRESET_KEYS.includes(searchParams.get('status') ?? '') ? searchParams.get('status')! : 'all';
   const { data, isLoading, isError, isFetching, refetch } = useJobRuns(
-    { status: PRESETS[preset], name: q || undefined, page, limit, order_by: orderBy },
+    { kind, status: PRESETS[preset], name: q || undefined, page, limit, order_by: orderBy },
     { poll: true }
   );
   const items = data?.items ?? [];

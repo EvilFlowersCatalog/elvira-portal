@@ -77,7 +77,8 @@ export default function JobsTable({
     });
   const preset = PRESET_KEYS.includes(searchParams.get('state') ?? '')
     ? searchParams.get('state')!
-    : entryId
+    : // A publication's or a type's jobs: show them all; the unfiltered list opens on what needs a look.
+      entryId || fixedKind
       ? 'all'
       : 'attention';
   const kind = fixedKind ?? searchParams.get('kind') ?? '';
@@ -158,7 +159,7 @@ export default function JobsTable({
           value: k.kind,
           label:
             kindGroup(k) === 'scheduled'
-              ? `${kindLabel(k.kind)} · ${t('administration.jobs.tabs.scheduled')}`
+              ? `${kindLabel(k.kind)} · ${t('administration.jobs.overview.maintenance')}`
               : kindLabel(k.kind),
         })),
     ];
@@ -208,7 +209,7 @@ export default function JobsTable({
       cell: (j) => {
         const title = titleOf(j.entry_id);
         // A job with no publication (maintenance) leads with its kind; the second line would only repeat it.
-        if (!entryId && !j.entry_id) {
+        if (!entryId && !j.entry_id && !fixedKind) {
           return (
             <span className='flex min-w-0 max-w-[min(26rem,34vw)] flex-col'>
               <span className='truncate font-medium text-zinc-800 dark:text-zinc-100'>
@@ -228,7 +229,9 @@ export default function JobsTable({
                 title={title}
               >
                 {title ??
-                  (!entries ? (
+                  (!j.entry_id ? (
+                    t('administration.jobs.all.noPublication')
+                  ) : !entries ? (
                     '…'
                   ) : (
                     // The portal lists its own catalog; the job API spans all of them.
@@ -239,16 +242,19 @@ export default function JobsTable({
                   ))}
               </span>
             )}
-            <span
-              className={twMerge(
-                'truncate',
-                entryId
-                  ? 'font-medium text-zinc-800 dark:text-zinc-100'
-                  : 'text-xs text-zinc-500 dark:text-zinc-400'
-              )}
-            >
-              {kindLabel(j.kind)}
-            </span>
+            {/* Inside a type's own list the type is the page's heading, not every row's. */}
+            {!fixedKind && (
+              <span
+                className={twMerge(
+                  'truncate',
+                  entryId
+                    ? 'font-medium text-zinc-800 dark:text-zinc-100'
+                    : 'text-xs text-zinc-500 dark:text-zinc-400'
+                )}
+              >
+                {kindLabel(j.kind)}
+              </span>
+            )}
           </span>
         );
       },

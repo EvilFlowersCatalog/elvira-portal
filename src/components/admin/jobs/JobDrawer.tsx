@@ -29,7 +29,8 @@ export default function JobDrawer({ jobId, onClose }: { jobId: string | null; on
     <Drawer
       open={!!current}
       onClose={onClose}
-      title={job ? kindLabel(job.kind) : t('administration.jobs.detail.title')}
+      // Names its level: this is one job (an instance) of the type, not the type itself.
+      title={job ? t('administration.jobs.detail.jobOf', { kind: kindLabel(job.kind) }) : t('administration.jobs.detail.title')}
       description={entry?.title ?? (job && !job.entry_id ? t('administration.jobs.all.noPublication') : undefined)}
       width="max-w-2xl"
       footer={

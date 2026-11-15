@@ -102,43 +102,68 @@ function RunRow({ run, child }: { run: IJobRun; child?: boolean }) {
   );
 }
 
-/** The job's own runs with the follow-up tasks they sent nested under them, newest first. */
-function Tasks({ jobId, active }: { jobId: string; active: boolean }) {
+/** Runs as a tree: each top-level run with the follow-up runs it sent nested under it. */
+function RunTree({ runs, all }: { runs: IJobRun[]; all: IJobRun[] }) {
+  const ids = new Set(all.map((r) => r.id));
+  const shown = new Set(runs.map((r) => r.id));
+  const roots = runs.filter((r) => !r.parent_id || !ids.has(r.parent_id) || !shown.has(r.parent_id));
+  return (
+    <ul className="rounded-lg border border-zinc-200 px-3 dark:border-zinc-700">
+      {roots.map((root) => (
+        <li key={root.id} className="list-none">
+          <ul>
+            <RunRow run={root} />
+            {runs
+              .filter((r) => r.parent_id === root.id)
+              .map((c) => (
+                <RunRow key={c.id} run={c} child />
+              ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/**
+ * The job's runs — each execution on a worker — follow-ups nested under the run that sent them. An
+ * extraction run is restarted under one reused run row, so runs sent before its current start are
+ * earlier attempts: they are folded away, or they read as if they belonged to the current one.
+ */
+function Runs({ jobId, active, attemptStartedAt }: { jobId: string; active: boolean; attemptStartedAt?: string | null }) {
   const { t } = useTranslation();
   const { data, isLoading } = useJobRuns({ job_id: jobId, limit: 50 }, { poll: active });
   const runs = useMemo(() => data?.items ?? [], [data]);
-  const tree = useMemo(() => {
-    const ids = new Set(runs.map((r) => r.id));
-    const roots = runs.filter((r) => !r.parent_id || !ids.has(r.parent_id));
-    const children = (id: string) => runs.filter((r) => r.parent_id === id);
-    return roots.map((root) => ({ root, children: children(root.id) }));
-  }, [runs]);
+  const { current, earlier } = useMemo(() => {
+    if (!attemptStartedAt) return { current: runs, earlier: [] as IJobRun[] };
+    const start = new Date(attemptStartedAt).getTime();
+    // The reused top-level row belongs to every attempt; only its follow-ups are dated.
+    const isEarlier = (r: IJobRun) => !!r.parent_id && new Date(r.sent_at ?? r.created_at).getTime() < start;
+    return { current: runs.filter((r) => !isEarlier(r)), earlier: runs.filter(isEarlier) };
+  }, [runs, attemptStartedAt]);
 
   return (
     <section>
       <h3 className={sectionTitle}>
-        {t('administration.jobs.detail.tasks')}
+        {t('administration.jobs.detail.runs')}
         {data && data.metadata.total > runs.length && (
-          <span className="ml-1 normal-case tracking-normal text-zinc-400">{t('administration.jobs.detail.tasksShown', { shown: runs.length, total: data.metadata.total })}</span>
+          <span className="ml-1 normal-case tracking-normal text-zinc-400">{t('administration.jobs.detail.runsShown', { shown: runs.length, total: data.metadata.total })}</span>
         )}
       </h3>
+      <p className="-mt-1 mb-2 text-xs text-zinc-400">{t('administration.jobs.detail.runsHint')}</p>
       {isLoading ? (
         <p className="text-xs text-zinc-400">…</p>
       ) : runs.length === 0 ? (
-        <p className="text-xs text-zinc-500">{t('administration.jobs.detail.noTasks')}</p>
+        <p className="text-xs text-zinc-500">{t('administration.jobs.detail.noRuns')}</p>
       ) : (
-        <ul className="rounded-lg border border-zinc-200 px-3 dark:border-zinc-700">
-          {tree.map(({ root, children }) => (
-            <li key={root.id} className="list-none">
-              <ul>
-                <RunRow run={root} />
-                {children.map((c) => (
-                  <RunRow key={c.id} run={c} child />
-                ))}
-              </ul>
-            </li>
-          ))}
-        </ul>
+        <div className="flex flex-col gap-2">
+          <RunTree runs={current} all={runs} />
+          {earlier.length > 0 && (
+            <Disclosure title={t('administration.jobs.detail.earlierAttempts', { count: earlier.length })}>
+              <RunTree runs={earlier} all={runs} />
+            </Disclosure>
+          )}
+        </div>
       )}
     </section>
   );
@@ -355,7 +380,7 @@ export default function JobDetail({ jobId, onOpenJob }: { jobId: string; onOpenJ
       </section>
 
       {job.detail.extraction_run && Object.keys(job.detail.extraction_run.jobs).length > 0 && <Steps jobs={job.detail.extraction_run.jobs} runFailed={job.state === 'failed'} />}
-      <Tasks jobId={job.id} active={active} />
+      <Runs jobId={job.id} active={active} attemptStartedAt={job.detail.extraction_run?.started_at} />
       <Related job={job} onOpen={onOpenJob} />
 
       <div className="flex flex-col gap-2">

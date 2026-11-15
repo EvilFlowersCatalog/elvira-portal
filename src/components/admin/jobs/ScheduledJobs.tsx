@@ -52,7 +52,7 @@ export default function ScheduledJobs() {
       cell: ({ kind }) => (
         <span className="flex max-w-[min(34rem,50vw)] flex-col">
           <span className="font-medium text-zinc-800 dark:text-zinc-100">{kindLabel(kind.kind)}</span>
-          <span className="line-clamp-2 text-xs text-zinc-500 dark:text-zinc-400" title={kind.description}>
+          <span className="truncate text-xs text-zinc-500 dark:text-zinc-400" title={kind.description} lang="en">
             {kind.description}
           </span>
         </span>

@@ -71,13 +71,19 @@ export function useTaskLabel() {
   };
 }
 
-/** A run's name: its kind's label when it is that kind's own task, else the step of its Celery task. */
+/**
+ * A run's name: the step its Celery task does ("Analysis", "Paragraphs") when the portal names that step —
+ * never the job type's name, so a run doesn't read like its type — else the type's name for a type's own task
+ * (maintenance), else the task's last segment.
+ */
 export function useRunLabel(kinds: IJobKind[] | undefined) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const kindLabel = useKindLabel(kinds);
   const taskLabel = useTaskLabel();
   return (run: { name: string; kind: string | null }) => {
     if (run.name === 'unknown') return t('administration.jobs.log.unknownTask');
+    const step = run.name.slice(run.name.lastIndexOf('.') + 1);
+    if (i18n.exists(`administration.extraction.jobs.${step}`)) return taskLabel(run.name);
     const kind = run.kind ? kinds?.find((k) => k.kind === run.kind) : undefined;
     return kind && kind.task === run.name ? kindLabel(kind.kind) : taskLabel(run.name);
   };
