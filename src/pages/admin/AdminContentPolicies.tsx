@@ -10,7 +10,10 @@ import UnavailableNotice from '../../components/admin/policies/UnavailableNotice
 import { isUnavailable, useContentPolicies } from '../../hooks/api/contentPolicies/useContentPolicies';
 import { IContentPolicy } from '../../utils/interfaces/contentPolicy';
 
-const POLICIES_ISSUE = 'https://github.com/EvilFlowersCatalog/EvilFlowersCatalog/issues/174';
+/** The access bases from most to least; the column header names them in this order. */
+const BASES = ['open', 'loan', 'past_loan', 'none'];
+
+const POLICIES_ISSUE ='https://github.com/EvilFlowersCatalog/EvilFlowersCatalog/issues/174';
 
 /**
  * Content policies (elvira-portal#47, catalog #174): the versioned rule documents that decide how much of a
@@ -18,21 +21,12 @@ const POLICIES_ISSUE = 'https://github.com/EvilFlowersCatalog/EvilFlowersCatalog
  * publication and reader. Catalogs and publications pick a policy in their own forms.
  */
 const AdminContentPolicies = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const tab = searchParams.get('tab') === 'explain' ? 'explain' : 'policies';
   const [editing, setEditing] = useState<string | null | undefined>(undefined);
   const policies = useContentPolicies();
   const unavailable = policies.isError && isUnavailable(policies.error);
-
-  const assignedTo = (policy: IContentPolicy) => {
-    const parts: string[] = [];
-    if (policy.assigned?.default) parts.push(t('administration.policies.assignedDefault'));
-    const catalogs = policy.assigned?.catalogs ?? [];
-    if (catalogs.length) parts.push(catalogs.map((c) => c.title).join(', '));
-    if (policy.assigned?.entries) parts.push(t('administration.policies.assignedEntries', { count: policy.assigned.entries }));
-    return parts.join(' · ') || '—';
-  };
 
   const columns: DataTableColumn<IContentPolicy>[] = [
     {
@@ -49,14 +43,28 @@ const AdminContentPolicies = () => {
     {
       id: 'version',
       header: t('administration.policies.version'),
-      cell: (p) => <StatusChip variant="neutral">v{p.version}</StatusChip>,
-      width: 'w-24',
+      cell: (p) =>
+        p.builtin ? (
+          <StatusChip variant="neutral" title={t('administration.policies.builtinHint')}>
+            {t('administration.policies.builtin')}
+          </StatusChip>
+        ) : (
+          <StatusChip variant="neutral">v{p.version}</StatusChip>
+        ),
+      width: 'w-32',
     },
-    { id: 'assigned', header: t('administration.policies.assigned'), cell: (p) => <span className="text-sm">{assignedTo(p)}</span> },
     {
-      id: 'updated',
-      header: t('administration.policies.updated'),
-      cell: (p) => (p.updated_at || p.created_at ? new Date(p.updated_at ?? p.created_at!).toLocaleString(i18n.language) : '—'),
+      id: 'tiers',
+      header: t('administration.policies.tiers'),
+      cell: (p) => {
+        // In the bases' own order: jsonb hands the keys back sorted alphabetically.
+        const tiers = (p.document?.tiers ?? {}) as Record<string, string>;
+        return (
+          <span className="font-mono text-xs text-zinc-600 dark:text-zinc-300">
+            {BASES.map((basis) => tiers[basis] ?? '—').join(' · ')}
+          </span>
+        );
+      },
     },
   ];
 
@@ -112,7 +120,7 @@ const AdminContentPolicies = () => {
 
       {/* Mounted per policy, so a discarded draft never carries over to the next one opened. */}
       {editing !== undefined && (
-        <PolicyDrawer key={editing ?? '__new'} open policyKey={editing} onClose={() => setEditing(undefined)} />
+        <PolicyDrawer key={editing ?? '__new'} policyKey={editing} onClose={() => setEditing(undefined)} />
       )}
     </div>
   );

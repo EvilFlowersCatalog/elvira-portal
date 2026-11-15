@@ -18,6 +18,7 @@ import IconButton from '../IconButton';
 import UserPicker from '../UserPicker';
 import UserLink from '../UserLink';
 import Button from '../../buttons/Button';
+import Select from '../../primitives/Select';
 
 const DEFAULT_LIMIT = 25;
 
@@ -35,6 +36,7 @@ function CreateKeyDrawer({ open, ownerId, onClose, onSaved }: CreateKeyDrawerPro
   const [name, setName] = useState('');
   const [owner, setOwner] = useState<IUser | null>(null);
   const [active, setActive] = useState(true);
+  const [processor, setProcessor] = useState<'' | 'local' | 'external'>('');
   const [saving, setSaving] = useState(false);
   // The one response that carries the secret; shown once, dropped on close.
   const [createdToken, setCreatedToken] = useState<string | null>(null);
@@ -44,6 +46,7 @@ function CreateKeyDrawer({ open, ownerId, onClose, onSaved }: CreateKeyDrawerPro
       setName('');
       setOwner(null);
       setActive(true);
+      setProcessor('');
       setCreatedToken(null);
     }
   }, [open]);
@@ -56,7 +59,12 @@ function CreateKeyDrawer({ open, ownerId, onClose, onSaved }: CreateKeyDrawerPro
   const submit = async () => {
     setSaving(true);
     try {
-      const key = await createKey({ name: name.trim() || undefined, user_id: ownerId ?? owner?.id, is_active: active });
+      const key = await createKey({
+        name: name.trim() || undefined,
+        user_id: ownerId ?? owner?.id,
+        is_active: active,
+        ...(processor ? { processor } : {}),
+      });
       toast.success(t('administration.accessPage.keys.created'));
       onSaved();
       // Keep the drawer open on the token — closing now would lose the only copy.
@@ -139,6 +147,20 @@ function CreateKeyDrawer({ open, ownerId, onClose, onSaved }: CreateKeyDrawerPro
         <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 p-3">
           <Switch checked={active} onChange={setActive} label={t('administration.accessPage.keys.activeToggle')} />
         </div>
+        {/* #174: what the key's client does with the text decides how much a content policy lets it read. */}
+        <Field label={t('administration.accessPage.keys.processor')} htmlFor="key-processor" hint={t('administration.accessPage.keys.processorHint')}>
+          <Select
+            id="key-processor"
+            value={processor}
+            onChange={(value) => setProcessor(value as typeof processor)}
+            options={[
+              { value: '', label: t('administration.accessPage.keys.processorInherit') },
+              { value: 'external', label: t('administration.accessPage.keys.processorExternal') },
+              { value: 'local', label: t('administration.accessPage.keys.processorLocal') },
+            ]}
+            triggerClassName="h-10 rounded-lg border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40"
+          />
+        </Field>
       </div>
       )}
     </Drawer>
@@ -248,6 +270,18 @@ export default function ApiKeysTable({ userId, createOpen, onCreateClose, onTota
           <StatusChip variant="success">{t('administration.accessPage.keys.active')}</StatusChip>
         ) : (
           <StatusChip variant="neutral">{t('administration.accessPage.keys.inactive')}</StatusChip>
+        ),
+    },
+    {
+      id: 'processor',
+      header: t('administration.accessPage.keys.processor'),
+      cell: (k) =>
+        k.processor ? (
+          <StatusChip variant={k.processor === 'local' ? 'info' : 'neutral'}>
+            {t(k.processor === 'local' ? 'administration.accessPage.keys.processorLocal' : 'administration.accessPage.keys.processorExternal')}
+          </StatusChip>
+        ) : (
+          <span className="text-xs text-zinc-400">{t('administration.accessPage.keys.processorInheritShort')}</span>
         ),
     },
     {

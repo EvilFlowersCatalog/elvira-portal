@@ -1,66 +1,54 @@
 # Content policies and settings in the admin
 
-Portal side of elvira-portal#47. It depends on EvilFlowersCatalog#174 (content policies) and #20 (settings
-store). Neither is implemented yet. Shapes marked *assumed* are not in the backend issues; please confirm or
-correct them there.
-
-Both pages work before the backend exists. When a list route answers 404, 405 or 501, the page shows one
-notice linking the backend issue instead of errors. When the policies list is unavailable or empty, the
-assignment pickers render nothing.
+Portal side of elvira-portal#47, on the catalog's EvilFlowersCatalog#174 (content policies) and #20 (instance
+settings), both in catalog `05cf002` and live on dev. The pages are behind `ELVIRA_EXPERIMENTAL_FEATURES`. On a
+catalog without these routes (404, 405 or 501), each page shows one notice and the pickers render nothing.
 
 ## Pages
 
 | Route | What |
 |---|---|
-| `/administration/content-policies` | Policy list, "New from preset", editor drawer (Edit · History · Explain), and an Explain tab |
-| `/administration/settings` | Every registry key: a typed field, its default, a source chip (database · environment · built-in), Save and Reset |
-| Catalog drawer, entry config | A "Content policy" picker with "Inherit" as the default; it lists policies and cannot edit them |
-
-The administration is superuser-only (`AdminGuard`), so the pickers are only shown to superusers. The
-backend still has to enforce that a catalog `manage` user may assign policies but never edit them.
+| `/administration/content-policies` | Policy list (key, version or "built-in", tiers), "New from preset", an editor drawer with Edit · History · Explain tabs, and an Explain tab on the page |
+| `/administration/settings` | Every declared key: a field from its JSON Schema, the default, the source (saved here · deployment `EVILFLOWERS_*` · built-in), Save and Reset |
+| Catalog drawer (edit), entry edit | A "Content policy" picker with "Inherit" first. It **saves on change** through the assign endpoint. |
 
 ## Content policies (`/api/v1/content-policies`)
 
-- `GET /` returns a list: an array, `{items}` or `{results}`. Each item:
-  `{key, title, version, updated_at?, created_at?, updated_by?, assigned?}`.
-  - *assumed* `assigned: {default?: bool, catalogs?: [{id, title}], entries?: number}` fills the "Used by"
-    column.
-- `GET /schema` returns the JSON Schema, wrapped or bare. The form is generated from it. It supports objects,
-  `enum`, `oneOf`/`anyOf` of consts, `$ref` to `$defs`/`definitions`, booleans, numbers, strings, arrays of
-  enums or strings, `title`, `description`, `default` and `required`. Anything else gets a JSON box. If the
-  schema fails to load, the whole document is edited as JSON.
-- `GET /{key}` returns `{key, title, version, document}`.
-- `PUT /{key}` with `{key, title, document}` saves a new version and returns it (`version` is read for the toast).
-- `POST /` with `{key, title, document}` creates a policy. "New from preset" copies an existing policy's
-  `document` into the editor first.
-- `document.key` and `document.title` are kept in sync with the form fields, as in the #174 YAML.
-- `GET /{key}/versions` returns a list of `{version, title, document, updated_by?, created_at}`. The portal
-  diffs any two versions leaf by leaf (`utils/func/documentDiff.ts`).
-- Validation errors are read from `detail`/`title` plus `errors[]` with `path` or `loc` and `message` or `msg`,
-  so the schema path of the error shows under the editor (#174: "refused with the schema path").
+| Call | Portal use |
+|---|---|
+| `GET /` → `[{key, version, ref, title, builtin, document}]` | List. `builtin` is the unsaved `parity` (version 0). |
+| `GET /schema` | The editor form is generated from it (`SchemaForm`). `key` and `title` are edited above the form. |
+| `GET /{key}` | Editor source; also the preset a new policy copies. |
+| `PUT /{key}` `{document}` → `{…, changed}` | New version; `changed: false` → "nothing changed". `?dry_run=true` is the **Validate** button. |
+| `POST /` `{document}` (`document.key` names it) | Create a policy, and the first save of the built-in `parity`. |
+| `GET /{key}/versions` → `[{version, ref, title, updated_by, created_at}]` | History list. It has no documents, so `?version=N` fetches each compared version for the diff. |
+| `POST /explain` `{entry_id, user_id?, processor?, policy?}` | Explain. `policy` previews another **stored** policy without assigning it. |
+| `POST /{key\|inherit}/assign` `{catalog_id?, entry_ids?}` → `{policy, catalog, entries}` | Pickers. `inherit` clears the assignment. |
 
-### Explain
+Refusals (422) carry `path` and `schema_path`, and the editor shows them under the form.
 
-`POST /explain` with `{entry_id, user_id?, processor?, surface?}`.
+**How the backend shaped the UI**
 
-- *assumed* `policy` (a key) and `document` (an unsaved draft) let an admin explain a change before saving it.
-  The editor's Explain tab sends the draft whenever there are unsaved changes.
-- The answer is shown as
-  `{basis, policy: "key@version", base_tier?, caps: [{cap, value?, applied, tier?, reason?}], tier}`.
+- Explain only works on stored policies. The editor's Explain tab explains the saved version; to check a
+  change, Validate it and save it first.
+- Catalogs don't expose `content_policy`, so the catalog picker reads it with a dry-run
+  `POST /inherit/assign {catalog_id}` (`catalog.previous`).
+- Entry `config` merges on save, so it could never clear the key. The entry picker therefore assigns through
+  the endpoint rather than through the entry form.
+- The explain `caps` are every cap's ceiling. The response doesn't include the basis tier, so the portal can't
+  tell which cap actually lowered the result, and doesn't claim to.
 
-## Settings (`/api/v1/settings`) — #20 has no contract yet
+## Settings (`/api/v1/settings`)
 
-- *assumed* `GET /` returns a list of
-  `{key, type, value, default, source: "db"|"env"|"default", title?, description?, choices?, schema?, secret?, readonly?}`.
-  - `type` is one of `string`, `text`, `url`, `email`, `integer`, `number`, `boolean` or `json`.
-  - `choices` renders as a select; `schema` overrides `type`.
-  - `secret` values are never sent back, and the field stays empty until typed.
-- *assumed* `PUT /{key}` with `{value}` stores the value in the database.
-- *assumed* `DELETE /{key}` drops the stored value, so the environment or the built-in default applies again.
-  The Reset button only appears when `source` is `db`.
+- `GET /` → `[{key, schema, description, default, fallback, permission, value, source: stored|setting|default}]`
+- `PUT /{key}` `{value}` saves the value; `{value: null}` resets it, so the deployment setting or the default
+  applies again.
+- Special cases in the form:
+  - `content.default_policy` is a select of the existing policies.
+  - `branding.logo` has a preview and an upload that turns the file into a `data:` URI (512 kB cap in the portal).
 
-## Assignment
+## API keys
 
-- Catalog: `catalogs.content_policy` (nullable), read from the catalog detail. It is sent on
-  `PUT /api/v1/catalogs/{id}` only when changed, so a catalog without #174 never receives the key.
-- Entry: `config.content_policy`. "Inherit" removes the key rather than sending `null`.
+`processor` (`local` | `external`, empty inherits `content.external_processor_default`) is set when a key is
+created and shown in the keys table. Only administrators may set `local`; the catalog refuses it for anyone
+else.

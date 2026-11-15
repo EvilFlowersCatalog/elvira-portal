@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 import { IPartParams, IConfig } from '../../../../utils/interfaces/general/general';
 import useAppContext from '../../../../hooks/contexts/useAppContext';
 import { Switch } from '../../../admin/Field';
@@ -31,6 +32,8 @@ const BOOL_FIELDS: { key: BoolKey; labelKey: string; helpKey: string; event: str
 ];
 
 const ConfigPart = ({ entry, setEntry }: IPartParams) => {
+  // Only the edit route has an entry to assign a policy to (`edit/:entry-id`).
+  const { 'entry-id': entryId } = useParams();
   const { umamiTrack } = useAppContext();
   const { t } = useTranslation();
   const config = entry.config;
@@ -111,14 +114,17 @@ const ConfigPart = ({ entry, setEntry }: IPartParams) => {
         </div>
       )}
 
-      {/* Content policy (#47): "inherit" drops the key, so an entry without one never sends it. */}
-      <ContentPolicyPicker
-        id="entry-content-policy"
-        value={config?.content_policy}
-        onChange={(key) => setConfig({ content_policy: key ?? undefined })}
-        inheritLabel={t('administration.policies.picker.inheritCatalog')}
-        hint={t('administration.policies.picker.entryHint')}
-      />
+      {/* Content policy (#47): saved on change through the assign endpoint, an existing entry only (the entry
+          form merges `config`, so it could never clear the key). */}
+      {entryId ? (
+        <ContentPolicyPicker
+          id="entry-content-policy"
+          entryId={entryId}
+          entryValue={config?.content_policy}
+          inheritLabel={t('administration.policies.picker.inheritCatalog')}
+          hint={t('administration.policies.picker.entryHint')}
+        />
+      ) : null}
     </div>
   );
 };

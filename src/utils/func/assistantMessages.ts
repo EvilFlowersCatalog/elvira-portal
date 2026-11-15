@@ -16,6 +16,8 @@ const TOOL_STATUS: Record<string, string> = {
   study: 'study',
   displayBooks: 'showBooks',
   library_overview: 'libraryOverview',
+  annotate_figure: 'markFigure',
+  follow: 'follow',
 };
 
 /**
@@ -44,6 +46,9 @@ const TOOL_ACTIVITY: Record<string, string> = {
   study: 'study',
   displayBooks: 'showBooks',
   library_overview: 'libraryOverview',
+  // EvilFlowersCatalog#179: marks drawn on a cited figure ("Marked F2").
+  annotate_figure: 'markFigure',
+  follow: 'follow',
 };
 
 /** Translation key of a finished tool call in the activity log (past tense). */

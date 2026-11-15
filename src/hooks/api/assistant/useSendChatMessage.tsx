@@ -36,6 +36,8 @@ const activityOf = (payload: object): Omit<IAssistantToolActivity, 'id' | 'tool'
   return {
     ...(typeof raw.query === 'string' && raw.query ? { query: raw.query } : {}),
     ...(pages.length ? { pages } : {}),
+    ...(typeof raw.label === 'string' && raw.label ? { label: raw.label.slice(0, 20) } : {}),
+    ...(typeof raw.relation === 'string' && raw.relation ? { relation: raw.relation.slice(0, 40) } : {}),
     ...(typeof raw.count === 'number' ? { count: raw.count } : {}),
     ...(entries.length ? { entries } : {}),
     ...(raw.error === true ? { error: true } : {}),

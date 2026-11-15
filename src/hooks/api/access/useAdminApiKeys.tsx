@@ -10,6 +10,12 @@ export interface IApiKey {
   created_at: string;
   updated_at: string;
   /**
+   * Where the key's client sends the text it reads (EvilFlowersCatalog#174): `local` (our hardware; can unlock
+   * more under a content policy, administrators only) or `external`. Null inherits
+   * `content.external_processor_default`.
+   */
+  processor?: 'local' | 'external' | null;
+  /**
    * The bearer secret. Only the `POST /api/v1/api_keys` response carries it —
    * listings never do (the catalog shows a credential once, at creation).
    */
@@ -28,6 +34,8 @@ export interface ICreateApiKeyPayload {
   name?: string;
   user_id?: string;
   is_active?: boolean;
+  /** Omitted inherits the instance setting. */
+  processor?: 'local' | 'external';
 }
 
 export const useListApiKeys = () => {

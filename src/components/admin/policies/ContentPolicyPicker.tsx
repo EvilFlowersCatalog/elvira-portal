@@ -1,32 +1,66 @@
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 import Select from '../../primitives/Select';
-import { useContentPolicies } from '../../../hooks/api/contentPolicies/useContentPolicies';
+import {
+  problemOf,
+  useAssignContentPolicy,
+  useCatalogPolicy,
+  useContentPolicies,
+} from '../../../hooks/api/contentPolicies/useContentPolicies';
 
 /**
- * Assigns an existing content policy (elvira-portal#47): a picker on the catalog settings and on entry edit, with
- * "inherit" as the default. It lists policies only — editing happens on the policies page. Renders nothing while
- * the catalog has no policies API (or none defined), so the forms stay as they were.
+ * Assigns an existing content policy (elvira-portal#47) to a catalog or one entry, with "Inherit" as the default.
+ * It saves on change through `POST /content-policies/{key|inherit}/assign` — neither the catalog nor the entry
+ * form can carry the key (the entry config merges, so it could never be cleared). It lists policies only;
+ * editing happens on the policies page. Renders nothing while the catalog has no policies API.
  */
 export default function ContentPolicyPicker({
   id,
-  value,
-  onChange,
+  catalogId,
+  entryId,
+  entryValue,
   inheritLabel,
   hint,
 }: {
   id: string;
-  value: string | null | undefined;
-  onChange: (key: string | null) => void;
-  /** What "inherit" falls back to here (the catalog's policy, the instance default). */
+  catalogId?: string;
+  entryId?: string;
+  /** The entry's `config.content_policy`, as loaded with the entry. */
+  entryValue?: string | null;
   inheritLabel: string;
   hint: string;
 }) {
   const { t } = useTranslation();
-  // Behind the flag with the policies page: no request (and no 404) on production entry and catalog forms.
+  // Behind the flag with the policies page: no request on production entry and catalog forms.
   const enabled = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
   const policies = useContentPolicies(enabled);
-  if (!enabled) return null;
-  if (policies.isError || !policies.data?.length) return null;
+  const catalogPolicy = useCatalogPolicy(catalogId ?? null, enabled && !entryId);
+  const assign = useAssignContentPolicy();
+  const [value, setValue] = useState<string | null>(entryId ? entryValue ?? null : null);
+
+  useEffect(() => {
+    if (entryId) setValue(entryValue ?? null);
+  }, [entryId, entryValue]);
+  useEffect(() => {
+    if (!entryId && catalogPolicy.data !== undefined) setValue(catalogPolicy.data);
+  }, [entryId, catalogPolicy.data]);
+
+  if (!enabled || policies.isError || !policies.data?.length || (!entryId && !catalogId)) return null;
+
+  const change = async (selected: string) => {
+    const key = selected || null;
+    const previous = value;
+    setValue(key);
+    try {
+      await assign.mutateAsync({ key, ...(entryId ? { entryIds: [entryId] } : { catalogId }) });
+      toast.success(key ? t('administration.policies.picker.assigned', { key }) : t('administration.policies.picker.inherited'));
+      if (!entryId) catalogPolicy.refetch();
+    } catch (error) {
+      setValue(previous);
+      toast.error(problemOf(error) ?? t('administration.policies.picker.error'));
+    }
+  };
 
   const known = policies.data.some((p) => p.key === value);
   const options = [
@@ -44,7 +78,8 @@ export default function ContentPolicyPicker({
       <Select
         id={id}
         value={value ?? ''}
-        onChange={(selected) => onChange(selected || null)}
+        onChange={change}
+        disabled={assign.isPending || (!entryId && catalogPolicy.isLoading)}
         options={options}
         className="max-w-sm"
         triggerClassName="h-10 rounded-lg border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40"

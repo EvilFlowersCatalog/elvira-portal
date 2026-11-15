@@ -103,9 +103,11 @@ interface FieldProps {
   required?: boolean;
   depth?: number;
   disabled?: boolean;
+  /** Top-level properties edited elsewhere (a policy's `key` and `title`). */
+  hidden?: string[];
 }
 
-export function SchemaField({ schema: raw, root, name, value, onChange, required, depth = 0, disabled }: FieldProps) {
+export function SchemaField({ schema: raw, root, name, value, onChange, required, depth = 0, disabled, hidden }: FieldProps) {
   const { t } = useTranslation();
   const id = useId();
   const schema = resolveSchema(raw, root);
@@ -122,7 +124,7 @@ export function SchemaField({ schema: raw, root, name, value, onChange, required
   if (type === 'object' || (!type && schema.properties)) {
     const object = (value && typeof value === 'object' && !Array.isArray(value) ? value : {}) as Record<string, unknown>;
     const properties = schema.properties ?? {};
-    const keys = Object.keys(properties);
+    const keys = Object.keys(properties).filter((key) => depth > 0 || !hidden?.includes(key));
     if (!keys.length) {
       return (
         <Labelled id={id} label={label} hint={hint} required={required}>
@@ -315,11 +317,13 @@ export default function SchemaForm({
   value,
   onChange,
   disabled,
+  hidden,
 }: {
   schema: IJsonSchema | null | undefined;
   value: Record<string, unknown>;
   onChange: (value: Record<string, unknown>) => void;
   disabled?: boolean;
+  hidden?: string[];
 }) {
   const { t } = useTranslation();
   const [raw, setRaw] = useState(!schema);
@@ -355,6 +359,7 @@ export default function SchemaForm({
           name=""
           value={value}
           disabled={disabled}
+          hidden={hidden}
           onChange={(next) => onChange((next ?? {}) as Record<string, unknown>)}
         />
       )}

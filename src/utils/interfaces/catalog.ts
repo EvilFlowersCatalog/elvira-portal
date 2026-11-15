@@ -21,8 +21,6 @@ export interface ICatalog {
   updated_at: string;
   /** Present on the detail endpoint. */
   user_catalogs?: IUserCatalog[];
-  /** Content policy key (EvilFlowersCatalog#174); null = the instance default. */
-  content_policy?: string | null;
 }
 
 /** Membership entry as accepted by POST/PUT /api/v1/catalogs. */
@@ -37,6 +35,4 @@ export interface ICatalogPayload {
   is_public: boolean;
   /** Full membership set — PUT replaces existing membership with this list. */
   users?: ICatalogMemberInput[];
-  /** Sent only when changed, so a catalog without #174 never sees the key. */
-  content_policy?: string | null;
 }

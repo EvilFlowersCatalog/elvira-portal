@@ -44,8 +44,6 @@ export default function CatalogDrawer({ open, catalog, mode, onClose, onSaved }:
   const [title, setTitle] = useState('');
   const [urlName, setUrlName] = useState('');
   const [isPublic, setIsPublic] = useState(false);
-  const [policy, setPolicy] = useState<string | null>(null);
-  const [policyDirty, setPolicyDirty] = useState(false);
   const [members, setMembers] = useState<Member[]>([]);
   const [memberFilter, setMemberFilter] = useState('');
   // Track load/dirty separately so we never wipe a 100+ member list by mistake:
@@ -62,17 +60,14 @@ export default function CatalogDrawer({ open, catalog, mode, onClose, onSaved }:
     setErrors({});
     setMemberFilter('');
     setMembersDirty(false);
-    setPolicyDirty(false);
     if (mode === 'edit' && catalog) {
       setTitle(catalog.title);
       setUrlName(catalog.url_name);
       setIsPublic(catalog.is_public);
-      setPolicy(catalog.content_policy ?? null);
       setMembers([]);
       setMembersLoaded(false);
       getDetail(catalog.id)
         .then((full) => {
-          if (full.content_policy !== undefined) setPolicy(full.content_policy);
           setMembers(
             (full.user_catalogs ?? []).map((uc) => ({
               id: uc.user.id,
@@ -88,7 +83,6 @@ export default function CatalogDrawer({ open, catalog, mode, onClose, onSaved }:
       setTitle('');
       setUrlName('');
       setIsPublic(false);
-      setPolicy(null);
       setMembers([]);
       setMembersLoaded(true); // fresh catalog: empty set is authoritative
     }
@@ -136,7 +130,6 @@ export default function CatalogDrawer({ open, catalog, mode, onClose, onSaved }:
       if (mode === 'create' || (membersLoaded && membersDirty)) {
         payload.users = members.map((m) => ({ user_id: m.id, mode: m.mode }));
       }
-      if (policyDirty) payload.content_policy = policy;
       if (mode === 'create') {
         await createCatalog(payload);
         toast.success(t('administration.catalogsPage.created'));
@@ -224,16 +217,15 @@ export default function CatalogDrawer({ open, catalog, mode, onClose, onSaved }:
             <p className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">{t('administration.catalogsPage.isPublicHint')}</p>
           </div>
 
-          <ContentPolicyPicker
-            id="cat-content-policy"
-            value={policy}
-            onChange={(key) => {
-              setPolicy(key);
-              setPolicyDirty(true);
-            }}
-            inheritLabel={t('administration.policies.picker.inheritInstance')}
-            hint={t('administration.policies.picker.catalogHint')}
-          />
+          {/* Saves on change through the assign endpoint (#174); an existing catalog only. */}
+          {mode === 'edit' && catalog && (
+            <ContentPolicyPicker
+              id="cat-content-policy"
+              catalogId={catalog.id}
+              inheritLabel={t('administration.policies.picker.inheritInstance')}
+              hint={t('administration.policies.picker.catalogHint')}
+            />
+          )}
 
           <div>
             <div className="flex items-baseline justify-between">

@@ -13,7 +13,8 @@ function ActivityRow({ call }: { call: IAssistantToolActivity }) {
   const titles = call.entries ?? [];
   // A record read is its title on the row itself; searches expand to the titles they found.
   const single = call.tool === 'get_entry' ? titles[0]?.title : undefined;
-  const object = call.query ?? single;
+  // `follow` / `annotate_figure` name a label instead of a query: "Marked F2", "Followed E3 · next".
+  const object = call.query ?? single ?? ([call.label, call.relation].filter(Boolean).join(' · ') || undefined);
   const expandable = call.done && !single && titles.length > 0;
 
   const facts: string[] = [];

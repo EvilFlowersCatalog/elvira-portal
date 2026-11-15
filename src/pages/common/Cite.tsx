@@ -48,9 +48,8 @@ const Cite = () => {
         if (cancelled) return;
         const status = isAxiosError(error) ? error.response?.status : undefined;
         if (status === 403) {
-          // No access: the publication's detail, where borrowing lives.
-          const body = isAxiosError(error) ? (error.response?.data as Partial<ILocator> | undefined) : undefined;
-          openDetail(body?.entry?.catalog_id);
+          // No access (e.g. outside the entry's IP ranges): the publication's detail, where borrowing lives.
+          openDetail();
           return;
         }
         if (status !== 404) toast.error(t('cite.failed'));
@@ -59,16 +58,16 @@ const Cite = () => {
       }
       if (cancelled) return;
 
-      const entry = await getEntryDetail(entryId, locator.entry?.catalog_id).catch(() => null);
+      const entry = await getEntryDetail(entryId).catch(() => null);
       if (cancelled) return;
       if (!entry) {
         navigate(NAVIGATION_PATHS.notFound, { replace: true });
         return;
       }
 
-      // Readium LCP titles are borrowed and read in a Readium app, never here; a locked one answers `how_to_unlock`.
+      // Readium LCP titles are borrowed and read in a Readium app, never here: their detail (borrow) instead.
       const index = readablePdfIndex(entry);
-      if (locator.how_to_unlock != null || !locator.page || index < 0) {
+      if (!locator.page || index < 0) {
         openDetail(entry.catalog_id);
         return;
       }
@@ -78,11 +77,7 @@ const Cite = () => {
 
       const target =
         locator.resolution !== 'page_only' && (locator.bbox || locator.quads?.length)
-          ? {
-              bbox: locator.bbox ?? undefined,
-              quads: locator.quads ?? undefined,
-              quadsPage: locator.quads_page && locator.quads_page !== locator.page ? locator.quads_page : undefined,
-            }
+          ? { bbox: locator.bbox ?? undefined, quads: locator.quads ?? undefined }
           : undefined;
       const state: IViewerLocationState = { catalogId: entry.catalog_id, ...(target ? { target } : {}) };
       navigate(`${NAVIGATION_PATHS.viewer}${entryId}/${index}?page=${locator.page}`, { replace: true, state });

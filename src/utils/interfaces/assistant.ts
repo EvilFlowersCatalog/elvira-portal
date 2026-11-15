@@ -74,6 +74,8 @@ export interface IAssistantCitation {
    * through `/cite/{entry_id}/{locator_key}`, which survives re-extraction (elvira-portal#46).
    */
   locator_key?: string;
+  /** How the locator was found in the current extraction: `exact`, `relocated` (moved) or `page_only`. */
+  resolution?: 'exact' | 'relocated' | 'page_only';
   /**
    * Marks the assistant draws over a figure's crop (contract: docs/assistant-figure-marks.md). Untrusted:
    * the portal clamps, caps and sanitises them before drawing (`figureMarks`).
@@ -321,6 +323,10 @@ export interface IAssistantToolActivity {
   query?: string;
   /** Pages read or matched. */
   pages?: number[];
+  /** The evidence label a call is about (`follow`, `annotate_figure`: "F2"). */
+  label?: string;
+  /** How `follow` moved from it (`next`, `previous`, …). */
+  relation?: string;
   /** Number of results. */
   count?: number;
   /** Publications it found, by title (ids only for linking). */
