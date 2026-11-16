@@ -93,7 +93,7 @@ export default function CitationChip({
                 width: CARD_WIDTH,
                 transform: card.above ? 'translateY(-100%)' : undefined,
               }}
-              className="fixed z-[1000] rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 overflow-hidden text-left"
+              className="fixed z-[1300] rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 overflow-hidden text-left"
             >
               {image ? (
                 <img src={image} alt={citation.caption ?? ''} className="w-full max-h-44 object-contain bg-white" />

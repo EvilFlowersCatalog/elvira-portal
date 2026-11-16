@@ -1,41 +1,11 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import { FiCopy, FiImage, FiMaximize2 } from 'react-icons/fi';
-import { toast } from 'react-toastify';
 import { twMerge } from 'tailwind-merge';
 import { IExtractionRegion } from '../../../../utils/interfaces/extraction';
 import { Drawer, StatusChip } from '../../../admin';
-
-export const copyText = async (text: string, okMessage: string) => {
-  try {
-    await navigator.clipboard.writeText(text);
-    toast.success(okMessage);
-  } catch {
-    /* clipboard blocked: nothing to do */
-  }
-};
-
-/** A table region's markdown as a real table, like the viewer's grid. */
-export const MarkdownTable = ({ markdown, className }: { markdown: string; className?: string }) => (
-  <div className={twMerge('overflow-x-auto rounded-lg border border-zinc-200 dark:border-zinc-700', className)}>
-    <ReactMarkdown
-      remarkPlugins={[remarkGfm]}
-      components={{
-        table: (props) => <table className="w-full border-collapse text-xs" {...props} />,
-        thead: (props) => <thead className="bg-zinc-50 dark:bg-zinc-900/40" {...props} />,
-        th: (props) => (
-          <th className="border-b border-zinc-200 px-2 py-1.5 text-left font-semibold dark:border-zinc-700" {...props} />
-        ),
-        td: (props) => <td className="border-b border-zinc-100 px-2 py-1 align-top dark:border-zinc-700/60" {...props} />,
-        p: (props) => <p className="px-2 py-1 text-xs" {...props} />,
-      }}
-    >
-      {markdown}
-    </ReactMarkdown>
-  </div>
-);
+import { MarkdownTable } from '../../../common/MarkdownTable';
+import { copyText } from '../../../../utils/func/clipboard';
 
 const Crop = ({ region, className }: { region: IExtractionRegion; className?: string }) => {
   const { t } = useTranslation();

@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import ReactMarkdown, { Components } from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { useTranslation } from 'react-i18next';
-import { FiRotateCcw } from 'react-icons/fi';
+import { FiFileText, FiRotateCcw } from 'react-icons/fi';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import useOpenInViewer from '../../hooks/api/assistant/useOpenInViewer';
@@ -13,7 +13,10 @@ import useEntriesByIds from '../../hooks/api/entries/useEntriesByIds';
 import { AiMessage } from '../../providers/AppProvider';
 import { IAssistantCitation } from '../../utils/interfaces/assistant';
 import {
+  answerFigures,
+  answerSources,
   citationsToLinks,
+  evidenceLabelsIn,
   findCitation,
   findRegion,
   figureLabelsIn,
@@ -27,6 +30,8 @@ import ToolActivityLog from './ToolActivityLog';
 import RegionCite, { CitedRegion } from './RegionCite';
 import CitationChip from './CitationChip';
 import FigureCard from './FigureCard';
+import FigureGallery from './FigureGallery';
+import FigureLightbox from './FigureLightbox';
 import { citeClass, figureContext } from './citationUi';
 import EvidencePanel from './EvidencePanel';
 import StudyCard from './StudyCard';
@@ -35,6 +40,9 @@ import AnswerFeedback from './AnswerFeedback';
 import GuideCard from '../guide/GuideCard';
 import useSimilarEntries from '../../hooks/api/entries/useSimilarEntries';
 import { ISendOptions } from '../../hooks/api/assistant/useAssistantChat';
+import { citeUris } from '../../hooks/api/assistant/useCite';
+import AccessCard from './AccessCard';
+import CiteDialog from './CiteDialog';
 
 /**
  * One chat message, rendered the way the viewer's chat renders it: the
@@ -144,6 +152,30 @@ export default function AssistantMessage({
     [msg.text, msg.citations, streaming, messages, figures, t],
   );
 
+  // Every figure of this answer, for one lightbox the reader steps through (cited, shown, from the sources).
+  const { shown: shownFigures, sources: sourceFigures, all: allFigures } = useMemo(
+    () =>
+      answerFigures(
+        blocks.flatMap((block) => block.figures),
+        { citations: msg.citations, evidence: msg.evidence, figureLabels: msg.figureLabels },
+        streaming,
+      ),
+    [blocks, msg.citations, msg.evidence, msg.figureLabels, streaming],
+  );
+  const [lightboxAt, setLightboxAt] = useState<number | null>(null);
+
+  // "Cite these sources": what the text cites, then the figures it showed (only those with an address).
+  const citedLabels = useMemo(() => evidenceLabelsIn(msg.text), [msg.text]);
+  const sourceUris = useMemo(
+    () => (streaming ? [] : citeUris(answerSources({ text: msg.text, citations: msg.citations, figureLabels: msg.figureLabels }))),
+    [streaming, msg.text, msg.citations, msg.figureLabels],
+  );
+  const [citing, setCiting] = useState(false);
+  const enlarge = (citation: IAssistantCitation) => {
+    const index = allFigures.findIndex((c) => c.label.toUpperCase() === citation.label.toUpperCase());
+    setLightboxAt(index >= 0 ? index : null);
+  };
+
   const askAboutFigure = onSend
     ? (citation: IAssistantCitation) => {
         const context = figureContext(citation);
@@ -231,7 +263,7 @@ export default function AssistantMessage({
 
   const failed = msg.status === 'error';
   // A study card is the whole answer of its turn: there is no text to rate apart from it.
-  const answered = !streaming && !failed && (!!msg.text || !!msg.study || !!msg.entryIds?.length);
+  const answered = !streaming && !failed && (!!msg.text || !!msg.study || !!msg.entryIds?.length || !!msg.figureLabels?.length);
 
   return (
     <div className={`self-start flex flex-col gap-2 w-full ${compact ? 'mb-2' : 'mb-4'}`}>
@@ -241,7 +273,14 @@ export default function AssistantMessage({
 
       {/* Sources, from the `evidence` frame before the first token; cited ones marked once the answer is in */}
       {msg.evidence || (msg.citations?.length && !streaming) ? (
-        <EvidencePanel evidence={msg.evidence} citations={msg.citations} streaming={streaming} onOpen={open} />
+        <EvidencePanel
+          evidence={msg.evidence}
+          citations={msg.citations}
+          citedLabels={citedLabels}
+          shownLabels={msg.figureLabels}
+          streaming={streaming}
+          onOpen={open}
+        />
       ) : null}
 
       {!msg.text ? liveLine : null}
@@ -269,6 +308,7 @@ export default function AssistantMessage({
                     citation={figure}
                     onOpen={figure.readable === false && !figure.page ? undefined : open}
                     onAsk={askAboutFigure}
+                    onEnlarge={enlarge}
                   />
                 ))}
               </div>
@@ -287,6 +327,23 @@ export default function AssistantMessage({
       )}
 
       {msg.text ? liveLine : null}
+
+      {/* Publications the turn could not read in full, each with its next step (sign in, borrow, campus network) */}
+      {msg.access?.map((access) => <AccessCard key={access.entry_id} access={access} onNavigate={onNavigate} />)}
+
+      {/* Figures the assistant chose to show, and the ones its sources hold that the answer did not cite */}
+      {shownFigures.length ? <FigureGallery figures={shownFigures} variant="shown" onEnlarge={enlarge} /> : null}
+      {sourceFigures.length ? <FigureGallery figures={sourceFigures} variant="sources" onEnlarge={enlarge} /> : null}
+      {lightboxAt !== null && allFigures[lightboxAt] ? (
+        <FigureLightbox
+          figures={allFigures}
+          index={lightboxAt}
+          onIndex={setLightboxAt}
+          onClose={() => setLightboxAt(null)}
+          onOpen={open}
+          onAsk={askAboutFigure}
+        />
+      ) : null}
 
       {/* Places in the portal the answer offers to show */}
       {msg.guide ? <GuideCard guide={msg.guide} /> : null}
@@ -354,6 +411,21 @@ export default function AssistantMessage({
 
       {msg.suggestions?.length ? (
         <SuggestionChips suggestions={msg.suggestions} onSend={onSend ? (message) => onSend(message) : undefined} />
+      ) : null}
+
+      {/* Formatted references for the answer's sources (ISO 690 by default) */}
+      {answered && sourceUris.length ? (
+        <button
+          type="button"
+          onClick={() => setCiting(true)}
+          className="self-start inline-flex items-center gap-1 text-xs text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primaryLight"
+        >
+          <FiFileText size={12} aria-hidden="true" /> {t('assistant.references.button')}
+          <span className="opacity-70">({sourceUris.length})</span>
+        </button>
+      ) : null}
+      {citing ? (
+        <CiteDialog uris={sourceUris} title={t('assistant.references.answerTitle')} onClose={() => setCiting(false)} />
       ) : null}
 
       {/* Rating needs an account: the catalog stores it on the reader's own chat. */}

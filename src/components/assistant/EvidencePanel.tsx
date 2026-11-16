@@ -23,7 +23,18 @@ const groupByPublication = (sources: IAssistantCitation[]): Group[] => {
   return [...groups.values()];
 };
 
-function SourceRow({ source, cited, onOpen }: { source: IAssistantCitation; cited: boolean; onOpen: () => void }) {
+function SourceRow({
+  source,
+  cited,
+  shownOnly,
+  onOpen,
+}: {
+  source: IAssistantCitation;
+  cited: boolean;
+  /** Shown in the figure gallery, not cited in the text. */
+  shownOnly: boolean;
+  onOpen: () => void;
+}) {
   const { t } = useTranslation();
   const cropUrl = useCropUrl();
   const image = isFigure(source) ? cropUrl(source.image_url) : undefined;
@@ -41,7 +52,11 @@ function SourceRow({ source, cited, onOpen }: { source: IAssistantCitation; cite
       <span className="min-w-0 flex flex-col">
         <span className="text-gray-700 dark:text-gray-300 group-hover:underline">
           {where || source.title}
-          {cited ? <span className="ml-1 text-[10px] uppercase tracking-wide text-sky-700 dark:text-sky-300">{t('assistant.evidence.cited')}</span> : null}
+          {cited ? (
+            <span className="ml-1 text-[10px] uppercase tracking-wide text-sky-700 dark:text-sky-300">
+              {t(shownOnly ? 'assistant.evidence.shown' : 'assistant.evidence.cited')}
+            </span>
+          ) : null}
         </span>
         {text ? (
           <span className="text-gray-500 dark:text-gray-400 line-clamp-2">{text}</span>
@@ -62,18 +77,26 @@ function SourceRow({ source, cited, onOpen }: { source: IAssistantCitation; cite
 export default function EvidencePanel({
   evidence,
   citations,
+  citedLabels,
+  shownLabels,
   streaming,
   onOpen,
 }: {
   evidence?: IAssistantEvidence;
   citations?: IAssistantCitation[];
+  /** Labels the answer's text cites; without it every label in `citations` counts as cited. */
+  citedLabels?: string[];
+  /** Figures the answer showed in its gallery (`figures` frame): they are in `citations` but not in the text. */
+  shownLabels?: string[];
   streaming: boolean;
   onOpen: (source: IAssistantCitation) => void;
 }) {
   const { t } = useTranslation();
   const [showUncited, setShowUncited] = useState(false);
 
-  const cited = new Set((citations ?? []).map((c) => c.label.toUpperCase()));
+  const inText = new Set((citedLabels ?? (citations ?? []).map((c) => c.label)).map((l) => l.toUpperCase()));
+  const shownOnly = new Set((shownLabels ?? []).map((l) => l.toUpperCase()).filter((l) => !inText.has(l)));
+  const cited = new Set([...inText, ...shownOnly]);
   // A citation is the completed form of its source: it may carry a better quote (the cited sentence).
   const merged = new Map<string, IAssistantCitation>();
   (evidence?.sources ?? []).forEach((s) => merged.set(s.label.toUpperCase(), s));
@@ -101,6 +124,7 @@ export default function EvidencePanel({
                 key={source.label}
                 source={source}
                 cited={settled && cited.has(source.label.toUpperCase())}
+                shownOnly={shownOnly.has(source.label.toUpperCase())}
                 onOpen={() => onOpen(source)}
               />
             ))}

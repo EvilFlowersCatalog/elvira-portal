@@ -10,11 +10,13 @@ import useAuth from '../../contexts/useAuthContext';
 import {
   ASSISTANT_URL,
   AssistantApiError,
+  accessOf,
   citationOf,
   citationsOf,
   doneIdOf,
   evidenceOf,
   failureOf,
+  figureLabelsOf,
   idsOf,
   pagesOf,
   parseSseData,
@@ -155,6 +157,16 @@ const useSendChatMessage = () => {
         case 'suggestions':
           handlers.onSuggestions?.(suggestionsOf(payload));
           break;
+        case 'figures': {
+          const labels = figureLabelsOf(payload);
+          if (labels.length) handlers.onFigures?.(labels);
+          break;
+        }
+        case 'access': {
+          const access = accessOf(payload);
+          if (access) handlers.onAccess?.(access);
+          break;
+        }
         case 'navigate': {
           const guide = guideOf(payload);
           if (guide) handlers.onNavigate?.(guide);

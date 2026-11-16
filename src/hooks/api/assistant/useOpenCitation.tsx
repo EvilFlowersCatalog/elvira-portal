@@ -1,8 +1,9 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { citePath } from '../../../utils/func/citeLink';
 import { IAssistantCitation } from '../../../utils/interfaces/assistant';
 import useGetEntryDetail from '../entries/useGetEntryDetail';
 import useOpenInViewer, { IViewerTarget } from './useOpenInViewer';
+import useOpenEntryDetail from './useOpenEntryDetail';
 
 /** The spot on the page a citation points to (IP-030 Phase 1), if the catalog sent one. */
 export const citationTarget = (citation: IAssistantCitation): IViewerTarget | undefined =>
@@ -24,7 +25,7 @@ export const citationTarget = (citation: IAssistantCitation): IViewerTarget | un
 const useOpenCitation = () => {
   const openInViewer = useOpenInViewer();
   const { getEntryDetail } = useGetEntryDetail();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const openEntryDetail = useOpenEntryDetail();
   const navigate = useNavigate();
 
   return async (citation: IAssistantCitation, onNavigate?: () => void) => {
@@ -38,12 +39,7 @@ const useOpenCitation = () => {
     const entry = await getEntryDetail(citation.entry_id).catch(() => null);
     onNavigate?.();
     if (entry?.config?.readium_enabled) {
-      // Same query params as EntryItem's openEntryDetail.
-      const params = new URLSearchParams(searchParams);
-      params.set('entry-detail-id', citation.entry_id);
-      params.set('entry-catalog-id', entry.catalog_id);
-      params.set('dialog-priority', 'entry-detail');
-      setSearchParams(params);
+      openEntryDetail(citation.entry_id, entry.catalog_id);
       return;
     }
     openInViewer(

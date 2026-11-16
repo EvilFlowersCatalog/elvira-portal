@@ -1,6 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaPaperPlane, FaX } from 'react-icons/fa6';
+import { FiFileText } from 'react-icons/fi';
+import { citeUris, MAX_CITE_URIS } from '../../hooks/api/assistant/useCite';
+import { answerSources } from '../../utils/func/assistantMessages';
+import CiteDialog from './CiteDialog';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import useAssistantChat, { IAssistantEntryRef, ISendOptions } from '../../hooks/api/assistant/useAssistantChat';
 import useStickToBottom from '../../hooks/useStickToBottom';
@@ -73,6 +77,16 @@ export default function AssistantChatPanel({
   };
 
   const busy = isGenerating;
+
+  // Every answer's sources in chat order, each once (the catalog formats at most 50 per request).
+  const [citingChat, setCitingChat] = useState(false);
+  const { chatUris, citingAnswers } = useMemo(() => {
+    const perAnswer = aiMessages
+      .filter((m) => m.role === 'assistant' && m.status !== 'error' && m.status !== 'streaming')
+      .map((m) => citeUris(answerSources(m)))
+      .filter((uris) => uris.length);
+    return { chatUris: [...new Set(perAnswer.flat())].slice(0, MAX_CITE_URIS), citingAnswers: perAnswer.length };
+  }, [aiMessages]);
   const followUp = busy ? undefined : send;
   const subjectId = aiChatSubject?.entryId ?? attached?.id;
 
@@ -102,6 +116,19 @@ export default function AssistantChatPanel({
               />
             ))
           )}
+          {/* A reference list for the whole chat, once more than one answer cites something */}
+          {!busy && chatUris.length && citingAnswers > 1 ? (
+            <button
+              type="button"
+              onClick={() => setCitingChat(true)}
+              className="self-center mb-2 inline-flex items-center gap-1 text-xs text-gray-500 hover:text-primary dark:text-gray-400 dark:hover:text-primaryLight"
+            >
+              <FiFileText size={12} aria-hidden="true" /> {t('assistant.references.chatButton', { count: chatUris.length })}
+            </button>
+          ) : null}
+          {citingChat ? (
+            <CiteDialog uris={chatUris} title={t('assistant.references.chatTitle')} onClose={() => setCitingChat(false)} />
+          ) : null}
         </div>
       </div>
 

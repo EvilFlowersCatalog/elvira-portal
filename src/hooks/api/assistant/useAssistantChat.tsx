@@ -124,6 +124,12 @@ const useAssistantChat = (entry?: IAssistantEntryRef) => {
         onEvidence: (evidence) => updateAnswer({ evidence }),
         onStudy: (study) => updateAnswer({ study }),
         onSuggestions: (suggestions) => updateAnswer({ suggestions: suggestions.length ? suggestions : undefined }),
+        onFigures: (labels) => updateAnswer({ figureLabels: labels }),
+        // Once per publication per turn; a repeat replaces the earlier notice.
+        onAccess: (access) =>
+          updateAnswer((m) => ({
+            access: [...(m.access ?? []).filter((a) => a.entry_id !== access.entry_id), access].slice(-4),
+          })),
         onAnnotation: (annotation) => {
           annotationIds.push(annotation.id);
           updateAnswer({ annotationIds: [...annotationIds] });

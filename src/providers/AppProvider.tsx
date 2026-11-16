@@ -17,6 +17,7 @@ import { IContextProviderParams } from "../utils/interfaces/contexts";
 import i18next from "../utils/i18n/i18next";
 import useCookiesContext from "../hooks/contexts/useCookiesContext";
 import type {
+  IAssistantAccess,
   IAssistantCitation,
   IAssistantEvidence,
   IAssistantFeedback,
@@ -44,8 +45,12 @@ export interface AiMessage {
   page?: number | null;
   /** Publications the assistant recommended with this answer. */
   entryIds?: string[];
+  /** `F#` labels the assistant showed as a figure gallery (`figures` frame / `displayed_figures`). */
+  figureLabels?: string[];
   /** Viewer pages the answer was drawn from. */
   pagesRead?: number[];
+  /** Publications the turn could not read in full, with how to unlock them (`access` frame). Live only. */
+  access?: IAssistantAccess[];
   /** Evidence labels the answer cites (`[E3]`), resolved to publication and page. */
   citations?: IAssistantCitation[];
   /** AI highlight layers (agent annotations) the assistant created with this answer. */

@@ -89,7 +89,7 @@ export default function RegionCite({
                 width: PREVIEW_WIDTH,
                 transform: preview.above ? 'translateY(-100%)' : undefined,
               }}
-              className="fixed z-[1000] rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 overflow-hidden text-left"
+              className="fixed z-[1300] rounded-lg shadow-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 overflow-hidden text-left"
             >
               {region.imageUrl ? (
                 <button
@@ -118,7 +118,7 @@ export default function RegionCite({
       {lightbox && region?.imageUrl
         ? createPortal(
             <div
-              className="fixed inset-0 z-[1001] bg-black/70 flex items-center justify-center p-4"
+              className="fixed inset-0 z-[1301] bg-black/70 flex items-center justify-center p-4"
               onClick={() => setLightbox(false)}
               role="dialog"
               aria-modal="true"

@@ -1,5 +1,7 @@
 import { isAxiosError } from 'axios';
 import type {
+  AssistantUnlock,
+  IAssistantAccess,
   IAssistantCitation,
   IAssistantEvidence,
   IAssistantStudy,
@@ -194,6 +196,50 @@ export const suggestionsOf = (payload: unknown): IAssistantSuggestion[] => {
           !!s && typeof s === 'object' && typeof s.label === 'string' && typeof s.message === 'string',
       )
     : [];
+};
+
+/** Most figures one gallery shows; the directive is model output, so it is capped like `displayBooks`. */
+export const MAX_GALLERY_FIGURES = 8;
+
+/**
+ * A `figures` payload `{labels: ["F1", "F3"]}` (or a bare list): `F#` labels only, normalised, each once. The
+ * labels name citations of the same turn, so nothing else (no URL, no id) is taken from the frame.
+ */
+export const figureLabelsOf = (payload: unknown): string[] => {
+  const list =
+    Array.isArray(payload) ? payload
+    : payload && typeof payload === 'object' ? (payload as Record<string, unknown>).labels
+    : undefined;
+  if (!Array.isArray(list)) return [];
+  const labels: string[] = [];
+  for (const raw of list) {
+    if (typeof raw !== 'string' || !/^\s*F\d{1,4}\s*$/i.test(raw)) continue;
+    const label = `F${Number(raw.trim().slice(1))}`;
+    if (!labels.includes(label)) labels.push(label);
+  }
+  return labels.slice(0, MAX_GALLERY_FIGURES);
+};
+
+const UNLOCKS: readonly AssistantUnlock[] = ['sign_in', 'borrow', 'campus_network', 'local_processor'];
+const shortText = (value: unknown, max: number): string | undefined =>
+  typeof value === 'string' && value.trim() ? value.trim().slice(0, max) : undefined;
+
+/**
+ * An `access` payload (#186): `{entry_id, title, tier, basis, reason, how_to_unlock}`. The entry id must look
+ * like a UUID (it builds a detail link); unknown ways to unlock are dropped, each kept once in the catalog's order.
+ */
+export const accessOf = (payload: unknown): IAssistantAccess | null => {
+  if (!payload || typeof payload !== 'object') return null;
+  const raw = payload as Record<string, unknown>;
+  if (typeof raw.entry_id !== 'string' || !/^[0-9a-f-]{32,36}$/i.test(raw.entry_id)) return null;
+  const ways = Array.isArray(raw.how_to_unlock) ? raw.how_to_unlock : [];
+  const how_to_unlock = UNLOCKS.filter((way) => ways.includes(way)).sort((a, b) => ways.indexOf(a) - ways.indexOf(b));
+  const fields = { title: shortText(raw.title, 300), tier: shortText(raw.tier, 20), basis: shortText(raw.basis, 20), reason: shortText(raw.reason, 40) };
+  return {
+    entry_id: raw.entry_id,
+    how_to_unlock,
+    ...Object.fromEntries(Object.entries(fields).filter(([, value]) => value !== undefined)),
+  };
 };
 
 /** The stored row that closed the turn, from a `done` payload `{chat_id, message_id}` (EvilFlowersCatalog#145). */

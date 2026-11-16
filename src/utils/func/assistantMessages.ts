@@ -1,5 +1,6 @@
 import { AiChatSubject, AiMessage } from '../../providers/AppProvider';
 import { IAssistantChat, IAssistantCitation, IAssistantMessage, IChatContext } from '../interfaces/assistant';
+import { figureLabelsOf } from '../../hooks/api/assistant/assistantApi';
 
 const TOOL_STATUS: Record<string, string> = {
   search_entries: 'searchCatalog',
@@ -18,6 +19,7 @@ const TOOL_STATUS: Record<string, string> = {
   library_overview: 'libraryOverview',
   annotate_figure: 'markFigure',
   follow: 'follow',
+  show_figures: 'showFigures',
 };
 
 /**
@@ -49,6 +51,8 @@ const TOOL_ACTIVITY: Record<string, string> = {
   // EvilFlowersCatalog#179: marks drawn on a cited figure ("Marked F2").
   annotate_figure: 'markFigure',
   follow: 'follow',
+  // Proposed directive (docs/assistant-figures.md): figures shown as a gallery.
+  show_figures: 'showFigures',
 };
 
 /** Translation key of a finished tool call in the activity log (past tense). */
@@ -105,6 +109,7 @@ export const fromApiMessages = (messages: IAssistantMessage[]): AiMessage[] =>
       contexts: msg.contexts ?? undefined,
       page: msg.page,
       entryIds: msg.displayed_entries ?? undefined,
+      figureLabels: msg.displayed_figures?.length ? figureLabelsOf(msg.displayed_figures) : undefined,
       pagesRead: msg.pages_read ?? undefined,
       citations: msg.citations?.length ? msg.citations : undefined,
       annotationIds: msg.annotations?.length ? msg.annotations : undefined,
@@ -244,16 +249,53 @@ export const markdownBlocks = (text: string): string[] => {
   return blocks;
 };
 
-/** Figure labels (`F#`) a piece of text cites, each once, in order of first appearance. */
-export const figureLabelsIn = (text: string): string[] => {
+/** Evidence labels (`E#`, `F#`) a piece of text cites, each once, in order of first appearance. */
+export const evidenceLabelsIn = (text: string): string[] => {
   const found: string[] = [];
   for (const match of text.matchAll(EVIDENCE_GROUP)) {
     for (const raw of match[1].split(/\s*[,;]\s*/)) {
       const label = normalizeLabel(raw);
-      if (label.startsWith('F') && !found.includes(label)) found.push(label);
+      if (!found.includes(label)) found.push(label);
     }
   }
   return found;
+};
+
+/** Figure labels (`F#`) a piece of text cites, each once, in order of first appearance. */
+export const figureLabelsIn = (text: string): string[] => evidenceLabelsIn(text).filter((label) => label.startsWith('F'));
+
+/**
+ * The sources an answer stands on, for "Cite these sources": what its text cites, in reading order, then the
+ * figures it showed. A shown figure is in `citations` too (for its crop, EvilFlowersCatalog#185), so "cited" is
+ * read from the text, never from `citations` alone.
+ */
+export const answerSources = (msg: Pick<AiMessage, 'text' | 'citations' | 'figureLabels'>): IAssistantCitation[] => {
+  const labels = [...new Set([...evidenceLabelsIn(msg.text), ...(msg.figureLabels ?? [])])];
+  return labels.map((label) => findCitation(msg.citations, label)).filter((c): c is IAssistantCitation => !!c);
+};
+
+/**
+ * Every figure of one answer, in the order its lightbox steps through them: those the text cites (`cited`, in
+ * reading order), those the assistant chose to show (`figureLabels`, the `figures` frame), and — once the answer is
+ * complete — the readable figures with a crop its sources hold that it neither cited nor showed. Labels resolve
+ * against the answer's citations first, then its evidence; each figure appears once.
+ */
+export const answerFigures = (
+  cited: IAssistantCitation[],
+  msg: Pick<AiMessage, 'citations' | 'evidence' | 'figureLabels'>,
+  streaming: boolean,
+) => {
+  const key = (c: IAssistantCitation) => c.label.toUpperCase();
+  const seen = new Set(cited.map(key));
+  const shown = (msg.figureLabels ?? [])
+    .map((label) => findCitation(msg.citations, label) ?? findCitation(msg.evidence?.sources, label))
+    .filter((c): c is IAssistantCitation => !!c && !seen.has(key(c)));
+  shown.forEach((c) => seen.add(key(c)));
+  const sources = streaming
+    ? []
+    : (msg.evidence?.sources ?? []).filter((c) => isFigure(c) && !!c.image_url && c.readable !== false && !seen.has(key(c)));
+  const all = [...new Map([...cited, ...shown, ...sources].map((c) => [key(c), c])).values()];
+  return { shown, sources, all };
 };
 
 /** Merges citations by label; a later one (the authoritative `citations` frame) replaces an earlier one. */

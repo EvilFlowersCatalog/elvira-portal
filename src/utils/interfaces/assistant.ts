@@ -18,6 +18,11 @@ export interface IAssistantMessage {
   pages_read: number[] | null;
   /** Publication ids the assistant showed alongside this message. */
   displayed_entries: string[] | null;
+  /**
+   * `F#` labels the assistant showed as a figure gallery (`show_figures`, the `figures` frame); their citations
+   * are in `citations`. Proposed contract: docs/assistant-figures.md.
+   */
+  displayed_figures?: string[] | null;
   /** Agent annotation (AI highlights) ids the assistant created with this answer (IP-018). */
   annotations?: string[] | null;
   /** The tool calls of the turn this answer closed (the activity log), rebuilt by the catalog. */
@@ -66,7 +71,24 @@ export interface IAssistantCitation {
   region_id?: string;
   caption?: string;
   image_url?: string;
+  /**
+   * The region's printed label ("Table 8.1", "Fig. 2.3"). Named by this rather than `kind`: the extractor's kind
+   * is sometimes wrong (a table detected as a figure). Proposed: docs/assistant-figures.md.
+   */
+  printed_label?: string;
+  /** What the figure shows, in the model's words (vision), where the reader may read it. */
+  description?: string;
+  /**
+   * A table's cells as Markdown / an equation as LaTeX, extracted automatically (at the `passage` tier only).
+   * Untrusted and often imperfect: the crop stays the primary view, these are a secondary "data" view.
+   */
+  markdown?: string;
+  latex?: string;
   readable?: boolean;
+  /** The citation object's address for agents (`evilflowers://entry/…/locator/…`, EvilFlowersCatalog#182). */
+  uri?: string;
+  /** The portal's durable `/cite/{entry_id}/{key}` link to the unit (EvilFlowersCatalog#182). */
+  url?: string;
   /** Relevance of an `evidence` source. */
   score?: number;
   /**
@@ -117,6 +139,36 @@ export interface IAssistantEvidence {
   sources: IAssistantCitation[];
   /** The library may not cover the question well. */
   low_relevance: boolean;
+}
+
+/** What would let the reader (and so the assistant) read more of a publication (`access` frame, #186). */
+export type AssistantUnlock = 'sign_in' | 'borrow' | 'campus_network' | 'local_processor';
+
+/**
+ * The `access` SSE frame (EvilFlowersCatalog#186): a tool of the turn had to withhold a publication's text, or
+ * the reading budget cut it short. At most once per publication per turn; live only, never stored.
+ */
+export interface IAssistantAccess {
+  entry_id: string;
+  title?: string;
+  /** What the reader may see of it: `none`, `metadata`, `outline`, `snippet`, … */
+  tier?: string;
+  /** `open`, `loan`, `past_loan`, `none`. */
+  basis?: string;
+  /** `lcp`, `budget`, or another gate reason; free text for the portal, mapped where known. */
+  reason?: string;
+  /** Known ways only, in the catalog's order (a signed-out reader who could borrow gets `sign_in` first). */
+  how_to_unlock: AssistantUnlock[];
+}
+
+/** Styles `POST /api/v1/cite` formats references in (#186). */
+export type CiteStyle = 'iso690' | 'apa' | 'bibtex' | 'csl-json';
+
+/** One formatted reference: `text` for every style but `csl-json`, which carries `csl`. */
+export interface ICiteReference {
+  uri: string;
+  text?: string;
+  csl?: Record<string, unknown>;
 }
 
 /** A chip under the last answer (`suggestions` frame); a click sends `message`. */
@@ -275,6 +327,10 @@ export interface IAssistantStreamHandlers {
   onStudy?: (study: IAssistantStudy) => void;
   /** Follow-up chips for the answer (`suggestions` event). */
   onSuggestions?: (suggestions: IAssistantSuggestion[]) => void;
+  /** `F#` labels to show as a figure gallery (`figures` event, the `show_figures` directive). */
+  onFigures?: (labels: string[]) => void;
+  /** A publication whose text the turn could not read in full (`access` event, #186). */
+  onAccess?: (access: IAssistantAccess) => void;
   /** An agent annotation the assistant started (AI highlights), as `/assistant/v1/highlights` returns it. */
   onAnnotation?: (annotation: IAssistantAnnotation) => void;
   /** A place in the portal to show the reader (`navigate` event). */

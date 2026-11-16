@@ -113,7 +113,7 @@ function QuizFigure({ citation, onOpen }: { citation: IAssistantCitation | undef
       {large
         ? createPortal(
             <div
-              className="fixed inset-0 z-[1001] bg-black/75 flex items-center justify-center p-4"
+              className="fixed inset-0 z-[1301] bg-black/75 flex items-center justify-center p-4"
               onClick={() => setLarge(false)}
               role="dialog"
               aria-modal="true"
