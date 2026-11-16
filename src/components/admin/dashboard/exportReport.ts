@@ -150,7 +150,11 @@ const body = (data: IAdminStatistics, kind: CsvKind): Cell[][] => {
           ? [['# NOTE', 'truncated to the 1,000 busiest LCP titles'] as Cell[]]
           : []),
       ];
-    case 'series':
+    case 'series': {
+      // Proposed measures appear only once the backend serves them — never as columns of blanks.
+      const extra = (['visitors', 'reads'] as const).filter((key) =>
+        data.series.some((b) => b[key] != null)
+      );
       return [
         [
           'bucket_start',
@@ -159,16 +163,21 @@ const body = (data: IAdminStatistics, kind: CsvKind): Cell[][] => {
           'loans_returned',
           'loans_expired',
           'holds_placed',
+          'active_readers',
+          ...extra,
         ],
-        ...data.series.map((b) => [
+        ...data.series.map((b, i) => [
           b.t,
           b.partial,
           b.loans_started,
           b.loans_returned,
           b.loans_expired,
           b.holds_placed,
+          data.kpis.active_readers.trend[i] ?? '',
+          ...extra.map((key) => b[key] ?? ''),
         ]),
       ];
+    }
     case 'categories':
       return [
         ['category_id', 'title', 'loans'],

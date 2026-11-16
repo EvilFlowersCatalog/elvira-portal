@@ -17,7 +17,11 @@ import Button from "../../../components/buttons/Button";
 import { BiSave } from "react-icons/bi";
 import { CopyId, PageHeader } from "../../../components/admin";
 import { useSearchParams } from "react-router-dom";
-import { FiActivity, FiCpu } from "react-icons/fi";
+import { FiActivity, FiArchive, FiCpu } from "react-icons/fi";
+import ConfirmDialog from "../../../components/admin/ConfirmDialog";
+import EntryLinkedSystems from "../../../components/admin/harvest/EntryLinkedSystems";
+import { useEntrySync, useHarvestSources } from "../../../hooks/api/harvest/useHarvest";
+import { fmtDateTime } from "../../../utils/func/adminDate";
 import EntryJobsPanel from "../../../components/admin/jobs/EntryJobsPanel";
 import { twMerge } from "tailwind-merge";
 import EntryExtractionPanel from "../../../components/specific-page/admin-entry-page/extraction/EntryExtractionPanel";
@@ -33,6 +37,27 @@ interface IAdminEntryFormProps {
     catalogId?: string;
     files?: { id: string; relation: string; file: File }[];
     setFiles?: React.Dispatch<React.SetStateAction<{ id: string; relation: string; file: File }[]>>;
+    /** Edit mode (IP-034): where the stored entry came from, whether it is withdrawn, and withdraw/restore. */
+    stored?: {
+        origin: string;
+        withdrawnAt: string | null;
+        onWithdraw: (withdrawn: boolean) => void | Promise<void>;
+        isWithdrawing: boolean;
+    };
+}
+
+/** "Imported from <source name>" for a `harvest:<slug>` origin; the slug resolves to the source's name. */
+function OriginLabel({ origin }: { origin: string }) {
+    const { t } = useTranslation();
+    const slug = origin.startsWith('harvest:') ? origin.slice('harvest:'.length) : null;
+    const { data } = useHarvestSources({ query: slug ?? undefined, limit: 5 }, !!slug);
+    if (!slug) return null;
+    const source = data?.items.find((s) => s.slug === slug);
+    return (
+        <span className='inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600 dark:bg-zinc-700 dark:text-zinc-300'>
+            {t('entry.withdrawal.importedFrom', { name: source?.name ?? slug })}
+        </span>
+    );
 }
 
 export default function AdminEntryForm({
@@ -46,8 +71,10 @@ export default function AdminEntryForm({
     catalogId,
     files,
     setFiles,
+    stored,
 }: IAdminEntryFormProps) {
     const { t } = useTranslation();
+    const [confirmWithdraw, setConfirmWithdraw] = useState<boolean>(false);
     const { 'entry-id': id } = useParams();
     const [isFilesLoading, setIsFilesLoading] = useState<boolean>(false);
     // Inline message instead of the browser's bubble (which is in the browser's
@@ -98,8 +125,37 @@ export default function AdminEntryForm({
                 <form className='flex flex-1 flex-col' onSubmit={handleSubmit}>
                     <PageHeader
                         title={FormType === 'add' ? t('entry.wizard.new') : (entry.title || t('entry.wizard.edit'))}
-                        meta={FormType === 'edit' && id ? <CopyId value={id} label={t('administration.copy.publicationId')} /> : undefined}
+                        meta={
+                            FormType === 'edit' && id ? (
+                                <>
+                                    <CopyId value={id} label={t('administration.copy.publicationId')} />
+                                    {stored && <OriginLabel origin={stored.origin} />}
+                                </>
+                            ) : undefined
+                        }
                     />
+
+                    {FormType === 'edit' && stored?.withdrawnAt && (
+                        // IP-034: hidden from every list and search, no new loans; running loans continue.
+                        <div role='status' className='mx-5 mb-4 flex flex-wrap items-start gap-3 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 dark:border-amber-500/50 dark:bg-amber-500/10'>
+                            <FiArchive size={18} className='mt-0.5 shrink-0 text-amber-700 dark:text-amber-400' />
+                            <div className='min-w-0 flex-1 text-sm text-amber-900 dark:text-amber-100'>
+                                <p className='font-semibold'>{t('entry.withdrawal.banner', { date: fmtDateTime(stored.withdrawnAt) ?? '' })}</p>
+                                <p className='mt-0.5 text-xs'>{t('entry.withdrawal.bannerHint')}</p>
+                                {stored.origin.startsWith('harvest:') && (
+                                    <p className='mt-0.5 text-xs'>{t('entry.withdrawal.bannerHarvest')}</p>
+                                )}
+                            </div>
+                            <button
+                                type='button'
+                                disabled={stored.isWithdrawing}
+                                onClick={() => stored.onWithdraw(false)}
+                                className='rounded-md border border-amber-400 bg-white px-3 py-1.5 text-sm font-medium text-amber-900 hover:bg-amber-100 disabled:opacity-60 dark:border-amber-500/60 dark:bg-transparent dark:text-amber-100 dark:hover:bg-amber-500/20'
+                            >
+                                {stored.isWithdrawing ? '…' : t('entry.withdrawal.restore')}
+                            </button>
+                        </div>
+                    )}
 
                     {FormType === 'edit' && (
                         // Primary tab is the publication; the AI view is deliberately quiet —
@@ -192,6 +248,18 @@ export default function AdminEntryForm({
                                     {t('entry.wizard.requiredMessages.title')}
                                 </p>
                             )}
+                            {/* IP-034 Q2: imports tell editions with equal titles apart by it. */}
+                            <label htmlFor='entry-edition' className='mt-3 block text-xs font-medium text-zinc-500 dark:text-zinc-400'>
+                                {t('entry.wizard.edition')}
+                            </label>
+                            <input
+                                id='entry-edition'
+                                value={entry.edition ?? ''}
+                                maxLength={255}
+                                onChange={(e) => setEntry((prev) => ({ ...prev!, edition: e.target.value }))}
+                                placeholder={t('entry.wizard.editionPlaceholder')}
+                                className='mt-1 w-full max-w-sm rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-800 outline-none focus:border-primary dark:border-zinc-600 dark:bg-zinc-900/40 dark:text-zinc-100'
+                            />
                         </div>
 
                         {/* Two-column: main content + settings sidebar */}
@@ -246,6 +314,25 @@ export default function AdminEntryForm({
                                     <IdentifiersPart entry={entry} setEntry={setEntry} />
                                 </div>
 
+                                {/* Managers only: the panel renders nothing for readers (403) and unlinked books. */}
+                                {FormType === 'edit' && id && <LinkedSystemsCard entryId={id} className={cardClass} />}
+
+                                {FormType === 'edit' && stored && !stored.withdrawnAt && (
+                                    <div className={`${cardClass} flex flex-col gap-2`}>
+                                        <h2 className={sectionTitle}>{t('entry.withdrawal.title')}</h2>
+                                        <p className='text-xs text-zinc-500 dark:text-zinc-400'>{t('entry.withdrawal.hint')}</p>
+                                        <button
+                                            type='button'
+                                            disabled={stored.isWithdrawing}
+                                            onClick={() => setConfirmWithdraw(true)}
+                                            className='inline-flex w-fit items-center gap-1.5 rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-100 disabled:opacity-60 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-700'
+                                        >
+                                            <FiArchive size={14} />
+                                            {t('entry.withdrawal.withdraw')}
+                                        </button>
+                                    </div>
+                                )}
+
                                 <div className={`${cardClass} flex flex-col gap-4`}>
                                     <FeedsPart entry={entry} setEntry={setEntry} />
                                     <CategoriesPart entry={entry} setEntry={setEntry} />
@@ -267,6 +354,34 @@ export default function AdminEntryForm({
                     </div>
                 </form>
             )}
+
+            {stored && (
+                <ConfirmDialog
+                    open={confirmWithdraw}
+                    title={t('entry.withdrawal.confirmTitle')}
+                    message={t('entry.withdrawal.confirmBody', { title: entry?.title ?? '' })}
+                    confirmLabel={t('entry.withdrawal.withdraw')}
+                    cancelLabel={t('administration.usersPage.cancel')}
+                    destructive
+                    loading={stored.isWithdrawing}
+                    onConfirm={async () => {
+                        await stored.onWithdraw(true);
+                        setConfirmWithdraw(false);
+                    }}
+                    onCancel={() => setConfirmWithdraw(false)}
+                />
+            )}
+        </div>
+    );
+}
+
+/** The linked-systems panel in a card, only when the book is linked somewhere. */
+function LinkedSystemsCard({ entryId, className }: { entryId: string; className: string }) {
+    const { data: sources = [] } = useEntrySync(entryId);
+    if (!sources.length) return null;
+    return (
+        <div className={className}>
+            <EntryLinkedSystems entryId={entryId} />
         </div>
     );
 }

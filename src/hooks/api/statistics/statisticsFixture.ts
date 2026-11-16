@@ -139,8 +139,15 @@ export const buildStatisticsFixture = (
   for (let b = from; b <= to; b = step(b, p.bucket)) {
     const end = step(b, p.bucket);
     let started = 0;
-    for (let d = b; d < end && d <= to; d = addDays(d, 1)) started += daily(d);
+    let span = 0;
+    for (let d = b; d < end && d <= to; d = addDays(d, 1)) {
+      started += daily(d);
+      span += 1;
+    }
+    // Visits run ahead of loans (most visitors browse, a share borrows); reads include open access.
     series.push({
+      visitors: Math.round(started * (5.5 + rnd() * 1.5) + span * 6),
+      reads: Math.round(started * (2.2 + rnd() * 0.6) + span * 2),
       t: format(b, 'yyyy-MM-dd'),
       // `to` is today, so its bucket is always still in progress.
       partial: end > to,

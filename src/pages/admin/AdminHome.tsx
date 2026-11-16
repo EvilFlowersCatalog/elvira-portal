@@ -37,19 +37,23 @@ import {
   DormantTitles,
   UtilizationLeaderboard,
 } from '../../components/admin/dashboard/TitleLists';
-import LendingTrend from '../../components/admin/dashboard/LendingTrend';
+import ActivityMonitor from '../../components/admin/dashboard/ActivityMonitor';
+import SemanticsDisclosure from '../../components/admin/dashboard/SemanticsDisclosure';
 import {
   BorrowHeatmap,
   OutcomeBars,
   TopCategories,
 } from '../../components/admin/dashboard/Patterns';
-import DemandMap from '../../components/admin/dashboard/DemandMap';
+import ActionBoard from '../../components/admin/dashboard/ActionBoard';
+import SubjectBalance from '../../components/admin/dashboard/SubjectBalance';
+import Neighbourhoods from '../../components/admin/dashboard/Neighbourhoods';
 import ExportMenu from '../../components/admin/dashboard/ExportMenu';
 import TitleInspector from '../../components/admin/dashboard/TitleInspector';
 import {
   SEMANTICS_ON,
   useDashboardMap,
   useSemanticIndex,
+  useSubjectNames,
 } from '../../components/admin/dashboard/semantic';
 import {
   useHotkeys,
@@ -57,6 +61,9 @@ import {
 } from '../../components/admin/dashboard/useDashboardKeys';
 
 const RANGE_KEY = 'elvira.admin.dashboardRange';
+const SEMANTICS_KEY = 'elvira.admin.dashboardSemantics';
+/** Stable empty list, so the semantic index isn't rebuilt on every render while stats load. */
+const EMPTY_TITLES: never[] = [];
 
 const isRange = (v: string | null): v is StatsRange =>
   !!v && (STATS_RANGES as string[]).includes(v);
@@ -213,16 +220,37 @@ const AdminHome = () => {
   const result = statistics.data;
   const data = result && result.status !== 'unavailable' ? result.data : null;
   const period = data?.period;
-  const semantic = useSemanticIndex(graph.data, data?.titles ?? []);
-  // Only worth a card when the graph actually knows some of the lent titles.
+  const semantic = useSemanticIndex(
+    graph.data,
+    data?.titles ?? EMPTY_TITLES,
+    period?.from
+  );
+  // Only worth a section when the graph actually knows some of the lent titles.
   const showMap =
     SEMANTICS_ON && !!graph.data?.nodes.length && !!semantic?.covered;
+  const subjectNames = useSubjectNames(showMap);
   const meta = {
     catalog: import.meta.env.ELVIRA_CATALOG_ID as string,
     demo: result?.status === 'demo',
   };
 
   const { printing, print: printReport } = usePrintReport();
+  // Collapsed by default: it is a specialist view; the choice is remembered per browser.
+  const [semanticsOpen, setSemanticsOpenState] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(SEMANTICS_KEY) === 'open';
+    } catch {
+      return false;
+    }
+  });
+  const setSemanticsOpen = useCallback((open: boolean) => {
+    setSemanticsOpenState(open);
+    try {
+      localStorage.setItem(SEMANTICS_KEY, open ? 'open' : 'closed');
+    } catch {
+      /* private mode — not remembered */
+    }
+  }, []);
 
   useHotkeys({
     ...Object.fromEntries(
@@ -236,10 +264,15 @@ const AdminHome = () => {
         }
       : null,
     m: showMap
-      ? () =>
-          document
-            .getElementById('semantics')
-            ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      ? () => {
+          setSemanticsOpen(true);
+          // After the section has expanded.
+          requestAnimationFrame(() =>
+            document
+              .getElementById('semantics')
+              ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          );
+        }
       : null,
   });
 
@@ -466,32 +499,11 @@ const AdminHome = () => {
               )}
             </Section>
 
-            {showMap && (
-              <Section
-                id='semantics'
-                title={t('administration.dashboard.sections.semantics')}
-                subtitle={t('administration.dashboard.sections.semanticsSub')}
-              >
-                <div data-guide='admin-dashboard-map'>
-                  <DemandMap
-                    map={graph.data!}
-                    semantic={semantic!}
-                    titles={data.titles}
-                    periodFrom={data.period.from}
-                    highlight={highlight}
-                    onHover={setHighlight}
-                    onOpen={openEntry}
-                    onTrack={track}
-                  />
-                </div>
-              </Section>
-            )}
-
             <Section
               title={t('administration.dashboard.sections.trends')}
               subtitle={t('administration.dashboard.sections.trendsSub')}
             >
-              <LendingTrend series={data.series} bucket={data.period.bucket} />
+              <ActivityMonitor data={data} onTrack={track} />
               <div className='grid grid-cols-1 gap-4 xl:grid-cols-5'>
                 <div className='min-w-0 xl:col-span-3'>
                   <BorrowHeatmap cells={data.heatmap} />
@@ -509,6 +521,49 @@ const AdminHome = () => {
                 </div>
               </div>
             </Section>
+
+            {showMap && (
+              <SemanticsDisclosure
+                id='semantics'
+                open={semanticsOpen}
+                onToggle={(open) => {
+                  setSemanticsOpen(open);
+                  track(open ? 'semantics-open' : 'semantics-close');
+                }}
+                actions={semantic!.actions}
+                guide='admin-dashboard-map'
+              >
+                  <ActionBoard
+                    semantic={semantic!}
+                    highlight={highlight}
+                    onHover={setHighlight}
+                    onOpen={openEntry}
+                    onTrack={track}
+                  />
+                  <SubjectBalance
+                    subjects={semantic!.subjects}
+                    names={subjectNames}
+                    onOpenSubject={(term) => {
+                      const id = subjectNames.idOf(term);
+                      if (!id) return;
+                      track('subject');
+                      navigate(
+                        `${NAVIGATION_PATHS.adminEntries}?category-id=${id}`
+                      );
+                    }}
+                  />
+                  <Neighbourhoods
+                    semantic={semantic!}
+                    names={subjectNames}
+                    titles={data.titles}
+                    periodFrom={data.period.from}
+                    highlight={highlight}
+                    onHover={setHighlight}
+                    onOpen={openEntry}
+                    onTrack={track}
+                  />
+              </SemanticsDisclosure>
+            )}
           </div>
         )}
 

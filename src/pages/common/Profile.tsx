@@ -19,6 +19,8 @@ import useGetShelf from '../../hooks/api/my-shelf/useGetShelf';
 import useLicensesQuery from '../../hooks/api/licenses/useLicensesQuery';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
+import { LCP_PASSPHRASE_MAX_LENGTH, LCP_PASSPHRASE_MIN_LENGTH, passphraseTooShort } from '../../utils/func/passphrase';
+import { fieldError } from '../../utils/problemDetail';
 import { BookmarkIcon, ClockIcon, LibraryIcon, LoansIcon } from '../../components/header/navbar/NavbarIcons';
 
 const Profile = () => {
@@ -57,6 +59,7 @@ const Profile = () => {
   const [passphrase, setPassphrase] = useState<string>('');
   const [passphraseHint, setPassphraseHint] = useState<string>('');
   const [showPassphrase, setShowPassphrase] = useState<boolean>(false);
+  const [passphraseError, setPassphraseError] = useState<string | null>(null);
 
   useEffect(() => {
     setPassphraseHint(userDetails?.lcp_passphrase_hint || '');
@@ -82,6 +85,11 @@ const Profile = () => {
   const handleSetPassphrase = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!passphrase.trim()) return;
+    if (passphraseTooShort(passphrase)) {
+      setPassphraseError(t('profile.passphrase.tooShort', { count: LCP_PASSPHRASE_MIN_LENGTH }));
+      return;
+    }
+    setPassphraseError(null);
 
     try {
       setIsSubmitting(true);
@@ -95,8 +103,11 @@ const Profile = () => {
       });
       toast.success(t('profile.passphrase.success'));
       setPassphrase('');
-    } catch {
-      toast.error(t('profile.passphrase.error'));
+    } catch (error) {
+      // The catalog's own minimum wins (#198); its 422 names the field.
+      const message = fieldError(error, 'lcp_passphrase');
+      setPassphraseError(message ?? null);
+      toast.error(message ?? t('profile.passphrase.error'));
     } finally {
       setIsSubmitting(false);
     }
@@ -210,14 +221,31 @@ const Profile = () => {
                     </button>
                   }
                   placeholder={t('profile.passphrase.placeholder')}
-                  invalidMessage={t('profile.passphrase.required')}
+                  invalidMessage={
+                    passphraseTooShort(passphrase)
+                      ? t('profile.passphrase.tooShort', { count: LCP_PASSPHRASE_MIN_LENGTH })
+                      : t('profile.passphrase.required')
+                  }
                   required
                   label='false'
-                  minLength={4}
-                  maxLength={256}
+                  minLength={LCP_PASSPHRASE_MIN_LENGTH}
+                  maxLength={LCP_PASSPHRASE_MAX_LENGTH}
                   value={passphrase}
-                  onChange={(e) => setPassphrase(e.target.value)}
+                  aria-describedby='profile-passphrase-rule'
+                  onChange={(e) => {
+                    setPassphrase(e.target.value);
+                    setPassphraseError(null);
+                  }}
                 />
+                {passphraseError ? (
+                  <p id='profile-passphrase-rule' role='alert' className='-mt-1 text-sm text-redText dark:text-red'>
+                    {passphraseError}
+                  </p>
+                ) : (
+                  <p id='profile-passphrase-rule' className='-mt-1 text-xs text-zinc-500 dark:text-zinc-400'>
+                    {t('profile.passphrase.minLength', { count: LCP_PASSPHRASE_MIN_LENGTH })}
+                  </p>
+                )}
                 <ElviraInput
                   type='text'
                   label='icon'

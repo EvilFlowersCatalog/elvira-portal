@@ -1,5 +1,6 @@
 import { ReactElement } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
+import { useOpenConflictCount } from '../../hooks/api/harvest/useHarvest';
 import { useTranslation } from 'react-i18next';
 import { twMerge } from 'tailwind-merge';
 import {
@@ -12,6 +13,8 @@ import {
   FiActivity,
   FiSettings,
   FiShield,
+  FiRefreshCw,
+  FiGitMerge,
 } from 'react-icons/fi';
 import { FaBook } from 'react-icons/fa';
 import { MdOutlineCollectionsBookmark, MdOutlineLibraryBooks, MdOutlineInventory2 } from 'react-icons/md';
@@ -28,6 +31,10 @@ interface NavItem {
   experimental?: boolean;
   /** not built yet — shown disabled for orientation. */
   soon?: boolean;
+  /** Not highlighted on this sub-path, which has its own item (harvest sources vs. the conflicts inbox). */
+  notUnder?: NAVIGATION_PATHS;
+  /** A live count next to the label. */
+  badge?: 'openConflicts';
 }
 
 interface NavGroup {
@@ -68,6 +75,14 @@ const GROUPS: NavGroup[] = [
     ],
   },
   {
+    // IP-033/IP-034: exchanging records with other systems (#51, #53).
+    labelKey: 'administration.nav.groupInterop',
+    items: [
+      { key: 'harvest', path: NAVIGATION_PATHS.adminHarvest, icon: <FiRefreshCw size={ICON} />, notUnder: NAVIGATION_PATHS.adminHarvestConflicts },
+      { key: 'conflicts', path: NAVIGATION_PATHS.adminHarvestConflicts, icon: <FiGitMerge size={ICON} />, badge: 'openConflicts' },
+    ],
+  },
+  {
     labelKey: 'administration.nav.groupOperations',
     items: [
       { key: 'jobs', path: NAVIGATION_PATHS.adminJobs, icon: <FiActivity size={ICON} /> },
@@ -83,6 +98,10 @@ const experimentalOn = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
 export default function AdminNav() {
   const { t } = useTranslation();
   const { umamiTrack } = useAppContext();
+  const { pathname } = useLocation();
+  // Unacknowledged sync conflicts (#53); quietly absent when the catalog has no harvest API.
+  const { data: openConflicts } = useOpenConflictCount();
+  const badges: Record<NonNullable<NavItem['badge']>, number | undefined> = { openConflicts };
 
   return (
     <nav
@@ -127,8 +146,8 @@ export default function AdminNav() {
                     onClick={() => umamiTrack('Admin Nav', { path: item.path })}
                     className={({ isActive }) =>
                       twMerge(
-                        'flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors',
-                        isActive
+                        'relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm font-medium whitespace-nowrap transition-colors',
+                        isActive && !(item.notUnder && pathname.startsWith(item.notUnder))
                           ? 'bg-primaryLight text-primaryText dark:bg-primaryDark dark:text-primaryLight'
                           : 'text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700/50'
                       )
@@ -136,6 +155,14 @@ export default function AdminNav() {
                   >
                     <span className="shrink-0">{item.icon}</span>
                     <span className="hidden lg:inline">{label}</span>
+                    {item.badge && !!badges[item.badge] && (
+                      <span
+                        aria-label={t(`administration.nav.badge.${item.badge}`, { count: badges[item.badge] })}
+                        className="absolute -right-0.5 -top-0.5 min-w-[1.25rem] rounded-full bg-amber-500 px-1.5 py-0.5 text-center text-[10px] font-bold leading-none text-white lg:static lg:ml-auto"
+                      >
+                        {badges[item.badge]! > 99 ? '99+' : badges[item.badge]}
+                      </span>
+                    )}
                   </NavLink>
                 );
               })}

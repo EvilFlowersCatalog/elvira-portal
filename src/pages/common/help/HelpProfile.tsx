@@ -1,5 +1,6 @@
 import HelpLayout, { TocSection } from './HelpLayout';
 import { HelpH2, HelpH3, HelpList, HelpP } from './HelpTypography';
+import { LCP_PASSPHRASE_MIN_LENGTH } from '../../../utils/func/passphrase';
 
 const toc: TocSection[] = [
   {
@@ -39,7 +40,7 @@ const HelpProfile = () => (
     <HelpH3 id="pristupova-fraza">Prístupová fráza</HelpH3>
     <HelpP>
       Prístupová fráza je heslo, ktorým sa odomykajú požičané chránené knihy v aplikácii Thorium Reader. Nastavíte ju v
-      profile v časti <strong>Prístupová fráza</strong>. Musí mať aspoň 4 znaky. Môžete pridať aj{' '}
+      profile v časti <strong>Prístupová fráza</strong>. Musí mať aspoň {LCP_PASSPHRASE_MIN_LENGTH} znakov. Môžete pridať aj{' '}
       <strong>nápovedu</strong>, ktorá vám pomôže si na frázu spomenúť. Thorium Reader vám ju pri otváraní knihy
       zobrazí.
     </HelpP>

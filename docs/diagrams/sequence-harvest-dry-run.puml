@@ -1,0 +1,45 @@
+@startuml sequence-harvest-dry-run
+!include elvira.iuml
+' =============================================================================
+' What: a librarian tests a source, dry-runs it, reads the ambiguous and unmatched records, and only then runs it;
+'       the portal polls the job and refreshes the source's counters when it finishes.
+' Kind: UML sequence diagram. Scope: the portal's source detail screen against the catalog API; the catalog's
+'       Celery worker is shown as one participant.
+' Source: EvilFlowersCatalog develop apps/harvest/views.py, apps/harvest/serializers.py (read 2026-11-16);
+'         elvira-portal src/hooks/api/jobs/useJobs.ts (2026-11-16)
+' =============================================================================
+
+title Test, dry run, then run a harvest source (proposal, 2026-11-16)
+
+actor Librarian as user
+participant "Source detail\n(portal)" as ui <<proposed>> <<focus>>
+participant "Catalog API\n/api/v1" as api
+participant "Celery worker\nharvest.run" as worker
+
+user -> ui : Test connection
+ui -> api : POST harvest/sources/{id}/test
+api --> ui : identify, formats, sets, sample, errors
+ui --> user : identify card, sample book card
+
+user -> ui : Dry run (primary action)
+ui -[$accent_msg()]> api : <b>POST jobs {kind: harvest.run, subject_id, spec: {dry_run: true}}</b>
+api ->> worker : queue run
+loop every 8 s while queued or running
+  ui -> api : GET jobs?kind=harvest.run&subject_id={id}
+end
+worker -->> api : records (dry_run=true), last_report
+ui -> api : GET harvest/sources/{id}
+api --> ui : dry_run_counts
+ui -> api : GET …/records?dry_run=true&status=ambiguous
+api --> ui : records
+ui --> user : Ambiguous · Unmatched tabs first
+
+user -> ui : Run (create mode: confirm first)
+ui -> api : POST jobs {…, spec: {dry_run: false}}
+note right of ui : Superusers only; catalog managers\nsee "runs follow the schedule".
+
+$legend_live_proposed()
+
+caption Dry run is the first and primary action; a real run into a catalog in create mode asks for confirmation, and progress comes from polling the jobs API.
+footer ELVIRA · FIIT STU · elvira-portal · docs/diagrams/sequence-harvest-dry-run.puml
+@enduml

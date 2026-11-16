@@ -23,6 +23,7 @@ import ReserveQueueModal from "../../../modals/ReserveQueueModal";
 import Thumbnail from "../Thumbnail";
 import {
   CONFLICT_REASON,
+  fieldError,
   getConflictReasonCode,
   getNoSlotsConflict,
   isPassphraseRequired,
@@ -30,6 +31,7 @@ import {
   INoSlotsConflictData,
 } from "../../../../utils/problemDetail";
 import useEscapeLayer from '../../../../hooks/useEscapeLayer';
+import { LCP_PASSPHRASE_MAX_LENGTH, LCP_PASSPHRASE_MIN_LENGTH, passphraseTooShort } from '../../../../utils/func/passphrase';
 
 type View = 'main' | 'passphrase' | 'success';
 type Duration = '1week' | '2weeks';
@@ -71,6 +73,7 @@ export default function LicenseCalendar() {
   const [passphraseHint, setPassphraseHint] = useState('');
   const [showPassphrase, setShowPassphrase] = useState(false);
   const [isSavingPassphrase, setIsSavingPassphrase] = useState(false);
+  const [passphraseError, setPassphraseError] = useState<string | null>(null);
 
   useEffect(() => {
     const paramEntryId = searchParams.get("licensing-entry-id");
@@ -83,6 +86,7 @@ export default function LicenseCalendar() {
     setShowHowItWorks(false);
     setPassphrase('');
     setPassphraseHint('');
+    setPassphraseError(null);
   }, [searchParams]);
 
   useEffect(() => {
@@ -183,8 +187,13 @@ export default function LicenseCalendar() {
       toast.error(t('license.passphrase.required', { defaultValue: 'Zadajte prístupovú frázu.' }));
       return;
     }
+    if (passphraseTooShort(passphrase.trim())) {
+      setPassphraseError(t('license.passphrase.tooShort', { count: LCP_PASSPHRASE_MIN_LENGTH }));
+      return;
+    }
     if (!auth || !userDetails) return;
 
+    setPassphraseError(null);
     setIsSavingPassphrase(true);
     try {
       await setUserPassphrase({
@@ -195,11 +204,18 @@ export default function LicenseCalendar() {
         lcp_passphrase: passphrase.trim(),
         lcp_passphrase_hint: passphraseHint.trim(),
       });
+    } catch (error) {
+      // The catalog's own minimum wins (#198); its 422 names the field.
+      const message = fieldError(error, 'lcp_passphrase');
+      setPassphraseError(message ?? null);
+      toast.error(message ?? t('license.passphrase.error', { defaultValue: 'Ukladanie zlyhalo. Skúste to znova.' }));
+      setIsSavingPassphrase(false);
+      return;
+    }
+    try {
       // Optimistically mark passphrase as set so future borrows skip this screen
       setUserDetails(prev => prev ? { ...prev, has_lcp_passphrase: true, lcp_passphrase_hint: passphraseHint.trim() } : prev);
       await doLendBook();
-    } catch {
-      toast.error(t('license.passphrase.error', { defaultValue: 'Ukladanie zlyhalo. Skúste to znova.' }));
     } finally {
       setIsSavingPassphrase(false);
     }
@@ -388,9 +404,16 @@ export default function LicenseCalendar() {
                     <input
                       type={showPassphrase ? 'text' : 'password'}
                       value={passphrase}
-                      onChange={(e) => setPassphrase(e.target.value)}
+                      minLength={LCP_PASSPHRASE_MIN_LENGTH}
+                      maxLength={LCP_PASSPHRASE_MAX_LENGTH}
+                      aria-invalid={!!passphraseError || undefined}
+                      aria-describedby="license-passphrase-rule"
+                      onChange={(e) => {
+                        setPassphrase(e.target.value);
+                        setPassphraseError(null);
+                      }}
                       placeholder={t('license.passphrase.field', { defaultValue: 'Prístupová fráza' })}
-                      className="w-full bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 rounded px-3 py-2 text-sm outline-none focus:border-primary pr-10"
+                      className={`w-full bg-white dark:bg-zinc-800 border rounded px-3 py-2 text-sm outline-none focus:border-primary pr-10 ${passphraseError ? 'border-redText dark:border-red' : 'border-gray-200 dark:border-zinc-600'}`}
                     />
                     <button
                       type="button"
@@ -400,6 +423,13 @@ export default function LicenseCalendar() {
                       {showPassphrase ? <FiEyeOff size={16} /> : <FiEye size={16} />}
                     </button>
                   </div>
+                  {passphraseError ? (
+                    <p id="license-passphrase-rule" role="alert" className="text-xs text-redText dark:text-red">{passphraseError}</p>
+                  ) : (
+                    <p id="license-passphrase-rule" className="text-xs text-gray-500 dark:text-gray-400">
+                      {t('license.passphrase.minLength', { count: LCP_PASSPHRASE_MIN_LENGTH })}
+                    </p>
+                  )}
                 </div>
                 <div className="flex flex-col gap-1">
                   <label className="text-xs font-medium text-secondary dark:text-secondaryLight">

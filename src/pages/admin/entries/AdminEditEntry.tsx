@@ -10,6 +10,8 @@ import { toast } from 'react-toastify';
 import useEditEntry from '../../../hooks/api/entries/useEditEntry';
 import AdminEntryForm from './AdminEntryForm';
 import { localize } from '../../../utils/func/localized';
+import { identifiersPayload } from '../../../utils/func/identifiers';
+import { fieldError, problemDetailMessage } from '../../../utils/problemDetail';
 
 const AdminEditEntry = () => {
   const { t } = useTranslation();
@@ -19,6 +21,10 @@ const AdminEditEntry = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [stringImage, setStringImage] = useState<string>('');
   const [entryCatalogId, setEntryCatalogId] = useState<string | null>(null);
+  // IP-034: read-only facts of the stored entry, for the banner and the "Imported from" label.
+  const [origin, setOrigin] = useState<string>('elvira');
+  const [withdrawnAt, setWithdrawnAt] = useState<string | null>(null);
+  const [isWithdrawing, setIsWithdrawing] = useState<boolean>(false);
 
   const { getEntryDetail } = useGetEntryDetail();
   const navigate = useNavigate();
@@ -40,6 +46,8 @@ const AdminEditEntry = () => {
           setEditingEntryTitle(entryDetail.title);
           setStringImage(entryDetail.thumbnail || '');
           setEntryCatalogId(entryDetail.catalog_id);
+          setOrigin(entryDetail.origin || 'elvira');
+          setWithdrawnAt(entryDetail.withdrawn_at ?? null);
 
           setEntry({
             title: entryDetail.title,
@@ -51,7 +59,13 @@ const AdminEditEntry = () => {
             summary: entryDetail.summary,
             language_code:
               entryDetail.language?.alpha3 ?? entryDetail.language?.alpha2,
-            identifiers: entryDetail.identifiers,
+            // Every key, not only DOI/ISBN: the external-system keys link the book to other systems (IP-034).
+            identifiers: {
+              ...(entryDetail.identifiers ?? {}),
+              doi: entryDetail.identifiers?.doi ?? '',
+              isbn: entryDetail.identifiers?.isbn ?? '',
+            },
+            edition: entryDetail.edition ?? '',
             config: entryDetail.config,
             citation: entryDetail.citation,
             published_at: entryDetail.published_at,
@@ -70,13 +84,8 @@ const AdminEditEntry = () => {
   }, [id]);
 
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    umamiTrack('Upload Edited Entry Button', {
-      entryId: id,
-    });
-
+  /** The whole entry as the PUT wants it (title and language are required on every update). */
+  const buildPayload = (): IEntryNew => {
     const newEntry: IEntryNew = {
       title: entry!.title,
       authors: entry!.authors,
@@ -87,15 +96,40 @@ const AdminEditEntry = () => {
       language_code: entry!.language_code,
       config: entry!.config,
       categories: entry!.categories,
-      identifiers: {
-        doi: entry!.identifiers?.doi ?? '',
-        isbn: entry!.identifiers?.isbn ?? '',
-      },
+      // All keys: sending only DOI/ISBN dropped `arl_stu`, `dataverse_pid` … and unlinked the book on every save.
+      identifiers: identifiersPayload(entry!.identifiers),
       citation: entry!.citation ?? '',
       publisher: entry!.publisher,
+      edition: entry!.edition?.trim() || null,
       image: stringImage,
     };
     if (entry!.published_at) newEntry.published_at = entry!.published_at;
+    return newEntry;
+  };
+
+  /** Withdraw (hide, refuse new loans) or restore, without leaving the form; running loans continue. */
+  const setWithdrawn = async (withdrawn: boolean) => {
+    if (!entry || !id) return;
+    setIsWithdrawing(true);
+    try {
+      await editEntry(id, { ...buildPayload(), withdrawn }, entryCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined);
+      setWithdrawnAt(withdrawn ? new Date().toISOString() : null);
+      toast.success(withdrawn ? t('entry.withdrawal.withdrawn') : t('entry.withdrawal.restored'));
+    } catch (e) {
+      toast.error(problemDetailMessage(e, t('entry.withdrawal.error')));
+    } finally {
+      setIsWithdrawing(false);
+    }
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    umamiTrack('Upload Edited Entry Button', {
+      entryId: id,
+    });
+
+    const newEntry = buildPayload();
 
     if (!newEntry.image) {
       // If there is no image notify that it is needed
@@ -107,8 +141,9 @@ const AdminEditEntry = () => {
         await editEntry(id!, newEntry, entryCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined);
         toast.success(t('notifications.entry.edit.success'));
         navigate(listPath, { replace: true });
-      } catch {
-        toast.error(t('notifications.entry.edit.error'));
+      } catch (error) {
+        // An unknown identifier key is a 422 naming `identifiers`; say so instead of a bare "failed".
+        toast.error(fieldError(error, 'identifiers') ?? problemDetailMessage(error, t('notifications.entry.edit.error')));
       } finally {
         setIsLoading(false);
       }
@@ -125,6 +160,7 @@ const AdminEditEntry = () => {
       stringImage={stringImage}
       setStringImage={setStringImage}
       catalogId={entryCatalogId || undefined}
+      stored={{ origin, withdrawnAt, onWithdraw: setWithdrawn, isWithdrawing }}
     />
   );
 };

@@ -1,0 +1,47 @@
+@startuml component-portal-interop
+!include elvira.iuml
+' =============================================================================
+' What: the portal gets a harvest-sources area and a conflicts inbox in the admin, a linked-systems panel and
+'       withdrawal on the entry, and an OAI card on the catalogs page; each part calls one IP-033/IP-034 endpoint
+'       group, and runs go through the existing jobs API.
+' Kind: UML component diagram. Scope: elvira-portal parts added for #51–#54 and the catalog endpoints they use;
+'       the catalog's internals (connectors, matcher, merge) are left out.
+' Source: EvilFlowersCatalog develop apps/harvest/urls.py, apps/oai/views.py, apps/api/forms/entries.py
+'         (read 2026-11-16); elvira-portal src/routes/BaseRoutes.tsx, src/hooks/api/jobs/useJobs.ts (2026-11-16)
+' =============================================================================
+
+title Portal interoperability screens and the catalog API (proposal, 2026-11-16)
+
+package "elvira-portal (SPA)" {
+  component "**Harvest sources**\n/administration/harvest\nlist · drawer · detail" <<proposed>> <<focus>> as sources
+  component "**Sync conflicts**\n/administration/harvest/conflicts" <<proposed>> as conflicts
+  component "**Entry admin**\nedition · withdraw · identifiers\nlinked systems panel" <<proposed>> as entryadmin
+  component "**Entry detail (reader)**\nedition · View in … links" <<proposed>> as reader
+  component "**Catalogs**\nharvestable toggle · OAI card" <<proposed>> as catalogs
+  component "**useJobs** (existing)\napply · plan · poll" as jobs
+}
+
+package "EvilFlowersCatalog API /api/v1" {
+  interface "harvest/connectors\nharvest/sources[/{id}[/test|/upload|/records]]" as iharvest
+  interface "harvest/conflicts[/{id}/acknowledge]" as iconflicts
+  interface "entries/{id}/sync\nexternal-systems" as isync
+  interface "catalogs/{c}/entries/{e}\n(edition, withdrawn, identifiers)" as ientries
+  interface "catalogs (harvestable)\noai/status" as ioai
+  interface "jobs\n(harvest.run · harvest.push · harvest.pull)" as ijobs
+}
+
+sources -[$accent()]-> iharvest : <b>HTTPS JSON</b>\nCRUD, test, upload, records
+sources --> jobs : dry run · run · full run
+conflicts --> iconflicts : list, acknowledge
+entryadmin --> isync : linked sources, sync state
+entryadmin --> ientries : PUT edition, withdrawn
+entryadmin --> jobs : push now · pull now
+reader --> isync : external-systems (links)
+catalogs --> ioai : PUT harvestable, GET status
+jobs --> ijobs : POST, GET ?kind&subject_id
+
+$legend_live_proposed()
+
+caption Every new portal part talks to one endpoint group of the catalog; runs, pushes and pulls reuse the existing jobs client, so the portal has no harvest runner of its own.
+footer ELVIRA · FIIT STU · elvira-portal · docs/diagrams/component-portal-interop.puml
+@enduml

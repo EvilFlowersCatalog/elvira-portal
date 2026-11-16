@@ -45,6 +45,9 @@ export default function CatalogDrawer({ open, catalog, mode, onClose, onSaved }:
   const [title, setTitle] = useState('');
   const [urlName, setUrlName] = useState('');
   const [isPublic, setIsPublic] = useState(false);
+  // IP-033: offered over OAI-PMH. Turning it off sends harvesters "deleted" records, so it asks first.
+  const [harvestable, setHarvestable] = useState(false);
+  const [confirmUnharvest, setConfirmUnharvest] = useState(false);
   const [members, setMembers] = useState<Member[]>([]);
   const [memberFilter, setMemberFilter] = useState('');
   // Track load/dirty separately so we never wipe a 100+ member list by mistake:
@@ -65,6 +68,7 @@ export default function CatalogDrawer({ open, catalog, mode, onClose, onSaved }:
       setTitle(catalog.title);
       setUrlName(catalog.url_name);
       setIsPublic(catalog.is_public);
+      setHarvestable(!!catalog.harvestable);
       setMembers([]);
       setMembersLoaded(false);
       getDetail(catalog.id)
@@ -84,6 +88,7 @@ export default function CatalogDrawer({ open, catalog, mode, onClose, onSaved }:
       setTitle('');
       setUrlName('');
       setIsPublic(false);
+      setHarvestable(false);
       setMembers([]);
       setMembersLoaded(true); // fresh catalog: empty set is authoritative
     }
@@ -125,7 +130,7 @@ export default function CatalogDrawer({ open, catalog, mode, onClose, onSaved }:
     if (!validate()) return;
     setSaving(true);
     try {
-      const payload: ICatalogPayload = { title: title.trim(), url_name: urlName.trim(), is_public: isPublic };
+      const payload: ICatalogPayload = { title: title.trim(), url_name: urlName.trim(), is_public: isPublic, harvestable };
       // Only include membership when it is authoritative (loaded) and changed.
       // Omitting `users` on a PUT preserves the existing membership server-side.
       if (mode === 'create' || (membersLoaded && membersDirty)) {
@@ -217,6 +222,19 @@ export default function CatalogDrawer({ open, catalog, mode, onClose, onSaved }:
           <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 p-3">
             <Switch checked={isPublic} onChange={setIsPublic} label={t('administration.catalogsPage.isPublic')} />
             <p className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">{t('administration.catalogsPage.isPublicHint')}</p>
+          </div>
+
+          <div className="rounded-lg border border-zinc-200 dark:border-zinc-700 p-3">
+            <Switch
+              checked={harvestable}
+              onChange={(next) => {
+                // Withdrawing an offered catalog tells every harvester its books are gone: confirm first.
+                if (!next && mode === 'edit' && catalog?.harvestable) setConfirmUnharvest(true);
+                else setHarvestable(next);
+              }}
+              label={t('administration.catalogsPage.harvestable')}
+            />
+            <p className="mt-1.5 text-xs text-zinc-500 dark:text-zinc-400">{t('administration.catalogsPage.harvestableHint')}</p>
           </div>
 
           {/* Saves on change through the assign endpoint (#174); an existing catalog only. */}
@@ -319,6 +337,20 @@ export default function CatalogDrawer({ open, catalog, mode, onClose, onSaved }:
         loading={deleting}
         onConfirm={handleDelete}
         onCancel={() => setConfirmDelete(false)}
+      />
+
+      <ConfirmDialog
+        open={confirmUnharvest}
+        title={t('administration.catalogsPage.unharvestTitle')}
+        message={t('administration.catalogsPage.unharvestBody', { name: catalog?.title ?? '' })}
+        confirmLabel={t('administration.catalogsPage.unharvestConfirm')}
+        cancelLabel={t('administration.catalogsPage.cancel')}
+        destructive
+        onConfirm={() => {
+          setHarvestable(false);
+          setConfirmUnharvest(false);
+        }}
+        onCancel={() => setConfirmUnharvest(false)}
       />
     </>
   );

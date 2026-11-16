@@ -9,6 +9,7 @@ import useUploadEntry from '../../../hooks/api/entries/useUploadEntry';
 import useCreateEntryAcquistion from '../../../hooks/api/acquisitiions/useCreateEntryAcquistion';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import AdminEntryForm from './AdminEntryForm';
+import { identifiersPayload } from '../../../utils/func/identifiers';
 
 const AdminAddEntry = () => {
   const { umamiTrack } = useAppContext();
@@ -77,12 +78,10 @@ const AdminAddEntry = () => {
       language_code: entry.language_code,
       config: entry.config,
       categories: entry.categories,
-      identifiers: {
-        doi: entry.identifiers?.doi ?? '',
-        isbn: entry.identifiers?.isbn ?? '',
-      },
+      identifiers: identifiersPayload(entry.identifiers),
       citation: entry.citation ?? '',
       publisher: entry.publisher,
+      edition: entry.edition?.trim() || null,
       image: stringImage,
     };
     if (entry.published_at) newEntry.published_at = entry.published_at;

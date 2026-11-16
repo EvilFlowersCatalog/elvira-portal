@@ -16,6 +16,7 @@ import {
 } from '../../components/admin';
 import Button from '../../components/buttons/Button';
 import CatalogDrawer from '../../components/admin/catalogs/CatalogDrawer';
+import OaiStatusCard from '../../components/admin/catalogs/OaiStatusCard';
 
 const DEFAULT_LIMIT = 10;
 
@@ -107,6 +108,16 @@ const AdminCatalogs = () => {
         ),
     },
     {
+      id: 'harvestable',
+      header: t('administration.catalogsPage.oaiCol'),
+      cell: (c) =>
+        c.harvestable ? (
+          <StatusChip variant="info">{t('administration.catalogsPage.offered')}</StatusChip>
+        ) : (
+          <span className="text-zinc-400">—</span>
+        ),
+    },
+    {
       id: 'created_at',
       header: t('administration.catalogsPage.createdAt'),
       sortKey: 'created_at',
@@ -127,6 +138,8 @@ const AdminCatalogs = () => {
           </Button>
         }
       />
+
+      <OaiStatusCard />
 
       <DataTable<ICatalog>
         caption={t('administration.catalogsPage.title')}

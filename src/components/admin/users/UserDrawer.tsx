@@ -17,6 +17,8 @@ import useDeleteUser from '../../../hooks/api/users/useDeleteUser';
 import useUserCatalogMembership from '../../../hooks/api/users/useUserCatalogMembership';
 import { forgetUser } from '../../../hooks/api/users/useUserLookup';
 import { useListCatalogs } from '../../../hooks/api/catalogs/useAdminCatalogs';
+import { LCP_PASSPHRASE_MIN_LENGTH, passphraseTooShort } from '../../../utils/func/passphrase';
+import { problemDetailMessage, validationErrorsByField } from '../../../utils/problemDetail';
 
 interface UserDrawerProps {
   open: boolean;
@@ -113,7 +115,8 @@ export default function UserDrawer({ open, user, mode, onClose, onSaved, onDelet
       if (!form.username.trim()) e.username = t('administration.usersPage.requiredUsername');
       if (!form.password.trim()) e.password = t('administration.usersPage.requiredPassword');
     }
-    if (form.passphrase && form.passphrase.length < 4) e.passphrase = t('administration.usersPage.passphraseTooShort');
+    if (passphraseTooShort(form.passphrase))
+      e.passphrase = t('administration.usersPage.passphraseTooShort', { count: LCP_PASSPHRASE_MIN_LENGTH });
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -166,10 +169,17 @@ export default function UserDrawer({ open, user, mode, onClose, onSaved, onDelet
       onSaved(saved);
       onClose();
     } catch (e: any) {
+      // A 422 names the field (the catalog's passphrase minimum is a setting, #198): show it there.
+      const fields = validationErrorsByField(e);
+      const known: (keyof FormState)[] = ['username', 'name', 'surname', 'password'];
+      const next: Partial<Record<keyof FormState, string>> = {};
+      if (fields.lcp_passphrase) next.passphrase = fields.lcp_passphrase;
+      for (const key of known) if (fields[key]) next[key] = fields[key];
+      if (Object.keys(next).length) setErrors(next);
       toast.error(
         e?.response?.status === 409
           ? t('administration.usersPage.usernameTaken')
-          : e?.response?.data?.title || t('administration.usersPage.saveError')
+          : Object.values(next)[0] || problemDetailMessage(e, t('administration.usersPage.saveError'))
       );
     } finally {
       setSaving(false);

@@ -53,6 +53,9 @@ const AdminLoans = lazy(() => import('../pages/admin/AdminLoans'));
 const AdminJobs = lazy(() => import('../pages/admin/AdminJobs'));
 const AdminSettings = lazy(() => import('../pages/admin/AdminSettings'));
 const AdminContentPolicies = lazy(() => import('../pages/admin/AdminContentPolicies'));
+const AdminHarvest = lazy(() => import('../pages/admin/harvest/AdminHarvest'));
+const AdminHarvestSource = lazy(() => import('../pages/admin/harvest/AdminHarvestSource'));
+const AdminHarvestConflicts = lazy(() => import('../pages/admin/harvest/AdminHarvestConflicts'));
 
 /**
  * One viewer per publication file. Without the key, going from one book to another inside the reader (a chat
@@ -146,6 +149,12 @@ const BaseRoutes = () => {
                 <Route path='jobs' element={<AdminJobs />} />
                 <Route path='settings' element={<AdminSettings />} />
                 <Route path='content-policies' element={<AdminContentPolicies />} />
+                {/* IP-034 (#51, #53): harvest sources, their detail, and the sync-conflicts inbox. */}
+                <Route path='harvest'>
+                  <Route index element={<AdminHarvest />} />
+                  <Route path='conflicts' element={<AdminHarvestConflicts />} />
+                  <Route path=':source-id' element={<AdminHarvestSource />} />
+                </Route>
               </Route>
             </Route>
           </Route>

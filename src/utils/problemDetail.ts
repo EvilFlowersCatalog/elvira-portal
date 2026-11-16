@@ -51,6 +51,32 @@ export interface IFeedUrlNameTakenData {
 export const getProblemDetail = (e: unknown): IProblemDetail | undefined =>
 	(e as AxiosError<IProblemDetail>)?.response?.data;
 
+/** One item of a 422 `validation_errors` list; `path` names the field (`["lcp_passphrase"]`, `["$body"]`). */
+export interface IValidationErrorItem {
+	code?: string;
+	message: string;
+	path?: string[];
+}
+
+/** The `validation_errors` of a 422, or an empty list. */
+export const getValidationErrors = (e: unknown): IValidationErrorItem[] => {
+	const items = (getProblemDetail(e) as { validation_errors?: unknown } | undefined)?.validation_errors;
+	return Array.isArray(items) ? (items as IValidationErrorItem[]).filter((item) => typeof item?.message === 'string') : [];
+};
+
+/** The messages of a 422, keyed by the first path segment (the form field); `$body` holds form-wide errors. */
+export const validationErrorsByField = (e: unknown): Record<string, string> => {
+	const out: Record<string, string> = {};
+	for (const item of getValidationErrors(e)) {
+		const field = item.path?.[0] ?? '$body';
+		out[field] = out[field] ? `${out[field]} ${item.message}` : item.message;
+	}
+	return out;
+};
+
+/** The message the catalog gave for one field of a 422, if any. */
+export const fieldError = (e: unknown, field: string): string | undefined => validationErrorsByField(e)[field];
+
 /**
  * True when the failure is the backend asking the user to set an LCP passphrase
  * before the action can proceed (claim / borrow). The API returns

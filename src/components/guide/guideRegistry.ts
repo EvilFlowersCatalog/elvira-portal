@@ -62,6 +62,12 @@ const ADMIN_PAGES: { key: string; path: NAVIGATION_PATHS; keywords: string[]; ex
   { key: 'loans', path: NAVIGATION_PATHS.adminLoans, keywords: ['vypozic', 'loan', 'rezervaci', 'reservation', 'cirkulaci', 'circulation'] },
   { key: 'jobs', path: NAVIGATION_PATHS.adminJobs, keywords: ['uloh', 'job', 'sifrovan', 'encrypt', 'queue', 'front'] },
   {
+    key: 'harvest',
+    path: NAVIGATION_PATHS.adminHarvest,
+    keywords: ['harvest', 'zber', 'import', 'oai', 'marc', 'dataverse', 'arl', 'zdroj', 'source', 'synchroniz', 'sync'],
+  },
+  { key: 'conflicts', path: NAVIGATION_PATHS.adminHarvestConflicts, keywords: ['konflikt', 'conflict', 'prepisan', 'overwritten'] },
+  {
     key: 'policies',
     path: NAVIGATION_PATHS.adminContentPolicies,
     keywords: ['politik', 'pravidl obsah', 'content polic', 'policy', 'pristup asistent', 'assistant access', 'tier', 'uroven'],

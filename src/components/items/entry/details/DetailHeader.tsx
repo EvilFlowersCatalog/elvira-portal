@@ -2,6 +2,7 @@ import React from "react";
 import { IEntryDetail } from "../../../../utils/interfaces/entry";
 import { localize } from '../../../../utils/func/localized';
 import { LocalizedText } from '../../../../utils/interfaces/general/general';
+import ExternalLinks from './ExternalLinks';
 
 type Feed = {
     id: string | number;
@@ -52,9 +53,13 @@ export function DetailHeader({
             )}
 
             {/* Title */}
-            <h3 className="w-full text-secondary dark:text-secondaryLight text-xl font-bold mb-3">
+            <h3 className={`w-full text-secondary dark:text-secondaryLight text-xl font-bold ${entry.edition ? 'mb-1' : 'mb-3'}`}>
                 {entry.title}
             </h3>
+            {/* IP-034: the edition statement as the catalogue gives it ("2. vydanie"). */}
+            {entry.edition && (
+                <p className="mb-3 text-sm font-medium text-zinc-500 dark:text-zinc-400">{entry.edition}</p>
+            )}
 
             {/* Authors */}
             {entry.authors.length > 0 && (
@@ -74,6 +79,8 @@ export function DetailHeader({
                     )}
                 </div>
             )}
+
+            <ExternalLinks identifiers={entry.identifiers} />
         </div>
     );
 }

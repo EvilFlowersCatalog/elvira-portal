@@ -19,6 +19,7 @@ import {
   SearchField,
   IconButton,
   ConfirmDialog,
+  Tabs,
 } from '../../../components/admin';
 import Button from '../../../components/buttons/Button';
 import { localize } from '../../../utils/func/localized';
@@ -64,6 +65,7 @@ const AdminEntries = () => {
   const limit = parseInt(searchParams.get('limit') || String(DEFAULT_LIMIT), 10);
   const q = searchParams.get('q') || '';
   const orderBy = searchParams.get('order_by') || '';
+  const withdrawnTab = searchParams.get('withdrawn') === 'true';
   const sort: SortState | null = orderBy
     ? { key: orderBy.replace(/^-/, ''), dir: orderBy.startsWith('-') ? 'desc' : 'asc' }
     : null;
@@ -94,6 +96,8 @@ const AdminEntries = () => {
     // AI processing (IP-018): the hidden columns below and the filter.
     extraction: true,
     extractionStatus: searchParams.get('ai') || undefined,
+    // IP-034: withdrawn publications are left out of every list unless asked for.
+    withdrawn: withdrawnTab || undefined,
     orderBy,
   });
   const items = data?.items ?? [];
@@ -299,6 +303,17 @@ const AdminEntries = () => {
         }
       />
 
+      <Tabs
+        tabs={[
+          { id: 'listed', label: t('administration.entriesPage.tabListed') },
+          { id: 'withdrawn', label: t('administration.entriesPage.tabWithdrawn') },
+        ]}
+        active={withdrawnTab ? 'withdrawn' : 'listed'}
+        onChange={(tab) => patchParams({ withdrawn: tab === 'withdrawn' ? 'true' : null, page: '1' })}
+        label={t('administration.entriesPage.tabsLabel')}
+        className="mx-5 mb-3"
+      />
+
       <DataTable<IEntry>
         caption={t('administration.entriesPage.tableTitle')}
         columns={columns}
@@ -308,8 +323,8 @@ const AdminEntries = () => {
         loading={loading}
         error={error ? t('administration.entriesPage.loadError') : undefined}
         onRetry={() => refetch()}
-        emptyTitle={t('administration.entriesPage.empty')}
-        emptyDescription={t('administration.entriesPage.emptyHint')}
+        emptyTitle={withdrawnTab ? t('administration.entriesPage.emptyWithdrawn') : t('administration.entriesPage.empty')}
+        emptyDescription={withdrawnTab ? t('administration.entriesPage.emptyWithdrawnHint') : t('administration.entriesPage.emptyHint')}
         sort={sort}
         onSortChange={(s) => patchParams({ order_by: s.dir === 'desc' ? `-${s.key}` : s.key, page: '1' })}
         page={metadata.page}

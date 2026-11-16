@@ -123,6 +123,12 @@ export interface IEntryDetail extends Partial<IEntryLcpFields> {
   table_of_contents?: IEntryHeading[] | null;
   /** IP-023 average and count of published reviews; null when reviews are disabled. */
   rating?: IEntryRating | null;
+  /** IP-034: `elvira`, or `harvest:<source slug>` for a book a harvest created. */
+  origin?: string;
+  /** IP-034: edition statement ("2. vydanie"); editions with equal titles are told apart by it. */
+  edition?: string | null;
+  /** IP-034: set while withdrawn (hidden from lists, not borrowable); `withdrawn` on PUT sets or clears it. */
+  withdrawn_at?: string | null;
 }
 
 export interface IEntryQuery {
@@ -159,6 +165,8 @@ export interface IEntryQuery {
   extractionStatus?: string;
   /** `facets` adds the facet counts of the same filters to the list response. */
   include?: 'facets';
+  /** IP-034: only withdrawn entries (superusers, managed catalogs); withdrawn ones never appear without it. */
+  withdrawn?: boolean;
 }
 
 /**
@@ -209,6 +217,9 @@ export interface IEntryNew {
   published_at?: string;
   publisher: string;
   image?: any;
+  edition?: string | null;
+  /** true withdraws, false restores; omitted keeps the current state. */
+  withdrawn?: boolean;
 }
 
 export interface IEntryNewForm {
@@ -227,11 +238,17 @@ export interface IEntryNewForm {
   published_at: string;
   publisher: string;
   thumbnail?: string;
+  edition?: string;
 }
 
+/**
+ * `identifiers`: DOI and ISBN, plus (IP-033 Q8) `issn`, `ccnb`, `google`, the Dataverse ids and one key per configured
+ * external system (`arl_stu` …). Every key is kept on save: dropping one unlinks the book from that system.
+ */
 export interface IEntryIdentifiers {
   doi: string;
   isbn: string;
+  [key: string]: string;
 }
 
 export interface IEntryInfo {

@@ -42,6 +42,8 @@ export enum NAVIGATION_PATHS {
   adminJobs = '/administration/jobs',
   adminSettings = '/administration/settings',
   adminContentPolicies = '/administration/content-policies',
+  adminHarvest = '/administration/harvest',
+  adminHarvestConflicts = '/administration/harvest/conflicts',
 }
 
 export enum THEME_TYPE {

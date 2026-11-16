@@ -11,6 +11,10 @@ import useGetData from '../../../hooks/api/identifiers/useGetData';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import ConfirmDialog from '../../admin/ConfirmDialog';
+import Select from '../../primitives/Select';
+import { FiX } from 'react-icons/fi';
+import { useExternalSystems } from '../../../hooks/api/harvest/useHarvest';
+import { BIBLIOGRAPHIC_IDENTIFIER_KEYS } from '../../../utils/interfaces/harvest';
 
 interface FetchedMeta {
   title?: string;
@@ -131,6 +135,8 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
         </div>
       )}
 
+      <OtherIdentifiers entry={entry} setEntry={setEntry} />
+
       <ConfirmDialog
         open={pending !== null}
         title={t('entry.wizard.metadataReplaceTitle')}
@@ -146,5 +152,68 @@ const IdentifiersPart = ({ entry, setEntry }: IPartParams) => {
     </div>
   );
 };
+
+/**
+ * Every identifier besides DOI and ISBN (IP-033 Q8): `issn`, `ccnb`, the Dataverse ids and one key per configured
+ * external system (`arl_stu` …), which is how a book stays linked to that system. Unknown keys are refused (422), so
+ * new ones are picked from the allowed set; keys already on the entry are always shown and kept.
+ */
+function OtherIdentifiers({ entry, setEntry }: IPartParams) {
+  const { t } = useTranslation();
+  const { data: systems = [] } = useExternalSystems();
+  const identifiers = (entry.identifiers ?? {}) as Record<string, string>;
+  const shown = Object.keys(identifiers).filter((key) => key !== 'doi' && key !== 'isbn');
+  const systemName = new Map(systems.map((s) => [s.key, s.name]));
+  const allowed = [
+    ...BIBLIOGRAPHIC_IDENTIFIER_KEYS.filter((key) => key !== 'doi' && key !== 'isbn'),
+    ...systems.map((s) => s.key),
+  ].filter((key, i, all) => all.indexOf(key) === i && !shown.includes(key));
+
+  const setValue = (key: string, value: string) =>
+    setEntry({ ...entry, identifiers: { ...identifiers, [key]: value } as typeof entry.identifiers });
+  const remove = (key: string) => {
+    const next = { ...identifiers };
+    delete next[key];
+    setEntry({ ...entry, identifiers: next as typeof entry.identifiers });
+  };
+
+  return (
+    <div className="mt-2 flex flex-col gap-2 border-t border-zinc-100 pt-3 dark:border-zinc-700">
+      <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">{t('entry.wizard.otherIdentifiers')}</span>
+      {shown.map((key) => (
+        <div key={key} className="flex items-center gap-2">
+          <label htmlFor={`identifier-${key}`} className="w-28 shrink-0 truncate text-xs text-zinc-600 dark:text-zinc-300" title={key}>
+            {systemName.get(key) ?? key.toUpperCase()}
+          </label>
+          <input
+            id={`identifier-${key}`}
+            value={identifiers[key] ?? ''}
+            onChange={(e) => setValue(key, e.target.value)}
+            className="min-w-0 flex-1 rounded-md border border-zinc-300 bg-white px-2 py-1 font-mono text-xs outline-none focus:border-primary dark:border-zinc-600 dark:bg-zinc-900/40"
+          />
+          <button
+            type="button"
+            aria-label={t('entry.wizard.removeIdentifier', { key })}
+            title={t('entry.wizard.removeIdentifierHint')}
+            onClick={() => remove(key)}
+            className="text-zinc-400 hover:text-redText dark:hover:text-red"
+          >
+            <FiX size={14} />
+          </button>
+        </div>
+      ))}
+      {allowed.length > 0 && (
+        <Select
+          aria-label={t('entry.wizard.addIdentifier')}
+          value=""
+          placeholder={t('entry.wizard.addIdentifier')}
+          onChange={(key) => key && setValue(key, '')}
+          options={allowed.map((key) => ({ value: key, label: systemName.get(key) ? `${systemName.get(key)} (${key})` : key.toUpperCase() }))}
+          triggerClassName="h-8 rounded-md border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-900/40 text-xs"
+        />
+      )}
+    </div>
+  );
+}
 
 export default IdentifiersPart;

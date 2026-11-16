@@ -92,6 +92,16 @@ export interface IStatisticsBucket {
   loans_returned: number;
   loans_expired: number;
   holds_placed: number;
+  /**
+   * PROPOSED, not served yet. Distinct visitors to the portal in the bucket (web analytics,
+   * e.g. Umami sessions). Absent or null = not collected; the UI says so instead of plotting zero.
+   */
+  visitors?: number | null;
+  /**
+   * PROPOSED, not served yet. Publications opened or downloaded in the bucket, any access path
+   * (open access and LCP). Needs an event log: `UserActivity` collapses repeats into one row.
+   */
+  reads?: number | null;
 }
 
 /** Licenses created in the period, by local weekday (0 = Monday) and hour. Always 168 cells. */

@@ -67,6 +67,8 @@ const Breadcrumb = () => {
     ['history']: isEn() ? 'History' : 'História',
     ['explore']: isEn() ? 'Explore' : 'Preskúmať',
     ['jobs']: isEn() ? 'Background jobs' : 'Úlohy na pozadí',
+    ['harvest']: isEn() ? 'Harvest sources' : 'Zdroje importu',
+    ['conflicts']: isEn() ? 'Sync conflicts' : 'Konflikty synchronizácie',
     ['ai-chat']: isEn() ? 'AI Assistant' : 'AI Asistent',
     ['ai-chat-history']: isEn() ? 'AI Assistant' : 'AI Asistent',
     ['books']: isEn() ? 'Books' : 'Knihy',
