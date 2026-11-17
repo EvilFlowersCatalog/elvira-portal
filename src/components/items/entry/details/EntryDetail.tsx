@@ -33,6 +33,7 @@ import { AvailabilityBadge, AvailabilityState } from './AvailabilityBadge';
 import Tooltip from '../../../primitives/Tooltip';
 import { localize } from '../../../../utils/func/localized';
 import { useFeature } from '../../../../features/features';
+import { writeClipboard } from '../../../../utils/func/clipboard';
 
 interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
@@ -143,7 +144,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
       toast.error(t('notifications.citation.noCite'));
       return;
     }
-    navigator.clipboard.writeText(cite).then(() => {
+    writeClipboard(cite).then(() => {
       toast.success(t('notifications.citation.copySuccess'));
     }, () => {
       toast.error(t('notifications.citation.copyError'));
@@ -162,8 +163,11 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
     }
 
     umamiTrack('Entry Detail Share Button');
-    navigator.clipboard.writeText(window.location.href);
-    toast.success(t('notifications.shareSuccess'));
+    // navigator.share and navigator.clipboard need a secure context; writeClipboard falls back (#62).
+    writeClipboard(window.location.href).then(
+      () => toast.success(t('notifications.shareSuccess')),
+      () => undefined,
+    );
   }
 
   useEffect(() => {

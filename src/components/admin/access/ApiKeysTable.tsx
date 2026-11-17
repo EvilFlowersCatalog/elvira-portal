@@ -19,6 +19,7 @@ import UserPicker from '../UserPicker';
 import UserLink from '../UserLink';
 import Button from '../../buttons/Button';
 import Select from '../../primitives/Select';
+import { copyText } from '../../../utils/func/clipboard';
 
 const DEFAULT_LIMIT = 25;
 
@@ -114,10 +115,7 @@ function CreateKeyDrawer({ open, ownerId, onClose, onSaved }: CreateKeyDrawerPro
               label={t('administration.accessPage.keys.copy')}
               variant="ghost"
               size="sm"
-              onClick={() => {
-                navigator.clipboard?.writeText(createdToken);
-                toast.success(t('administration.accessPage.keys.copied'));
-              }}
+              onClick={() => copyText(createdToken, t('administration.accessPage.keys.copied'))}
             >
               <FiCopy size={14} />
             </IconButton>
@@ -185,10 +183,7 @@ function TokenCell({ token }: { token?: string }) {
         label={t('administration.accessPage.keys.copy')}
         variant="ghost"
         size="sm"
-        onClick={() => {
-          navigator.clipboard?.writeText(token);
-          toast.success(t('administration.accessPage.keys.copied'));
-        }}
+        onClick={() => copyText(token, t('administration.accessPage.keys.copied'))}
       >
         <FiCopy size={14} />
       </IconButton>

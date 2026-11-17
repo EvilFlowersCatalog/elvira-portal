@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiCheck, FiCopy } from 'react-icons/fi';
 import { twMerge } from 'tailwind-merge';
+import { writeClipboard } from '../../utils/func/clipboard';
 
 /** Copies `text`; the icon turns into a check for a moment. Clicks never reach a clickable row. */
 export function CopyButton({ text, label, className }: { text: string; label?: string; className?: string }) {
@@ -18,11 +19,14 @@ export function CopyButton({ text, label, className }: { text: string; label?: s
       title={copied ? t('administration.copy.copied') : name}
       onClick={(e) => {
         e.stopPropagation();
-        navigator.clipboard?.writeText(text).then(() => {
-          setCopied(true);
-          clearTimeout(timer.current);
-          timer.current = setTimeout(() => setCopied(false), 1500);
-        });
+        writeClipboard(text).then(
+          () => {
+            setCopied(true);
+            clearTimeout(timer.current);
+            timer.current = setTimeout(() => setCopied(false), 1500);
+          },
+          () => undefined,
+        );
       }}
       className={twMerge(
         'inline-flex h-6 w-6 shrink-0 items-center justify-center rounded text-zinc-400 transition-colors hover:bg-zinc-200/70 hover:text-zinc-700 dark:hover:bg-zinc-700 dark:hover:text-zinc-200',

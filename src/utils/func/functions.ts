@@ -28,8 +28,18 @@ export const getBase64 = async (fileBase: File | null) => {
   return base;
 };
 
-/** An RFC 4122 version 4 UUID from the platform's CSPRNG. */
-export const uuid = (): string => crypto.randomUUID();
+/**
+ * An RFC 4122 version 4 UUID from the platform's CSPRNG. `crypto.randomUUID` exists only in a secure
+ * context (HTTPS or localhost); the intranet portals are plain HTTP (#62), where `getRandomValues` still works.
+ */
+export const uuid = (): string => {
+  if (typeof crypto.randomUUID === 'function') return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6] & 0x0f) | 0x40; // version 4
+  b[8] = (b[8] & 0x3f) | 0x80; // variant 10
+  const h = Array.from(b, (x) => x.toString(16).padStart(2, '0')).join('');
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+};
 
 /** Max length of a feed `url_name` on the catalog side. */
 export const SLUG_MAX_LENGTH = 50;

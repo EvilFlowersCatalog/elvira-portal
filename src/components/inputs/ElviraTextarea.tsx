@@ -1,6 +1,5 @@
-import { forwardRef, TextareaHTMLAttributes, useState } from 'react';
+import { forwardRef, TextareaHTMLAttributes, useId, useState } from 'react';
 import { twMerge } from 'tailwind-merge';
-import { uuid } from '../../utils/func/functions';
 import useAppContext from '../../hooks/contexts/useAppContext';
 
 interface CustomTextareaProps
@@ -11,7 +10,9 @@ interface CustomTextareaProps
 const ElviraTextarea = forwardRef<HTMLTextAreaElement, CustomTextareaProps>(
   ({ invalidMessage, ...props }, ref) => {
     const [focus, setFocus] = useState<boolean>(false);
-    const id = uuid();
+    // Stable across renders and needs no secure context (#62); a caller's own id wins.
+    const generatedId = useId();
+    const id = props.id ?? generatedId;
 
     const { placeholder, value } = props;
 

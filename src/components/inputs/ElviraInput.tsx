@@ -3,9 +3,9 @@ import {
   FocusEvent,
   forwardRef,
   InputHTMLAttributes,
+  useId,
   useState,
 } from 'react';
-import { uuid } from '../../utils/func/functions';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { twMerge } from 'tailwind-merge';
 import PopupInfo from '../common/PopupInfo';
@@ -37,7 +37,9 @@ interface CustomInputProps extends InputHTMLAttributes<HTMLInputElement> {
 // Custom input used in step forms in ADMIN
 const ElviraInput = forwardRef<HTMLInputElement, CustomInputProps>(
   ({ invalidMessage, paddingLeft, nativePlaceholder, label = 'animated', icon, tooltip, tooltipLabel, trailing, ...props }, ref) => {
-    const id = uuid();
+    // Stable across renders and needs no secure context (#62); a caller's own id wins.
+    const generatedId = useId();
+    const id = props.id ?? generatedId;
     const [isInvalid, setIsInvalid] = useState<boolean>(false);
     const [isFocused, setIsFocused] = useState<boolean>(false);
 

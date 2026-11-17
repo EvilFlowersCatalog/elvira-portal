@@ -17,6 +17,7 @@ import {
   downloadJson,
 } from './exportReport';
 import { fmtCount, fmtHours, fmtPct } from './format';
+import { writeClipboard } from '../../../utils/func/clipboard';
 
 interface Props {
   data: IAdminStatistics;
@@ -103,9 +104,8 @@ export default function ExportMenu({
 
   const copySummary = () =>
     run('summary', () => {
-      // Clipboard API needs a secure context; without it (or on refusal) nothing is claimed as copied.
-      navigator.clipboard
-        ?.writeText(summary())
+      // writeClipboard falls back outside a secure context (#62); on refusal nothing is claimed as copied.
+      writeClipboard(summary())
         .then(() => {
           setCopied(true);
           setTimeout(() => setCopied(false), 1800);
