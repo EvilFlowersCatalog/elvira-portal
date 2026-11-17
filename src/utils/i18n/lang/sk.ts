@@ -1,5 +1,12 @@
 export const sk = {
   translation: {
+    errorBoundary: {
+      title: 'Niečo sa pokazilo',
+      chunk: 'Túto časť portálu sa nepodarilo načítať. Zvyčajne ide o výpadok siete alebo bola nasadená nová verzia. Pomôže obnovenie stránky.',
+      render: 'Pri zobrazení tejto stránky nastala neočakávaná chyba.',
+      reload: 'Obnoviť',
+      reference: 'Ak sa to opakuje, pošlite nám tento kód:',
+    },
     common: {
       showMore: '{{count}} ďalších',
       showLess: 'Zobraziť menej',

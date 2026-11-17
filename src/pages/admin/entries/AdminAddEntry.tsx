@@ -1,4 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
+import { config } from '@/lib/config';
 import { ChangeEvent, FormEvent, useState } from 'react';
 import { IEntryNew, IEntryNewForm } from '../../../utils/interfaces/entry';
 import { useTranslation } from 'react-i18next';
@@ -95,7 +96,7 @@ const AdminAddEntry = () => {
       // Upload
       try {
         setIsLoading(true);
-        const info = await uploadEntry(newEntry, import.meta.env.ELVIRA_CATALOG_ID || undefined);
+        const info = await uploadEntry(newEntry, config.ELVIRA_CATALOG_ID || undefined);
 
         await Promise.all(
           files.map(async (item) => {
@@ -109,7 +110,7 @@ const AdminAddEntry = () => {
               entryAcquisition.append('content', item.file);
               entryAcquisition.append('metadata', JSON.stringify(metadata));
 
-              await createEntryAcquisition(entryAcquisition, info.id, import.meta.env.ELVIRA_CATALOG_ID || undefined);
+              await createEntryAcquisition(entryAcquisition, info.id, config.ELVIRA_CATALOG_ID || undefined);
             } catch {
               // Show error notification
               toast.error(

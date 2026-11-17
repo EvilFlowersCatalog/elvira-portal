@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { config } from '@/lib/config';
 import useAuthContext from '../../contexts/useAuthContext';
 import { useGetCatalogDetail } from './useAdminCatalogs';
 
@@ -11,7 +12,7 @@ import { useGetCatalogDetail } from './useAdminCatalogs';
 const useCurrentCatalog = () => {
   const { auth } = useAuthContext();
   const getCatalogDetail = useGetCatalogDetail();
-  const catalogId: string | undefined = import.meta.env.ELVIRA_CATALOG_ID || undefined;
+  const catalogId: string | undefined = config.ELVIRA_CATALOG_ID || undefined;
 
   return useQuery({
     queryKey: ['catalog', catalogId],

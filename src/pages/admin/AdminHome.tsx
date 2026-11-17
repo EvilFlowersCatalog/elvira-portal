@@ -1,3 +1,4 @@
+import { config } from '@/lib/config';
 import {
   ReactElement,
   ReactNode,
@@ -231,7 +232,7 @@ const AdminHome = () => {
     semanticsOn && !!graph.data?.nodes.length && !!semantic?.covered;
   const subjectNames = useSubjectNames(showMap);
   const meta = {
-    catalog: import.meta.env.ELVIRA_CATALOG_ID as string,
+    catalog: config.ELVIRA_CATALOG_ID,
     demo: result?.status === 'demo',
   };
 

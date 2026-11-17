@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react';
+import { config } from '@/lib/config';
 
 /**
  * Portal features an administrator switches on or off at runtime (elvira-portal: KU minimal instance).
@@ -88,8 +89,9 @@ export const parseFeatureList = (raw: string | undefined): Partial<Record<Featur
   return result;
 };
 
-const EXPERIMENTAL = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
-const BUILD_OVERRIDES = parseFeatureList(import.meta.env.ELVIRA_FEATURES);
+// Build-time values, or the deployment's /config.json when it sets them (#61).
+const EXPERIMENTAL = config.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
+const BUILD_OVERRIDES = parseFeatureList(config.ELVIRA_FEATURES);
 
 /** What the build says, without the catalog. */
 export const buildDefault = (key: FeatureKey): boolean => {
@@ -148,7 +150,7 @@ export const resolveFeature = (key: FeatureKey, snapshot: FeatureSnapshot): Feat
 
 // ── The store: module scope, so non-React code (route tables, the guide registry) reads it too ─────────────
 
-const CACHE_KEY = `elvira.features:${import.meta.env.ELVIRA_BASE_URL ?? ''}`;
+const CACHE_KEY = `elvira.features:${config.ELVIRA_BASE_URL}`;
 
 const readCache = (): FeatureSnapshot => {
   try {

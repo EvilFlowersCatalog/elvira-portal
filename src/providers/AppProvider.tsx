@@ -15,6 +15,8 @@ import {
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { IContextProviderParams } from "../utils/interfaces/contexts";
 import i18next from "../utils/i18n/i18next";
+import { config } from "../lib/config";
+import { track } from "../lib/analytics";
 import useCookiesContext from "../hooks/contexts/useCookiesContext";
 import type {
   IAssistantAccess,
@@ -164,16 +166,12 @@ const AppProvider = ({ children }: IContextProviderParams) => {
   const [showAiAssistant, setShowAiAssistant] = useState<boolean>(false);
   const [editingEntryTitle, setEditingEntryTitle] = useState<string>("");
   
-  // Theme is configured via a build-time env var. The catalog UUID lives in
-  // import.meta.env.ELVIRA_CATALOG_ID and is read directly at each call site.
-  const elviraTheme = import.meta.env.ELVIRA_THEME || 'default';
+  // Theme comes from the portal config (build default or the deployment's /config.json, #61).
+  // The catalog UUID is config.ELVIRA_CATALOG_ID, read directly at each call site.
+  const elviraTheme = config.ELVIRA_THEME || 'stu';
 
-  // assets / LOGOS - dynamically generated based on elviraTheme
-  // Use 'default' as fallback for unknown catalog values
-  const getAssetPath = (catalog: string) => {
-    const knownCatalogs = ['fiit', 'mtf', 'fad', 'fchpt', 'fei', 'sjf', 'svf', 'ku', 'stu'];
-    return knownCatalogs.includes(catalog) ? catalog : 'default';
-  };
+  // Logos and colours: STU (the default, also for an unknown value) or KU.
+  const getAssetPath = (theme: string) => (theme === 'ku' ? 'ku' : 'stu');
   
   const assetTheme = getAssetPath(elviraTheme);
   const logoDark = `/assets/${assetTheme}/elvira/logo-dark.png`;
@@ -257,14 +255,9 @@ const AppProvider = ({ children }: IContextProviderParams) => {
     }
   };
 
-  const umamiTrack = (title: string, data?: object) => {
-    const tracker = (
-      window as unknown as {
-        umami?: { track: (title: string, data?: object) => void };
-      }
-    ).umami;
-    tracker?.track(title, data);
-  };
+  // Named reader actions go to Umami and Faro through the one analytics layer (lib/analytics, #59).
+  // Kept on the context under its old name for the existing call sites.
+  const umamiTrack = (title: string, data?: object) => track(title, data);
 
   const clearFilters = () => {
     const params = new URLSearchParams();
@@ -452,7 +445,8 @@ const AppProvider = ({ children }: IContextProviderParams) => {
         value.length > 0 &&
         previousParams.current[key] !== value
       ) {
-        umamiTrack(eventName, { [key]: value });
+        // Umami only: these follow URL changes, not clicks, and carry search text (never sent to Faro).
+        track(eventName, { [key]: value }, { faro: false });
       }
     });
 

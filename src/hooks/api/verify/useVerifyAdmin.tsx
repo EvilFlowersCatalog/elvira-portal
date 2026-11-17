@@ -1,4 +1,5 @@
 import { IVerifyAdminResponse } from '../../../utils/interfaces/auth';
+import { config } from '@/lib/config';
 import useAuth from '../../contexts/useAuthContext';
 import useAxios from '../useAxios';
 
@@ -11,10 +12,10 @@ const useVerifyAdmin = () => {
     const VERIFY_URL = `/api/v1/users/${auth?.userId}`;
     const { data: user } = await axios.get<IVerifyAdminResponse>(VERIFY_URL);
 
-    const catalogId = import.meta.env.ELVIRA_CATALOG_ID;
+    const catalogId = config.ELVIRA_CATALOG_ID;
     const isSuperUser =
       user.response.is_superuser ||
-      (catalogId && user.response.catalog_permissions[catalogId] === 'manage');
+      (!!catalogId && user.response.catalog_permissions[catalogId] === 'manage');
     // return response
     return isSuperUser;
   };

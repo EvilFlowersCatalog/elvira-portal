@@ -381,6 +381,7 @@ export default function LicenseCalendar() {
                 <button
                   disabled={isSubmitting}
                   onClick={handleBorrow}
+                  data-faro-user-action-name="Borrow Confirm"
                   className="h-[35px] w-[150px] rounded-[7px] bg-primary text-white text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60 shadow"
                 >
                   {isSubmitting ? '...' : t('license.borrow.action', { defaultValue: 'Požičať' })}
@@ -452,6 +453,7 @@ export default function LicenseCalendar() {
                 <button
                   disabled={isSubmitting}
                   onClick={handleSavePassphraseAndBorrow}
+                  data-faro-user-action-name="Borrow Confirm"
                   className="h-[35px] w-[170px] rounded-[7px] bg-primary text-white text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-60 shadow"
                 >
                   {isSubmitting ? '...' : t('license.passphrase.saveAndBorrow', { defaultValue: 'Uložiť a požičať' })}

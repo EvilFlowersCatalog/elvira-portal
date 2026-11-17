@@ -22,8 +22,7 @@ import useVerifyCredentials from '../hooks/api/verify/useVerifyCredentials';
 import axios, { CancelTokenSource } from 'axios';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
 import { setAxiosAuth } from '../hooks/api/useAxios';
-import { umamiIdentify } from '../utils/umamiIdentify';
-import { identifyTelemetryUser } from '../lib/telemetry';
+import { identify } from '../lib/analytics';
 
 export interface IAuthContext {
   auth: IAuth | null;
@@ -138,16 +137,18 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
     }
   }, [auth, check]);
 
-  // Identify the logged-in user in Umami (on login and on restored sessions)
-  useEffect(() => {
-    // Browser traces carry the user id on dev only (IP-029 Q1); a no-op elsewhere.
-    identifyTelemetryUser(auth?.userId ? String(auth.userId) : undefined);
-    if (!auth?.userId) return;
-    return umamiIdentify(String(auth.userId), {
-      username: auth.username,
-      isSuperUser: auth.isSuperUser,
-    });
-  }, [auth?.userId]);
+  // Identify the user in analytics on login and on restored sessions (lib/analytics): Umami gets the
+  // id, Faro signed_in / role (#58) and the id on dev only (IP-029 Q1). Admin can change later
+  // (AdminGuard re-verifies), hence isSuperUser in the deps.
+  useEffect(
+    () =>
+      identify(
+        auth?.userId
+          ? { id: String(auth.userId), username: auth.username, isSuperUser: auth.isSuperUser }
+          : undefined,
+      ),
+    [auth?.userId, auth?.isSuperUser],
+  );
 
   const logout = () => {
     // Cancel all ongoing requests

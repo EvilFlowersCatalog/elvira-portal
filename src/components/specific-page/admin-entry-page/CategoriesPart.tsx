@@ -1,4 +1,5 @@
 import { MdRemoveCircle } from 'react-icons/md';
+import { config } from '@/lib/config';
 import { IPartParams } from '../../../utils/interfaces/general/general';
 import CategoryAutofill from '../../autofills/CategoryAutofill';
 import { useState } from 'react';
@@ -22,7 +23,7 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
         <div className='flex justify-between w-full'>
           <h2 className='text-sm font-semibold text-zinc-700 dark:text-zinc-200'>{t('entry.wizard.categories')}</h2>
           <IoMdAdd onClick={() => {
-            umamiTrack('try Create Category Bu');
+            umamiTrack('Entry Create Category Button');
             setOpen(true);
           }} className='ml-auto cursor-pointer' size={20} />
         </div>
@@ -56,7 +57,7 @@ const CategoriesPart = ({ entry, setEntry }: IPartParams) => {
         open={open}
         category={null}
         mode='create'
-        catalogId={import.meta.env.ELVIRA_CATALOG_ID}
+        catalogId={config.ELVIRA_CATALOG_ID}
         onClose={() => setOpen(false)}
         onSaved={() => setAutofillKey((k) => k + 1)}
         onCreated={(category) => {

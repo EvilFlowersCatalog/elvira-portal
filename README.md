@@ -82,18 +82,40 @@ Then glide over to `http://localhost:3000/` to explore. The dev server reads
 Run `npm run build:<mode>` — the mode selects which `env/.env.<mode>` file shapes
 the build. Then `npm run preview` to serve it.
 
-## Faculty themes
+### One image, runtime configuration
 
-The active theme is chosen per catalog / via `ELVIRA_THEME` and drives the brand
-palette and logos (light & dark). Supported `data-theme` values:
+`npm run build` (mode `image`) builds a bundle with no client in it; the `Dockerfile` serves it with
+`nginx-unprivileged` (uid 101, port 8080, read-only root filesystem). CI pushes
+`ghcr.io/evilflowerscatalog/elvira-portal` (`:dev`, `:master`, `:sha-<short>`).
 
-`fiit` · `stu` · `mtf` · `svf` · `sjf` · `fei` · `fchpt` · `fad` · `ku` (Katolícka
-univerzita Ružomberok) · `default`
+Each deployment mounts `/usr/share/nginx/html/config.json` with any of the `ELVIRA_*` keys, plus its
+nginx config as `/etc/nginx/conf.d/default.conf` (SPA fallback). The keys override the build-time values
+before the app renders (`src/lib/config.ts`). A missing or invalid file leaves the build-time values, so
+`npm run dev` and the static deploys work unchanged. Read configuration through `config`, never
+`import.meta.env.ELVIRA_*`.
+
+```json
+{ "ELVIRA_BASE_URL": "https://api.e-knihy.ku.sk", "ELVIRA_CATALOG_ID": "1863182a-…", "ELVIRA_THEME": "ku" }
+```
+
+## Analytics and telemetry
+
+`src/lib/analytics.ts` is the one layer for Umami and Grafana Faro: `track` (reader actions), `trackOutcome`
+(`loan.result`, `search.result`, `ui.error_shown`, `ui.render_error`, `api.error`, …), `measure`, `identify`.
+Umami events carry `view` (route pattern), and on development `faro_session` to join them with Faro
+(not in production: Umami identifies the user, IP-029). Faro itself
+(`src/lib/telemetry.ts`) is on when `ELVIRA_FARO_URL` is set. Never put search text, titles, names or
+e-mails into an event.
+
+## Themes
+
+`ELVIRA_THEME` picks the brand palette and logos (light & dark): `stu` (the default, also when unset or
+unknown) or `ku` (Katolícka univerzita v Ružomberku).
 
 Each theme exposes contrast-aware CSS variables in `src/main.css`
 (`--color-primary`, `--color-primary-text`, `--color-on-primary`,
 `--color-primary-dark`, `--color-primary-hover`, …) so text and buttons meet WCAG AA on every palette.
-Light brand fills (KU gold, FCHPT yellow) put dark ink on the fill (`--color-on-primary`).
+KU gold is a light fill, so it puts dark ink on the fill (`--color-on-primary`).
 
 The institution logo of a theme (`public/assets/<theme>/stu/logo-{dark,light}.png`) is shown on the
 sign-in page, linked to the institution (`src/utils/institution.ts`). KU follows its design manual

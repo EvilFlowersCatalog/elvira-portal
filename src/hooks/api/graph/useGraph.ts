@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { config } from '@/lib/config';
 import useAxios from '../useAxios';
 import useGetEntries from '../entries/useGetEntries';
 import { IChapterMap, ILibraryMap, IPrerequisite, IRelatedSection } from '../../../utils/interfaces/graph';
@@ -12,12 +13,12 @@ const STALE = 5 * 60 * 1000;
 export const useLibraryMap = (opts: { enabled?: boolean; retry?: boolean } = {}) => {
   const axios = useAxios();
   return useQuery({
-    queryKey: ['graph-map', import.meta.env.ELVIRA_CATALOG_ID],
+    queryKey: ['graph-map', config.ELVIRA_CATALOG_ID],
     staleTime: STALE,
     ...opts,
     queryFn: async () => {
       const { data } = await axios.get<{ response: ILibraryMap }>('/api/v1/entries/map', {
-        params: { catalog_id: import.meta.env.ELVIRA_CATALOG_ID },
+        params: { catalog_id: config.ELVIRA_CATALOG_ID },
       });
       return data.response;
     },

@@ -1,4 +1,5 @@
 import { IFeedQuery, IFeedsList } from '../../../utils/interfaces/feed';
+import { config } from '@/lib/config';
 import i18next from 'i18next';
 import useAxios from '../useAxios';
 
@@ -17,7 +18,7 @@ const useGetFeeds = () => {
   }: IFeedQuery): Promise<IFeedsList> => {
     // Set params
     const params = new URLSearchParams();
-    params.set('catalog_id', import.meta.env.ELVIRA_CATALOG_ID);
+    params.set('catalog_id', config.ELVIRA_CATALOG_ID);
 
     if (orderBy) params.set('order_by', orderBy);
     else params.set('order_by', '-created_at');

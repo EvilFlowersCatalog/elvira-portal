@@ -95,6 +95,7 @@ function ActionBtn({
   disabled,
   filled,
   title,
+  action,
 }: {
   icon: React.ReactNode;
   label: string;
@@ -102,10 +103,13 @@ function ActionBtn({
   disabled?: boolean;
   filled?: boolean;
   title?: string;
+  /** Faro user action name (#59). */
+  action?: string;
 }) {
   return (
     <button
       onClick={onClick}
+      data-faro-user-action-name={action}
       disabled={disabled}
       title={title}
       className={`flex items-center justify-center gap-[10px] h-[34px] w-[100px] px-2 py-1 rounded-[6px] text-[12px] tracking-[0.1px] transition-colors shrink-0
@@ -189,7 +193,7 @@ function BorrowedCard({
               }
               onClick={() => onExtend(license)}
             />
-            <ActionBtn icon={<BsArrowReturnLeft size={20} />} label={t(`${CARD}.return`)} onClick={() => onReturn(license)} />
+            <ActionBtn icon={<BsArrowReturnLeft size={20} />} label={t(`${CARD}.return`)} action="Return Button" onClick={() => onReturn(license)} />
             <ActionBtn icon={<LuDownload size={20} />} label={t(`${CARD}.download`)} filled onClick={() => onDownload(license.id)} />
           </div>
         </div>
@@ -289,6 +293,7 @@ function ReservationCard({
                 label={claiming ? t(`${CARD}.pickingUp`) : t(`${CARD}.pickUp`)}
                 filled
                 disabled={claiming}
+                action="Claim Reservation"
                 onClick={() => onClaim(reservation)}
               />
             )}

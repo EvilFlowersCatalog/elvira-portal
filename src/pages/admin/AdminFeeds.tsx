@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { config } from '@/lib/config';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { FiPlus, FiFolder, FiEdit2, FiChevronRight } from 'react-icons/fi';
@@ -199,7 +200,7 @@ const AdminFeeds = () => {
         open={drawerOpen}
         feed={active}
         mode={drawerMode}
-        catalogId={import.meta.env.ELVIRA_CATALOG_ID}
+        catalogId={config.ELVIRA_CATALOG_ID}
         defaultParentId={drawerMode === 'create' ? currentParent : null}
         onClose={() => setDrawerOpen(false)}
         onSaved={fetchFeeds}

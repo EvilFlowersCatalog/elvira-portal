@@ -1,3 +1,5 @@
+import { config } from '@/lib/config';
+
 export const getFileSize = (bytes: number): string => {
   if (bytes === 0) {
     return '0 Bytes';
@@ -66,7 +68,7 @@ export const withAccessToken = (
 ): string | null => {
   if (!url) return null;
   try {
-    const parsed = new URL(url, import.meta.env.ELVIRA_BASE_URL);
+    const parsed = new URL(url, config.ELVIRA_BASE_URL);
     parsed.searchParams.set('access_token', token ?? '');
     return parsed.toString();
   } catch {

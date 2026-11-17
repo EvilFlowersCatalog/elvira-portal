@@ -136,6 +136,7 @@ export default function ReserveQueueModal({ entry, onClose, onSuccess, queueLeng
             disabled={loading}
             className="h-[35px] w-[170px] rounded-[7px] bg-primary text-onPrimary text-sm font-medium hover:bg-primaryDark transition-colors disabled:opacity-60 shadow"
             onClick={handleJoin}
+            data-faro-user-action-name="Reserve Confirm"
           >
             {loading
               ? t(`${M}.joining`, { defaultValue: 'Joining…' })

@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { config } from '@/lib/config';
 import useAxios from '../useAxios';
 import { IAdminReviewList, ReviewState } from '../../../utils/interfaces/review';
 
@@ -19,7 +20,7 @@ const useAdminReviews = (q: IAdminReviewQuery) => {
     placeholderData: keepPreviousData,
     queryFn: async () => {
       const params: Record<string, string | number> = {
-        catalog_id: import.meta.env.ELVIRA_CATALOG_ID,
+        catalog_id: config.ELVIRA_CATALOG_ID,
         page: q.page,
         limit: q.limit,
       };

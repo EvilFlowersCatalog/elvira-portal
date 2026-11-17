@@ -1,4 +1,5 @@
 import useAxios, { LONG_TIMEOUT } from '../useAxios';
+import { config } from '@/lib/config';
 
 const useCreateEntryAcquistion = () => {
   const axios = useAxios();
@@ -8,7 +9,7 @@ const useCreateEntryAcquistion = () => {
     entryId: string,
     catalogId?: string
   ) => {
-    const effectiveCatalogId = catalogId || import.meta.env.ELVIRA_CATALOG_ID;
+    const effectiveCatalogId = catalogId || config.ELVIRA_CATALOG_ID;
     // Create user acquistion
     const CREATE_ENTRY_ACQUISITION_URL = `/api/v1/catalogs/${effectiveCatalogId}/entries/${entryId}`;
 

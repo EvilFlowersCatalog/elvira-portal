@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { config } from '@/lib/config';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { FiTrash2, FiX } from 'react-icons/fi';
@@ -96,7 +97,7 @@ export default function UserDrawer({ open, user, mode, onClose, onSaved, onDelet
           setCatalogs(items);
           // The API does not add a hand-made account to any catalog (only LDAP
           // sign-ins get that), so start with the portal's own catalog granted.
-          const current = items.find((c) => c.id === import.meta.env.ELVIRA_CATALOG_ID);
+          const current = items.find((c) => c.id === config.ELVIRA_CATALOG_ID);
           if (current) setGrants([{ catalog: current, mode: 'read' }]);
         })
         .catch(() => setCatalogs([]));

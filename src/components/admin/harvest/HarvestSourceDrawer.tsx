@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { config } from '@/lib/config';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { FiTrash2 } from 'react-icons/fi';
@@ -58,7 +59,7 @@ const EMPTY: FormState = {
   name: '',
   slug: '',
   adapter: '',
-  targetCatalogId: import.meta.env.ELVIRA_CATALOG_ID ?? '',
+  targetCatalogId: config.ELVIRA_CATALOG_ID,
   baseUrl: '',
   metadataPrefix: 'marc21',
   setSpec: '',

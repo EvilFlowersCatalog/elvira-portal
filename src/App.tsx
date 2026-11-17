@@ -37,20 +37,6 @@ const App = () => {
     rememberSearch(location.pathname, location.search);
   }, [location.pathname, location.search]);
 
-  // Scripts for analytics
-  useEffect(() => {
-    const UMAMI_SERVER = import.meta.env.ELVIRA_UMAMI_SERVER;
-    const UMAMI_WEBSITE = import.meta.env.ELVIRA_UMAMI_WEBSITE;
-
-    if (UMAMI_SERVER && UMAMI_WEBSITE) {
-      const script = document.createElement('script');
-      script.defer = true;
-      script.setAttribute('src', `${UMAMI_SERVER}/script.js`);
-      script.setAttribute('data-website-id', UMAMI_WEBSITE);
-      document.head.appendChild(script);
-    }
-  }, []);
-
   return (
     // The guide (assistant navigation) lives above the pages so it can move between them.
     <GuideProvider>

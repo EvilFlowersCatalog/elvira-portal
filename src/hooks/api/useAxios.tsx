@@ -1,6 +1,7 @@
 import { MutableRefObject } from 'react';
 import axios, { CancelTokenSource } from 'axios';
 import { noteFailedRequest } from '../../lib/errorReference';
+import { config } from '../../lib/config';
 
 /** Default request timeout: a hung request surfaces as an error after this, not after minutes. */
 export const DEFAULT_TIMEOUT = 30 * 1000;
@@ -12,7 +13,7 @@ export const LONG_TIMEOUT = 5 * 60 * 1000;
 
 // Shared axios instance. Also imported directly (e.g. login / useGetMe).
 export const baseAxios = axios.create({
-  baseURL: import.meta.env.ELVIRA_BASE_URL,
+  baseURL: config.ELVIRA_BASE_URL,
   timeout: DEFAULT_TIMEOUT,
   headers: { 'Content-Type': 'application/json' },
 });
@@ -56,7 +57,8 @@ baseAxios.interceptors.response.use(
   (response) => response,
   (error) => {
     // The catalog's trace id for this failure; error toasts show it as "Ref …" (errorReference).
-    const traceId = noteFailedRequest(error?.response?.headers);
+    // Cancelled requests (logout, navigation) are not failures a reader is told about.
+    const traceId = axios.isCancel(error) ? undefined : noteFailedRequest(error?.response?.headers, error?.response?.status);
     if (traceId) error.traceId = traceId;
     if (error?.response?.status === 401) authState.logout();
     return Promise.reject(error);

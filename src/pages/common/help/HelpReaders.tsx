@@ -1,4 +1,5 @@
 import HelpLayout, { TocSection } from './HelpLayout';
+import { config } from '@/lib/config';
 import { HelpCode, HelpFigure, HelpH2, HelpH3, HelpList, HelpNote, HelpP, HelpSteps } from './HelpTypography';
 import useCurrentCatalog from '../../../hooks/api/catalogs/useCurrentCatalog';
 import useAppContext from '../../../hooks/contexts/useAppContext';
@@ -56,7 +57,7 @@ const HelpReaders = () => {
   const { specialNavigation } = useAppContext();
   const { data: catalog } = useCurrentCatalog();
 
-  const baseUrl = (import.meta.env.ELVIRA_BASE_URL ?? '').replace(/\/+$/, '');
+  const baseUrl = config.ELVIRA_BASE_URL.replace(/\/+$/, '');
   // Signed out, the catalog detail is not readable: show a placeholder the reader replaces.
   const catalogName = catalog?.url_name ?? '<katalóg>';
   const opds2 = `${baseUrl}/opds/v2/${catalogName}/`;

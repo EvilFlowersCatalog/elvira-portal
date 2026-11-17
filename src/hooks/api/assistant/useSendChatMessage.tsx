@@ -7,6 +7,9 @@ import {
   IAssistantToolActivity,
 } from '../../../utils/interfaces/assistant';
 import useAuth from '../../contexts/useAuthContext';
+import { config } from '@/lib/config';
+import { startAssistantTimer } from '@/lib/analytics';
+import { noteFailedRequest } from '@/lib/errorReference';
 import {
   ASSISTANT_URL,
   AssistantApiError,
@@ -75,7 +78,41 @@ const useSendChatMessage = () => {
     handlers: IAssistantStreamHandlers,
     options?: IAssistantMessageOptions,
   ): Promise<void> => {
-    const response = await fetch(`${import.meta.env.ELVIRA_BASE_URL}${ASSISTANT_URL}/chats/${chatId}/messages`, {
+    // The reader's wait for an answer, as a Faro measurement (#59): first streamed text, and the end.
+    const timer = startAssistantTimer('chat');
+    let failed = false;
+    try {
+      await streamAnswer(chatId, message, {
+        ...handlers,
+        onChunk: (text) => {
+          if (text) timer.firstToken();
+          handlers.onChunk(text);
+        },
+        onMessage: (text) => {
+          if (text) timer.firstToken();
+          handlers.onMessage(text);
+        },
+        onError: (...args) => {
+          failed = true;
+          handlers.onError(...args);
+        },
+      }, options);
+    } catch (error) {
+      failed = true;
+      throw error;
+    } finally {
+      // A reader who stopped the answer is not a slow answer.
+      if (!options?.signal?.aborted) timer.end(failed ? 'error' : 'ok');
+    }
+  };
+
+  const streamAnswer = async (
+    chatId: string,
+    message: string,
+    handlers: IAssistantStreamHandlers,
+    options?: IAssistantMessageOptions,
+  ): Promise<void> => {
+    const response = await fetch(`${config.ELVIRA_BASE_URL}${ASSISTANT_URL}/chats/${chatId}/messages`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -95,7 +132,8 @@ const useSendChatMessage = () => {
     });
 
     if (!response.ok) {
-      // fetch bypasses the axios interceptor, so mirror its 401 handling.
+      // fetch bypasses the axios interceptor, so mirror its 401 handling and its "Ref" on the toast.
+      noteFailedRequest(response.headers, response.status);
       if (response.status === 401) logout();
       const body = await response.json().catch(() => null);
       throw new AssistantApiError(

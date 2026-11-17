@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { config } from '@/lib/config';
 import { IMyShelfList } from '../../../utils/interfaces/my-shelf';
 import useAxios from '../useAxios';
 
@@ -17,7 +18,7 @@ const useShelfEntryIds = () => {
     queryKey: SHELF_ENTRY_IDS_KEY,
     queryFn: async () => {
       const { data } = await axios.get<IMyShelfList>('/api/v1/shelf-records', {
-        params: { paginate: 'false', catalog_id: import.meta.env.ELVIRA_CATALOG_ID },
+        params: { paginate: 'false', catalog_id: config.ELVIRA_CATALOG_ID },
       });
       return data.items.map((record) => record.entry.id);
     },

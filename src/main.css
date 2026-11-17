@@ -83,61 +83,16 @@ input:focus:not(:focus-visible) {
   padding: 0 1px;
 }
 
-/* CSS Variables for faculty themes */
-:root[data-theme="fiit"] {
-  --color-primary: #01a9e0;
-  --color-primary-light: #E6F3FF;
-  --color-secondary: #15384E;
-  --color-secondary-light: #A8D0E6;
-}
-
+/*
+ * Themes: STU (the default, also for an unset or unknown ELVIRA_THEME) and KU. Plain `:root` carries STU,
+ * so `:root[data-theme="ku"]` (higher specificity) overrides it.
+ */
+:root,
 :root[data-theme="stu"] {
   --color-primary: #a80331;
   --color-primary-light: #FDEEE3;
-  --color-secondary: #4A2E17;       
-  --color-secondary-light: #D7C0AE; 
-}
-
-:root[data-theme="mtf"] {
-  --color-primary: #E62B1E;
-  --color-primary-light: #FDE9E8; 
-  --color-secondary: #560006;
-  --color-secondary-light: #D8B4B4; 
-}
-
-:root[data-theme="svf"] {
-  --color-primary: #E5722A;
-  --color-primary-light: #FDEEE3;
-  --color-secondary: #4A2E17;       
-  --color-secondary-light: #D7C0AE; 
-}
-
-:root[data-theme="sjf"] {
-  --color-primary: #4C5B60;
-  --color-primary-light: #E7EEF0;
-  --color-secondary: #1F2A2D;       
-  --color-secondary-light: #B8C5C9; 
-}
-
-:root[data-theme="fei"] {
-  --color-primary: #0C4A8E;
-  --color-primary-light: #E4EEF9;
-  --color-secondary: #0D2238;      
-  --color-secondary-light: #B7C5D5; 
-}
-
-:root[data-theme="fchpt"] {
-  --color-primary: #FFDA1C;
-  --color-primary-light: #FFF8D9; 
-  --color-secondary: #4A3F0F;       
-  --color-secondary-light: #D8CDA5;
-}
-
-:root[data-theme="fad"] {
-  --color-primary: #009D4A;
-  --color-primary-light: #E2F4EA;
-  --color-secondary: #143724;        /* deep forest slate */
-  --color-secondary-light: #B8CEC2;
+  --color-secondary: #4A2E17;
+  --color-secondary-light: #D7C0AE;
 }
 
 /*
@@ -154,13 +109,6 @@ input:focus:not(:focus-visible) {
   --font-heading: "Palatino Linotype", Palatino, "Book Antiqua", "URW Palladio L", "P052", Georgia, serif;
 }
 
-:root[data-theme="default"] {
-  --color-primary: #01a9e0;
-  --color-primary-light: #E6F3FF;
-  --color-secondary: #15384E;
-  --color-secondary-light: #A8D0E6;
-}
-
 /* Global color variables */
 :root {
   --color-light-gray: #F5F7FA;
@@ -175,31 +123,22 @@ input:focus:not(:focus-visible) {
 
 /*
  * Derived, contrast-aware theme tokens (WCAG 1.4.3).
- * For each faculty theme:
+ * For each theme:
  *   --color-on-primary   : text/icon color to place ON a `primary` fill (buttons)
  *   --color-primary-text : `primary` darkened enough to use as TEXT on white/primaryLight
  *   --color-primary-dark : dark-mode surface tint for `primary` chips (pairs with light text)
- * Defaults below cover any theme that doesn't override them.
+ * Plain `:root` is STU, the default.
  */
 :root {
   --color-on-primary: #ffffff;
-  --color-primary-text: #0077A3;
-  --color-primary-dark: #0A3D52;
+  --color-primary-text: #a80331;
+  --color-primary-dark: #4A0716;
   /* Hover of a filled primary button; the dark tint suits white text, a light brand fill overrides it. */
   --color-primary-hover: var(--color-primary-dark);
 }
-:root[data-theme="fiit"]    { --color-on-primary:#ffffff; --color-primary-text:#0077A3; --color-primary-dark:#0A3D52; }
-:root[data-theme="stu"]     { --color-on-primary:#ffffff; --color-primary-text:#a80331; --color-primary-dark:#4A0716; }
-:root[data-theme="mtf"]     { --color-on-primary:#ffffff; --color-primary-text:#C81F14; --color-primary-dark:#5A0E09; }
-:root[data-theme="svf"]     { --color-on-primary:#ffffff; --color-primary-text:#B0511A; --color-primary-dark:#4A2410; }
-:root[data-theme="sjf"]     { --color-on-primary:#ffffff; --color-primary-text:#4C5B60; --color-primary-dark:#202A2D; }
-:root[data-theme="fei"]     { --color-on-primary:#ffffff; --color-primary-text:#0C4A8E; --color-primary-dark:#0D2238; }
-/* Light brand fills (FCHPT yellow 1.4:1, KU gold 2.3:1 with white): dark ink on the fill, darker fill on hover. */
-:root[data-theme="fchpt"]   { --color-on-primary:#1F1A17; --color-primary-text:#756000; --color-primary-dark:#4A3F0F; --color-primary-hover:#E6C200; }
-:root[data-theme="fad"]     { --color-on-primary:#ffffff; --color-primary-text:#007A3A; --color-primary-dark:#103A22; }
-/* KU: ink #1F1A17 on gold 7.5:1, on hover #C29A12 6.5:1; text gold #6B5300 on white 7.3:1. */
-:root[data-theme="ku"]      { --color-on-primary:#1F1A17; --color-primary-text:#6B5300; --color-primary-dark:#3A2F0A; --color-primary-hover:#C29A12; }
-:root[data-theme="default"] { --color-on-primary:#ffffff; --color-primary-text:#0077A3; --color-primary-dark:#0A3D52; }
+/* KU gold is a light fill (2.3:1 with white): ink #1F1A17 on gold 7.5:1, on hover #C29A12 6.5:1; text gold
+   #6B5300 on white 7.3:1. */
+:root[data-theme="ku"] { --color-on-primary:#1F1A17; --color-primary-text:#6B5300; --color-primary-dark:#3A2F0A; --color-primary-hover:#C29A12; }
 
 /*
  * Filled primary controls follow the theme's ink, not a hard-coded white (22 components wrote
@@ -217,8 +156,7 @@ input:focus:not(:focus-visible) {
  * Brand yellows are unreadable as text on white (KU gold 2.3:1): in light mode `text-primary` uses the
  * darkened --color-primary-text. Dark mode keeps the brand colour (gold on zinc-800 is 6.5:1).
  */
-:root[data-theme="ku"] body:not(.dark) .text-primary,
-:root[data-theme="fchpt"] body:not(.dark) .text-primary {
+:root[data-theme="ku"] body:not(.dark) .text-primary {
   color: var(--color-primary-text);
 }
 

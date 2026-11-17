@@ -1,6 +1,7 @@
 import { ILicense } from '../../../utils/interfaces/license';
 import { IReservation, RESERVATION_STATUS } from '../../../utils/interfaces/reservation';
 import useAxios from '../useAxios';
+import { withLoanResult } from '../../../lib/analytics';
 
 /**
  * Mutate a reservation via the declarative endpoint. Only `cancelled` and
@@ -21,9 +22,11 @@ const useUpdateReservation = () => {
   };
 
   const claimReservation = async (reservationId: string): Promise<ILicense> => {
-    const { data } = await axios.patch<{ response: ILicense } & Partial<ILicense>>(
-      `/readium/v1/reservations/${reservationId}`,
-      { status: RESERVATION_STATUS.claimed },
+    // `loan.result` in Faro (#59).
+    const { data } = await withLoanResult('claim', () =>
+      axios.patch<{ response: ILicense } & Partial<ILicense>>(`/readium/v1/reservations/${reservationId}`, {
+        status: RESERVATION_STATUS.claimed,
+      }),
     );
     return data.response ?? (data as ILicense);
   };

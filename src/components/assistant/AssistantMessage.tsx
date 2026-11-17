@@ -9,6 +9,7 @@ import useAuthContext from '../../hooks/contexts/useAuthContext';
 import useOpenInViewer from '../../hooks/api/assistant/useOpenInViewer';
 import useOpenCitation from '../../hooks/api/assistant/useOpenCitation';
 import useAgentHighlights from '../../hooks/api/assistant/useAgentHighlights';
+import { track } from '../../lib/analytics';
 import useEntriesByIds from '../../hooks/api/entries/useEntriesByIds';
 import { AiMessage } from '../../providers/AppProvider';
 import { IAssistantCitation } from '../../utils/interfaces/assistant';
@@ -358,6 +359,7 @@ export default function AssistantMessage({
           onHighlight={
             subject?.userAcquisitionId && msg.study.mode === 'key_concepts'
               ? async (prompt) => {
+                  track('Reader Highlight', { entry_id: subject.entryId, source: 'assistant' });
                   const annotation = await requestAgentAnnotation(subject.userAcquisitionId!, prompt, lang);
                   if (annotation.status === 'failed') throw new Error('highlight-failed');
                 }

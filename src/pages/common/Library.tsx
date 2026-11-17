@@ -13,6 +13,8 @@ import usePassageSearch from '../../hooks/api/entries/usePassageSearch';
 import FigureResults from '../../components/items/entry/FigureResults';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { useFeature } from '../../features/features';
+import { useEffect, useRef } from 'react';
+import { trackSearchResult } from '../../lib/analytics';
 
 /** URL param of the active results tab; absent = publications. */
 export const RESULTS_TAB_PARAM = 'results';
@@ -35,6 +37,17 @@ const Library = () => {
 
   // Search inside books, scoped by the same filters (ordering doesn't apply).
   const query = (searchParams.get('query') ?? '').trim();
+
+  // `search.result` in Faro (#59): did a search find anything? A bucket per search, never the query.
+  const reportedSearch = useRef<string | null>(null);
+  const searchKey = query ? JSON.stringify(filters) : null;
+  const firstPageReady = !list.isLoading && !list.isFetching && !list.isError && list.page >= 1;
+  useEffect(() => {
+    if (!searchKey || !firstPageReady || reportedSearch.current === searchKey) return;
+    reportedSearch.current = searchKey;
+    // A second page means more than one page of 30, so the bucket is `>10` without counting.
+    trackSearchResult(list.maxPage > 1 ? Infinity : list.items.length);
+  }, [searchKey, firstPageReady, list.maxPage, list.items.length]);
   const passageFilters = { ...filters, orderBy: '', query: '' };
   // Both need the extraction index, which a minimal instance (KU) does not have: Administration › Features.
   const passagesOn = useFeature('passageSearch');

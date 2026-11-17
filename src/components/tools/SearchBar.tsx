@@ -6,6 +6,7 @@ import ElviraInput from '../inputs/ElviraInput';
 import SearchSuggestions from './SearchSuggestions';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { useFeature } from '../../features/features';
+import { track } from '../../lib/analytics';
 
 interface ISearchBar {
   param: string;
@@ -35,6 +36,8 @@ const SearchBar = ({
 
   const submit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    // One user action per search (#59), joined with the calls it starts; never the search text.
+    track('Search Submit', { param });
     if (input) searchParams.set(param, input);
     else searchParams.delete(param);
     setSearchParams(searchParams);

@@ -1,4 +1,5 @@
 import { IEntryDetail } from '../../../utils/interfaces/entry';
+import { config } from '@/lib/config';
 import { ILicense, LICENSE_STATE } from '../../../utils/interfaces/license';
 import useAxios from '../useAxios';
 import useAuthContext from '../../contexts/useAuthContext';
@@ -13,7 +14,7 @@ const useGetEntryDetail = () => {
   const authContext = useAuthContext();
 
   const getEntryDetail = async (entryId: string, catalogId?: string): Promise<IEntryDetail> => {
-    const effectiveCatalogId = catalogId || import.meta.env.ELVIRA_CATALOG_ID;
+    const effectiveCatalogId = catalogId || config.ELVIRA_CATALOG_ID;
     const ENTRY_DETAIL_URL = `/api/v1/catalogs/${effectiveCatalogId}/entries/${entryId}`;
     const { data: entryDetail } = await axios.get<{ response: IEntryDetail }>(ENTRY_DETAIL_URL);
     return entryDetail.response;
@@ -21,7 +22,7 @@ const useGetEntryDetail = () => {
 
   // Fetches entry detail and the current user's active/reserved license for it in parallel.
   const getEntryDetailWithLicense = async (entryId: string, catalogId?: string): Promise<IEntryWithLicense> => {
-    const effectiveCatalogId = catalogId || import.meta.env.ELVIRA_CATALOG_ID;
+    const effectiveCatalogId = catalogId || config.ELVIRA_CATALOG_ID;
     const ENTRY_DETAIL_URL = `/api/v1/catalogs/${effectiveCatalogId}/entries/${entryId}`;
 
     const licenseParams = new URLSearchParams({

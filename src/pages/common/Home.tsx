@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { config } from '@/lib/config';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useEntriesQuery from '../../hooks/api/entries/useEntriesQuery';
@@ -20,7 +21,7 @@ const Home = () => {
   const { t } = useTranslation();
 
   // The themed row's collection comes from the deployment (ELVIRA_FEATURED_FEED_ID), not the source.
-  const featuredFeedId: string | undefined = import.meta.env.ELVIRA_FEATURED_FEED_ID || undefined;
+  const featuredFeedId: string | undefined = config.ELVIRA_FEATURED_FEED_ID || undefined;
   const showThemed = useFeature('themedFeed') && !!featuredFeedId;
 
   // Home rows via React Query — each is cached/deduped and refetches when the

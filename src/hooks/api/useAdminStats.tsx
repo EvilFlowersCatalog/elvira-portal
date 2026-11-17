@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { config } from '@/lib/config';
 import useAxios from './useAxios';
 
 export interface AdminStats {
@@ -23,7 +24,7 @@ const useAdminStats = () => {
     const total = async (path: string, scoped: boolean): Promise<number | null> => {
       try {
         const params = new URLSearchParams({ page: '1', limit: '1' });
-        if (scoped) params.set('catalog_id', import.meta.env.ELVIRA_CATALOG_ID);
+        if (scoped) params.set('catalog_id', config.ELVIRA_CATALOG_ID);
         const { data } = await axios.get<{ metadata?: { total?: number } }>(`/api/v1/${path}`, { params });
         return data?.metadata?.total ?? null;
       } catch {

@@ -144,6 +144,7 @@ const ClaimReservation = () => {
                   disabled={phase === 'claiming'}
                   className="h-[40px] px-6 rounded-[7px] bg-primary text-onPrimary text-sm font-medium hover:bg-primaryDark transition-colors disabled:opacity-60"
                   onClick={doClaim}
+                  data-faro-user-action-name="Claim Reservation"
                 >
                   {phase === 'claiming'
                     ? t('claim.claiming', { defaultValue: 'Claiming…' })

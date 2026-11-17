@@ -1,36 +1,6 @@
 import './lib/forceHttps';
-// Browser tracing: before any other import can capture fetch/XHR (no-op without ELVIRA_FARO_URL).
-import './lib/telemetry';
-import './lib/errorReference';
-import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
-import { QueryClientProvider } from '@tanstack/react-query';
-import BaseRoutes from './routes/BaseRoutes';
-import AuthProvider from './providers/AuthProvider';
-import AppProvider from './providers/AppProvider';
-import CookiesProvider from './providers/CookiesProvider';
-import { queryClient } from './lib/reactQuery';
-import 'react-toastify/dist/ReactToastify.css';
-import './main.css';
+import { loadRuntimeConfig } from './lib/config';
 
-// For zotero to update
-document.dispatchEvent(
-  new Event('ZoteroItemUpdated', {
-    bubbles: true,
-    cancelable: true,
-  })
-);
-
-ReactDOM.createRoot(document.getElementById('root')!).render(
-  <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <CookiesProvider>
-        <AppProvider>
-          <AuthProvider>
-            <BaseRoutes />
-          </AuthProvider>
-        </AppProvider>
-      </CookiesProvider>
-    </BrowserRouter>
-  </QueryClientProvider>
-);
+// One image for every client (#61): /config.json overrides the build-time ELVIRA_* values, so it
+// must be in place before any module that reads configuration is evaluated.
+loadRuntimeConfig().then(() => import('./bootstrap'));

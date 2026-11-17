@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { config } from '@/lib/config';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import { FiPlus } from 'react-icons/fi';
@@ -48,7 +49,7 @@ const AdminAuthors = () => {
     setError(false);
     try {
       const { items, metadata } = await listAuthors({
-        catalog_id: import.meta.env.ELVIRA_CATALOG_ID,
+        catalog_id: config.ELVIRA_CATALOG_ID,
         page,
         limit,
         query: q || undefined,
@@ -151,7 +152,7 @@ const AdminAuthors = () => {
         open={drawerOpen}
         author={active}
         mode={drawerMode}
-        catalogId={import.meta.env.ELVIRA_CATALOG_ID}
+        catalogId={config.ELVIRA_CATALOG_ID}
         onClose={() => setDrawerOpen(false)}
         onSaved={fetchAuthors}
       />

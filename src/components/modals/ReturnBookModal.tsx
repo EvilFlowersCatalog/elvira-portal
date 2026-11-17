@@ -114,6 +114,7 @@ export default function ReturnBookModal({ license, onClose, onSuccess }: Props) 
             disabled={loading}
             className="h-[35px] w-[170px] rounded-[7px] bg-primary text-onPrimary text-sm font-medium hover:bg-primaryDark transition-colors disabled:opacity-60 shadow"
             onClick={handleReturn}
+            data-faro-user-action-name="Return Confirm"
           >
             {loading
               ? t(`${M}.returning`, { defaultValue: 'Returning...' })

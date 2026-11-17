@@ -1,15 +1,32 @@
 import { defineConfig } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
 import { readFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import react from '@vitejs/plugin-react';
 
 const { version } = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
 
+/**
+ * The build's short commit (Faro `app.release`, #58): GIT_SHA (the image build arg, #61), else
+ * GITHUB_SHA (Actions), else the local checkout, else `local`.
+ */
+const gitSha = (() => {
+  const fromEnv = process.env.GIT_SHA || process.env.GITHUB_SHA;
+  if (fromEnv) return fromEnv.slice(0, 7);
+  try {
+    return execFileSync('git', ['rev-parse', '--short=7', 'HEAD'], { stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString()
+      .trim();
+  } catch {
+    return 'local';
+  }
+})();
+
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  // service.version on browser telemetry (src/lib/telemetry.ts).
-  define: { __APP_VERSION__: JSON.stringify(version) },
+  // service.version and app.release on browser telemetry (src/lib/telemetry.ts).
+  define: { __APP_VERSION__: JSON.stringify(version), __GIT_SHA__: JSON.stringify(gitSha) },
   clearScreen: false,
   envPrefix: 'ELVIRA_',
   envDir: 'env',

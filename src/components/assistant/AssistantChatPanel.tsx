@@ -6,6 +6,7 @@ import { citeUris, MAX_CITE_URIS } from '../../hooks/api/assistant/useCite';
 import { answerSources } from '../../utils/func/assistantMessages';
 import CiteDialog from './CiteDialog';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import { track } from '../../lib/analytics';
 import useAssistantChat, { IAssistantEntryRef, ISendOptions } from '../../hooks/api/assistant/useAssistantChat';
 import useStickToBottom from '../../hooks/useStickToBottom';
 import AssistantMessage from './AssistantMessage';
@@ -58,6 +59,9 @@ export default function AssistantChatPanel({
   const follow = useStickToBottom(scrollRef, contentRef);
 
   const send = (message: string, options?: ISendOptions) => {
+    // One user action per question (typed, chip or suggestion), with its streamed call attached.
+    // Never the message text.
+    track('Assistant Send', { entry_id: attached?.id });
     setAiShowSuggestions(false);
     follow();
     sendMessage(message, options);

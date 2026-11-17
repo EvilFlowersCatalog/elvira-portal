@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { config } from '@/lib/config';
 import { IEntrySuggestions } from '../../../utils/interfaces/entry';
 import useAxios from '../useAxios';
 
@@ -16,7 +17,7 @@ const useEntrySuggest = (query: string, options?: { enabled?: boolean; limit?: n
     queryKey: ['entry-suggest', query, limit],
     queryFn: async ({ signal }) => {
       const { data } = await axios.get<{ response: IEntrySuggestions }>('/api/v1/entries/suggest', {
-        params: { query, limit, catalog_id: import.meta.env.ELVIRA_CATALOG_ID },
+        params: { query, limit, catalog_id: config.ELVIRA_CATALOG_ID },
         signal,
       });
       return data.response;

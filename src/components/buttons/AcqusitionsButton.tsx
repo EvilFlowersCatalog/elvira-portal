@@ -123,6 +123,7 @@ export default function AcquisitionsButton({
             <button
               className={`${ActionButtonStyle} flex-1 cursor-pointer`}
               onClick={() => setShowReturn(true)}
+              data-faro-user-action-name="Return Button"
             >
               <MdOutlineKeyboardReturn size={20} className="flex-shrink-0" />
               {t('entry.detail.return')}
@@ -174,6 +175,7 @@ export default function AcquisitionsButton({
           <button
             type="button"
             aria-label={t("entry.detail.reserve", { defaultValue: "Reserve" })}
+            data-faro-user-action-name="Reserve Button"
             className={`${ActionButtonStyle} w-full cursor-pointer`}
             onClick={() => setShowReserve(true)}
           >
@@ -193,7 +195,12 @@ export default function AcquisitionsButton({
     }
 
     return (
-      <button type="button" className={`${ActionButtonStyle} w-full cursor-pointer`} onClick={openBorrowModal}>
+      <button
+        type="button"
+        data-faro-user-action-name="Borrow Button"
+        className={`${ActionButtonStyle} w-full cursor-pointer`}
+        onClick={openBorrowModal}
+      >
         <BiCalendar size={24} className="flex-shrink-0" />
         {t("entry.detail.borrow")}
       </button>

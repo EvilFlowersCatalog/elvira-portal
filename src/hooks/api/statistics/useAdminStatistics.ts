@@ -1,4 +1,5 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
+import { config } from '@/lib/config';
 import { isAxiosError } from 'axios';
 import {
   format,
@@ -37,7 +38,7 @@ export const rangeToParams = (
         ? startOfISOWeek(subDays(to, 89))
         : subDays(to, Number(range.replace('d', '')) - 1);
   return {
-    catalog_id: import.meta.env.ELVIRA_CATALOG_ID,
+    catalog_id: config.ELVIRA_CATALOG_ID,
     from: format(from, 'yyyy-MM-dd'),
     to: format(to, 'yyyy-MM-dd'),
     bucket: BUCKET[range],

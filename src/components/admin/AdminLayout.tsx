@@ -1,6 +1,7 @@
 import { Outlet } from 'react-router-dom';
 import Breadcrumb from '../buttons/Breadcrumb';
 import AdminNav from './AdminNav';
+import RouteErrorBoundary from '../page/RouteErrorBoundary';
 
 /**
  * Persistent admin shell: breadcrumb + section sub-navigation + scrollable
@@ -14,7 +15,10 @@ export default function AdminLayout() {
       <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         <AdminNav />
         <div id="admin-content" className="relative min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
-          <Outlet />
+          {/* A broken admin page keeps the admin navigation (#60). */}
+          <RouteErrorBoundary testFlag="admin">
+            <Outlet />
+          </RouteErrorBoundary>
         </div>
       </div>
     </div>

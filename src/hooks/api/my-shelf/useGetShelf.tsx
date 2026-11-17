@@ -1,4 +1,5 @@
 import { IEntryQuery } from '../../../utils/interfaces/entry';
+import { config } from '@/lib/config';
 import { IMyShelfList } from '../../../utils/interfaces/my-shelf';
 import useAxios from '../useAxios';
 
@@ -23,7 +24,7 @@ const useGetShelf = () => {
     const params = new URLSearchParams();
     params.set('page', page.toString());
     params.set('limit', limit.toString());
-    params.set('catalog_id', import.meta.env.ELVIRA_CATALOG_ID);
+    params.set('catalog_id', config.ELVIRA_CATALOG_ID);
 
     if (orderBy) params.set('order_by', orderBy);
     else params.set('order_by', '-created_at');

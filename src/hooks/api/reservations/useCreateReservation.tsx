@@ -1,5 +1,6 @@
 import { IReservation } from '../../../utils/interfaces/reservation';
 import useAxios from '../useAxios';
+import { withLoanResult } from '../../../lib/analytics';
 
 /**
  * Join the queue for a fully-borrowed entry.
@@ -13,9 +14,11 @@ const useCreateReservation = () => {
   const axios = useAxios();
 
   const createReservation = async (entryId: string): Promise<IReservation> => {
-    const { data } = await axios.post<{ response: IReservation } & Partial<IReservation>>(
-      '/readium/v1/reservations',
-      { entry_id: entryId },
+    // `loan.result` in Faro (#59); a reservation that succeeds is a place in the queue.
+    const { data } = await withLoanResult(
+      'reserve',
+      () => axios.post<{ response: IReservation } & Partial<IReservation>>('/readium/v1/reservations', { entry_id: entryId }),
+      'queued',
     );
     return data.response ?? (data as IReservation);
   };

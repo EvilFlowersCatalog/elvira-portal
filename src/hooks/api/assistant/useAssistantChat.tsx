@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { config } from '@/lib/config';
 import { useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../contexts/useAppContext';
@@ -84,7 +85,7 @@ const useAssistantChat = (entry?: IAssistantEntryRef) => {
       let chatId = aiChatId;
       if (!chatId) {
         const chat = await startChat({
-          catalog_id: import.meta.env.ELVIRA_CATALOG_ID || undefined,
+          catalog_id: config.ELVIRA_CATALOG_ID || undefined,
           entry_id: entryId,
         });
         chatId = chat.id;

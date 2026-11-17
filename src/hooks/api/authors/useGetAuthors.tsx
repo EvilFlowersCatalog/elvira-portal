@@ -1,4 +1,5 @@
 import { IAuthorsList } from '../../../utils/interfaces/author';
+import { config } from '@/lib/config';
 import useAxios from '../useAxios';
 
 interface IAuthorQuery {
@@ -16,7 +17,7 @@ const useGetAuthors = () => {
     page,
     limit,
     paginate = false,
-    catalogId = import.meta.env.ELVIRA_CATALOG_ID,
+    catalogId = config.ELVIRA_CATALOG_ID,
   }: IAuthorQuery) => {
     const GET_AUTHORS_URL = '/api/v1/authors';
     const params = new URLSearchParams();

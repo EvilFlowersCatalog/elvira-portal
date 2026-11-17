@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { config } from '@/lib/config';
 import { useSearchParams } from 'react-router-dom';
 import { IEntryQuery } from '../../../utils/interfaces/entry';
 import { AvailabilityState } from '../../../components/items/entry/details/AvailabilityBadge';
@@ -41,7 +42,7 @@ export const availabilityToLcpState = (availability: string): string =>
  */
 export const buildEntryFilterParams = (query: EntryFilters): URLSearchParams => {
   const params = new URLSearchParams();
-  params.set('catalog_id', import.meta.env.ELVIRA_CATALOG_ID);
+  params.set('catalog_id', config.ELVIRA_CATALOG_ID);
 
   if (query.title) params.set('title', query.title);
   if (query.publishedAtGte) params.set('published_at__gte', query.publishedAtGte);

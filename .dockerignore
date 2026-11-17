@@ -1,0 +1,19 @@
+node_modules
+dist
+dist-ssr
+.git
+.github
+.gitlab-ci.yml
+.idea
+.vscode
+.claude
+.playwright-mcp
+.mcp.json
+.DS_Store
+temp
+docs
+*.log
+*.local
+env/*.local
+# Never bake a runtime config into the image (#61).
+public/config.json

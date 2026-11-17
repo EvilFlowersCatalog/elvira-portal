@@ -1,4 +1,5 @@
-import { QueryClient } from '@tanstack/react-query';
+import { MutationCache, QueryCache, QueryClient } from '@tanstack/react-query';
+import { trackApiError } from './analytics';
 
 /**
  * Shared React Query client.
@@ -14,6 +15,12 @@ import { QueryClient } from '@tanstack/react-query';
  * time — both styles coexist.
  */
 export const queryClient = new QueryClient({
+  // Every failed query and mutation as `api.error` in Umami and Faro (lib/analytics): the failures
+  // no component reports, labelled by the query key's fixed name, never its parameters.
+  queryCache: new QueryCache({ onError: (error, query) => trackApiError('query', query.queryKey, error) }),
+  mutationCache: new MutationCache({
+    onError: (error, _vars, _ctx, mutation) => trackApiError('mutation', mutation.options.mutationKey, error),
+  }),
   defaultOptions: {
     queries: {
       // Data is fresh for 30s before a background refetch is considered.

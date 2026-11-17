@@ -1,5 +1,12 @@
 export const en = {
   translation: {
+    errorBoundary: {
+      title: 'Something went wrong',
+      chunk: 'This part of the portal failed to load. That usually means a network hiccup or a new version was deployed. Reloading fixes it.',
+      render: 'An unexpected error occurred while showing this page.',
+      reload: 'Reload',
+      reference: 'If it keeps happening, send us this reference:',
+    },
     common: {
       showMore: '{{count}} more',
       showLess: 'Show less',

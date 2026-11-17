@@ -1,4 +1,5 @@
 import { createPortal } from "react-dom";
+import { config } from "@/lib/config";
 import { FaX } from "react-icons/fa6";
 import { FiPlus } from "react-icons/fi";
 import { useEffect, useState } from "react";
@@ -19,7 +20,7 @@ export default function AiAssistant() {
     const { getEntryDetail } = useGetEntryDetail();
 
     const [assistantEntry, setAssistantEntry] = useState<IEntryDetail | null>(null);
-    const [currentCatalogId] = useState<string | undefined>(import.meta.env.ELVIRA_CATALOG_ID || undefined);
+    const [currentCatalogId] = useState<string | undefined>(config.ELVIRA_CATALOG_ID || undefined);
     // The id comes straight from the URL so a message sent before the book detail
     // has loaded still carries the reference; the detail only supplies the title.
     const assistantEntryId = searchParams.get('assistant-entry-id') || undefined;

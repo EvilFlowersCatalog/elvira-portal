@@ -1,4 +1,5 @@
 import { IActivityList } from '../../../utils/interfaces/activity';
+import { config } from '@/lib/config';
 import useAxios from '../useAxios';
 
 interface IActivityQuery {
@@ -13,7 +14,7 @@ const useGetActivity = () => {
     const params = new URLSearchParams();
     params.set('page', page.toString());
     params.set('limit', limit.toString());
-    params.set('catalog_id', import.meta.env.ELVIRA_CATALOG_ID);
+    params.set('catalog_id', config.ELVIRA_CATALOG_ID);
     params.set('order_by', '-last_occurred_at');
 
     const ACTIVITY_URL = '/api/v1/activity';

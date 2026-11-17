@@ -1,4 +1,5 @@
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { config } from '@/lib/config';
 import useGetEntryDetail from '../../../hooks/api/entries/useGetEntryDetail';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { IEntryNew, IEntryNewForm } from '../../../utils/interfaces/entry';
@@ -42,7 +43,7 @@ const AdminEditEntry = () => {
       setIsLoading(true);
       try {
         if (id) {
-          const entryDetail = await getEntryDetail(id, import.meta.env.ELVIRA_CATALOG_ID || undefined);
+          const entryDetail = await getEntryDetail(id, config.ELVIRA_CATALOG_ID || undefined);
           setEditingEntryTitle(entryDetail.title);
           setStringImage(entryDetail.thumbnail || '');
           setEntryCatalogId(entryDetail.catalog_id);
@@ -112,7 +113,7 @@ const AdminEditEntry = () => {
     if (!entry || !id) return;
     setIsWithdrawing(true);
     try {
-      await editEntry(id, { ...buildPayload(), withdrawn }, entryCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined);
+      await editEntry(id, { ...buildPayload(), withdrawn }, entryCatalogId || config.ELVIRA_CATALOG_ID || undefined);
       setWithdrawnAt(withdrawn ? new Date().toISOString() : null);
       toast.success(withdrawn ? t('entry.withdrawal.withdrawn') : t('entry.withdrawal.restored'));
     } catch (e) {
@@ -138,7 +139,7 @@ const AdminEditEntry = () => {
       // Upload
       try {
         setIsLoading(true);
-        await editEntry(id!, newEntry, entryCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined);
+        await editEntry(id!, newEntry, entryCatalogId || config.ELVIRA_CATALOG_ID || undefined);
         toast.success(t('notifications.entry.edit.success'));
         navigate(listPath, { replace: true });
       } catch (error) {

@@ -9,6 +9,7 @@ import {
   setFeatureSnapshot,
   toStored,
 } from './features';
+import { config } from '@/lib/config';
 
 /**
  * The reader-visible settings and the deployment's capabilities (EvilFlowersCatalog#212): the settings
@@ -16,7 +17,7 @@ import {
  */
 export const PUBLIC_SETTINGS_PATH = '/api/v1/settings?public=true&include=capabilities';
 
-const base = (import.meta.env.ELVIRA_BASE_URL ?? '').replace(/\/$/, '');
+const base = config.ELVIRA_BASE_URL.replace(/\/$/, '');
 
 /**
  * Plain `fetch`, not the shared axios: its 401 interceptor logs the reader out, and an anonymous reader's

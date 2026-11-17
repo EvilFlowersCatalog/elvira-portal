@@ -1,4 +1,5 @@
 import { MdRemoveCircle } from 'react-icons/md';
+import { config } from '@/lib/config';
 import { IPartParams } from '../../../utils/interfaces/general/general';
 import FeedAutofill from '../../autofills/FeedAutofill';
 import { useState } from 'react';
@@ -54,7 +55,7 @@ const FeedsPart = ({ entry, setEntry }: IPartParams) => {
         open={open}
         feed={null}
         mode='create'
-        catalogId={import.meta.env.ELVIRA_CATALOG_ID}
+        catalogId={config.ELVIRA_CATALOG_ID}
         onClose={() => setOpen(false)}
         onSaved={() => {}}
         onCreated={(feed) => {

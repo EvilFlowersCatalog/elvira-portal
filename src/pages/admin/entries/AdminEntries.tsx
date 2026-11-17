@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react';
+import { config } from '@/lib/config';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -117,7 +118,7 @@ const AdminEntries = () => {
   const doDelete = async () => {
     if (!pendingDelete) return;
     try {
-      await deleteEntry(pendingDelete.id, pendingDelete.catalog_id || import.meta.env.ELVIRA_CATALOG_ID || undefined);
+      await deleteEntry(pendingDelete.id, pendingDelete.catalog_id || config.ELVIRA_CATALOG_ID || undefined);
       toast.success(t('administration.entriesPage.deleted'));
       refetch();
     } catch {

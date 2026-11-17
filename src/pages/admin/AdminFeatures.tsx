@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { config } from '@/lib/config';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -55,7 +56,7 @@ const usePublicRead = () =>
     retry: false,
     staleTime: 5 * 60 * 1000,
     queryFn: async () => {
-      const base = (import.meta.env.ELVIRA_BASE_URL ?? '').replace(/\/$/, '');
+      const base = config.ELVIRA_BASE_URL.replace(/\/$/, '');
       try {
         return (await fetch(`${base}${PUBLIC_SETTINGS_PATH}`, { headers: { Accept: 'application/json' } })).ok;
       } catch {

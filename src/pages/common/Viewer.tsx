@@ -1,3 +1,5 @@
+import { config } from '@/lib/config';
+import { track } from '@/lib/analytics';
 import {
   useLocation,
   useNavigate,
@@ -298,13 +300,16 @@ const Viewer = () => {
   const explainFunction = async (
     selectedText: string,
     context?: { page?: number }
-  ): Promise<IExplainResult> =>
-    explainPassage({
+  ): Promise<IExplainResult> => {
+    // A reader action in Umami and Faro (#59); never the selected text.
+    track('Reader Explain', { entry_id: id, page: context?.page });
+    return explainPassage({
       user_acquisition_id,
       text: selectedText,
       page: context?.page,
       language: lang,
     });
+  };
 
   // --- Reading chat ---------------------------------------------------------
   // The viewer's chat is stored as an ordinary assistant chat, bound to this
@@ -360,7 +365,7 @@ const Viewer = () => {
         const chat = await startChat({
           entry_id: id,
           user_acquisition_id,
-          catalog_id: entryCatalogId || import.meta.env.ELVIRA_CATALOG_ID || undefined,
+          catalog_id: entryCatalogId || config.ELVIRA_CATALOG_ID || undefined,
         });
         chatId = chat.id;
       }
@@ -754,8 +759,11 @@ const Viewer = () => {
     }
   };
 
-  const requestAgentAnnotationFunc = (prompt: string) =>
-    requestAgentAnnotation(user_acquisition_id, prompt, lang);
+  const requestAgentAnnotationFunc = (prompt: string) => {
+    // A reader action in Umami and Faro (#59); never the prompt.
+    track('Reader Highlight', { entry_id: id, source: 'viewer' });
+    return requestAgentAnnotation(user_acquisition_id, prompt, lang);
+  };
 
   const waitForAgentAnnotationFunc = (annotationId: string) => waitForAgentAnnotation(annotationId);
 

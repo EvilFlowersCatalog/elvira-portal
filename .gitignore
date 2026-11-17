@@ -14,6 +14,8 @@ dist-ssr
 *.local
 !.env.local
 .mcp.json
+# A local runtime config for testing (#61); deployments mount their own.
+public/config.json
 
 # Editor directories and files
 .vscode/*
