@@ -1,0 +1,39 @@
+@startuml sequence-portal-features
+!include elvira.iuml
+' =============================================================================
+' What: how the portal decides which features to show, and how an administrator switches one at runtime
+'       through the catalog's instance settings (portal.features) instead of a rebuild.
+' Kind: UML sequence diagram. Scope: the portal (feature store + Administration › Features) against the
+'       catalog's settings API; the public read is a proposal.
+' Source: EvilFlowersCatalog develop apps/core/settings_store.py, apps/api/views/instance_settings.py,
+'         apps/core/capabilities.py (#212 as implemented, 2026-11-17); elvira-portal src/features/ (2026-11-17)
+' =============================================================================
+
+title Portal features: build default, catalog setting, catalog capability (proposal, 2026-11-17)
+
+actor Reader as reader
+actor Administrator as admin
+participant "Portal\nfeature store" as store <<proposed>> <<focus>>
+participant "Administration ›\nFeatures" as page <<proposed>>
+participant "Catalog API\n/api/v1/settings" as api
+
+== Every page load ==
+reader -> store : open portal
+store -> store : localStorage (last answer)\nelse build default (ELVIRA_FEATURES)
+store -[$accent_msg()]> api : <b>GET settings?public=true&include=capabilities</b> (no token)
+api --> store : {response: [{key: portal.features, value}], capabilities}
+store -> store : enabled = capability ≠ off\n∧ (setting ?? build default)
+store --> reader : menu, routes, tabs for enabled features only
+
+== An administrator switches a feature ==
+admin -> page : Assistant: Off
+page -> api : PUT settings/portal.features {value: {assistant: false}}\n(superuser)
+api --> page : 200 {value, source: stored}
+page -> store : update snapshot (admin sees it now)
+note right of api : Next reader request reads the\nnew row (Redis cache invalidated\non commit, settings_store).
+
+$legend_live_proposed()
+
+caption The first layer that says "off" wins: a capability the catalog reports off, then the stored setting, then the build default.
+footer ELVIRA · FIIT STU · elvira-portal · docs/diagrams/sequence-portal-features.puml
+@enduml

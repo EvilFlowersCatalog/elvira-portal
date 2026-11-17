@@ -32,6 +32,7 @@ import { useEntryChapters } from '../../../../hooks/api/graph/useGraph';
 import { AvailabilityBadge, AvailabilityState } from './AvailabilityBadge';
 import Tooltip from '../../../primitives/Tooltip';
 import { localize } from '../../../../utils/func/localized';
+import { useFeature } from '../../../../features/features';
 
 interface IEntryDetailParams {
   triggerReload?: (() => void) | null;
@@ -57,8 +58,10 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
 
   const { getEntryDetail, getEntryDetailWithLicense } = useGetEntryDetail();
   // Library graph (#41): the Chapters tab exists only when the graph knows this publication's sections.
-  const experimentalOn = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
-  const { data: chapterMap } = useEntryChapters(experimentalOn && entry?.id ? entry.id : undefined);
+  const graphOn = useFeature('graph');
+  const insightsOn = useFeature('contentInsights');
+  const assistantOn = useFeature('assistant');
+  const { data: chapterMap } = useEntryChapters(graphOn && entry?.id ? entry.id : undefined);
   const hasChapters = !!chapterMap?.sections.length;
 
   // A review changed the entry's rating: refresh only the rating, without reloading the whole detail.
@@ -237,7 +240,6 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
   };
 
   const availabilityBadge = getAvailabilityBadge();
-  const experimental = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
   // The catalog sends `rating: null` when reviews are disabled (and no `rating` before IP-023).
   const reviewsEnabled = !!entry?.rating;
 
@@ -381,6 +383,7 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
               </InfoItemCustom>
             </InfoGrid>
 
+              {assistantOn && (
               <Tooltip content={t('entry.detail.askAi')} placement='left'>
                 <button
                   className="absolute right-6 bottom-4 z-10 p-3 rounded-full bg-primary text-white font-semibold hover:bg-primaryDark transition-colors duration-150 hidden mdlg:block"
@@ -394,26 +397,29 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                   </div>
                 </button>
               </Tooltip>
+              )}
 
-            {/* TABS */}
-            {/* TABS: reviews are shipped (shown whenever the catalog has them enabled,
-                i.e. `rating` is present); the other tabs are still experimental. */}
-            {(experimental || reviewsEnabled) && (
-              <TabsComponent key={entry.id} defaultTab={experimental ? 'contents' : 'reviews'}>
+            {/* TABS: reviews show whenever the catalog has them enabled (`rating` is present); contents,
+                related and figures need the extraction index, chapters the library graph (Administration › Features). */}
+            {(insightsOn || reviewsEnabled || (graphOn && hasChapters)) && (
+              <TabsComponent
+                key={entry.id}
+                defaultTab={insightsOn ? 'contents' : reviewsEnabled ? 'reviews' : 'chapters'}
+              >
                 <TabsHeader>
-                  {experimental && <TabTitle id="contents">{t('entry.detail.tabs.contents')}</TabTitle>}
+                  {insightsOn && <TabTitle id="contents">{t('entry.detail.tabs.contents')}</TabTitle>}
                   {reviewsEnabled && (
                     <TabTitle id="reviews">
                       {t('entry.detail.tabs.reviews')}
                       {!!entry.rating?.count && <span className="ml-1 font-normal">({entry.rating.count})</span>}
                     </TabTitle>
                   )}
-                  {experimental && hasChapters && <TabTitle id="chapters">{t('entry.detail.tabs.chapters')}</TabTitle>}
-                  {experimental && <TabTitle id="related">{t('entry.detail.tabs.related')}</TabTitle>}
-                  {experimental && <TabTitle id="figures">{t('entry.detail.tabs.figures')}</TabTitle>}
+                  {graphOn && hasChapters && <TabTitle id="chapters">{t('entry.detail.tabs.chapters')}</TabTitle>}
+                  {insightsOn && <TabTitle id="related">{t('entry.detail.tabs.related')}</TabTitle>}
+                  {insightsOn && <TabTitle id="figures">{t('entry.detail.tabs.figures')}</TabTitle>}
                 </TabsHeader>
                 <Tabs>
-                  {experimental && (
+                  {insightsOn && (
                     <TabContent id="contents">
                       <EntryContents entry={entry} catalogId={catalogId} />
                     </TabContent>
@@ -423,17 +429,17 @@ const EntryDetail = ({ triggerReload }: IEntryDetailParams) => {
                       <EntryReviews entryId={entry.id} onChanged={refreshRating} />
                     </TabContent>
                   )}
-                  {experimental && hasChapters && (
+                  {graphOn && hasChapters && (
                     <TabContent id="chapters">
                       <EntryChapters entry={entry} />
                     </TabContent>
                   )}
-                  {experimental && (
+                  {insightsOn && (
                     <TabContent id="related">
                       <EntryRelated entryId={entry.id} />
                     </TabContent>
                   )}
-                  {experimental && (
+                  {insightsOn && (
                     <TabContent id="figures">
                       <EntryFigures entryId={entry.id} />
                     </TabContent>

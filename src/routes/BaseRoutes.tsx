@@ -6,6 +6,7 @@ import RequireAuth from './guards/AuthGuard';
 import useAuthContext from '../hooks/contexts/useAuthContext';
 import RequireAdmin from './guards/AdminGuard';
 import { AdminLayout } from '../components/admin';
+import RequireFeature from './guards/FeatureGuard';
 
 // Route-level code-splitting: each page becomes its own lazily-loaded chunk so
 // the initial bundle no longer ships the entire app (viewer, admin, AI, help…).
@@ -52,6 +53,7 @@ const AdminUserProfile = lazy(() => import('../pages/admin/AdminUserProfile'));
 const AdminLoans = lazy(() => import('../pages/admin/AdminLoans'));
 const AdminJobs = lazy(() => import('../pages/admin/AdminJobs'));
 const AdminSettings = lazy(() => import('../pages/admin/AdminSettings'));
+const AdminFeatures = lazy(() => import('../pages/admin/AdminFeatures'));
 const AdminContentPolicies = lazy(() => import('../pages/admin/AdminContentPolicies'));
 const AdminHarvest = lazy(() => import('../pages/admin/harvest/AdminHarvest'));
 const AdminHarvestSource = lazy(() => import('../pages/admin/harvest/AdminHarvestSource'));
@@ -89,19 +91,21 @@ const BaseRoutes = () => {
             element={<Navigate to={NAVIGATION_PATHS.notFound} replace />}
           ></Route>
 
-          {/* Help — public, reachable without login */}
-          {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
-            <>
-              <Route path='help' element={<Help />} />
-              <Route path='help/books' element={<HelpBooks />} />
-              <Route path='help/search' element={<HelpSearch />} />
+          {/* Help — public, reachable without login. Features switched off answer 404 (Administration › Features). */}
+          <Route element={<RequireFeature feature='help' />}>
+            <Route path='help' element={<Help />} />
+            <Route path='help/books' element={<HelpBooks />} />
+            <Route path='help/search' element={<HelpSearch />} />
+            <Route element={<RequireFeature feature='lending' />}>
               <Route path='help/loans' element={<HelpLoans />} />
-              <Route path='help/viewer' element={<HelpViewer />} />
+            </Route>
+            <Route path='help/viewer' element={<HelpViewer />} />
+            <Route element={<RequireFeature feature='assistant' />}>
               <Route path='help/ai' element={<HelpAi />} />
-              <Route path='help/profile' element={<HelpProfile />} />
-              <Route path='help/readers' element={<HelpReaders />} />
-            </>
-          )}
+            </Route>
+            <Route path='help/profile' element={<HelpProfile />} />
+            <Route path='help/readers' element={<HelpReaders />} />
+          </Route>
 
           {/* Only authorized */}
           <Route element={<RequireAuth />}>
@@ -114,12 +118,18 @@ const BaseRoutes = () => {
             <Route path='shelf' element={<Shelf />} />
             <Route path='profile' element={<Profile />} />
             <Route path='history' element={<History />} />
-            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && <Route path='explore' element={<Explore />} />}
-            <Route path='loans' element={<Loans />} />
+            <Route element={<RequireFeature feature='graph' />}>
+              <Route path='explore' element={<Explore />} />
+            </Route>
+            <Route element={<RequireFeature feature='lending' />}>
+              <Route path='loans' element={<Loans />} />
+            </Route>
             <Route path='feeds' element={<Feeds />} />
             <Route path='categories' element={<Categories />} />
-            <Route path='ai-assistant' element={<AiAssistantPage />} />
-            <Route path='ai-chat-history' element={<AiChatHistory />} />
+            <Route element={<RequireFeature feature='assistant' />}>
+              <Route path='ai-assistant' element={<AiAssistantPage />} />
+              <Route path='ai-chat-history' element={<AiChatHistory />} />
+            </Route>
             <Route path='viewer/:entry-id/:index' element={<ViewerRoute />} />
             {/* Durable citation links (#46); behind login, which returns here afterwards. */}
             <Route path='cite/:entryId/:key' element={<Cite />} />
@@ -147,13 +157,21 @@ const BaseRoutes = () => {
                 <Route path='ai-users' element={<Navigate to={NAVIGATION_PATHS.adminUsers} replace />} />
                 <Route path='loans' element={<AdminLoans />} />
                 <Route path='jobs' element={<AdminJobs />} />
-                <Route path='settings' element={<AdminSettings />} />
-                <Route path='content-policies' element={<AdminContentPolicies />} />
+                {/* Always reachable: it is where switched-off features are switched back on. */}
+                <Route path='features' element={<AdminFeatures />} />
+                <Route element={<RequireFeature feature='instanceSettings' />}>
+                  <Route path='settings' element={<AdminSettings />} />
+                </Route>
+                <Route element={<RequireFeature feature='contentPolicies' />}>
+                  <Route path='content-policies' element={<AdminContentPolicies />} />
+                </Route>
                 {/* IP-034 (#51, #53): harvest sources, their detail, and the sync-conflicts inbox. */}
-                <Route path='harvest'>
-                  <Route index element={<AdminHarvest />} />
-                  <Route path='conflicts' element={<AdminHarvestConflicts />} />
-                  <Route path=':source-id' element={<AdminHarvestSource />} />
+                <Route element={<RequireFeature feature='interop' />}>
+                  <Route path='harvest'>
+                    <Route index element={<AdminHarvest />} />
+                    <Route path='conflicts' element={<AdminHarvestConflicts />} />
+                    <Route path=':source-id' element={<AdminHarvestSource />} />
+                  </Route>
                 </Route>
               </Route>
             </Route>

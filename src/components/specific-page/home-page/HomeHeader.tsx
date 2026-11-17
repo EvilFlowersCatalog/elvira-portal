@@ -11,12 +11,14 @@ import ElviraInput from "../../inputs/ElviraInput";
 import Button from "../../buttons/Button";
 import { H1 } from "../../primitives/Heading";
 import SearchSuggestions from "../../tools/SearchSuggestions";
+import { useFeature } from "../../../features/features";
 
 const HomeHeader = () => {
   const { t } = useTranslation();
   const [searchInput, setSearchInput] = useState<string>("");
   const [isFocused, setIsFocused] = useState<boolean>(false);
   const { setShowAiAssistant } = useAppContext();
+  const assistantOn = useFeature("assistant");
 
   const navigate = useNavigate();
 
@@ -44,12 +46,15 @@ const HomeHeader = () => {
         <H1 className="px-0">{t("about.title")}</H1>
       </div>
 
+      {assistantOn && (
       <div
         data-guide="home-ai-banner"
         className="text-white w-full py-4 px-5 rounded-lg relative"
         style={{
           background:
-            "linear-gradient(90deg,color-mix(in srgb, var(--color-primary) 50%, #666) 30%,color-mix(in srgb, var(--color-primary) 80%, #aaa) 60%,var(--color-primary) 100%)",
+            // From the theme's dark tint (white text and the primary button sit there) to the brand colour,
+            // so light brands (KU gold) keep contrast instead of turning olive against grey.
+            "linear-gradient(90deg, var(--color-primary-dark) 0%, var(--color-primary-dark) 35%, color-mix(in srgb, var(--color-primary-dark) 45%, var(--color-primary)) 70%, var(--color-primary) 100%)",
           boxShadow: "0px 4px 12px 0px #0000001A",
         }}
       >
@@ -83,6 +88,7 @@ const HomeHeader = () => {
           </svg>
         </div>
       </div>
+      )}
 
       <form
         data-guide="home-search"
@@ -96,7 +102,7 @@ const HomeHeader = () => {
           onFocus={() => setIsFocused(true)}
           onBlur={() => setTimeout(() => setIsFocused(false), 200)}
           onChange={handleSearchInput}
-          className="border-none md:pr-32"
+          className={assistantOn ? "border-none md:pr-32" : "border-none"}
           paddingLeft={40}
         />
         <button
@@ -115,6 +121,7 @@ const HomeHeader = () => {
           />
         )}
 
+        {assistantOn && (
         <button
           type="button"
           onClick={() => {
@@ -138,6 +145,7 @@ const HomeHeader = () => {
           </svg>
           <p className="whitespace-nowrap">{t("assistant.title")}</p>
         </button>
+        )}
       </form>
     </div>
   );

@@ -21,7 +21,9 @@ import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 import { LCP_PASSPHRASE_MAX_LENGTH, LCP_PASSPHRASE_MIN_LENGTH, passphraseTooShort } from '../../utils/func/passphrase';
 import { fieldError } from '../../utils/problemDetail';
-import { BookmarkIcon, ClockIcon, LibraryIcon, LoansIcon } from '../../components/header/navbar/NavbarIcons';
+import { BookmarkIcon, LoansIcon } from '../../components/header/navbar/NavbarIcons';
+import { useFeature } from '../../features/features';
+import { userEmail as emailOf } from '../../utils/institution';
 
 const Profile = () => {
   const { t } = useTranslation();
@@ -46,11 +48,16 @@ const Profile = () => {
     enabled: !!auth,
   });
 
-  const { data: licenseData } = useLicensesQuery({
-    user_mode: 'current',
-    page: 1,
-    limit: 1,
-  });
+  // Readium LCP lending (Administration › Features): loans and the reading passphrase belong to it.
+  const lendingOn = useFeature('lending');
+  const { data: licenseData } = useLicensesQuery(
+    {
+      user_mode: 'current',
+      page: 1,
+      limit: 1,
+    },
+    { enabled: lendingOn },
+  );
 
   const bookmarksCount = shelfData?.metadata.total ?? 0;
   const loansCount = licenseData?.metadata.total ?? 0;
@@ -65,11 +72,10 @@ const Profile = () => {
     setPassphraseHint(userDetails?.lcp_passphrase_hint || '');
   }, [userDetails?.lcp_passphrase_hint]);
 
-  const userEmail = useMemo(() => {
-    if (userDetails?.username) return `${userDetails.username}@stuba.sk`;
-    if (auth?.username) return `${auth.username}@stuba.sk`;
-    return '-';
-  }, [auth?.username, userDetails?.username]);
+  const userEmail = useMemo(
+    () => emailOf(userDetails?.username) ?? emailOf(auth?.username) ?? '-',
+    [auth?.username, userDetails?.username]
+  );
 
   if (!auth) return null;
 
@@ -113,11 +119,12 @@ const Profile = () => {
     }
   };
 
+  // Only figures the catalog actually counts (books read and reading hours had no source and always showed 0).
   const stats: { labelKey: string; value: number; icon: ReactNode; path?: NAVIGATION_PATHS }[] = [
-    { labelKey: 'profile.stats.readBooks', value: 0, icon: <LibraryIcon size={22} className='text-secondary dark:text-secondaryLight' /> },
     { labelKey: 'profile.stats.savedBooks', value: bookmarksCount, icon: <BookmarkIcon size={22} className='text-secondary dark:text-secondaryLight' />, path: NAVIGATION_PATHS.shelf },
-    { labelKey: 'profile.stats.borrowedBooks', value: loansCount, icon: <LoansIcon size={22} className='text-secondary dark:text-secondaryLight' />, path: NAVIGATION_PATHS.loans },
-    { labelKey: 'profile.stats.readingHours', value: 0, icon: <ClockIcon size={22} className='text-secondary dark:text-secondaryLight' /> },
+    ...(lendingOn
+      ? [{ labelKey: 'profile.stats.borrowedBooks', value: loansCount, icon: <LoansIcon size={22} className='text-secondary dark:text-secondaryLight' />, path: NAVIGATION_PATHS.loans }]
+      : []),
   ];
 
   return (
@@ -166,7 +173,7 @@ const Profile = () => {
           </section>
 
           {/* Stats row */}
-          <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
+          <div className='grid grid-cols-2 gap-4 lg:max-w-xl'>
             {stats.map(({ labelKey, value, icon, path }) => {
               const clickable = !!path;
               return (
@@ -191,19 +198,20 @@ const Profile = () => {
           </div>
 
           {/* Bottom two-column section */}
-          <div className='grid grid-cols-1 lg:grid-cols-2 gap-5'>
+          <div className={`grid grid-cols-1 gap-5 ${lendingOn ? 'lg:grid-cols-2' : 'lg:max-w-3xl'}`}>
             {/* Passphrase section */}
+            {lendingOn && (
             <section data-guide="profile-passphrase" className='rounded-[7px] p-5 bg-white dark:bg-zinc-800 shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] dark:shadow-[0px_4px_6px_0px_rgba(0,0,0,0.3)] border border-[#e5e5e5] dark:border-zinc-700'>
               <div className='flex items-center gap-2 mb-4'>
                 <h2 className='text-lg font-bold text-secondary dark:text-secondaryLight'>
                   {t('profile.passphrase.title')}
                 </h2>
-                <PopupInfo label='Info o prístupovej fráze'>
-                  Knihy sú dostupné vo formáte PDF. Na ich otvorenie odporúčame aplikáciu{' '}
-                  <a href='https://thorium.edrlab.org/en/' target='_blank' rel='noopener noreferrer' className='text-primary underline'>
+                <PopupInfo label={t('profile.passphrase.infoLabel')}>
+                  {t('profile.passphrase.infoBefore')}{' '}
+                  <a href='https://thorium.edrlab.org/en/' target='_blank' rel='noopener noreferrer' className='text-primaryText dark:text-primaryLight underline'>
                     Thorium Reader
                   </a>
-                  , ktorá je bezplatná a dostupná pre Windows, macOS aj Linux. Pri prvom otvorení súboru vás čítačka požiada o zadanie prístupovej frázy na odomknutie.
+                  {t('profile.passphrase.infoAfter')}
                 </PopupInfo>
               </div>
               <form className='flex flex-col gap-3' onSubmit={handleSetPassphrase}>
@@ -264,10 +272,11 @@ const Profile = () => {
                 </div>
               </form>
             </section>
+            )}
 
             {/* Notifications section — real notification contacts (email delivery
                 addresses); replaces the former local-state-only toggles. */}
-            <NotificationContactsSection />
+            {lendingOn && <NotificationContactsSection />}
           </div>
         </div>
       )}

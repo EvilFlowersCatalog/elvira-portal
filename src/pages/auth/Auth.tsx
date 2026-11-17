@@ -15,10 +15,11 @@ import useCookiesContext from '../../hooks/contexts/useCookiesContext';
 import FormModal from '../../components/modals/FormModal';
 import LicenseTerms from '../../components/dialogs/LicenseTerms';
 import Checkbox from '../../components/primitives/Checkbox';
+import { institution } from '../../utils/institution';
 
 const Auth = () => {
   const { login , staySigned, setStaySigned} = useAuthContext();
-  const { theme, titleLogoDark, titleLogoLight, umamiTrack } =
+  const { theme, titleLogoDark, titleLogoLight, stuLogoDark, stuLogoLight, umamiTrack } =
     useAppContext();
   const { cookies, setCookie } = useCookiesContext();
 
@@ -85,7 +86,7 @@ const Auth = () => {
         <LicenseTerms setOpenLicenseModal={setOpenLicenseModal} />
       )}
       <div className='flex w-full flex-1 flex-col justify-center items-center p-4'>
-        <div className='flex flex-col p-5 h-[500px] w-full max-w-[700px] justify-evenly items-center rounded-md'>
+        <div className='flex flex-col p-5 min-h-[500px] w-full max-w-[700px] justify-evenly items-center rounded-md'>
           <div className='flex flex-col items-center justify-center gap-2'>
             <img
               className='w-96'
@@ -171,6 +172,22 @@ const Auth = () => {
               </form>
             )}
           </div>
+          {institution && (
+            <a
+              href={institution.url}
+              target='_blank'
+              rel='noopener noreferrer'
+              title={institution.name}
+              className='mt-10 opacity-90 transition-opacity hover:opacity-100'
+            >
+              {/* A box, not a height: KU's logo is stacked (~1.3:1), STU's faculties are wide (~4:1). */}
+              <img
+                className='h-auto w-auto max-h-20 max-w-[200px]'
+                src={theme === THEME_TYPE.dark ? stuLogoLight : stuLogoDark}
+                alt={institution.name}
+              />
+            </a>
+          )}
         </div>
       </div>
     </>

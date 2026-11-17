@@ -5,6 +5,7 @@ import { useSearchParams } from 'react-router-dom';
 import ElviraInput from '../inputs/ElviraInput';
 import SearchSuggestions from './SearchSuggestions';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import { useFeature } from '../../features/features';
 
 interface ISearchBar {
   param: string;
@@ -15,12 +16,14 @@ interface ISearchBar {
 
 const SearchBar = ({
   param,
-  aiEnabled = true,
+  aiEnabled: aiAllowed = true,
   enableSuggestions = true,
   shouldRedirectSuggestions = false,
 }: ISearchBar) => {
   const { t } = useTranslation();
   const { setShowAiAssistant } = useAppContext();
+  const assistantOn = useFeature('assistant');
+  const aiEnabled = aiAllowed && assistantOn;
   const [searchParams, setSearchParams] = useSearchParams();
   const [input, setInput] = useState<string>('');
   const [isFocused, setIsFocused] = useState<boolean>(false);

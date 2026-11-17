@@ -10,6 +10,7 @@ import LicenseCalendar from '../../components/items/entry/details/LicenseCalenda
 import { useCachedFeedDetail } from '../../hooks/api/feeds/useGetFeedDetail';
 import { localize } from '../../utils/func/localized';
 import { LocalizedText } from '../../utils/interfaces/general/general';
+import { useFeature } from '../../features/features';
 
 // The first visible row of "Popular" is the LCP: on a wide screen (150px+ cards)
 // it holds up to ~8 covers. They load eagerly with high priority, all others lazily.
@@ -20,7 +21,7 @@ const Home = () => {
 
   // The themed row's collection comes from the deployment (ELVIRA_FEATURED_FEED_ID), not the source.
   const featuredFeedId: string | undefined = import.meta.env.ELVIRA_FEATURED_FEED_ID || undefined;
-  const showThemed = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && !!featuredFeedId;
+  const showThemed = useFeature('themedFeed') && !!featuredFeedId;
 
   // Home rows via React Query — each is cached/deduped and refetches when the
   // selected catalog changes (catalog id is part of the query key).
@@ -54,8 +55,9 @@ const Home = () => {
     return () => {
       alive = false;
     };
+    // Again when an administrator switches the row on while the page is open.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [showThemed]);
 
   return (
     <>

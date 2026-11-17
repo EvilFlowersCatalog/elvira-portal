@@ -1,6 +1,7 @@
 import React from 'react';
 import FormModal from '../modals/FormModal';
 import { useTranslation } from 'react-i18next';
+import { institution } from '../../utils/institution';
 
 interface ILicenseTermsParams {
   setOpenLicenseModal: (open: boolean) => void;
@@ -8,6 +9,8 @@ interface ILicenseTermsParams {
 
 const LicenseTerms = ({ setOpenLicenseModal }: ILicenseTermsParams) => {
   const { t } = useTranslation();
+  // The operator named in the terms is the build's institution (STU, KU …). KU has to approve this wording.
+  const org = institution?.short ?? 'STU';
 
   return (
     <FormModal
@@ -18,7 +21,7 @@ const LicenseTerms = ({ setOpenLicenseModal }: ILicenseTermsParams) => {
       <div className='flex flex-col gap-2 text-black dark:text-white text-left'>
         <h3 className='font-bold text-lg mt-5'>LICENCIA NA DOKUMENTY</h3>
         <p>
-          V prípade Dokumentov uvedených v Digitálnej knižnici ELVIRA STU (ďalej
+          V prípade Dokumentov uvedených v Digitálnej knižnici ELVIRA {org} (ďalej
           len ELVIRA) týmto udeľuje používateľovi neprenosnú (okrem prípadu, ak
           je to inak stanovené v týchto Podmienkách), nevýhradnú, obmedzenú
           licenciu, aby mohol využívať prístup a používanie Dokumentov
@@ -36,21 +39,21 @@ const LicenseTerms = ({ setOpenLicenseModal }: ILicenseTermsParams) => {
         <p>
           Držiteľ licencie môže získať prístup k Dokumentom prostredníctvom
           príslušnej platformi ELVIRA použitím (i) jedného alebo viacerých
-          identifikačných hesiel vydaných zo strany STU; (ii) overením IP
+          identifikačných hesiel vydaných zo strany {org}; (ii) overením IP
           adresy; (iii) prostredníctvom on-line referenčného odkazu schváleného
-          zo strany STU; alebo (iv) zakúpenie si prístupového kódu zo strany
-          Administrátora STU. Spôsob prístupu k príslušnej platforme ELVIRA sa
-          časom môže meniť. Administrátor STU si vyhradzuje právo podľa svojho
+          zo strany {org}; alebo (iv) zakúpenie si prístupového kódu zo strany
+          Administrátora {org}. Spôsob prístupu k príslušnej platforme ELVIRA sa
+          časom môže meniť. Administrátor {org} si vyhradzuje právo podľa svojho
           vlastného uváženia upraviť alebo zmeniť identifikačné heslá
           používateľa, a to podľa potreby, alebo ak to vyžadujú dané okolnosti a
-          Administrátor STU bude okamžite o tom informovať používateľa.
+          Administrátor {org} bude okamžite o tom informovať používateľa.
           Používateľ sa môže rozhodnúť používať proxy servery za účelom
           zabezpečenia vzdialeného prístupu k Dokumentom pre používateľov
           prostredníctvom Oprávnených stránok. Používateľ nemôže poskytnúť
-          vzdialený prístup, Administrátor STU je jediný opravnený poskytovať
+          vzdialený prístup, Administrátor {org} je jediný opravnený poskytovať
           takýto prístup používateľov a to iba prostredníctvom bezpečnej metódy
           overovania používateľov. Používate je povinný okamžite informovať
-          Administrátora STU, pokiaľ sa nazdáva, že došlo k neoprávnenému
+          Administrátora {org}, pokiaľ sa nazdáva, že došlo k neoprávnenému
           prístupu k niektorému z Dokumentov.
         </p>
       </div>

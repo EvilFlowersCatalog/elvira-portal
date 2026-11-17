@@ -5,19 +5,21 @@ import { useLocalize } from '../../../utils/func/localized';
 import { ILibraryMap } from '../../../utils/interfaces/graph';
 import { ITitleStatistics } from '../../../utils/interfaces/statistics';
 import { buildSemanticIndex, SemanticIndex } from './semanticModel';
+import { useFeature } from '../../../features/features';
 
 export * from './semanticModel';
 
-/** The graph routes (and /explore) only exist where experimental features are on. */
-export const SEMANTICS_ON =
-  import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
+/** The graph routes (and /explore) only exist where the library graph feature is on. */
+export const useSemanticsOn = () => useFeature('graph');
 
 /**
  * The library map for the dashboard's semantic layer. Same cache key as Explore, so a visit
  * to either warms the other. Never throws into the page: a failure just hides the layer.
  */
-export const useDashboardMap = () =>
-  useLibraryMap({ enabled: SEMANTICS_ON, retry: false });
+export const useDashboardMap = () => {
+  const on = useSemanticsOn();
+  return useLibraryMap({ enabled: on, retry: false });
+};
 
 /** Joins the meaning-graph (all processed publications) with the lending stats (LCP titles only). */
 export const useSemanticIndex = (

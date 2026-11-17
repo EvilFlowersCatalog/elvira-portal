@@ -50,7 +50,7 @@ import Neighbourhoods from '../../components/admin/dashboard/Neighbourhoods';
 import ExportMenu from '../../components/admin/dashboard/ExportMenu';
 import TitleInspector from '../../components/admin/dashboard/TitleInspector';
 import {
-  SEMANTICS_ON,
+  useSemanticsOn,
   useDashboardMap,
   useSemanticIndex,
   useSubjectNames,
@@ -217,6 +217,7 @@ const AdminHome = () => {
     [setParam, umamiTrack]
   );
 
+  const semanticsOn = useSemanticsOn();
   const result = statistics.data;
   const data = result && result.status !== 'unavailable' ? result.data : null;
   const period = data?.period;
@@ -227,7 +228,7 @@ const AdminHome = () => {
   );
   // Only worth a section when the graph actually knows some of the lent titles.
   const showMap =
-    SEMANTICS_ON && !!graph.data?.nodes.length && !!semantic?.covered;
+    semanticsOn && !!graph.data?.nodes.length && !!semantic?.covered;
   const subjectNames = useSubjectNames(showMap);
   const meta = {
     catalog: import.meta.env.ELVIRA_CATALOG_ID as string,

@@ -13,10 +13,15 @@ import { rememberSearch } from './utils/func/listSearch';
 import GuideProvider from './providers/GuideProvider';
 import AiAssistant from './components/dialogs/AiAssistant';
 import AssistantLauncher from './components/assistant/AssistantLauncher';
+import useFeatureSync from './features/useFeatureSync';
+import { useFeature } from './features/features';
 
 const App = () => {
   const { informed } = useCookiesContext();
   const { isSmallDevice } = useAppContext();
+  // Which portal features are on (Administration › Features); the store re-renders its readers.
+  useFeatureSync();
+  const assistantOn = useFeature('assistant');
 
   const location = useLocation();
 
@@ -78,8 +83,12 @@ const App = () => {
 
       </div>
       {/* One assistant for the whole portal, so it stays open (and keeps its chat) across pages. */}
-      <AiAssistant />
-      <AssistantLauncher />
+      {assistantOn && (
+        <>
+          <AiAssistant />
+          <AssistantLauncher />
+        </>
+      )}
     </GuideProvider>
   );
 };

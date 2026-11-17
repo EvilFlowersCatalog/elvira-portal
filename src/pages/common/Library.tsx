@@ -12,6 +12,7 @@ import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
 import usePassageSearch from '../../hooks/api/entries/usePassageSearch';
 import FigureResults from '../../components/items/entry/FigureResults';
 import useAppContext from '../../hooks/contexts/useAppContext';
+import { useFeature } from '../../features/features';
 
 /** URL param of the active results tab; absent = publications. */
 export const RESULTS_TAB_PARAM = 'results';
@@ -35,10 +36,13 @@ const Library = () => {
   // Search inside books, scoped by the same filters (ordering doesn't apply).
   const query = (searchParams.get('query') ?? '').trim();
   const passageFilters = { ...filters, orderBy: '', query: '' };
-  const passages = usePassageSearch(query, { limit: 6, perEntry: 3, filters: passageFilters });
+  // Both need the extraction index, which a minimal instance (KU) does not have: Administration › Features.
+  const passagesOn = useFeature('passageSearch');
+  const insightsOn = useFeature('contentInsights');
+  const passages = usePassageSearch(query, { enabled: passagesOn, limit: 6, perEntry: 3, filters: passageFilters });
 
-  // Figures and tables across the library (#45), with the other extraction features behind the experimental flag.
-  const figuresTab = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && query.length >= 2;
+  // Figures and tables across the library (#45).
+  const figuresTab = insightsOn && query.length >= 2;
   const showFigures = figuresTab && searchParams.get(RESULTS_TAB_PARAM) === 'figures';
 
   const selectTab = (tab: 'entries' | 'figures') => {
@@ -88,7 +92,7 @@ const Library = () => {
           facets={list.facets?.data}
           passageHits={passages.data?.items}
           passagesLoading={passages.isLoading}
-          showPassages={!!query}
+          showPassages={passagesOn && !!query}
         />
       )}
       <EntriesWrapper>

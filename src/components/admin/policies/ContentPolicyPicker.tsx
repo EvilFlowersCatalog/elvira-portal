@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'react-toastify';
 import Select from '../../primitives/Select';
+import { useFeature } from '../../../features/features';
 import {
   problemOf,
   useAssignContentPolicy,
@@ -32,8 +33,8 @@ export default function ContentPolicyPicker({
   hint: string;
 }) {
   const { t } = useTranslation();
-  // Behind the flag with the policies page: no request on production entry and catalog forms.
-  const enabled = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
+  // With the policies page (Administration › Features): no request on entry and catalog forms while it is off.
+  const enabled = useFeature('contentPolicies');
   const policies = useContentPolicies(enabled);
   const catalogPolicy = useCatalogPolicy(catalogId ?? null, enabled && !entryId);
   const assign = useAssignContentPolicy();

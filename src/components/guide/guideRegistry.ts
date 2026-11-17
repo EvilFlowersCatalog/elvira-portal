@@ -1,4 +1,5 @@
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
+import { FeatureKey, isFeatureOn } from '../../features/features';
 
 /**
  * The portal map the assistant guides with: every place it can take the reader to and the element it lights
@@ -8,7 +9,8 @@ import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
  * Anchors are `data-guide="<anchor>"` attributes on the elements themselves.
  */
 
-export type GuideGate = 'auth' | 'admin' | 'experimental';
+/** `auth`, `admin`, or a portal feature that must be on (Administration › Features). */
+export type GuideGate = 'auth' | 'admin' | FeatureKey;
 
 export type GuideSection = 'menu' | 'reader' | 'personal' | 'admin';
 
@@ -49,7 +51,7 @@ export interface GuideRequest {
   tour?: string;
 }
 
-const ADMIN_PAGES: { key: string; path: NAVIGATION_PATHS; keywords: string[]; experimental?: boolean }[] = [
+const ADMIN_PAGES: { key: string; path: NAVIGATION_PATHS; keywords: string[]; feature?: FeatureKey }[] = [
   { key: 'dashboard', path: NAVIGATION_PATHS.adminHome, keywords: ['dashboard', 'prehlad', 'nastenk', 'statistik', 'statistics'] },
   { key: 'publications', path: NAVIGATION_PATHS.adminEntries, keywords: ['publikaci', 'publication', 'zaznam', 'entries', 'titul'] },
   { key: 'collections', path: NAVIGATION_PATHS.adminFeeds, keywords: ['kolekci', 'collection', 'feed'] },
@@ -59,21 +61,27 @@ const ADMIN_PAGES: { key: string; path: NAVIGATION_PATHS; keywords: string[]; ex
   { key: 'catalogs', path: NAVIGATION_PATHS.adminCatalogs, keywords: ['katalog', 'catalog'] },
   { key: 'users', path: NAVIGATION_PATHS.adminUsers, keywords: ['pouzivatel', 'user', 'citatel', 'account', 'ucet', 'ucty'] },
   { key: 'access', path: NAVIGATION_PATHS.adminAccess, keywords: ['pristup', 'opravnen', 'access', 'permission', 'api kluc', 'api key', 'grant'] },
-  { key: 'loans', path: NAVIGATION_PATHS.adminLoans, keywords: ['vypozic', 'loan', 'rezervaci', 'reservation', 'cirkulaci', 'circulation'] },
+  { key: 'loans', path: NAVIGATION_PATHS.adminLoans, keywords: ['vypozic', 'loan', 'rezervaci', 'reservation', 'cirkulaci', 'circulation'], feature: 'lending' },
   { key: 'jobs', path: NAVIGATION_PATHS.adminJobs, keywords: ['uloh', 'job', 'sifrovan', 'encrypt', 'queue', 'front'] },
   {
     key: 'harvest',
     path: NAVIGATION_PATHS.adminHarvest,
     keywords: ['harvest', 'zber', 'import', 'oai', 'marc', 'dataverse', 'arl', 'zdroj', 'source', 'synchroniz', 'sync'],
+    feature: 'interop',
   },
-  { key: 'conflicts', path: NAVIGATION_PATHS.adminHarvestConflicts, keywords: ['konflikt', 'conflict', 'prepisan', 'overwritten'] },
+  { key: 'conflicts', path: NAVIGATION_PATHS.adminHarvestConflicts, keywords: ['konflikt', 'conflict', 'prepisan', 'overwritten'], feature: 'interop' },
   {
     key: 'policies',
     path: NAVIGATION_PATHS.adminContentPolicies,
     keywords: ['politik', 'pravidl obsah', 'content polic', 'policy', 'pristup asistent', 'assistant access', 'tier', 'uroven'],
-    experimental: true,
+    feature: 'contentPolicies',
   },
-  { key: 'settings', path: NAVIGATION_PATHS.adminSettings, keywords: ['nastaven', 'settings', 'konfigur', 'configur'], experimental: true },
+  { key: 'settings', path: NAVIGATION_PATHS.adminSettings, keywords: ['nastaven', 'settings', 'konfigur', 'configur'], feature: 'instanceSettings' },
+  {
+    key: 'features',
+    path: NAVIGATION_PATHS.adminFeatures,
+    keywords: ['funkci', 'feature', 'modul', 'zapnut', 'vypnut', 'switch on', 'switch off', 'enable', 'disable'],
+  },
 ];
 
 export const GUIDE_TARGETS: GuideTarget[] = [
@@ -82,12 +90,12 @@ export const GUIDE_TARGETS: GuideTarget[] = [
   { id: 'menu-library', section: 'menu', anchor: 'nav-library', gates: ['auth'] },
   { id: 'menu-feeds', section: 'menu', anchor: 'nav-feeds', gates: ['auth'] },
   { id: 'menu-categories', section: 'menu', anchor: 'nav-categories', gates: ['auth'] },
-  { id: 'menu-ai', section: 'menu', anchor: 'nav-ai', gates: ['auth'] },
-  { id: 'menu-explore', section: 'menu', anchor: 'nav-explore', gates: ['auth', 'experimental'] },
+  { id: 'menu-ai', section: 'menu', anchor: 'nav-ai', gates: ['auth', 'assistant'] },
+  { id: 'menu-explore', section: 'menu', anchor: 'nav-explore', gates: ['auth', 'graph'] },
   { id: 'menu-admin', section: 'menu', anchor: 'nav-admin', gates: ['auth', 'admin'] },
   { id: 'menu-shelf', section: 'menu', anchor: 'nav-shelf', gates: ['auth'] },
   { id: 'menu-history', section: 'menu', anchor: 'nav-history', gates: ['auth'] },
-  { id: 'menu-loans', section: 'menu', anchor: 'nav-loans', gates: ['auth'] },
+  { id: 'menu-loans', section: 'menu', anchor: 'nav-loans', gates: ['auth', 'lending'] },
   { id: 'menu-profile', section: 'menu', anchor: 'nav-profile', gates: ['auth'] },
   {
     id: 'menu-language',
@@ -101,12 +109,12 @@ export const GUIDE_TARGETS: GuideTarget[] = [
     anchor: 'nav-theme',
     keywords: ['tmavy', 'svetly', 'dark mode', 'light mode', 'night mode', 'nocny rezim', 'theme', 'vzhlad'],
   },
-  { id: 'menu-help', section: 'menu', anchor: 'nav-help', gates: ['experimental'], keywords: ['pomoc', 'navod', 'help', 'manual', 'faq'] },
-  { id: 'assistant-launcher', section: 'menu', anchor: 'assistant-launcher', gates: ['auth'] },
+  { id: 'menu-help', section: 'menu', anchor: 'nav-help', gates: ['help'], keywords: ['pomoc', 'navod', 'help', 'manual', 'faq'] },
+  { id: 'assistant-launcher', section: 'menu', anchor: 'assistant-launcher', gates: ['auth', 'assistant'] },
 
   // ── Reading ─────────────────────────────────────────────────────────────────
   { id: 'home', section: 'reader', path: NAVIGATION_PATHS.home, anchor: 'home-search', via: 'nav-home', gates: ['auth'], keywords: ['domov', 'uvod', 'home', 'start'] },
-  { id: 'home-ai', section: 'reader', path: NAVIGATION_PATHS.home, anchor: 'home-ai-banner', gates: ['auth'] },
+  { id: 'home-ai', section: 'reader', path: NAVIGATION_PATHS.home, anchor: 'home-ai-banner', gates: ['auth', 'assistant'] },
   {
     id: 'library',
     section: 'reader',
@@ -149,7 +157,7 @@ export const GUIDE_TARGETS: GuideTarget[] = [
     path: NAVIGATION_PATHS.explore,
     anchor: 'page-title',
     via: 'nav-explore',
-    gates: ['auth', 'experimental'],
+    gates: ['auth', 'graph'],
     keywords: ['preskuma', 'mapa kniznic', 'graf', 'explore', 'library map', 'graph', 'suvislost', 'connections'],
   },
   {
@@ -158,7 +166,7 @@ export const GUIDE_TARGETS: GuideTarget[] = [
     path: NAVIGATION_PATHS.aiChatHistory,
     anchor: 'page-title',
     via: 'nav-ai',
-    gates: ['auth'],
+    gates: ['auth', 'assistant'],
     keywords: ['konverzac', 'chat history', 'historia chat', 'predosle chat', 'previous chat', 'my chats', 'moje chat'],
   },
 
@@ -171,7 +179,7 @@ export const GUIDE_TARGETS: GuideTarget[] = [
     path: NAVIGATION_PATHS.loans,
     anchor: 'page-title',
     via: 'nav-loans',
-    gates: ['auth'],
+    gates: ['auth', 'lending'],
     keywords: ['vypozic', 'moje pozic', 'loan', 'borrowed', 'rezervaci', 'reservation', 'vratit', 'return', 'licenci', 'license'],
   },
   { id: 'profile', section: 'personal', path: NAVIGATION_PATHS.profile, anchor: 'page-title', via: 'nav-profile', gates: ['auth'], keywords: ['profil', 'profile', 'moj ucet', 'my account', 'account'] },
@@ -194,13 +202,13 @@ export const GUIDE_TARGETS: GuideTarget[] = [
   },
 
   // ── Administration ──────────────────────────────────────────────────────────
-  ...ADMIN_PAGES.map<GuideTarget>(({ key, path, keywords, experimental }) => ({
+  ...ADMIN_PAGES.map<GuideTarget>(({ key, path, keywords, feature }) => ({
     id: `admin-${key}`,
     section: 'admin',
     path,
     anchor: 'page-title',
     via: `admin-nav-${key}`,
-    gates: experimental ? ['auth', 'admin', 'experimental'] : ['auth', 'admin'],
+    gates: feature ? ['auth', 'admin', feature] : ['auth', 'admin'],
     keywords,
   })),
   // The jobs page opens on its overview of job types (OCR, AI processing, encryption …); a question about
@@ -214,12 +222,12 @@ export const GUIDE_TARGETS: GuideTarget[] = [
     gates: ['auth', 'admin'],
     keywords: ['ocr', 'extrakci', 'extraction', 'spracovan', 'processing', 'zlyha', 'failed', 'neuspes', 'chyb'],
   },
-  ...ADMIN_PAGES.map<GuideTarget>(({ key, experimental }) => ({
+  ...ADMIN_PAGES.map<GuideTarget>(({ key, feature }) => ({
     id: `admin-menu-${key}`,
     section: 'admin',
     path: NAVIGATION_PATHS.adminHome,
     anchor: `admin-nav-${key}`,
-    gates: experimental ? ['auth', 'admin', 'experimental'] : ['auth', 'admin'],
+    gates: feature ? ['auth', 'admin', feature] : ['auth', 'admin'],
   })),
   { id: 'admin-attention', section: 'admin', path: NAVIGATION_PATHS.adminHome, anchor: 'admin-attention', gates: ['auth', 'admin'], keywords: ['pozornost', 'problem', 'attention', 'issue', 'chyby', 'error'] },
   {
@@ -243,7 +251,7 @@ export const GUIDE_TARGETS: GuideTarget[] = [
     section: 'admin',
     path: NAVIGATION_PATHS.adminHome,
     anchor: 'admin-dashboard-map',
-    gates: ['auth', 'admin', 'experimental'],
+    gates: ['auth', 'admin', 'graph'],
     keywords: ['dopyt', 'demand', 'tem', 'topic', 'susedst', 'neighbour', 'neighbor', 'nahrad', 'substitut'],
   },
   {
@@ -307,11 +315,10 @@ export interface GuideAccess {
   admin: boolean;
 }
 
-const experimental = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
-
+// Features are read on each call, so a switch in Administration › Features applies without a reload.
 const allowed = (gates: GuideGate[] | undefined, access: GuideAccess) =>
   (gates ?? []).every((gate) =>
-    gate === 'auth' ? access.authenticated : gate === 'admin' ? access.admin : experimental,
+    gate === 'auth' ? access.authenticated : gate === 'admin' ? access.admin : isFeatureOn(gate),
   );
 
 export const guideTarget = (id: string, access: GuideAccess): GuideTarget | undefined => {

@@ -140,11 +140,18 @@ input:focus:not(:focus-visible) {
   --color-secondary-light: #B8CEC2;
 }
 
+/*
+ * KU (Katolícka univerzita v Ružomberku), ku.sk › Verejnosť a médiá › Dizajn manuál. Part 03 Farebnosť:
+ * gold Pantone 871 C = RGB 209·166·25 (#D1A619), greys 10 % #DEDEDD / 40 % #969594, black #1F1A17.
+ * Part 02 Typografia: Arno Pro (logotype), Palatino Linotype allowed in other documents — serif headings
+ * here. The manual's PDF parts predate the logos valid from 2025 (emblem + sans wordmark, used as is).
+ */
 :root[data-theme="ku"] {
   --color-primary: #D1A619;
   --color-primary-light: #FAF2D5;
-  --color-secondary: #3A320D;        /* muted dark ochre slate */
-  --color-secondary-light: #CFC6A3;
+  --color-secondary: #1F1A17;        /* KU black (manual: 100 % čierna) */
+  --color-secondary-light: #DEDEDD;  /* KU grey 10 % */
+  --font-heading: "Palatino Linotype", Palatino, "Book Antiqua", "URW Palladio L", "P052", Georgia, serif;
 }
 
 :root[data-theme="default"] {
@@ -178,6 +185,8 @@ input:focus:not(:focus-visible) {
   --color-on-primary: #ffffff;
   --color-primary-text: #0077A3;
   --color-primary-dark: #0A3D52;
+  /* Hover of a filled primary button; the dark tint suits white text, a light brand fill overrides it. */
+  --color-primary-hover: var(--color-primary-dark);
 }
 :root[data-theme="fiit"]    { --color-on-primary:#ffffff; --color-primary-text:#0077A3; --color-primary-dark:#0A3D52; }
 :root[data-theme="stu"]     { --color-on-primary:#ffffff; --color-primary-text:#a80331; --color-primary-dark:#4A0716; }
@@ -185,10 +194,43 @@ input:focus:not(:focus-visible) {
 :root[data-theme="svf"]     { --color-on-primary:#ffffff; --color-primary-text:#B0511A; --color-primary-dark:#4A2410; }
 :root[data-theme="sjf"]     { --color-on-primary:#ffffff; --color-primary-text:#4C5B60; --color-primary-dark:#202A2D; }
 :root[data-theme="fei"]     { --color-on-primary:#ffffff; --color-primary-text:#0C4A8E; --color-primary-dark:#0D2238; }
-:root[data-theme="fchpt"]   { --color-on-primary:#ffffff; --color-primary-text:#756000; --color-primary-dark:#4A3F0F; }
+/* Light brand fills (FCHPT yellow 1.4:1, KU gold 2.3:1 with white): dark ink on the fill, darker fill on hover. */
+:root[data-theme="fchpt"]   { --color-on-primary:#1F1A17; --color-primary-text:#756000; --color-primary-dark:#4A3F0F; --color-primary-hover:#E6C200; }
 :root[data-theme="fad"]     { --color-on-primary:#ffffff; --color-primary-text:#007A3A; --color-primary-dark:#103A22; }
-:root[data-theme="ku"]      { --color-on-primary:#ffffff; --color-primary-text:#7A6100; --color-primary-dark:#3A2F0A; }
+/* KU: ink #1F1A17 on gold 7.5:1, on hover #C29A12 6.5:1; text gold #6B5300 on white 7.3:1. */
+:root[data-theme="ku"]      { --color-on-primary:#1F1A17; --color-primary-text:#6B5300; --color-primary-dark:#3A2F0A; --color-primary-hover:#C29A12; }
 :root[data-theme="default"] { --color-on-primary:#ffffff; --color-primary-text:#0077A3; --color-primary-dark:#0A3D52; }
+
+/*
+ * Filled primary controls follow the theme's ink, not a hard-coded white (22 components wrote
+ * `bg-primary text-white`), and hover with --color-primary-hover. Unlayered, so they win over the
+ * utilities; on themes whose on-primary is white and hover is the dark tint they change nothing.
+ */
+.bg-primary.text-white {
+  color: var(--color-on-primary);
+}
+.hover\:bg-primaryDark:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/*
+ * Brand yellows are unreadable as text on white (KU gold 2.3:1): in light mode `text-primary` uses the
+ * darkened --color-primary-text. Dark mode keeps the brand colour (gold on zinc-800 is 6.5:1).
+ */
+:root[data-theme="ku"] body:not(.dark) .text-primary,
+:root[data-theme="fchpt"] body:not(.dark) .text-primary {
+  color: var(--color-primary-text);
+}
+
+/* KU headings in the manual's serif (Palatino Linotype, part 02); body text stays Inter for screen reading. */
+:root[data-theme="ku"] h1,
+:root[data-theme="ku"] h1 *,
+:root[data-theme="ku"] h2:not(.uppercase),
+:root[data-theme="ku"] h2:not(.uppercase) *,
+:root[data-theme="ku"] .font-heading {
+  font-family: var(--font-heading);
+  letter-spacing: 0.005em;
+}
 
 /*
  * Data-visualization tokens (admin dashboard). Deliberately independent of the

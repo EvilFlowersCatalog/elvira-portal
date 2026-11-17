@@ -64,6 +64,7 @@ import type { IViewerLocationState } from "../../hooks/api/assistant/useOpenInVi
 import { useQueryClient } from "@tanstack/react-query";
 import useReaderPage from "../../hooks/useReaderPage";
 import ExplainedElsewhere from "../../components/viewer/ExplainedElsewhere";
+import { useFeature } from "../../features/features";
 
 
 interface ISuggestedEntry {
@@ -185,8 +186,10 @@ const Viewer = () => {
   const updateAnotationItem = useUpdateAnotationItem();
   const createAnotationItem = useCreateAnotationItem();
   const deleteAnotationItem = useDeleteAnotationItem();
-  // The library graph panels (#41, #43) ship behind the experimental flag, like the Chapters tab.
-  const graphPanels = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true";
+  // The library graph panels (#41, #43) follow the graph feature, like the Chapters tab.
+  const graphPanels = useFeature("graph");
+  // Explain and the in-reader chat need the assistant (Administration › Features).
+  const assistantOn = useFeature("assistant");
   const readerPage = useReaderPage(rootId);
 
   let acquisition_id = "";
@@ -861,20 +864,26 @@ const Viewer = () => {
             shareFunction,
             openEntryDetailFunction,
             bookmarkToggleFunction,
-            explainFunction,
             suggestionsFunction,
-            chatPackage: {
-              sendMessageFunc: sendChatMessageFunc,
-              getChatsFunc,
-              getChatFunc,
-              deleteChatFunc,
-              // Evidence citations (IP-024): this book jumps to the page, others open here.
-              // Spread so the build passes against a viewer whose IChatPackage lacks the keys.
-              ...{
-                entryId: id,
-                openCitationFunc: (citation: ViewerCitation) => openCitation(fromViewerCitation(citation)),
-              },
-            },
+            // Without the assistant the viewer gets neither function and shows no "Explain" or chat
+            // (Administration › Features). Spread so the build passes whichever keys the viewer marks required.
+            ...(assistantOn
+              ? {
+                  explainFunction,
+                  chatPackage: {
+                    sendMessageFunc: sendChatMessageFunc,
+                    getChatsFunc,
+                    getChatFunc,
+                    deleteChatFunc,
+                    // Evidence citations (IP-024): this book jumps to the page, others open here.
+                    // Spread so the build passes against a viewer whose IChatPackage lacks the keys.
+                    ...{
+                      entryId: id,
+                      openCitationFunc: (citation: ViewerCitation) => openCitation(fromViewerCitation(citation)),
+                    },
+                  },
+                }
+              : {}),
             // Opens at the page a chat citation pointed to.
             initialPage: Number(searchParams.get("page")) || undefined,
             // ...and at the cited paragraph or figure (IP-030 Phase 1): outline `bbox`, flash `quads`, then fade.
@@ -900,13 +909,18 @@ const Viewer = () => {
               getLayerFunc,
               getGroupsFunc,
             },
-          agentAnnotationPackage: {
-            getAnnotationsFunc: getAgentAnnotationsFunc,
-            requestAnnotationFunc: requestAgentAnnotationFunc,
-            waitForAnnotationFunc: waitForAgentAnnotationFunc,
-            deleteHighlightFunc: deleteAgentHighlightFunc,
-            deleteAnnotationFunc: deleteAgentAnnotationFunc,
-          },
+          // AI highlight layers are the assistant's (`/assistant/v1/highlights`): none without it.
+          ...(assistantOn
+            ? {
+                agentAnnotationPackage: {
+                  getAnnotationsFunc: getAgentAnnotationsFunc,
+                  requestAnnotationFunc: requestAgentAnnotationFunc,
+                  waitForAnnotationFunc: waitForAgentAnnotationFunc,
+                  deleteHighlightFunc: deleteAgentHighlightFunc,
+                  deleteAnnotationFunc: deleteAgentAnnotationFunc,
+                },
+              }
+            : {}),
           // Viewer 0.7.3+; older viewers ignore it. Spread so the build also
           // passes against a viewer whose IViewerOptions lacks the key.
           ...{

@@ -22,7 +22,7 @@ import {
   fmtRatio,
   needsCopies,
 } from './format';
-import { Neighbour, SEMANTICS_ON, SemanticIndex, spareOf } from './semantic';
+import { Neighbour, SemanticIndex, spareOf, useSemanticsOn } from './semantic';
 
 interface Props {
   entryId: string | null;
@@ -71,6 +71,7 @@ export default function TitleInspector({
 }: Props) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const SEMANTICS_ON = useSemanticsOn();
   const k = 'administration.dashboard.inspector';
   const stats = useMemo(
     () => titles.find((d) => d.entry_id === entryId) ?? null,

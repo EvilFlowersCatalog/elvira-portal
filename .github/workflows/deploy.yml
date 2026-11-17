@@ -72,6 +72,9 @@ jobs:
           ELVIRA_UMAMI_SERVER: ${{ vars.ELVIRA_UMAMI_SERVER }}
           ELVIRA_UMAMI_WEBSITE: ${{ vars.ELVIRA_UMAMI_WEBSITE }}
           ELVIRA_EXPERIMENTAL_FEATURES: ${{ vars.ELVIRA_EXPERIMENTAL_FEATURES }}
+          # Optional per-feature build defaults (`assistant=off,graph=on`); Administration › Features
+          # overrides them at runtime once the catalog has portal.features (EvilFlowersCatalog#212).
+          ELVIRA_FEATURES: ${{ vars.ELVIRA_FEATURES }}
           # Optional: the collection shown as the themed row on Home (empty hides the row).
           ELVIRA_FEATURED_FEED_ID: ${{ vars.ELVIRA_FEATURED_FEED_ID }}
           # Optional: browser tracing via Grafana Faro (elvira-portal#39). Empty URL = no telemetry.

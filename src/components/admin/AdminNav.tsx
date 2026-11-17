@@ -15,7 +15,9 @@ import {
   FiShield,
   FiRefreshCw,
   FiGitMerge,
+  FiToggleRight,
 } from 'react-icons/fi';
+import { FeatureKey, resolveFeature, useFeatureSnapshot } from '../../features/features';
 import { FaBook } from 'react-icons/fa';
 import { MdOutlineCollectionsBookmark, MdOutlineLibraryBooks, MdOutlineInventory2 } from 'react-icons/md';
 import useAppContext from '../../hooks/contexts/useAppContext';
@@ -27,8 +29,8 @@ interface NavItem {
   icon: ReactElement;
   /** exact match required (dashboard index). */
   exact?: boolean;
-  /** hidden unless experimental features are on. */
-  experimental?: boolean;
+  /** Hidden while this portal feature is off (Administration › Features). */
+  feature?: FeatureKey;
   /** not built yet — shown disabled for orientation. */
   soon?: boolean;
   /** Not highlighted on this sub-path, which has its own item (harvest sources vs. the conflicts inbox). */
@@ -71,36 +73,44 @@ const GROUPS: NavGroup[] = [
   {
     labelKey: 'administration.nav.groupCirculation',
     items: [
-      { key: 'loans', path: NAVIGATION_PATHS.adminLoans, icon: <MdOutlineInventory2 size={ICON} /> },
+      { key: 'loans', path: NAVIGATION_PATHS.adminLoans, icon: <MdOutlineInventory2 size={ICON} />, feature: 'lending' },
     ],
   },
   {
     // IP-033/IP-034: exchanging records with other systems (#51, #53).
     labelKey: 'administration.nav.groupInterop',
     items: [
-      { key: 'harvest', path: NAVIGATION_PATHS.adminHarvest, icon: <FiRefreshCw size={ICON} />, notUnder: NAVIGATION_PATHS.adminHarvestConflicts },
-      { key: 'conflicts', path: NAVIGATION_PATHS.adminHarvestConflicts, icon: <FiGitMerge size={ICON} />, badge: 'openConflicts' },
+      {
+        key: 'harvest',
+        path: NAVIGATION_PATHS.adminHarvest,
+        icon: <FiRefreshCw size={ICON} />,
+        notUnder: NAVIGATION_PATHS.adminHarvestConflicts,
+        feature: 'interop',
+      },
+      { key: 'conflicts', path: NAVIGATION_PATHS.adminHarvestConflicts, icon: <FiGitMerge size={ICON} />, badge: 'openConflicts', feature: 'interop' },
     ],
   },
   {
     labelKey: 'administration.nav.groupOperations',
     items: [
       { key: 'jobs', path: NAVIGATION_PATHS.adminJobs, icon: <FiActivity size={ICON} /> },
-      // #47: built ahead of the catalog (#174, #20), so behind the flag like the other unreleased features.
-      { key: 'policies', path: NAVIGATION_PATHS.adminContentPolicies, icon: <FiShield size={ICON} />, experimental: true },
-      { key: 'settings', path: NAVIGATION_PATHS.adminSettings, icon: <FiSettings size={ICON} />, experimental: true },
+      // #47: built ahead of the catalog (#174, #20); off until switched on in Features.
+      { key: 'policies', path: NAVIGATION_PATHS.adminContentPolicies, icon: <FiShield size={ICON} />, feature: 'contentPolicies' },
+      { key: 'settings', path: NAVIGATION_PATHS.adminSettings, icon: <FiSettings size={ICON} />, feature: 'instanceSettings' },
+      // Always shown: where a switched-off feature is switched back on.
+      { key: 'features', path: NAVIGATION_PATHS.adminFeatures, icon: <FiToggleRight size={ICON} /> },
     ],
   },
 ];
-
-const experimentalOn = import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true';
 
 export default function AdminNav() {
   const { t } = useTranslation();
   const { umamiTrack } = useAppContext();
   const { pathname } = useLocation();
+  const features = useFeatureSnapshot();
+  const isOn = (key?: FeatureKey) => !key || resolveFeature(key, features).enabled;
   // Unacknowledged sync conflicts (#53); quietly absent when the catalog has no harvest API.
-  const { data: openConflicts } = useOpenConflictCount();
+  const { data: openConflicts } = useOpenConflictCount(isOn('interop'));
   const badges: Record<NonNullable<NavItem['badge']>, number | undefined> = { openConflicts };
 
   return (
@@ -110,7 +120,7 @@ export default function AdminNav() {
     >
       <div className="flex gap-1 overflow-x-auto px-3 py-2 lg:flex-col lg:gap-0.5 lg:overflow-visible lg:px-3 lg:py-4">
         {GROUPS.map((group, gi) => {
-          const items = group.items.filter((it) => !it.experimental || experimentalOn);
+          const items = group.items.filter((it) => isOn(it.feature));
           if (items.length === 0) return null;
           return (
             <div key={gi} className="flex gap-1 lg:mb-2 lg:flex-col lg:gap-0.5">

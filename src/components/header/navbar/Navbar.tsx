@@ -31,6 +31,8 @@ import Gravatar from "react-gravatar";
 import Button from "../../buttons/Button";
 import { ReactElement, useEffect, useRef, useState } from "react";
 import { IoMoonOutline, IoSunnyOutline } from "react-icons/io5";
+import { useFeature } from "../../../features/features";
+import { userEmail } from "../../../utils/institution";
 
 interface INavbarButtonParams {
   name: string;
@@ -96,20 +98,13 @@ const Navbar = () => {
     umamiTrack,
   } = useAppContext();
   const { auth, logout } = useAuthContext();
+  const graphOn = useFeature("graph");
+  const assistantOn = useFeature("assistant");
+  const lendingOn = useFeature("lending");
+  const helpOn = useFeature("help");
 
   const { t } = useTranslation();
   const location = useLocation();
-  const stuLinks: { [key: string]: string } = {
-    ["fiit"]: "https://www.fiit.stuba.sk/",
-    ["mtf"]: "https://www.mtf.stuba.sk/",
-    ["fad"]: "https://www.fad.stuba.sk/",
-    ["fchpt"]: "https://www.fchpt.stuba.sk/",
-    ["fei"]: "https://www.fei.stuba.sk/",
-    ["sjf"]: "https://www.sjf.stuba.sk/",
-    ["svf"]: "https://www.svf.stuba.sk/",
-    ["ku"]: "https://www.ku.sk/",
-  };
-
   // Function for returning if theme is dark cuz of lot of usage
   const isDark = () => {
     return theme === THEME_TYPE.dark;
@@ -239,7 +234,7 @@ const Navbar = () => {
               isActive={location.pathname === NAVIGATION_PATHS.categories}
               textVisible={!isCollapsed}
             />
-            {import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === 'true' && (
+            {graphOn && (
               <NavbarButton
                 name={t("navbarMenu.explore")}
                 guide="nav-explore"
@@ -249,17 +244,19 @@ const Navbar = () => {
                 textVisible={!isCollapsed}
               />
             )}
-            <NavbarButton
-              name={t("navbarMenu.aiAssistant")}
-              guide="nav-ai"
-              path={NAVIGATION_PATHS.aiChatHistory}
-              icon={<ChatIcon size={20} />}
-              isActive={
-                location.pathname === NAVIGATION_PATHS.aiAssistant ||
-                location.pathname === NAVIGATION_PATHS.aiChatHistory
-              }
-              textVisible={!isCollapsed}
-            />
+            {assistantOn && (
+              <NavbarButton
+                name={t("navbarMenu.aiAssistant")}
+                guide="nav-ai"
+                path={NAVIGATION_PATHS.aiChatHistory}
+                icon={<ChatIcon size={20} />}
+                isActive={
+                  location.pathname === NAVIGATION_PATHS.aiAssistant ||
+                  location.pathname === NAVIGATION_PATHS.aiChatHistory
+                }
+                textVisible={!isCollapsed}
+              />
+            )}
             {/* <NavbarButton
             name={t('navbarMenu.about')}
             path={NAVIGATION_PATHS.about}
@@ -312,14 +309,16 @@ const Navbar = () => {
               isActive={location.pathname === NAVIGATION_PATHS.history}
               textVisible={!isCollapsed}
             />
-            <NavbarButton
-              name={t("navbarMenu.loan")}
-              guide="nav-loans"
-              path={NAVIGATION_PATHS.loans}
-              icon={<LoansIcon size={20} />}
-              isActive={location.pathname === NAVIGATION_PATHS.loans}
-              textVisible={!isCollapsed}
-            />
+            {lendingOn && (
+              <NavbarButton
+                name={t("navbarMenu.loan")}
+                guide="nav-loans"
+                path={NAVIGATION_PATHS.loans}
+                icon={<LoansIcon size={20} />}
+                isActive={location.pathname === NAVIGATION_PATHS.loans}
+                textVisible={!isCollapsed}
+              />
+            )}
           </div>
         )}
 
@@ -358,7 +357,7 @@ const Navbar = () => {
             isActive={false}
             textVisible={!isCollapsed}
           />
-          { import.meta.env.ELVIRA_EXPERIMENTAL_FEATURES === "true" && (
+          {helpOn && (
           <NavbarButton
             name={t("navbarMenu.help")}
             guide="nav-help"
@@ -406,7 +405,7 @@ const Navbar = () => {
               onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
             >
               <Gravatar
-                email={`${auth.username}@stuba.sk`}
+                email={userEmail(auth.username) ?? ""}
                 size={28}
                 className="rounded-full shrink-0"
                 default="monsterid"
@@ -433,7 +432,7 @@ const Navbar = () => {
                 onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}
               >
                 <Gravatar
-                  email={`${auth.username}@stuba.sk`}
+                  email={userEmail(auth.username) ?? ""}
                   size={28}
                   className="rounded-full"
                   default="monsterid"
