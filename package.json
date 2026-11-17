@@ -10,7 +10,6 @@
     "build:stu": "tsc && vite build --mode stu",
     "build:ku": "tsc && vite build --mode ku",
     "dev:ku": "vite --mode ku",
-    "deploy:ku": "./scripts/deploy-ku.sh",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --report-unused-disable-directives",

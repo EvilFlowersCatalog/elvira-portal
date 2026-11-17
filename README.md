@@ -69,7 +69,6 @@ Then glide over to `http://localhost:3000/` to explore. The dev server reads
 | `npm run build:stu` | Type-check + build in **stu** mode (`env/.env.stu`) |
 | `npm run build:ku` | Type-check + build in **ku** mode (`env/.env.ku`, KU production) |
 | `npm run dev:ku` | Dev server with the KU profile (put local overrides in `env/.env.ku.local`) |
-| `npm run deploy:ku` | Build and deploy KU production (`scripts/deploy-ku.sh`, see below) |
 | `npm run preview` | Serve the last build locally |
 | `npm run typecheck` | Type-check without emitting (`tsc --noEmit`) |
 | `npm run lint` | ESLint 9 (flat config) over `src` |
@@ -124,18 +123,15 @@ Gate new UI with `useFeature('<key>')`, routes with `<RequireFeature feature='<k
 - **elvira.stuba.sk / dev.elvira.stuba.sk** — GitHub Actions on push to `master` / `dev`
   (`.github/workflows/deploy.yml`).
 - **KU production (e-knihy.ku.sk)** — the only KU instance; it runs the *dev* packages (`dev` branch +
-  EvilFlowersViewer `develop`). The host is reachable only from KU's admin network, so deploy from a
-  workstation on the KU VPN:
+  EvilFlowersViewer `develop`). Push to `dev`: the `deploy-ku` job in `.github/workflows/deploy.yml`
+  builds with `npm run build:ku` (`env/.env.ku`), joins the private network, uploads a release and swaps
+  `current` (last 5 kept). Rollback = re-run an older successful run. `https://e-knihy.ku.sk/version.json`
+  names the live release.
 
-  ```bash
-  npm run deploy:ku -- --dry-run   # build, show what would change
-  npm run deploy:ku                # build, upload a release, swap `current`, smoke-test
-  npm run deploy:ku -- --rollback  # back to the previous release
-  ```
-
-  The host side (deploy account, `releases/` + `current` layout, vhost root) is
-  EvilFlowersCatalog/knowledge#83; the catalog's minimal-instance settings knowledge#84. Remove
-  `env/.env.ku.local` before deploying — the script refuses a bundle not built for `api.e-knihy.ku.sk`.
+  The host side (deploy account, network ACL, GitHub Environment `e-knihy.ku.sk`, `releases/` +
+  `current` layout) is EvilFlowersCatalog/knowledge#83; the catalog's minimal-instance settings
+  knowledge#84. For local development against KU's catalog, see knowledge#83 for the
+  `env/.env.ku.local` value (`npm run dev:ku`).
 
 ## Environment variables
 

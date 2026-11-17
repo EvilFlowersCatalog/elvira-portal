@@ -2,6 +2,7 @@ name: Deploy
 
 # master -> elvira.stuba.sk       (stu config, `npm run build:stu`)
 # dev    -> dev.elvira.stuba.sk   (dev config, `npm run build:dev`)
+#        -> e-knihy.ku.sk         (KU production, `npm run build:ku`; job `deploy-ku` below)
 #
 # Per-environment configuration lives in the GitHub Environments
 # "elvira.stuba.sk" (master) and "dev.elvira.stuba.sk" (dev):
@@ -134,6 +135,110 @@ jobs:
 
           # Atomically flip `current` -> new release, then prune old releases
           # keeping the 5 most recent (the just-deployed one is always newest).
+          $SSH "bash -s" <<EOF
+          set -euo pipefail
+          cd '${DEPLOY_PATH}'
+          ln -sfn 'releases/${RELEASE}' current.tmp
+          mv -T current.tmp current
+          cd releases
+          ls -1dt */ | tail -n +6 | xargs -r rm -rf
+          echo "Active release: \$(readlink '${DEPLOY_PATH}/current')"
+          EOF
+
+  # dev -> e-knihy.ku.sk (KU production, `npm run build:ku`, elvira-portal#57).
+  # KU production runs the dev packages, so every push to `dev` deploys it too.
+  # GitHub Environment "e-knihy.ku.sk" (deployable from `dev` only; host side in knowledge#83):
+  #   Variables: DEPLOY_HOST, DEPLOY_PORT, DEPLOY_USER, DEPLOY_PATH, TS_LOGIN_SERVER
+  #   Secrets:   DEPLOY_PRIVATE_KEY, TS_AUTHKEY
+  # The host is not reachable from GitHub's runners, so the job joins the private network first
+  # with a tagged, ephemeral pre-auth key that reaches the deploy host's SSH only.
+  # Rollback: re-run an older successful run of this workflow.
+  deploy-ku:
+    name: Build & deploy KU (e-knihy.ku.sk)
+    if: github.ref_name == 'dev'
+    runs-on: ubuntu-latest
+    environment:
+      name: e-knihy.ku.sk
+      url: https://e-knihy.ku.sk
+    concurrency:
+      group: deploy-ku
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # KU production runs the dev packages: the viewer's develop, like dev.elvira.stuba.sk.
+      - name: Viewer (latest develop)
+        run: npm install --no-save "github:EvilFlowersCatalog/EvilFlowersViewer#develop"
+
+      # No ELVIRA_* env here: an unset variable injects an empty string that would override
+      # env/.env.ku (see the `deploy` job's Build step). KU's config lives in env/.env.ku.
+      - name: Build (KU profile, env/.env.ku)
+        run: npm run build:ku
+
+      - name: Bundle is built for KU
+        run: grep -rq "api.e-knihy.ku.sk" dist/assets
+
+      - name: Release info
+        run: |
+          echo "{\"release\":\"$(date -u +%Y-%m-%d_%H%M%S)-${GITHUB_SHA::7}\",\"commit\":\"${GITHUB_SHA}\",\"branch\":\"${GITHUB_REF_NAME}\"}" > dist/version.json
+
+      # Private network: ephemeral node, tagged key (reaches the deploy host's SSH only).
+      - name: Join the private network
+        uses: tailscale/github-action@v3
+        with:
+          authkey: ${{ secrets.TS_AUTHKEY }}
+          args: --login-server=${{ vars.TS_LOGIN_SERVER }}
+          hostname: gha-elvira-portal-ku-${{ github.run_id }}
+          version: 1.104.7   # the control server needs clients >= 1.104.4
+
+      - name: Configure SSH agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+
+      - name: Trust deploy host
+        env:
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          ssh-keyscan -H -p "${DEPLOY_PORT:-22}" "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      # Same layout as the `deploy` job; the release name comes from dist/version.json.
+      - name: Deploy release & swap symlink
+        env:
+          DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+          DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+          DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
+          DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+        run: |
+          set -euo pipefail
+
+          PORT="${DEPLOY_PORT:-22}"
+          SSH="ssh -p ${PORT} ${DEPLOY_USER}@${DEPLOY_HOST}"
+          RELEASE="$(jq -r .release dist/version.json)"
+          RELEASE_DIR="${DEPLOY_PATH}/releases/${RELEASE}"
+
+          echo "Deploying release ${RELEASE} to ${DEPLOY_HOST}:${RELEASE_DIR}"
+
+          $SSH "mkdir -p '${DEPLOY_PATH}/releases'"
+
+          rsync -az --delete --human-readable \
+            -e "ssh -p ${PORT}" \
+            --link-dest="${DEPLOY_PATH}/current/" \
+            dist/ \
+            "${DEPLOY_USER}@${DEPLOY_HOST}:${RELEASE_DIR}/"
+
           $SSH "bash -s" <<EOF
           set -euo pipefail
           cd '${DEPLOY_PATH}'
