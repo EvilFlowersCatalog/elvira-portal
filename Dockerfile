@@ -7,9 +7,13 @@ FROM node:22-alpine AS build
 WORKDIR /src
 COPY package*.json .npmrc ./
 RUN npm ci
-# The dev image ships the viewer's `develop` (as the static dev deploy does).
+# The dev image ships the viewer's `develop` (as the static dev deploy does). npm clones a
+# `github:` dependency with git, which node:alpine does not ship.
 ARG VIEWER_REF=""
-RUN if [ -n "$VIEWER_REF" ]; then npm install --no-save "github:EvilFlowersCatalog/EvilFlowersViewer#${VIEWER_REF}"; fi
+RUN if [ -n "$VIEWER_REF" ]; then \
+      apk add --no-cache git && \
+      npm install --no-save "github:EvilFlowersCatalog/EvilFlowersViewer#${VIEWER_REF}"; \
+    fi
 COPY . .
 # Faro `app.release` (#58): the commit the image was built from (no .git in the build context).
 ARG GIT_SHA=""

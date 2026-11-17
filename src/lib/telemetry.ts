@@ -27,7 +27,11 @@ import i18next from 'i18next';
 import { config } from './config';
 
 const FARO_URL = config.ELVIRA_FARO_URL;
-const ENVIRONMENT = config.ELVIRA_FARO_ENVIRONMENT || import.meta.env.MODE;
+const FARO_API_KEY = config.ELVIRA_FARO_API_KEY;
+// The image build (mode `image`) serves real deployments: without an explicit value it is production, so the
+// dev-only identity rules (user id, faro_session) stay off unless config.json says `development`.
+const ENVIRONMENT =
+  config.ELVIRA_FARO_ENVIRONMENT || (import.meta.env.MODE === 'image' ? 'production' : import.meta.env.MODE);
 const SAMPLE_RATE = Number(config.ELVIRA_FARO_SAMPLE_RATE || 1);
 
 /** API calls a screen starts this long after navigation are grouped under its route span. */
@@ -232,13 +236,20 @@ let enabled = false;
 
 const initTelemetry = () => {
   if (!FARO_URL || typeof window === 'undefined') return;
+  // The receiver answers 401 to a keyless POST (x-api-key); sending would only collect errors.
+  if (!FARO_API_KEY) {
+    console.warn('[telemetry] ELVIRA_FARO_URL is set without ELVIRA_FARO_API_KEY; Faro stays off.');
+    return;
+  }
 
   const apiOrigin = originOf(config.ELVIRA_BASE_URL);
   const umamiOrigin = originOf(config.ELVIRA_UMAMI_SERVER);
 
   initializeFaro({
     url: FARO_URL,
-    apiKey: config.ELVIRA_FARO_API_KEY || undefined,
+    // Sent as x-api-key. Not a secret (it ships in the bundle or config.json); the receiver's CORS origin
+    // list and the nginx/Alloy rate limits are what protect it (Observability-Stack §11).
+    apiKey: FARO_API_KEY,
     // `release` identifies the build (short commit) for source maps per release (#58, knowledge#85).
     app: { name: 'elvira-portal', version: __APP_VERSION__, release: __GIT_SHA__, environment: ENVIRONMENT },
     view: { name: routePattern(window.location.pathname) },

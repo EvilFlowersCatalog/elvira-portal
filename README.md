@@ -98,14 +98,37 @@ before the app renders (`src/lib/config.ts`). A missing or invalid file leaves t
 { "ELVIRA_BASE_URL": "https://api.e-knihy.ku.sk", "ELVIRA_CATALOG_ID": "1863182a-…", "ELVIRA_THEME": "ku" }
 ```
 
+![One portal image, configured per deployment](docs/diagrams/deployment-portal-image.svg)
+
+![Portal bootstrap: runtime config first](docs/diagrams/sequence-portal-bootstrap.svg)
+
 ## Analytics and telemetry
 
 `src/lib/analytics.ts` is the one layer for Umami and Grafana Faro: `track` (reader actions), `trackOutcome`
 (`loan.result`, `search.result`, `ui.error_shown`, `ui.render_error`, `api.error`, …), `measure`, `identify`.
 Umami events carry `view` (route pattern), and on development `faro_session` to join them with Faro
-(not in production: Umami identifies the user, IP-029). Faro itself
-(`src/lib/telemetry.ts`) is on when `ELVIRA_FARO_URL` is set. Never put search text, titles, names or
-e-mails into an event.
+(not in production: Umami identifies the user, IP-029). Never put search text, titles, names or e-mails
+into an event.
+
+![Portal analytics layer](docs/diagrams/component-portal-analytics.svg)
+
+### Faro on an instance
+
+Faro (`src/lib/telemetry.ts`) is on when the config has both of these:
+
+| Key | Value |
+|---|---|
+| `ELVIRA_FARO_URL` | the public receiver, today `https://dev.elvira.stuba.sk/faro/collect` |
+| `ELVIRA_FARO_API_KEY` | the receiver's app key (1Password `stu.observability.faro/api_key`) |
+| `ELVIRA_FARO_ENVIRONMENT` | `development` or `production`; the image defaults to `production` |
+| `ELVIRA_FARO_SAMPLE_RATE` | optional, `0`–`1` (default `1`) |
+
+- The static deploys get these from the GitHub Environment at build time. The image gets them from `config.json`.
+- The key goes out as `x-api-key`. It is not a secret, because it ships to every browser.
+- What protects the receiver is its CORS origin list and the nginx and Alloy rate limits. **A new instance's
+  origin must be added to the receiver's allowed origins**, or the browser blocks every POST. Today only
+  `https://dev.elvira.stuba.sk` is allowed.
+- A URL without a key leaves Faro off, with a console warning.
 
 ## Themes
 

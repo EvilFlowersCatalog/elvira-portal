@@ -7,7 +7,7 @@
  * |-----------------|-----------------------------|-----------------------------------------------|
  * | `track`         | event + labels              | `faro.user.action` (safe attributes only)     |
  * | `trackOutcome`  | event + labels              | event (`event_data_<key>`)                    |
- * | `measure`       | —                           | measurement (`context_<key>`)                 |
+ * | `measure`       | —                           | measurement (`context_<key>`): assistant, viewer |
  * | `identify`      | identify (id + data)        | signed_in / role; user id on dev only         |
  * | global capture  | errors, API failures, vitals | (Faro captures errors and vitals itself)      |
  *
@@ -52,6 +52,8 @@ export const EVENTS = {
   apiError: 'api.error',
   /** An uncaught error or rejection (Umami only; Faro has the exception itself): `kind`. */
   jsError: 'js.error',
+  /** The viewer failed to show a document before its first page: `stage` (download | parse | render). */
+  viewerError: 'viewer.error',
   /** A Core Web Vital, rated (Umami only; Faro has the values): `metric`, `rating`. */
   webVital: 'perf.web_vital',
 } as const;

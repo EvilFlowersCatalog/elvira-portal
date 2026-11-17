@@ -1,5 +1,5 @@
 import { config } from '@/lib/config';
-import { track } from '@/lib/analytics';
+import { EVENTS, measure, track, trackOutcome } from '@/lib/analytics';
 import {
   useLocation,
   useNavigate,
@@ -810,6 +810,8 @@ const Viewer = () => {
 
     let viewerApp: { unmount: () => void } | undefined;
     let cancelled = false;
+    // Start of the reader's wait for the first page (the `viewer` measurement).
+    const openedAt = performance.now();
 
     (async () => {
       try {
@@ -937,6 +939,20 @@ const Viewer = () => {
               addHighlightFunc: addReaderHighlightFunc,
               deleteHighlightFunc: deleteReaderHighlightFunc,
             },
+          },
+          // The reader's wait to the first page (#59, EvilFlowersViewer#150): from opening this screen
+          // (entry detail, licence and PDF download included) to the first painted page; `render_ms` is the
+          // viewer's own load and paint. Viewer develop+; older viewers ignore the keys, and the spread keeps
+          // the build passing against a viewer whose IViewerOptions lacks them.
+          ...{
+            onFirstPageRendered: ({ durationMs }: { page: number; durationMs: number }) =>
+              measure(
+                "viewer",
+                { first_page_ms: Math.round(performance.now() - openedAt), render_ms: durationMs },
+                { kind: "pdf" },
+              ),
+            onDocumentError: ({ stage }: { stage: "download" | "parse" | "render" }) =>
+              trackOutcome(EVENTS.viewerError, { stage }),
           },
           regionPackage: { getRegionsFunc, getAllRegionsFunc },
           pageBookmarkPackage: {

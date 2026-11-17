@@ -1,0 +1,50 @@
+@startuml sequence-portal-bootstrap
+!include elvira.iuml
+' =============================================================================
+' What: the browser loads the runtime config before any module that reads configuration is evaluated, so
+'       one bundle serves every client; telemetry starts next, so it instruments fetch/XHR before the app.
+' Kind: UML sequence diagram. Scope: one page load, from index.html to the first render; the config fetch
+'       itself is not traced (Faro is not running yet).
+' Source: elvira-portal src/main.tsx, src/bootstrap.tsx, src/lib/config.ts, src/lib/telemetry.ts,
+'         src/lib/analytics.ts (2026-11-17); issue elvira-portal#61
+' =============================================================================
+
+title Portal bootstrap: runtime config first (2026-11-17)
+
+participant "Browser" as browser
+participant "nginx\n(pod)" as nginx
+participant "main.tsx" as main
+participant "lib/\nconfig.ts" as config <<focus>>
+participant "bootstrap\n.tsx" as boot
+participant "lib/\ntelemetry.ts" as tel
+participant "lib/\nanalytics.ts" as ana
+participant "React\napp" as app
+
+browser -> nginx : GET /, index.html,\nmain chunk
+nginx --> browser : SPA bundle
+browser -> main : evaluate
+main -> main : import forceHttps
+main -[$accent_msg()]> config : <b>loadRuntimeConfig()</b>
+config -> nginx : GET /config.json\n(no-cache, 3 s timeout)
+alt 200, JSON
+  nginx --> config : {ELVIRA_*}
+  config -> config : known keys override\nbuild defaults
+else 404, text/html, invalid, timeout
+  nginx --> config : not a config
+  config -> config : keep build defaults
+end
+main -> boot : import('./bootstrap')
+boot -> tel : import first
+alt ELVIRA_FARO_URL set
+  tel -> tel : initializeFaro: release, view,\nsession attrs (theme, catalog, lang)
+  tel -> tel : patch fetch/XHR,\nroute spans, user actions
+else not set
+  tel -> tel : nothing patched or sent
+end
+boot -> ana : import: Umami script\nif configured, global capture
+boot -> app : createRoot().render
+app -> config : modules read config.ELVIRA_*\n(final values)
+
+caption Every module that reads configuration is imported only after the override,\nso module-level reads (axios base URL, features, theme) see the deployment's values.
+footer ELVIRA · FIIT STU · elvira-portal · docs/diagrams/sequence-portal-bootstrap.puml
+@enduml

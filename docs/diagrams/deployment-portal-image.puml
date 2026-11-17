@@ -1,0 +1,45 @@
+@startuml deployment-portal-image
+!include elvira.iuml
+' =============================================================================
+' What: one portal image is built per commit and pushed to GHCR; each client runs the same image on k3s
+'       and becomes "itself" only through the config.json and nginx config that ops mounts beside it.
+' Kind: UML deployment diagram, specification level for the cluster (no portal pods exist yet), instance
+'       level for GitHub and GHCR. Scope: the image path and the per-instance configuration; the catalog,
+'       the Faro receiver and Umami appear only as the endpoints config.json names.
+' Source: elvira-portal Dockerfile, .github/workflows/deploy.yml (job image), src/lib/config.ts,
+'         env/.env.image (2026-11-17); issue elvira-portal#61; evilflowers-knowledge Repositories,
+'         Tracing-Conventions (Faro receiver live on dev since 2026-11-14) (read 2026-11-17)
+' =============================================================================
+
+title One portal image, configured per deployment (proposal, 2026-11-17)
+
+node "**GitHub Actions**\nubuntu-latest" <<executionEnvironment>> as gha {
+  artifact "deploy.yml · job **image**\nbuildx · linux/amd64\nVIEWER_REF=develop on dev\nGIT_SHA = github.sha" as job
+}
+
+node "**GHCR**\nghcr.io/evilflowerscatalog/elvira-portal" <<executionEnvironment>> as ghcr {
+  artifact ":dev · :master (floating)\n:sha-<short> (pinned by prod)" as tags
+}
+
+node "**k3s**\nnamespace per instance" <<executionEnvironment>> <<proposed>> as k3s {
+  node "**portal pod**\nnginx-unprivileged 1.29\nuid 101 · :8080 · read-only root" <<container>> <<proposed>> <<focus>> as pod {
+    artifact "html/\nSPA bundle\n(mode image)" as bundle
+    artifact "config.json\nmounted by ops\nELVIRA_* keys" <<proposed>> as cfg
+    artifact "conf.d/default.conf\nmounted by ops\nSPA fallback" <<proposed>> as nginxconf
+  }
+}
+
+node "**Reader's browser**" <<device>> as browser
+
+node "**Endpoints named in config.json**\nCatalog API (ELVIRA_BASE_URL)\nFaro receiver (ELVIRA_FARO_URL)\nUmami (ELVIRA_UMAMI_SERVER)" <<executionEnvironment>> as endpoints
+
+gha -[$accent()]-> ghcr : <b>HTTPS docker push</b>\nGITHUB_TOKEN
+k3s --> ghcr : HTTPS pull\n(anonymous)
+browser --> pod : HTTPS GET /, assets,\n/config.json (no-cache)
+browser --> endpoints : HTTPS JSON / POST
+
+$legend_live_proposed()
+
+caption The image carries no client: a new client is a new config.json and nginx config beside the same image,\nnot a new build. Without config.json the bundle runs on its build defaults (STU theme, no catalog).
+footer ELVIRA · FIIT STU · elvira-portal · docs/diagrams/deployment-portal-image.puml
+@enduml

@@ -1,0 +1,58 @@
+@startuml component-portal-analytics
+!include elvira.iuml
+' =============================================================================
+' What: every reader action, outcome and error goes through one analytics layer, which sends the same event
+'       name to Umami and to Faro; components never call window.umami or faro.api themselves.
+' Kind: UML component diagram. Scope: the portal's analytics and telemetry modules, their callers, and the
+'       two receivers; Faro's own instrumentation (vitals, resources, sessions) is summarised in one part.
+' Source: elvira-portal src/lib/analytics.ts, src/lib/telemetry.ts, src/lib/errorReference.tsx,
+'         src/lib/reactQuery.ts, src/components/page/RouteErrorBoundary.tsx, src/providers/AppProvider.tsx,
+'         src/providers/AuthProvider.tsx (2026-11-17); issues elvira-portal#58, #59, #60
+' =============================================================================
+
+title Portal analytics layer: one vocabulary, two receivers (2026-11-17)
+
+package "Callers" {
+  component "**umamiTrack** (AppProvider)\n38 named actions" as umamitrack
+  component "**Submit handlers**\nSearch Submit, Assistant Send,\nReader Explain / Highlight" as submits
+  component "**Loan, search, assistant hooks**\nwithLoanResult, trackSearchResult,\nstartAssistantTimer" as hooks
+  component "**Error surfaces**\ntoast.error override, RouteErrorBoundary,\nReact Query caches" as errors
+  component "**AuthProvider**\nlogin, restore, logout" as auth
+}
+
+package "elvira-portal lib" {
+  component "**lib/analytics.ts**\ntrack · trackOutcome · measure · identify\nEVENTS · safeAttributes · labels" as analytics <<focus>>
+  component "**lib/telemetry.ts**\nFaro init, route spans, view,\nsession attrs, guarded helpers" as telemetry
+  component "**Faro instrumentation**\nerrors, web vitals, resources,\nfetch/XHR traces, auto user actions" as faroinst
+}
+
+interface "Umami\nwindow.umami.track / identify" as iumami
+interface "Faro receiver\nPOST /collect" as ifaro
+
+' Layout only: the five callers in two rows, so the figure stays narrow.
+umamitrack -[hidden]down-> hooks
+submits -[hidden]down-> errors
+auth -[hidden]down-> errors
+
+umamitrack --> analytics : track(name, data)
+submits --> analytics : track(name, ids)
+hooks --> analytics : trackOutcome(loan.result,\nsearch.result)\nmeasure(assistant)
+errors --> analytics : trackOutcome(ui.error_shown,\nui.render_error, api.error)
+auth --> analytics : identify(user | undefined)
+
+analytics -[$accent()]-> iumami : <b>event + labels</b>\nview, faro_session (dev only)
+analytics -[$accent()]-> telemetry : <b>same name</b>\nsafe attributes only
+telemetry --> faroinst : configures
+faroinst --> ifaro : HTTPS JSON\nview_name, session_attr_*,\napp_release
+
+note left of telemetry
+  Privacy (IP-029): bounded values only.
+  Free-text keys (query, title, author, name,
+  text, prompt…) and values over 64 chars are
+  dropped. URL-parameter events keep search
+  text, so they go to Umami only (faro: false).
+end note
+
+caption One call site, one event name in both receivers: Umami counts it next to the product events,\nFaro joins it with the API calls, traces and errors of the same screen.
+footer ELVIRA · FIIT STU · elvira-portal · docs/diagrams/component-portal-analytics.puml
+@enduml
