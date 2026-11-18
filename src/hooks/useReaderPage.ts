@@ -1,19 +1,27 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 /**
- * The page the reader shows, read from the viewer's own DOM: its bottom bar's page box
- * (`input[name="search-page"]`) carries the active page as its placeholder.
+ * The page the reader shows.
  *
- * Stopgap: `@evilflowers/evilflowersviewer` has no page-change callback yet. Once it gets one (e.g.
- * `onPageChange` in its options), pass that instead and drop this observer. Null until the viewer has rendered.
+ * The viewer's `onPageChange` (EvilFlowersViewer#152) reports it: pass the returned `onPageChange` in
+ * the viewer's options. Viewer 0.7.9 has no such callback; for it the page is read from its bottom bar's
+ * page box (`input[name="search-page"]`, whose placeholder carries the active page) until the callback
+ * has fired once. Null until the viewer has rendered.
  */
-export default function useReaderPage(rootId: string): number | null {
+export default function useReaderPage(rootId: string) {
   const [page, setPage] = useState<number | null>(null);
+  const reported = useRef(false);
+
+  const onPageChange = useCallback(({ page: next }: { page: number }) => {
+    reported.current = true;
+    setPage(next);
+  }, []);
 
   useEffect(() => {
     const root = document.getElementById(rootId);
     if (!root) return;
     const read = () => {
+      if (reported.current) return;
       const input = root.querySelector<HTMLInputElement>('input[name="search-page"]');
       const value = Number(input?.placeholder);
       setPage(Number.isInteger(value) && value > 0 ? value : null);
@@ -24,5 +32,5 @@ export default function useReaderPage(rootId: string): number | null {
     return () => observer.disconnect();
   }, [rootId]);
 
-  return page;
+  return { page, onPageChange };
 }

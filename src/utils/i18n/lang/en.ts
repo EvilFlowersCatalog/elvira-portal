@@ -7,6 +7,11 @@ export const en = {
       reload: 'Reload',
       reference: 'If it keeps happening, send us this reference:',
     },
+    readerLoading: {
+      label: 'Opening the publication',
+      preparing: 'Preparing your copy…',
+      opening: 'Opening the first page…',
+    },
     common: {
       showMore: '{{count}} more',
       showLess: 'Show less',

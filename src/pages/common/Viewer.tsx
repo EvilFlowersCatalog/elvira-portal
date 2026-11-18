@@ -1,4 +1,4 @@
-import { config } from '@/lib/config';
+import { config, viewerLoading } from '@/lib/config';
 import { EVENTS, measure, track, trackOutcome } from '@/lib/analytics';
 import {
   useLocation,
@@ -10,13 +10,11 @@ import { useTranslation } from "react-i18next";
 import { useEffect, useState } from "react";
 import { IUserAcquisitionShare } from "../../utils/interfaces/acquisition";
 import useCreateUserAcquisition from "../../hooks/api/acquisitiions/user-acquistions/useCreateUserAcquisition";
-import {
-  NAVIGATION_PATHS,
-  THEME_TYPE,
-} from "../../utils/interfaces/general/general";
+import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
 import EntryDetail from "../../components/items/entry/details/EntryDetail";
 import useGetUserAcquisition from "../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisition";
+import useGetUserAcquisitionInfo from "../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisitionInfo";
 import useGetRegions from "../../hooks/api/acquisitiions/user-acquistions/useGetRegions";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -66,6 +64,7 @@ import type { IViewerLocationState } from "../../hooks/api/assistant/useOpenInVi
 import { useQueryClient } from "@tanstack/react-query";
 import useReaderPage from "../../hooks/useReaderPage";
 import ExplainedElsewhere from "../../components/viewer/ExplainedElsewhere";
+import ReaderLoader, { type IReaderLoaderBook } from "../../components/viewer/ReaderLoader";
 import { useFeature } from "../../features/features";
 
 
@@ -144,14 +143,62 @@ const fromViewerCitation = (citation: ViewerCitation): IAssistantCitation => ({
   locator_key: citation.locatorKey,
 });
 
+/**
+ * Where the viewer reads the PDF from (EvilFlowersViewer `IDocumentSource`), declared here so the build
+ * passes against viewer 0.7.9, which has `url`/`httpHeaders`/`rangeChunkSize` but not `streaming`.
+ * The viewer's `streaming` means range-only loading (no background fetch), i.e. the portal's `autoFetch` off.
+ */
+type ViewerSource = {
+  data?: Uint8Array;
+  url?: string;
+  httpHeaders?: Record<string, string>;
+  rangeChunkSize?: number;
+  streaming?: boolean;
+};
+
+/** What `renderViewer` returns; `viewer` (the host controller) exists from EvilFlowersViewer#153 on. */
+type ViewerApp = {
+  unmount: () => void;
+  viewer?: {
+    open: (source: ViewerSource, at?: { initialPage?: number | null }) => void;
+    getState: () => { page: number };
+  };
+};
+
+type DocumentErrorInfo = {
+  stage: "download" | "parse" | "render";
+  reason?: string;
+  status?: number | null;
+  source?: string;
+};
+
+type FirstPageInfo = {
+  page: number;
+  durationMs: number;
+  source?: string;
+  bytesLoaded?: number | null;
+  totalBytes?: number | null;
+};
+
+/** The longest the reader's loading screen waits for the first painted page before stepping aside. */
+const READER_LOADER_MAX_MS = 45_000;
+
+/** A signed content URL (`?exp=&sig=`, EvilFlowersCatalog#214): 403 once it has expired. */
+const isSigned = (url?: string) => !!url && /[?&]sig=/.test(url);
+
 const Viewer = () => {
-  const { lang, theme, titleLogoDark, titleLogoLight, aiChatId, clearAiChat } = useAppContext();
+  const { lang, theme, aiChatId, clearAiChat } = useAppContext();
   const { auth } = useAuthContext();
   const { "entry-id": id, index } = useParams();
   const { t } = useTranslation();
   const location = useLocation();
-  const [loading, setLoading] = useState<boolean>(true);
-  const [progressBar, setProgressBar] = useState<number>(0);
+  // One loading screen from the click to the first painted page (ReaderLoader); it also covers the
+  // viewer's own spinner. `leaving` fades it out, `gone` unmounts it.
+  const [loaderBook, setLoaderBook] = useState<IReaderLoaderBook | null>(null);
+  const [loaderStage, setLoaderStage] = useState<"preparing" | "opening">("preparing");
+  const [loaderPhase, setLoaderPhase] = useState<"shown" | "leaving" | "gone">("shown");
+  const loading = loaderPhase !== "gone";
+  const revealReader = () => setLoaderPhase((phase) => (phase === "shown" ? "leaving" : phase));
   // Where the reader was opened from. Kept from mount: opening a dialog here
   // rewrites the URL and drops the navigation state.
   const [origin] = useState(
@@ -170,6 +217,7 @@ const Viewer = () => {
   const { getSimilarToPassage } = useSimilarEntries();
   const fetchEntriesByIds = useEntriesByIdsFetcher();
   const getUserAcquisition = useGetUserAcquisition();
+  const getUserAcquisitionInfo = useGetUserAcquisitionInfo();
   const explainPassage = useExplainPassage();
   const startChat = useStartChat();
   const sendChatMessage = useSendChatMessage();
@@ -192,7 +240,7 @@ const Viewer = () => {
   const graphPanels = useFeature("graph");
   // Explain and the in-reader chat need the assistant (Administration › Features).
   const assistantOn = useFeature("assistant");
-  const readerPage = useReaderPage(rootId);
+  const { page: readerPage, onPageChange: onReaderPageChange } = useReaderPage(rootId);
 
   let acquisition_id = "";
   let user_acquisition_id = "";
@@ -808,18 +856,23 @@ const Viewer = () => {
     // specificity as the viewer's scoped ones, and the later stylesheet wins.
     document.head.appendChild(styleElement);
 
-    let viewerApp: { unmount: () => void } | undefined;
+    let viewerApp: ViewerApp | undefined;
+    let revealTimer: ReturnType<typeof setTimeout> | undefined;
     let cancelled = false;
     // Start of the reader's wait for the first page (the `viewer` measurement).
     const openedAt = performance.now();
 
     (async () => {
       try {
-        setProgressBar(30);
-
         // Fetch entry details and process acquisition
-        console.log(entryCatalogId);
         const entryDetail = await getEntryDetail(id!, entryCatalogId || undefined);
+        if (!cancelled) {
+          setLoaderBook({
+            title: entryDetail.title,
+            authors: entryDetail.authors.map((author) => `${author.name} ${author.surname}`.trim()).join(", "),
+            thumbnail: entryDetail.thumbnail,
+          });
+        }
         // Cache catalog_id from entry for subsequent operations
         if (entryDetail.catalog_id && !entryCatalogId) {
           setEntryCatalogId(entryDetail.catalog_id);
@@ -831,7 +884,6 @@ const Viewer = () => {
 
         acquisition_id = entryDetail.acquisitions[parseInt(index || "0")].id;
         user_acquisition_id = userAcquisition.id;
-        setProgressBar(50);
 
         // Update metatags if properties exist
         const metaTagUpdates = {
@@ -851,20 +903,55 @@ const Viewer = () => {
           if (value) updateMetaTag(key, value);
         });
 
-        setProgressBar(70);
+        // Where the PDF comes from (#63). Streaming: the viewer range-loads a URL and paints the first
+        // page before the last byte. Otherwise the whole file is downloaded here first, as before.
+        const loading = viewerLoading();
+        let source: ViewerSource;
+        if (loading.streaming) {
+          const signedUrl = userAcquisition.stream_url || undefined;
+          source = signedUrl
+            ? // Signed and reusable (EvilFlowersCatalog#214): no Authorization header, so no preflight
+              // and no token expiring mid-book.
+              { url: signedUrl, rangeChunkSize: loading.rangeChunkSize, streaming: !loading.autoFetch }
+            : {
+                // A catalog without stream_url: Bearer header. Auto-fetch stays on whatever the setting,
+                // so the whole file is in before a long read outlives the token.
+                url: new URL(`/data/v1/user-acquisitions/${userAcquisition.id}`, config.ELVIRA_BASE_URL).toString(),
+                httpHeaders: auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined,
+                rangeChunkSize: loading.rangeChunkSize,
+                streaming: false,
+              };
+        } else {
+          const { data } = await getUserAcquisition(userAcquisition.id);
+          source = { data: (await data) as Uint8Array };
+        }
+        const sourceKind = source.url ? "url" : "data";
 
-        // Fetch the PDF data
-        const { data } = await getUserAcquisition(userAcquisition.id);
-        const pdf = await data;
-
-        setProgressBar(90);
+        // An expired signature (403) is renewed once per open: the acquisition hands out a fresh
+        // stream_url and the viewer reopens at the reader's page.
+        let renewed = false;
+        const renewStreamUrl = async (status?: number | null) => {
+          if (renewed || cancelled || status !== 403 || !isSigned(source.url) || !viewerApp?.viewer) return false;
+          renewed = true;
+          try {
+            const fresh = await getUserAcquisitionInfo(user_acquisition_id);
+            if (!fresh.stream_url || cancelled) return false;
+            const page = viewerApp.viewer.getState().page;
+            source = { ...source, url: fresh.stream_url };
+            viewerApp.viewer.open(source, { initialPage: page || undefined });
+            return true;
+          } catch {
+            return false;
+          }
+        };
 
         if (cancelled) return;
+        setLoaderStage("opening");
 
         // Render viewer with the provided options and configurations
         viewerApp = renderViewer({
           rootId: `#${rootId}`,
-          data: pdf,
+          ...source,
           options: {
             theme,
             lang,
@@ -941,18 +1028,48 @@ const Viewer = () => {
             },
           },
           // The reader's wait to the first page (#59, EvilFlowersViewer#150): from opening this screen
-          // (entry detail, licence and PDF download included) to the first painted page; `render_ms` is the
-          // viewer's own load and paint. Viewer develop+; older viewers ignore the keys, and the spread keeps
-          // the build passing against a viewer whose IViewerOptions lacks them.
+          // (entry detail, licence and, without streaming, the PDF download included) to the first painted
+          // page; `render_ms` is the viewer's own load and paint. `streaming` (#63) is the portal setting
+          // (url vs data), so the dashboards compare like with like. Viewer 0.7.9 lacks some keys; the spread
+          // keeps the build passing and older viewers ignore them.
           ...{
-            onFirstPageRendered: ({ durationMs }: { page: number; durationMs: number }) =>
+            onFirstPageRendered: ({ durationMs, bytesLoaded, totalBytes }: FirstPageInfo) => {
+              revealReader();
               measure(
                 "viewer",
-                { first_page_ms: Math.round(performance.now() - openedAt), render_ms: durationMs },
-                { kind: "pdf" },
-              ),
-            onDocumentError: ({ stage }: { stage: "download" | "parse" | "render" }) =>
-              trackOutcome(EVENTS.viewerError, { stage }),
+                {
+                  first_page_ms: Math.round(performance.now() - openedAt),
+                  render_ms: durationMs,
+                  ...(typeof bytesLoaded === "number" ? { bytes_loaded: bytesLoaded } : {}),
+                  ...(typeof totalBytes === "number" ? { total_bytes: totalBytes } : {}),
+                },
+                {
+                  kind: "pdf",
+                  streaming: String(loading.streaming),
+                  source: sourceKind,
+                  auto_fetch: String(source.streaming !== true),
+                },
+              );
+            },
+            onDocumentError: async ({ stage, reason, status }: DocumentErrorInfo) => {
+              if (await renewStreamUrl(status)) return;
+              // The viewer shows its own error and retry; the loader must not hide them.
+              revealReader();
+              trackOutcome(EVENTS.viewerError, {
+                stage,
+                reason: reason ?? "unknown",
+                status: status ? String(status) : "none",
+                source: sourceKind,
+              });
+            },
+            // A Range request failed after the open; the viewer shows its own Reconnect notice.
+            onStreamError: ({ status }: { status: number | null }) => {
+              void renewStreamUrl(status);
+            },
+            onPageChange: onReaderPageChange,
+            // pdf.js resources (wasm decoders for JPX/JBIG2 scans, CMaps, standard fonts, ICC profiles),
+            // copied from the installed pdfjs-dist at build time (vite.config.ts).
+            pdfAssetsUrl: `${import.meta.env.BASE_URL}pdfjs/`,
           },
           regionPackage: { getRegionsFunc, getAllRegionsFunc },
           pageBookmarkPackage: {
@@ -968,16 +1085,19 @@ const Viewer = () => {
             edit: entryDetail.config.evilflowers_annotations_create,
           },
         });
-      } catch (error) {
+        // A viewer before EvilFlowersViewer#153 (npm 0.7.9) reports no first paint: step aside now and let
+        // its own spinner show. Otherwise wait for the paint, with a safety net should it never come.
+        if (!viewerApp?.viewer) revealReader();
+        else revealTimer = setTimeout(revealReader, READER_LOADER_MAX_MS);
+      } catch {
         navigate(NAVIGATION_PATHS.home, { replace: true });
         toast.error(t("notifications.fileFailed"));
-      } finally {
-        setProgressBar(100);
       }
     })();
 
     return () => {
       cancelled = true;
+      clearTimeout(revealTimer);
       viewerApp?.unmount();
 
       // Remove the scoped styles
@@ -1006,33 +1126,21 @@ const Viewer = () => {
     };
   }, [id]);
 
-  // If everything loaded set to false
+  // The loader fades out (ReaderLoader's transition), then unmounts.
   useEffect(() => {
-    if (progressBar === 100) {
-      setTimeout(() => setLoading(false), 500);
-    }
-  }, [progressBar]);
+    if (loaderPhase !== "leaving") return;
+    const timer = setTimeout(() => setLoaderPhase("gone"), 300);
+    return () => clearTimeout(timer);
+  }, [loaderPhase]);
 
   return (
     <>
       {loading && (
-        <div
-          className={
-            "fixed top-0 bottom-0 left-0 right-0 bg-white dark:bg-darkGray bg-opacity-80 dark:bg-opacity-80 z-50 flex flex-col gap-10 justify-center items-center"
-          }
-        >
-          <img
-            className="w-52 md:w-96"
-            src={theme === THEME_TYPE.dark ? titleLogoLight : titleLogoDark}
-            alt="Elvira Logo"
-          />
-          <div className="w-[80%] max-w-96 h-4 bg-zinc-300 dark:bg-strongDarkGray rounded-md overflow-hidden">
-            <div
-              className={`h-full bg-primary duration-500 rounded-md`}
-              style={{ width: `${progressBar}%` }}
-            ></div>
-          </div>
-        </div>
+        <ReaderLoader
+          book={loaderBook}
+          stage={loaderStage}
+          leaving={loaderPhase === "leaving"}
+        />
       )}
       <div id={rootId}></div>
       {graphPanels && id && !loading && <ExplainedElsewhere entryId={id} page={readerPage} />}

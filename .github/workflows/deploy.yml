@@ -117,6 +117,12 @@ jobs:
           ELVIRA_FARO_API_KEY: ${{ secrets.ELVIRA_FARO_API_KEY }}
           ELVIRA_FARO_ENVIRONMENT: ${{ vars.ELVIRA_FARO_ENVIRONMENT }}
           ELVIRA_FARO_SAMPLE_RATE: ${{ vars.ELVIRA_FARO_SAMPLE_RATE }}
+          # Reader PDF streaming (elvira-portal#63): range-loads the signed stream_url. On for dev unless
+          # the environment variable says otherwise; empty = the code's default (off). Chunk size and
+          # auto-fetch are optional (empty = 262144 bytes, auto-fetch on).
+          ELVIRA_VIEWER_STREAMING: ${{ vars.ELVIRA_VIEWER_STREAMING || (github.ref_name == 'dev' && 'true' || '') }}
+          ELVIRA_VIEWER_RANGE_CHUNK_SIZE: ${{ vars.ELVIRA_VIEWER_RANGE_CHUNK_SIZE }}
+          ELVIRA_VIEWER_AUTO_FETCH: ${{ vars.ELVIRA_VIEWER_AUTO_FETCH }}
         run: |
           if [ "${{ github.ref_name }}" = "master" ]; then
             npm run build:stu

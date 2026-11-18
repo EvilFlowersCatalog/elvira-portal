@@ -130,6 +130,37 @@ Faro (`src/lib/telemetry.ts`) is on when the config has both of these:
   `https://dev.elvira.stuba.sk` is allowed.
 - A URL without a key leaves Faro off, with a console warning.
 
+## Reader: PDF streaming
+
+The reader (`src/pages/common/Viewer.tsx`) loads the PDF one of two ways (elvira-portal#63):
+
+| Key | Value |
+|---|---|
+| `ELVIRA_VIEWER_STREAMING` | `true`: the viewer range-loads the user acquisition and paints page 1 before the last byte. Empty or `false`: the portal downloads the whole file first (the old path). On for the dev and KU builds (`env/.env.development`, `env/.env.ku`, deploy.yml); the k8s instances set it in their `config.json` |
+| `ELVIRA_VIEWER_RANGE_CHUNK_SIZE` | optional, bytes per Range request (default `262144`, minimum `65536`) |
+| `ELVIRA_VIEWER_AUTO_FETCH` | optional, default `true`: after page 1 the rest is fetched in the background. `false` = range-only, for huge scans; search, print and download then fetch many ranges |
+
+- With streaming the viewer gets the catalog's signed `stream_url` (`?exp=&sig=`, EvilFlowersCatalog#214). It
+  needs no `Authorization` header, so there is no preflight. Once it expires (6 h) the catalog answers 403; the
+  reader fetches a fresh one and reopens at the same page.
+- A catalog without `stream_url` gets `/data/v1/user-acquisitions/<id>` with a Bearer header, and auto-fetch
+  stays on so a long read does not outlive the token.
+- Signed URLs get no `traceparent` (it would add a preflight); their requests are traced as spans of their own.
+  Faro strips the query (`sig=`) before sending. The gateway's access log still sees it: apply the Alloy
+  redaction (knowledge, cookbook §11c) before production.
+- Faro `type=viewer` carries `context_streaming` (the setting) and `context_source` (`url` / `data`), next to
+  `first_page_ms` and `render_ms`.
+- The build copies the pdf.js resource folders (`wasm/`, `cmaps/`, `standard_fonts/`, `iccs/`) of the installed
+  viewer's `pdfjs-dist` to `dist/pdfjs/` (served at `/pdfjs/` in dev), the viewer's `pdfAssetsUrl`. They give
+  scans (JPX/JBIG2) their Wasm decoders.
+- CSP for the host, when it sets one: `worker-src 'self' data: blob:`, the catalog origin in `connect-src`, no
+  `'unsafe-eval'` needed.
+- One loading screen (`ReaderLoader`: cover, title, status) covers the wait from the click to the first painted
+  page, the viewer's own spinner included. A viewer without `onFirstPageRendered` (npm 0.7.9) gets it only until
+  mount.
+
+![Reader: PDF streaming from a signed URL](docs/diagrams/sequence-reader-streaming.svg)
+
 ## Themes
 
 `ELVIRA_THEME` picks the brand palette and logos (light & dark): `stu` (the default, also when unset or

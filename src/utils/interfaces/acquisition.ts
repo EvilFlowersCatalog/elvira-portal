@@ -41,6 +41,13 @@ export interface IUserAcquisitionShare {
 export interface IUserAcquisitionResponse {
   id: string;
   url: string;
+  /**
+   * Owner only (EvilFlowersCatalog#214): a signed, reusable content URL (`?exp=&sig=`) that needs no
+   * Authorization header, for range loading. Valid until `stream_url_expires_at` (6 h by default);
+   * afterwards it answers 403 and a fresh one comes from GET /api/v1/user-acquisitions/<id>.
+   */
+  stream_url?: string | null;
+  stream_url_expires_at?: string | null;
 }
 
 export interface IUserAcquisitionData {

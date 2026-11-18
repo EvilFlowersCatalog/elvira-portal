@@ -75,6 +75,23 @@ input:focus:not(:focus-visible) {
   outline: none;
 }
 
+/* The reader's loading line while no byte count is known (ReaderLoader). */
+@keyframes reader-loader-slide {
+  from { left: -33%; }
+  to { left: 100%; }
+}
+.reader-loader-indeterminate {
+  animation: reader-loader-slide 1.4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reader-loader-indeterminate {
+    animation: none;
+    left: 0;
+    width: 100%;
+    opacity: 0.5;
+  }
+}
+
 /* Search terms marked by the catalog (`<mark>` in search highlights). */
 .search-highlight mark {
   background-color: color-mix(in srgb, var(--color-primary) 22%, transparent);

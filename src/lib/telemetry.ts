@@ -269,8 +269,12 @@ const initTelemetry = () => {
       new TracingInstrumentation({
         contextManager,
         instrumentationOptions: {
-          // traceparent ONLY to the catalog API. Never to third-party origins.
-          propagateTraceHeaderCorsUrls: apiOrigin ? [new RegExp(`^${escapeRegExp(apiOrigin)}/`)] : [],
+          // traceparent ONLY to the catalog API. Never to third-party origins. Nor to signed content URLs
+          // (`?sig=`, the reader's range requests, #63): they were made to need no preflight, and a custom
+          // header would add one; their chunks get spans of their own instead.
+          propagateTraceHeaderCorsUrls: apiOrigin
+            ? [new RegExp(`^${escapeRegExp(apiOrigin)}/(?![^?#]*\\?(?:[^#]*&)?sig=)`)]
+            : [],
           fetchInstrumentationOptions: { applyCustomAttributesOnSpan: (span) => noteRequestEnd(span) },
           xhrInstrumentationOptions: { applyCustomAttributesOnSpan: (span) => noteRequestEnd(span) },
         },

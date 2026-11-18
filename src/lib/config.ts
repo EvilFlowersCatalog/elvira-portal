@@ -25,6 +25,9 @@ export interface PortalConfig {
   ELVIRA_FARO_API_KEY: string;
   ELVIRA_FARO_ENVIRONMENT: string;
   ELVIRA_FARO_SAMPLE_RATE: string;
+  ELVIRA_VIEWER_STREAMING: string;
+  ELVIRA_VIEWER_RANGE_CHUNK_SIZE: string;
+  ELVIRA_VIEWER_AUTO_FETCH: string;
 }
 
 const env = import.meta.env;
@@ -43,6 +46,30 @@ const BUILD_DEFAULTS: PortalConfig = {
   ELVIRA_FARO_API_KEY: env.ELVIRA_FARO_API_KEY ?? '',
   ELVIRA_FARO_ENVIRONMENT: env.ELVIRA_FARO_ENVIRONMENT ?? '',
   ELVIRA_FARO_SAMPLE_RATE: env.ELVIRA_FARO_SAMPLE_RATE ?? '',
+  ELVIRA_VIEWER_STREAMING: env.ELVIRA_VIEWER_STREAMING ?? '',
+  ELVIRA_VIEWER_RANGE_CHUNK_SIZE: env.ELVIRA_VIEWER_RANGE_CHUNK_SIZE ?? '',
+  ELVIRA_VIEWER_AUTO_FETCH: env.ELVIRA_VIEWER_AUTO_FETCH ?? '',
+};
+
+const isOn = (value: string, fallback: boolean): boolean =>
+  value === '' ? fallback : /^(1|true|on|yes)$/i.test(value.trim());
+
+/**
+ * How the reader loads the PDF (elvira-portal#63), from ELVIRA_VIEWER_*:
+ * - `streaming`: hand the viewer a URL it range-loads (first page before the last byte) instead of
+ *   downloading the whole file first. Off by default; enable per instance.
+ * - `rangeChunkSize`: bytes per Range request (default 256 KiB).
+ * - `autoFetch`: after the first page, fetch the rest in the background (default on). Off means
+ *   range-only reading, best for huge scans; search, print and download then fetch many ranges.
+ * Read when the reader opens, after the runtime config has loaded.
+ */
+export const viewerLoading = () => {
+  const chunk = Number(config.ELVIRA_VIEWER_RANGE_CHUNK_SIZE);
+  return {
+    streaming: isOn(config.ELVIRA_VIEWER_STREAMING, false),
+    rangeChunkSize: Number.isInteger(chunk) && chunk >= 65536 ? chunk : 262144,
+    autoFetch: isOn(config.ELVIRA_VIEWER_AUTO_FETCH, true),
+  };
 };
 
 /** The effective configuration. Mutated once, by `loadRuntimeConfig`, before the app is imported. */

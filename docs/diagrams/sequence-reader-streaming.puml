@@ -1,0 +1,54 @@
+@startuml sequence-reader-streaming
+!include elvira.iuml
+' =============================================================================
+' What: how the reader opens a PDF with ELVIRA_VIEWER_STREAMING on: the catalog's signed stream_url is handed
+'       to the viewer, which range-loads it and paints page 1 before the last byte; an expired signature (403)
+'       is renewed once and the viewer reopens at the same page. One loading screen covers the whole wait.
+' Kind: UML sequence diagram. Scope: one reader open in the browser; the catalog's rendering of the
+'       personal copy is not shown.
+' Source: elvira-portal src/pages/common/Viewer.tsx, src/lib/config.ts, src/lib/telemetry.ts,
+'         src/components/viewer/ReaderLoader.tsx (2026-11-18); issue elvira-portal#63; catalog
+'         EvilFlowersCatalog#214; viewer EvilFlowersViewer#151/#153
+' =============================================================================
+
+title Reader: PDF streaming from a signed URL (2026-11-18)
+
+participant "Reader\n(browser)" as reader
+participant "Viewer.tsx" as portal <<focus>>
+participant "Evil-\nFlowers\nViewer" as viewer
+participant "Catalog API\n(evilflowers)" as api
+
+reader -> portal : open /viewer/<entry>/<i>
+portal -> reader : ReaderLoader (cover, title,\n"Preparing your copy…")
+portal -> api : GET /api/v1/catalogs/<catalog>/\nentries/<entry> (Bearer)
+api --> portal : entry detail
+portal -> api : POST /api/v1/user-acquisitions\n(Bearer)
+api --> portal : {id, url, stream_url, stream_url_expires_at}
+alt ELVIRA_VIEWER_STREAMING on, stream_url present
+  portal -[$accent_msg()]> viewer : <b>renderViewer({ url: stream_url,</b>\n<b>rangeChunkSize, streaming: !autoFetch })</b>
+  viewer -> api : GET stream_url (no Authorization,\nno traceparent, no preflight)
+  api --> viewer : 200 headers: Accept-Ranges,\nContent-Length
+  loop ranges the open page needs, then the rest (auto-fetch)
+    viewer -> api : GET stream_url\nRange: bytes=a-b (256 KiB)
+    api --> viewer : 206 Content-Range
+  end
+else streaming on, no stream_url
+  portal -> viewer : renderViewer({ url: /data/v1/…/<id>,\nhttpHeaders: Bearer, auto-fetch on })
+else streaming off
+  portal -> api : GET /data/v1/user-acquisitions/<id>\n(Bearer, whole file)
+  api --> portal : PDF bytes
+  portal -> viewer : renderViewer({ data })
+end
+viewer -> portal : onFirstPageRendered(durationMs, source)
+portal -> reader : loader fades out
+portal -> portal : Faro type=viewer: first_page_ms,\nrender_ms, context_streaming, context_source
+opt signature expired (403) on open or on a later range
+  viewer -> portal : onDocumentError / onStreamError\n(status 403)
+  portal -> api : GET /api/v1/user-acquisitions/<id>\n(Bearer)
+  api --> portal : fresh stream_url
+  portal -> viewer : viewer.open({ url: fresh },\n{ initialPage: current page })
+end
+
+caption Once per open; the renewal runs at most once. Faro strips the query (sig=) from every URL it sends.
+footer ELVIRA · FIIT STU · elvira-portal · docs/diagrams/sequence-reader-streaming.puml
+@enduml

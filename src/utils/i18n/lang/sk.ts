@@ -7,6 +7,11 @@ export const sk = {
       reload: 'Obnoviť',
       reference: 'Ak sa to opakuje, pošlite nám tento kód:',
     },
+    readerLoading: {
+      label: 'Otvára sa publikácia',
+      preparing: 'Pripravujeme vašu kópiu…',
+      opening: 'Otvára sa prvá strana…',
+    },
     common: {
       showMore: '{{count}} ďalších',
       showLess: 'Zobraziť menej',
