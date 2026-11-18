@@ -13,6 +13,7 @@ import {
 import Drawer from '../Drawer';
 import { ITitleStatistics } from '../../../utils/interfaces/statistics';
 import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
+import { entryPath } from '@/lib/links/paths';
 import { Swatch } from '../../graph/LibraryMap';
 import {
   dateLocale,
@@ -228,10 +229,7 @@ export default function TitleInspector({
               type='button'
               className={shortcut}
               onClick={() =>
-                go(
-                  'public',
-                  `${NAVIGATION_PATHS.library}?entry-detail-id=${entryId}`
-                )
+                entryId && go('public', entryPath(entryId))
               }
             >
               <FiExternalLink size={15} /> {t(`${k}.public`)}

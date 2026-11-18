@@ -13,6 +13,7 @@ import SearchBar from './SearchBar';
 import FilterChips, { FilterChipItem } from './FilterChips';
 import SortSelect, { RELEVANCE } from './SortSelect';
 import { localize } from '../../utils/func/localized';
+import { paramKind } from '@/lib/links/params';
 
 // Comma-separated params rendered as one chip per value (removable individually).
 const MULTI_VALUE_PARAMS = ['categories', 'feeds', 'languageCode', 'availability'];
@@ -84,11 +85,10 @@ const ToolsContainer = ({
 
   const getActiveFilters = (): FilterChipItem[] => {
     const filters: FilterChipItem[] = [];
-    // `results` picks the results tab (publications | figures), it does not narrow anything.
-    const excluded = ['order-by', 'dialog-priority', 'assistant-entry-id', 'feed-id-step', 'parent-id', 'search-all', 'from', 'results', AUTHOR_ID_PARAM];
-
+    // Only filters get a chip: presentation (sort, results tab, drill-down) and dialogs don't narrow anything.
     searchParams.forEach((value, key) => {
-      if (excluded.includes(key) || !value.trim()) return;
+      const kind = paramKind(key);
+      if (kind === 'view' || kind === 'dialog' || key === AUTHOR_ID_PARAM || !value.trim()) return;
 
       if (key === 'categories') {
         value.split(',').forEach((categoryId) => {

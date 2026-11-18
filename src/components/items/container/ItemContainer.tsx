@@ -6,11 +6,10 @@ import PageMessage from '../../page/PageMessage';
 import { useTranslation } from 'react-i18next';
 import useAppContext from '../../../hooks/contexts/useAppContext';
 import ToolsContainer from '../../tools/ToolsContainer';
-import EntryDetail from '../entry/details/EntryDetail';
 import { H1 } from '../../primitives/Heading';
 import { AdvancedSearchWrapper } from './AdvancedSearch';
 import OpenFiltersButton from '../../buttons/OpenFiltersButton';
-import LicenseCalendar from '../entry/details/LicenseCalendar';
+import { hasListFilters } from '@/lib/links/params';
 import { IItemContainerList } from '../../../hooks/api/useInfiniteItemContainer';
 import { EntryFilters } from '../../../hooks/api/entries/entryFilters';
 import SearchNotice from './SearchNotice';
@@ -20,6 +19,7 @@ interface IItemContainer {
   list: IItemContainerList;
   showLayout?: boolean;
   isEntries?: boolean;
+  /** @deprecated The one publication dialog (App) refreshes the shelf itself; kept for existing callers. */
   triggerReload?: (() => void) | null;
   searchSpecifier: string;
   title?: string;
@@ -39,13 +39,9 @@ interface IItemContainer {
   panel?: ReactNode;
 }
 
-// Params that open dialogs rather than narrow the list.
-const NON_FILTER_PARAMS = /^(entry-detail-id|entry-catalog-id|licensing-|dialog-priority|assistant-|results$)/;
-
 const ItemContainer = ({
   children,
   list,
-  triggerReload = null,
   showLayout = false,
   isEntries = true,
   searchSpecifier,
@@ -74,7 +70,7 @@ const ItemContainer = ({
 
   // Background refetch (new filter/search while previous results stay visible).
   const isRefreshing = list.isFetching && !list.isLoading;
-  const hasFilters = [...searchParams.keys()].some((k) => !NON_FILTER_PARAMS.test(k));
+  const hasFilters = hasListFilters(searchParams);
   const resultsHeading =
     searchParams.get('author') && !searchParams.get('query') ? searchParams.get('author') :
     searchParams.get('query') ? t('page.resultsQuery') : '';
@@ -147,8 +143,6 @@ const ItemContainer = ({
               </>
             )}
             <OpenFiltersButton />
-            <EntryDetail triggerReload={triggerReload} />
-            <LicenseCalendar />
           </>
         </AdvancedSearchWrapper>
       </div>

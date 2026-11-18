@@ -3,6 +3,7 @@ import { isAxiosError } from 'axios';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { useEffect, useState } from 'react';
 import useRefreshToken from '../../hooks/api/verify/useRefreshToken';
+import { isTokenFresh } from '../../lib/session';
 
 /** Delays between retries of a refresh that failed for a transient reason. */
 const RETRY_DELAYS_MS = [1000, 3000];
@@ -23,7 +24,10 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const AuthGuard = () => {
   const { auth, updateAuth, logout } = useAuthContext();
-  const [verified, setVerified] = useState<boolean>(false);
+  // A stored access token that is still valid lets the page render at once: the refresh below then runs
+  // in the background instead of holding every page load (a refresh, a shared link) behind a blank screen
+  // for one round-trip. An expired or unreadable token still waits for the refresh.
+  const [verified, setVerified] = useState<boolean>(() => isTokenFresh(auth?.token));
 
   const refreshToken = useRefreshToken();
 

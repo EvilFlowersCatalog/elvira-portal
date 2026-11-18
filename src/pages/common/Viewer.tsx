@@ -3,7 +3,6 @@ import { EVENTS, measure, track, trackOutcome } from '@/lib/analytics';
 import {
   useLocation,
   useNavigate,
-  useParams,
   useSearchParams,
 } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -12,7 +11,15 @@ import { IUserAcquisitionShare } from "../../utils/interfaces/acquisition";
 import useCreateUserAcquisition from "../../hooks/api/acquisitiions/user-acquistions/useCreateUserAcquisition";
 import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
 import useGetEntryDetail from "../../hooks/api/entries/useGetEntryDetail";
-import EntryDetail from "../../components/items/entry/details/EntryDetail";
+import useEntryDialog from "../../hooks/useEntryDialog";
+import { absoluteUrl, entryPath, readerPath, type ReaderPanel } from "@/lib/links/paths";
+import { takeReaderSession } from "../../routes/readerSession";
+import { notReadableHere, resolveReaderFile, type IReaderRouteData } from "../../routes/loaders";
+import { cachedReaderBook } from "../../components/viewer/readerBook";
+import { httpStatus } from "../../hooks/api/entries/entryQueries";
+import { withRememberedSearch } from "../../utils/func/listSearch";
+import useReaderUrlSync from "../../hooks/useReaderUrlSync";
+import type { ILocator } from "../../utils/interfaces/locator";
 import useGetUserAcquisition from "../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisition";
 import useGetUserAcquisitionInfo from "../../hooks/api/acquisitiions/user-acquistions/useGetUserAcquisitionInfo";
 import useGetRegions from "../../hooks/api/acquisitiions/user-acquistions/useGetRegions";
@@ -34,7 +41,6 @@ import type {
 } from "@evilflowers/evilflowersviewer";
 import useAppContext from "../../hooks/contexts/useAppContext";
 import { toast } from "react-toastify";
-import { updateMetaTag, withAccessToken } from "../../utils/func/functions";
 import useAuthContext from "../../hooks/contexts/useAuthContext";
 import { FALLBACK_SRC } from "../../components/items/entry/Thumbnail";
 import useGetAnotations from "../../hooks/api/anotations/useGetAnotations";
@@ -156,13 +162,26 @@ type ViewerSource = {
   streaming?: boolean;
 };
 
+/**
+ * The viewer's host controller (EvilFlowersViewer#153/#154, docs/host-integration.md), declared here with
+ * the parts the portal uses so the build passes against viewers that lack some of them; each is optional.
+ */
+// Method syntax on purpose: its parameters are checked bivariantly, so the viewer's narrower types
+// (`VIEWER_PANEL`, its typed event map) still satisfy this host-side view of the controller.
+export type ViewerController = {
+  open(source: ViewerSource, at?: { initialPage?: number | null }): void;
+  getState(): { page: number; search?: { query?: string | null } | null };
+  goToPage?(page: number): void;
+  goToLabel?(label: string): Promise<number | null> | number | null;
+  openPanel?(panel: ReaderPanel | null): void;
+  search?(query: string, options?: { openPanel?: boolean }): unknown;
+  on?<T = unknown>(event: string, listener: (payload: T) => void): () => void;
+};
+
 /** What `renderViewer` returns; `viewer` (the host controller) exists from EvilFlowersViewer#153 on. */
 type ViewerApp = {
   unmount: () => void;
-  viewer?: {
-    open: (source: ViewerSource, at?: { initialPage?: number | null }) => void;
-    getState: () => { page: number };
-  };
+  viewer?: ViewerController;
 };
 
 type DocumentErrorInfo = {
@@ -186,30 +205,39 @@ const READER_LOADER_MAX_MS = 45_000;
 /** A signed content URL (`?exp=&sig=`, EvilFlowersCatalog#214): 403 once it has expired. */
 const isSigned = (url?: string) => !!url && /[?&]sig=/.test(url);
 
-const Viewer = () => {
+/** React Router's index of the current history entry (0 = the first page of this tab). */
+const historyIndex = () => (window.history.state as { idx?: number } | null)?.idx ?? 0;
+
+/**
+ * The reader (`/entries/:entryId/read`), mounted by routes/ReaderShell with the route loader's answer: one
+ * per publication file.
+ */
+const Viewer = ({ route }: { route: IReaderRouteData }) => {
   const { lang, theme, aiChatId, clearAiChat } = useAppContext();
   const { auth } = useAuthContext();
-  const { "entry-id": id, index } = useParams();
+  const id = route.entryId;
   const { t } = useTranslation();
   const location = useLocation();
+  const queryClientForCover = useQueryClient();
   // One loading screen from the click to the first painted page (ReaderLoader); it also covers the
-  // viewer's own spinner. `leaving` fades it out, `gone` unmounts it.
-  const [loaderBook, setLoaderBook] = useState<IReaderLoaderBook | null>(null);
+  // viewer's own spinner. `leaving` fades it out, `gone` unmounts it. The cover shows at once: the
+  // route loader has put the publication in the cache.
+  const [loaderBook, setLoaderBook] = useState<IReaderLoaderBook | null>(() => cachedReaderBook(queryClientForCover, id));
   const [loaderStage, setLoaderStage] = useState<"preparing" | "opening">("preparing");
   const [loaderPhase, setLoaderPhase] = useState<"shown" | "leaving" | "gone">("shown");
   const loading = loaderPhase !== "gone";
   const revealReader = () => setLoaderPhase((phase) => (phase === "shown" ? "leaving" : phase));
-  // Where the reader was opened from. Kept from mount: opening a dialog here
-  // rewrites the URL and drops the navigation state.
-  const [origin] = useState(
-    location.state as ({ from?: string } & IViewerLocationState) | null
-  );
-  const [entryCatalogId, setEntryCatalogId] = useState<string | null>(
-    origin?.catalogId || null
-  );
+  // A chat citation without a locator may bring the sentence boxes as navigation state: an enrichment only.
+  // Everything else is in the URL, so a refresh or a copied link opens the same place.
+  const [origin] = useState(location.state as IViewerLocationState | null);
+  const [entryCatalogId, setEntryCatalogId] = useState<string | null>(route.catalogId);
+  // The history entry the reader was opened on: leaving goes back past the reader's own page jumps.
+  const [enteredAt] = useState(historyIndex);
 
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
+  const entryDialog = useEntryDialog();
+  const attachUrlSync = useReaderUrlSync();
   const addToShelf = useAddToShelf();
   const removeFromShelf = useRemoveFromShelf();
   const createUserAcquisition = useCreateUserAcquisition();
@@ -264,28 +292,29 @@ const Viewer = () => {
       return "";
     }
   };
-  // Home function for viewer to navigate back to where the reader was opened from, or home if unknown
-  const homeFunction = () => {
-    navigate(origin?.fromPath || NAVIGATION_PATHS.home);
+  /**
+   * Leave the reader for the page it was opened from, exactly as it was (list, filters, an open dialog),
+   * by stepping back past the reader's own entries (page jumps). Opened from outside the portal (a shared
+   * link, a new tab), there is nothing to go back to: `fallback` instead.
+   */
+  const leaveReader = (fallback: string) => {
+    if (enteredAt > 0) navigate(-(historyIndex() - enteredAt + 1));
+    else navigate(fallback, { replace: true });
   };
-  const closeFunction = () => {
-    const base = origin?.from === "shelf" ? NAVIGATION_PATHS.shelf : NAVIGATION_PATHS.library;
-    // Reopen the detail on top of the search/filters the reader was opened from.
-    const [fromPathname, fromSearch = ''] = origin?.fromPath?.split('?') ?? [];
-    const params = new URLSearchParams(fromPathname === base ? fromSearch : '');
-    if (id) params.set('entry-detail-id', id);
-    if (entryCatalogId) params.set('entry-catalog-id', entryCatalogId);
+  // Home (the viewer's top-left): back where the reader came from, else the library as it was left.
+  const homeFunction = () => leaveReader(withRememberedSearch(NAVIGATION_PATHS.library));
+  // Close: back where the reader came from, else the publication's page.
+  const closeFunction = () => leaveReader(entryPath(id, { catalogId: entryCatalogId }));
 
-    navigate(`${base}?${params.toString()}`);
-  };
+  // A recommended publication opens in the one publication dialog, over the reader.
+  const openEntryDetailFunction = (entry: ISuggestedEntry) => entryDialog.open(entry.id, { catalogId: entry.catalog_id });
 
-  // Mirrors EntryItem.tsx's openEntryDetail — same modal, same query params.
-  const openEntryDetailFunction = (entry: ISuggestedEntry) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("entry-detail-id", entry.id);
-    params.set("entry-catalog-id", entry.catalog_id);
-    setSearchParams(params);
-  };
+  /**
+   * "Copy link" in the viewer (EvilFlowersViewer#155): an address, not a share. It grants nothing and opens
+   * the same page for anyone who can already read the publication; giving access is Share (`shareFunction`).
+   */
+  const linkFunction = async (target: { page: number }) =>
+    absoluteUrl(readerPath(id, { file: route.file, page: target.page, catalogId: entryCatalogId }));
 
   const bookmarkToggleFunction = async (entry: ISuggestedEntry) => {
     try {
@@ -857,15 +886,36 @@ const Viewer = () => {
     document.head.appendChild(styleElement);
 
     let viewerApp: ViewerApp | undefined;
+    let detachUrlSync: () => void = () => {};
     let revealTimer: ReturnType<typeof setTimeout> | undefined;
     let cancelled = false;
     // Start of the reader's wait for the first page (the `viewer` measurement).
     const openedAt = performance.now();
 
+    // The address the reader was opened with (later changes are the reader's own, see useReaderUrlSync).
+    const opened = {
+      page: Number(searchParams.get("page")) || undefined,
+      loc: searchParams.get("loc"),
+      r: searchParams.get("r"),
+      q: searchParams.get("q"),
+      panel: searchParams.get("panel"),
+      label: searchParams.get("label"),
+    };
+
     (async () => {
       try {
-        // Fetch entry details and process acquisition
-        const entryDetail = await getEntryDetail(id!, entryCatalogId || undefined);
+        // The publication is in the cache (the route loader resolved the file from it); the personal copy
+        // and the locator were started by the loader in parallel with this chunk (routes/readerSession).
+        // With an expired token the loader left all of it to here, after the auth guard's refresh.
+        const entryDetail = await getEntryDetail(id, entryCatalogId || undefined);
+        const resolved = route.resolved ?? resolveReaderFile(entryDetail, route.file);
+        if (!resolved) {
+          if (cancelled) return;
+          notReadableHere();
+          navigate(entryPath(id, { catalogId: entryDetail.catalog_id }), { replace: true });
+          return;
+        }
+        const session = takeReaderSession(id, resolved.acquisitionId, opened.loc);
         if (!cancelled) {
           setLoaderBook({
             title: entryDetail.title,
@@ -873,35 +923,33 @@ const Viewer = () => {
             thumbnail: entryDetail.thumbnail,
           });
         }
-        // Cache catalog_id from entry for subsequent operations
         if (entryDetail.catalog_id && !entryCatalogId) {
           setEntryCatalogId(entryDetail.catalog_id);
         }
-        const userAcquisition = await createUserAcquisition({
-          acquisition_id: entryDetail.acquisitions[parseInt(index || "0")].id,
-          type: "personal",
-        });
 
-        acquisition_id = entryDetail.acquisitions[parseInt(index || "0")].id;
+        // A passage link (`loc`, the durable citation of #46): re-resolved against the current extraction on
+        // every open, so a refresh or a shared link highlights the same sentence even after reprocessing.
+        let locator: ILocator | null = null;
+        if (session.locator) {
+          try {
+            locator = await session.locator;
+          } catch (error) {
+            if (httpStatus(error) === 403) {
+              // Not readable for this reader (IP range, content policy): the publication, where the reason is.
+              if (!cancelled) navigate(entryPath(id, { catalogId: entryCatalogId }), { replace: true });
+              return;
+            }
+            toast.error(t("cite.failed"));
+          }
+          if (locator?.resolution === "relocated") toast.info(t("cite.relocated"));
+          else if (locator?.resolution === "page_only") toast.info(t("cite.pageOnly"));
+        }
+
+        const userAcquisition = await session.copy;
+        if (cancelled) return;
+
+        acquisition_id = resolved.acquisitionId;
         user_acquisition_id = userAcquisition.id;
-
-        // Update metatags if properties exist
-        const metaTagUpdates = {
-          citation_year: entryDetail.published_at,
-          citation_publisher: entryDetail.publisher,
-          citation_doi: entryDetail.identifiers.doi,
-          citation_isbn: entryDetail.identifiers.isbn,
-          citation_authors: entryDetail.authors
-            .map((author) => `${author.name}, ${author.surname}`)
-            .join("; "),
-          citation_title: entryDetail.title,
-          citation_first_page: "1",
-          citation_pdf_url: withAccessToken(userAcquisition.url, auth?.token),
-        };
-
-        Object.entries(metaTagUpdates).forEach(([key, value]) => {
-          if (value) updateMetaTag(key, value);
-        });
 
         // Where the PDF comes from (#63). Streaming: the viewer range-loads a URL and paints the first
         // page before the last byte. Otherwise the whole file is downloaded here first, as before.
@@ -948,8 +996,10 @@ const Viewer = () => {
         if (cancelled) return;
         setLoaderStage("opening");
 
-        // Render viewer with the provided options and configurations
-        viewerApp = renderViewer({
+        // Render viewer with the provided options and configurations. The result is read through the
+        // host's own view of the controller (ViewerController): the parts used here, each optional, so the
+        // portal builds against the npm release and the develop viewer alike.
+        const rendered = renderViewer({
           rootId: `#${rootId}`,
           ...source,
           options: {
@@ -959,6 +1009,8 @@ const Viewer = () => {
             closeFunction,
             homeFunction,
             shareFunction,
+            // EvilFlowersViewer#155; a viewer without it ignores the key.
+            ...{ linkFunction },
             openEntryDetailFunction,
             bookmarkToggleFunction,
             suggestionsFunction,
@@ -981,24 +1033,31 @@ const Viewer = () => {
                   },
                 }
               : {}),
-            // Opens at the page a chat citation pointed to.
-            initialPage: Number(searchParams.get("page")) || undefined,
-            // ...and at the cited paragraph or figure (IP-030 Phase 1): outline `bbox`, flash `quads`, then fade.
-            // No released viewer takes it yet (it has `initialPage` only); spread so the build passes, and a
-            // viewer without the key ignores it.
-            // A copied or reloaded link has no navigation state, only `r` (a region the viewer outlines by itself).
-            ...(origin?.target || searchParams.get("r")
+            // Opens where the address says: a passage's page (`loc`), else `page`.
+            initialPage: locator?.page || opened.page,
+            // ...at the cited passage or figure (IP-030): outline `bbox`, flash `quads`, then fade. From the
+            // locator when the link has one (survives refresh and re-extraction), else from a chat citation's
+            // navigation state, else a region id (`r`) the viewer outlines by itself.
+            ...(locator && locator.resolution !== "page_only" && (locator.bbox || locator.quads?.length)
               ? {
                   initialFocus: {
-                    page: Number(searchParams.get("page")) || undefined,
-                    paragraphId: origin?.target?.paragraphId,
-                    regionId: origin?.target?.regionId ?? searchParams.get("r") ?? undefined,
-                    bbox: origin?.target?.bbox,
-                    quads: origin?.target?.quads,
-                    quadsPage: origin?.target?.quadsPage,
+                    page: locator.page,
+                    bbox: locator.bbox ?? undefined,
+                    quads: locator.quads ?? undefined,
                   },
                 }
-              : {}),
+              : origin?.target || opened.r
+                ? {
+                    initialFocus: {
+                      page: opened.page,
+                      paragraphId: origin?.target?.paragraphId,
+                      regionId: origin?.target?.regionId ?? opened.r ?? undefined,
+                      bbox: origin?.target?.bbox,
+                      quads: origin?.target?.quads,
+                      quadsPage: origin?.target?.quadsPage,
+                    },
+                  }
+                : {}),
             editPackage: {
               saveLayerFunc,
               saveGroupFunc,
@@ -1085,19 +1144,36 @@ const Viewer = () => {
             edit: entryDetail.config.evilflowers_annotations_create,
           },
         });
+        viewerApp = rendered as unknown as ViewerApp;
         // A viewer before EvilFlowersViewer#153 (npm 0.7.9) reports no first paint: step aside now and let
         // its own spinner show. Otherwise wait for the paint, with a safety net should it never come.
         if (!viewerApp?.viewer) revealReader();
-        else revealTimer = setTimeout(revealReader, READER_LOADER_MAX_MS);
-      } catch {
-        navigate(NAVIGATION_PATHS.home, { replace: true });
-        toast.error(t("notifications.fileFailed"));
+        else {
+          revealTimer = setTimeout(revealReader, READER_LOADER_MAX_MS);
+          // The address follows the reader (page, search, Navigator section) and Back / Forward move it.
+          const openedPage = locator?.page || opened.page || null;
+          detachUrlSync = attachUrlSync(viewerApp.viewer, {
+            page: openedPage,
+            // The passage (`loc`) or paragraph / region (`p`, `r`) the address points at, on this page.
+            focusPage: opened.loc || searchParams.get("p") || opened.r ? openedPage : null,
+            q: opened.q,
+            panel: opened.panel,
+            label: opened.label,
+          });
+        }
+      } catch (error) {
+        if (cancelled) return;
+        // No personal copy (no access from here, a policy, a failure): the publication's page says why and
+        // offers what is possible (borrow, other files), instead of dropping the reader on the home page.
+        toast.error(t(httpStatus(error) === 403 ? "links.forbidden" : "links.openFailed"));
+        navigate(entryPath(id, { catalogId: entryCatalogId }), { replace: true });
       }
     })();
 
     return () => {
       cancelled = true;
       clearTimeout(revealTimer);
+      detachUrlSync();
       viewerApp?.unmount();
 
       // Remove the scoped styles
@@ -1105,24 +1181,6 @@ const Viewer = () => {
       if (styleElement) {
         styleElement.remove();
       }
-
-      const metaTags = [
-        "citation_title",
-        "citation_year",
-        "citation_journal_title",
-        "citation_first_page",
-        "citation_last_page",
-        "citation_publisher",
-        "citation_doi",
-        "citation_isbn",
-        "citation_abstract",
-        "citation_authors",
-        "citation_pdf_url",
-      ];
-
-      metaTags.forEach((name) => {
-        updateMetaTag(name, "");
-      });
     };
   }, [id]);
 
@@ -1144,10 +1202,7 @@ const Viewer = () => {
       )}
       <div id={rootId}></div>
       {graphPanels && id && !loading && <ExplainedElsewhere entryId={id} page={readerPage} />}
-      {/* ItemContainer (which normally hosts this) isn't rendered on this
-          route, so entry-detail-id/entry-catalog-id search params set from
-          the viewer's suggestion cards had nowhere to be picked up. */}
-      <EntryDetail triggerReload={null} />
+      {/* The publication dialog (recommendation cards) is App's one EntryDialogHost. */}
     </>
   );
 };

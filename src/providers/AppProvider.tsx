@@ -384,26 +384,13 @@ const AppProvider = ({ children }: IContextProviderParams) => {
       setIsSmallDevice(newWidth < 959);
     };
 
-    // handle esc
-    const handleESC = (e?: KeyboardEvent) => {
-      // Only act when an entry detail is actually open. Otherwise this rewrote
-      // the URL on every Esc press (e.g. closing an admin drawer) and, since
-      // AppProvider sits above the routes, sent the user back to the homepage.
-      if (e?.code?.toLocaleLowerCase() === "escape" && searchParams.has("entry-detail-id")) {
-        searchParams.delete("entry-detail-id");
-        setSearchParams(searchParams);
-      }
-    };
-
-    // Attach the event listener when the component mounts
+    // Escape on the publication dialog is the dialog's own (DetailModal → useEscapeLayer → useEntryDialog's
+    // history-aware close); a second, global handler here used to strip the param and push a history entry.
     window.addEventListener("resize", handleResize);
-    window.addEventListener("keydown", handleESC);
-    // Clean up the event listener when the component unmounts
     return () => {
       window.removeEventListener("resize", handleResize);
-      window.removeEventListener("keydown", handleESC);
     };
-  }, [searchParams]);
+  }, []);
 
   // track searchParam for umami
   useEffect(() => {

@@ -1,0 +1,48 @@
+@startuml sequence-portal-link-resolution
+!include elvira.iuml
+' =============================================================================
+' What: a portal link is an address, never a grant. Whoever opens it (the sender, a colleague, an agent's
+'       reader) passes login and the catalog's own access checks; the link only decides WHAT is shown, the
+'       catalog decides WHETHER: 200 shows it, 403 falls back to the publication (borrow), 404 to not-found.
+' Kind: UML sequence diagram. Scope: one shared link opened in a fresh tab; the in-app dialog over a list
+'       is the same resolution without the login step.
+' Source: elvira-portal src/routes/BaseRoutes.tsx, src/pages/common/Cite.tsx, src/pages/common/Viewer.tsx,
+'         src/providers/AuthProvider.tsx, src/routes/loaders.ts, docs/citation-links.md (2026-11-18); docs/semantic-urls.md;
+'         viewer EvilFlowersViewer#154 (docs/host-integration.md)
+' =============================================================================
+
+title Opening a shared portal link (2026-11-18)
+
+participant "Recipient\n(browser)" as reader
+participant "Link layer\n(src/lib/links)" as links <<focus>>
+participant "Portal page\n(entry / reader)" as page
+participant "Evil-\nFlowers\nViewer" as viewer
+participant "Catalog API\n(evilflowers)" as api
+
+reader -> links : open /entries/<id>/read?page=31&loc=<key>
+links -> links : parse + canonicalise\n(legacy names, /viewer/:id/:index)
+alt not signed in
+  links -> reader : /login?next=<same path>\n(next: same-origin path only)
+  reader -> links : signed in: back to next
+end
+links -> page : typed route state\n{ entry, file?, page, loc?, q?, panel? }
+page -> api : GET entry detail (Bearer)
+alt 200, readable PDF
+  opt loc present
+    page -> api : GET /api/v1/locators/<id>/<loc>
+    api --> page : page, bbox, quads, resolution
+  end
+  page -[$accent_msg()]> viewer : <b>renderViewer({ initialPage, initialFocus })</b>
+  viewer -> page : on('page-change', cause)
+  page -> links : replace ?page= (push only for\nlink · outline · search · citation · host)
+else 200, Readium LCP or no readable file
+  page -> reader : entry page: borrow / reserve
+else 403 (IP range, policy, tier)
+  page -> reader : entry page, with why and how to unlock
+else 404 (unknown, or hidden from this reader)
+  page -> reader : not found (existence not revealed)
+end
+
+caption The URL never carries a token, a signed URL or content; a capability share stays the viewer's Share (expiring, page-ranged).
+footer ELVIRA · FIIT STU · elvira-portal · docs/diagrams/sequence-portal-link-resolution.puml
+@enduml

@@ -13,6 +13,7 @@ export enum NAVIGATION_PATHS {
   history = '/history',
   explore = '/explore',
   licenses = '/licenses',
+  /** Old reader address, redirected to `/entries/:id/read` (routes/loaders.ts). Build reader links with lib/links. */
   viewer = '/viewer/',
   cite = '/cite/',
   aiAssistant = '/ai-assistant',

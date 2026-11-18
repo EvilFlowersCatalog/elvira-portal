@@ -3429,6 +3429,20 @@ export const en = {
       failed: 'The citation could not be opened.',
     },
 
+    // LINKS: the publication page and shareable addresses (docs/semantic-urls.md)
+    links: {
+      openPage: 'Open as page',
+      copyLink: 'Copy link',
+      copied: 'Link copied.',
+      backToLibrary: 'Back to the library',
+      back: 'Back',
+      notFound: 'This publication does not exist, or it is not available to you.',
+      forbidden: 'This publication is not available to you from here.',
+      loadFailed: 'The publication could not be loaded.',
+      notReadable: 'This publication is not read in the portal reader; borrow it or open one of its files from here.',
+      openFailed: 'The publication could not be opened in the reader.',
+    },
+
     // EXPLORE (library graph, elvira-portal#41)
     explore: {
       title: 'Explore',

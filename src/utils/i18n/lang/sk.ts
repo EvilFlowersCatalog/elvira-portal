@@ -3601,6 +3601,20 @@ export const sk = {
       failed: 'Citáciu sa nepodarilo otvoriť.',
     },
 
+    // ODKAZY: stránka publikácie a zdieľateľné adresy (docs/semantic-urls.md)
+    links: {
+      openPage: 'Otvoriť ako stránku',
+      copyLink: 'Kopírovať odkaz',
+      copied: 'Odkaz bol skopírovaný.',
+      backToLibrary: 'Späť do knižnice',
+      back: 'Späť',
+      notFound: 'Táto publikácia neexistuje alebo vám nie je dostupná.',
+      forbidden: 'Táto publikácia vám odtiaľto nie je dostupná.',
+      loadFailed: 'Publikáciu sa nepodarilo načítať.',
+      notReadable: 'Táto publikácia sa nečíta v čítačke portálu; vypožičajte si ju alebo otvorte niektorý z jej súborov tu.',
+      openFailed: 'Publikáciu sa nepodarilo otvoriť v čítačke.',
+    },
+
     // EXPLORE (library graph, elvira-portal#41)
     explore: {
       title: 'Preskúmať',

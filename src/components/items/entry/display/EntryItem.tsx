@@ -12,6 +12,7 @@ import Thumbnail, { FALLBACK_SRC } from "../Thumbnail";
 import { localize } from '../../../../utils/func/localized';
 import { setAuthorParams } from "../../../../hooks/api/entries/entryFilters";
 import Highlight from "../Highlight";
+import EntryLink from "../EntryLink";
 
 /** `search.matched` values shown as "matched in" badges. A title match is already
  * visible as the highlighted title, so it gets no badge; unknown values are ignored. */
@@ -79,21 +80,6 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
         }
     };
 
-    /* TODO: trigger search */
-
-    const openEntryDetail = () => {
-        const params = new URLSearchParams(searchParams);
-
-        if (type == 'ai-recommendation') {
-            params.set('dialog-priority', 'entry-detail')
-        }
-
-        params.set('entry-detail-id', entry.id);
-        params.set('entry-catalog-id', entry.catalog_id);
-
-        setSearchParams(params);
-    };
-
     const applyFilter = (apply: (params: URLSearchParams) => void) => {
         if (location.pathname === NAVIGATION_PATHS.library) {
             apply(searchParams);
@@ -141,18 +127,12 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
         <div data-guide={type === 'ai-recommendation' ? undefined : 'entry-card'} className="group rounded-[8px] relative w-full bg-white dark:bg-strongDarkGray shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.25)] dark:hover:shadow-strongDarkGray transition-shadow duration-300 flex flex-col gap-[7px] pb-[10px]">
             {/* Book cover */}
             <div className="h-[163px] relative shrink-0 w-full overflow-hidden rounded-t-[8px] bg-lightGray dark:bg-darkGray">
-                <div
-                    onClick={openEntryDetail}
-                    role="button"
-                    tabIndex={0}
+                <EntryLink
+                    entryId={entry.id}
+                    catalogId={entry.catalog_id}
+                    onTop={type === 'ai-recommendation'}
                     aria-label={`${t('entry.detail.openDetail', { defaultValue: 'Open detail' })}: ${entry.title}`}
-                    onKeyDown={(e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            openEntryDetail();
-                        }
-                    }}
-                    className="relative w-full h-full cursor-pointer select-none"
+                    className="block relative w-full h-full cursor-pointer select-none"
                 >
                     <Thumbnail
                         thumbnail={entry.thumbnail}
@@ -171,7 +151,7 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
                             </>
                         }
                     />
-                </div>
+                </EntryLink>
                 <button
                     type="button"
                     onClick={handleBookmarkToggle}
@@ -220,11 +200,15 @@ export default function EntryItem({ entry, triggerReload, id, type, hasActiveLoa
 
                 {/* Title + Author */}
                 <div className="flex flex-col gap-[2px] w-full min-w-0">
-                    <h3
-                        onClick={openEntryDetail}
-                        className="cursor-pointer font-semibold text-[14px] leading-[16px] tracking-[0.1px] text-secondary dark:text-white line-clamp-2 group-hover:underline transition-all duration-300 break-words"
-                    >
-                        <Highlight html={search?.highlights?.title} text={entry.title} />
+                    <h3 className="font-semibold text-[14px] leading-[16px] tracking-[0.1px] text-secondary dark:text-white line-clamp-2 group-hover:underline transition-all duration-300 break-words">
+                        <EntryLink
+                            entryId={entry.id}
+                            catalogId={entry.catalog_id}
+                            onTop={type === 'ai-recommendation'}
+                            className="cursor-pointer"
+                        >
+                            <Highlight html={search?.highlights?.title} text={entry.title} />
+                        </EntryLink>
                     </h3>
                     <p
                         className="font-light text-[10px] leading-[18px] tracking-[0.1px] text-[#333] dark:text-white overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer"

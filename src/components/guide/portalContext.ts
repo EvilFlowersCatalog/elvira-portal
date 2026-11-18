@@ -1,5 +1,7 @@
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
 import { GUIDE_TARGETS, GuideAccess, guideTarget } from './guideRegistry';
+import { contextParams } from '@/lib/links/params';
+import { matchEntryPath } from '@/lib/links/paths';
 
 /**
  * What the reader is looking at, in the portal's own semantic vocabulary, sent with every assistant message as
@@ -37,8 +39,6 @@ export interface IPortalContext {
 
 type Translate = (key: string, options?: Record<string, unknown>) => string;
 
-/** Query parameters worth the assistant's attention; the rest (sorting, paging) is noise. */
-const KEPT_PARAMS = ['entry-detail-id', 'tab', 'query', 'q', 'state', 'category-id', 'feed-id'];
 const MAX_PLACES = 12;
 
 const place = (id: string, t: Translate): IPortalPlace => ({
@@ -57,12 +57,8 @@ export const portalContext = (
 ): IPortalContext => {
   const { pathname } = location;
   const params = new URLSearchParams(location.search);
-  const kept = new URLSearchParams();
-  KEPT_PARAMS.forEach((key) => {
-    const value = params.get(key);
-    if (value) kept.set(key, value.slice(0, 120));
-  });
-  const query = kept.toString();
+  // Query parameters worth the assistant's attention (the registry's `context` flag); sorting and paging are noise.
+  const query = contextParams(params).toString();
 
   const here = GUIDE_TARGETS.filter((target) => target.path === pathname && guideTarget(target.id, access));
   const pageTarget = here.find((target) => target.anchor === 'page-title') ?? here[0];
@@ -74,10 +70,11 @@ export const portalContext = (
   const focus: IPortalFocus[] = [];
   const detailId = params.get('entry-detail-id');
   if (detailId) focus.push({ kind: 'entry', id: detailId, view: 'detail' });
-  if (pathname.startsWith(NAVIGATION_PATHS.viewer)) {
-    // `/viewer/<entry>/<file index>`; the reader's page travels separately (`page` in the message body).
-    const entryId = pathname.slice(NAVIGATION_PATHS.viewer.length).split('/')[0];
-    if (entryId) focus.push({ kind: 'entry', id: entryId, view: 'reader' });
+  // `/entries/<id>` (the publication page, shown to the assistant like the dialog) or `/entries/<id>/read`;
+  // the reader's page travels separately (`page` in the message body).
+  const onEntry = matchEntryPath(pathname);
+  if (onEntry && onEntry.entryId !== detailId) {
+    focus.push({ kind: 'entry', id: onEntry.entryId, view: onEntry.view === 'reader' ? 'reader' : 'detail' });
   }
   if (pathname.startsWith(NAVIGATION_PATHS.adminEditEntries)) {
     const entryId = pathname.slice(NAVIGATION_PATHS.adminEditEntries.length).split('/')[0];

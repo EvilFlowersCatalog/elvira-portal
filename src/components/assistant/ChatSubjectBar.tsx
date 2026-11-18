@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
 import { FiBookOpen } from 'react-icons/fi';
+import useEntryDialog from '../../hooks/useEntryDialog';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import useOpenInViewer from '../../hooks/api/assistant/useOpenInViewer';
 
@@ -14,20 +14,14 @@ export default function ChatSubjectBar({ onNavigate, compact }: { onNavigate?: (
   const { t } = useTranslation();
   const { aiChatSubject } = useAppContext();
   const openInViewer = useOpenInViewer();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const dialog = useEntryDialog();
 
   if (!aiChatSubject) return null;
 
   const readable = aiChatSubject.readable !== false;
 
-  // Same query params as EntryItem's openEntryDetail; the detail yields to nothing.
-  const openDetail = () => {
-    const params = new URLSearchParams(searchParams);
-    params.set('entry-detail-id', aiChatSubject.entryId);
-    if (aiChatSubject.catalogId) params.set('entry-catalog-id', aiChatSubject.catalogId);
-    params.set('dialog-priority', 'entry-detail');
-    setSearchParams(params);
-  };
+  // The detail yields to nothing: above the assistant drawer.
+  const openDetail = () => dialog.open(aiChatSubject.entryId, { catalogId: aiChatSubject.catalogId, onTop: true });
 
   return (
     <div

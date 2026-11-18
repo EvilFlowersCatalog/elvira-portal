@@ -5,8 +5,10 @@ on dev). The catalog's `content.cite_base_url` setting is the base it hands to a
 
 ## The route
 
-`/cite/:entryId/:key` sits behind login, and login returns to the link afterwards. Every outcome navigates on
-with `replace`, so Back skips `/cite`.
+Since 2026-11-18 (docs/semantic-urls.md), `/cite/:entryId/:key` is a redirect: it lands on
+`/entries/:entryId/read?loc=:key`. The locator travels in the reader's address, so a refresh or a copied link keeps
+the highlight. The reader resolves it on every open; the outcomes below are unchanged. Behind login, `?next=`
+returns to the link afterwards.
 
 1. `GET /api/v1/locators/{entry_id}/{key}` returns
    `{key, entry_id, kind, resolution, page, source_page, bbox, quads, readable, quote, detached_at, readium}`.

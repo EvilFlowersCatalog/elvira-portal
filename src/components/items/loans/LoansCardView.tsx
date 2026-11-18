@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import useEntryDialog from '../../../hooks/useEntryDialog';
 import { differenceInDays, format, parseISO } from 'date-fns';
 import { toast } from 'react-toastify';
 import { RxCalendar } from 'react-icons/rx';
@@ -410,7 +411,7 @@ export default function LoansCardView() {
   const { t } = useTranslation();
   const { claimReservation } = useUpdateReservation();
   const { openInThorium, downloadDirect } = useDownloadLicense();
-  const [, setSearchParams] = useSearchParams();
+  const entryDialog = useEntryDialog();
   const navigate = useNavigate();
 
   // Licences and reservations are React Query reads keyed on the user (NOT on the
@@ -473,14 +474,7 @@ export default function LoansCardView() {
     [reservationsQuery.data]
   );
 
-  const openEntryDetail = (entryId: string, catalogId?: string) => {
-    setSearchParams((prev) => {
-      const p = new URLSearchParams(prev);
-      p.set('entry-detail-id', entryId);
-      if (catalogId) p.set('entry-catalog-id', catalogId);
-      return p;
-    });
-  };
+  const openEntryDetail = (entryId: string, catalogId?: string) => entryDialog.open(entryId, { catalogId });
 
   // Refresh both lists after a mutation (background refetch — cards stay visible).
   const loadAll = () => {

@@ -1,7 +1,8 @@
 import { useCallback } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { IEntry } from '../utils/interfaces/entry';
-import { NAVIGATION_PATHS } from '../utils/interfaces/general/general';
+import { readerPath } from '@/lib/links/paths';
+import useEntryDialog from './useEntryDialog';
 
 /** What opening needs of a publication: a list item or a detail both carry it. */
 type Openable = Pick<IEntry, 'config' | 'catalog_id'> & { acquisitions: { mime: string }[] };
@@ -13,35 +14,24 @@ export const readablePdfIndex = (entry: Pick<Openable, 'acquisitions' | 'config'
 };
 
 /**
- * Open a publication: at a page in the viewer when its PDF can be read directly, else its
- * detail (where borrowing and the other files live). The viewer applies its own access checks.
+ * Open a publication: at a page in the reader when its PDF can be read directly, else its dialog (where
+ * borrowing and the other files live). The reader route applies its own access checks.
  */
 export default function useOpenPublication() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const dialog = useEntryDialog();
 
-  const openDetail = useCallback(
-    (entryId: string) => {
-      const params = new URLSearchParams(searchParams);
-      params.set('entry-detail-id', entryId);
-      setSearchParams(params);
-    },
-    [searchParams, setSearchParams]
-  );
+  const openDetail = useCallback((entryId: string, catalogId?: string | null) => dialog.open(entryId, { catalogId }), [dialog]);
 
   const openAt = useCallback(
     (entryId: string, entry: Openable | undefined, page: number | null | undefined) => {
-      const index = readablePdfIndex(entry);
-      if (index < 0 || !page) {
-        openDetail(entryId);
+      if (readablePdfIndex(entry) < 0 || !page) {
+        openDetail(entryId, entry?.catalog_id);
         return;
       }
-      navigate(`${NAVIGATION_PATHS.viewer}${entryId}/${index}?page=${page}`, {
-        state: { fromPath: `${location.pathname}${location.search}`, catalogId: entry?.catalog_id },
-      });
+      navigate(readerPath(entryId, { page, catalogId: entry?.catalog_id }));
     },
-    [navigate, location, openDetail]
+    [navigate, openDetail],
   );
 
   return { openAt, openDetail };

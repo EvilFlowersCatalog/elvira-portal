@@ -43,7 +43,7 @@ const AdminEditEntry = () => {
       setIsLoading(true);
       try {
         if (id) {
-          const entryDetail = await getEntryDetail(id, config.ELVIRA_CATALOG_ID || undefined);
+          const entryDetail = await getEntryDetail(id, config.ELVIRA_CATALOG_ID || undefined, { fresh: true });
           setEditingEntryTitle(entryDetail.title);
           setStringImage(entryDetail.thumbnail || '');
           setEntryCatalogId(entryDetail.catalog_id);

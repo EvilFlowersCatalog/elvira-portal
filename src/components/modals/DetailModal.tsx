@@ -7,7 +7,7 @@ import useEscapeLayer from '../../hooks/useEscapeLayer';
  * Used for: Entry details, licensing calendar, and other full-screen overlays
  * For form modals, use FormModal instead
  */
-export default function DetailModal({ title, isOpen, onClose, zIndex, children }: { title: string, isOpen: boolean, onClose: () => void, zIndex: number, children: React.ReactNode }) {
+export default function DetailModal({ title, isOpen, onClose, zIndex, children, actions }: { title: string, isOpen: boolean, onClose: () => void, zIndex: number, children: React.ReactNode, /** Extra header controls, left of the close button. */ actions?: React.ReactNode }) {
     const ref = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -41,12 +41,16 @@ export default function DetailModal({ title, isOpen, onClose, zIndex, children }
                     <h2 className='text-secondary dark:text-secondaryLight text-lg font-bold'>
                         {title}
                     </h2>
+                    <div className='ml-auto flex items-center gap-4'>
+                    {actions}
                     <button
-                        className={`text-black dark:text-white p-0 ml-auto`}
+                        type='button'
+                        className={`text-black dark:text-white p-0`}
                         onClick={onClose}
                     >
                         <RiCloseLine size={32} />
                     </button>
+                    </div>
                 </div>
                 {children}
             </div>

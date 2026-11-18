@@ -1,8 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import { H1 } from '../../components/primitives/Heading';
-import EntryDetail from '../../components/items/entry/details/EntryDetail';
-import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
 import LoansCardView from '../../components/items/loans/LoansCardView';
 
 const Loans = () => {
@@ -14,8 +12,6 @@ const Loans = () => {
       <div className="px-4">
         <LoansCardView />
       </div>
-      <EntryDetail />
-      <LicenseCalendar />
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { MutableRefObject } from 'react';
 import axios, { CancelTokenSource } from 'axios';
 import { noteFailedRequest } from '../../lib/errorReference';
 import { config } from '../../lib/config';
+import { readStoredAuth } from '../../lib/session';
 
 /** Default request timeout: a hung request surfaces as an error after this, not after minutes. */
 export const DEFAULT_TIMEOUT = 30 * 1000;
@@ -31,6 +32,8 @@ interface AxiosAuthState {
 }
 
 const authState: AxiosAuthState = {
+  // From the stored session, so route loaders (which run before AuthProvider renders) send the token too.
+  token: readStoredAuth()?.token,
   logout: () => {},
 };
 

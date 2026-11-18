@@ -1,28 +1,20 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { twMerge } from 'tailwind-merge';
 import { IEntryDetail, IEntryHeading } from '../../../../utils/interfaces/entry';
-import { NAVIGATION_PATHS } from '../../../../utils/interfaces/general/general';
+import { readerPath } from '@/lib/links/paths';
+import { readablePdfIndex } from '../../../../hooks/useOpenPublication';
+import { preloadReader } from '../../../../routes/pages';
 
 /**
- * The publication's outline, read from its PDF by the catalog. A chapter opens
- * the PDF in the viewer at its page; entries lent through Readium LCP only list
- * their chapters (opening them goes through borrowing).
+ * The publication's outline, read from its PDF by the catalog. A chapter is a link into the reader at its
+ * page (a new tab, Copy link address and middle-click work); entries lent through Readium LCP only list their
+ * chapters (opening them goes through borrowing).
  */
 export const EntryContents = ({ entry, catalogId }: { entry: IEntryDetail; catalogId?: string | null }) => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const location = useLocation();
   const headings: IEntryHeading[] = entry.table_of_contents ?? [];
-
-  const pdfIndex = entry.acquisitions.findIndex((a) => a.mime === 'application/pdf');
-  const canOpen = pdfIndex >= 0 && !entry.config?.readium_enabled;
-
-  const open = (page: number) => {
-    const state: { catalogId?: string; fromPath?: string } = { fromPath: `${location.pathname}${location.search}` };
-    if (catalogId) state.catalogId = catalogId;
-    navigate(`${NAVIGATION_PATHS.viewer}${entry.id}/${pdfIndex}?page=${page}`, { state });
-  };
+  const canOpen = readablePdfIndex(entry) >= 0;
 
   if (!headings.length) {
     return <p className="text-sm text-gray-500 dark:text-gray-400 py-4">{t('entry.detail.contents.empty')}</p>;
@@ -32,7 +24,7 @@ export const EntryContents = ({ entry, catalogId }: { entry: IEntryDetail; catal
   let chapter = 0;
 
   return (
-    <ol className="flex flex-col">
+    <ol className="flex flex-col" onMouseEnter={canOpen ? preloadReader : undefined}>
       {headings.map((heading, index) => {
         const depth = Math.max(0, heading.level - topLevel);
         if (depth === 0) chapter += 1;
@@ -52,9 +44,12 @@ export const EntryContents = ({ entry, catalogId }: { entry: IEntryDetail; catal
         return (
           <li key={index} style={{ paddingLeft: `${Math.min(depth, 4) * 16}px` }}>
             {canOpen ? (
-              <button type="button" className={twMerge(className, 'hover:text-primary dark:hover:text-primaryLight')} onClick={() => open(heading.page)}>
+              <Link
+                to={readerPath(entry.id, { page: heading.page, catalogId: catalogId ?? entry.catalog_id })}
+                className={twMerge(className, 'hover:text-primary dark:hover:text-primaryLight')}
+              >
                 {content}
-              </button>
+              </Link>
             ) : (
               <div className={className}>{content}</div>
             )}

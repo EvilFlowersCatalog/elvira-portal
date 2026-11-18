@@ -1,8 +1,9 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AiChatSubject } from '../../../providers/AppProvider';
-import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
 import type { IAssistantBox } from '../../../utils/interfaces/assistant';
 import useGetEntryDetail from '../entries/useGetEntryDetail';
+import { readerPath } from '@/lib/links/paths';
+import { readablePdfIndex } from '../../useOpenPublication';
 
 /**
  * Where on the page a citation points (IP-030 Phase 1): the paragraph (or figure) box to outline and the quads
@@ -17,50 +18,49 @@ export interface IViewerTarget {
   quadsPage?: number;
 }
 
-/** What the viewer route finds in its navigation state. */
+/**
+ * What the reader route may find in its navigation state: only an enrichment of the URL. The URL alone
+ * (page, `loc`, `p`, `r`) must open the same place, so a refresh or a copied link loses at most the
+ * sentence flash of a citation without a locator.
+ */
 export interface IViewerLocationState {
-  catalogId?: string;
-  fromPath?: string;
   target?: IViewerTarget;
 }
 
 /**
- * Opens a chat's publication in the viewer, optionally at a page and a target on it. The chat
- * remembers which file (acquisition) it was read from; the viewer route takes
- * the file's index in the entry, so that is looked up first.
- *
- * The target travels as navigation state (boxes are too big for a URL); `p` / `r` in the query keep the
- * paragraph or region id in a link that is copied or reloaded.
+ * Opens a chat's publication in the reader, optionally at a page and a target on it. The chat remembers
+ * which file (acquisition) it was read from; it is named in the address when it isn't the readable PDF.
  */
 const useOpenInViewer = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const { getEntryDetail } = useGetEntryDetail();
 
   return async (subject: AiChatSubject, page?: number, target?: IViewerTarget) => {
-    let index = 0;
+    let file: string | null = null;
     if (subject.acquisitionId) {
       try {
         const entry = await getEntryDetail(subject.entryId, subject.catalogId ?? undefined);
-        index = Math.max(0, entry.acquisitions.findIndex((a) => a.id === subject.acquisitionId));
+        const index = entry.acquisitions.findIndex((a) => a.id === subject.acquisitionId);
+        if (index >= 0 && index !== readablePdfIndex(entry)) file = subject.acquisitionId;
       } catch {
-        // The first file is the right one for almost every publication.
+        // The reader route answers for an unknown or hidden publication.
       }
     }
 
-    const state: IViewerLocationState = {
-      fromPath: `${location.pathname}${location.search}`,
-    };
-    if (subject.catalogId) state.catalogId = subject.catalogId;
+    const state: IViewerLocationState = {};
     // A region id alone is enough: the viewer outlines the region with its own box (`regionPackage`).
     if (target && (target.bbox || target.quads?.length || target.regionId)) state.target = target;
 
-    const query = new URLSearchParams();
-    if (page) query.set('page', String(page));
-    if (target?.paragraphId) query.set('p', target.paragraphId);
-    else if (target?.regionId) query.set('r', target.regionId);
-    const search = query.toString();
-    navigate(`${NAVIGATION_PATHS.viewer}${subject.entryId}/${index}${search ? `?${search}` : ''}`, { state });
+    navigate(
+      readerPath(subject.entryId, {
+        file,
+        page,
+        p: target?.paragraphId,
+        r: target?.paragraphId ? null : target?.regionId,
+        catalogId: subject.catalogId,
+      }),
+      { state },
+    );
   };
 };
 

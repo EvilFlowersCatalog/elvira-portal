@@ -10,6 +10,8 @@ import { addCategoryId, addFeedId } from "../../utils/func/filterParams";
 import { localize } from '../../utils/func/localized';
 import usePassageSearch from "../../hooks/api/entries/usePassageSearch";
 import PassageHits from "../items/entry/PassageHits";
+import useEntryDialog from "../../hooks/useEntryDialog";
+import { prefetchEntry } from "../../hooks/api/entries/entryQueries";
 
 interface SearchSuggestionsProps {
   searchQuery: string;
@@ -25,6 +27,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const dialog = useEntryDialog();
 
   const debouncedQuery = useDebouncedValue(searchQuery, 250);
   const enabled = !!debouncedQuery && debouncedQuery.trim().length >= 2;
@@ -48,9 +51,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
   const isRefreshing = isFetching && isPlaceholderData;
 
   const handleBookClick = (entryId: string, catalogId: string) => {
-    searchParams.set('entry-detail-id', entryId);
-    searchParams.set('entry-catalog-id', catalogId);
-    setSearchParams(searchParams);
+    dialog.open(entryId, { catalogId });
     onClose();
   };
 
@@ -166,6 +167,7 @@ const SearchSuggestions = ({ searchQuery, onClose, shouldRedirect = false }: Sea
                 <div
                   key={entry.id}
                   onClick={() => handleBookClick(entry.id, entry.catalog_id)}
+                  onMouseEnter={() => prefetchEntry(entry.id, entry.catalog_id)}
                   className="flex gap-3 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 p-2 rounded transition-colors"
                 >
                   <Thumbnail

@@ -1,12 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { fmtDate } from '../../utils/func/adminDate';
-import { useSearchParams } from 'react-router-dom';
 import { BiHistory } from 'react-icons/bi';
 import { CircleLoader } from 'react-spinners';
 import Breadcrumb from '../../components/buttons/Breadcrumb';
 import { H1 } from '../../components/primitives/Heading';
-import EntryDetail from '../../components/items/entry/details/EntryDetail';
-import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
+import useEntryDialog from '../../hooks/useEntryDialog';
+import { prefetchEntry } from '../../hooks/api/entries/entryQueries';
 import useGetActivity from '../../hooks/api/activity/useGetActivity';
 import useInfiniteItemContainer from '../../hooks/api/useInfiniteItemContainer';
 import { ActivityAction, IActivity } from '../../utils/interfaces/activity';
@@ -35,7 +34,7 @@ const PAGE_SIZE = 30;
 
 const History = () => {
   const { t } = useTranslation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const dialog = useEntryDialog();
   const getActivity = useGetActivity();
 
   const list = useInfiniteItemContainer<IActivity>(['activity'], (page) =>
@@ -43,12 +42,7 @@ const History = () => {
   );
 
   // Every history row is about one entry; the detail popup already shows its loan / reservation state.
-  const openEntryDetail = (item: IActivity) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('entry-detail-id', item.entry.id);
-    params.set('entry-catalog-id', item.entry.catalog_id);
-    setSearchParams(params);
-  };
+  const openEntryDetail = (item: IActivity) => dialog.open(item.entry.id, { catalogId: item.entry.catalog_id });
 
   const formatTimestamp = (timestamp: string) => {
     const date = new Date(timestamp);
@@ -103,6 +97,8 @@ const History = () => {
                   type="button"
                   key={item.id}
                   onClick={() => openEntryDetail(item)}
+                  onMouseEnter={() => prefetchEntry(item.entry.id, item.entry.catalog_id)}
+                  onFocus={() => prefetchEntry(item.entry.id, item.entry.catalog_id)}
                   className="w-full text-left bg-white dark:bg-zinc-800 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow border border-gray-200 dark:border-zinc-700"
                 >
                   <div className="flex items-center gap-4">
@@ -152,9 +148,6 @@ const History = () => {
           )}
         </div>
       </div>
-
-      <EntryDetail />
-      <LicenseCalendar />
     </>
   );
 };

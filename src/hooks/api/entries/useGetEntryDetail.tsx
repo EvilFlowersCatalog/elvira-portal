@@ -1,58 +1,31 @@
 import { IEntryDetail } from '../../../utils/interfaces/entry';
-import { config } from '@/lib/config';
-import { ILicense, LICENSE_STATE } from '../../../utils/interfaces/license';
-import useAxios from '../useAxios';
+import { ILicense } from '../../../utils/interfaces/license';
 import useAuthContext from '../../contexts/useAuthContext';
+import { queryClient } from '@/lib/reactQuery';
+import { entryDetailQuery, entryLicenseQuery } from './entryQueries';
 
 export interface IEntryWithLicense {
   entry: IEntryDetail;
   activeLicense: ILicense | null;
 }
 
+/**
+ * Imperative access to a publication for event handlers. Goes through the shared cache
+ * (`entryQueries`), so a detail already shown or prefetched costs no request.
+ */
 const useGetEntryDetail = () => {
-  const axios = useAxios();
   const authContext = useAuthContext();
 
-  const getEntryDetail = async (entryId: string, catalogId?: string): Promise<IEntryDetail> => {
-    const effectiveCatalogId = catalogId || config.ELVIRA_CATALOG_ID;
-    const ENTRY_DETAIL_URL = `/api/v1/catalogs/${effectiveCatalogId}/entries/${entryId}`;
-    const { data: entryDetail } = await axios.get<{ response: IEntryDetail }>(ENTRY_DETAIL_URL);
-    return entryDetail.response;
-  };
+  // `fresh`: always ask the catalog (an edit form, availability), and refresh the cache with the answer.
+  const getEntryDetail = (entryId: string, catalogId?: string, options?: { fresh?: boolean }): Promise<IEntryDetail> =>
+    queryClient.fetchQuery({ ...entryDetailQuery(entryId, catalogId), ...(options?.fresh ? { staleTime: 0 } : {}) });
 
-  // Fetches entry detail and the current user's active/reserved license for it in parallel.
+  // The detail and the reader's live loan, in parallel; a failed licence lookup is "no loan".
   const getEntryDetailWithLicense = async (entryId: string, catalogId?: string): Promise<IEntryWithLicense> => {
-    const effectiveCatalogId = catalogId || config.ELVIRA_CATALOG_ID;
-    const ENTRY_DETAIL_URL = `/api/v1/catalogs/${effectiveCatalogId}/entries/${entryId}`;
-
-    const licenseParams = new URLSearchParams({
-      user_id: authContext.auth?.userId || '',
-      entry_id: entryId,
-      // Backend disables pagination via `paginate=false` (not `pagination`); the
-      // old key was ignored so only the first default-size page came back.
-      paginate: 'false',
-    });
-
-    const [entryRes, licenseRes] = await Promise.allSettled([
-      axios.get<{ response: IEntryDetail }>(ENTRY_DETAIL_URL),
-      axios.get<{ items: ILicense[] }>('/readium/v1/licenses', { params: licenseParams }),
+    const [entry, activeLicense] = await Promise.all([
+      getEntryDetail(entryId, catalogId),
+      queryClient.fetchQuery(entryLicenseQuery(entryId, authContext.auth?.userId)).catch(() => null),
     ]);
-
-    if (entryRes.status === 'rejected') throw entryRes.reason;
-    const entry = entryRes.value.data.response;
-
-    let activeLicense: ILicense | null = null;
-    if (licenseRes.status === 'fulfilled') {
-      const now = new Date();
-      activeLicense = licenseRes.value.data.items.find((l) => {
-        const notExpired = !l.expires_at || new Date(l.expires_at) > now;
-        if (l.state === LICENSE_STATE.active) {
-          return notExpired;
-        }
-        return l.state === LICENSE_STATE.ready;
-      }) ?? null;
-    }
-
     return { entry, activeLicense };
   };
 

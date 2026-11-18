@@ -1,51 +1,37 @@
-import { MouseEvent } from 'react';
+import { Link } from 'react-router-dom';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { IEntryAcquisition } from '../../utils/interfaces/acquisition';
-import Button from './Button';
-import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
-import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { readerPath } from '@/lib/links/paths';
+import { preloadReader } from '../../routes/pages';
 
 interface IPDFButtonsParams {
   acquisition: IEntryAcquisition;
   entryId: string;
   catalogId?: string;
-  index: number;
+  /** Name the file explicitly (another file than the publication's readable PDF). */
+  explicitFile?: boolean;
   children: React.ReactNode;
 }
 
-const PDFButton = ({ acquisition, index, entryId, catalogId, children }: IPDFButtonsParams) => {
+/**
+ * "Read": a real link to the reader (`/entries/:id/read`), so a new tab, middle-click and Copy link address
+ * all work, and the browser shows where it goes. Hover and focus start downloading the reader's code, the
+ * largest chunk of the portal, so the click doesn't wait for it.
+ */
+const PDFButton = ({ acquisition, entryId, catalogId, explicitFile, children }: IPDFButtonsParams) => {
   const { umamiTrack } = useAppContext();
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const handleRead = (e: MouseEvent<HTMLButtonElement>) => {
-    umamiTrack('PDF Read Button', {
-      pdf: acquisition.id,
-      entryId,
-    });
-    const path = NAVIGATION_PATHS.viewer + entryId + `/${index}`;
-    const from = location.pathname.includes(NAVIGATION_PATHS.shelf) ? 'shelf' : '';
-    const fromPath = `${location.pathname}${location.search}`;
-
-    // Navigate with catalog_id in state
-    const isMac = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
-    e.preventDefault();
-    if (e.ctrlKey || (e.metaKey && isMac) || e.button === 1) {
-      window.open(path, '_blank');
-    } else {
-      const state: { from?: string; catalogId?: string; fromPath?: string } = {};
-      if (from) state.from = from;
-      if (catalogId) state.catalogId = catalogId;
-      if (fromPath) state.fromPath = fromPath;
-      navigate(path, { state });
-    }
-  };
 
   return (
-    <button className="w-full" onClick={(e) => handleRead(e)}>
+    <Link
+      className="w-full block"
+      to={readerPath(entryId, { file: explicitFile ? acquisition.id : null, catalogId })}
+      onMouseEnter={preloadReader}
+      onFocus={preloadReader}
+      onTouchStart={preloadReader}
+      onClick={() => umamiTrack('PDF Read Button', { pdf: acquisition.id, entryId })}
+    >
       {children}
-    </button>
+    </Link>
   );
 };
 

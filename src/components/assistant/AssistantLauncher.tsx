@@ -5,6 +5,7 @@ import { HiSparkles } from 'react-icons/hi2';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import useAuthContext from '../../hooks/contexts/useAuthContext';
 import { NAVIGATION_PATHS } from '../../utils/interfaces/general/general';
+import { isReaderPath } from '@/lib/links/paths';
 
 const isMac = typeof navigator !== 'undefined' && /mac/i.test(navigator.platform);
 
@@ -18,7 +19,7 @@ export default function AssistantLauncher() {
   const { auth } = useAuthContext();
   const { showAiAssistant, setShowAiAssistant, aiMessages, umamiTrack } = useAppContext();
   const available =
-    !!auth && !pathname.startsWith(NAVIGATION_PATHS.viewer) && pathname !== NAVIGATION_PATHS.aiAssistant && pathname !== NAVIGATION_PATHS.login;
+    !!auth && !isReaderPath(pathname) && pathname !== NAVIGATION_PATHS.aiAssistant && pathname !== NAVIGATION_PATHS.login;
 
   useEffect(() => {
     if (!available) return;

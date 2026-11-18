@@ -6,7 +6,6 @@ import { Link, useNavigate } from "react-router-dom";
 import AssistantChatPanel from "../../components/assistant/AssistantChatPanel";
 import ChatSubjectBar from "../../components/assistant/ChatSubjectBar";
 import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
-import EntryDetail from "../../components/items/entry/details/EntryDetail";
 
 /** The assistant as a page; the conversation itself is `AssistantChatPanel`. */
 export default function AiAssistantPage() {
@@ -53,7 +52,6 @@ export default function AiAssistantPage() {
                     </button>
                 </div>
             </div>
-            <EntryDetail  />
             <div className="flex-1 flex flex-col items-center w-full overflow-hidden">
                 <AssistantChatPanel />
             </div>

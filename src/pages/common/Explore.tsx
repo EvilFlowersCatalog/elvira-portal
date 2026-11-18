@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { CircleLoader } from 'react-spinners';
-import EntryDetail from '../../components/items/entry/details/EntryDetail';
 import ExploreCanvas, { Insets } from '../../components/graph/explore/ExploreCanvas';
 import ExploreSidebar from '../../components/graph/explore/ExploreSidebar';
 import FocusPanel from '../../components/graph/explore/FocusPanel';
@@ -38,8 +37,22 @@ const Explore = () => {
   const [showMembership, setShowMembership] = useState(true);
   const [highlightId, setHighlightId] = useState<string | null>(null);
 
-  // Topics first: the classification reads at a glance; "content" is one click away.
-  const [arrangement, setArrangement] = useState<Arrangement>('topics');
+  // Topics first: the classification reads at a glance; "content" is one click away. In the URL
+  // (`?arrange=content`) like the focus, so a shared map opens the way it was arranged.
+  const arrangement: Arrangement = searchParams.get('arrange') === 'content' ? 'content' : 'topics';
+  const setArrangement = useCallback(
+    (next: Arrangement) =>
+      setSearchParams(
+        (prev) => {
+          const params = new URLSearchParams(prev);
+          if (next === 'content') params.set('arrange', 'content');
+          else params.delete('arrange');
+          return params;
+        },
+        { replace: true },
+      ),
+    [setSearchParams],
+  );
   const byContent = useMemo(() => (data?.nodes.length && arrangement === 'content' ? buildExploreGraph(data, 'content') : null), [data, arrangement]);
   const byTopics = useMemo(() => (data?.nodes.length && arrangement === 'topics' ? buildExploreGraph(data, 'topics') : null), [data, arrangement]);
   const graph = arrangement === 'topics' ? byTopics : byContent;
@@ -175,8 +188,6 @@ const Explore = () => {
           />
         </div>
       )}
-
-      <EntryDetail />
     </div>
   );
 };

@@ -1,14 +1,6 @@
-const STORAGE_KEY = 'elvira-list-search';
+import { withoutDialogParams } from '@/lib/links/params';
 
-// Dialog state, not list state: returning to a list must not reopen a dialog.
-const DIALOG_PARAMS = [
-  'entry-detail-id',
-  'entry-catalog-id',
-  'licensing-entry-id',
-  'licensing-catalog-id',
-  'assistant-entry-id',
-  'dialog-priority',
-];
+const STORAGE_KEY = 'elvira-list-search';
 
 const read = (): Record<string, string> => {
   try {
@@ -22,9 +14,8 @@ const normalize = (pathname: string) => pathname.replace(/\/+$/, '') || '/';
 
 /** Record the query string a page is showing (called on every location change). */
 export const rememberSearch = (pathname: string, search: string) => {
-  const params = new URLSearchParams(search);
-  DIALOG_PARAMS.forEach((p) => params.delete(p));
-  const query = params.toString();
+  // Dialog state, not list state: returning to a list must not reopen a dialog (lib/links/params).
+  const query = withoutDialogParams(search).toString();
 
   const stored = read();
   const key = normalize(pathname);

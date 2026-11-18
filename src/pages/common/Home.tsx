@@ -4,10 +4,8 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import useEntriesQuery from '../../hooks/api/entries/useEntriesQuery';
 import HomeHeader from '../../components/specific-page/home-page/HomeHeader';
-import EntryDetail from '../../components/items/entry/details/EntryDetail';
 import EntryDisplay from '../../components/items/entry/display/EntryDisplay';
 import ThemedEntryDisplay from '../../components/items/entry/display/ThemedEntryDisplay';
-import LicenseCalendar from '../../components/items/entry/details/LicenseCalendar';
 import { useCachedFeedDetail } from '../../hooks/api/feeds/useGetFeedDetail';
 import { localize } from '../../utils/func/localized';
 import { LocalizedText } from '../../utils/interfaces/general/general';
@@ -105,8 +103,6 @@ const Home = () => {
         )}
 
       </div>
-      <EntryDetail />
-      <LicenseCalendar />
     </>
   );
 };

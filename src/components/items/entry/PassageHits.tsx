@@ -1,7 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { IPassage, IPassageHit } from '../../../hooks/api/entries/usePassageSearch';
-import { NAVIGATION_PATHS } from '../../../utils/interfaces/general/general';
+import useEntryDialog from '../../../hooks/useEntryDialog';
+import { readerPath } from '@/lib/links/paths';
+import { prefetchEntry } from '../../../hooks/api/entries/entryQueries';
+import { preloadReader } from '../../../routes/pages';
 import Thumbnail from './Thumbnail';
 import Highlight from './Highlight';
 
@@ -21,15 +24,10 @@ interface IPassageHits {
 const PassageHits = ({ hits, compact = false, onOpen }: IPassageHits) => {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const dialog = useEntryDialog();
 
   const openDetail = (hit: IPassageHit) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('entry-detail-id', hit.entry_id);
-    const catalogId = hit.catalog_id ?? hit.entry?.catalog_id;
-    if (catalogId) params.set('entry-catalog-id', catalogId);
-    setSearchParams(params);
+    dialog.open(hit.entry_id, { catalogId: hit.catalog_id ?? hit.entry?.catalog_id });
     onOpen?.();
   };
 
@@ -38,12 +36,14 @@ const PassageHits = ({ hits, compact = false, onOpen }: IPassageHits) => {
       openDetail(hit);
       return;
     }
-    // The page numbers the PDF; open the entry's PDF file, the first file otherwise.
-    const index = Math.max(0, hit.entry?.acquisitions?.findIndex((a) => a.mime === 'application/pdf') ?? 0);
-    const state: { catalogId?: string; fromPath: string } = { fromPath: `${location.pathname}${location.search}` };
-    const catalogId = hit.catalog_id ?? hit.entry?.catalog_id;
-    if (catalogId) state.catalogId = catalogId;
-    navigate(`${NAVIGATION_PATHS.viewer}${hit.entry_id}/${index}?page=${passage.page}`, { state });
+    // The page numbers the PDF; the reader opens the publication's readable PDF at it, at the paragraph.
+    navigate(
+      readerPath(hit.entry_id, {
+        page: passage.page,
+        p: passage.paragraph_id,
+        catalogId: hit.catalog_id ?? hit.entry?.catalog_id,
+      }),
+    );
     onOpen?.();
   };
 
@@ -53,6 +53,10 @@ const PassageHits = ({ hits, compact = false, onOpen }: IPassageHits) => {
         <div
           key={hit.entry_id}
           className="flex gap-3 p-2 rounded min-w-0"
+          onMouseEnter={() => {
+            prefetchEntry(hit.entry_id, hit.catalog_id ?? hit.entry?.catalog_id);
+            preloadReader();
+          }}
         >
           <button
             type="button"

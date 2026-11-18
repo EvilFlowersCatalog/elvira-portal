@@ -2,7 +2,7 @@ import { useState, createContext, useContext } from 'react';
 
 type TabContextType = {
   activeTab: string | null;
-  setActiveTab: React.Dispatch<React.SetStateAction<string | null>>;
+  setActiveTab: (id: string) => void;
 };
 
 const TabContext = createContext<TabContextType>({
@@ -12,11 +12,16 @@ const TabContext = createContext<TabContextType>({
 
 type TabsComponentProps = {
   children: React.ReactNode;
-  defaultTab?: string
+  defaultTab?: string;
+  /** Controlled: the open tab comes from outside (the URL), and `onTabChange` asks to change it. */
+  activeTab?: string | null;
+  onTabChange?: (id: string) => void;
 };
 
-export function TabsComponent({ defaultTab, children }: TabsComponentProps) {
-  const [activeTab, setActiveTab] = useState<string | null>(defaultTab || null);
+export function TabsComponent({ defaultTab, activeTab: controlled, onTabChange, children }: TabsComponentProps) {
+  const [own, setOwn] = useState<string | null>(defaultTab || null);
+  const activeTab = controlled !== undefined ? controlled : own;
+  const setActiveTab = (id: string) => (onTabChange ? onTabChange(id) : setOwn(id));
 
   return (
     <TabContext.Provider value={{ activeTab, setActiveTab }}>
@@ -48,6 +53,9 @@ export function TabTitle({ id, children }: TabTitleProps) {
 
   return (
     <button
+      type="button"
+      role="tab"
+      aria-selected={isActive}
       onClick={() => setActiveTab(id)}
       className={`px-4 py-2 font-semibold focus:outline-none ${
         isActive

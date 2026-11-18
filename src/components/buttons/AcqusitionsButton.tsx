@@ -209,7 +209,7 @@ export default function AcquisitionsButton({
 
   if (hasAcquisitions) {
     return (
-      <PDFButton acquisition={acquisitions[0]} index={0} entryId={entry.id} catalogId={entry.catalog_id}>
+      <PDFButton acquisition={acquisitions[0]} entryId={entry.id} catalogId={entry.catalog_id}>
         <div className={ActionButtonStyle}>
           <BiBookOpen size={24} />
           {t("entry.detail.read")}

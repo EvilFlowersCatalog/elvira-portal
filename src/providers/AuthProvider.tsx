@@ -23,6 +23,8 @@ import axios, { CancelTokenSource } from 'axios';
 import useCookiesContext from '../hooks/contexts/useCookiesContext';
 import { setAxiosAuth } from '../hooks/api/useAxios';
 import { identify } from '../lib/analytics';
+import { queryClient } from '../lib/reactQuery';
+import { loginPath, safeNext } from '../lib/links/paths';
 
 export interface IAuthContext {
   auth: IAuth | null;
@@ -103,15 +105,13 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
         refreshToken: user.refresh_token,
       });
 
-      // Get where the user lastly was / if does not exist, go to home
-      const pathname = location.state?.from?.pathname ?? NAVIGATION_PATHS.home;
-      const params = location.state?.from?.search ?? '';
+      // Back to where the link was going: `?next=` (survives a refresh of the login page and arrives with a
+      // shared link), else the older navigation state, else home. Same-origin paths only (open redirect).
+      const fromState = location.state?.from ? `${location.state.from.pathname ?? ''}${location.state.from.search ?? ''}` : null;
+      const next = safeNext(new URLSearchParams(location.search).get('next') ?? fromState, NAVIGATION_PATHS.home);
 
-      const from = pathname + params;
-
-      // Navigate to where was user lastly or to library
       toast.success(t('notifications.login.success')); // Notify succes
-      navigate(from, { replace: true });
+      navigate(next, { replace: true });
     } catch {
       toast.error(t('notifications.login.error'));
     }
@@ -127,11 +127,13 @@ const AuthProvider = ({ children }: IContextProviderParams) => {
       removeCookie(COOKIES_TYPE.AUTH_KEY);
       logoutChannel?.postMessage(BROADCAST_MESSAGE);
 
+      // Whatever was cached belongs to the previous reader (shelf records, loans, chats): never show it to the next.
+      queryClient.clear();
+
       if (location.pathname !== NAVIGATION_PATHS.login) {
-        navigate(NAVIGATION_PATHS.login, {
-          state: { from: location },
-          replace: true,
-        });
+        // The way back is in the address, so a refresh of the login page (or the session running out in
+        // another tab) still returns there after signing in.
+        navigate(loginPath(`${location.pathname}${location.search}`), { replace: true });
         toast.info(t('notifications.logout'));
       }
     }

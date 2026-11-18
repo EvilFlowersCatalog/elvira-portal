@@ -95,7 +95,7 @@ export default function LicenseCalendar() {
     if (!entryId || !auth) return;
     setIsLoading(true);
     Promise.all([
-      getEntryDetail(entryId, catalogId || undefined),
+      getEntryDetail(entryId, catalogId || undefined, { fresh: true }),
       getUserDetails(auth.userId),
     ])
       .then(([entryData, userData]) => {

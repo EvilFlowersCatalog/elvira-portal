@@ -6,34 +6,16 @@ import './lib/telemetry';
 import './lib/analytics';
 import './lib/errorReference';
 import ReactDOM from 'react-dom/client';
-import { BrowserRouter } from 'react-router-dom';
+import { RouterProvider } from 'react-router-dom';
 import { QueryClientProvider } from '@tanstack/react-query';
-import BaseRoutes from './routes/BaseRoutes';
-import AuthProvider from './providers/AuthProvider';
-import AppProvider from './providers/AppProvider';
-import CookiesProvider from './providers/CookiesProvider';
+import { router } from './routes/router';
 import { queryClient } from './lib/reactQuery';
 import 'react-toastify/dist/ReactToastify.css';
 import './main.css';
 
-// For zotero to update
-document.dispatchEvent(
-  new Event('ZoteroItemUpdated', {
-    bubbles: true,
-    cancelable: true,
-  })
-);
-
+// The data router (routes/router.tsx) owns navigation; the providers that need it live in its root route.
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <QueryClientProvider client={queryClient}>
-    <BrowserRouter>
-      <CookiesProvider>
-        <AppProvider>
-          <AuthProvider>
-            <BaseRoutes />
-          </AuthProvider>
-        </AppProvider>
-      </CookiesProvider>
-    </BrowserRouter>
+    <RouterProvider router={router} />
   </QueryClientProvider>
 );
