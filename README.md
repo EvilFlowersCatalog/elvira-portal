@@ -156,8 +156,9 @@ The reader (`src/pages/common/Viewer.tsx`) loads the PDF one of two ways (elvira
 - CSP for the host, when it sets one: `worker-src 'self' data: blob:`, the catalog origin in `connect-src`, no
   `'unsafe-eval'` needed.
 - One loading screen (`ReaderLoader`: cover, title, status) covers the wait from the click to the first painted
-  page, the viewer's own spinner included. A viewer without `onFirstPageRendered` (npm 0.7.9) gets it only until
-  mount.
+  page, the viewer's own spinner included.
+- The viewer is a git dependency pinned to an EvilFlowersViewer commit in `package-lock.json` (every build and
+  image uses it). Bump it with `npm install github:EvilFlowersCatalog/EvilFlowersViewer#<sha>`.
 
 ![Reader: PDF streaming from a signed URL](docs/diagrams/sequence-reader-streaming.svg)
 

@@ -14,7 +14,7 @@
 title One portal image, configured per deployment (proposal, 2026-11-17)
 
 node "**GitHub Actions**\nubuntu-latest" <<executionEnvironment>> as gha {
-  artifact "deploy.yml · job **image**\nbuildx · linux/amd64\nVIEWER_REF=develop on dev\nGIT_SHA = github.sha" as job
+  artifact "deploy.yml · job **image**\nbuildx · linux/amd64\nviewer pinned in package-lock\nGIT_SHA = github.sha" as job
 }
 
 node "**GHCR**\nghcr.io/evilflowerscatalog/elvira-portal" <<executionEnvironment>> as ghcr {

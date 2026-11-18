@@ -33,6 +33,6 @@ re-extraction. Citations without a key keep using their stored page and boxes.
 
 ## Viewer
 
-The released viewer (0.7.9) has no `initialFocus`, so links land on the right page without a highlight until a
-viewer release ships it. Checked on dev: a paragraph locator of *Finite Difference Computing with PDEs*
+The pinned viewer (`develop`, package-lock.json) takes `initialFocus`, so links land on the passage with it
+highlighted. Checked on dev: a paragraph locator of *Finite Difference Computing with PDEs*
 (source page 30) opens reader page 31 with that paragraph on it.

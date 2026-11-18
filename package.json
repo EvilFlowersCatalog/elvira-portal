@@ -19,7 +19,7 @@
     "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\""
   },
   "dependencies": {
-    "@evilflowers/evilflowersviewer": "^0.7.9",
+    "@evilflowers/evilflowersviewer": "github:EvilFlowersCatalog/EvilFlowersViewer#c443a1b50166ac13368dabd9c24c04ae2457cbff",
     "@grafana/faro-react": "~2.14.0",
     "@grafana/faro-web-sdk": "^2.14.0",
     "@grafana/faro-web-tracing": "^2.14.0",
