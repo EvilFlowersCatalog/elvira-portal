@@ -29,12 +29,45 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # Which EvilFlowersViewer every build of this run ships:
+  #   master -> the commit pinned in package-lock.json (empty `sha`, nothing overridden)
+  #   dev    -> the head of the viewer's `develop` at the time of the run, for dev.elvira.stuba.sk,
+  #             e-knihy.ku.sk and the :dev image alike. Resolved once, as a commit, so the three
+  #             builds cannot drift apart and the image's layer cache cannot serve an older viewer
+  #             (a literal `develop` build-arg never changes the cache key).
+  # A new viewer develop commit alone does not start this workflow: re-run it from Actions
+  # (workflow_dispatch on `dev`) or push to dev.
+  viewer:
+    name: Viewer (${{ github.ref_name }})
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.resolve.outputs.sha }}
+    steps:
+      - name: Resolve the viewer commit
+        id: resolve
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_REF_NAME" = "master" ]; then
+            echo "sha=" >> "$GITHUB_OUTPUT"
+            echo "Viewer: the commit pinned in package-lock.json" >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          sha="$(git ls-remote https://github.com/EvilFlowersCatalog/EvilFlowersViewer.git refs/heads/develop | cut -f1)"
+          if [ -z "$sha" ]; then
+            echo "::error::Could not resolve EvilFlowersViewer develop"
+            exit 1
+          fi
+          echo "sha=${sha}" >> "$GITHUB_OUTPUT"
+          echo "Viewer: EvilFlowersViewer develop @ [\`${sha::7}\`](https://github.com/EvilFlowersCatalog/EvilFlowersViewer/commit/${sha})" >> "$GITHUB_STEP_SUMMARY"
+
   # One image for every client (#61): ghcr.io/evilflowerscatalog/elvira-portal, configured per
   # deployment by a mounted /config.json. Tags: :dev / :master (floating) and :sha-<short>.
   # CI does not touch the cluster; ops rolls out (knowledge#83). Needs only GITHUB_TOKEN.
+  # Built on every push, and on a manual run of dev (to pick up a newer viewer develop).
   image:
     name: Image (${{ github.ref_name }})
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' || github.ref_name == 'dev'
+    needs: viewer
     runs-on: ubuntu-latest
     permissions: { contents: read, packages: write }
     steps:
@@ -58,11 +91,13 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             GIT_SHA=${{ github.sha }}
+            VIEWER_SHA=${{ needs.viewer.outputs.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
   deploy:
     name: Build & deploy (${{ github.ref_name }})
+    needs: viewer
     runs-on: ubuntu-latest
     environment:
       name: ${{ github.ref_name == 'master' && 'elvira.stuba.sk' || 'dev.elvira.stuba.sk' }}
@@ -75,11 +110,27 @@ jobs:
           node-version: 22
           cache: npm
 
-      # The viewer comes from the lockfile: a commit of EvilFlowersViewer pinned there (git
-      # dependency; its `prepare` builds dist/, EvilFlowersViewer#149). Bump it with
-      # `npm install github:EvilFlowersCatalog/EvilFlowersViewer#<sha>`.
+      # The lockfile pins a commit of EvilFlowersViewer (git dependency; its `prepare` builds dist/,
+      # EvilFlowersViewer#149). master ships that pin (bump it with
+      # `npm install github:EvilFlowersCatalog/EvilFlowersViewer#<sha>`); dev replaces it below.
       - name: Install dependencies
         run: npm ci
+
+      # dev: the viewer develop commit resolved by the `viewer` job (see there).
+      - name: Viewer (develop)
+        if: needs.viewer.outputs.sha != ''
+        env:
+          VIEWER_SHA: ${{ needs.viewer.outputs.sha }}
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-audit --no-fund "github:EvilFlowersCatalog/EvilFlowersViewer#${VIEWER_SHA}"
+          installed="$(jq -r '.packages["node_modules/@evilflowers/evilflowersviewer"].resolved' node_modules/.package-lock.json)"
+          echo "Installed viewer: ${installed}"
+          case "$installed" in
+            *"#${VIEWER_SHA}") ;;
+            *) echo "::error::Expected viewer ${VIEWER_SHA}, installed ${installed}"; exit 1 ;;
+          esac
+          test -f node_modules/@evilflowers/evilflowersviewer/dist/evilFlowersViewer.es.js
 
       - name: Lint
         run: npm run lint
@@ -188,6 +239,7 @@ jobs:
   deploy-ku:
     name: Build & deploy KU (e-knihy.ku.sk)
     if: github.ref_name == 'dev'
+    needs: viewer
     runs-on: ubuntu-latest
     environment:
       name: e-knihy.ku.sk
@@ -203,9 +255,23 @@ jobs:
           node-version: 22
           cache: npm
 
-      # The viewer comes from the lockfile, as in the `deploy` job.
       - name: Install dependencies
         run: npm ci
+
+      # KU production runs the dev packages: the same viewer develop commit as dev.elvira.stuba.sk.
+      - name: Viewer (develop)
+        env:
+          VIEWER_SHA: ${{ needs.viewer.outputs.sha }}
+        run: |
+          set -euo pipefail
+          npm install --no-save --no-audit --no-fund "github:EvilFlowersCatalog/EvilFlowersViewer#${VIEWER_SHA}"
+          installed="$(jq -r '.packages["node_modules/@evilflowers/evilflowersviewer"].resolved' node_modules/.package-lock.json)"
+          echo "Installed viewer: ${installed}"
+          case "$installed" in
+            *"#${VIEWER_SHA}") ;;
+            *) echo "::error::Expected viewer ${VIEWER_SHA}, installed ${installed}"; exit 1 ;;
+          esac
+          test -f node_modules/@evilflowers/evilflowersviewer/dist/evilFlowersViewer.es.js
 
       # No ELVIRA_* env here: an unset variable injects an empty string that would override
       # env/.env.ku (see the `deploy` job's Build step). KU's config lives in env/.env.ku.
@@ -216,8 +282,10 @@ jobs:
         run: grep -rq "api.e-knihy.ku.sk" dist/assets
 
       - name: Release info
+        env:
+          VIEWER_SHA: ${{ needs.viewer.outputs.sha }}
         run: |
-          echo "{\"release\":\"$(date -u +%Y-%m-%d_%H%M%S)-${GITHUB_SHA::7}\",\"commit\":\"${GITHUB_SHA}\",\"branch\":\"${GITHUB_REF_NAME}\"}" > dist/version.json
+          echo "{\"release\":\"$(date -u +%Y-%m-%d_%H%M%S)-${GITHUB_SHA::7}\",\"commit\":\"${GITHUB_SHA}\",\"branch\":\"${GITHUB_REF_NAME}\",\"viewer\":\"${VIEWER_SHA}\"}" > dist/version.json
 
       # Private network: ephemeral node, tagged key (reaches the deploy host's SSH only).
       - name: Join the private network

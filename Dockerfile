@@ -10,6 +10,13 @@ COPY package*.json .npmrc ./
 # dist/, EvilFlowersViewer#149). npm fetches it with git, which node:alpine does not ship.
 RUN apk add --no-cache git
 RUN npm ci
+# VIEWER_SHA (a commit, set by CI for dev: the viewer develop head) replaces the pinned viewer.
+# A commit, not a branch name: the value is the layer's cache key, so a new commit rebuilds it.
+ARG VIEWER_SHA=""
+RUN if [ -n "$VIEWER_SHA" ]; then \
+      npm install --no-save --no-audit --no-fund "github:EvilFlowersCatalog/EvilFlowersViewer#${VIEWER_SHA}" && \
+      grep -q "EvilFlowersViewer.git#${VIEWER_SHA}\"" node_modules/.package-lock.json; \
+    fi
 COPY . .
 # Faro `app.release` (#58): the commit the image was built from (no .git in the build context).
 ARG GIT_SHA=""

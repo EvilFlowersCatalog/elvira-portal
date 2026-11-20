@@ -157,8 +157,10 @@ The reader (`src/pages/common/Viewer.tsx`) loads the PDF one of two ways (elvira
   `'unsafe-eval'` needed.
 - One loading screen (`ReaderLoader`: cover, title, status) covers the wait from the click to the first painted
   page, the viewer's own spinner included.
-- The viewer is a git dependency pinned to an EvilFlowersViewer commit in `package-lock.json` (every build and
-  image uses it). Bump it with `npm install github:EvilFlowersCatalog/EvilFlowersViewer#<sha>`.
+- The viewer is a git dependency pinned to an EvilFlowersViewer commit in `package-lock.json`: local installs
+  and every `master` build/image use it (bump with `npm install github:EvilFlowersCatalog/EvilFlowersViewer#<sha>`).
+  `dev` builds (dev.elvira.stuba.sk, e-knihy.ku.sk, `:dev` image) replace it with the head of viewer `develop`,
+  resolved once per run (see Deploy).
 
 ![Reader: PDF streaming from a signed URL](docs/diagrams/sequence-reader-streaming.svg)
 
@@ -203,7 +205,11 @@ Gate new UI with `useFeature('<key>')`, routes with `<RequireFeature feature='<k
   EvilFlowersViewer `develop`). Push to `dev`: the `deploy-ku` job in `.github/workflows/deploy.yml`
   builds with `npm run build:ku` (`env/.env.ku`), joins the private network, uploads a release and swaps
   `current` (last 5 kept). Rollback = re-run an older successful run. `https://e-knihy.ku.sk/version.json`
-  names the live release.
+  names the live release and the viewer commit (`viewer`).
+- **Viewer on dev** — the `viewer` job resolves EvilFlowersViewer `develop` to a commit at the start of each
+  run; the dev deploy, the KU deploy and the `:dev` image all install exactly that commit over the lockfile
+  pin and fail if a different one ends up in `node_modules`. The run summary names it. A new viewer commit
+  alone does not start a run: push to `dev`, or Actions › Deploy › Run workflow on `dev`.
 
   The host side (deploy account, network ACL, GitHub Environment `e-knihy.ku.sk`, `releases/` +
   `current` layout) is EvilFlowersCatalog/knowledge#83; the catalog's minimal-instance settings
