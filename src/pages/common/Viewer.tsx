@@ -1,12 +1,12 @@
 import { config, viewerLoading } from '@/lib/config';
-import { EVENTS, measure, track, trackOutcome } from '@/lib/analytics';
+import { EVENTS, measure, track, trackOutcome, viewerTelemetrySink } from '@/lib/analytics';
 import {
   useLocation,
   useNavigate,
   useSearchParams,
 } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IUserAcquisitionShare } from "../../utils/interfaces/acquisition";
 import useCreateUserAcquisition from "../../hooks/api/acquisitiions/user-acquistions/useCreateUserAcquisition";
 import { NAVIGATION_PATHS } from "../../utils/interfaces/general/general";
@@ -82,9 +82,13 @@ interface ISuggestedEntry {
   thumbnail: string;
   shelf_record_id?: string | null;
 }
+/** The viewer's `IExplainResult`: `simple` is required, every other part adds a section to the Explain card. */
 interface IExplainResult {
   simple: string;
-  examples: { label: string; description: string }[];
+  examples?: { label: string; description: string }[];
+  detailed?: string | null;
+  terms?: { term: string; definition: string }[];
+  followUps?: string[];
 }
 
 const rootId = "elvira-viewer-app";
@@ -171,6 +175,12 @@ type ViewerSource = {
 export type ViewerController = {
   open(source: ViewerSource, at?: { initialPage?: number | null }): void;
   getState(): { page: number; search?: { query?: string | null } | null };
+  /** Called after every state change; with `getState` a `useSyncExternalStore` source (useReaderPage). */
+  subscribe?(listener: () => void): () => void;
+  /** Replace services and callbacks without remounting; a key set to null removes it. */
+  setOptions?(options: Record<string, unknown>): void;
+  setLang?(lang: string): void;
+  setTheme?(theme: string | null): void;
   goToPage?(page: number): void;
   goToLabel?(label: string): Promise<number | null> | number | null;
   openPanel?(panel: ReaderPanel | null): void;
@@ -189,14 +199,6 @@ type DocumentErrorInfo = {
   reason?: string;
   status?: number | null;
   source?: string;
-};
-
-type FirstPageInfo = {
-  page: number;
-  durationMs: number;
-  source?: string;
-  bytesLoaded?: number | null;
-  totalBytes?: number | null;
 };
 
 /** The longest the reader's loading screen waits for the first painted page before stepping aside. */
@@ -268,15 +270,25 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
   const graphPanels = useFeature("graph");
   // Explain and the in-reader chat need the assistant (Administration › Features).
   const assistantOn = useFeature("assistant");
-  const { page: readerPage, onPageChange: onReaderPageChange } = useReaderPage(rootId);
+  // The mounted viewer's controller: its state is read through useSyncExternalStore (useReaderPage) and
+  // its services are swapped through setOptions, never by remounting (#64).
+  const [viewerController, setViewerController] = useState<ViewerController | null>(null);
+  const readerPage = useReaderPage(viewerController);
 
-  let acquisition_id = "";
-  let user_acquisition_id = "";
+  // The open copy and the reader's annotation containers. Refs, not per-render variables: the handlers
+  // handed to the viewer later through setOptions come from later renders and must see the same values.
+  const copy = useRef({ acquisitionId: "", userAcquisitionId: "" }).current;
+  const containers = useRef<{
+    highlightsId: string | null;
+    highlightsRequest: Promise<string> | null;
+    bookmarksId: string | null;
+    bookmarksRequest: Promise<string | null> | null;
+  }>({ highlightsId: null, highlightsRequest: null, bookmarksId: null, bookmarksRequest: null }).current;
 
   const shareFunction = async (pages: string | null, expireDate: string) => {
     // creat share user acquistion object
     const userAcquisitionShare: IUserAcquisitionShare = {
-      acquisition_id,
+      acquisition_id: copy.acquisitionId,
       range: pages ?? "",
       type: "shared",
       expires_at: expireDate,
@@ -364,7 +376,7 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
   ): Promise<ISuggestedEntry[]> => {
     if (kind !== "similar") return [];
     try {
-      const similar = await getSimilarToPassage(user_acquisition_id, context?.selectedText ?? "");
+      const similar = await getSimilarToPassage(copy.userAcquisitionId, context?.selectedText ?? "");
       return await toSuggestedEntries(similar.map((item) => item.entry_id));
     } catch {
       return [];
@@ -374,18 +386,24 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
 
   // Shipped feature — deliberately not behind ELVIRA_EXPERIMENTAL_FEATURES
   // (false on elvira.stuba.sk), which used to hide "Vysvetliť" in production.
+  // Explain v2 (#64): the request honours the card's `signal` (closed, or something else explained). The
+  // assistant answers in one piece, so there is nothing to stream through `onPartial`; without `related`
+  // the viewer finds related passages itself.
   const explainFunction = async (
     selectedText: string,
-    context?: { page?: number }
+    context?: { page?: number; signal?: AbortSignal }
   ): Promise<IExplainResult> => {
     // A reader action in Umami and Faro (#59); never the selected text.
     track('Reader Explain', { entry_id: id, page: context?.page });
-    return explainPassage({
-      user_acquisition_id,
-      text: selectedText,
-      page: context?.page,
-      language: lang,
-    });
+    return explainPassage(
+      {
+        user_acquisition_id: copy.userAcquisitionId,
+        text: selectedText,
+        page: context?.page,
+        language: lang,
+      },
+      { signal: context?.signal },
+    );
   };
 
   // --- Reading chat ---------------------------------------------------------
@@ -441,7 +459,7 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
       if (!chatId) {
         const chat = await startChat({
           entry_id: id,
-          user_acquisition_id,
+          user_acquisition_id: copy.userAcquisitionId,
           catalog_id: entryCatalogId || config.ELVIRA_CATALOG_ID || undefined,
         });
         chatId = chat.id;
@@ -481,7 +499,7 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
           onError: (detail) => handlers.onError(detail || t("assistant.errors.generic")),
           onDone: () => {},
         },
-        { contexts, page: meta.page, userAcquisitionId: user_acquisition_id, language: lang }
+        { contexts, page: meta.page, userAcquisitionId: copy.userAcquisitionId, language: lang }
       );
       await Promise.all(pending);
       queryClient.invalidateQueries({ queryKey: ["user-chats"] });
@@ -561,7 +579,7 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
   const saveGroupFunc = async (name: string): Promise<{ response: { id: string } }> => {
     try {
       const response = await createAnotation({
-        user_acquisition_id,
+        user_acquisition_id: copy.userAcquisitionId,
         title: name,
       });
       // toast within editor only notifications.editPage.group.add.success
@@ -629,33 +647,31 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
   // "Zvýrazniť" in the viewer's selection menu: one annotation of kind
   // `highlight` per user acquisition, an item per highlight with its text and
   // line boxes, listed beside the AI highlights (IP-018).
-  let highlightsAnotationId: string | null = null;
-  let highlightsAnotationRequest: Promise<string> | null = null;
-
+  // The annotation id and its creating request live in `containers`.
   const findHighlightsAnotation = async (): Promise<string | null> => {
-    if (highlightsAnotationId) return highlightsAnotationId;
-    const { items } = await getAnotations(user_acquisition_id);
-    highlightsAnotationId = items.find((item) => item.kind === "highlight")?.id ?? null;
-    return highlightsAnotationId;
+    if (containers.highlightsId) return containers.highlightsId;
+    const { items } = await getAnotations(copy.userAcquisitionId);
+    containers.highlightsId = items.find((item) => item.kind === "highlight")?.id ?? null;
+    return containers.highlightsId;
   };
 
   const ensureHighlightsAnotation = (): Promise<string> => {
-    if (!highlightsAnotationRequest) {
-      highlightsAnotationRequest = (async () => {
+    if (!containers.highlightsRequest) {
+      containers.highlightsRequest = (async () => {
         const existing = await findHighlightsAnotation();
         if (existing) return existing;
         const created = await createAnotation({
-          user_acquisition_id,
+          user_acquisition_id: copy.userAcquisitionId,
           title: t("assistant.myHighlights"),
           kind: "highlight",
         });
-        highlightsAnotationId = created.id;
+        containers.highlightsId = created.id;
         return created.id;
       })().finally(() => {
-        highlightsAnotationRequest = null;
+        containers.highlightsRequest = null;
       });
     }
-    return highlightsAnotationRequest;
+    return containers.highlightsRequest;
   };
 
   const toReaderHighlight = (item: {
@@ -712,40 +728,38 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
   // --- Page bookmarks -------------------------------------------------------
   // One dedicated annotation per user acquisition holds an item per bookmarked
   // page (`content: true`) — a page is bookmarked iff its item exists.
-  let bookmarksAnotationId: string | null = null;
-  let bookmarksAnotationRequest: Promise<string | null> | null = null;
-
+  // The annotation id and its creating request live in `containers`.
   const findBookmarksAnotation = async (): Promise<string | null> => {
-    if (bookmarksAnotationId) return bookmarksAnotationId;
+    if (containers.bookmarksId) return containers.bookmarksId;
 
-    const { items } = await getAnotations(user_acquisition_id);
-    bookmarksAnotationId =
+    const { items } = await getAnotations(copy.userAcquisitionId);
+    containers.bookmarksId =
       items.find((item) => item.title === PAGE_BOOKMARKS_TITLE)?.id ?? null;
 
-    return bookmarksAnotationId;
+    return containers.bookmarksId;
   };
 
   const ensureBookmarksAnotation = async (): Promise<string | null> => {
-    if (bookmarksAnotationId) return bookmarksAnotationId;
+    if (containers.bookmarksId) return containers.bookmarksId;
 
-    if (!bookmarksAnotationRequest) {
-      bookmarksAnotationRequest = (async () => {
+    if (!containers.bookmarksRequest) {
+      containers.bookmarksRequest = (async () => {
         const existing = await findBookmarksAnotation();
         if (existing) return existing;
 
         const created = await createAnotation({
-          user_acquisition_id,
+          user_acquisition_id: copy.userAcquisitionId,
           title: PAGE_BOOKMARKS_TITLE,
           kind: "bookmarks",
         });
-        bookmarksAnotationId = created.id;
+        containers.bookmarksId = created.id;
         return created.id;
       })().finally(() => {
-        bookmarksAnotationRequest = null;
+        containers.bookmarksRequest = null;
       });
     }
 
-    return bookmarksAnotationRequest;
+    return containers.bookmarksRequest;
   };
 
   const getPageBookmarksFunc = async (): Promise<IPageBookmark[]> => {
@@ -811,7 +825,7 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
 
   const getGroupsFunc = async (): Promise<{ id: string; name: string }[]> => {
     try {
-      const { items } = await getAnotations(user_acquisition_id);
+      const { items } = await getAnotations(copy.userAcquisitionId);
       // The page-bookmark container is an annotation too — keep it out of the
       // editor's group list.
       // Only the drawing layer: agent annotations have their own layer and
@@ -830,7 +844,7 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
   // Agent highlights (IP-018): the assistant marks passages in the reader's copy.
   const getAgentAnnotationsFunc = async (): Promise<IAgentAnnotation[]> => {
     try {
-      return await getAgentAnnotations(user_acquisition_id);
+      return await getAgentAnnotations(copy.userAcquisitionId);
     } catch {
       return [];
     }
@@ -839,7 +853,7 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
   const requestAgentAnnotationFunc = (prompt: string) => {
     // A reader action in Umami and Faro (#59); never the prompt.
     track('Reader Highlight', { entry_id: id, source: 'viewer' });
-    return requestAgentAnnotation(user_acquisition_id, prompt, lang);
+    return requestAgentAnnotation(copy.userAcquisitionId, prompt, lang);
   };
 
   const waitForAgentAnnotationFunc = (annotationId: string) => waitForAgentAnnotation(annotationId);
@@ -855,7 +869,7 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
   // Extracted figures, tables and equations (IP-018); no extraction means no regions.
   const getRegionsFunc = async (page: number) => {
     try {
-      return await getRegions(user_acquisition_id, page);
+      return await getRegions(copy.userAcquisitionId, page);
     } catch {
       return [];
     }
@@ -864,14 +878,73 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
   // Every region of the copy, for the viewer's contents "Figures" tab.
   const getAllRegionsFunc = async () => {
     try {
-      return await getRegions(user_acquisition_id);
+      return await getRegions(copy.userAcquisitionId);
     } catch {
       return [];
     }
   };
 
+  /**
+   * The viewer options whose handlers close over render values (language, catalog, the open chat, the
+   * assistant feature). Built from this render; handed in at mount and again through `setOptions` when
+   * those values change, so the viewer never keeps a stale closure and is never remounted for it (#64).
+   * Without the assistant the viewer gets neither Explain, the chat nor AI highlight layers
+   * (Administration › Features): null removes a key through setOptions.
+   */
+  const hostServices = () => ({
+    closeFunction,
+    linkFunction,
+    shareFunction,
+    explainFunction: assistantOn ? explainFunction : null,
+    chatPackage: assistantOn
+      ? {
+          sendMessageFunc: sendChatMessageFunc,
+          getChatsFunc,
+          getChatFunc,
+          deleteChatFunc,
+          // Evidence citations (IP-024): this book jumps to the page, others open here.
+          entryId: id,
+          openCitationFunc: (citation: ViewerCitation) => openCitation(fromViewerCitation(citation)),
+        }
+      : null,
+    // AI highlight layers are the assistant's (`/assistant/v1/highlights`).
+    agentAnnotationPackage: assistantOn
+      ? {
+          getAnnotationsFunc: getAgentAnnotationsFunc,
+          requestAnnotationFunc: requestAgentAnnotationFunc,
+          waitForAnnotationFunc: waitForAgentAnnotationFunc,
+          deleteHighlightFunc: deleteAgentHighlightFunc,
+          deleteAnnotationFunc: deleteAgentAnnotationFunc,
+        }
+      : null,
+  });
+  // What `hostServices` depends on; the viewer is refreshed when it changes.
+  const servicesKey = JSON.stringify([lang, assistantOn, entryCatalogId, aiChatId]);
+  // The key the mounted viewer's services were built with.
+  const servicesKeyApplied = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!viewerController?.setOptions || servicesKeyApplied.current === servicesKey) return;
+    servicesKeyApplied.current = servicesKey;
+    viewerController.setOptions(hostServices());
+    // hostServices is rebuilt every render; servicesKey names what it reads.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [viewerController, servicesKey]);
+
+  // Language and theme switch in place.
+  useEffect(() => {
+    viewerController?.setLang?.(lang);
+  }, [viewerController, lang]);
+  useEffect(() => {
+    viewerController?.setTheme?.(theme);
+  }, [viewerController, theme]);
+
   useEffect(() => {
     if (!id) return;
+    // A publication of its own: no annotation containers known yet.
+    Object.assign(containers, { highlightsId: null, highlightsRequest: null, bookmarksId: null, bookmarksRequest: null });
+    // The services handed in below are this render's.
+    servicesKeyApplied.current = servicesKey;
 
     // The viewer library now ships fully self-scoped styles — every rule lives
     // under its own `.efv-viewer` root class and its global preflight is
@@ -948,8 +1021,8 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
         const userAcquisition = await session.copy;
         if (cancelled) return;
 
-        acquisition_id = resolved.acquisitionId;
-        user_acquisition_id = userAcquisition.id;
+        copy.acquisitionId = resolved.acquisitionId;
+        copy.userAcquisitionId = userAcquisition.id;
 
         // Where the PDF comes from (#63). Streaming: the viewer range-loads a URL and paints the first
         // page before the last byte. Otherwise the whole file is downloaded here first, as before.
@@ -982,7 +1055,7 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
           if (renewed || cancelled || status !== 403 || !isSigned(source.url) || !viewerApp?.viewer) return false;
           renewed = true;
           try {
-            const fresh = await getUserAcquisitionInfo(user_acquisition_id);
+            const fresh = await getUserAcquisitionInfo(copy.userAcquisitionId);
             if (!fresh.stream_url || cancelled) return false;
             const page = viewerApp.viewer.getState().page;
             source = { ...source, url: fresh.stream_url };
@@ -1006,33 +1079,14 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
             theme,
             lang,
             citationBib: entryDetail.citation,
-            closeFunction,
             homeFunction,
-            shareFunction,
-            // EvilFlowersViewer#155; a viewer without it ignores the key.
-            ...{ linkFunction },
             openEntryDetailFunction,
             bookmarkToggleFunction,
             suggestionsFunction,
-            // Without the assistant the viewer gets neither function and shows no "Explain" or chat
-            // (Administration › Features). Spread so the build passes whichever keys the viewer marks required.
-            ...(assistantOn
-              ? {
-                  explainFunction,
-                  chatPackage: {
-                    sendMessageFunc: sendChatMessageFunc,
-                    getChatsFunc,
-                    getChatFunc,
-                    deleteChatFunc,
-                    // Evidence citations (IP-024): this book jumps to the page, others open here.
-                    // Spread so the build passes against a viewer whose IChatPackage lacks the keys.
-                    ...{
-                      entryId: id,
-                      openCitationFunc: (citation: ViewerCitation) => openCitation(fromViewerCitation(citation)),
-                    },
-                  },
-                }
-              : {}),
+            // Close, link, share, Explain, the chat and AI highlights (#64): the same builder later feeds
+            // setOptions. A key the assistant does not get is left out here. Spread so the build passes
+            // whichever keys the viewer marks required.
+            ...Object.fromEntries(Object.entries(hostServices()).filter(([, value]) => value != null)),
             // Opens where the address says: a passage's page (`loc`), else `page`.
             initialPage: locator?.page || opened.page,
             // ...at the cited passage or figure (IP-030): outline `bbox`, flash `quads`, then fade. From the
@@ -1065,18 +1119,6 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
               getLayerFunc,
               getGroupsFunc,
             },
-          // AI highlight layers are the assistant's (`/assistant/v1/highlights`): none without it.
-          ...(assistantOn
-            ? {
-                agentAnnotationPackage: {
-                  getAnnotationsFunc: getAgentAnnotationsFunc,
-                  requestAnnotationFunc: requestAgentAnnotationFunc,
-                  waitForAnnotationFunc: waitForAgentAnnotationFunc,
-                  deleteHighlightFunc: deleteAgentHighlightFunc,
-                  deleteAnnotationFunc: deleteAgentAnnotationFunc,
-                },
-              }
-            : {}),
           // Viewer 0.7.3+; older viewers ignore it. Spread so the build also
           // passes against a viewer whose IViewerOptions lacks the key.
           ...{
@@ -1086,22 +1128,20 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
               deleteHighlightFunc: deleteReaderHighlightFunc,
             },
           },
-          // The reader's wait to the first page (#59, EvilFlowersViewer#150): from opening this screen
-          // (entry detail, licence and, without streaming, the PDF download included) to the first painted
-          // page; `render_ms` is the viewer's own load and paint. `streaming` (#63) is the portal setting
-          // (url vs data), so the dashboards compare like with like. Viewer 0.7.9 lacks some keys; the spread
-          // keeps the build passing and older viewers ignore them.
+          // The viewer's own telemetry into Faro (#64, EvilFlowersViewer docs/telemetry.md): document open,
+          // first paint, page renders, host calls, main-thread stalls. Nothing without Faro.
+          ...{ telemetry: viewerTelemetrySink() },
+          // The reader's wait to the first page (#59): from opening this screen (entry detail, licence and,
+          // without streaming, the PDF download included) to the first painted page. The viewer's own part
+          // (load, paint, bytes) is `viewer.document.first_paint` in its telemetry; this is the portal's
+          // whole wait, which only the portal can time. `streaming` (#63) is the portal setting (url vs data),
+          // so the dashboards compare like with like.
           ...{
-            onFirstPageRendered: ({ durationMs, bytesLoaded, totalBytes }: FirstPageInfo) => {
+            onFirstPageRendered: () => {
               revealReader();
               measure(
                 "viewer",
-                {
-                  first_page_ms: Math.round(performance.now() - openedAt),
-                  render_ms: durationMs,
-                  ...(typeof bytesLoaded === "number" ? { bytes_loaded: bytesLoaded } : {}),
-                  ...(typeof totalBytes === "number" ? { total_bytes: totalBytes } : {}),
-                },
+                { first_page_ms: Math.round(performance.now() - openedAt) },
                 {
                   kind: "pdf",
                   streaming: String(loading.streaming),
@@ -1125,10 +1165,12 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
             onStreamError: ({ status }: { status: number | null }) => {
               void renewStreamUrl(status);
             },
-            onPageChange: onReaderPageChange,
             // pdf.js resources (wasm decoders for JPX/JBIG2 scans, CMaps, standard fonts, ICC profiles),
             // copied from the installed pdfjs-dist at build time (vite.config.ts).
             pdfAssetsUrl: `${import.meta.env.BASE_URL}pdfjs/`,
+            // The pdf.js worker of the same pdfjs-dist, hashed under assets/ (#64): the viewer's bundled
+            // ~1.7 MB `data:` worker chunk is then never downloaded, and the file is cached across visits.
+            ...(__PDFJS_WORKER__ ? { pdfWorkerUrl: `${import.meta.env.BASE_URL}${__PDFJS_WORKER__}` } : {}),
           },
           regionPackage: { getRegionsFunc, getAllRegionsFunc },
           pageBookmarkPackage: {
@@ -1150,6 +1192,7 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
         if (!viewerApp?.viewer) revealReader();
         else {
           revealTimer = setTimeout(revealReader, READER_LOADER_MAX_MS);
+          setViewerController(viewerApp.viewer);
           // The address follows the reader (page, search, Navigator section) and Back / Forward move it.
           const openedPage = locator?.page || opened.page || null;
           detachUrlSync = attachUrlSync(viewerApp.viewer, {
@@ -1174,6 +1217,7 @@ const Viewer = ({ route }: { route: IReaderRouteData }) => {
       cancelled = true;
       clearTimeout(revealTimer);
       detachUrlSync();
+      setViewerController(null);
       viewerApp?.unmount();
 
       // Remove the scoped styles

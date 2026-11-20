@@ -355,6 +355,9 @@ export const currentSessionId = (): string | undefined => {
   }
 };
 
+/** Faro is initialised (a receiver is configured): callers can skip work that only feeds it. */
+export const telemetryEnabled = (): boolean => enabled;
+
 /** The current screen's trace id (Faro on), for a "Ref …" on the error screen. */
 export const currentTraceId = (): string | undefined => (enabled ? routeTraceId : undefined);
 

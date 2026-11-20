@@ -41,7 +41,7 @@ else streaming off
 end
 viewer -> portal : onFirstPageRendered(durationMs, source)
 portal -> reader : loader fades out
-portal -> portal : Faro type=viewer: first_page_ms,\nrender_ms, context_streaming, context_source
+portal -> portal : Faro type=viewer: first_page_ms,\ncontext_streaming, context_source\n(viewer.document.first_paint etc. via options.telemetry)
 opt signature expired (403) on open or on a later range
   viewer -> portal : onDocumentError / onStreamError\n(status 403)
   portal -> api : GET /api/v1/user-acquisitions/<id>\n(Bearer)

@@ -4,6 +4,7 @@ import { cpSync, existsSync, readFileSync, statSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { dirname, join, normalize, resolve, sep } from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 import react from '@vitejs/plugin-react';
 
 /**
@@ -13,6 +14,8 @@ import react from '@vitejs/plugin-react';
  * always match, also when CI swaps in the viewer's `develop`).
  */
 const PDFJS_FOLDERS = ['wasm', 'cmaps', 'standard_fonts', 'iccs'];
+/** The pdf.js worker the viewer's own pdfjs-dist ships (`pdfWorkerUrl`, elvira-portal#64). */
+const PDFJS_WORKER = join('legacy', 'build', 'pdf.worker.min.mjs');
 const pdfjsAssets = (): Plugin => {
   let root = '';
   /** Null (with a warning) when it cannot be resolved: the viewer then decodes without the Wasm helpers. */
@@ -26,14 +29,35 @@ const pdfjsAssets = (): Plugin => {
       return null;
     }
   };
+  /**
+   * Where the worker is served, relative to the base: `assets/pdf.worker-<content hash>.min.js`. Under
+   * `assets/` with a content hash, so the deployments' nginx rule for `/assets/` (immutable, IP-027) caches
+   * it for good and a viewer upgrade gets a new name. `.js`, not `.mjs`: a module worker needs a JavaScript
+   * MIME type and nginx's stock mime.types may not map `.mjs`. Null without pdfjs-dist: the viewer then
+   * loads its bundled copy.
+   */
+  const workerFile = (() => {
+    const base = pdfjsRoot();
+    const source = base && join(base, PDFJS_WORKER);
+    if (!source || !existsSync(source)) return null;
+    const hash = createHash('sha256').update(readFileSync(source)).digest('hex').slice(0, 10);
+    return { source, path: `assets/pdf.worker-${hash}.min.js` };
+  })();
   return {
     name: 'pdfjs-assets',
+    config: () => ({ define: { __PDFJS_WORKER__: JSON.stringify(workerFile?.path ?? null) } }),
     configResolved(resolved) {
       root = resolve(resolved.root, resolved.build.outDir);
     },
     configureServer(server) {
       const base = pdfjsRoot();
       if (!base) return;
+      if (workerFile) {
+        server.middlewares.use(`/${workerFile.path}`, (_req, res) => {
+          res.setHeader('Content-Type', 'text/javascript');
+          res.end(readFileSync(workerFile.source));
+        });
+      }
       server.middlewares.use('/pdfjs', (req, res, next) => {
         const path = normalize(decodeURIComponent((req.url ?? '').split('?')[0])).replace(/^([/\\])+/, '');
         const file = join(base, path);
@@ -50,6 +74,7 @@ const pdfjsAssets = (): Plugin => {
         const from = join(base, folder);
         if (existsSync(from)) cpSync(from, join(root, 'pdfjs', folder), { recursive: true });
       }
+      if (workerFile) cpSync(workerFile.source, join(root, workerFile.path));
     },
   };
 };
@@ -101,7 +126,10 @@ export default defineConfig({
         manualChunks(id) {
           if (id.includes('node_modules')) {
             if (/[\\/](react|react-dom|react-router-dom)[\\/]/.test(id)) return 'vendor-react';
-            if (id.includes('@evilflowers/evilflowersviewer')) return 'vendor-viewer';
+            // The viewer's entry only: its own lazy chunks (`dist/chunks/`: the bundled pdf.js worker, the
+            // renderer worker, print, QR, ink) stay lazy. Pulled in here, the ~1.7 MB bundled worker would
+            // be downloaded on every read even with `pdfWorkerUrl` (#64).
+            if (id.includes('@evilflowers/evilflowersviewer') && !/[\\/]dist[\\/]chunks[\\/]/.test(id)) return 'vendor-viewer';
             if (/[\\/](react-i18next|i18next)[\\/]/.test(id)) return 'vendor-i18n';
             if (/[\\/](react-markdown|remark-gfm)[\\/]/.test(id)) return 'vendor-markdown';
           }

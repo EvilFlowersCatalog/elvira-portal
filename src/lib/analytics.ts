@@ -33,6 +33,7 @@ import {
   routePattern,
   safeAttributes,
   setTelemetryAuth,
+  telemetryEnabled,
   trackEvent,
   trackMeasurement,
   trackUserAction,
@@ -158,6 +159,45 @@ export const startAssistantTimer = (kind: 'chat' | 'explain') => {
       const values: Record<string, number> = { total_ms: Math.round(performance.now() - started) };
       if (firstToken !== undefined) values.first_token_ms = Math.round(firstToken);
       measure('assistant', values, { kind, outcome });
+    },
+  };
+};
+
+/** One event of the viewer's telemetry (EvilFlowersViewer docs/telemetry.md, `ITelemetryEvent`). */
+interface IViewerTelemetryEvent {
+  name: string;
+  time: number;
+  durationMs?: number;
+  level: 'info' | 'warn' | 'error';
+  sessionId: string;
+  documentSeq: number;
+  attributes: Record<string, string | number | boolean | null>;
+}
+
+/**
+ * The viewer's telemetry sink (`options.telemetry`, elvira-portal#64), or null with Faro off, so the viewer
+ * records nothing. Timed events become measurements (`viewer.<name>`, `duration_ms`), the rest events; the
+ * attributes reach Loki as `context_<key>` / `event_data_<key>`. The viewer sends no document content and
+ * bounded values only; `safeAttributes` still applies, as for every Faro record.
+ *
+ * `longFrames` stays on: Faro's web vitals give INP per interaction, not main-thread stalls while reading.
+ */
+export const viewerTelemetrySink = () => {
+  if (!telemetryEnabled()) return null;
+  return {
+    export: (batch: readonly IViewerTelemetryEvent[]) => {
+      for (const event of batch) {
+        const context = safeAttributes({
+          ...event.attributes,
+          level: event.level,
+          documentSeq: event.documentSeq,
+          viewerSession: event.sessionId,
+        });
+        // `viewer.mount` / `viewer.unmount` already carry the prefix.
+        const name = event.name.startsWith('viewer.') ? event.name : `viewer.${event.name}`;
+        if (event.durationMs !== undefined) trackMeasurement(name, { duration_ms: Math.round(event.durationMs) }, context);
+        else trackEvent(name, context);
+      }
     },
   };
 };

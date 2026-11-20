@@ -148,13 +148,23 @@ The reader (`src/pages/common/Viewer.tsx`) loads the PDF one of two ways (elvira
 - Signed URLs get no `traceparent` (it would add a preflight); their requests are traced as spans of their own.
   Faro strips the query (`sig=`) before sending. The gateway's access log still sees it: apply the Alloy
   redaction (knowledge, cookbook §11c) before production.
-- Faro `type=viewer` carries `context_streaming` (the setting) and `context_source` (`url` / `data`), next to
-  `first_page_ms` and `render_ms`.
+- Faro `type=viewer` carries `first_page_ms` (the portal's whole wait, click to first page),
+  `context_streaming` (the setting) and `context_source` (`url` / `data`).
+- The viewer's own telemetry goes to Faro too (#64, `viewerTelemetrySink` in `src/lib/analytics.ts`): timed
+  events as measurements `viewer.<event>` (`duration_ms`: `viewer.document.first_paint`, `viewer.page.render`,
+  `viewer.host.call` with `context_fn`, `viewer.ui.long_frame`, …), the rest as events. No document content;
+  nothing without Faro.
 - The build copies the pdf.js resource folders (`wasm/`, `cmaps/`, `standard_fonts/`, `iccs/`) of the installed
   viewer's `pdfjs-dist` to `dist/pdfjs/` (served at `/pdfjs/` in dev), the viewer's `pdfAssetsUrl`. They give
   scans (JPX/JBIG2) their Wasm decoders.
-- CSP for the host, when it sets one: `worker-src 'self' data: blob:`, the catalog origin in `connect-src`, no
-  `'unsafe-eval'` needed.
+- The pdf.js worker of the same `pdfjs-dist` is served as `assets/pdf.worker-<hash>.min.js` (`pdfWorkerUrl`,
+  #64): cached as immutable like every `/assets/` file, and the viewer's bundled `data:` worker chunk (~600 kB
+  gzip) is never downloaded. `vendor-viewer` holds the viewer's entry only, so its lazy chunks stay lazy.
+- CSP for the host, when it sets one: `worker-src 'self' blob:` (`data:` no longer needed with the hosted
+  worker), the catalog origin in `connect-src`, no `'unsafe-eval'` needed.
+- The reader reads the viewer's state with `useSyncExternalStore` (`useReaderPage`) and swaps its services
+  (Explain, chat, AI highlights, close / link / share) through `setOptions` when the language, catalog, open chat
+  or assistant feature changes: never a remount.
 - One loading screen (`ReaderLoader`: cover, title, status) covers the wait from the click to the first painted
   page, the viewer's own spinner included.
 - The viewer is a git dependency pinned to an EvilFlowersViewer commit in `package-lock.json`: local installs
@@ -208,8 +218,9 @@ Gate new UI with `useFeature('<key>')`, routes with `<RequireFeature feature='<k
   names the live release and the viewer commit (`viewer`).
 - **Viewer on dev** — the `viewer` job resolves EvilFlowersViewer `develop` to a commit at the start of each
   run; the dev deploy, the KU deploy and the `:dev` image all install exactly that commit over the lockfile
-  pin and fail if a different one ends up in `node_modules`. The run summary names it. A new viewer commit
-  alone does not start a run: push to `dev`, or Actions › Deploy › Run workflow on `dev`.
+  pin and fail if a different one ends up in `node_modules`. The run summary names it. A push to viewer `develop`
+  starts a run on `dev` (the viewer's `deploy-portal-dev.yml`, EvilFlowersViewer#160); by hand: Actions ›
+  Deploy › Run workflow on `dev`.
 
   The host side (deploy account, network ACL, GitHub Environment `e-knihy.ku.sk`, `releases/` +
   `current` layout) is EvilFlowersCatalog/knowledge#83; the catalog's minimal-instance settings

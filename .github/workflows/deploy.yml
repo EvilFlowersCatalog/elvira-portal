@@ -35,8 +35,8 @@ jobs:
   #             e-knihy.ku.sk and the :dev image alike. Resolved once, as a commit, so the three
   #             builds cannot drift apart and the image's layer cache cannot serve an older viewer
   #             (a literal `develop` build-arg never changes the cache key).
-  # A new viewer develop commit alone does not start this workflow: re-run it from Actions
-  # (workflow_dispatch on `dev`) or push to dev.
+  # A push to viewer develop starts this workflow on `dev` via workflow_dispatch, from the viewer
+  # repo's deploy-portal-dev.yml (EvilFlowersViewer#160). By hand: Actions › Deploy › Run on `dev`.
   viewer:
     name: Viewer (${{ github.ref_name }})
     runs-on: ubuntu-latest

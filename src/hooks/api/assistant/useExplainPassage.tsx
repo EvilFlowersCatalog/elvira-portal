@@ -19,18 +19,21 @@ export interface IExplanation {
 const useExplainPassage = () => {
   const axios = useAxios();
 
-  const explainPassage = async (body: IExplainPassage): Promise<IExplanation> => {
+  /** `signal` cancels the request (the viewer's Explain card closed or moved on, elvira-portal#64). */
+  const explainPassage = async (body: IExplainPassage, options?: { signal?: AbortSignal }): Promise<IExplanation> => {
     // The reader's wait, as a Faro measurement (#59). Not streamed, so total_ms only.
     const timer = startAssistantTimer('explain');
     try {
       const { data } = await axios.post<{ response: IExplanation }>(`${ASSISTANT_URL}/explain`, body, {
         // Waits on the model, which reads pages of the copy first.
         timeout: LONG_TIMEOUT,
+        signal: options?.signal,
       });
       timer.end('ok');
       return data.response;
     } catch (error) {
-      timer.end('error');
+      // A cancelled explanation is the reader moving on, not a failure.
+      if (!options?.signal?.aborted) timer.end('error');
       throw error;
     }
   };
