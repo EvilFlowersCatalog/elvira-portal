@@ -2,7 +2,7 @@ import React from "react";
 
 export function ActionsWrapper({ children }: { children: React.ReactNode }) {
     // A lone last button (odd count after the full-width first row) spans the whole row.
-    return <div className='grid grid-cols-2 gap-4 py-4 mt-auto mb-4 [&>*:last-child:nth-child(even)]:col-span-2'>
+    return <div className='grid grid-cols-2 gap-2 pt-2 pb-4 mt-auto mb-4 [&>*:last-child:nth-child(even)]:col-span-2'>
         {children}
     </div>
 }
