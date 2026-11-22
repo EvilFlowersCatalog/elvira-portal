@@ -3604,7 +3604,7 @@ export const sk = {
     // ODKAZY: stránka publikácie a zdieľateľné adresy (docs/semantic-urls.md)
     links: {
       openPage: 'Otvoriť ako stránku',
-      copyLink: 'Kopírovať odkaz',
+      copyLink: 'Odkaz',
       copied: 'Odkaz bol skopírovaný.',
       backToLibrary: 'Späť do knižnice',
       back: 'Späť',

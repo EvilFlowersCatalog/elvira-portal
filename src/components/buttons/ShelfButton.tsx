@@ -38,11 +38,11 @@ const ShelfButton = ({
   return (
     <>
       {shelfId ? (
-        <div onClick={onClickRemove}>
+        <div className="h-full" onClick={onClickRemove}>
           {children}
         </div>
       ) : (
-        <div onClick={onClickAdd}>
+        <div className="h-full" onClick={onClickAdd}>
           {children}
         </div>
       )}
