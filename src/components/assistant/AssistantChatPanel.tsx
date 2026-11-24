@@ -7,6 +7,7 @@ import { answerSources } from '../../utils/func/assistantMessages';
 import CiteDialog from './CiteDialog';
 import useAppContext from '../../hooks/contexts/useAppContext';
 import { track } from '../../lib/analytics';
+import useAssistantCapabilities from '../../hooks/api/assistant/useAssistantCapabilities';
 import useAssistantChat, { IAssistantEntryRef, ISendOptions } from '../../hooks/api/assistant/useAssistantChat';
 import useStickToBottom from '../../hooks/useStickToBottom';
 import AssistantMessage from './AssistantMessage';
@@ -94,6 +95,17 @@ export default function AssistantChatPanel({
   const followUp = busy ? undefined : send;
   const subjectId = aiChatSubject?.entryId ?? attached?.id;
 
+  // An empty chat offers starter prompts right above the input (the welcome's request, cached).
+  const capabilities = useAssistantCapabilities({ entryId: subjectId, bound: !!aiChatSubject?.userAcquisitionId });
+  const starters = aiMessages.length
+    ? []
+    : (capabilities.data?.starters.length
+        ? capabilities.data.starters
+        : capabilities.isError
+          ? [t('assistant.suggestion1'), t('assistant.suggestion2')]
+          : []
+      ).slice(0, 3);
+
   return (
     <>
       <div ref={scrollRef} className={`flex flex-col grow overflow-y-auto ${compact ? '' : 'w-full max-w-5xl px-4 py-4'}`}>
@@ -137,6 +149,24 @@ export default function AssistantChatPanel({
       </div>
 
       <form onSubmit={handleSubmit} className={compact ? '' : 'w-full max-w-5xl px-4 pb-4'}>
+        {starters.length ? (
+          <div className="mb-2 flex flex-col gap-1">
+            <span className="text-xs text-gray-500 dark:text-gray-400">{t('assistant.welcome.tryAsking')}</span>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              {starters.map((starter) => (
+                <button
+                  key={starter}
+                  type="button"
+                  disabled={busy}
+                  onClick={() => send(starter)}
+                  className="flex-1 rounded-lg p-2 text-center text-sm bg-zinc-200 text-gray-600 hover:bg-zinc-300 dark:bg-zinc-700 dark:text-white dark:hover:bg-zinc-600 transition-colors"
+                >
+                  {starter}
+                </button>
+              ))}
+            </div>
+          </div>
+        ) : null}
         {attached ? (
           <div className="mb-1 flex w-full items-center gap-2 text-xs text-black dark:text-zinc-200">
             <p className="truncate">{t('assistant.entryAssistant', { x: attached.title ?? '' })}</p>

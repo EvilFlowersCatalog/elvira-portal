@@ -26,7 +26,8 @@ import {
 import useAuthContext from "../../../hooks/contexts/useAuthContext";
 import { useTranslation } from "react-i18next";
 import { useLocation } from "react-router-dom";
-import { FiCompass, FiLogOut, FiUser } from "react-icons/fi";
+import { FiCompass, FiLogOut, FiMap, FiUser } from "react-icons/fi";
+import GuideExplore from "../../guide/GuideExplore";
 import Gravatar from "react-gravatar";
 import Button from "../../buttons/Button";
 import { ReactElement, useEffect, useRef, useState } from "react";
@@ -130,6 +131,7 @@ const Navbar = () => {
 
   const [isCollapsed, setIsCollapsed] = useState(!isSmallDevice);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
+  const [guideOpen, setGuideOpen] = useState(false);
   const profileRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -357,6 +359,17 @@ const Navbar = () => {
             isActive={false}
             textVisible={!isCollapsed}
           />
+          {auth && (
+            <NavbarButton
+              name={t("guide.explore.title")}
+              path=""
+              onClick={() => setGuideOpen(true)}
+              icon={<FiMap size={20} />}
+              isActive={false}
+              textVisible={!isCollapsed}
+            />
+          )}
+          <GuideExplore open={guideOpen} onClose={() => setGuideOpen(false)} />
           {helpOn && (
           <NavbarButton
             name={t("navbarMenu.help")}

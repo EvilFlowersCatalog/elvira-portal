@@ -1,7 +1,9 @@
 import { createPortal } from "react-dom";
 import { config } from "@/lib/config";
 import { FaX } from "react-icons/fa6";
-import { FiPlus } from "react-icons/fi";
+import { FiClock, FiPlus } from "react-icons/fi";
+import AssistantHistory from "../assistant/AssistantHistory";
+import useAuthContext from "../../hooks/contexts/useAuthContext";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import useAppContext from "../../hooks/contexts/useAppContext";
@@ -18,6 +20,8 @@ export default function AiAssistant() {
     const [searchParams, setSearchParams] = useSearchParams();
     const { showAiAssistant, setShowAiAssistant, umamiTrack, clearAiChat } = useAppContext();
     const { getEntryDetail } = useGetEntryDetail();
+    const { auth } = useAuthContext();
+    const [showHistory, setShowHistory] = useState(false);
 
     const [assistantEntry, setAssistantEntry] = useState<IEntryDetail | null>(null);
     const [currentCatalogId] = useState<string | undefined>(config.ELVIRA_CATALOG_ID || undefined);
@@ -96,6 +100,17 @@ export default function AiAssistant() {
                             {t("assistant.title")}
                         </p>
                         <div className="flex gap-1">
+                            {auth ? (
+                                <button
+                                    type="button"
+                                    aria-label={t("assistant.chatHistory")}
+                                    title={t("assistant.chatHistory")}
+                                    onClick={() => setShowHistory(true)}
+                                    className="inline-flex items-center justify-center rounded-full p-2 hover:bg-black/5 dark:hover:bg-white/10 transition-colors"
+                                >
+                                    <FiClock size={18} className="text-black dark:text-white" />
+                                </button>
+                            ) : null}
                             <button
                                 type="button"
                                 aria-label={t("assistant.newChat")}
@@ -141,6 +156,7 @@ export default function AiAssistant() {
                         onClearEntry={clearAssistantEntry}
                     />
                 </div>
+                <AssistantHistory open={showHistory && showAiAssistant} onClose={() => setShowHistory(false)} />
             </div>
         </div>,
         document.body
