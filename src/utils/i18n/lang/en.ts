@@ -2986,14 +2986,13 @@ export const en = {
           empty: "No contents yet: they appear once the PDF is processed, or the PDF has no outline.",
         },
         chapters: {
-          intro: 'How the chapters of this publication connect: what each builds on and where its material returns. Open a chapter to see what to read first and where other books explain it.',
           empty: 'No chapter map yet: it appears once the publication is processed.',
           untitled: 'Section on page {{page}}',
           buildsOn: 'Builds on',
-          returnsIn: 'Returns in',
+          returnsIn: 'Continues in',
           linkStrength_one: '{{count}} related paragraph',
           linkStrength_other: '{{count}} related paragraphs',
-          expand: 'Show what to read first and related sections elsewhere',
+          expand: 'What to read first and where else it is explained',
           collapse: 'Hide',
         },
         insights: {

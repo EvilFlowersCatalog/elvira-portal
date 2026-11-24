@@ -233,12 +233,12 @@ const EntryDetailContent = ({ entryId, catalogId, tab, onTabChange, variant }: I
   const activeTab = tab && available.includes(tab) ? tab : available[0] ?? null;
 
   return (
-    <div className={variant === 'dialog' ? 'flex h-full flex-col mdlg:flex-row' : 'flex flex-col mdlg:flex-row min-h-full'}>
+    <div className={variant === 'dialog' ? 'flex flex-col mdlg:min-h-0 mdlg:flex-1 mdlg:flex-row' : 'flex flex-col mdlg:flex-row min-h-full'}>
       {/* Fixed-width left column: the tab content on the right must never change it. */}
       <div
         className={
           'p-8 bg-lightGray dark:bg-darkGray w-full mdlg:w-[400px] mdlg:flex-none flex flex-col ' +
-          (variant === 'dialog' ? 'h-full' : 'mdlg:sticky mdlg:top-0 mdlg:self-start mdlg:h-screen')
+          (variant === 'dialog' ? 'h-full mdlg:pb-0' : 'mdlg:sticky mdlg:top-0 mdlg:self-start mdlg:h-screen')
         }
       >
         <Thumbnail
