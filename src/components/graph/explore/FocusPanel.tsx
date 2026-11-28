@@ -1,8 +1,9 @@
-import { ReactNode, useMemo } from 'react';
+import { ReactNode, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiArrowLeft, FiBookOpen, FiExternalLink, FiX } from 'react-icons/fi';
 import { twMerge } from 'tailwind-merge';
-import { ExploreGraph, ExploreNode } from '../../../utils/func/exploreGraph';
+import { ExploreGraph, ExploreNode, PersonalMark } from '../../../utils/func/exploreGraph';
+import PubCard, { PersonalStatus } from './PubCard';
 import { useEntriesById } from '../../../hooks/api/graph/useGraph';
 import useOpenPublication, { readablePdfIndex } from '../../../hooks/useOpenPublication';
 import Thumbnail from '../../items/entry/Thumbnail';
@@ -79,28 +80,26 @@ const Chip = ({ node, label, onFocus }: { node: ExploreNode; label: string; onFo
   </button>
 );
 
-function EntryFocus({
-  graph,
-  node,
-  labelOf,
-  onFocus,
-  onHighlight,
-}: {
+interface FocusProps {
   graph: ExploreGraph;
   node: ExploreNode;
   labelOf: (n: ExploreNode) => string;
   onFocus: (id: string) => void;
   onHighlight: (id: string | null) => void;
-}) {
+  marks: Map<string, PersonalMark>;
+}
+
+function EntryFocus({ graph, node, labelOf, onFocus, onHighlight, marks }: FocusProps) {
   const { t } = useTranslation();
   const { openDetail, openAt } = useOpenPublication();
   const similar = graph.similar.get(node.id) ?? [];
   const topic = node.topicId ? graph.byId.get(node.topicId) : undefined;
   const domain = graph.byId.get(node.domainId!)!;
-  const siblings = (topic?.children ?? []).filter((id) => id !== node.id && !similar.some((s) => s.id === id));
+  const siblings = (topic?.children ?? []).filter((id) => id !== node.id && !similar.some((s) => s.id === id)).slice(0, 4);
+  const mark = marks.get(node.id);
 
   // One request for everything the panel shows; the previous answer stays up while hopping.
-  const { data: entries } = useEntriesById([node.id, ...similar.map((s) => s.id)], { keepPrevious: true });
+  const { data: entries } = useEntriesById([node.id, ...similar.map((s) => s.id), ...siblings], { keepPrevious: true });
   const entry = entries?.get(node.id);
   const summary = useMemo(() => plainText(entry?.summary), [entry?.summary]);
   const authors = entry?.authors?.map((a) => `${a.name} ${a.surname}`.trim()).filter(Boolean) ?? [];
@@ -117,22 +116,30 @@ function EntryFocus({
           wrapperClassName="h-32 w-24 shrink-0 rounded-lg shadow-md ring-1 ring-black/5"
         />
         <div className="min-w-0 flex-1">
-          <h2 className="text-lg font-bold leading-snug text-zinc-900 dark:text-zinc-50">{node.title}</h2>
+          <h2 className="line-clamp-4 text-base font-bold leading-snug text-zinc-900 dark:text-zinc-50">{node.title}</h2>
           <p className={twMerge('mt-1 text-sm text-zinc-600 dark:text-zinc-300', !entry && 'animate-pulse')}>
             {entry ? authors.slice(0, 3).join(', ') || t('explore.focus.noAuthor') : ' '}
           </p>
           <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
             {[year, node.pages ? t('explore.map.pages', { count: node.pages }) : null].filter(Boolean).join(' · ')}
           </p>
+          {/* The reader's own story with this publication comes before anything about the graph. */}
+          <div className="mt-2">
+            {mark?.readAt || mark?.shelfAt ? (
+              <PersonalStatus mark={mark} className="text-xs" />
+            ) : (
+              <span className="text-xs text-zinc-500 dark:text-zinc-400">{t('explore.personal.unread')}</span>
+            )}
+          </div>
         </div>
       </div>
+
+      {summary && <p className="line-clamp-4 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">{summary}</p>}
 
       <div className="flex flex-wrap gap-1.5">
         {topic && <Chip node={topic} label={labelOf(topic)} onFocus={onFocus} />}
         <Chip node={domain} label={labelOf(domain)} onFocus={onFocus} />
       </div>
-
-      {summary && <p className="line-clamp-5 text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">{summary}</p>}
 
       <div className="flex flex-wrap gap-2">
         <button
@@ -148,23 +155,25 @@ function EntryFocus({
             onClick={() => openAt(node.id, entry, 1)}
             className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-300 px-3 py-2 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-600 dark:text-zinc-200 dark:hover:bg-zinc-800"
           >
-            <FiBookOpen /> {t('explore.focus.read')}
+            <FiBookOpen /> {t(mark?.readAt ? 'explore.focus.readAgain' : 'explore.focus.read')}
           </button>
         )}
       </div>
 
       <Section title={t('explore.focus.similar')} count={similar.length}>
         {similar.length ? (
-          <ul className="-mx-2 flex flex-col">
+          <ul className="-mx-1.5 flex flex-col">
             {similar.map(({ id, score }) => {
               const other = graph.byId.get(id)!;
               const otherTopic = other.topicId ? graph.byId.get(other.topicId) : undefined;
               return (
-                <NodeRow
+                <PubCard
                   key={id}
                   node={other}
-                  label={other.title ?? ''}
-                  meta={otherTopic && otherTopic.id !== topic?.id ? labelOf(otherTopic) : undefined}
+                  entry={entries?.get(id)}
+                  mark={marks.get(id)}
+                  // A neighbour filed elsewhere is a way out of this topic.
+                  note={otherTopic && otherTopic.id !== topic?.id ? `→ ${labelOf(otherTopic)}` : undefined}
                   score={score}
                   onFocus={onFocus}
                   onHighlight={onHighlight}
@@ -179,118 +188,107 @@ function EntryFocus({
       </Section>
 
       {topic && siblings.length > 0 && (
-        <Section title={t('explore.focus.alsoIn', { topic: labelOf(topic) })} count={siblings.length}>
-          <ul className="-mx-2 flex flex-col">
-            {siblings.slice(0, 6).map((id) => {
-              const other = graph.byId.get(id)!;
-              return <NodeRow key={id} node={other} label={other.title ?? ''} onFocus={onFocus} onHighlight={onHighlight} />;
-            })}
+        <Section title={t('explore.focus.alsoIn', { topic: labelOf(topic) })}>
+          <ul className="-mx-1.5 flex flex-col">
+            {siblings.map((id) => (
+              <PubCard key={id} node={graph.byId.get(id)!} entry={entries?.get(id)} mark={marks.get(id)} onFocus={onFocus} onHighlight={onHighlight} />
+            ))}
           </ul>
-          {siblings.length > 6 && (
-            <button type="button" onClick={() => onFocus(topic.id)} className="self-start text-xs font-semibold text-primary hover:underline dark:text-primaryLight">
-              {t('explore.focus.showTopic', { count: topic.children.length })}
-            </button>
-          )}
+          <button type="button" onClick={() => onFocus(topic.id)} className="self-start text-xs font-semibold text-primary hover:underline dark:text-primaryLight">
+            {t('explore.focus.showTopic', { count: topic.children.length })}
+          </button>
         </Section>
       )}
     </div>
   );
 }
 
-function TopicFocus({
-  graph,
-  node,
-  labelOf,
-  onFocus,
-  onHighlight,
-}: {
-  graph: ExploreGraph;
-  node: ExploreNode;
-  labelOf: (n: ExploreNode) => string;
-  onFocus: (id: string) => void;
-  onHighlight: (id: string | null) => void;
-}) {
+const PAGE = 6;
+
+function TopicFocus({ graph, node, labelOf, onFocus, onHighlight, marks }: FocusProps) {
   const { t } = useTranslation();
+  const [shown, setShown] = useState(PAGE);
   const domain = graph.byId.get(node.domainId!)!;
   const related = graph.relatedTopics.get(node.id) ?? [];
-  const members = node.children
-    .map((id) => graph.byId.get(id)!)
-    .sort((a, b) => (graph.similar.get(b.id)?.length ?? 0) - (graph.similar.get(a.id)?.length ?? 0) || (a.title ?? '').localeCompare(b.title ?? ''));
-  const internal = graph.edges.filter((e) => e.kind === 'similar' && node.children.includes(e.source) && node.children.includes(e.target)).length;
+  // What the reader knows first, then the best-connected: the places a walk through the topic starts from.
+  const members = useMemo(
+    () =>
+      node.children
+        .map((id) => graph.byId.get(id)!)
+        .sort(
+          (a, b) =>
+            Number(!!marks.get(b.id)?.readAt) - Number(!!marks.get(a.id)?.readAt) ||
+            (graph.similar.get(b.id)?.length ?? 0) - (graph.similar.get(a.id)?.length ?? 0) ||
+            (a.title ?? '').localeCompare(b.title ?? '')
+        ),
+    [node, graph, marks]
+  );
+  const readCount = members.filter((m) => marks.get(m.id)?.readAt).length;
+  const visible = members.slice(0, shown);
+  const { data: entries } = useEntriesById(visible.map((m) => m.id), { keepPrevious: true });
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-4">
       <div>
         <p className="text-[11px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">{t('explore.focus.topic')}</p>
-        <h2 className="mt-0.5 text-xl font-bold text-zinc-900 dark:text-zinc-50">{labelOf(node)}</h2>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          {/^\d/.test(node.term ?? '') && <span className="mr-1.5 rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs dark:bg-zinc-800">{t('explore.focus.udc', { code: node.term })}</span>}
-          {t('explore.focus.publications', { count: node.children.length })}
+        <h2 className="mt-0.5 text-lg font-bold leading-snug text-zinc-900 dark:text-zinc-50">{labelOf(node)}</h2>
+        <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-zinc-500 dark:text-zinc-400">
+          {/^\d/.test(node.term ?? '') && <span className="rounded bg-zinc-100 px-1.5 py-0.5 font-mono text-xs dark:bg-zinc-800">{t('explore.focus.udc', { code: node.term })}</span>}
+          <span>{t('explore.focus.publications', { count: node.children.length })}</span>
+          {readCount > 0 && <span className="font-medium text-emerald-700 dark:text-emerald-400">{t('explore.focus.readOf', { count: readCount })}</span>}
         </p>
       </div>
-      <div className="flex flex-wrap gap-1.5">
-        <Chip node={domain} label={labelOf(domain)} onFocus={onFocus} />
-      </div>
-      <dl className="grid grid-cols-2 gap-2">
-        <div className="rounded-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-800">
-          <dt className="text-[11px] text-zinc-500 dark:text-zinc-400">{t('explore.focus.internalLinks')}</dt>
-          <dd className="text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-50">{internal}</dd>
+
+      {/* The roads out of this topic: the same ones the map lights up, strongest first. */}
+      <Section title={t('explore.focus.relatedTopics')} count={related.length}>
+        <div className="flex flex-wrap gap-1.5">
+          <Chip node={domain} label={labelOf(domain)} onFocus={onFocus} />
+          {related.slice(0, 8).map(({ id, links }) => {
+            const other = graph.byId.get(id)!;
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => onFocus(id)}
+                onMouseEnter={() => onHighlight(id)}
+                onMouseLeave={() => onHighlight(null)}
+                title={t('explore.focus.sharedLinks', { count: links })}
+                className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-zinc-200 px-2.5 py-1 text-xs text-zinc-700 transition-colors hover:border-zinc-400 hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              >
+                <Swatch cls={other.cls} />
+                <span className="truncate">{labelOf(other)}</span>
+                <span className="tabular-nums text-zinc-400">{links}</span>
+              </button>
+            );
+          })}
         </div>
-        <div className="rounded-xl bg-zinc-100 px-3 py-2 dark:bg-zinc-800">
-          <dt className="text-[11px] text-zinc-500 dark:text-zinc-400">{t('explore.focus.bridges')}</dt>
-          <dd className="text-lg font-bold tabular-nums text-zinc-900 dark:text-zinc-50">{related.reduce((sum, r) => sum + r.links, 0)}</dd>
-        </div>
-      </dl>
-      {related.length > 0 && (
-        <Section title={t('explore.focus.relatedTopics')} count={related.length}>
-          <ul className="-mx-2 flex flex-col">
-            {related.slice(0, 6).map(({ id, links }) => {
-              const other = graph.byId.get(id)!;
-              return (
-                <NodeRow
-                  key={id}
-                  node={other}
-                  label={labelOf(other)}
-                  meta={t('explore.focus.sharedLinks', { count: links })}
-                  onFocus={onFocus}
-                  onHighlight={onHighlight}
-                />
-              );
-            })}
-          </ul>
-        </Section>
-      )}
-      <Section title={t('explore.focus.members')} count={members.length}>
-        <ul className="-mx-2 flex flex-col">
-          {members.map((m) => (
-            <NodeRow
+      </Section>
+
+      <Section title={t('explore.focus.startHere')} count={members.length}>
+        <ul className="-mx-1.5 flex flex-col">
+          {visible.map((m) => (
+            <PubCard
               key={m.id}
               node={m}
-              label={m.title ?? ''}
-              meta={t('explore.map.neighbours', { count: graph.similar.get(m.id)?.length ?? 0 })}
+              entry={entries?.get(m.id)}
+              mark={marks.get(m.id)}
+              note={t('explore.map.neighbours', { count: graph.similar.get(m.id)?.length ?? 0 })}
               onFocus={onFocus}
               onHighlight={onHighlight}
             />
           ))}
         </ul>
+        {members.length > shown && (
+          <button type="button" onClick={() => setShown((n) => n + 12)} className="self-start text-xs font-semibold text-primary hover:underline dark:text-primaryLight">
+            {t('explore.focus.showMore', { count: members.length - shown })}
+          </button>
+        )}
       </Section>
     </div>
   );
 }
 
-function DomainFocus({
-  graph,
-  node,
-  labelOf,
-  onFocus,
-  onHighlight,
-}: {
-  graph: ExploreGraph;
-  node: ExploreNode;
-  labelOf: (n: ExploreNode) => string;
-  onFocus: (id: string) => void;
-  onHighlight: (id: string | null) => void;
-}) {
+function DomainFocus({ graph, node, labelOf, onFocus, onHighlight }: FocusProps) {
   const { t } = useTranslation();
   const topics = node.children.map((id) => graph.byId.get(id)!).sort((a, b) => b.children.length - a.children.length);
   const unfiled = graph.nodes.filter((n) => n.kind === 'entry' && !n.topicId && n.domainId === node.id);
@@ -351,7 +349,9 @@ export default function FocusPanel({
   onHighlight,
   onBack,
   backLabel,
+  marks,
 }: {
+  marks: Map<string, PersonalMark>;
   graph: ExploreGraph;
   node: ExploreNode;
   labelOf: (n: ExploreNode) => string;
@@ -361,7 +361,7 @@ export default function FocusPanel({
   backLabel?: string;
 }) {
   const { t } = useTranslation();
-  const props = { graph, node, labelOf, onFocus: (id: string) => onFocus(id), onHighlight };
+  const props = { graph, node, labelOf, onFocus: (id: string) => onFocus(id), onHighlight, marks };
 
   return (
     <aside

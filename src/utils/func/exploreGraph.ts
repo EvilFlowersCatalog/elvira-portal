@@ -55,6 +55,44 @@ export interface ExploreGraph {
   similar: Map<string, { id: string; score: number }[]>;
   /** Topic → other topics it shares similarity edges with, most shared first. */
   relatedTopics: Map<string, { id: string; links: number }[]>;
+  /** One road per pair of topics that share similarity edges: what the overview draws instead of every edge. */
+  roads: ExploreRoad[];
+  /** Publication → its similarity edges. */
+  edgesOf: Map<string, ExploreEdge[]>;
+}
+
+export interface ExploreRoad {
+  a: string;
+  b: string;
+  /** Similarity edges between the two topics' publications. */
+  links: number;
+  /** The strongest road of either end: drawn in the overview. */
+  main: boolean;
+}
+
+/** What the reader has done with a publication (history and shelf). */
+export interface PersonalMark {
+  readAt?: string;
+  reads?: number;
+  shelfAt?: string;
+}
+
+/** Unread publications closest to what the reader has read, best first; `via` is the read one that pulls hardest. */
+export function readNext(graph: ExploreGraph, readIds: Set<string>, limit = 6) {
+  const found = new Map<string, { id: string; score: number; via: string; best: number }>();
+  readIds.forEach((readId) => {
+    (graph.similar.get(readId) ?? []).forEach(({ id, score }) => {
+      if (readIds.has(id)) return;
+      const row = found.get(id) ?? { id, score: 0, via: readId, best: 0 };
+      row.score += score;
+      if (score > row.best) {
+        row.best = score;
+        row.via = readId;
+      }
+      found.set(id, row);
+    });
+  });
+  return [...found.values()].sort((x, y) => y.score - x.score).slice(0, limit);
 }
 
 export const topicId = (term: string) => `topic:${term}`;
@@ -198,7 +236,21 @@ export function buildExploreGraph(map: ILibraryMap, arrangement: Arrangement = '
     ])
   );
 
-  return { nodes, byId, edges: [...memberEdges, ...similarEdges], similar, relatedTopics };
+  const roads: ExploreRoad[] = [];
+  relatedTopics.forEach((list, a) => {
+    list.forEach(({ id: b, links }, i) => {
+      if (a >= b) return;
+      const back = relatedTopics.get(b)?.findIndex((r) => r.id === a) ?? 9;
+      roads.push({ a, b, links, main: i < 1 || back < 1 });
+    });
+  });
+
+  const edgesOf = new Map<string, ExploreEdge[]>();
+  similarEdges.forEach((e) => {
+    [e.source, e.target].forEach((id) => edgesOf.set(id, [...(edgesOf.get(id) ?? []), e]));
+  });
+
+  return { nodes, byId, edges: [...memberEdges, ...similarEdges], similar, relatedTopics, roads, edgesOf };
 }
 
 const GOLDEN = Math.PI * (3 - Math.sqrt(5));
